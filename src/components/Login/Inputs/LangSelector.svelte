@@ -1,0 +1,218 @@
+<script lang="ts">
+    import { browser } from "$app/environment";
+    import { goto } from "$app/navigation";
+    import { onMount, onDestroy } from "svelte";
+
+    // Stores for multi-language support
+    import type { Language } from "../../../stores/lang";
+    import { selectedLang, texts } from "../../../stores/lang";
+    import { page } from "$app/state";
+
+    // Layout / styling props
+    export let backgroundColor: string = "#252b33";
+    export let borderColor: string = "#323a45";
+    export let selectedColor: string = "#00796b";
+
+    // Variables
+    let isOpen: boolean = false;
+    let langDivEl: Node;
+
+    // Functions
+    function toggleSelector(): void {
+        isOpen = !isOpen;
+    }
+
+    function changeLanguage(language: Language): void {
+        selectedLang.set(language);
+        isOpen = false;
+
+        const currentPath = page.url.pathname; // Current route
+        const newURL = `${currentPath}?lang=${language}`;
+
+        goto(newURL);
+    }
+
+    function handleClickOutside(event: MouseEvent): void {
+        if (langDivEl && !langDivEl.contains(event.target as Node)) {
+            isOpen = false;
+        }
+    }
+
+    onMount(() => {
+        if (browser) {
+            const params = new URLSearchParams(window.location.search);
+            let lang = (params.get("lang") || "PT") as Language;
+            if (lang !== "PT" && lang !== "EN") {
+                lang = "PT";
+            }
+            selectedLang.set(lang);
+
+            window.addEventListener("click", handleClickOutside);
+        }
+    });
+
+    onDestroy(() => {
+        if (browser) {
+            window.removeEventListener("click", handleClickOutside);
+        }
+    });
+</script>
+
+<!-- 
+  LangSelDropdown: Dropdown component for selecting the application language.
+-->
+<div
+    bind:this={langDivEl}
+    class="language-div"
+    style="
+        --background-color: {backgroundColor};
+        --border-color: {borderColor};
+        --selected-color: {selectedColor};
+    "
+>
+    <div class="content-div">
+        <span class="action">{$texts.selectLanguage[$selectedLang]}</span>
+        <img class="globe" src="./img/globe.png" alt="globe" />
+        <span class="selected-lang">{$selectedLang}</span>
+        <img
+            class="arrow"
+            src={isOpen ? "./img/up-arrow.png" : "./img/down-arrow.png"}
+            alt={isOpen ? "up-arrow" : "down-arrow"}
+        />
+        <button class="open-selector" on:click={toggleSelector} aria-label="View options"></button>
+        <div class="options {isOpen ? '' : 'disabled'}">
+            <div class="option {$selectedLang == 'PT' ? 'selected-option' : ''}">
+                <span class="lang-option">PT</span>
+                <button on:click={() => changeLanguage("PT")} aria-label="PT"></button>
+            </div>
+            <div class="option {$selectedLang == 'EN' ? 'selected-option' : ''}">
+                <span class="lang-option">EN</span>
+                <button on:click={() => changeLanguage("EN")} aria-label="EN"></button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    /* Wrapper for the language selector */
+    .language-div {
+        display: block;
+        background-color: var(--background-color);
+        border-radius: 5px;
+        border: 1px solid var(--border-color);
+        height: 40px;
+        width: 150px;
+        top: 50%;
+    }
+
+    /* Inner content container */
+    .content-div {
+        position: relative;
+        width: 100%;
+        height: 100%;
+    }
+
+    /* "Select Language" action label (starts hidden) */
+    .action {
+        color: #eeeeee;
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+        font-size: 1.1rem;
+        position: absolute;
+        left: 0;
+        top: 50%;
+        transform: translate(-100%, -50%);
+        text-align: right;
+        padding-right: 10px;
+        width: max-content;
+        display: none;
+    }
+
+    /* Globe icon */
+    .globe {
+        height: 32px;
+        width: 32px;
+        position: absolute;
+        top: 50%;
+        left: 10px;
+        transform: translateY(-50%);
+    }
+
+    /* Arrow icon (down or up) */
+    .arrow {
+        height: 16px;
+        width: 16px;
+        position: absolute;
+        top: 50%;
+        right: 10px;
+        transform: translateY(-50%);
+    }
+
+    /* Current selected language text */
+    .selected-lang {
+        color: #eeeeee;
+        font-weight: 400;
+        position: absolute;
+        font-size: 1.5rem;
+        left: 50%;
+        top: 50%;
+        transform: translate(-50%, -50%);
+    }
+
+    /* Transparent button that triggers the dropdown */
+    .open-selector {
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        opacity: 0;
+        cursor: pointer;
+    }
+
+    /* Dropdown options container */
+    .options {
+        position: absolute;
+        width: 100%;
+        top: calc(100% + 2px);
+        height: fit-content;
+        background-color: #1e242b;
+        border-radius: 5px;
+        border: 1px solid #323a45;
+        display: flex;
+        flex-direction: column;
+        justify-content: start;
+        align-items: center;
+    }
+
+    /* Hide dropdown when closed */
+    .options.disabled {
+        display: none;
+    }
+
+    /* Individual option item */
+    .option {
+        position: relative;
+        width: 100%;
+        padding: 5px;
+        box-sizing: border-box;
+        text-align: center;
+        font-weight: 400;
+        font-size: 1.5rem;
+        color: #b0bec5;
+    }
+
+    /* Clickable transparent overlay for option */
+    .option button {
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        top: 0;
+        left: 0;
+        opacity: 0;
+        cursor: pointer;
+    }
+
+    /* Styling for the currently selected option */
+    .option.selected-option {
+        background-color: var(--selected-color);
+        color: #ffffff;
+    }
+</style>
