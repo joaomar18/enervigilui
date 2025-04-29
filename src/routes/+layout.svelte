@@ -1,6 +1,6 @@
 <script lang="ts">
     import { onMount } from "svelte";
-    import { goto, afterNavigate } from "$app/navigation";
+    import { goto } from "$app/navigation";
     import { autoLogin } from "../ts/login";
 
     let splashDone: boolean = false;
@@ -28,30 +28,18 @@
     }
 
     onMount(async () => {
+        // Always wait at least this amount after redirect/navigation
         const MIN_SPLASH_DURATION = 300;
-        const splashStart = performance.now();
 
         await checkAuthentication();
 
-        const elapsed = performance.now() - splashStart;
-        const waitTime = Math.max(0, MIN_SPLASH_DURATION - elapsed);
-
-        if (waitTime > 0) {
-            await new Promise((resolve) => setTimeout(resolve, waitTime));
-        }
         if (shouldRedirect && redirectTarget) {
-            goto(redirectTarget);
-            authFinished = true;
-            return;
+            await goto(redirectTarget);
         }
-        authFinished = true;
-        splashDone = true;
-    });
 
-    afterNavigate(() => {
-        if (authFinished) {
-            splashDone = true;
-        }
+        await new Promise((res) => setTimeout(res, MIN_SPLASH_DURATION));
+
+        splashDone = true;
     });
 </script>
 
