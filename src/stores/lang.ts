@@ -69,6 +69,38 @@ const textsObject: TextsObject = {
         PT: "Ocorreu um erro inesperado. Por favor tente mais tarde.",
         EN: "An unexpected error occurred. Please try again.",
     },
+    devices: {
+        PT: "Dispositivos",
+        EN: "Devices",
+    },
+    general: {
+        PT: "Geral",
+        EN: "General",
+    },
+    diagnostics: {
+        PT: "Diagnóstico",
+        EN: "Diagnostics",
+    },
+    health: {
+        PT: "Estado",
+        EN: "Health",
+    },
+    logs: {
+        PT: "Registros",
+        EN: "Logs",
+    },
+    system: {
+        PT: "Sistema",
+        EN: "System",
+    },
+    settings: {
+        PT: "Definições",
+        EN: "Settings",
+    },
+    backup: {
+        PT: "Backup",
+        EN: "Backup",
+    },
 };
 
 export const texts = readable<TextsObject>(textsObject);

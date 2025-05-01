@@ -3,9 +3,12 @@
     import { goto } from "$app/navigation";
     import { onMount, onDestroy } from "svelte";
 
+    //Props
+    export let invertOptions: boolean = false; //Invert Options div position
+
     // Stores for multi-language support
-    import type { Language } from "../../../stores/lang";
-    import { selectedLang, texts } from "../../../stores/lang";
+    import type { Language } from "../../stores/lang";
+    import { selectedLang, texts } from "../../stores/lang";
     import { page } from "$app/state";
 
     // Layout / styling props
@@ -76,11 +79,17 @@
         <span class="selected-lang">{$selectedLang}</span>
         <img
             class="arrow"
-            src={isOpen ? "./img/up-arrow.png" : "./img/down-arrow.png"}
+            src={invertOptions
+                ? isOpen
+                    ? "./img/down-arrow.png"
+                    : "./img/up-arrow.png"
+                : isOpen
+                  ? "./img/up-arrow.png"
+                  : "./img/down-arrow.png"}
             alt={isOpen ? "up-arrow" : "down-arrow"}
         />
         <button class="open-selector" on:click={toggleSelector} aria-label="View options"></button>
-        <div class="options {isOpen ? '' : 'disabled'}">
+        <div class="options {isOpen ? '' : 'disabled'} {invertOptions ? 'inverted' : 'normal'}">
             <div class="option {$selectedLang == 'PT' ? 'selected-option' : ''}">
                 <span class="lang-option">PT</span>
                 <button on:click={() => changeLanguage("PT")} aria-label="PT"></button>
@@ -171,7 +180,6 @@
     .options {
         position: absolute;
         width: 100%;
-        top: calc(100% + 2px);
         height: fit-content;
         background-color: #1e242b;
         border-radius: 5px;
@@ -180,6 +188,16 @@
         flex-direction: column;
         justify-content: start;
         align-items: center;
+    }
+
+    /* Dropdown options position when normal (opens to the bottom) */
+    .options.normal {
+        top: calc(100% + 2px);
+    }
+
+    /* Dropdown options position when normal (opens to the top) */
+    .options.inverted {
+        bottom: calc(100% + 2px);
     }
 
     /* Hide dropdown when closed */

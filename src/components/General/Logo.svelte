@@ -5,28 +5,16 @@
 <!-- 
   Logo: Displays the logo and product name
 -->
-<div class="logo-div">
-    <div class="content">
-        <img class="logo" alt="logo" src="./img/logo.png" />
-        <span class="main-text">EDGE</span>
-    </div>
+<div class="content">
+    <img class="logo" alt="logo" src="./img/logo.png" />
+    <span class="main-text">EDGE</span>
 </div>
 
 <style>
-    /* Logo container positioned top-left */
-    .logo-div {
-        position: absolute;
-        top: 50%;
-        transform: translateY(-50%);
-        left: 20px;
-    }
-
     /* Flex layout for logo + text */
     .content {
         padding: 0;
         margin: 0;
-        width: 100%;
-        height: 100%;
         position: relative;
         display: flex;
         flex-direction: row;

@@ -70,7 +70,7 @@
 
             // Handle success or failure
             if (status === 200) {
-                goto("/dashboard"); // Navigate to the dashboard on success
+                goto("/devices"); // Navigate to the dashboard on success
             } else {
                 showAlert(interpretLoginStatus(status, data, $texts)); // Handle error
             }

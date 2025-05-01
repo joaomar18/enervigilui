@@ -1,10 +1,10 @@
 <script lang="ts">
     import { browser } from "$app/environment";
     import { onMount, onDestroy } from "svelte";
-    import Logo from "./Logo.svelte";
+    import Logo from "../../General/Logo.svelte";
     import Link from "../Buttons/Link.svelte";
-    import MenuButton from "../Buttons/MenuButton.svelte";
-    import LangSelector from "../Inputs/LangSelector.svelte";
+    import MenuButton from "../../General/MenuButton.svelte";
+    import LangSelector from "../../General/LangSelector.svelte";
 
     // Stores for multi-language support
     import { selectedLang, texts } from "../../../stores/lang";
@@ -54,7 +54,9 @@
 -->
 <div class="header-div" bind:this={headerElement}>
     <div class="content-div">
-        <Logo />
+        <div class="logo-div">
+            <Logo />
+        </div>
         <div class="links-header-div">
             <Link
                 width="150px"
@@ -180,6 +182,14 @@
         align-items: center;
     }
 
+    /* Logo container positioned top-left */
+    .logo-div {
+        position: absolute;
+        top: 50%;
+        transform: translateY(-50%);
+        left: 20px;
+    }
+
     /* Link buttons visible in desktop layout */
     .links-header-div {
         height: fit-content;
@@ -233,6 +243,7 @@
 
     /* Mobile menu toggle button */
     .menu-button-div {
+        display: none;
         position: absolute;
         right: 20px;
     }
@@ -249,6 +260,9 @@
 
         .dropdown-menu.open {
             display: flex;
+        }
+        .menu-button-div {
+            display: block;
         }
     }
 </style>

@@ -2,11 +2,17 @@
     import { onMount } from "svelte";
     import { goto } from "$app/navigation";
     import { autoLogin } from "../ts/login";
+    import { page } from "$app/state";
+
+    import LeftPanel from "../components/Dashboard/LeftPanel.svelte";
+    import MenuButton from "../components/General/MenuButton.svelte";
+    import Logo from "../components/General/Logo.svelte";
 
     let splashDone: boolean = false;
     let shouldRedirect: boolean = false;
-    let authFinished: boolean = false;
     let redirectTarget: string | undefined = undefined;
+
+    let leftPanelOpen: boolean = true;
 
     async function checkAuthentication() {
         const path = window.location.pathname;
@@ -16,7 +22,7 @@
             // Authenticated
             if (path === "/" || path === "/login") {
                 shouldRedirect = true;
-                redirectTarget = "/dashboard";
+                redirectTarget = "/devices";
             }
         } else {
             // Unauthenticated or failed
@@ -43,9 +49,11 @@
     });
 </script>
 
+{#if !splashDone}{:else}{/if}
+
 {#if !splashDone}
     <!-- Splash screen -->
-    <div class="container">
+    <div class="splash-container">
         <div class="loader-wrapper">
             <div class="spinner"></div>
             <div class="image-div"></div>
@@ -55,13 +63,30 @@
             <span class="product fade-in">EDGE</span>
         </footer>
     </div>
+{:else if !page.url.pathname.startsWith("/login")}
+    <div class="dashboard-container">
+        <div class="header-div">
+            <div class="menu-button-div">
+                <MenuButton
+                    backgroundColor="transparent"
+                    hoverColor="#323a45"
+                    bind:menuOpen={leftPanelOpen}
+                />
+            </div>
+            <div class="logo-div">
+                <Logo />
+            </div>
+        </div>
+        <LeftPanel activeSection={page.url.pathname} {leftPanelOpen} />
+        <div class="content"><slot /></div>
+    </div>
 {:else}
     <slot />
 {/if}
 
 <style>
     /* Fullscreen container for the splash screen */
-    .container {
+    .splash-container {
         position: relative;
         margin: 0;
         padding: 0;
@@ -76,7 +101,7 @@
     }
 
     /* Wrapper to center spinner + logo */
-    .loader-wrapper {
+    .splash-container .loader-wrapper {
         position: relative;
         width: 280px;
         height: 280px;
@@ -86,7 +111,7 @@
     }
 
     /* Circular loading animation ring */
-    .spinner {
+    .loader-wrapper .spinner {
         position: absolute;
         width: 280px;
         height: 280px;
@@ -99,7 +124,7 @@
     }
 
     /* Circular logo background in center */
-    .image-div {
+    .loader-wrapper .image-div {
         padding: 0;
         margin: 0;
         width: 256px;
@@ -114,7 +139,7 @@
     }
 
     /* Footer container for brand name */
-    .footer {
+    .splash-container .footer {
         position: absolute;
         bottom: 40px;
         width: 100%;
@@ -122,7 +147,7 @@
     }
 
     /* Base style for both ENERVIGIL and EDGE text */
-    span {
+    .splash-container .footer span {
         font-family: "Montserrat", Tahoma, Geneva, Verdana, sans-serif;
         font-size: 32px;
         text-align: center;
@@ -130,7 +155,7 @@
     }
 
     /* Fade-in animation for brand and product text */
-    span.fade-in {
+    .splash-container .footer span.fade-in {
         opacity: 0;
         transform: translateY(10px);
         animation: fadeIn 1s ease-out forwards;
@@ -138,7 +163,7 @@
     }
 
     /* Gradient brand styling for "ENERVIGIL" */
-    span.brand {
+    .splash-container .footer span.brand {
         background: linear-gradient(90deg, #4caf50, #2196f3);
         -webkit-background-clip: text;
         background-clip: text;
@@ -146,9 +171,59 @@
     }
 
     /* Lighter color for "EDGE" product label */
-    span.product {
+    .splash-container .footer span.product {
         padding-left: 10px;
         color: #aaa;
+    }
+
+    /* Main Dashboard container uses grid layout */
+    .dashboard-container {
+        position: relative;
+        margin: 0;
+        padding: 0;
+        width: 100%;
+        height: 100vh;
+        min-width: 320px;
+        min-height: 760px;
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        justify-content: start;
+        background-color: #181d23;
+    }
+
+    .dashboard-container .header-div {
+        position: fixed;
+        left: 0px;
+        top: 0px;
+        width: 250px;
+        height: 74px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        z-index: 1;
+    }
+
+    .dashboard-container .header-div .logo-div {
+        position: absolute;
+        left: 56px;
+        width: calc(250px - 56px);
+        display: flex;
+        justify-content: start;
+        align-items: center;
+        padding-left: 25px;
+    }
+
+    .dashboard-container .header-div .menu-button-div {
+        position: absolute;
+        left: 10px;
+    }
+
+    .dashboard-container .content {
+        position: relative;
+        left: 250px;
+        width: 200px;
+        height: 1500px;
     }
 
     /* Spinner keyframe animation (continuous rotation) */
@@ -175,24 +250,24 @@
 
     /* Desktop-specific overrides */
     @media (max-width: 415px) {
-        .loader-wrapper {
+        .splash-container .loader-wrapper {
             width: 200px;
             height: 200px;
         }
 
-        .spinner {
+        .loader-wrapper .spinner {
             width: 200px;
             height: 200px;
             border-width: 5px;
         }
 
-        .image-div {
+        .loader-wrapper .image-div {
             width: 180px;
             height: 180px;
             background-size: 50%;
         }
 
-        .footer span {
+        .splash-container .footer span {
             font-size: 24px; /* reduce brand text size too */
         }
     }

@@ -111,11 +111,4 @@
         top: 50%;
         transform: translate(-50%, -50%) rotate(-45deg);
     }
-
-    /* Hidden on desktop */
-    @media (min-width: 1024px) {
-        .menu-button-div {
-            display: none;
-        }
-    }
 </style>
