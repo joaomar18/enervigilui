@@ -1,5 +1,5 @@
 <script lang="ts">
-    import { goto } from "$app/navigation";
+    import { navigateTo } from "../../ts/navigation";
     import Link from "./Buttons/Link.svelte";
     import LangSelector from "../General/LangSelector.svelte";
 
@@ -10,8 +10,8 @@
     export let leftPanelOpen: boolean;
     export let activeSection: string;
 
-    function navigateTo(path: string) {
-        goto(path);
+    async function browseTo(path: string) {
+        await navigateTo(path, $selectedLang);
     }
 </script>
 
@@ -35,7 +35,7 @@
                     hoverColor="rgba(255, 255, 255, 0.05)"
                     selectedColor="#2F4138"
                     onClick={() => {
-                        navigateTo("/devices");
+                        browseTo("/devices");
                     }}
                 />
                 <Link
@@ -52,7 +52,7 @@
                     hoverColor="rgba(255, 255, 255, 0.05)"
                     selectedColor="#2F4138"
                     onClick={() => {
-                        navigateTo("/mqtt");
+                        browseTo("/mqtt");
                     }}
                 />
             </div>
@@ -74,7 +74,7 @@
                     hoverColor="rgba(255, 255, 255, 0.05)"
                     selectedColor="#2F4138"
                     onClick={() => {
-                        navigateTo("/health");
+                        browseTo("/health");
                     }}
                 />
                 <Link
@@ -91,7 +91,7 @@
                     hoverColor="rgba(255, 255, 255, 0.05)"
                     selectedColor="#2F4138"
                     onClick={() => {
-                        navigateTo("/logs");
+                        browseTo("/logs");
                     }}
                 />
             </div>
@@ -113,7 +113,7 @@
                     hoverColor="rgba(255, 255, 255, 0.05)"
                     selectedColor="#2F4138"
                     onClick={() => {
-                        navigateTo("/settings");
+                        browseTo("/settings");
                     }}
                 />
                 <Link
@@ -130,7 +130,7 @@
                     hoverColor="rgba(255, 255, 255, 0.05)"
                     selectedColor="#2F4138"
                     onClick={() => {
-                        navigateTo("/backup");
+                        browseTo("/backup");
                     }}
                 />
             </div>
@@ -147,18 +147,19 @@
         position: fixed;
         top: 0;
         left: 0;
-        width: 0px;
+        width: 250px;
         height: calc(100vh - 74px);
         padding-top: 74px;
         background: #15191f;
         border-right: 1px solid rgba(255, 255, 255, 0.02);
         display: flex;
         flex-direction: column;
-        transition: width 0.1s ease-in-out;
+        transform: translateX(-100%);
+        transition: transform 0.2s ease-in-out;
     }
 
     .container.open {
-        width: 250px;
+        transform: translateX(0);
     }
 
     .content {
@@ -191,7 +192,9 @@
         box-sizing: content-box;
         display: block;
         margin: 0;
+        margin-bottom: 2px;
         padding: 10px;
+        padding-bottom: 5px;
         padding-right: 0px;
         font-size: 0.75rem;
         font-weight: 500;

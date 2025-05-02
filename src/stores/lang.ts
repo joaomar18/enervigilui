@@ -101,6 +101,10 @@ const textsObject: TextsObject = {
         PT: "Backup",
         EN: "Backup",
     },
+    logout: {
+        PT: "Sair",
+        EN: "Logout",
+    },
 };
 
 export const texts = readable<TextsObject>(textsObject);

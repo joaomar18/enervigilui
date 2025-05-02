@@ -48,7 +48,7 @@
             if (lang !== "PT" && lang !== "EN") {
                 lang = "PT";
             }
-            selectedLang.set(lang);
+            changeLanguage(lang);
 
             window.addEventListener("click", handleClickOutside);
         }

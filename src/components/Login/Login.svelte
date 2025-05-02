@@ -1,7 +1,6 @@
 <script lang="ts">
     import { browser } from "$app/environment";
     import { onMount, onDestroy } from "svelte";
-    import { goto } from "$app/navigation";
     import { selectedLang, texts } from "../../stores/lang";
     import type { Language } from "../../stores/lang";
     import {
@@ -10,6 +9,7 @@
         validateUsername,
         validatePassword,
     } from "../../ts/login";
+    import { navigateTo } from "../../ts/navigation";
 
     import LoginField from "./Inputs/LoginField.svelte";
     import LoginButton from "./Buttons/LoginButton.svelte";
@@ -70,7 +70,7 @@
 
             // Handle success or failure
             if (status === 200) {
-                goto("/devices"); // Navigate to the dashboard on success
+                await navigateTo("/devices", $selectedLang, true); // Navigate to the dashboard on success
             } else {
                 showAlert(interpretLoginStatus(status, data, $texts)); // Handle error
             }

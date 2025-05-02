@@ -16,6 +16,7 @@
     export let selectedColor: string = backgroundColor;
     export let borderBottomColor: string = "transparent";
 
+    // Click Export Funcion
     export let onClick: () => void;
 
     // Functions

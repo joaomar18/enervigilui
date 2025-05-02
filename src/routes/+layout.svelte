@@ -1,14 +1,22 @@
 <script lang="ts">
     import { onMount } from "svelte";
-    import { goto } from "$app/navigation";
     import { autoLogin } from "../ts/login";
     import { page } from "$app/state";
+    import { logoutUser } from "../ts/login";
+    import { navigateTo } from "../ts/navigation";
+    import { fade } from "svelte/transition";
+
+    // Stores for multi-language support
+    import { selectedLang, texts } from "../stores/lang";
+
+    // Splash screen store
+    import { splashDone } from "../stores/auth";
 
     import LeftPanel from "../components/Dashboard/LeftPanel.svelte";
     import MenuButton from "../components/General/MenuButton.svelte";
+    import Logout from "../components/Dashboard/Buttons/Logout.svelte";
     import Logo from "../components/General/Logo.svelte";
 
-    let splashDone: boolean = false;
     let shouldRedirect: boolean = false;
     let redirectTarget: string | undefined = undefined;
 
@@ -33,25 +41,28 @@
         }
     }
 
-    onMount(async () => {
-        // Always wait at least this amount after redirect/navigation
-        const MIN_SPLASH_DURATION = 300;
-
+    async function waitInitialSplash(minSplashDuration: number): Promise<void> {
         await checkAuthentication();
 
         if (shouldRedirect && redirectTarget) {
-            await goto(redirectTarget);
+            await navigateTo(redirectTarget, $selectedLang);
         }
 
-        await new Promise((res) => setTimeout(res, MIN_SPLASH_DURATION));
+        await new Promise((res) => setTimeout(res, minSplashDuration));
 
-        splashDone = true;
+        splashDone.set(true);
+    }
+    onMount(async () => {
+        await waitInitialSplash(300);
     });
+
+    async function logout(): Promise<void> {
+        const { status } = await logoutUser("/api/logout", "POST");
+        await navigateTo("/login", $selectedLang, true);
+    }
 </script>
 
-{#if !splashDone}{:else}{/if}
-
-{#if !splashDone}
+{#if !$splashDone}
     <!-- Splash screen -->
     <div class="splash-container">
         <div class="loader-wrapper">
@@ -64,7 +75,7 @@
         </footer>
     </div>
 {:else if !page.url.pathname.startsWith("/login")}
-    <div class="dashboard-container">
+    <div class="dashboard-container" in:fade={{ duration: 300 }}>
         <div class="header-div">
             <div class="menu-button-div">
                 <MenuButton
@@ -76,9 +87,29 @@
             <div class="logo-div">
                 <Logo />
             </div>
+            <div class="logout-button-div">
+                <Logout
+                    width="125px"
+                    height="40px"
+                    borderRadius="20px"
+                    backgroundColor="#14161c"
+                    hoverColor="#2A2E3A"
+                    borderColor="#2a2e3a"
+                    buttonText={$texts.logout[$selectedLang]}
+                    fontSize="1rem"
+                    paddingLeft="10px"
+                    paddingRight="20px"
+                    imageUrl="./img/logout.png"
+                    imageWidth="32px"
+                    imageHeight="32px"
+                    onClick={logout}
+                />
+            </div>
         </div>
-        <LeftPanel activeSection={page.url.pathname} {leftPanelOpen} />
-        <div class="content"><slot /></div>
+        <LeftPanel {leftPanelOpen} activeSection={page.url.pathname} />
+        <main class="content" class:open={leftPanelOpen}>
+            <slot />
+        </main>
     </div>
 {:else}
     <slot />
@@ -186,17 +217,15 @@
         min-width: 320px;
         min-height: 760px;
         display: flex;
-        flex-direction: row;
-        align-items: center;
         justify-content: start;
-        background-color: #181d23;
+        align-items: center;
     }
 
     .dashboard-container .header-div {
         position: fixed;
         left: 0px;
         top: 0px;
-        width: 250px;
+        width: 100%;
         height: 74px;
         display: flex;
         justify-content: center;
@@ -221,9 +250,22 @@
 
     .dashboard-container .content {
         position: relative;
-        left: 250px;
-        width: 200px;
-        height: 1500px;
+        margin-left: 0px;
+        height: fit-content;
+        min-height: 760px;
+        width: 100%;
+        transition: margin-left 0.2s ease-in-out;
+    }
+
+    .dashboard-container .content.open {
+        margin-left: 250px;
+    }
+
+    .dashboard-container .logout-button-div {
+        position: absolute;
+        width: fit-content;
+        height: fit-content;
+        right: 20px;
     }
 
     /* Spinner keyframe animation (continuous rotation) */
@@ -269,6 +311,12 @@
 
         .splash-container .footer span {
             font-size: 24px; /* reduce brand text size too */
+        }
+    }
+
+    @media (min-height: 760px) {
+        .dashboard-container .content {
+            min-height: 100vh;
         }
     }
 </style>

@@ -74,6 +74,38 @@ export async function autoLogin(
     }
 }
 
+export async function logoutUser(
+    url: string,
+    method: string,
+    timeout: number = 3000
+): Promise<{ status: number; data: any }> {
+    const controller = new AbortController();
+    const signal = controller.signal;
+
+    // Automatically abort the request after `timeout` milliseconds
+    const timeoutId = setTimeout(() => controller.abort(), timeout);
+    try {
+        const response = await fetch(url, {
+            method: method,
+            headers: {
+                "Content-Type": "application/json",
+            },
+            signal,
+        });
+
+        clearTimeout(timeoutId);
+        return {
+            status: response.status,
+            data: await response.json(),
+        };
+    } catch (error) {
+        return {
+            status: -1,
+            data: null,
+        };
+    }
+}
+
 export function interpretLoginStatus(
     status: number,
     data: { remaining?: number; unlocked?: string },
