@@ -15,6 +15,8 @@
     import LeftPanel from "../components/Dashboard/LeftPanel.svelte";
     import MenuButton from "../components/General/MenuButton.svelte";
     import Logout from "../components/Dashboard/Buttons/Logout.svelte";
+    import Notification from "../components/Dashboard/Buttons/Notification.svelte";
+    import SearchBar from "../components/Dashboard/SearchBar.svelte";
     import Logo from "../components/General/Logo.svelte";
 
     let shouldRedirect: boolean = false;
@@ -87,23 +89,38 @@
             <div class="logo-div">
                 <Logo />
             </div>
-            <div class="logout-button-div">
-                <Logout
-                    width="125px"
-                    height="40px"
-                    borderRadius="20px"
-                    backgroundColor="#14161c"
-                    hoverColor="#2A2E3A"
-                    borderColor="#2a2e3a"
-                    buttonText={$texts.logout[$selectedLang]}
-                    fontSize="1rem"
-                    paddingLeft="10px"
-                    paddingRight="20px"
-                    imageUrl="./img/logout.png"
-                    imageWidth="32px"
-                    imageHeight="32px"
-                    onClick={logout}
-                />
+            <div class="main-header-div">
+                <div class="search-bar-div">
+                    <SearchBar
+                        placeholderText={$texts.searchDevice[$selectedLang]}
+                        backgroundColor="#14161c"
+                        borderColor="#2a2e3a"
+                    />
+                </div>
+                <div class="right-header-div">
+                    <Notification
+                        notificationsNumber={"12"}
+                        backgroundColor="#14161c"
+                        hoverColor="#2A2E3A"
+                        borderColor="#2a2e3a"
+                    />
+                    <Logout
+                        width="125px"
+                        height="40px"
+                        borderRadius="20px"
+                        backgroundColor="#14161c"
+                        hoverColor="#2A2E3A"
+                        borderColor="#2a2e3a"
+                        buttonText={$texts.logout[$selectedLang]}
+                        fontSize="1rem"
+                        paddingLeft="10px"
+                        paddingRight="20px"
+                        imageUrl="./img/logout.png"
+                        imageWidth="32px"
+                        imageHeight="32px"
+                        onClick={logout}
+                    />
+                </div>
             </div>
         </div>
         <LeftPanel {leftPanelOpen} activeSection={page.url.pathname} />
@@ -248,6 +265,17 @@
         left: 10px;
     }
 
+    .dashboard-container .header-div .main-header-div {
+        margin: 0;
+        padding: 0;
+        margin-left: 250px;
+        width: 100%;
+        position: relative;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+    }
+
     .dashboard-container .content {
         position: relative;
         margin-left: 0px;
@@ -261,11 +289,22 @@
         margin-left: 250px;
     }
 
-    .dashboard-container .logout-button-div {
-        position: absolute;
+    .dashboard-container .search-bar-div {
+        flex: 1;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+
+    .dashboard-container .right-header-div {
+        padding-right: 20px;
         width: fit-content;
         height: fit-content;
         right: 20px;
+        display: flex;
+        flex-direction: row;
+        justify-content: space-evenly;
+        gap: 10px;
     }
 
     /* Spinner keyframe animation (continuous rotation) */

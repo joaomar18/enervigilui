@@ -107,7 +107,8 @@
 
     span {
         box-sizing: border-box;
-        display: flex;
+        display: inline-block;
+        line-height: 100%;
         justify-content: start;
         align-items: center;
         flex-direction: row;

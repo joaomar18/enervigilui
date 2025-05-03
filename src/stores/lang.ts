@@ -105,6 +105,10 @@ const textsObject: TextsObject = {
         PT: "Sair",
         EN: "Logout",
     },
+    searchDevice: {
+        PT: "Pesquisar dispositivo",
+        EN: "Search device",
+    },
 };
 
 export const texts = readable<TextsObject>(textsObject);
