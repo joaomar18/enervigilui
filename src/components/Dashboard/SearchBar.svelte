@@ -3,12 +3,14 @@
     export let placeholderText: string;
     export let backgroundColor: string;
     export let borderColor: string = backgroundColor;
+    export let selectedBorderColor: string = backgroundColor;
 </script>
 
 <div
     style="
         --background-color: {backgroundColor};
         --border-color: {borderColor};
+        --selected-border-color: {selectedBorderColor};
     "
     class="container"
 >
@@ -26,6 +28,10 @@
         max-width: 650px;
         height: 40px;
         border-radius: 20px;
+    }
+
+    .container:focus-within {
+        border-color: var(--selected-border-color);
     }
 
     .content {

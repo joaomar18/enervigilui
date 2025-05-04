@@ -95,11 +95,12 @@
                         placeholderText={$texts.searchDevice[$selectedLang]}
                         backgroundColor="#14161c"
                         borderColor="#2a2e3a"
+                        selectedBorderColor="#3B7DFF"
                     />
                 </div>
                 <div class="right-header-div">
                     <Notification
-                        notificationsNumber={"12"}
+                        notificationsNumber={""}
                         backgroundColor="#14161c"
                         hoverColor="#2A2E3A"
                         borderColor="#2a2e3a"
