@@ -390,10 +390,6 @@
         transition: margin-left 0.2s ease-in-out;
     }
 
-    .dashboard-container .content.open {
-        margin-left: 250px;
-    }
-
     .dashboard-container .search-bar-div {
         flex: 1;
         display: none;
@@ -495,6 +491,9 @@
         }
         .dashboard-container .header-div .main-header-div {
             justify-content: space-between;
+        }
+        .dashboard-container .content.open {
+            margin-left: 250px;
         }
     }
 
