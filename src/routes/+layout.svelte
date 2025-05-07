@@ -1,5 +1,5 @@
 <script lang="ts">
-    import { onMount } from "svelte";
+    import { onMount, onDestroy } from "svelte";
     import { autoLogin } from "../ts/login";
     import { page } from "$app/state";
     import { logoutUser } from "../ts/login";
@@ -13,16 +13,21 @@
     import { splashDone } from "../stores/auth";
 
     import LeftPanel from "../components/Dashboard/LeftPanel.svelte";
+    import Logo from "../components/General/Logo.svelte";
     import MenuButton from "../components/General/MenuButton.svelte";
     import Logout from "../components/Dashboard/Buttons/Logout.svelte";
     import Notification from "../components/Dashboard/Buttons/Notification.svelte";
     import SearchBar from "../components/Dashboard/SearchBar.svelte";
-    import Logo from "../components/General/Logo.svelte";
+    import Action from "../components/Dashboard/Buttons/Action.svelte";
 
     let shouldRedirect: boolean = false;
     let redirectTarget: string | undefined = undefined;
 
-    let leftPanelOpen: boolean = true;
+    let leftPanelOpen: boolean;
+    let mobileSearchOpen: boolean = false;
+
+    let leftHeaderEl: Node;
+    let headerEl: Node;
 
     async function checkAuthentication() {
         const path = window.location.pathname;
@@ -54,8 +59,39 @@
 
         splashDone.set(true);
     }
-    onMount(async () => {
-        await waitInitialSplash(300);
+
+    function handleClickOutside(event: MouseEvent): void {
+        if (
+            leftHeaderEl &&
+            headerEl &&
+            !leftHeaderEl.contains(event.target as Node) &&
+            !headerEl.contains(event.target as Node)
+        ) {
+            mobileSearchOpen = false;
+        }
+    }
+
+    onMount(() => {
+        leftPanelOpen = window.matchMedia("(min-width: 880px)").matches;
+
+        (async () => {
+            await waitInitialSplash(300);
+        })();
+
+        const mql = window.matchMedia("(min-width: 880px)");
+        const handleMqChange = (e: MediaQueryListEvent) => {
+            if (e.matches) {
+                mobileSearchOpen = false;
+            }
+        };
+
+        mql.onchange = handleMqChange;
+        window.addEventListener("click", handleClickOutside);
+
+        return () => {
+            mql.onchange = null;
+            window.removeEventListener("click", handleClickOutside);
+        };
     });
 
     async function logout(): Promise<void> {
@@ -78,29 +114,62 @@
     </div>
 {:else if !page.url.pathname.startsWith("/login")}
     <div class="dashboard-container" in:fade={{ duration: 300 }}>
-        <div class="header-div">
-            <div class="menu-button-div">
+        <LeftPanel bind:leftPanelOpen activeSection={page.url.pathname} />
+        <div class="left-header-div" bind:this={leftHeaderEl}>
+            <div class="menu-button-div" class:close={mobileSearchOpen}>
                 <MenuButton
                     backgroundColor="transparent"
                     hoverColor="#323a45"
                     bind:menuOpen={leftPanelOpen}
                 />
             </div>
-            <div class="logo-div">
+            <div class="close-mobile-search-div" class:open={mobileSearchOpen}>
+                <Action
+                    backgroundColor="#14161c"
+                    borderColor="#2a2e3a"
+                    hoverColor="#2A2E3A"
+                    imageURL="./img/previous.png"
+                    imageWidth="25px"
+                    imageHeight="25px"
+                    onClick={() => {
+                        mobileSearchOpen = false;
+                    }}
+                />
+            </div>
+            <div class="logo-div" class:close={mobileSearchOpen}>
                 <Logo />
             </div>
-            <div class="main-header-div">
-                <div class="search-bar-div">
+        </div>
+        <div class="header-div" bind:this={headerEl}>
+            <div class="main-header-div" class:collapse={mobileSearchOpen}>
+                <div class="search-bar-div" class:open={mobileSearchOpen}>
                     <SearchBar
                         placeholderText={$texts.searchDevice[$selectedLang]}
                         backgroundColor="#14161c"
+                        buttonBgColor="#1C2126"
+                        buttonHoverColor="#232731"
                         borderColor="#2a2e3a"
+                        buttonBorderColor="#2A2E3A"
                         selectedBorderColor="#3B7DFF"
                     />
                 </div>
-                <div class="right-header-div">
+                <div class="right-header-div" class:close={mobileSearchOpen}>
+                    <div class="open-search-bar-div" class:close={mobileSearchOpen}>
+                        <Action
+                            backgroundColor="#14161c"
+                            borderColor="#2a2e3a"
+                            hoverColor="#2A2E3A"
+                            imageURL="./img/search.png"
+                            imageWidth="25px"
+                            imageHeight="25px"
+                            onClick={() => {
+                                leftPanelOpen = false;
+                                mobileSearchOpen = true;
+                            }}
+                        />
+                    </div>
                     <Notification
-                        notificationsNumber={""}
+                        notificationsNumber={"1"}
                         backgroundColor="#14161c"
                         hoverColor="#2A2E3A"
                         borderColor="#2a2e3a"
@@ -124,7 +193,6 @@
                 </div>
             </div>
         </div>
-        <LeftPanel {leftPanelOpen} activeSection={page.url.pathname} />
         <main class="content" class:open={leftPanelOpen}>
             <slot />
         </main>
@@ -251,30 +319,66 @@
         z-index: 1;
     }
 
-    .dashboard-container .header-div .logo-div {
+    .dashboard-container .left-header-div {
+        position: fixed;
+        left: 0px;
+        top: 0px;
+        width: fit-content;
+        height: 74px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        z-index: 2;
+    }
+
+    .dashboard-container .left-header-div .logo-div {
+        box-sizing: border-box;
         position: absolute;
         left: 56px;
         width: calc(250px - 56px);
-        display: flex;
+        display: none;
         justify-content: start;
         align-items: center;
         padding-left: 25px;
     }
 
-    .dashboard-container .header-div .menu-button-div {
+    .dashboard-container .left-header-div .logo-div.close {
+        display: none;
+    }
+
+    .dashboard-container .left-header-div .menu-button-div {
         position: absolute;
         left: 10px;
+    }
+
+    .dashboard-container .left-header-div .menu-button-div.close {
+        display: none;
+    }
+
+    .dashboard-container .left-header-div .close-mobile-search-div {
+        position: absolute;
+        left: 10px;
+        display: none;
+    }
+
+    .dashboard-container .left-header-div .close-mobile-search-div.open {
+        display: block;
     }
 
     .dashboard-container .header-div .main-header-div {
         margin: 0;
         padding: 0;
-        margin-left: 250px;
+        margin-left: calc(250px - (250px - 56px));
         width: 100%;
         position: relative;
         display: flex;
         align-items: center;
-        justify-content: space-between;
+        justify-content: flex-end;
+        z-index: 0;
+    }
+
+    .dashboard-container .header-div .main-header-div.collapse {
+        margin-left: 0;
     }
 
     .dashboard-container .content {
@@ -292,20 +396,41 @@
 
     .dashboard-container .search-bar-div {
         flex: 1;
-        display: flex;
+        display: none;
         justify-content: center;
         align-items: center;
+    }
+
+    .dashboard-container .search-bar-div.open {
+        padding-left: 56px;
+        padding-right: 10px;
+        display: flex;
+    }
+
+    .dashboard-container .open-search-bar-div {
+        flex: 1;
+        display: flex;
+        justify-content: start;
+        align-items: center;
+        padding-left: 20px;
+    }
+
+    .dashboard-container .open-search-bar-div.close {
+        display: none;
     }
 
     .dashboard-container .right-header-div {
         padding-right: 20px;
         width: fit-content;
         height: fit-content;
-        right: 20px;
         display: flex;
         flex-direction: row;
         justify-content: space-evenly;
-        gap: 10px;
+        gap: 20px;
+    }
+
+    .dashboard-container .right-header-div.close {
+        display: none;
     }
 
     /* Spinner keyframe animation (continuous rotation) */
@@ -357,6 +482,28 @@
     @media (min-height: 760px) {
         .dashboard-container .content {
             min-height: 100vh;
+        }
+    }
+
+    /* Responsive layout for desktops */
+    @media (min-width: 880px) {
+        .dashboard-container .search-bar-div {
+            display: flex;
+        }
+        .dashboard-container .open-search-bar-div {
+            display: none;
+        }
+        .dashboard-container .header-div .main-header-div {
+            justify-content: space-between;
+        }
+    }
+
+    @media (min-width: 440px) {
+        .dashboard-container .left-header-div .logo-div {
+            display: flex;
+        }
+        .dashboard-container .header-div .main-header-div {
+            margin-left: 250px;
         }
     }
 </style>

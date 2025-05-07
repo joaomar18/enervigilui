@@ -2,6 +2,7 @@
     import { navigateTo } from "../../ts/navigation";
     import Link from "./Buttons/Link.svelte";
     import LangSelector from "../General/LangSelector.svelte";
+    import Logo from "../General/Logo.svelte";
 
     // Stores for multi-language support
     import { selectedLang, texts } from "../../stores/lang";
@@ -13,9 +14,20 @@
     async function browseTo(path: string) {
         await navigateTo(path, $selectedLang);
     }
+
+    function closePanel(): void {
+        leftPanelOpen = false;
+    }
 </script>
 
+<div class="mask" class:close={!leftPanelOpen}>
+    <button on:click={closePanel} aria-label="Close Panel"></button>
+</div>
 <div class="container" class:open={leftPanelOpen}>
+    <!--Only show logo div when logo div of header is disabled-->
+    <div class="logo-div">
+        <Logo />
+    </div>
     <div class="content">
         <nav class="nav-section">
             <!-- Devices Section -->
@@ -143,6 +155,30 @@
 </div>
 
 <style>
+    .mask {
+        background-color: rgba(0, 0, 0, 0.3);
+        position: fixed;
+        top: 0;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        z-index: 2;
+        display: block;
+    }
+
+    .mask.close {
+        display: none;
+    }
+
+    .mask button {
+        width: 100%;
+        height: 100%;
+        margin: 0;
+        padding: 0;
+        background: transparent;
+        border: none;
+    }
+
     .container {
         position: fixed;
         top: 0;
@@ -156,10 +192,24 @@
         flex-direction: column;
         transform: translateX(-100%);
         transition: transform 0.2s ease-in-out;
+        z-index: 2;
     }
 
     .container.open {
         transform: translateX(0);
+    }
+
+    .container .logo-div {
+        box-sizing: border-box;
+        position: absolute;
+        top: 0px;
+        height: 74px;
+        left: 56px;
+        width: calc(250px - 56px);
+        display: flex;
+        justify-content: start;
+        align-items: center;
+        padding-left: 25px;
     }
 
     .content {
@@ -220,5 +270,16 @@
         font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
         font-size: 18px;
         padding-top: 10px;
+    }
+
+    @media (min-width: 440px) {
+        .container .logo-div {
+            display: none;
+        }
+    }
+    @media (min-width: 880px) {
+        .mask {
+            display: none;
+        }
     }
 </style>

@@ -144,4 +144,20 @@
     button:hover {
         background: transparent;
     }
+
+    /* Responsive layout for tablets */
+    @media (max-width: 519px) {
+        .container {
+            width: var(--height);
+        }
+
+        .content{
+            justify-content: center;
+            padding:0;
+        }
+
+        .text-div {
+            display: none;
+        }
+    }
 </style>
