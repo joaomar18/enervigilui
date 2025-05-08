@@ -26,6 +26,9 @@
     }
 </script>
 
+<!-- 
+  Logout Button: Pill-shaped button with optional icon and label.  
+-->
 <div
     style="
         --width: {width};
@@ -67,6 +70,7 @@
 </div>
 
 <style>
+    /* Container: size, shape, colors, and click cursor */
     .container {
         background-color: var(--background-color);
         border: 1px solid var(--border-color);
@@ -74,14 +78,15 @@
         height: var(--height);
         border-radius: var(--border-radius, 0px);
         right: 20px;
-        border-radius: 25px;
         cursor: pointer;
     }
 
+    /* Hover state: visual feedback on pointer-over */
     .container:hover {
         background-color: var(--hover-color);
     }
 
+    /* Content wrapper: horizontal layout and padding */
     .content {
         box-sizing: border-box;
         width: 100%;
@@ -97,6 +102,7 @@
         justify-content: flex-start;
     }
 
+    /* Text container: centers the label */
     .text-div {
         height: 100%;
         flex: 1;
@@ -105,6 +111,7 @@
         justify-content: center;
     }
 
+    /* Label: font sizing and padding */
     span {
         box-sizing: border-box;
         display: inline-block;
@@ -123,11 +130,14 @@
         -webkit-font-smoothing: antialiased;
         -moz-osx-font-smoothing: grayscale;
     }
+
+    /* Icon sizing: controlled by CSS variables */
     img {
         width: var(--image-width);
         height: var(--image-height);
     }
 
+    /* Invisible overlay button: captures clicks over entire area */
     button {
         position: absolute;
         width: 100%;
@@ -141,19 +151,20 @@
         cursor: pointer;
     }
 
+    /* Button hover: keep transparent */
     button:hover {
         background: transparent;
     }
 
-    /* Responsive layout for tablets */
+    /* Tablet breakpoint: collapse text, same width and height container */
     @media (max-width: 519px) {
         .container {
             width: var(--height);
         }
 
-        .content{
+        .content {
             justify-content: center;
-            padding:0;
+            padding: 0;
         }
 
         .text-div {

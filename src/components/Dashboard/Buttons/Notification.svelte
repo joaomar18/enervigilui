@@ -4,9 +4,14 @@
     export let notificationsNumber: string;
 
     // Layout / styling props
+    export let width: string;
+    export let height: string;
+    export let borderRadius: string = "";
     export let backgroundColor: string;
     export let hoverColor: string = backgroundColor;
     export let borderColor: string = backgroundColor;
+    export let imageWidth: string;
+    export let imageHeight: string;
 
     // Functions
     function handleClick(): void {
@@ -14,12 +19,20 @@
     }
 </script>
 
+<!-- 
+  Notifications Button: Clickable bell icon with unread count badge, and toogle notifications window
+-->
 <div
     class="notifications-button-div"
     style="
+        --width: {width};
+        --height: {height};
+        --border-radius: {borderRadius};
         --background-color: {backgroundColor};
         --hover-color: {hoverColor};
         --border-color: {borderColor};
+        --image-width: {imageWidth};
+        --image-height: {imageHeight};
     "
 >
     {#if notificationsOpen}
@@ -36,23 +49,25 @@
 </div>
 
 <style>
+    /* Container: circular notification button */
     .notifications-button-div {
         background-color: var(--background-color);
         border: 1px solid var(--border-color);
         display: flex;
         justify-content: center;
         align-items: center;
-        border-radius: 20px;
-        width: 40px;
-        height: 40px;
-        position:relative;
+        width: var(--width);
+        height: var(--height);
+        border-radius: var(--border-radius);
+        position: relative;
     }
 
-    /* Hover background color */
+    /* Hover state: provide visual feedback */
     .notifications-button-div:hover {
         background-color: var(--hover-color);
     }
 
+    /* Badge: red circle showing unread count */
     .notifications-number-text-div {
         position: absolute;
         width: 26px;
@@ -67,6 +82,7 @@
         align-items: center;
     }
 
+    /* Badge text: styled number inside badge */
     .notifications-number-text-div span {
         display: inline-block;
         font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
@@ -76,7 +92,7 @@
         line-height: 24px;
     }
 
-    /* Full-size invisible button to capture clicks */
+    /* Invisible overlay button: captures clicks across entire area */
     button {
         background: transparent;
         cursor: pointer;
@@ -86,12 +102,14 @@
         height: 100%;
     }
 
+    /* Button hover: keep transparent to avoid color shift */
     button:hover {
         background: transparent;
     }
 
+    /* Icon sizing: fixed dimensions for the bell icon */
     img {
-        width: 25px;
-        height: 25px;
+        width: var(--image-width, 25px);
+        height: var(--image-height, 25px);
     }
 </style>

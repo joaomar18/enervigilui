@@ -1,5 +1,8 @@
 <script lang="ts">
     // Layout / styling props
+    export let width: string;
+    export let height: string;
+    export let borderRadius: string = "";
     export let backgroundColor: string;
     export let borderColor: string = backgroundColor;
     export let hoverColor: string = backgroundColor;
@@ -18,9 +21,15 @@
     }
 </script>
 
+<!-- 
+  Action Button: Reusable clickable component with optional image.  
+-->
 <div
-    class="search-button-div"
+    class="action-button-div"
     style="
+        --width: {width};
+        --height: {height};
+        --border-radius: {borderRadius};
         --background-color: {backgroundColor};
         --border-color: {borderColor};
         --hover-color: {hoverColor};
@@ -37,30 +46,30 @@
                 alt={imageURL}
             />
         {/if}
-        <button on:click={handleClick} aria-label="Open Search Button"></button>
+        <button on:click={handleClick} aria-label="Action Button"></button>
     </div>
 </div>
 
 <style>
-    /* Outer wrapper with configurable width and height */
-    .search-button-div {
+    /* Wrapper: size, shape, and base look */
+    .action-button-div {
         position: relative;
-        width: 40px;
-        height: 40px;
+        width: var(--width);
+        height: var(--height);
         margin: 0;
         padding: 0;
         background-color: var(--background-color);
         border: 1px solid var(--border-color);
-        border-radius: 20px;
+        border-radius: var(--border-radius, 0px);
         cursor: pointer;
     }
 
-    /* Hover effect for the outter div */
-    .search-button-div:hover {
+    /* Hover state: visual feedback on pointer-over */
+    .action-button-div:hover {
         background-color: var(--hover-color);
     }
 
-    /* Internal content container */
+    /* Content container: centers icon or label */
     .content {
         margin: 0;
         padding: 0;
@@ -72,7 +81,7 @@
         align-items: center;
     }
 
-    /* Transparent overlay button for capturing clicks */
+    /* Invisible overlay button: captures clicks */
     button {
         position: absolute;
         width: 100%;
@@ -85,7 +94,7 @@
         cursor: pointer;
     }
 
-    /*  Optional positioned icon on the right side of the component */
+    /* Icon sizing: driven by CSS variables */
     img {
         width: var(--image-width, 0px);
         height: var(--image-height, 0px);

@@ -125,6 +125,9 @@
             </div>
             <div class="close-mobile-search-div" class:open={mobileSearchOpen}>
                 <Action
+                    width="40px"
+                    height="40px"
+                    borderRadius="20px"
                     backgroundColor="#14161c"
                     borderColor="#2a2e3a"
                     hoverColor="#2A2E3A"
@@ -156,6 +159,9 @@
                 <div class="right-header-div" class:close={mobileSearchOpen}>
                     <div class="open-search-bar-div" class:close={mobileSearchOpen}>
                         <Action
+                            width="40px"
+                            height="40px"
+                            borderRadius="20px"
                             backgroundColor="#14161c"
                             borderColor="#2a2e3a"
                             hoverColor="#2A2E3A"
@@ -169,10 +175,15 @@
                         />
                     </div>
                     <Notification
+                        width="40px"
+                        height="40px"
+                        borderRadius="20px"
                         notificationsNumber={"1"}
                         backgroundColor="#14161c"
                         hoverColor="#2A2E3A"
                         borderColor="#2a2e3a"
+                        imageWidth="25px"
+                        imageHeight="25px"
                     />
                     <Logout
                         width="125px"
