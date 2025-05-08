@@ -11,6 +11,7 @@
     export let leftPanelOpen: boolean;
     export let activeSection: string;
 
+    //Functions
     async function browseTo(path: string) {
         await navigateTo(path, $selectedLang);
     }
@@ -20,6 +21,9 @@
     }
 </script>
 
+<!-- 
+  Left Side Panel: Overlay mask and collapsible left navigation with logo, sections, and language selector.  
+-->
 <div class="mask" class:close={!leftPanelOpen}>
     <button on:click={closePanel} aria-label="Close Panel"></button>
 </div>
@@ -155,6 +159,7 @@
 </div>
 
 <style>
+    /* Overlay mask: full-screen semi-transparent backdrop */
     .mask {
         background-color: rgba(0, 0, 0, 0.3);
         position: fixed;
@@ -166,10 +171,12 @@
         display: block;
     }
 
+    /* Hide mask when panel closed */
     .mask.close {
         display: none;
     }
 
+    /* Mask click area */
     .mask button {
         width: 100%;
         height: 100%;
@@ -179,6 +186,7 @@
         border: none;
     }
 
+    /* Side panel container: off-canvas slide-in panel */
     .container {
         position: fixed;
         top: 0;
@@ -195,10 +203,12 @@
         z-index: 2;
     }
 
+    /* Slide panel into view when open */
     .container.open {
         transform: translateX(0);
     }
 
+    /* Logo area: fixed header slot inside panel */
     .container .logo-div {
         box-sizing: border-box;
         position: absolute;
@@ -212,6 +222,7 @@
         padding-left: 25px;
     }
 
+    /* Main content: scrollable vertical flex container */
     .content {
         display: flex;
         flex: 1 1 auto;
@@ -223,13 +234,14 @@
         scrollbar-color: #323a45 #1e242b;
     }
 
-    /* Navigation Section */
+    /* Navigation section wrapper */
     .nav-section {
         padding: 16px 0;
         display: flex;
         flex-direction: column;
     }
 
+    /* Individual menu section block */
     .section {
         margin-bottom: 24px;
         display: flex;
@@ -238,6 +250,7 @@
         justify-content: start;
     }
 
+    /* Section header label styling */
     .section-label {
         box-sizing: content-box;
         display: block;
@@ -255,6 +268,7 @@
         width: calc(100% - 40px);
     }
 
+    /* Language selector area */
     .language-selector-div {
         box-sizing: border-box;
         width: 100%;
@@ -264,6 +278,7 @@
         padding: 30px;
     }
 
+    /* Language text label */
     .language-text {
         color: #eeeeee;
         font-weight: 300;
@@ -272,11 +287,14 @@
         padding-top: 10px;
     }
 
+    /* Hide logo slot on larger screens */
     @media (min-width: 440px) {
         .container .logo-div {
             display: none;
         }
     }
+
+    /* Disable mask above certain width */
     @media (min-width: 880px) {
         .mask {
             display: none;
