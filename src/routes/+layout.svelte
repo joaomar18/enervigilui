@@ -147,6 +147,12 @@
             <div class="main-header-div" class:collapse={mobileSearchOpen}>
                 <div class="search-bar-div" class:open={mobileSearchOpen}>
                     <SearchBar
+                        width="80%"
+                        minWidth="250px"
+                        maxWidth="650px"
+                        height="40px"
+                        borderRadius="20px"
+                        searchButtonWidth="75px"
                         placeholderText={$texts.searchDevice[$selectedLang]}
                         backgroundColor="#14161c"
                         buttonBgColor="#1C2126"
@@ -154,6 +160,8 @@
                         borderColor="#2a2e3a"
                         buttonBorderColor="#2A2E3A"
                         selectedBorderColor="#3B7DFF"
+                        imageWidth="25px"
+                        imageHeight="25px"
                     />
                 </div>
                 <div class="right-header-div" class:close={mobileSearchOpen}>
