@@ -1,5 +1,5 @@
 <script lang="ts">
-    import { onMount, onDestroy } from "svelte";
+    import { onMount } from "svelte";
     import { autoLogin } from "../ts/login";
     import { page } from "$app/state";
     import { logoutUser } from "../ts/login";
@@ -20,6 +20,7 @@
     import SearchBar from "../components/Dashboard/SearchBar.svelte";
     import Action from "../components/Dashboard/Buttons/Action.svelte";
 
+    //Variables
     let shouldRedirect: boolean = false;
     let redirectTarget: string | undefined = undefined;
 
@@ -29,6 +30,7 @@
     let leftHeaderEl: Node;
     let headerEl: Node;
 
+    //Check Auto-login Function
     async function checkAuthentication() {
         const path = window.location.pathname;
         const { status } = await autoLogin("/api/auto_login", "POST");
@@ -48,6 +50,7 @@
         }
     }
 
+    //Function to wait for authentication while showing an initial loader screen with minimum display time
     async function waitInitialSplash(minSplashDuration: number): Promise<void> {
         await checkAuthentication();
 
@@ -60,7 +63,8 @@
         splashDone.set(true);
     }
 
-    function handleClickOutside(event: MouseEvent): void {
+    //Function to handle clicks outside header element
+    function handleClickOutsideHeader(event: MouseEvent): void {
         if (
             leftHeaderEl &&
             headerEl &&
@@ -71,6 +75,7 @@
         }
     }
 
+    //On Mount Function
     onMount(() => {
         leftPanelOpen = window.matchMedia("(min-width: 880px)").matches;
 
@@ -86,20 +91,28 @@
         };
 
         mql.onchange = handleMqChange;
-        window.addEventListener("click", handleClickOutside);
+        window.addEventListener("click", handleClickOutsideHeader);
 
+        //Return: Clean-up logic goes here
         return () => {
             mql.onchange = null;
-            window.removeEventListener("click", handleClickOutside);
+            window.removeEventListener("click", handleClickOutsideHeader);
         };
     });
 
+    //Logout Function
     async function logout(): Promise<void> {
         const { status } = await logoutUser("/api/logout", "POST");
         await navigateTo("/login", $selectedLang, true);
     }
 </script>
 
+<!-- 
+  Layout Wrapper:  
+    • Shows splash screen until app initialization completes.  
+    • After that, renders dashboard (left panel, header with search/notifications/logout, and main content) on all routes except “/login”.  
+    • On “/login” and other auth pages, renders only the slot.  
+-->
 {#if !$splashDone}
     <!-- Splash screen -->
     <div class="splash-container">
@@ -221,7 +234,7 @@
 {/if}
 
 <style>
-    /* Fullscreen container for the splash screen */
+    /* Splash screen full-viewport backdrop */
     .splash-container {
         position: relative;
         margin: 0;
@@ -312,7 +325,7 @@
         color: #aaa;
     }
 
-    /* Main Dashboard container uses grid layout */
+    /* Main dashboard flex container */
     .dashboard-container {
         position: relative;
         margin: 0;
@@ -326,6 +339,7 @@
         align-items: center;
     }
 
+    /* Top fixed header */
     .dashboard-container .header-div {
         position: fixed;
         left: 0px;
@@ -338,6 +352,7 @@
         z-index: 1;
     }
 
+    /* Left side header (menu/logo/actions) */
     .dashboard-container .left-header-div {
         position: fixed;
         left: 0px;
@@ -350,6 +365,7 @@
         z-index: 2;
     }
 
+    /* Hidden logo slot until enabled */
     .dashboard-container .left-header-div .logo-div {
         box-sizing: border-box;
         position: absolute;
@@ -365,6 +381,7 @@
         display: none;
     }
 
+    /* Menu button position */
     .dashboard-container .left-header-div .menu-button-div {
         position: absolute;
         left: 10px;
@@ -374,6 +391,7 @@
         display: none;
     }
 
+    /* Close-search button slot (mobile only) */
     .dashboard-container .left-header-div .close-mobile-search-div {
         position: absolute;
         left: 10px;
@@ -384,6 +402,7 @@
         display: block;
     }
 
+    /* Main header area for search & actions */
     .dashboard-container .header-div .main-header-div {
         margin: 0;
         padding: 0;
@@ -400,6 +419,7 @@
         margin-left: 0;
     }
 
+    /* Dashboard content area with slide-in margin */
     .dashboard-container .content {
         position: relative;
         margin-left: 0px;
@@ -409,6 +429,7 @@
         transition: margin-left 0.2s ease-in-out;
     }
 
+    /* Hidden search bar on mobile, flex on desktop */
     .dashboard-container .search-bar-div {
         flex: 1;
         display: none;
@@ -422,6 +443,7 @@
         display: flex;
     }
 
+    /* Mobile search open icon wrapper */
     .dashboard-container .open-search-bar-div {
         flex: 1;
         display: flex;
@@ -434,6 +456,7 @@
         display: none;
     }
 
+    /* Right header action icons */
     .dashboard-container .right-header-div {
         padding-right: 20px;
         width: fit-content;
@@ -470,7 +493,7 @@
         }
     }
 
-    /* Desktop-specific overrides */
+    /* Mobile splash adjustments */
     @media (max-width: 415px) {
         .splash-container .loader-wrapper {
             width: 200px;
@@ -490,17 +513,18 @@
         }
 
         .splash-container .footer span {
-            font-size: 24px; /* reduce brand text size too */
+            font-size: 24px;
         }
     }
 
+    /* Ensure content fills taller viewports */
     @media (min-height: 760px) {
         .dashboard-container .content {
             min-height: 100vh;
         }
     }
 
-    /* Responsive layout for desktops */
+    /* Desktop layout: show search bar and slide panel margin */
     @media (min-width: 880px) {
         .dashboard-container .search-bar-div {
             display: flex;
@@ -516,6 +540,7 @@
         }
     }
 
+    /* Show logo slot and fixed header margin on wider screens */
     @media (min-width: 440px) {
         .dashboard-container .left-header-div .logo-div {
             display: flex;
