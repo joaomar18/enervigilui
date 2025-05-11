@@ -335,15 +335,17 @@
         min-width: 320px;
         min-height: 760px;
         display: flex;
+        flex-direction: column;
         justify-content: start;
         align-items: center;
     }
 
     /* Top fixed header */
     .dashboard-container .header-div {
-        position: fixed;
-        left: 0px;
-        top: 0px;
+        position: sticky;
+        top:0;
+        background-color: #181d23;
+        flex-shrink: 0;
         width: 100%;
         height: 74px;
         display: flex;
@@ -421,12 +423,13 @@
 
     /* Dashboard content area with slide-in margin */
     .dashboard-container .content {
+        box-sizing: border-box;
         position: relative;
-        margin-left: 0px;
+        padding-left: 0px;
         height: fit-content;
         min-height: 760px;
         width: 100%;
-        transition: margin-left 0.2s ease-in-out;
+        transition: padding-left 0.2s ease-in-out;
     }
 
     /* Hidden search bar on mobile, flex on desktop */
@@ -536,7 +539,7 @@
             justify-content: space-between;
         }
         .dashboard-container .content.open {
-            margin-left: 250px;
+            padding-left: 250px;
         }
     }
 
