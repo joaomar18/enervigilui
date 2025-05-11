@@ -523,7 +523,7 @@
     /* Ensure content fills taller viewports */
     @media (min-height: 760px) {
         .dashboard-container .content {
-            min-height: 100vh;
+            min-height: calc(100vh - 74px);
         }
     }
 

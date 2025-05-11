@@ -3,12 +3,12 @@
 
 <div class="container">
     <div class="content">
-        Hello
     </div>
 </div>
 
 <style>
     .container {
+        box-sizing: border-box;
         margin:0;
         padding: 20px;
         height:100%;
@@ -16,7 +16,7 @@
 
     .container .content {
         width: 100%;
-        height: 1000px;
+        min-height: 100%;
         margin: 0;
         padding: 0;
         position: relative;
