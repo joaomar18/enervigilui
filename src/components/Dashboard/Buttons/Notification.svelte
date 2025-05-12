@@ -51,6 +51,7 @@
 <style>
     /* Container: circular notification button */
     .notifications-button-div {
+        box-sizing: border-box;
         background-color: var(--background-color);
         border: 1px solid var(--border-color);
         display: flex;

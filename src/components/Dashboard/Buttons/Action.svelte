@@ -53,6 +53,7 @@
 <style>
     /* Wrapper: size, shape, and base look */
     .action-button-div {
+        box-sizing: border-box;
         position: relative;
         width: var(--width);
         height: var(--height);

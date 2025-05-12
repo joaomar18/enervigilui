@@ -109,6 +109,18 @@ const textsObject: TextsObject = {
         PT: "Pesquisar dispositivo",
         EN: "Search device",
     },
+    connected: {
+        PT: "conectado",
+        EN: "connected",
+    },
+    disconnected: {
+        PT: "desconectado",
+        EN: "disconnected",
+    },
+    addDevice: {
+        PT: "Adicionar dispositivo",
+        EN: "Add device",
+    },
 };
 
 export const texts = readable<TextsObject>(textsObject);
