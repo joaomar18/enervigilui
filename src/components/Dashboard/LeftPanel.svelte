@@ -200,7 +200,7 @@
         flex-direction: column;
         transform: translateX(-100%);
         transition: transform 0.2s ease-in-out;
-        z-index: 2;
+        z-index: 3;
     }
 
     /* Slide panel into view when open */

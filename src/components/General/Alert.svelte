@@ -78,8 +78,9 @@
     .alert-div {
         position: absolute;
         top: var(--top-position, auto);
+        left:50%;
         bottom: var(--bottom-position, auto);
-        transform: translateY(var(--transform-y));
+        transform: translate(-50% ,var(--transform-y));
         width: 90%;
         max-width: 500px;
         border-radius: 5px;

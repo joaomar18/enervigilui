@@ -121,6 +121,10 @@ const textsObject: TextsObject = {
         PT: "Adicionar dispositivo",
         EN: "Add device",
     },
+    errorDevicesState: {
+        PT: "Não foi possível obter o estado dos dispositivos do servidor.",
+        EN: "Could not obtain device status from the server.",
+    },
 };
 
 export const texts = readable<TextsObject>(textsObject);

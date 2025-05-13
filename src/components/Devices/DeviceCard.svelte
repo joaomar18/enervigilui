@@ -9,6 +9,7 @@
     export let deviceID: number;
     export let deviceName: string;
     export let connected: boolean;
+    export let notifications: string;
 
     // Layout / styling props
     export let width: string;
@@ -17,8 +18,28 @@
     export let backgroundColor: string;
     export let borderColor: string = backgroundColor;
     export let imageURL: string;
+    export let imageBackgroundColor: string;
+    export let imageWidth: string;
+    export let imageHeight: string;
+
+    // Export Funcions
+    export let onEdit: () => void;
+    export let onEnter: () => void;
+
+    // Functions
+    function handleEdit(): void {
+        if (onEdit) {
+            onEdit();
+        }
+    }
+    function handleEnter(): void {
+        if (onEnter) {
+            onEnter();
+        }
+    }
 </script>
 
+<!-- Device Card: displays a device’s name, image, action buttons, ID and connection status -->
 <div
     style="
         --width: {width};
@@ -26,16 +47,22 @@
         --border-radius: {borderRadius};
         --background-color: {backgroundColor};
         --border-color: {borderColor};
+        --image-background-color: {imageBackgroundColor};
+        --image-width: {imageWidth};
+        --image-height: {imageHeight};
     "
     class="container"
 >
     <div class="content">
         <h3>{deviceName}</h3>
-        <div style="background-image: url('{imageURL}');" class="device-image-div"></div>
+        <div style="background-image: url('{imageURL}');" class="device-image-div">
+            <button class="device-image-mask" onclick={handleEnter} aria-label="Enter Device"
+            ></button>
+        </div>
         <div class="actions-div">
             <Notification
                 notificationsOpen={false}
-                notificationsNumber={"1"}
+                notificationsNumber={notifications}
                 width="50px"
                 height="50px"
                 borderRadius="50%"
@@ -55,7 +82,7 @@
                 imageURL="./img/edit.png"
                 imageWidth="25px"
                 imageHeight="25px"
-                onClick={() => {}}
+                onClick={handleEdit}
             />
             <Action
                 width="50px"
@@ -67,7 +94,7 @@
                 imageURL="./img/enter.png"
                 imageWidth="32px"
                 imageHeight="32px"
-                onClick={() => {}}
+                onClick={handleEnter}
             />
         </div>
         <span class="id-text">ID: {String(deviceID).padStart(3, "0")}</span>
@@ -83,6 +110,7 @@
 </div>
 
 <style>
+    /* Container: card wrapper with size, bg, border and transitions */
     .container {
         width: var(--width);
         height: var(--height);
@@ -94,11 +122,13 @@
             box-shadow 0.2s ease-in-out;
     }
 
+    /* Hover state: lift and shadow for emphasis */
     .container:hover {
         transform: scale(1.1);
         box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
     }
 
+    /* Content: vertical flex container, centered items */
     .content {
         padding: 0;
         margin: 0;
@@ -111,37 +141,61 @@
         align-items: center;
     }
 
+    /* Title: centered light-weight heading */
     h3 {
         color: #f5f5f5;
         width: 100%;
         text-align: center;
-        font-family:
-            system-ui,
-            -apple-system,
-            BlinkMacSystemFont,
-            "Segoe UI",
-            Roboto,
-            Oxygen,
-            Ubuntu,
-            Cantarell,
-            "Open Sans",
-            "Helvetica Neue",
-            sans-serif;
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+        font-weight: 300;
     }
 
+    /* Image div: circular placeholder with bg image */
     .device-image-div {
+        position: relative;
         padding: 0;
         margin: 0;
         margin-top: 10px;
-        width: 200px;
-        height: 200px;
-        background-color: rgba(255, 255, 255, 0.1);
+        width: var(--image-width);
+        height: var(--image-height);
+        background-color: var(--image-background-color);
         background-repeat: no-repeat;
         background-position: center;
-        background-size: auto 175px;
-        border-radius: 100px;
+        background-size: auto 87.5%;
+        border-radius: 50%;
     }
 
+    /* Image hover: slightly dim the device image on hover */
+    .device-image-div:hover {
+        opacity: 0.8;
+    }
+
+    /* Overlay mask: invisible full-circle button to capture clicks */
+    .device-image-div .device-image-mask {
+        padding: 0;
+        margin: 0;
+        border: none;
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        border-radius: 50%;
+        cursor: pointer;
+        background: transparent;
+        background-repeat: no-repeat;
+        background-position: center;
+        background-size: 128px 128px;
+        transition:
+            background-color 0.2s ease-in-out,
+            opacity 0.2s ease-in-out;
+    }
+
+    /* Overlay hover: show enter icon and translucent gray overlay */
+    .device-image-mask:hover {
+        background-image: url("./img/enter.png");
+        background-color: rgba(50, 50, 50, 0.4);
+    }
+
+    /* Actions: horizontal flex layout for buttons */
     .actions-div {
         margin: 0;
         padding: 0;
@@ -153,26 +207,18 @@
         align-items: center;
     }
 
+    /* ID text: positioned bottom-left, subtle styling */
     .id-text {
         position: absolute;
         left: 20px;
         bottom: 10px;
         color: #e0e0e0;
-        font-family:
-            system-ui,
-            -apple-system,
-            BlinkMacSystemFont,
-            "Segoe UI",
-            Roboto,
-            Oxygen,
-            Ubuntu,
-            Cantarell,
-            "Open Sans",
-            "Helvetica Neue",
-            sans-serif;
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
         font-size: 0.9rem;
+        font-weight: 300;
     }
 
+    /* Connection state container: bottom-right alignment */
     .connection-state-div {
         position: absolute;
         right: 20px;
@@ -184,6 +230,7 @@
         bottom: 10px;
     }
 
+    /* Status dot: default disconnected color */
     .connection-state-div .connection-status {
         width: 16px;
         height: 16px;
@@ -191,24 +238,16 @@
         background-color: #f44336;
     }
 
+    /* Status dot when connected */
     .connection-state-div .connection-status.connected {
         background-color: #4caf50;
     }
 
+    /* Connection text: subtle label next to dot */
     .connection-state-div .connection-text {
         color: #e0e0e0;
-        font-family:
-            system-ui,
-            -apple-system,
-            BlinkMacSystemFont,
-            "Segoe UI",
-            Roboto,
-            Oxygen,
-            Ubuntu,
-            Cantarell,
-            "Open Sans",
-            "Helvetica Neue",
-            sans-serif;
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
         font-size: 0.9rem;
+        font-weight: 300;
     }
 </style>

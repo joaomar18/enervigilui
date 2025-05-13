@@ -363,7 +363,7 @@
         display: flex;
         justify-content: center;
         align-items: center;
-        z-index: 2;
+        z-index: 3;
     }
 
     /* Hidden logo slot until enabled */
