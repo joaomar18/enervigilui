@@ -9,6 +9,9 @@
     // Stores for multi-language support
     import { selectedLang, texts } from "../stores/lang";
 
+    // Stores for alerts
+    import { displayAlert, alertText, alertTimeout } from "../stores/alerts";
+
     // Splash screen store
     import { splashDone } from "../stores/auth";
 
@@ -19,6 +22,7 @@
     import Notification from "../components/Dashboard/Buttons/Notification.svelte";
     import SearchBar from "../components/Dashboard/SearchBar.svelte";
     import Action from "../components/Dashboard/Buttons/Action.svelte";
+    import Alert from "../components/General/Alert.svelte";
 
     //Variables
     let shouldRedirect: boolean = false;
@@ -226,6 +230,29 @@
             </div>
         </div>
         <main class="content" class:open={leftPanelOpen}>
+            <div
+                class="alerts-div"
+                class:prioritize={$displayAlert}
+                class:sidebar-open={leftPanelOpen}
+            >
+                {#if $displayAlert}
+                    <Alert
+                        bottomPos="0px"
+                        alertText={$alertText[$selectedLang]}
+                        backgroundColor="rgba(171, 34, 43, 0.25)"
+                        borderColor="#b91c1c"
+                        textColor="#ffd5d5"
+                        onClick={() => {
+                            alertTimeout.update((id) => {
+                                if (id) clearTimeout(id);
+                                return null;
+                            });
+                            displayAlert.set(false);
+                            console.log("closing");
+                        }}
+                    />
+                {/if}
+            </div>
             <slot />
         </main>
     </div>
@@ -342,7 +369,7 @@
     /* Top fixed header */
     .dashboard-container .header-div {
         position: sticky;
-        top:0;
+        top: 0;
         background-color: #181d23;
         flex-shrink: 0;
         width: 100%;
@@ -429,6 +456,21 @@
         min-height: 760px;
         width: 100%;
         transition: padding-left 0.2s ease-in-out;
+    }
+
+    /* Fixed div for alerts display */
+    .dashboard-container .content .alerts-div {
+        position: fixed;
+        bottom: 50px;
+        width: 100%;
+        left: 0;
+        z-index: 0;
+        transition: margin-left 0.2s ease-in-out;
+    }
+
+    /* Send alerts div to front */
+    .dashboard-container .content .alerts-div.prioritize {
+        z-index: 2;
     }
 
     /* Hidden search bar on mobile, flex on desktop */
@@ -539,6 +581,10 @@
         }
         .dashboard-container .content.open {
             padding-left: 250px;
+        }
+        .dashboard-container .content .alerts-div.sidebar-open {
+            margin-left: 250px;
+            width: calc(100% - 250px);
         }
     }
 

@@ -1,82 +1,63 @@
 <script lang="ts">
-    import { selectedLang, texts } from "../../stores/lang";
-    import type { Language } from "../../stores/lang";
+    // Stores for multi-language support
+    import { texts } from "../../stores/lang";
+
+    // Stores for alerts
+    import { showAlert } from "../../stores/alerts";
 
     import { getAllDevicesState } from "../../ts/devices";
 
     import { onMount, onDestroy } from "svelte";
     import DeviceCard from "../../components/Devices/DeviceCard.svelte";
     import AddDevice from "../../components/Devices/AddDevice.svelte";
-    import Alert from "../../components/General/Alert.svelte";
 
+    // Variables
     let pollTimer: ReturnType<typeof setTimeout>;
     let devices: any;
+    let loaded: boolean = false;
 
-    //Sorted devices
+    // Sorted devices
     $: sortedDevices = Array.isArray(devices) ? [...devices].sort((a, b) => a.id - b.id) : [];
 
-    //Function to poll devices status
+    // Function to poll devices status
     function startPolling() {
         const tick = async () => {
             try {
                 const { status, data }: { status: number; data: any } = await getAllDevicesState();
                 if (status !== 200) {
                     showAlert($texts.errorDevicesState);
-                    return;
+                } else {
+                    devices = data;
                 }
-                devices = data;
             } catch (e) {
                 showAlert($texts.errorDevicesState);
             }
-            pollTimer = setTimeout(tick, 3000);
+            loaded = true;
+            pollTimer = setTimeout(tick, 2500);
         };
         tick();
     }
 
-    // Alert State
-    let displayAlert: boolean = false;
-    let alertText: Record<Language, string>;
-    let alertTimeout: number | undefined = undefined;
-
-    // Function to create alert / delete old alerts
-    function showAlert(textLang: Record<Language, string>): void {
-        if (alertTimeout) {
-            clearTimeout(alertTimeout);
-        }
-        alertText = textLang;
-        displayAlert = true;
-        alertTimeout = setTimeout(() => (displayAlert = false), 3000);
-    }
-
-    //Mount function to poll devices status
+    // Mount function to poll devices status
     onMount(() => {
         startPolling();
     });
 
-    //Cleanup function
+    // Cleanup function
     onDestroy(() => {
         clearTimeout(pollTimer);
     });
 </script>
 
+<!--
+  Devices Page: renders a loading spinner until `loaded` is true,
+  then displays a grid of DeviceCard components followed by the AddDevice button.
+-->
 <div class="container">
-    <div class="alerts-div" class:toBack={!displayAlert}>
-        {#if displayAlert}
-            <Alert
-                bottomPos="0px"
-                alertText={alertText[$selectedLang]}
-                backgroundColor="rgba(171, 34, 43, 0.25)"
-                borderColor="#b91c1c"
-                textColor="#ffd5d5"
-                onClick={() => {
-                    clearTimeout(alertTimeout);
-                    alertTimeout = undefined;
-                    displayAlert = false;
-                }}
-            />
-        {/if}
-    </div>
     <div class="content">
+        <div class="loader-div" class:close={loaded}>
+            <div class="spinner"></div>
+        </div>
         {#each sortedDevices as device (device.id)}
             <DeviceCard
                 deviceID={device.id}
@@ -117,6 +98,7 @@
 </div>
 
 <style>
+    /* Container: outer wrapper with padding and full height */
     .container {
         box-sizing: border-box;
         margin: 0;
@@ -124,22 +106,10 @@
         height: 100%;
     }
 
-    .container .alerts-div {
-        position: fixed;
-        bottom: 50px;
-        height: 74px;
-        width: 100%;
-        left: 50%;
-        transform: translateX(-50%);
-        z-index: 2;
-    }
-    .container .alerts-div.toBack {
-        z-index: 0;
-    }
-
+    /* Content: grid layout centering 300px cards with gaps */
     .container .content {
         width: 100%;
-        min-height: 100%;
+        height: 100%;
         margin: 0;
         padding: 0;
         position: relative;
@@ -147,5 +117,46 @@
         grid-template-columns: repeat(auto-fill, 300px);
         gap: 30px;
         justify-content: center;
+    }
+
+    /* Loader overlay: full-screen dark backdrop with centered spinner */
+    .container .content .loader-div {
+        position: absolute;
+        inset: 0;
+        margin: 0;
+        padding: 0;
+        width: 100%;
+        min-height: calc(100vh - 74px - 60px);
+        height: 100%;
+        background-color: #181d23;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        z-index: 1;
+        opacity: 1;
+        transition: opacity 0.2s ease-in-out;
+    }
+
+    /* Loader hidden state: fade out and drop behind content */
+    .container .content .loader-div.close {
+        opacity: 0;
+        z-index: 0;
+    }
+
+    /* Spinner: circular border animation */
+    .spinner {
+        width: 128px;
+        height: 128px;
+        border: 4px solid rgba(255, 255, 255, 0.2);
+        border-top-color: #fff;
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+    }
+
+    /* Spin animation: full rotation */
+    @keyframes spin {
+        to {
+            transform: rotate(360deg);
+        }
     }
 </style>
