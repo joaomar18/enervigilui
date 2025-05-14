@@ -1,6 +1,6 @@
 <script lang="ts">
     // Stores for multi-language support
-    import { selectedLang, texts } from "../../../lib/stores/lang";
+    import { selectedLang, texts } from "$lib/stores/lang";
 
     // Props
     export let processing: boolean; //Login is being processed

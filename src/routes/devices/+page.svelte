@@ -1,11 +1,11 @@
 <script lang="ts">
     // Stores for multi-language support
-    import { texts } from "../../lib/stores/lang";
+    import { texts } from "$lib/stores/lang";
 
     // Stores for alerts
-    import { showAlert } from "../../lib/stores/alerts";
+    import { showAlert } from "$lib/stores/alerts";
 
-    import { getAllDevicesState } from "../../lib/ts/devices";
+    import { getAllDevicesState } from "$lib/ts/devices";
 
     import { onMount, onDestroy } from "svelte";
     import DeviceCard from "../../components/Devices/DeviceCard.svelte";

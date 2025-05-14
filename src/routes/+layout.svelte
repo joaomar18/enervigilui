@@ -1,19 +1,19 @@
 <script lang="ts">
     import { onMount } from "svelte";
-    import { autoLogin } from "../lib/ts/login";
+    import { autoLogin } from "$lib/ts/login";
     import { page } from "$app/state";
-    import { logoutUser } from "../lib/ts/login";
-    import { navigateTo } from "../lib/ts/navigation";
+    import { logoutUser } from "$lib/ts/login";
+    import { navigateTo } from "$lib/ts/navigation";
     import { fade } from "svelte/transition";
 
     // Stores for multi-language support
-    import { selectedLang, texts } from "../lib/stores/lang";
+    import { selectedLang, texts } from "$lib/stores/lang";
 
     // Stores for alerts
-    import { displayAlert, alertText, alertTimeout } from "../lib/stores/alerts";
+    import { displayAlert, alertText, alertTimeout } from "$lib/stores/alerts";
 
     // Splash screen store
-    import { splashDone } from "../lib/stores/auth";
+    import { splashDone } from "$lib/stores/auth";
 
     import LeftPanel from "../components/Dashboard/LeftPanel.svelte";
     import Logo from "../components/General/Logo.svelte";

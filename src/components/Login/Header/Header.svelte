@@ -7,7 +7,7 @@
     import LangSelector from "../../General/LangSelector.svelte";
 
     // Stores for multi-language support
-    import { selectedLang, texts } from "../../../lib/stores/lang";
+    import { selectedLang, texts } from "$lib/stores/lang";
 
     // Variables
     let dropdownOpen: boolean;

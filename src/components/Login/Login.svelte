@@ -1,15 +1,15 @@
 <script lang="ts">
     import { browser } from "$app/environment";
     import { onMount, onDestroy } from "svelte";
-    import { selectedLang, texts } from "../../lib/stores/lang";
-    import type { Language } from "../../lib/stores/lang";
+    import { selectedLang, texts } from "$lib/stores/lang";
+    import type { Language } from "$lib/stores/lang";
     import {
         loginUser,
         interpretLoginStatus,
         validateUsername,
         validatePassword,
-    } from "../../lib/ts/login";
-    import { navigateTo } from "../../lib/ts/navigation";
+    } from "$lib/ts/login";
+    import { navigateTo } from "$lib/ts/navigation";
 
     import LoginField from "./Inputs/LoginField.svelte";
     import LoginButton from "./Buttons/LoginButton.svelte";
