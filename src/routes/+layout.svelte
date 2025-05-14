@@ -12,8 +12,8 @@
     // Stores for alerts
     import { displayAlert, alertText, alertTimeout } from "$lib/stores/alerts";
 
-    // Splash screen store
-    import { splashDone } from "$lib/stores/auth";
+    // Authorization stores
+    import { splashDone, loadedDone } from "$lib/stores/auth";
 
     import LeftPanel from "../components/Dashboard/LeftPanel.svelte";
     import Logo from "../components/General/Logo.svelte";
@@ -37,17 +37,27 @@
     //Check Auto-login Function
     async function checkAuthentication() {
         const path = window.location.pathname;
+
+        const segments = path.split("/").filter(Boolean);
+        const base = segments.length > 0 ? `/${segments[0]}` : "/";
+        const isSubpage = segments.length > 1;
+
         const { status } = await autoLogin();
 
         if (status === 200) {
             // Authenticated
-            if (path === "/" || path === "/login") {
+            if (base === "/" || base === "/login") {
                 shouldRedirect = true;
                 redirectTarget = "/devices";
             }
+            // User is in a subpage, redirect to main page
+            else if (isSubpage) {
+                shouldRedirect = true;
+                redirectTarget = base;
+            }
         } else {
             // Unauthenticated or failed
-            if (path !== "/login") {
+            if (base !== "/login") {
                 shouldRedirect = true;
                 redirectTarget = "/login";
             }
@@ -107,7 +117,7 @@
     //Logout Function
     async function logout(): Promise<void> {
         const { status } = await logoutUser();
-        await navigateTo("/login", $selectedLang, true);
+        await navigateTo("/login", $selectedLang, {}, true);
     }
 </script>
 
@@ -148,7 +158,7 @@
                     backgroundColor="#14161c"
                     borderColor="#2a2e3a"
                     hoverColor="#2A2E3A"
-                    imageURL="./img/previous.png"
+                    imageURL="/img/previous.png"
                     imageWidth="25px"
                     imageHeight="25px"
                     onClick={() => {
@@ -190,7 +200,7 @@
                             backgroundColor="#14161c"
                             borderColor="#2a2e3a"
                             hoverColor="#2A2E3A"
-                            imageURL="./img/search.png"
+                            imageURL="/img/search.png"
                             imageWidth="25px"
                             imageHeight="25px"
                             onClick={() => {
@@ -221,7 +231,7 @@
                         fontSize="1rem"
                         paddingLeft="10px"
                         paddingRight="20px"
-                        imageUrl="./img/logout.png"
+                        imageUrl="/img/logout.png"
                         imageWidth="32px"
                         imageHeight="32px"
                         onClick={logout}
@@ -248,12 +258,18 @@
                                 return null;
                             });
                             displayAlert.set(false);
-                            console.log("closing");
                         }}
                     />
                 {/if}
             </div>
-            <slot />
+            <div class="container-div">
+                <div class="content-div">
+                    <div class="loader-div" class:close={$loadedDone}>
+                        <div class="spinner"></div>
+                    </div>
+                    <slot />
+                </div>
+            </div>
         </main>
     </div>
 {:else}
@@ -309,7 +325,7 @@
         border-radius: 50%;
         background-repeat: no-repeat;
         background-position: center;
-        background-image: url("./img/logo.png");
+        background-image: url("/img/logo.png");
         box-shadow: 0px 6px 20px rgba(0, 0, 0, 0.2);
         background-size: auto;
     }
@@ -513,6 +529,68 @@
 
     .dashboard-container .right-header-div.close {
         display: none;
+    }
+
+    /* Container: outer wrapper with padding and full height */
+    .dashboard-container .container-div {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 30px;
+        height: 100%;
+    }
+
+    /* Content: grid layout centering 300px cards with gaps */
+    .dashboard-container .container-div .content-div {
+        width: 100%;
+        height: 100%;
+        margin: 0;
+        padding: 0;
+        position: relative;
+        display: grid;
+        grid-template-columns: repeat(auto-fill, 300px);
+        gap: 30px;
+        justify-content: center;
+    }
+
+    /* Loader overlay: full-screen dark backdrop with centered spinner */
+    .dashboard-container .container-div .content-div .loader-div {
+        position: absolute;
+        inset: 0;
+        margin: 0;
+        padding: 0;
+        width: 100%;
+        min-height: calc(100vh - 74px - 60px);
+        height: 100%;
+        background-color: #181d23;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        z-index: 1;
+        opacity: 1;
+        transition: opacity 0.2s ease-in-out;
+    }
+
+    /* Loader hidden state: fade out and drop behind content */
+    .dashboard-container .container-div .content-div .loader-div.close {
+        opacity: 0;
+        z-index: 0;
+    }
+
+    /* Spinner: circular border animation */
+    .dashboard-container .container-div .content-div .loader-div .spinner {
+        width: 128px;
+        height: 128px;
+        border: 4px solid rgba(255, 255, 255, 0.2);
+        border-top-color: #fff;
+        border-radius: 50%;
+        animation: content-spin 1s linear infinite;
+    }
+
+    /* Spin animation: full rotation */
+    @keyframes content-spin {
+        to {
+            transform: rotate(360deg);
+        }
     }
 
     /* Spinner keyframe animation (continuous rotation) */

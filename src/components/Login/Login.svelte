@@ -68,7 +68,7 @@
 
             // Handle success or failure
             if (status === 200) {
-                await navigateTo("/devices", $selectedLang, true); // Navigate to the dashboard on success
+                await navigateTo("/devices", $selectedLang, {}, true); // Navigate to the dashboard on success
             } else {
                 showAlert(interpretLoginStatus(status, data, $texts)); // Handle error
             }
@@ -133,7 +133,7 @@
         id="username"
         paddingTop="10px"
         paddingBottom="0px"
-        imageUrl="./img/user.png"
+        imageUrl="/img/user.png"
         imageWidth="32px"
         imageHeight="32px"
         fieldText={$texts.username[$selectedLang]}
@@ -147,7 +147,7 @@
         id="password"
         paddingTop="30px"
         paddingBottom="0px"
-        imageUrl="./img/password.png"
+        imageUrl="/img/password.png"
         imageWidth="32px"
         imageHeight="32px"
         fieldText={$texts.password[$selectedLang]}

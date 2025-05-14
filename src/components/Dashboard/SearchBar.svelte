@@ -53,7 +53,7 @@
             "
             class="search-button-div"
         >
-            <img src="./img/search.png" alt="Search Loop" />
+            <img src="/img/search.png" alt="Search Loop" />
             <button aria-label="Search Button"></button>
         </div>
     </div>

@@ -39,12 +39,12 @@
             <div class="section">
                 <span class="section-label">{$texts.general[$selectedLang]}</span>
                 <Link
-                    selected={activeSection === "/devices"}
+                    selected={activeSection.includes("/devices")}
                     paddingLeft="10px"
                     paddingRight="10px"
                     paddingLeftText="10px"
                     buttonText={$texts.devices[$selectedLang]}
-                    imageURL="./img/devices.png"
+                    imageURL="/img/devices.png"
                     imageWidth="25px"
                     imageHeight="25px"
                     fontSize="1rem"
@@ -56,12 +56,12 @@
                     }}
                 />
                 <Link
-                    selected={activeSection == "/mqtt"}
+                    selected={activeSection.includes("/mqtt")}
                     paddingLeft="10px"
                     paddingRight="10px"
                     paddingLeftText="10px"
                     buttonText="MQTT"
-                    imageURL="./img/mqtt.png"
+                    imageURL="/img/mqtt.png"
                     imageWidth="25px"
                     imageHeight="25px"
                     fontSize="1rem"
@@ -78,12 +78,12 @@
             <div class="section">
                 <span class="section-label">{$texts.diagnostics[$selectedLang]}</span>
                 <Link
-                    selected={activeSection === "/health"}
+                    selected={activeSection.includes("/health")}
                     paddingLeft="10px"
                     paddingRight="10px"
                     paddingLeftText="10px"
                     buttonText={$texts.health[$selectedLang]}
-                    imageURL="./img/health.png"
+                    imageURL="/img/health.png"
                     imageWidth="25px"
                     imageHeight="25px"
                     fontSize="1rem"
@@ -95,12 +95,12 @@
                     }}
                 />
                 <Link
-                    selected={activeSection === "/logs"}
+                    selected={activeSection.includes("/logs")}
                     paddingLeft="10px"
                     paddingRight="10px"
                     paddingLeftText="10px"
                     buttonText={$texts.logs[$selectedLang]}
-                    imageURL="./img/logs.png"
+                    imageURL="/img/logs.png"
                     imageWidth="25px"
                     imageHeight="25px"
                     fontSize="1rem"
@@ -117,12 +117,12 @@
             <div class="section">
                 <span class="section-label">{$texts.system[$selectedLang]}</span>
                 <Link
-                    selected={activeSection === "/settings"}
+                    selected={activeSection.includes("/settings")}
                     paddingLeft="10px"
                     paddingRight="10px"
                     paddingLeftText="10px"
                     buttonText={$texts.settings[$selectedLang]}
-                    imageURL="./img/settings.png"
+                    imageURL="/img/settings.png"
                     imageWidth="25px"
                     imageHeight="25px"
                     fontSize="1rem"
@@ -134,12 +134,12 @@
                     }}
                 />
                 <Link
-                    selected={activeSection === "/backup"}
+                    selected={activeSection.includes("/backup")}
                     paddingLeft="10px"
                     paddingRight="10px"
                     paddingLeftText="10px"
                     buttonText={$texts.backup[$selectedLang]}
-                    imageURL="./img/backup.png"
+                    imageURL="/img/backup.png"
                     imageWidth="25px"
                     imageHeight="25px"
                     fontSize="1rem"

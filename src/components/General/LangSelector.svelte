@@ -29,10 +29,9 @@
         selectedLang.set(language);
         isOpen = false;
 
-        const currentPath = page.url.pathname; // Current route
-        const newURL = `${currentPath}?lang=${language}`;
-
-        goto(newURL);
+        const params = new URLSearchParams(page.url.searchParams);
+        params.set("lang", language);
+        goto(`${page.url.pathname}?${params.toString()}`);
     }
 
     function handleClickOutside(event: MouseEvent): void {
@@ -75,17 +74,17 @@
 >
     <div class="content-div">
         <span class="action">{$texts.selectLanguage[$selectedLang]}</span>
-        <img class="globe" src="./img/globe.png" alt="globe" />
+        <img class="globe" src="/img/globe.png" alt="globe" />
         <span class="selected-lang">{$selectedLang}</span>
         <img
             class="arrow"
             src={invertOptions
                 ? isOpen
-                    ? "./img/down-arrow.png"
-                    : "./img/up-arrow.png"
+                    ? "/img/down-arrow.png"
+                    : "/img/up-arrow.png"
                 : isOpen
-                  ? "./img/up-arrow.png"
-                  : "./img/down-arrow.png"}
+                  ? "/img/up-arrow.png"
+                  : "/img/down-arrow.png"}
             alt={isOpen ? "up-arrow" : "down-arrow"}
         />
         <button class="open-selector" on:click={toggleSelector} aria-label="View options"></button>

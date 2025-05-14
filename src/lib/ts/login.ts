@@ -85,7 +85,7 @@ export async function autoLogin(timeout: number = 3000): Promise<{ status: numbe
     // Automatically abort the request after `timeout` milliseconds
     const timeoutId = setTimeout(() => controller.abort(), timeout);
     try {
-        const response = await fetch("api/auto_login", {
+        const response = await fetch("/api/auto_login", {
             method: "POST",
             credentials: "include", // Cookies (including HTTP-only cookies) are automatically sent by the browser
             headers: {

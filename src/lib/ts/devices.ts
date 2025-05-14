@@ -45,3 +45,31 @@ export async function getAllDevicesState(
         };
     }
 }
+
+export async function getDeviceState(
+    name: string,
+    id: number,
+    timeout: number = 3000
+): Promise<{ status: number; data: any }> {
+    const controller = new AbortController();
+    const signal = controller.signal;
+
+    // Automatically abort the request after `timeout` milliseconds
+    const timeoutId = setTimeout(() => controller.abort(), timeout);
+    try {
+        const url = `/api/get_device_state?name=${encodeURIComponent(name)}&id=${id}`;
+        const response = await fetch(url, { method: "GET", signal });
+
+        clearTimeout(timeoutId); // cancel timeout if response arrives in time
+        return {
+            status: response.status,
+            data: await response.json(),
+        };
+    } catch (error) {
+        console.log(error);
+        return {
+            status: -1,
+            data: null,
+        };
+    }
+}

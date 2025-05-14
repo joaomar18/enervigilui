@@ -6,7 +6,7 @@
   Logo: Displays the logo and product name
 -->
 <div class="content">
-    <img class="logo" alt="logo" src="./img/logo.png" />
+    <img class="logo" alt="logo" src="/img/logo.png" />
     <span class="main-text">EDGE</span>
 </div>
 

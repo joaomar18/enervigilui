@@ -36,9 +36,9 @@
     "
 >
     {#if notificationsOpen}
-        <img src="./img/bell-on.png" alt="Bell Off" />
+        <img src="/img/bell-on.png" alt="Bell Off" />
     {:else}
-        <img src="./img/bell-off.png" alt="Bell On" />
+        <img src="/img/bell-off.png" alt="Bell On" />
     {/if}
     {#if notificationsNumber}
         <div class="notifications-number-text-div">

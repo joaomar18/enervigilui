@@ -79,7 +79,7 @@
                 backgroundColor="rgba(255, 255, 255, 0.1)"
                 hoverColor="rgba(255, 255, 255, 0.2)"
                 borderColor="transparent"
-                imageURL="./img/edit.png"
+                imageURL="/img/edit.png"
                 imageWidth="25px"
                 imageHeight="25px"
                 onClick={handleEdit}
@@ -91,7 +91,7 @@
                 backgroundColor="rgba(255, 255, 255, 0.1)"
                 hoverColor="rgba(255, 255, 255, 0.2)"
                 borderColor="transparent"
-                imageURL="./img/enter.png"
+                imageURL="/img/enter.png"
                 imageWidth="32px"
                 imageHeight="32px"
                 onClick={handleEnter}
@@ -191,7 +191,7 @@
 
     /* Overlay hover: show enter icon and translucent gray overlay */
     .device-image-mask:hover {
-        background-image: url("./img/enter.png");
+        background-image: url("/img/enter.png");
         background-color: rgba(50, 50, 50, 0.4);
     }
 

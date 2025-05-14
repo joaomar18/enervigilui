@@ -168,7 +168,15 @@ const textsObject: TextsObject = {
     },
     errorDevicesState: {
         PT: "Não foi possível obter o estado dos dispositivos do servidor.",
+        EN: "Could not obtain devices status from the server.",
+    },
+    errorDeviceState: {
+        PT: "Não foi possível obter o estado do dispositivo do servidor.",
         EN: "Could not obtain device status from the server.",
+    },
+    errorEditDeviceParams: {
+        PT: "Não foram atribuídos o nome e/ou o id do dispositivo.",
+        EN: "The name and/or the id of the device were not assigned.",
     },
 };
 

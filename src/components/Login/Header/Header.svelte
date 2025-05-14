@@ -63,7 +63,7 @@
                 height="40px"
                 paddingLeft="10px"
                 buttonText={$texts.aboutUs[$selectedLang]}
-                imageURL="./img/info.png"
+                imageURL="/img/info.png"
                 imageRightPosition="10px"
                 imageWidth="24px"
                 imageHeight="24px"
@@ -74,7 +74,7 @@
                 height="40px"
                 paddingLeft="10px"
                 buttonText={$texts.help[$selectedLang]}
-                imageURL="./img/help.png"
+                imageURL="/img/help.png"
                 imageRightPosition="10px"
                 imageWidth="24px"
                 imageHeight="24px"
@@ -85,7 +85,7 @@
                 height="40px"
                 paddingLeft="10px"
                 buttonText={$texts.contacts[$selectedLang]}
-                imageURL="./img/customer-service.png"
+                imageURL="/img/customer-service.png"
                 imageRightPosition="10px"
                 imageWidth="24px"
                 imageHeight="24px"
@@ -110,7 +110,7 @@
             paddingLeft="20px"
             paddingRight="20px"
             buttonText={$texts.aboutUs[$selectedLang]}
-            imageURL="./img/info.png"
+            imageURL="/img/info.png"
             imageWidth="46px"
             imageHeight="46px"
             imageRightPosition="20px"
@@ -126,7 +126,7 @@
             paddingLeft="20px"
             paddingRight="20px"
             buttonText={$texts.help[$selectedLang]}
-            imageURL="./img/help.png"
+            imageURL="/img/help.png"
             imageWidth="46px"
             imageHeight="46px"
             imageRightPosition="20px"
@@ -142,7 +142,7 @@
             paddingLeft="20px"
             paddingRight="20px"
             buttonText={$texts.contacts[$selectedLang]}
-            imageURL="./img/customer-service.png"
+            imageURL="/img/customer-service.png"
             imageWidth="46px"
             imageHeight="46px"
             imageRightPosition="20px"

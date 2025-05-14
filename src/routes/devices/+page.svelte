@@ -1,11 +1,15 @@
 <script lang="ts">
+    import { navigateTo } from "$lib/ts/navigation";
+    import { getAllDevicesState } from "$lib/ts/devices";
+
     // Stores for multi-language support
-    import { texts } from "$lib/stores/lang";
+    import { texts, selectedLang } from "$lib/stores/lang";
 
     // Stores for alerts
     import { showAlert } from "$lib/stores/alerts";
 
-    import { getAllDevicesState } from "$lib/ts/devices";
+    // Stores for authorization
+    import { loadedDone } from "$lib/stores/auth";
 
     import { onMount, onDestroy } from "svelte";
     import DeviceCard from "../../components/Devices/DeviceCard.svelte";
@@ -14,7 +18,6 @@
     // Variables
     let pollTimer: ReturnType<typeof setTimeout>;
     let devices: any;
-    let loaded: boolean = false;
 
     // Sorted devices
     $: sortedDevices = Array.isArray(devices) ? [...devices].sort((a, b) => a.id - b.id) : [];
@@ -32,7 +35,7 @@
             } catch (e) {
                 showAlert($texts.errorDevicesState);
             }
-            loaded = true;
+            loadedDone.set(true);
             pollTimer = setTimeout(tick, 2500);
         };
         tick();
@@ -47,116 +50,55 @@
     onDestroy(() => {
         clearTimeout(pollTimer);
     });
+
+    //Go to edit device page
+    async function editDevice(deviceId: number, deviceName: string) {
+        await navigateTo("devices/edit", $selectedLang, {
+            deviceId: String(deviceId),
+            deviceName: deviceName,
+        });
+    }
 </script>
 
 <!--
   Devices Page: renders a loading spinner until `loaded` is true,
   then displays a grid of DeviceCard components followed by the AddDevice button.
 -->
-<div class="container">
-    <div class="content">
-        <div class="loader-div" class:close={loaded}>
-            <div class="spinner"></div>
-        </div>
-        {#each sortedDevices as device (device.id)}
-            <DeviceCard
-                deviceID={device.id}
-                deviceName={device.name}
-                connected={device.connected}
-                notifications={device.notifications ?? ""}
-                width="300px"
-                height="400px"
-                borderRadius="20px"
-                backgroundColor="#14161c"
-                borderColor="rgba(255,255,255,0.07)"
-                imageURL={`/devices/${device.name}_${device.id}.png`}
-                imageBackgroundColor="rgba(255, 255, 255, 0.1)"
-                imageWidth="200px"
-                imageHeight="200px"
-                onEdit={() => {
-                    /* ... */
-                }}
-                onEnter={() => {
-                    /* ... */
-                }}
-            />
-        {/each}
-        <AddDevice
-            width="300px"
-            height="400px"
-            borderRadius="20px"
-            backgroundColor="#14161c"
-            borderColor="rgba(255,255,255,0.07)"
-            imageBackgroundColor="rgba(255, 255, 255, 0.1)"
-            imageWidth="200px"
-            imageHeight="200px"
-            strokeColor="#9E9E9E"
-            strokeSelectedColor="#e0e0e0"
-            onClick={() => {}}
-        />
-    </div>
-</div>
+
+{#each sortedDevices as device (device.id)}
+    <DeviceCard
+        deviceID={device.id}
+        deviceName={device.name}
+        connected={device.connected}
+        notifications={device.notifications ?? ""}
+        width="300px"
+        height="400px"
+        borderRadius="20px"
+        backgroundColor="#14161c"
+        borderColor="rgba(255,255,255,0.07)"
+        imageURL={`/devices/${device.name}_${device.id}.png`}
+        imageBackgroundColor="rgba(255, 255, 255, 0.1)"
+        imageWidth="200px"
+        imageHeight="200px"
+        onEdit={() => editDevice(device.id, device.name)}
+        onEnter={() => {
+            /* ... */
+        }}
+    />
+{/each}
+<AddDevice
+    width="300px"
+    height="400px"
+    borderRadius="20px"
+    backgroundColor="#14161c"
+    borderColor="rgba(255,255,255,0.07)"
+    imageBackgroundColor="rgba(255, 255, 255, 0.1)"
+    imageWidth="200px"
+    imageHeight="200px"
+    strokeColor="#9E9E9E"
+    strokeSelectedColor="#e0e0e0"
+    onClick={() => {}}
+/>
 
 <style>
-    /* Container: outer wrapper with padding and full height */
-    .container {
-        box-sizing: border-box;
-        margin: 0;
-        padding: 30px;
-        height: 100%;
-    }
-
-    /* Content: grid layout centering 300px cards with gaps */
-    .container .content {
-        width: 100%;
-        height: 100%;
-        margin: 0;
-        padding: 0;
-        position: relative;
-        display: grid;
-        grid-template-columns: repeat(auto-fill, 300px);
-        gap: 30px;
-        justify-content: center;
-    }
-
-    /* Loader overlay: full-screen dark backdrop with centered spinner */
-    .container .content .loader-div {
-        position: absolute;
-        inset: 0;
-        margin: 0;
-        padding: 0;
-        width: 100%;
-        min-height: calc(100vh - 74px - 60px);
-        height: 100%;
-        background-color: #181d23;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        z-index: 1;
-        opacity: 1;
-        transition: opacity 0.2s ease-in-out;
-    }
-
-    /* Loader hidden state: fade out and drop behind content */
-    .container .content .loader-div.close {
-        opacity: 0;
-        z-index: 0;
-    }
-
-    /* Spinner: circular border animation */
-    .spinner {
-        width: 128px;
-        height: 128px;
-        border: 4px solid rgba(255, 255, 255, 0.2);
-        border-top-color: #fff;
-        border-radius: 50%;
-        animation: spin 1s linear infinite;
-    }
-
-    /* Spin animation: full rotation */
-    @keyframes spin {
-        to {
-            transform: rotate(360deg);
-        }
-    }
 </style>
