@@ -1,6 +1,6 @@
 <script lang="ts">
     // Stores for multi-language support
-    import { selectedLang, texts } from "../../../stores/lang";
+    import { selectedLang, texts } from "../../../lib/stores/lang";
 
     // Layout / styling props
     export let paddingTop: string = "0px";

@@ -7,8 +7,8 @@
     export let invertOptions: boolean = false; //Invert Options div position
 
     // Stores for multi-language support
-    import type { Language } from "../../stores/lang";
-    import { selectedLang, texts } from "../../stores/lang";
+    import type { Language } from "../../lib/stores/lang";
+    import { selectedLang, texts } from "../../lib/stores/lang";
     import { page } from "$app/state";
 
     // Layout / styling props

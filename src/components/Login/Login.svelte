@@ -1,15 +1,15 @@
 <script lang="ts">
     import { browser } from "$app/environment";
     import { onMount, onDestroy } from "svelte";
-    import { selectedLang, texts } from "../../stores/lang";
-    import type { Language } from "../../stores/lang";
+    import { selectedLang, texts } from "../../lib/stores/lang";
+    import type { Language } from "../../lib/stores/lang";
     import {
         loginUser,
         interpretLoginStatus,
         validateUsername,
         validatePassword,
-    } from "../../ts/login";
-    import { navigateTo } from "../../ts/navigation";
+    } from "../../lib/ts/login";
+    import { navigateTo } from "../../lib/ts/navigation";
 
     import LoginField from "./Inputs/LoginField.svelte";
     import LoginButton from "./Buttons/LoginButton.svelte";
@@ -61,8 +61,6 @@
         try {
             // Send login request
             const { status, data }: { status: number; data: any } = await loginUser(
-                "/api/login", // API URL
-                "POST", // HTTP method
                 username, // Username
                 password, // Password
                 autoLogin // Auto-login flag

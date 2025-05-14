@@ -1,19 +1,19 @@
 <script lang="ts">
     import { onMount } from "svelte";
-    import { autoLogin } from "../ts/login";
+    import { autoLogin } from "../lib/ts/login";
     import { page } from "$app/state";
-    import { logoutUser } from "../ts/login";
-    import { navigateTo } from "../ts/navigation";
+    import { logoutUser } from "../lib/ts/login";
+    import { navigateTo } from "../lib/ts/navigation";
     import { fade } from "svelte/transition";
 
     // Stores for multi-language support
-    import { selectedLang, texts } from "../stores/lang";
+    import { selectedLang, texts } from "../lib/stores/lang";
 
     // Stores for alerts
-    import { displayAlert, alertText, alertTimeout } from "../stores/alerts";
+    import { displayAlert, alertText, alertTimeout } from "../lib/stores/alerts";
 
     // Splash screen store
-    import { splashDone } from "../stores/auth";
+    import { splashDone } from "../lib/stores/auth";
 
     import LeftPanel from "../components/Dashboard/LeftPanel.svelte";
     import Logo from "../components/General/Logo.svelte";
@@ -37,7 +37,7 @@
     //Check Auto-login Function
     async function checkAuthentication() {
         const path = window.location.pathname;
-        const { status } = await autoLogin("/api/auto_login", "POST");
+        const { status } = await autoLogin();
 
         if (status === 200) {
             // Authenticated
@@ -106,7 +106,7 @@
 
     //Logout Function
     async function logout(): Promise<void> {
-        const { status } = await logoutUser("/api/logout", "POST");
+        const { status } = await logoutUser();
         await navigateTo("/login", $selectedLang, true);
     }
 </script>

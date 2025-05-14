@@ -1,11 +1,11 @@
 <script lang="ts">
-    import { navigateTo } from "../../ts/navigation";
+    import { navigateTo } from "../../lib/ts/navigation";
     import Link from "./Buttons/Link.svelte";
     import LangSelector from "../General/LangSelector.svelte";
     import Logo from "../General/Logo.svelte";
 
     // Stores for multi-language support
-    import { selectedLang, texts } from "../../stores/lang";
+    import { selectedLang, texts } from "$lib/stores/lang"
 
     //Props
     export let leftPanelOpen: boolean;
