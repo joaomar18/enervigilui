@@ -1,7 +1,7 @@
 <script lang="ts">
     import { onMount, onDestroy } from "svelte";
     import { getDeviceState } from "$lib/ts/devices";
-    import Selector from "src/components/General/Selector.svelte";
+    import Selector from "../../../components/General/Selector.svelte";
 
     // Stores for multi-language support
     import { texts, selectedLang } from "$lib/stores/lang";
@@ -31,7 +31,6 @@
                     showAlert($texts.errorDeviceState);
                 } else {
                     deviceData = data;
-                    console.log(deviceData);
                     sucess = true;
                 }
             } catch (e) {

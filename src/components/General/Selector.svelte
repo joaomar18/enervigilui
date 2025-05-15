@@ -39,6 +39,7 @@
     onMount(() => {
         if (browser) {
             window.addEventListener("click", handleClickOutside);
+            console.log(options);
         }
     });
 
@@ -76,7 +77,7 @@
         <div class="options {isOpen ? '' : 'disabled'} {invertOptions ? 'inverted' : 'normal'}">
             {#each Object.entries(options) as [key, value]}
                 <div class="option {selectedOption == value ? 'selected-option' : ''}">
-                    <span class="option-name"></span>
+                    <span class="option-name">{key}</span>
                     <button on:click={() => changeOption(key)} aria-label={key}></button>
                 </div>
             {/each}
@@ -91,7 +92,7 @@
         border-radius: 5px;
         border: 1px solid var(--border-color);
         height: 40px;
-        width: 150px;
+        width: 250px;
         top: 50%;
     }
 
@@ -114,7 +115,7 @@
         color: #eeeeee;
         font-weight: 400;
         position: absolute;
-        font-size: 1.5rem;
+        font-size: 1rem;
         left: 50%;
         top: 50%;
         transform: translate(-50%, -50%);
@@ -157,10 +158,14 @@
         position: relative;
         width: 100%;
         padding: 5px;
+        min-height: 40px;
         box-sizing: border-box;
+        display: flex;
+        align-items: center;
+        justify-content: center;
         text-align: center;
         font-weight: 400;
-        font-size: 1.5rem;
+        font-size: 1rem;
         color: #b0bec5;
     }
 
