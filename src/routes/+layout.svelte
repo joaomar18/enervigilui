@@ -539,17 +539,13 @@
         height: 100%;
     }
 
-    /* Content: grid layout centering 300px cards with gaps */
+    /* Content div */
     .dashboard-container .container-div .content-div {
         width: 100%;
         height: 100%;
         margin: 0;
         padding: 0;
         position: relative;
-        display: grid;
-        grid-template-columns: repeat(auto-fill, 300px);
-        gap: 30px;
-        justify-content: center;
     }
 
     /* Loader overlay: full-screen dark backdrop with centered spinner */
@@ -567,13 +563,14 @@
         align-items: center;
         z-index: 1;
         opacity: 1;
-        transition: opacity 0.2s ease-in-out;
     }
 
     /* Loader hidden state: fade out and drop behind content */
     .dashboard-container .container-div .content-div .loader-div.close {
+        transition: opacity 0.2s ease-in-out;
         opacity: 0;
         z-index: 0;
+        pointer-events: none;
     }
 
     /* Spinner: circular border animation */
@@ -667,7 +664,7 @@
     }
 
     /* Show logo slot and fixed header margin on wider screens */
-    @media (min-width: 440px) {
+    @media (min-width: 470px) {
         .dashboard-container .left-header-div .logo-div {
             display: flex;
         }

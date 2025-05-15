@@ -157,7 +157,7 @@
     }
 
     /* Tablet breakpoint: collapse text, same width and height container */
-    @media (max-width: 519px) {
+    @media (max-width: 559px) {
         .container {
             width: var(--height);
         }

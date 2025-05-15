@@ -1,15 +1,11 @@
 <script lang="ts">
     import { browser } from "$app/environment";
-    import { goto } from "$app/navigation";
     import { onMount, onDestroy } from "svelte";
-    import { page } from "$app/state";
 
     //Props
+    export let options: Record<string, any>; //Record with options for the selector
+    export let selectedOption: any; //Selected option
     export let invertOptions: boolean = false; //Invert Options div position
-
-    // Stores for multi-language support
-    import type { Language } from "$lib/stores/lang";
-    import { selectedLang, texts } from "$lib/stores/lang";
 
     // Layout / styling props
     export let backgroundColor: string = "#252b33";
@@ -18,41 +14,35 @@
 
     // Variables
     let isOpen: boolean = false;
-    let langDivEl: Node;
+    let selDivEl: Node;
+    $: selectedKey = Object.entries(options).find(([_, value]) => value === selectedOption)?.[0];
 
     // Functions
     function toggleSelector(): void {
         isOpen = !isOpen;
     }
 
-    function changeLanguage(language: Language): void {
-        selectedLang.set(language);
+    //Change Option Function
+    function changeOption(optionKey: string): void {
+        selectedOption = options[optionKey];
         isOpen = false;
-
-        const params = new URLSearchParams(page.url.searchParams);
-        params.set("lang", language);
-        goto(`${page.url.pathname}?${params.toString()}`);
     }
 
+    //Handle Click Outside Function
     function handleClickOutside(event: MouseEvent): void {
-        if (langDivEl && !langDivEl.contains(event.target as Node)) {
+        if (selDivEl && !selDivEl.contains(event.target as Node)) {
             isOpen = false;
         }
     }
 
+    //On Mount Function
     onMount(() => {
         if (browser) {
-            const params = new URLSearchParams(window.location.search);
-            let lang = (params.get("lang") || "PT") as Language;
-            if (lang !== "PT" && lang !== "EN") {
-                lang = "PT";
-            }
-            changeLanguage(lang);
-
             window.addEventListener("click", handleClickOutside);
         }
     });
 
+    //Cleanup Function
     onDestroy(() => {
         if (browser) {
             window.removeEventListener("click", handleClickOutside);
@@ -60,12 +50,9 @@
     });
 </script>
 
-<!-- 
-  LangSelDropdown: Dropdown component for selecting the application language.
--->
 <div
-    bind:this={langDivEl}
-    class="language-div"
+    bind:this={selDivEl}
+    class="selector-div"
     style="
         --background-color: {backgroundColor};
         --border-color: {borderColor};
@@ -73,8 +60,7 @@
     "
 >
     <div class="content-div">
-        <img class="globe" src="/img/globe.png" alt="globe" />
-        <span class="selected-lang">{$selectedLang}</span>
+        <span class="selected-option">{selectedKey}</span>
         <img
             class="arrow"
             src={invertOptions
@@ -88,21 +74,18 @@
         />
         <button class="open-selector" on:click={toggleSelector} aria-label="View options"></button>
         <div class="options {isOpen ? '' : 'disabled'} {invertOptions ? 'inverted' : 'normal'}">
-            <div class="option {$selectedLang == 'PT' ? 'selected-option' : ''}">
-                <span class="lang-option">PT</span>
-                <button on:click={() => changeLanguage("PT")} aria-label="PT"></button>
-            </div>
-            <div class="option {$selectedLang == 'EN' ? 'selected-option' : ''}">
-                <span class="lang-option">EN</span>
-                <button on:click={() => changeLanguage("EN")} aria-label="EN"></button>
-            </div>
+            {#each Object.entries(options) as [key, value]}
+                <div class="option {selectedOption == value ? 'selected-option' : ''}">
+                    <span class="option-name"></span>
+                    <button on:click={() => changeOption(key)} aria-label={key}></button>
+                </div>
+            {/each}
         </div>
     </div>
 </div>
 
 <style>
-    /* Wrapper for the language selector */
-    .language-div {
+    .selector-div {
         display: block;
         background-color: var(--background-color);
         border-radius: 5px;
@@ -112,24 +95,12 @@
         top: 50%;
     }
 
-    /* Inner content container */
     .content-div {
         position: relative;
         width: 100%;
         height: 100%;
     }
 
-    /* Globe icon */
-    .globe {
-        height: 32px;
-        width: 32px;
-        position: absolute;
-        top: 50%;
-        left: 10px;
-        transform: translateY(-50%);
-    }
-
-    /* Arrow icon (down or up) */
     .arrow {
         height: 16px;
         width: 16px;
@@ -139,8 +110,7 @@
         transform: translateY(-50%);
     }
 
-    /* Current selected language text */
-    .selected-lang {
+    .selected-option {
         color: #eeeeee;
         font-weight: 400;
         position: absolute;
@@ -150,7 +120,6 @@
         transform: translate(-50%, -50%);
     }
 
-    /* Transparent button that triggers the dropdown */
     .open-selector {
         position: absolute;
         width: 100%;
@@ -159,7 +128,6 @@
         cursor: pointer;
     }
 
-    /* Dropdown options container */
     .options {
         position: absolute;
         width: 100%;
@@ -173,22 +141,18 @@
         align-items: center;
     }
 
-    /* Dropdown options position when normal (opens to the bottom) */
     .options.normal {
         top: calc(100% + 2px);
     }
 
-    /* Dropdown options position when normal (opens to the top) */
     .options.inverted {
         bottom: calc(100% + 2px);
     }
 
-    /* Hide dropdown when closed */
     .options.disabled {
         display: none;
     }
 
-    /* Individual option item */
     .option {
         position: relative;
         width: 100%;
@@ -200,7 +164,6 @@
         color: #b0bec5;
     }
 
-    /* Clickable transparent overlay for option */
     .option button {
         position: absolute;
         width: 100%;
@@ -211,7 +174,6 @@
         cursor: pointer;
     }
 
-    /* Styling for the currently selected option */
     .option.selected-option {
         background-color: var(--selected-color);
         color: #ffffff;

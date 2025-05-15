@@ -65,40 +65,51 @@
   then displays a grid of DeviceCard components followed by the AddDevice button.
 -->
 
-{#each sortedDevices as device (device.id)}
-    <DeviceCard
-        deviceID={device.id}
-        deviceName={device.name}
-        connected={device.connected}
-        notifications={device.notifications ?? ""}
+<div class="content">
+    {#each sortedDevices as device (device.id)}
+        <DeviceCard
+            deviceID={device.id}
+            deviceName={device.name}
+            connected={device.connected}
+            notifications={device.notifications ?? ""}
+            width="300px"
+            height="400px"
+            borderRadius="20px"
+            backgroundColor="#14161c"
+            borderColor="rgba(255,255,255,0.07)"
+            imageURL={`/devices/${device.name}_${device.id}.png`}
+            imageBackgroundColor="rgba(255, 255, 255, 0.1)"
+            imageWidth="200px"
+            imageHeight="200px"
+            onEdit={() => editDevice(device.id, device.name)}
+            onEnter={() => {
+                /* ... */
+            }}
+        />
+    {/each}
+    <AddDevice
         width="300px"
         height="400px"
         borderRadius="20px"
         backgroundColor="#14161c"
         borderColor="rgba(255,255,255,0.07)"
-        imageURL={`/devices/${device.name}_${device.id}.png`}
         imageBackgroundColor="rgba(255, 255, 255, 0.1)"
         imageWidth="200px"
         imageHeight="200px"
-        onEdit={() => editDevice(device.id, device.name)}
-        onEnter={() => {
-            /* ... */
-        }}
+        strokeColor="#9E9E9E"
+        strokeSelectedColor="#e0e0e0"
+        onClick={() => {}}
     />
-{/each}
-<AddDevice
-    width="300px"
-    height="400px"
-    borderRadius="20px"
-    backgroundColor="#14161c"
-    borderColor="rgba(255,255,255,0.07)"
-    imageBackgroundColor="rgba(255, 255, 255, 0.1)"
-    imageWidth="200px"
-    imageHeight="200px"
-    strokeColor="#9E9E9E"
-    strokeSelectedColor="#e0e0e0"
-    onClick={() => {}}
-/>
+</div>
 
 <style>
+    .content {
+        padding: 0;
+        margin: 0;
+        height: 100%;
+        display: grid;
+        grid-template-columns: repeat(auto-fill, 300px);
+        gap: 30px;
+        justify-content: center;
+    }
 </style>

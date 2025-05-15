@@ -178,6 +178,14 @@ const textsObject: TextsObject = {
         PT: "Não foram atribuídos o nome e/ou o id do dispositivo.",
         EN: "The name and/or the id of the device were not assigned.",
     },
+    deviceOptions: {
+        PT: "Opções do Dispositivo",
+        EN: "Device Options",
+    },
+    deviceOptionsSub: {
+        PT: "Opções relacionadas com o tipo e gestão do dispositivo",
+        EN: "Options related to device type and management",
+    },
 };
 
 export const texts = readable<TextsObject>(textsObject);

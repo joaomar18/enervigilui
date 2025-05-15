@@ -289,7 +289,7 @@
     }
 
     /* Hide logo slot on larger screens */
-    @media (min-width: 440px) {
+    @media (min-width: 470px) {
         .container .logo-div {
             display: none;
         }
