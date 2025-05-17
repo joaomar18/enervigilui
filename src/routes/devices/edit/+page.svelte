@@ -31,6 +31,7 @@
                     showAlert($texts.errorDeviceState);
                 } else {
                     deviceData = data;
+                    selectedProtocol = deviceData.protocol;
                     sucess = true;
                 }
             } catch (e) {
@@ -61,6 +62,8 @@
     onDestroy(() => {
         clearTimeout(pollTimer);
     });
+
+    $: console.log(selectedProtocol);
 </script>
 
 <div class="content">
@@ -77,7 +80,20 @@
                 <h3>{$texts.deviceOptions[$selectedLang]}</h3>
                 <span>{$texts.deviceOptionsSub[$selectedLang]}</span>
             </div>
-            <Selector options={protocols} bind:selectedOption={selectedProtocol} />
+            <Selector
+                options={protocols}
+                bind:selectedOption={selectedProtocol}
+                width="200px"
+                height="40px"
+                borderRadius="5px"
+                backgroundColor="#252b33"
+                borderColor="#323a45"
+                selectedColor="#14566b"
+                optionsBackgroundColor="#1e242b"
+                optionsBorderColor="#323a45"
+                letterSpacing="0.5px"
+                wordSpacing="1px"
+            />
         </div>
     </div>
 </div>

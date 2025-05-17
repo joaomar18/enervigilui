@@ -8,9 +8,17 @@
     export let invertOptions: boolean = false; //Invert Options div position
 
     // Layout / styling props
-    export let backgroundColor: string = "#252b33";
-    export let borderColor: string = "#323a45";
-    export let selectedColor: string = "#00796b";
+    export let width: string;
+    export let height: string;
+    export let borderRadius: string = "0px";
+    export let backgroundColor: string;
+    export let borderColor: string = backgroundColor;
+    export let selectedColor: string = backgroundColor;
+    export let optionsBackgroundColor: string = backgroundColor;
+    export let optionsBorderColor: string = backgroundColor;
+    export let fontSize: string = "1rem";
+    export let letterSpacing: string = "normal";
+    export let wordSpacing: string = "normal";
 
     // Variables
     let isOpen: boolean = false;
@@ -39,7 +47,6 @@
     onMount(() => {
         if (browser) {
             window.addEventListener("click", handleClickOutside);
-            console.log(options);
         }
     });
 
@@ -55,9 +62,17 @@
     bind:this={selDivEl}
     class="selector-div"
     style="
+        --width: {width};
+        --height: {height};
+        --border-radius: {borderRadius};
         --background-color: {backgroundColor};
         --border-color: {borderColor};
         --selected-color: {selectedColor};
+        --options-background-color: {optionsBackgroundColor};
+        --options-border-color: {optionsBorderColor};
+        --font-size: {fontSize};
+        --leter-spacing: {letterSpacing};
+        --word-spacing: {wordSpacing};
     "
 >
     <div class="content-div">
@@ -88,18 +103,20 @@
 <style>
     .selector-div {
         display: block;
+        width: var(--width);
+        height: var(--height);
         background-color: var(--background-color);
-        border-radius: 5px;
+        border-radius: var(--border-radius);
         border: 1px solid var(--border-color);
-        height: 40px;
-        width: 250px;
-        top: 50%;
     }
 
     .content-div {
         position: relative;
         width: 100%;
         height: 100%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
     }
 
     .arrow {
@@ -114,11 +131,10 @@
     .selected-option {
         color: #eeeeee;
         font-weight: 400;
-        position: absolute;
-        font-size: 1rem;
-        left: 50%;
-        top: 50%;
-        transform: translate(-50%, -50%);
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+        font-size: var(--font-size);
+        letter-spacing: var(--leter-spacing);
+        word-spacing: var(--word-spacing);
     }
 
     .open-selector {
@@ -133,9 +149,9 @@
         position: absolute;
         width: 100%;
         height: fit-content;
-        background-color: #1e242b;
-        border-radius: 5px;
-        border: 1px solid #323a45;
+        background-color: var(--options-backgound-color);
+        border-radius: var(--border-radius);
+        border: 1px solid var(--options-border-color);
         display: flex;
         flex-direction: column;
         justify-content: start;
@@ -157,15 +173,18 @@
     .option {
         position: relative;
         width: 100%;
+        height: var(--height);
         padding: 5px;
-        min-height: 40px;
         box-sizing: border-box;
         display: flex;
         align-items: center;
         justify-content: center;
         text-align: center;
         font-weight: 400;
-        font-size: 1rem;
+        font-size: var(--font-size);
+        letter-spacing: var(--leter-spacing);
+        word-spacing: var(--word-spacing);
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
         color: #b0bec5;
     }
 
