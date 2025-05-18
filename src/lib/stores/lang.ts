@@ -202,6 +202,22 @@ const textsObject: TextsObject = {
         PT: "Tipo de conexão elétrica para medição e análise de energia.",
         EN: "Electrical connection type for energy metering and analysis.",
     },
+    readEnergyFromMeter: {
+        PT: "Obter leitura de energia do dispositivo",
+        EN: "Get energy reading from device",
+    },
+    readForwardReverseEnergySeparate: {
+        PT: "Leitura de energia direta e inversa separada",
+        EN: "Separate forward and reverse energy reading",
+    },
+    negativeReactivePower: {
+        PT: "Potência reativa negativa",
+        EN: "Negative reactive power",
+    },
+    frequencyReading: {
+        PT: "Leitura de frequência",
+        EN: "Frequency reading",
+    },
 };
 
 export const texts = readable<TextsObject>(textsObject);

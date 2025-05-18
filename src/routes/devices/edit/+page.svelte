@@ -176,6 +176,19 @@
                     </div>
                 </div>
             </div>
+
+            <div class="device-input-div">
+                <span>{$texts.readEnergyFromMeter[$selectedLang]}</span>
+            </div>
+            <div class="device-input-div">
+                <span>{$texts.readForwardReverseEnergySeparate[$selectedLang]}</span>
+            </div>
+            <div class="device-input-div">
+                <span>{$texts.negativeReactivePower[$selectedLang]}</span>
+            </div>
+            <div class="device-input-div">
+                <span>{$texts.frequencyReading[$selectedLang]}</span>
+            </div>
         </div>
     </div>
 </div>
@@ -277,7 +290,7 @@
         align-items: center;
         flex-direction: row;
         flex-wrap: wrap;
-        gap: 30px;
+        gap: 20px;
     }
 
     .device-input-div span {
