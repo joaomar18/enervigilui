@@ -156,6 +156,8 @@
         position: absolute;
         width: 100%;
         height: 100%;
+        padding: 0;
+        margin: 0;
         opacity: 0;
         cursor: pointer;
     }
@@ -171,7 +173,7 @@
         flex-direction: column;
         justify-content: start;
         align-items: center;
-        z-index:1;
+        z-index: 1;
     }
 
     .options.normal {
