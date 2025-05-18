@@ -78,7 +78,7 @@
     >
         <slot />
     </div>
-    <button on:click={toogleHint} bind:this={buttonEl} aria-label="Show Hint">
+    <button on:click={toogleHint} bind:this={buttonEl} aria-label="Show Hint" class:hint-opened={hintOpened}>
         <div
             class="hint-button"
             style="
@@ -178,6 +178,10 @@
         cursor: pointer;
         background-color: transparent;
         border: none;
+    }
+
+    /* Places button on front when hint is opened */
+    button.hint-opened{
         z-index: 1;
     }
 
