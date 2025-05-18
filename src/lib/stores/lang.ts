@@ -186,6 +186,22 @@ const textsObject: TextsObject = {
         PT: "Opções relacionadas com o tipo e gestão do dispositivo",
         EN: "Options related to device type and management",
     },
+    communicationProtocol: {
+        PT: "Protocolo de Comunicação",
+        EN: "Communication Protocol",
+    },
+    communicationProtocolInfo: {
+        PT: "Protocolo de comunicação utilizado para obter dados do dispositivo.",
+        EN: "Communication protocol used to obtain data from the device.",
+    },
+    connectionType: {
+        PT: "Tipo de Conexão",
+        EN: "Connection Type",
+    },
+    connectionTypeInfo: {
+        PT: "Tipo de conexão elétrica para medição e análise de energia.",
+        EN: "Electrical connection type for energy metering and analysis.",
+    },
 };
 
 export const texts = readable<TextsObject>(textsObject);

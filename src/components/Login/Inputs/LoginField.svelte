@@ -224,6 +224,7 @@
         font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
         font-size: 1rem;
         font-weight: 300;
+        line-height: 1.5;
         color: white;
     }
 

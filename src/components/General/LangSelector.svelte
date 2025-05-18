@@ -171,6 +171,7 @@
         flex-direction: column;
         justify-content: start;
         align-items: center;
+        z-index: 1;
     }
 
     /* Dropdown options position when normal (opens to the bottom) */

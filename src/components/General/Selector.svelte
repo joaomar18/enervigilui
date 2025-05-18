@@ -19,6 +19,9 @@
     export let fontSize: string = "1rem";
     export let letterSpacing: string = "normal";
     export let wordSpacing: string = "normal";
+    export let arrowWidth: string;
+    export let arrowHeight: string;
+    export let arrowRightPos: string = "0px";
 
     // Variables
     let isOpen: boolean = false;
@@ -73,6 +76,10 @@
         --font-size: {fontSize};
         --leter-spacing: {letterSpacing};
         --word-spacing: {wordSpacing};
+        --arrow-width: {arrowWidth};
+        --arrow-height: {arrowHeight};
+        --arrow-right-position: {arrowRightPos};
+        --selected-option-shift-left: {arrowRightPos};
     "
 >
     <div class="content-div">
@@ -120,21 +127,29 @@
     }
 
     .arrow {
-        height: 16px;
-        width: 16px;
         position: absolute;
+        width: var(--arrow-width);
+        height: var(--arrow-height);
+        right: var(--arrow-right-position);
         top: 50%;
-        right: 10px;
         transform: translateY(-50%);
     }
 
     .selected-option {
+        width: 100%;
+        height: 100%;
+        display: flex;
+        margin: 0;
+        padding: 0;
+        align-items: center;
+        justify-content: center;
         color: #eeeeee;
         font-weight: 400;
         font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
         font-size: var(--font-size);
         letter-spacing: var(--leter-spacing);
         word-spacing: var(--word-spacing);
+        padding-right: var(--selected-option-shift-left);
     }
 
     .open-selector {
@@ -149,13 +164,14 @@
         position: absolute;
         width: 100%;
         height: fit-content;
-        background-color: var(--options-backgound-color);
+        background-color: var(--options-background-color);
         border-radius: var(--border-radius);
         border: 1px solid var(--options-border-color);
         display: flex;
         flex-direction: column;
         justify-content: start;
         align-items: center;
+        z-index:1;
     }
 
     .options.normal {

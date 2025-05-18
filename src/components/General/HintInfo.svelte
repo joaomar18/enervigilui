@@ -64,6 +64,20 @@
 -->
 <div class="info-div">
     <span style="--info-text-color:{textColor}" class="info-text">{labelText}</span>
+    <div
+        bind:this={hintDiv}
+        class="hint-div"
+        style="
+            --hint-width: {hintWidth};
+            --hint-height: {hintHeight};
+            --hint-background-color: {hintBackgroundColor};
+            --hint-border-color: {hintBorderColor};
+            --hint-border-radius: {hintBorderRadius};
+        "
+        class:open={hintOpened}
+    >
+        <slot />
+    </div>
     <button on:click={toogleHint} bind:this={buttonEl} aria-label="Show Hint">
         <div
             class="hint-button"
@@ -134,20 +148,6 @@
             </div>
         </div>
     </button>
-    <div
-        bind:this={hintDiv}
-        class="hint-div"
-        style="
-            --hint-width: {hintWidth};
-            --hint-height: {hintHeight};
-            --hint-background-color: {hintBackgroundColor};
-            --hint-border-color: {hintBorderColor};
-            --hint-border-radius: {hintBorderRadius};
-        "
-        class:open={hintOpened}
-    >
-        <slot />
-    </div>
 </div>
 
 <style>
@@ -157,7 +157,7 @@
         height: fit-content;
         display: flex;
         flex-direction: row;
-        justify-content: right;
+        justify-content: flex-end;
         align-items: end;
         position: relative;
         font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
@@ -277,6 +277,7 @@
         max-width: 280px;
         box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
         display: none;
+        z-index: 1;
     }
 
     /* Display hint box when open */
