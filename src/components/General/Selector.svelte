@@ -61,6 +61,12 @@
     });
 </script>
 
+<!-- 
+  Custom dropdown selector component.
+  Dynamically styled using CSS variables.
+  Displays a list of options, highlights the selected one, 
+  and toggles visibility on button click.
+-->
 <div
     bind:this={selDivEl}
     class="selector-div"
@@ -108,6 +114,7 @@
 </div>
 
 <style>
+    /* Wrapper for the custom selector */
     .selector-div {
         display: block;
         width: var(--width);
@@ -117,6 +124,7 @@
         border: 1px solid var(--border-color);
     }
 
+    /* Inner content container with centered layout */
     .content-div {
         position: relative;
         width: 100%;
@@ -126,6 +134,7 @@
         align-items: center;
     }
 
+    /* Arrow icon (dropdown indicator) */
     .arrow {
         position: absolute;
         width: var(--arrow-width);
@@ -135,6 +144,7 @@
         transform: translateY(-50%);
     }
 
+    /* Currently selected option text */
     .selected-option {
         width: 100%;
         height: 100%;
@@ -152,6 +162,7 @@
         padding-right: var(--selected-option-shift-left);
     }
 
+    /* Invisible button to trigger dropdown */
     .open-selector {
         position: absolute;
         width: 100%;
@@ -162,6 +173,7 @@
         cursor: pointer;
     }
 
+    /* Dropdown container for options */
     .options {
         position: absolute;
         width: 100%;
@@ -176,18 +188,22 @@
         z-index: 1;
     }
 
+    /* Dropdown opens below selector */
     .options.normal {
         top: calc(100% + 2px);
     }
 
+    /* Dropdown opens above selector */
     .options.inverted {
         bottom: calc(100% + 2px);
     }
 
+    /* Hides the dropdown when closed */
     .options.disabled {
         display: none;
     }
 
+    /* Individual option style */
     .option {
         position: relative;
         width: 100%;
@@ -206,6 +222,7 @@
         color: #b0bec5;
     }
 
+    /* Transparent overlay to make the option fully clickable */
     .option button {
         position: absolute;
         width: 100%;
@@ -216,6 +233,7 @@
         cursor: pointer;
     }
 
+    /* Styling for the currently selected option */
     .option.selected-option {
         background-color: var(--selected-color);
         color: #ffffff;
