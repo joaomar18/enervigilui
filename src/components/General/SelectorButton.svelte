@@ -58,6 +58,8 @@
 <style>
     /* Toggle button container */
     button {
+        margin:0;
+        padding:0;
         width: var(--width);
         height: var(--height);
         background-color: var(--background-color);
