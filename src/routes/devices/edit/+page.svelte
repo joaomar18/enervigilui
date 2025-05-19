@@ -181,25 +181,125 @@
             <div class="device-input-div">
                 <span>{$texts.readEnergyFromMeter[$selectedLang]}</span>
                 <div class="selector-div">
-                    <SelectorButton />
+                    <div class="selector-button-div">
+                        <SelectorButton />
+                    </div>
+                    <div class="info-div">
+                        <HintInfo
+                            labelText=""
+                            hintWidth="300px"
+                            hintHeight="fit-content"
+                            hintBackgroundColor="#1e242b"
+                            hintBorderColor="#2c343d"
+                            hintBorderRadius="10px"
+                            textColor="#f5f5f5;"
+                            openBackgroundColor="rgba(255, 255, 255, 0.05)"
+                            openHoverBackgroundColor="rgba(255, 255, 255, 0.1)"
+                            openStrokeColor="#cccccc"
+                            openHoverStrokeColor="#eeeeee"
+                            closeBackgroundColor="rgba(255, 255, 255, 0.1)"
+                            closeHoverBackgroundColor="rgba(255, 255, 255, 0.2)"
+                            closeStrokeColor="white"
+                            closeHoverStrokeColor="#eeeeee"
+                        >
+                            <span class="info-text"
+                                >{$texts.readEnergyFromMeterInfo[$selectedLang]}</span
+                            >
+                        </HintInfo>
+                    </div>
                 </div>
             </div>
             <div class="device-input-div">
                 <span>{$texts.readForwardReverseEnergySeparate[$selectedLang]}</span>
                 <div class="selector-div">
-                    <SelectorButton />
+                    <div class="selector-button-div">
+                        <SelectorButton />
+                    </div>
+                    <div class="info-div">
+                        <HintInfo
+                            labelText=""
+                            hintWidth="300px"
+                            hintHeight="fit-content"
+                            hintBackgroundColor="#1e242b"
+                            hintBorderColor="#2c343d"
+                            hintBorderRadius="10px"
+                            textColor="#f5f5f5;"
+                            openBackgroundColor="rgba(255, 255, 255, 0.05)"
+                            openHoverBackgroundColor="rgba(255, 255, 255, 0.1)"
+                            openStrokeColor="#cccccc"
+                            openHoverStrokeColor="#eeeeee"
+                            closeBackgroundColor="rgba(255, 255, 255, 0.1)"
+                            closeHoverBackgroundColor="rgba(255, 255, 255, 0.2)"
+                            closeStrokeColor="white"
+                            closeHoverStrokeColor="#eeeeee"
+                        >
+                            <span class="info-text"
+                                >{$texts.readForwardReverseEnergySeparateInfo[$selectedLang]}</span
+                            >
+                        </HintInfo>
+                    </div>
                 </div>
             </div>
             <div class="device-input-div">
                 <span>{$texts.negativeReactivePower[$selectedLang]}</span>
                 <div class="selector-div">
-                    <SelectorButton />
+                    <div class="selector-button-div">
+                        <SelectorButton />
+                    </div>
+                    <div class="info-div">
+                        <HintInfo
+                            labelText=""
+                            hintWidth="300px"
+                            hintHeight="fit-content"
+                            hintBackgroundColor="#1e242b"
+                            hintBorderColor="#2c343d"
+                            hintBorderRadius="10px"
+                            textColor="#f5f5f5;"
+                            openBackgroundColor="rgba(255, 255, 255, 0.05)"
+                            openHoverBackgroundColor="rgba(255, 255, 255, 0.1)"
+                            openStrokeColor="#cccccc"
+                            openHoverStrokeColor="#eeeeee"
+                            closeBackgroundColor="rgba(255, 255, 255, 0.1)"
+                            closeHoverBackgroundColor="rgba(255, 255, 255, 0.2)"
+                            closeStrokeColor="white"
+                            closeHoverStrokeColor="#eeeeee"
+                        >
+                            <span class="info-text"
+                                >{$texts.negativeReactivePowerInfo[$selectedLang]}</span
+                            >
+                        </HintInfo>
+                    </div>
                 </div>
             </div>
             <div class="device-input-div">
                 <span>{$texts.frequencyReading[$selectedLang]}</span>
                 <div class="selector-div">
-                    <SelectorButton />
+                    <div class="selector-button-div">
+                        <SelectorButton />
+                    </div>
+                    <div class="info-div">
+                        <HintInfo
+                            labelText=""
+                            hintWidth="300px"
+                            hintHeight="fit-content"
+                            hintBackgroundColor="#1e242b"
+                            hintBorderColor="#2c343d"
+                            hintBorderRadius="10px"
+                            textColor="#f5f5f5;"
+                            openBackgroundColor="rgba(255, 255, 255, 0.05)"
+                            openHoverBackgroundColor="rgba(255, 255, 255, 0.1)"
+                            openStrokeColor="#cccccc"
+                            openHoverStrokeColor="#eeeeee"
+                            closeBackgroundColor="rgba(255, 255, 255, 0.1)"
+                            closeHoverBackgroundColor="rgba(255, 255, 255, 0.2)"
+                            closeStrokeColor="white"
+                            closeHoverStrokeColor="#eeeeee"
+                        >
+                            <span class="info-text"
+                                >{$texts.frequencyReadingInfo[$selectedLang]}</span
+                            >
+                        </HintInfo>
+                    </div>
                 </div>
             </div>
         </div>
@@ -298,6 +398,7 @@
     .device-input-div {
         position: relative;
         margin-top: 30px;
+        min-height: 50px;
         display: flex;
         justify-content: center;
         align-items: center;
@@ -327,6 +428,12 @@
         padding: 0;
         width: fit-content;
         height: 100%;
+    }
+
+    .selector-div .selector-button-div {
+        width: 200px;
+        display: flex;
+        justify-content: center;
     }
 
     .info-div .info-text {

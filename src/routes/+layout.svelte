@@ -267,7 +267,9 @@
                     <div class="loader-div" class:close={$loadedDone}>
                         <div class="spinner"></div>
                     </div>
-                    <slot />
+                    <div class="section-content-div" class:hide={!$loadedDone}>
+                        <slot class="section-content-div" />
+                    </div>
                 </div>
             </div>
         </main>
@@ -555,8 +557,7 @@
         margin: 0;
         padding: 0;
         width: 100%;
-        min-height: calc(100vh - 74px - 60px);
-        height: 100%;
+        height: calc(100vh - 74px - 60px);
         background-color: #181d23;
         display: flex;
         justify-content: center;
@@ -581,6 +582,11 @@
         border-top-color: #fff;
         border-radius: 50%;
         animation: content-spin 1s linear infinite;
+    }
+
+    /* Hide Section Content div */
+    .dashboard-container .container-div .content-div .section-content-div.hide {
+        display: none;
     }
 
     /* Spin animation: full rotation */

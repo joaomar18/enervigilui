@@ -206,17 +206,33 @@ const textsObject: TextsObject = {
         PT: "Obter leitura de energia do dispositivo",
         EN: "Get energy reading from device",
     },
+    readEnergyFromMeterInfo: {
+        PT: "Opção para valores de energia serem obtidos a partir do dispositivo.",
+        EN: "Option for energy readings to be obtained from the device.",
+    },
     readForwardReverseEnergySeparate: {
         PT: "Leitura de energia direta e inversa separada",
         EN: "Separate forward and reverse energy reading",
+    },
+    readForwardReverseEnergySeparateInfo: {
+        PT: "Opção para definir se o dispositivo comunica os valores de energia diretos e inversos separados.",
+        EN: "Option to define whether the device sends separate forward and reverse energy values.",
     },
     negativeReactivePower: {
         PT: "Potência reativa negativa",
         EN: "Negative reactive power",
     },
+    negativeReactivePowerInfo: {
+        PT: "Opção para definir se o dispositivo define valores de potência reativa negativos para fatores de potência adiantados.",
+        EN: "Option to define whether the device sets negative reactive power values ​​for leading power factors.",
+    },
     frequencyReading: {
         PT: "Leitura de frequência",
         EN: "Frequency reading",
+    },
+    frequencyReadingInfo: {
+        PT: "Opção para definir se o dispotivo permite a leitura de valores de frequência.",
+        EN: "Option to define whether the device allows reading frequency values.",
     },
 };
 
