@@ -2,6 +2,7 @@
     import { onMount, onDestroy } from "svelte";
     import { getDeviceState } from "$lib/ts/devices";
     import Selector from "../../../components/General/Selector.svelte";
+    import SelectorButton from "../../../components/General/SelectorButton.svelte";
     import HintInfo from "../../../components/General/HintInfo.svelte";
 
     // Stores for multi-language support
@@ -179,15 +180,27 @@
 
             <div class="device-input-div">
                 <span>{$texts.readEnergyFromMeter[$selectedLang]}</span>
+                <div class="selector-div">
+                    <SelectorButton />
+                </div>
             </div>
             <div class="device-input-div">
                 <span>{$texts.readForwardReverseEnergySeparate[$selectedLang]}</span>
+                <div class="selector-div">
+                    <SelectorButton />
+                </div>
             </div>
             <div class="device-input-div">
                 <span>{$texts.negativeReactivePower[$selectedLang]}</span>
+                <div class="selector-div">
+                    <SelectorButton />
+                </div>
             </div>
             <div class="device-input-div">
                 <span>{$texts.frequencyReading[$selectedLang]}</span>
+                <div class="selector-div">
+                    <SelectorButton />
+                </div>
             </div>
         </div>
     </div>
