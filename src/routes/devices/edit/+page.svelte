@@ -21,6 +21,10 @@
     let types = { "1F": "SINGLE_PHASE", "3F": "THREE_PHASE" };
     let selectedProtocol: string;
     let selectedType: string;
+    let readEnergyFromMeter: boolean;
+    let readForwardReverseEnergySeparate: boolean;
+    let negativeReactivePower: boolean;
+    let frequencyReading: boolean;
 
     //Function to fetch device status
     function fetchDeviceStatus(name: string, id: number): void {
@@ -38,6 +42,10 @@
                     console.log(deviceData);
                     selectedProtocol = deviceData.protocol;
                     selectedType = deviceData.type;
+                    readEnergyFromMeter = deviceData.options.read_energy_from_meter;
+                    readForwardReverseEnergySeparate = deviceData.options.read_separate_forward_reverse_energy;
+                    negativeReactivePower = deviceData.options.negative_reactive_power;
+                    frequencyReading = deviceData.options.frequency_reading;
                     sucess = true;
                 }
             } catch (e) {
@@ -182,7 +190,18 @@
                 <span>{$texts.readEnergyFromMeter[$selectedLang]}</span>
                 <div class="selector-div">
                     <div class="selector-button-div">
-                        <SelectorButton />
+                        <SelectorButton
+                            bind:checked={readEnergyFromMeter}
+                            width="75px"
+                            height="20px"
+                            knobWidth="32px"
+                            knobHeight="32px"
+                            borderRadius="10px"
+                            backgroundColor="#3a3a3a"
+                            selectedBackgroundColor="#4a4a4a"
+                            knobBackgroundColor="#e0e0e0"
+                            knobSelectedBackgroundColor="#2f80ed"
+                        />
                     </div>
                     <div class="info-div">
                         <HintInfo
@@ -213,7 +232,18 @@
                 <span>{$texts.readForwardReverseEnergySeparate[$selectedLang]}</span>
                 <div class="selector-div">
                     <div class="selector-button-div">
-                        <SelectorButton />
+                        <SelectorButton
+                            bind:checked={readForwardReverseEnergySeparate}
+                            width="75px"
+                            height="20px"
+                            knobWidth="32px"
+                            knobHeight="32px"
+                            borderRadius="10px"
+                            backgroundColor="#3a3a3a"
+                            selectedBackgroundColor="#4a4a4a"
+                            knobBackgroundColor="#e0e0e0"
+                            knobSelectedBackgroundColor="#2f80ed"
+                        />
                     </div>
                     <div class="info-div">
                         <HintInfo
@@ -244,7 +274,18 @@
                 <span>{$texts.negativeReactivePower[$selectedLang]}</span>
                 <div class="selector-div">
                     <div class="selector-button-div">
-                        <SelectorButton />
+                        <SelectorButton
+                            bind:checked={negativeReactivePower}
+                            width="75px"
+                            height="20px"
+                            knobWidth="32px"
+                            knobHeight="32px"
+                            borderRadius="10px"
+                            backgroundColor="#3a3a3a"
+                            selectedBackgroundColor="#4a4a4a"
+                            knobBackgroundColor="#e0e0e0"
+                            knobSelectedBackgroundColor="#2f80ed"
+                        />
                     </div>
                     <div class="info-div">
                         <HintInfo
@@ -275,7 +316,18 @@
                 <span>{$texts.frequencyReading[$selectedLang]}</span>
                 <div class="selector-div">
                     <div class="selector-button-div">
-                        <SelectorButton />
+                        <SelectorButton
+                            bind:checked={frequencyReading}
+                            width="75px"
+                            height="20px"
+                            knobWidth="32px"
+                            knobHeight="32px"
+                            borderRadius="10px"
+                            backgroundColor="#3a3a3a"
+                            selectedBackgroundColor="#4a4a4a"
+                            knobBackgroundColor="#e0e0e0"
+                            knobSelectedBackgroundColor="#2f80ed"
+                        />
                     </div>
                     <div class="info-div">
                         <HintInfo
@@ -318,6 +370,7 @@
     .edit-device-div {
         height: 100%;
         width: 80%;
+        min-width:250px;
         display: flex;
         flex-direction: column;
         justify-content: flex-start;
@@ -364,6 +417,10 @@
         flex-direction: column;
         justify-content: flex-start;
         align-items: center;
+        margin: 0;
+        padding: 0;
+        padding-bottom: 20px;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.2);
     }
 
     .device-options-div .device-options-title {
