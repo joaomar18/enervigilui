@@ -21,7 +21,7 @@
     import Logout from "../components/Dashboard/Buttons/Logout.svelte";
     import Notification from "../components/Dashboard/Buttons/Notification.svelte";
     import SearchBar from "../components/Dashboard/SearchBar.svelte";
-    import Action from "../components/Dashboard/Buttons/Action.svelte";
+    import Action from "../components/General/Action.svelte";
     import Alert from "../components/General/Alert.svelte";
 
     //Variables

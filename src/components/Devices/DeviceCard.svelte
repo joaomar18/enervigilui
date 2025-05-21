@@ -1,5 +1,5 @@
 <script lang="ts">
-    import Action from "../Dashboard/Buttons/Action.svelte";
+    import Action from "../General/Action.svelte";
     import Notification from "../Dashboard/Buttons/Notification.svelte";
 
     // Stores for multi-language support

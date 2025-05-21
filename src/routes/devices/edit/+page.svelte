@@ -4,6 +4,7 @@
     import Selector from "../../../components/General/Selector.svelte";
     import SelectorButton from "../../../components/General/SelectorButton.svelte";
     import HintInfo from "../../../components/General/HintInfo.svelte";
+    import EditableText from "../../../components/General/EditableText.svelte";
 
     // Stores for multi-language support
     import { texts, selectedLang } from "$lib/stores/lang";
@@ -19,6 +20,7 @@
     let deviceData: any;
     let protocols = { "OPC UA": "OPC_UA", "MODBUS RTU": "MODBUS_RTU" };
     let types = { "1F": "SINGLE_PHASE", "3F": "THREE_PHASE" };
+    let deviceName: string;
     let selectedProtocol: string;
     let selectedType: string;
     let readEnergyFromMeter: boolean;
@@ -40,10 +42,12 @@
                 } else {
                     deviceData = data;
                     console.log(deviceData);
+                    deviceName = deviceData.name;
                     selectedProtocol = deviceData.protocol;
                     selectedType = deviceData.type;
                     readEnergyFromMeter = deviceData.options.read_energy_from_meter;
-                    readForwardReverseEnergySeparate = deviceData.options.read_separate_forward_reverse_energy;
+                    readForwardReverseEnergySeparate =
+                        deviceData.options.read_separate_forward_reverse_energy;
                     negativeReactivePower = deviceData.options.negative_reactive_power;
                     frequencyReading = deviceData.options.frequency_reading;
                     sucess = true;
@@ -83,7 +87,15 @@
 <div class="content">
     <div class="edit-device-div">
         <div class="device-identification-div">
-            <h3>{deviceData?.name}</h3>
+            <EditableText
+                bind:text={deviceName}
+                fontSize="1.1rem"
+                fontColor="#f5f5f5"
+                borderColorBottom="rgba(255, 255, 255, 0.2)"
+                buttonImageWidth="22px"
+                buttonImageHeight="22px"
+            />
+            <span class="id-text">ID: {String(deviceData?.id).padStart(3, "0")}</span>
             <div
                 class="device-image-div"
                 style="background-image: url('{`/devices/${deviceData?.name}_${deviceData?.id}.png`}');"
@@ -370,7 +382,7 @@
     .edit-device-div {
         height: 100%;
         width: 80%;
-        min-width:250px;
+        min-width: 250px;
         display: flex;
         flex-direction: column;
         justify-content: flex-start;
@@ -390,13 +402,6 @@
         border-bottom: 1px solid rgba(255, 255, 255, 0.2);
     }
 
-    .device-identification-div h3 {
-        color: #f5f5f5;
-        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
-        font-size: 1rem;
-        font-weight: 300;
-    }
-
     .device-identification-div .device-image-div {
         padding: 0;
         margin: 0;
@@ -408,6 +413,16 @@
         background-position: center;
         background-size: auto 87.5%;
         border-radius: 50%;
+    }
+
+    .device-identification-div .id-text {
+        padding: 0px;
+        padding-top: 10px;
+        padding-bottom: 10px;
+        color: rgb(170, 170, 170);
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+        font-size: 0.9rem;
+        font-weight: 300;
     }
 
     .device-options-div {
