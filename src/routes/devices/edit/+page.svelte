@@ -5,6 +5,7 @@
     import SelectorButton from "../../../components/General/SelectorButton.svelte";
     import HintInfo from "../../../components/General/HintInfo.svelte";
     import EditableText from "../../../components/General/EditableText.svelte";
+    import UploadImage from "../../../components/General/UploadImage.svelte";
 
     // Stores for multi-language support
     import { texts, selectedLang } from "$lib/stores/lang";
@@ -21,6 +22,7 @@
     let protocols = { "OPC UA": "OPC_UA", "MODBUS RTU": "MODBUS_RTU" };
     let types = { "1F": "SINGLE_PHASE", "3F": "THREE_PHASE" };
     let deviceName: string;
+    let deviceImage: File | undefined;
     let selectedProtocol: string;
     let selectedType: string;
     let readEnergyFromMeter: boolean;
@@ -96,10 +98,18 @@
                 buttonImageHeight="22px"
             />
             <span class="id-text">ID: {String(deviceData?.id).padStart(3, "0")}</span>
-            <div
-                class="device-image-div"
-                style="background-image: url('{`/devices/${deviceData?.name}_${deviceData?.id}.png`}');"
-            ></div>
+            <div class="device-image-div">
+                <UploadImage
+                    bind:imageFile={deviceImage}
+                    width="200px"
+                    height="200px"
+                    borderRadius="50%"
+                    imageUrl={`/devices/${deviceData?.name}_${deviceData?.id}.png`}
+                    imageHeight="87.5%"
+                    backgroundColor="rgba(255, 255, 255, 0.1)"
+                    hoverColor="rgba(255, 255, 255, 0.13)"
+                />
+            </div>
         </div>
         <div class="device-options-div">
             <div class="device-options-title">
@@ -402,19 +412,6 @@
         border-bottom: 1px solid rgba(255, 255, 255, 0.2);
     }
 
-    .device-identification-div .device-image-div {
-        padding: 0;
-        margin: 0;
-        margin-top: 10px;
-        width: 200px;
-        height: 200px;
-        background-color: rgba(255, 255, 255, 0.1);
-        background-repeat: no-repeat;
-        background-position: center;
-        background-size: auto 87.5%;
-        border-radius: 50%;
-    }
-
     .device-identification-div .id-text {
         padding: 0px;
         padding-top: 10px;
@@ -423,6 +420,10 @@
         font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
         font-size: 0.9rem;
         font-weight: 300;
+    }
+
+    .device-identification-div .device-image-div {
+        padding-top: 10px;
     }
 
     .device-options-div {
