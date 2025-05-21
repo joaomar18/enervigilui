@@ -73,6 +73,7 @@
         class="editable-text"
         class:enable={enableInput}
         type="text"
+        name="Editable Text"
         bind:this={inputEl}
         bind:value={text}
         on:keydown={(e) => {

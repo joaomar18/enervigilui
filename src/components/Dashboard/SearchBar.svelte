@@ -39,7 +39,7 @@
             "
             class="search-bar-div"
         >
-            <input type="text" placeholder={placeholderText} />
+            <input type="text" placeholder={placeholderText} name="Search Bar" />
         </div>
         <div
             style="
