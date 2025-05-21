@@ -57,6 +57,7 @@
     });
 </script>
 
+<!-- Inline-edit field: click pencil to enter edit mode, press Enter or check to save, Esc or arrow to cancel -->
 <div
     style="
         --font-size: {fontSize};
@@ -125,6 +126,7 @@
 </div>
 
 <style>
+    /* Flex container to center input and buttons */
     .container {
         position: relative;
         margin: 0;
@@ -134,6 +136,7 @@
         align-items: center;
     }
 
+    /* Base styling for the text field */
     .editable-text {
         padding: 0;
         margin: 0;
@@ -145,6 +148,7 @@
         color: var(--font-color);
     }
 
+    /* When editing is active: add underline and remove default outline */
     .editable-text.enable {
         outline: none;
         padding-top: 5px;
@@ -152,6 +156,7 @@
         border-bottom: 1px solid var(--border-color-bottom);
     }
 
+    /* Shared positioning for all action buttons */
     .button-div {
         margin: 0;
         padding: 0;
@@ -161,20 +166,24 @@
         height: fit-content;
     }
 
+    /* Utility class to hide inactive buttons */
     .button-div.hide {
         display: none;
     }
 
+    /* Edit button: aligned to the right of the container */
     .edit-button-div {
         right: 0px;
         transform: translate(100%, -50%);
     }
 
+    /* Confirm (save) button: also on the right, shows in edit mode */
     .confirm-button-div {
         right: 0px;
         transform: translate(100%, -50%);
     }
 
+    /* Cancel button: aligned to the left of the container */
     .cancel-button-div {
         left: 0px;
         transform: translate(-100%, -50%);
