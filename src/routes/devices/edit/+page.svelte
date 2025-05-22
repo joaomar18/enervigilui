@@ -61,6 +61,7 @@
                 showAlert($texts.errorDeviceState);
             }
             loadedDone.set(true);
+            document.body.style.overflow = "auto";
             if (!sucess) {
                 pollTimer = setTimeout(tick, 2500);
             }
@@ -81,6 +82,7 @@
     // Function to open popup to confirm device delete
     async function deleteDevice(): Promise<void> {
         console.log("Delete device popup");
+        document.body.style.overflow = "hidden";
     }
 
     // Mount function
@@ -93,6 +95,7 @@
         } else {
             showAlert($texts.errorEditDeviceParams);
             loadedDone.set(true);
+            document.body.style.overflow = "auto";
         }
     });
 

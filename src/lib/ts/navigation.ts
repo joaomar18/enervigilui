@@ -51,6 +51,7 @@ export async function navigateTo(
     if (splashScreen) {
         splashDone.set(false);
     }
+    document.body.style.overflow = "hidden";
     loadedDone.set(false);
 
     await goto(target);
