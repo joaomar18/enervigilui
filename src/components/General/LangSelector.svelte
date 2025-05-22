@@ -1,6 +1,6 @@
 <script lang="ts">
     import { browser } from "$app/environment";
-    import { goto } from "$app/navigation";
+    import { replaceState } from "$app/navigation";
     import { onMount, onDestroy } from "svelte";
     import { page } from "$app/state";
 
@@ -29,9 +29,13 @@
         selectedLang.set(language);
         isOpen = false;
 
-        const params = new URLSearchParams(page.url.searchParams);
+        if (!browser) return;
+
+        const params = new URLSearchParams(window.location.search);
         params.set("lang", language);
-        goto(`${page.url.pathname}?${params.toString()}`);
+        const newUrl = `${window.location.pathname}?${params.toString()}`;
+
+        replaceState(newUrl, {});
     }
 
     function handleClickOutside(event: MouseEvent): void {

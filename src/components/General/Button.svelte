@@ -27,6 +27,12 @@
     }
 </script>
 
+<!--
+  Action button component:
+  - Styled via CSS variables for size, colors, typography, and icon positioning.
+  - Supports optional icon on left or right.
+  - Fires `handleClick` on click, with accessible `aria-label`.
+-->
 <button
     style="
         --width: {width};
@@ -55,6 +61,7 @@
 </button>
 
 <style>
+    /* Base styling for the action button */
     button {
         margin: 0;
         padding: 0;
@@ -72,20 +79,24 @@
         transition: background-color 0.2s ease;
     }
 
+    /* When icon is on the left: text aligns left and padding makes room */
     button.align-left {
         text-align: left;
         padding-left: var(--image-right-position);
     }
 
+    /* When icon is on the right: text aligns right and padding makes room */
     button.align-right {
         text-align: right;
         padding-right: var(--image-left-position);
     }
 
+    /* Hover state: lighten or change background */
     button:hover {
         background-color: var(--hover-color);
     }
 
+    /* Icon inside button: size and center vertically */
     button img {
         width: var(--image-width);
         height: var(--image-height);
