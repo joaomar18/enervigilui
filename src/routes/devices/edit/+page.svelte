@@ -6,6 +6,10 @@
     import HintInfo from "../../../components/General/HintInfo.svelte";
     import EditableText from "../../../components/General/EditableText.svelte";
     import UploadImage from "../../../components/General/UploadImage.svelte";
+    import Button from "../../../components/General/Button.svelte";
+
+    // Navigation
+    import { navigateTo } from "$lib/ts/navigation";
 
     // Stores for multi-language support
     import { texts, selectedLang } from "$lib/stores/lang";
@@ -48,7 +52,7 @@
                     selectedType = deviceData.type;
                     readEnergyFromMeter = deviceData.options.read_energy_from_meter;
                     readForwardReverseEnergySeparate =
-                    deviceData.options.read_separate_forward_reverse_energy;
+                        deviceData.options.read_separate_forward_reverse_energy;
                     negativeReactivePower = deviceData.options.negative_reactive_power;
                     frequencyReading = deviceData.options.frequency_reading;
                     sucess = true;
@@ -62,6 +66,21 @@
             }
         };
         tick();
+    }
+
+    //Function to save device changes
+    async function saveEdit(): Promise<void> {
+        console.log("Save Device changes");
+    }
+
+    // Function to cancel edit device (go to devices page)
+    async function cancelEdit(): Promise<void> {
+        await navigateTo("/devices", $selectedLang, {});
+    }
+
+    // Function to open popup to confirm device delete
+    async function deleteDevice(): Promise<void> {
+        console.log("Delete device popup");
     }
 
     // Mount function
@@ -143,7 +162,7 @@
                                 hintBackgroundColor="#1e242b"
                                 hintBorderColor="#2c343d"
                                 hintBorderRadius="10px"
-                                textColor="#f5f5f5;"
+                                textColor="#f5f5f5"
                                 openBackgroundColor="rgba(255, 255, 255, 0.05)"
                                 openHoverBackgroundColor="rgba(255, 255, 255, 0.1)"
                                 openStrokeColor="#cccccc"
@@ -189,7 +208,7 @@
                                 hintBackgroundColor="#1e242b"
                                 hintBorderColor="#2c343d"
                                 hintBorderRadius="10px"
-                                textColor="#f5f5f5;"
+                                textColor="#f5f5f5"
                                 openBackgroundColor="rgba(255, 255, 255, 0.05)"
                                 openHoverBackgroundColor="rgba(255, 255, 255, 0.1)"
                                 openStrokeColor="#cccccc"
@@ -199,7 +218,8 @@
                                 closeStrokeColor="white"
                                 closeHoverStrokeColor="#eeeeee"
                             >
-                                <span class="info-text">{$texts.connectionTypeInfo[$selectedLang]}</span
+                                <span class="info-text"
+                                    >{$texts.connectionTypeInfo[$selectedLang]}</span
                                 >
                             </HintInfo>
                         </div>
@@ -231,7 +251,7 @@
                                 hintBackgroundColor="#1e242b"
                                 hintBorderColor="#2c343d"
                                 hintBorderRadius="10px"
-                                textColor="#f5f5f5;"
+                                textColor="#f5f5f5"
                                 openBackgroundColor="rgba(255, 255, 255, 0.05)"
                                 openHoverBackgroundColor="rgba(255, 255, 255, 0.1)"
                                 openStrokeColor="#cccccc"
@@ -273,7 +293,7 @@
                                 hintBackgroundColor="#1e242b"
                                 hintBorderColor="#2c343d"
                                 hintBorderRadius="10px"
-                                textColor="#f5f5f5;"
+                                textColor="#f5f5f5"
                                 openBackgroundColor="rgba(255, 255, 255, 0.05)"
                                 openHoverBackgroundColor="rgba(255, 255, 255, 0.1)"
                                 openStrokeColor="#cccccc"
@@ -284,7 +304,9 @@
                                 closeHoverStrokeColor="#eeeeee"
                             >
                                 <span class="info-text"
-                                    >{$texts.readForwardReverseEnergySeparateInfo[$selectedLang]}</span
+                                    >{$texts.readForwardReverseEnergySeparateInfo[
+                                        $selectedLang
+                                    ]}</span
                                 >
                             </HintInfo>
                         </div>
@@ -315,7 +337,7 @@
                                 hintBackgroundColor="#1e242b"
                                 hintBorderColor="#2c343d"
                                 hintBorderRadius="10px"
-                                textColor="#f5f5f5;"
+                                textColor="#f5f5f5"
                                 openBackgroundColor="rgba(255, 255, 255, 0.05)"
                                 openHoverBackgroundColor="rgba(255, 255, 255, 0.1)"
                                 openStrokeColor="#cccccc"
@@ -357,7 +379,7 @@
                                 hintBackgroundColor="#1e242b"
                                 hintBorderColor="#2c343d"
                                 hintBorderRadius="10px"
-                                textColor="#f5f5f5;"
+                                textColor="#f5f5f5"
                                 openBackgroundColor="rgba(255, 255, 255, 0.05)"
                                 openHoverBackgroundColor="rgba(255, 255, 255, 0.1)"
                                 openStrokeColor="#cccccc"
@@ -374,6 +396,56 @@
                         </div>
                     </div>
                 </div>
+            </div>
+            <div class="device-nodes-div">
+                <div class="device-nodes-title">
+                    <h3>{$texts.deviceNodes[$selectedLang]}</h3>
+                    <span>{$texts.deviceNodesSub[$selectedLang]}</span>
+                </div>
+            </div>
+            <div class="action-buttons-div">
+                <Button
+                    buttonText={$texts.save[$selectedLang]}
+                    width="150px"
+                    height="40px"
+                    borderRadius="5px"
+                    backgroundColor="#2F80ED"
+                    hoverColor="#1C6DD0"
+                    fontColor="#f5f5f5"
+                    imageURL="/img/save.png"
+                    imageWidth="22px"
+                    imageHeight="22px"
+                    imageLeftPos="20px"
+                    onClick={saveEdit}
+                />
+                <Button
+                    buttonText={$texts.cancel[$selectedLang]}
+                    width="150px"
+                    height="40px"
+                    borderRadius="5px"
+                    backgroundColor="#707070"
+                    hoverColor="#5A5A5A"
+                    fontColor="#f5f5f5"
+                    imageURL="/img/previous.png"
+                    imageWidth="22px"
+                    imageHeight="22px"
+                    imageLeftPos="20px"
+                    onClick={cancelEdit}
+                />
+                <Button
+                    buttonText={$texts.delete[$selectedLang]}
+                    width="150px"
+                    height="40px"
+                    borderRadius="5px"
+                    backgroundColor="#E74C3C"
+                    hoverColor="#C0392B"
+                    fontColor="#f5f5f5"
+                    imageURL="/img/delete.png"
+                    imageWidth="22px"
+                    imageHeight="22px"
+                    imageLeftPos="20px"
+                    onClick={deleteDevice}
+                />
             </div>
         </div>
     {/if}
@@ -467,6 +539,48 @@
         line-height: 1.5;
     }
 
+    .device-nodes-div {
+        width: 100%;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        justify-content: flex-start;
+        align-items: center;
+        margin: 0;
+        padding: 0;
+        padding-bottom: 20px;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+    }
+
+    .device-nodes-div .device-nodes-title {
+        display: flex;
+        flex-direction: column;
+        align-self: flex-start;
+        gap: 10px;
+        padding: 20px;
+        padding-left: 0px;
+        padding-right: 0px;
+        width: 100%;
+    }
+
+    .device-nodes-div h3 {
+        color: #f5f5f5;
+        font-size: 1rem;
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+        font-weight: 500;
+        margin: 0;
+        padding: 0;
+    }
+
+    .device-nodes-div span {
+        color: rgb(170, 170, 170);
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+        font-weight: 400;
+        margin: 0;
+        padding: 0;
+        line-height: 1.5;
+    }
+
     .device-input-div {
         position: relative;
         margin-top: 30px;
@@ -517,5 +631,25 @@
         font-weight: 300;
         line-height: 1.5;
         color: white;
+    }
+
+    .action-buttons-div {
+        margin: 0;
+        padding: 0;
+        padding-top: 50px;
+        padding-bottom: 50px;
+        width: 100%;
+        height: 100%;
+        display: grid;
+        grid-template-columns: repeat(3, 150px);
+        gap: 30px;
+        justify-content: center;
+        justify-items: center;
+    }
+
+    @media (max-width: 769px) {
+        .action-buttons-div {
+            grid-template-columns: 1fr;
+        }
     }
 </style>

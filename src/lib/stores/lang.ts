@@ -234,6 +234,26 @@ const textsObject: TextsObject = {
         PT: "Opção para definir se o dispotivo permite a leitura de valores de frequência.",
         EN: "Option to define whether the device allows reading frequency values.",
     },
+    deviceNodes: {
+        PT: "Variáveis do Dispositivo",
+        EN: "Device Variables",
+    },
+    deviceNodesSub: {
+        PT: "Configuração dos valores de medição do dispositivo",
+        EN: "Measurement values configuration on the device",
+    },
+    save: {
+        PT: "Guardar",
+        EN: "Save",
+    },
+    delete: {
+        PT: "Eliminar",
+        EN: "Delete",
+    },
+    cancel: {
+        PT: "Cancelar",
+        EN: "Cancel",
+    },
 };
 
 export const texts = readable<TextsObject>(textsObject);
