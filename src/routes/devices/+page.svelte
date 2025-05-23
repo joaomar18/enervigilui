@@ -36,7 +36,6 @@
                 showAlert($texts.errorDevicesState);
             }
             loadedDone.set(true);
-            document.body.style.overflow = "auto";
             pollTimer = setTimeout(tick, 2500);
         };
         tick();

@@ -7,6 +7,7 @@
     import EditableText from "../../../components/General/EditableText.svelte";
     import UploadImage from "../../../components/General/UploadImage.svelte";
     import Button from "../../../components/General/Button.svelte";
+    import ConfirmWindow from "../../../components/General/ConfirmWindow.svelte";
 
     // Navigation
     import { navigateTo } from "$lib/ts/navigation";
@@ -21,6 +22,8 @@
     import { loadedDone } from "$lib/stores/auth";
 
     //Variables
+    let showDeleteWindow: boolean = false;
+
     let pollTimer: ReturnType<typeof setTimeout>;
     let deviceData: any;
     let protocols = { "OPC UA": "OPC_UA", "MODBUS RTU": "MODBUS_RTU" };
@@ -61,7 +64,6 @@
                 showAlert($texts.errorDeviceState);
             }
             loadedDone.set(true);
-            document.body.style.overflow = "auto";
             if (!sucess) {
                 pollTimer = setTimeout(tick, 2500);
             }
@@ -70,9 +72,7 @@
     }
 
     //Function to save device changes
-    async function saveEdit(): Promise<void> {
-        console.log("Save Device changes");
-    }
+    async function saveEdit(): Promise<void> {}
 
     // Function to cancel edit device (go to devices page)
     async function cancelEdit(): Promise<void> {
@@ -81,8 +81,7 @@
 
     // Function to open popup to confirm device delete
     async function deleteDevice(): Promise<void> {
-        console.log("Delete device popup");
-        document.body.style.overflow = "hidden";
+        showDeleteWindow = true;
     }
 
     // Mount function
@@ -95,7 +94,6 @@
         } else {
             showAlert($texts.errorEditDeviceParams);
             loadedDone.set(true);
-            document.body.style.overflow = "auto";
         }
     });
 
@@ -452,6 +450,24 @@
             </div>
         </div>
     {/if}
+    {#if showDeleteWindow}
+        <div class="delete-device-div">
+            <div class="delete-device-div-content">
+                <div class="window-div">
+                    <ConfirmWindow
+                        width="50%"
+                        height="250px"
+                        borderRadius="10px"
+                        borderColor="#2a2e3a"
+                        backgroundColor="#14161c"
+                        closeWindow={() => {
+                            showDeleteWindow = false;
+                        }}
+                    />
+                </div>
+            </div>
+        </div>
+    {/if}
 </div>
 
 <style>
@@ -648,6 +664,38 @@
         gap: 30px;
         justify-content: center;
         justify-items: center;
+    }
+
+    .delete-device-div {
+        position: absolute;
+        inset: 0;
+    }
+
+    .delete-device-div-content {
+        margin: 0;
+        padding: 0;
+        position: relative;
+        width: 100%;
+        height: 100%;
+        display: flex;
+        flex-direction: row;
+        justify-content: center;
+        background: rgba(24, 29, 35, 0.25);
+        backdrop-filter: blur(8px);
+        -webkit-backdrop-filter: blur(8px);
+    }
+
+    .delete-device-div-content .window-div {
+        width: 100%;
+        height: fit-content;
+        margin: 0;
+        padding: 0;
+        position: sticky;
+        top: 50%;
+        transform: translateY(-50%);
+        display: flex;
+        justify-content: center;
+        align-items: center;
     }
 
     @media (max-width: 769px) {
