@@ -249,9 +249,9 @@
                     <Alert
                         bottomPos="0px"
                         alertText={$alertText[$selectedLang]}
-                        backgroundColor="rgba(171, 34, 43, 0.25)"
+                        backgroundColor="#a11f2a"
                         borderColor="#b91c1c"
-                        textColor="#ffd5d5"
+                        textColor="#ffffff"
                         onClick={() => {
                             alertTimeout.update((id) => {
                                 if (id) clearTimeout(id);

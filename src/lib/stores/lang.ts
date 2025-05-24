@@ -178,6 +178,14 @@ const textsObject: TextsObject = {
         PT: "Não foram atribuídos o nome e/ou o id do dispositivo.",
         EN: "The name and/or the id of the device were not assigned.",
     },
+    deviceCommunication: {
+        PT: "Comunicação do Dispositivo",
+        EN: "Device Communication",
+    },
+    deviceCommunicationSub: {
+        PT: "Opções relacionadas com a comunicação do dispositivo",
+        EN: "Options related to device communication",
+    },
     deviceOptions: {
         PT: "Opções do Dispositivo",
         EN: "Device Options",
@@ -277,7 +285,27 @@ const textsObject: TextsObject = {
     saveDeviceInfo: {
         PT: "Aplicar as alterações irá atualizar as configurações do dispositivo. Tem a certeza que pretende continuar?",
         EN: "Applying changes will update the device settings. Are you sure you want to continue?",
-    }
+    },
+    networkAddress: {
+        PT: "Endereço de Rede",
+        EN: "Network Address",
+    },
+    readPeriod: {
+        PT: "Período de Leitura",
+        EN: "Read Period",
+    },
+    readTimeout: {
+        PT: "Tempo Limite de Leitura",
+        EN: "Read Timeout",
+    },
+    authenticationOptional: {
+        PT: "Autenticação (opcional)",
+        EN: "Authentication (optional)",
+    },
+    secondsUnit: {
+        PT: "seg.",
+        EN: "s.",
+    },
 };
 
 export const texts = readable<TextsObject>(textsObject);
