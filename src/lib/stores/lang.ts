@@ -242,6 +242,10 @@ const textsObject: TextsObject = {
         PT: "Configuração dos valores de medição do dispositivo",
         EN: "Measurement values configuration on the device",
     },
+    confirm: {
+        PT: "Confirmar",
+        EN: "Confirm",
+    },
     save: {
         PT: "Guardar",
         EN: "Save",
@@ -254,6 +258,26 @@ const textsObject: TextsObject = {
         PT: "Cancelar",
         EN: "Cancel",
     },
+    deleteDevice: {
+        PT: "Eliminar o dispositivo",
+        EN: "Delete device",
+    },
+    deleteDeviceInfo: {
+        PT: "Eliminar o dispositivo irá remover permanentemente todos os dados associados. Tem a certeza que pretende continuar?",
+        EN: "Deleting the device will permanently remove all associated data. Are you sure you want to continue?",
+    },
+    confirmDeleteDevice: {
+        PT: "Digite o nome do dispositivo para confirmar",
+        EN: "Type the device name to confirm",
+    },
+    saveDevice: {
+        PT: "Aplicar as alterações ao dispositivo",
+        EN: "Apply changes to the device",
+    },
+    saveDeviceInfo: {
+        PT: "Aplicar as alterações irá atualizar as configurações do dispositivo. Tem a certeza que pretende continuar?",
+        EN: "Applying changes will update the device settings. Are you sure you want to continue?",
+    }
 };
 
 export const texts = readable<TextsObject>(textsObject);

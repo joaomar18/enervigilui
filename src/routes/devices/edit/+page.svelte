@@ -8,6 +8,7 @@
     import UploadImage from "../../../components/General/UploadImage.svelte";
     import Button from "../../../components/General/Button.svelte";
     import ConfirmWindow from "../../../components/General/ConfirmWindow.svelte";
+    import InputField from "../../../components/General/InputField.svelte";
 
     // Navigation
     import { navigateTo } from "$lib/ts/navigation";
@@ -22,7 +23,9 @@
     import { loadedDone } from "$lib/stores/auth";
 
     //Variables
+    let showSaveWindow: boolean = false;
     let showDeleteWindow: boolean = false;
+    let deleteDeviceName: string;
 
     let pollTimer: ReturnType<typeof setTimeout>;
     let deviceData: any;
@@ -72,7 +75,9 @@
     }
 
     //Function to save device changes
-    async function saveEdit(): Promise<void> {}
+    async function saveEdit(): Promise<void> {
+        showSaveWindow = false;
+    }
 
     // Function to cancel edit device (go to devices page)
     async function cancelEdit(): Promise<void> {
@@ -81,7 +86,8 @@
 
     // Function to open popup to confirm device delete
     async function deleteDevice(): Promise<void> {
-        showDeleteWindow = true;
+        deleteDeviceName = "";
+        showDeleteWindow = false;
     }
 
     // Mount function
@@ -417,7 +423,9 @@
                     imageWidth="22px"
                     imageHeight="22px"
                     imageLeftPos="20px"
-                    onClick={saveEdit}
+                    onClick={() => {
+                        showSaveWindow = true;
+                    }}
                 />
                 <Button
                     buttonText={$texts.cancel[$selectedLang]}
@@ -445,28 +453,108 @@
                     imageWidth="22px"
                     imageHeight="22px"
                     imageLeftPos="20px"
-                    onClick={deleteDevice}
+                    onClick={() => {
+                        showDeleteWindow = true;
+                    }}
                 />
             </div>
         </div>
-    {/if}
-    {#if showDeleteWindow}
-        <div class="delete-device-div">
-            <div class="delete-device-div-content">
-                <div class="window-div">
-                    <ConfirmWindow
-                        width="50%"
-                        height="250px"
-                        borderRadius="10px"
-                        borderColor="#2a2e3a"
-                        backgroundColor="#14161c"
-                        closeWindow={() => {
-                            showDeleteWindow = false;
-                        }}
-                    />
+        {#if showDeleteWindow}
+            <div class="overlay-device-div">
+                <div class="overlay-device-div-content">
+                    <div class="window-div">
+                        <ConfirmWindow
+                            title={`${$texts.deleteDevice[$selectedLang]} ${deviceName}`}
+                            width="80%"
+                            minWidth="300px"
+                            maxWidth="550px"
+                            height="fit-content"
+                            borderRadius="10px"
+                            borderColor="#2a2e3a"
+                            backgroundColor="#14161c"
+                            closeWindow={() => {
+                                showDeleteWindow = false;
+                            }}
+                        >
+                            <span>{$texts.deleteDeviceInfo[$selectedLang]}</span>
+                            <div class="input-field-div">
+                                <InputField
+                                    bind:inputValue={deleteDeviceName}
+                                    infoText={$texts.confirmDeleteDevice[$selectedLang]}
+                                    width="100%"
+                                    height="40px"
+                                    borderRadius="5px"
+                                    backgroundColor="#23272f"
+                                    borderColor="#323a45"
+                                    selectedBackgroundColor="#252b33"
+                                    selectedBorderColor="#e74c3c"
+                                    fontSize="1rem"
+                                    fontColor="#f5f5f5"
+                                    fontWeight="300"
+                                    infoTextColor="rgb(170, 170, 170)"
+                                    infoTextSize="0.95rem"
+                                />
+                            </div>
+                            <div class="button-div">
+                                <Button
+                                    enabled={deleteDeviceName === deviceName}
+                                    buttonText={$texts.confirm[$selectedLang]}
+                                    width="150px"
+                                    height="40px"
+                                    borderRadius="5px"
+                                    backgroundColor="#E74C3C"
+                                    hoverColor="#C0392B"
+                                    borderColor="#A93226"
+                                    disabledBackgroundColor="#3a2323"
+                                    disabledHoverColor="#2a1818"
+                                    disabledBorderColor="#5a3a3a"
+                                    fontColor="#f5f5f5"
+                                    onClick={deleteDevice}
+                                />
+                            </div>
+                        </ConfirmWindow>
+                    </div>
                 </div>
             </div>
-        </div>
+        {/if}
+        {#if showSaveWindow}
+            <div class="overlay-device-div">
+                <div class="overlay-device-div-content">
+                    <div class="window-div">
+                        <ConfirmWindow
+                            title={`${$texts.saveDevice[$selectedLang]}`}
+                            width="80%"
+                            minWidth="300px"
+                            maxWidth="550px"
+                            height="fit-content"
+                            borderRadius="10px"
+                            borderColor="#2a2e3a"
+                            backgroundColor="#14161c"
+                            closeWindow={() => {
+                                showSaveWindow = false;
+                            }}
+                        >
+                            <span class="save-window-text"
+                                >{$texts.saveDeviceInfo[$selectedLang]}</span
+                            >
+                            <div class="button-div save-window-button">
+                                <Button
+                                    buttonText={$texts.confirm[$selectedLang]}
+                                    width="150px"
+                                    height="40px"
+                                    borderRadius="5px"
+                                    backgroundColor="#2F80ED"
+                                    hoverColor="#1C6DD0"
+                                    borderColor="#1456B0"
+                                    fontColor="#f5f5f5"
+                                    onClick={saveEdit}
+                                />
+                            </div>
+                        </ConfirmWindow>
+                    </div>
+                </div>
+            </div>
+        {/if}
     {/if}
 </div>
 
@@ -666,12 +754,12 @@
         justify-items: center;
     }
 
-    .delete-device-div {
+    .overlay-device-div {
         position: absolute;
         inset: 0;
     }
 
-    .delete-device-div-content {
+    .overlay-device-div-content {
         margin: 0;
         padding: 0;
         position: relative;
@@ -685,7 +773,7 @@
         -webkit-backdrop-filter: blur(8px);
     }
 
-    .delete-device-div-content .window-div {
+    .overlay-device-div-content .window-div {
         width: 100%;
         height: fit-content;
         margin: 0;
@@ -696,6 +784,53 @@
         display: flex;
         justify-content: center;
         align-items: center;
+    }
+
+    .overlay-device-div-content .window-div span {
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+        font-size: 1rem;
+        font-weight: 300;
+        color: #e74c3c;
+        line-height: 1.5;
+        text-align: left;
+        word-break: break-word;
+    }
+
+    .overlay-device-div-content .window-div span.save-window-text {
+        color: rgb(170, 170, 170);
+    }
+
+    .overlay-device-div-content .window-div .input-field-div {
+        margin: 0;
+        width: 100%;
+        height: fit-content;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        flex-direction: column;
+        padding: 20px;
+        padding-left: 0px;
+        padding-right: 0px;
+    }
+
+    .overlay-device-div-content .window-div .button-div {
+        margin: 0;
+        width: 100%;
+        height: fit-content;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        flex-direction: column;
+        padding: 10px;
+        padding-left: 0px;
+        padding-right: 0px;
+    }
+
+    .overlay-device-div-content .window-div .button-div.save-window-button {
+        padding: 10px;
+        padding-top: 20px;
+        padding-left: 0px;
+        padding-right: 0px;
     }
 
     @media (max-width: 769px) {
