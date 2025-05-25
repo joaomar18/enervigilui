@@ -61,13 +61,20 @@
                 if (status !== 200) {
                     showAlert($texts.errorDeviceState);
                 } else {
+                    console.log("Device data fetched successfully:", data);
                     deviceData = data;
                     deviceName = deviceData.name;
+
                     selectedProtocol = deviceData.protocol;
+                    deviceAddress = deviceData.communication_options.url;
+                    readPeriod = deviceData.communication_options.read_period;
+                    readTimeout = deviceData.communication_options.timeout;
+                    commUsername = deviceData.communication_options.username || "";
+                    commPassword = deviceData.communication_options.password || "";
+
                     selectedType = deviceData.type;
                     readEnergyFromMeter = deviceData.options.read_energy_from_meter;
-                    readForwardReverseEnergySeparate =
-                        deviceData.options.read_separate_forward_reverse_energy;
+                    readForwardReverseEnergySeparate = deviceData.options.read_separate_forward_reverse_energy;
                     negativeReactivePower = deviceData.options.negative_reactive_power;
                     frequencyReading = deviceData.options.frequency_reading;
                     sucess = true;
@@ -234,7 +241,7 @@
                                     closeHoverStrokeColor="#eeeeee"
                                 >
                                     <span class="info-text"
-                                        >{$texts.readEnergyFromMeterInfo[$selectedLang]}</span
+                                        >{$texts.networkAddressInfo[$selectedLang]}</span
                                     >
                                 </HintInfo>
                             </div>
@@ -251,7 +258,10 @@
                                     minValue={5.0}
                                     maxValue={300.0}
                                     limitsPassed={() => {
-                                        showAlert($texts.readTimeout);
+                                        showAlert($texts.readPeriodError, {
+                                            minValue: 5,
+                                            maxValue: 300,
+                                        });
                                     }}
                                     width="100%"
                                     height="40px"
@@ -286,7 +296,7 @@
                                     closeHoverStrokeColor="#eeeeee"
                                 >
                                     <span class="info-text"
-                                        >{$texts.readEnergyFromMeterInfo[$selectedLang]}</span
+                                        >{$texts.readPeriodInfo[$selectedLang]}</span
                                     >
                                 </HintInfo>
                             </div>
@@ -303,7 +313,10 @@
                                     minValue={5.0}
                                     maxValue={300.0}
                                     limitsPassed={() => {
-                                        showAlert($texts.readTimeout);
+                                        showAlert($texts.readTimeoutError, {
+                                            minValue: 5,
+                                            maxValue: 300,
+                                        });
                                     }}
                                     width="100%"
                                     height="40px"
@@ -338,7 +351,7 @@
                                     closeHoverStrokeColor="#eeeeee"
                                 >
                                     <span class="info-text"
-                                        >{$texts.readEnergyFromMeterInfo[$selectedLang]}</span
+                                        >{$texts.readTimeoutInfo[$selectedLang]}</span
                                     >
                                 </HintInfo>
                             </div>
@@ -385,7 +398,7 @@
                                         closeHoverStrokeColor="#eeeeee"
                                     >
                                         <span class="info-text"
-                                            >{$texts.readEnergyFromMeterInfo[$selectedLang]}</span
+                                            >{$texts.commUsernameInfo[$selectedLang]}</span
                                         >
                                     </HintInfo>
                                 </div>
@@ -429,7 +442,7 @@
                                         closeHoverStrokeColor="#eeeeee"
                                     >
                                         <span class="info-text"
-                                            >{$texts.readEnergyFromMeterInfo[$selectedLang]}</span
+                                            >{$texts.commPasswordInfo[$selectedLang]}</span
                                         >
                                     </HintInfo>
                                 </div>

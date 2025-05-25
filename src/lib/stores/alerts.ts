@@ -8,24 +8,46 @@ export const alertText = writable<Record<Language, string>>({ EN: "", PT: "" });
 export const alertTimeout: Writable<ReturnType<typeof setTimeout> | null> = writable(null);
 
 /**
- * Displays a transient alert message in the UI, using Svelte stores to manage state.
+ * Displays a transient alert message in the UI with support for variable interpolation.
  *
- * Clears any existing alert timeout, sets the provided localized text, shows the alert,
- * and automatically hides it after 3 seconds.
- *
- * @param textLang - A record mapping each supported `Language` code (`"EN"`, `"PT"`, etc.)
- *                   to the alert message to display.
+ * @param textLang - A record mapping each supported `Language` code to the alert message.
+ * @param variables - Optional object with key-value pairs to replace placeholders in messages.
  *
  * @example
- * // Show an English alert
- * showAlert({ EN: "Operation successful!", PT: "Operação bem-sucedida!" });
+ * // Show an alert with dynamic content
+ * showAlert(
+ *   { EN: "Connected to device: {deviceName}", PT: "Conectado ao dispositivo: {deviceName}" },
+ *   { deviceName: "Energy Meter 01" }
+ * );
  */
-export function showAlert(textLang: Record<Language, string>) {
+export function showAlert(
+    textLang: Record<Language, string>,
+    variables?: Record<string, string | number>
+) {
     alertTimeout.update((old) => {
         if (old) clearTimeout(old);
         return null;
     });
-    alertText.set(textLang);
+
+    // If variables are provided, replace placeholders in each language
+    if (variables) {
+        const processedText: Record<Language, string> = { ...textLang };
+
+        Object.keys(textLang).forEach((lang) => {
+            let message = textLang[lang as Language];
+
+            Object.entries(variables).forEach(([key, value]) => {
+                message = message.replace(`{${key}}`, String(value));
+            });
+
+            processedText[lang as Language] = message;
+        });
+
+        alertText.set(processedText);
+    } else {
+        alertText.set(textLang);
+    }
+
     displayAlert.set(true);
     const id = setTimeout(() => displayAlert.set(false), 3000);
     alertTimeout.set(id);

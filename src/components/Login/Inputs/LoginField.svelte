@@ -202,6 +202,7 @@
         padding: 0;
         width: 100%;
         height: 40px;
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
         font-size: 1.25rem;
         padding-left: 50px;
         outline: none;

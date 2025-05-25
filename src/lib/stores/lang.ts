@@ -1,3 +1,4 @@
+import { read } from "$app/server";
 import { writable, readable } from "svelte/store";
 
 // Type for the available languages
@@ -290,21 +291,50 @@ const textsObject: TextsObject = {
         PT: "Endereço de Rede",
         EN: "Network Address",
     },
+    networkAddressInfo: {
+        PT: "O endereço de rede utilizado para estabelecer comunicação com o dispositivo.",
+        EN: "Network address used to establish communication with the device.",
+    },
     readPeriod: {
         PT: "Período de Leitura",
         EN: "Read Period",
+    },
+    readPeriodInfo: {
+        PT: "Intervalo de tempo (em segundos) entre as leituras de dados do dispositivo.",
+        EN: "Time interval (in seconds) between data readings from the device.",
     },
     readTimeout: {
         PT: "Tempo Limite de Leitura",
         EN: "Read Timeout",
     },
+    readTimeoutInfo: {
+        PT: "Tempo máximo (em segundos) que o sistema aguarda por uma resposta do dispositivo antes de considerar que a comunicação falhou.",
+        EN: "Maximum time (in seconds) that the system waits for a response from the device before considering that communication failed.",
+    },
+
     authenticationOptional: {
         PT: "Autenticação (opcional)",
         EN: "Authentication (optional)",
     },
+    commUsernameInfo: {
+        PT: "Nome de utilizador para autenticação em dispositivos que requerem credenciais. Deixe em branco se o dispositivo não necessitar de autenticação.",
+        EN: "Username for authentication on devices that require credentials. Leave blank if the device does not require authentication.",
+    },
+    commPasswordInfo: {
+        PT: "Palavra-passe para autenticação em dispositivos que requerem credenciais. Deixe em branco se o dispositivo não necessitar de autenticação.",
+        EN: "Password for authentication on devices that require credentials. Leave blank if the device does not require authentication.",
+    },
     secondsUnit: {
         PT: "seg.",
         EN: "s.",
+    },
+    readPeriodError: {
+        PT: "O período de leitura deve estar compreendido entre {minValue} e {maxValue} segundos.",
+        EN: "The read period must be between {minValue} and {maxValue} seconds.",
+    },
+    readTimeoutError: {
+        PT: "O tempo limite de leitura deve estar compreendido entre {minValue} e {maxValue} segundos.",
+        EN: "The read timeout must be between {minValue} and {maxValue} seconds.",
     },
 };
 

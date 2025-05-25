@@ -129,7 +129,7 @@
         --border-color: {borderColor};
         --selected-background-color: {selectedBackgroundColor};
         --selected-border-color: {selectedBorderColor};
-        --input-padding-right: {unitWidth > 0 ? unitWidth + 10 + 'px' : '0px'};
+        --input-padding-right: {unitWidth > 0 ? unitWidth + 10 + 'px' : '10px'};
         --padding-left: {paddingLeft};
         --font-size: {fontSize};
         --font-color: {fontColor};
