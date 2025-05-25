@@ -38,7 +38,7 @@
     let selectedProtocol: string;
     let deviceAddress: string = "";
     let readPeriod: string = "";
-    let readTimeout: string = "";
+    let commTimeout: string = "";
     let commUsername: string = "";
     let commPassword: string = "";
 
@@ -68,7 +68,7 @@
                     selectedProtocol = deviceData.protocol;
                     deviceAddress = deviceData.communication_options.url;
                     readPeriod = deviceData.communication_options.read_period;
-                    readTimeout = deviceData.communication_options.timeout;
+                    commTimeout = deviceData.communication_options.timeout;
                     commUsername = deviceData.communication_options.username || "";
                     commPassword = deviceData.communication_options.password || "";
 
@@ -303,17 +303,17 @@
                         </div>
                     </div>
                     <div class="device-input-div">
-                        <span>{$texts.readTimeout[$selectedLang]}</span>
+                        <span>{$texts.commTimeout[$selectedLang]}</span>
                         <div class="input-div">
                             <div class="input-content-div">
                                 <InputField
-                                    bind:inputValue={readTimeout}
+                                    bind:inputValue={commTimeout}
                                     inputType="POSITIVE_FLOAT"
                                     inputUnit={$texts.secondsUnit[$selectedLang]}
                                     minValue={5.0}
                                     maxValue={300.0}
                                     limitsPassed={() => {
-                                        showAlert($texts.readTimeoutError, {
+                                        showAlert($texts.commTimeoutError, {
                                             minValue: 5,
                                             maxValue: 300,
                                         });
@@ -351,7 +351,7 @@
                                     closeHoverStrokeColor="#eeeeee"
                                 >
                                     <span class="info-text"
-                                        >{$texts.readTimeoutInfo[$selectedLang]}</span
+                                        >{$texts.commTimeoutInfo[$selectedLang]}</span
                                     >
                                 </HintInfo>
                             </div>
