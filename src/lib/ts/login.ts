@@ -1,25 +1,25 @@
+import { makeAPIRequest } from "./api";
 import type { Language, TextsObject } from "../stores/lang";
 
 /**
- * Attempts to log in a user with the provided credentials, optionally enabling auto-login, and supports request timeout.
+ * Authenticates a user by sending their credentials to the server's login endpoint.
  *
- * @param username - The user's username.
- * @param password - The user's password.
+ * @param username - The user's username or email for authentication.
+ * @param password - The user's password for authentication.
  * @param autoLogin - Whether to enable automatic login for future sessions.
- * @param timeout - Maximum time in milliseconds to wait for the server response before aborting. Defaults to 3000 ms.
+ *   If `true`, the server will return credentials that can be used for auto-login.
+ * @param timeout - The maximum time in milliseconds to wait for a server response
+ *   before aborting the request. Defaults to 3000ms (3 seconds).
  * @returns A promise that resolves to an object containing:
- *   - `status`: the HTTP status code returned by the server, or -1 if the request was aborted or failed.
- *   - `data`: the parsed JSON response from the server, or `null` if the request failed or was aborted.
+ *   - `status`: HTTP status code from the server response, or -1 if the request failed/timed out
+ *   - `data`: The data returned by the server, or null if the request failed
  *
  * @example
- * loginUser('johndoe', 's3cr3t', true, 5000)
- *   .then(({ status, data }) => {
- *     if (status === 200) {
- *       console.log('Login successful:', data);
- *     } else {
- *       console.error('Login failed. Status:', status);
- *     }
- *   });
+ * // Standard login
+ * const { status, data } = await loginUser("admin", "password123", false);
+ *
+ * // Login with auto-login enabled and custom timeout
+ * const { status, data } = await loginUser("admin", "password123", true, 5000);
  */
 export async function loginUser(
     username: string,
@@ -27,130 +27,57 @@ export async function loginUser(
     autoLogin: boolean,
     timeout: number = 3000
 ): Promise<{ status: number; data: any }> {
-    const controller = new AbortController();
-    const signal = controller.signal;
-
-    // Automatically abort the request after `timeout` milliseconds
-    const timeoutId = setTimeout(() => controller.abort(), timeout);
-    try {
-        const response = await fetch("/api/login", {
-            method: "POST",
-            credentials: "include", // Cookies (including HTTP-only cookies)
-            headers: {
-                "Content-Type": "application/json",
-            },
-            body: JSON.stringify({
-                username: username,
-                password: password,
-                auto_login: autoLogin,
-            }),
-            signal,
-        });
-
-        clearTimeout(timeoutId); // cancel timeout if response arrives in time
-        return {
-            status: response.status,
-            data: await response.json(),
-        };
-    } catch (error) {
-        return {
-            status: -1,
-            data: null,
-        };
-    }
+    return makeAPIRequest(
+        "/api/login",
+        "POST",
+        {
+            username,
+            password,
+            auto_login: autoLogin,
+        },
+        timeout
+    );
 }
 
 /**
- * Attempts to automatically log in the user using stored cookies, with an optional timeout to abort the request.
+ * Attempts to automatically log in a user using stored credentials or session data
+ * by sending a POST request to the server's auto-login endpoint.
  *
- * @param timeout - Maximum time in milliseconds to wait for the server response before aborting. Defaults to 3000 ms.
+ * @param timeout - The maximum time in milliseconds to wait for a server response
+ *   before aborting the request. Defaults to 3000ms (3 seconds).
  * @returns A promise that resolves to an object containing:
- *   - `status`: the HTTP status code returned by the server, or -1 if the request was aborted or failed.
- *   - `data`: the parsed JSON response from the server, or `null` if the request failed or was aborted.
+ *   - `status`: HTTP status code from the server response, or -1 if the request failed/timed out
+ *   - `data`: The data returned by the server, or null if the request failed
  *
  * @example
- * autoLogin(5000)
- *   .then(({ status, data }) => {
- *     if (status === 200) {
- *       console.log('Auto-login successful:', data);
- *     } else {
- *       console.warn('Auto-login failed. Status:', status);
- *     }
- *   });
+ * // Standard auto-login attempt
+ * const { status, data } = await autoLogin();
+ *
+ * // Auto-login with extended timeout
+ * const { status, data } = await autoLogin(5000); // 5 second timeout
  */
 export async function autoLogin(timeout: number = 3000): Promise<{ status: number; data: any }> {
-    const controller = new AbortController();
-    const signal = controller.signal;
-
-    // Automatically abort the request after `timeout` milliseconds
-    const timeoutId = setTimeout(() => controller.abort(), timeout);
-    try {
-        const response = await fetch("/api/auto_login", {
-            method: "POST",
-            credentials: "include", // Cookies (including HTTP-only cookies) are automatically sent by the browser
-            headers: {
-                "Content-Type": "application/json",
-            },
-            signal,
-        });
-
-        clearTimeout(timeoutId); // cancel timeout if response arrives in time
-        return {
-            status: response.status,
-            data: await response.json(),
-        };
-    } catch (error) {
-        return {
-            status: -1,
-            data: null,
-        };
-    }
+    return makeAPIRequest("/api/auto_login", "POST", {}, timeout);
 }
 
 /**
- * Logs out the current user by sending a POST request to the server, with an optional timeout to abort.
+ * Logs out the current user by sending a POST request to the server's logout endpoint.
  *
- * @param timeout - Maximum time in milliseconds to wait for the server response before aborting. Defaults to 3000 ms.
+ * @param timeout - The maximum time in milliseconds to wait for a server response
+ *   before aborting the request. Defaults to 3000ms (3 seconds).
  * @returns A promise that resolves to an object containing:
- *   - `status`: the HTTP status code returned by the server, or -1 if the request was aborted or failed.
- *   - `data`: the parsed JSON response from the server, or `null` if the request failed or was aborted.
+ *   - `status`: HTTP status code from the server response, or -1 if the request failed/timed out
+ *   - `data`: The data returned by the server, or null if the request failed
  *
  * @example
- * logoutUser(5000)
- *   .then(({ status, data }) => {
- *     if (status === 200) {
- *       console.log('Logout successful:', data);
- *     } else {
- *       console.error('Logout failed. Status:', status);
- *     }
- *   });
+ * // Standard logout
+ * const { status, data } = await logoutUser();
+ *
+ * // Logout with custom timeout
+ * const { status, data } = await logoutUser(5000); // 5 second timeout
  */
 export async function logoutUser(timeout: number = 3000): Promise<{ status: number; data: any }> {
-    const controller = new AbortController();
-    const signal = controller.signal;
-
-    // Automatically abort the request after `timeout` milliseconds
-    const timeoutId = setTimeout(() => controller.abort(), timeout);
-    try {
-        const response = await fetch("/api/logout", {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-            },
-            signal,
-        });
-
-        clearTimeout(timeoutId);
-        return {
-            status: response.status,
-            data: await response.json(),
-        };
-    } catch (error) {
-        return {
-            status: -1,
-            data: null,
-        };
-    }
+    return makeAPIRequest("/api/logout", "POST", {}, timeout);
 }
 
 /**

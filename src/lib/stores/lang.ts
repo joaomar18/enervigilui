@@ -171,9 +171,13 @@ const textsObject: TextsObject = {
         PT: "Não foi possível obter o estado dos dispositivos do servidor.",
         EN: "Could not obtain devices status from the server.",
     },
-    errorDeviceState: {
-        PT: "Não foi possível obter o estado do dispositivo do servidor.",
-        EN: "Could not obtain device status from the server.",
+    errorDeviceConfig: {
+        PT: "Não foi possível obter a configuração para o dispositivo do servidor.",
+        EN: "Could not obtain device configuration from the server.",
+    },
+    errorDeviceNodesConfig: {
+        PT: "Não foi possível obter a configuração das variáveis para o dispositivo do servidor.",
+        EN: "Could not obtain device variables configuration from the server.",
     },
     errorEditDeviceParams: {
         PT: "Não foram atribuídos o nome e/ou o id do dispositivo.",
@@ -326,7 +330,7 @@ const textsObject: TextsObject = {
     },
     secondsUnit: {
         PT: "seg.",
-        EN: "s.",
+        EN: "sec.",
     },
     readPeriodError: {
         PT: "O período de leitura deve estar compreendido entre {minValue} e {maxValue} segundos.",

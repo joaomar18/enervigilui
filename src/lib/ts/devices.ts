@@ -1,75 +1,66 @@
+import { makeAPIRequest } from "./api";
+
 /**
- * Fetches the state of all devices from the server, with an optional timeout to abort the request.
+ * Fetches the state and configuration of a specific device from the server.
  *
- * @param timeout - Maximum time in milliseconds to wait for the server response before aborting. Defaults to 3000 ms.
- * @returns A promise that resolves to an object containing:
- *   - `status`: the HTTP status code of the response, or -1 if the request was aborted or failed.
- *   - `data`: the parsed JSON payload from the server, or `null` if the request failed or was aborted.
+ * @param {number} [timeout=3000] - The timeout duration in milliseconds for the API request.
+ * @returns {Promise<{ status: number; data: any }>} - A promise that resolves to an object containing
+ * the HTTP status code and the response data.
  *
- * @example
- * getAllDevicesState(5000)
- *   .then(({ status, data }) => {
- *     if (status === 200) {
- *       console.log('Device states:', data);
- *     } else {
- *       console.error('Failed to fetch device states. Status:', status);
- *     }
- *   });
+ * Example usage:
+ * ```typescript
+ * const response = await getAllDevicesState();
+ * console.log(response.status, response.data);
+ * ```
  */
 export async function getAllDevicesState(
     timeout: number = 3000
 ): Promise<{ status: number; data: any }> {
-    const controller = new AbortController();
-    const signal = controller.signal;
-
-    // Automatically abort the request after `timeout` milliseconds
-    const timeoutId = setTimeout(() => controller.abort(), timeout);
-    try {
-        const response = await fetch("/api/get_all_device_state", {
-            method: "GET",
-            headers: {
-                "Content-Type": "application/json",
-            },
-            signal,
-        });
-
-        clearTimeout(timeoutId); // cancel timeout if response arrives in time
-        return {
-            status: response.status,
-            data: await response.json(),
-        };
-    } catch (error) {
-        return {
-            status: -1,
-            data: null,
-        };
-    }
+    return makeAPIRequest("/api/get_all_device_state", "GET", {}, timeout);
 }
 
+/**
+ * Fetches the state and configuration of a specific device from the server.
+ *
+ * @param {string} name - The name of the device.
+ * @param {number} id - The unique identifier of the device.
+ * @param {number} [timeout=3000] - The timeout duration in milliseconds for the API request.
+ * @returns {Promise<{ status: number; data: any }>} - A promise that resolves to an object containing
+ * the HTTP status code and the response data.
+ *
+ * Example usage:
+ * ```typescript
+ * const response = await getDeviceState("DeviceName", 123);
+ * console.log(response.status, response.data);
+ * ```
+ */
 export async function getDeviceState(
     name: string,
     id: number,
     timeout: number = 3000
 ): Promise<{ status: number; data: any }> {
-    const controller = new AbortController();
-    const signal = controller.signal;
+    return makeAPIRequest("/api/get_device_state", "GET", { name, id }, timeout);
+}
 
-    // Automatically abort the request after `timeout` milliseconds
-    const timeoutId = setTimeout(() => controller.abort(), timeout);
-    try {
-        const url = `/api/get_device_state?name=${encodeURIComponent(name)}&id=${id}`;
-        const response = await fetch(url, { method: "GET", signal });
-
-        clearTimeout(timeoutId); // cancel timeout if response arrives in time
-        return {
-            status: response.status,
-            data: await response.json(),
-        };
-    } catch (error) {
-        console.log(error);
-        return {
-            status: -1,
-            data: null,
-        };
-    }
+/**
+ * Fetches the configuration of nodes associated with a specific device from the server.
+ *
+ * @param {string} name - The name of the device.
+ * @param {number} id - The unique identifier of the device.
+ * @param {number} [timeout=3000] - The timeout duration in milliseconds for the API request.
+ * @returns {Promise<{ status: number; data: any }>} - A promise that resolves to an object containing
+ * the HTTP status code and the response data.
+ *
+ * Example usage:
+ * ```typescript
+ * const response = await getDeviceNodesConfig("DeviceName", 123);
+ * console.log(response.status, response.data);
+ * ```
+ */
+export async function getDeviceNodesConfig(
+    name: string,
+    id: number,
+    timeout: number = 3000
+): Promise<{ status: number; data: any }> {
+    return makeAPIRequest("/api/get_nodes_config", "GET", { name, id }, timeout);
 }

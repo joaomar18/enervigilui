@@ -91,7 +91,6 @@
         await tick();
         if (unitElement) {
             unitWidth = unitElement.offsetWidth;
-            console.log("Unit width updated:", unitWidth, "Unit: ", inputUnit);
         }
     }
 

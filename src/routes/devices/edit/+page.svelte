@@ -1,6 +1,6 @@
 <script lang="ts">
     import { onMount, onDestroy } from "svelte";
-    import { getDeviceState } from "$lib/ts/devices";
+    import { getDeviceState, getDeviceNodesConfig } from "$lib/ts/devices";
     import Selector from "../../../components/General/Selector.svelte";
     import SelectorButton from "../../../components/General/SelectorButton.svelte";
     import HintInfo from "../../../components/General/HintInfo.svelte";
@@ -27,8 +27,10 @@
     let showDeleteWindow: boolean = false;
     let deleteDeviceName: string;
 
-    let pollTimer: ReturnType<typeof setTimeout>;
+    let devicePollTimer: ReturnType<typeof setTimeout>;
+    let nodesPollTimer: ReturnType<typeof setTimeout>;
     let deviceData: any;
+    let deviceNodes: any;
     let protocols: Record<string, string> = { "OPC UA": "OPC_UA", "MODBUS RTU": "MODBUS_RTU" };
     let types: Record<string, string> = { "1F": "SINGLE_PHASE", "3F": "THREE_PHASE" };
 
@@ -85,13 +87,16 @@
     };
 
     // Variables for device options
-    let selectedType: string;
-    let readEnergyFromMeter: boolean;
-    let readForwardReverseEnergySeparate: boolean;
-    let negativeReactivePower: boolean;
-    let frequencyReading: boolean;
+    let meter_type: "SINGLE_PHASE" | "THREE_PHASE" = "SINGLE_PHASE";
 
-    //Function to fetch device status
+    let meter_options: Record<string, any> = {
+        read_energy_from_meter: true, // Read energy from meter
+        read_separate_forward_reverse_energy: false, // Read forward and reverse energy separately
+        negative_reactive_power: false, // Read negative reactive power
+        frequency_reading: false, // Read frequency
+    };
+
+    //Function to fetch device status and configuration
     function fetchDeviceStatus(name: string, id: number): void {
         const tick = async () => {
             let sucess = false;
@@ -101,9 +106,8 @@
                     id
                 );
                 if (status !== 200) {
-                    showAlert($texts.errorDeviceState);
+                    showAlert($texts.errorDeviceConfig);
                 } else {
-                    console.log("Device data fetched successfully:", data);
                     deviceData = data;
                     deviceName = deviceData.name;
 
@@ -123,20 +127,46 @@
                         }
                     }
 
-                    selectedType = deviceData.type;
-                    readEnergyFromMeter = deviceData.options.read_energy_from_meter;
-                    readForwardReverseEnergySeparate =
-                        deviceData.options.read_separate_forward_reverse_energy;
-                    negativeReactivePower = deviceData.options.negative_reactive_power;
-                    frequencyReading = deviceData.options.frequency_reading;
+                    meter_type = deviceData.type;
+                    for (let option in deviceData.options) {
+                        if (meter_options.hasOwnProperty(option)) {
+                            meter_options[option] = deviceData.options[option];
+                        }
+                    }
+
                     sucess = true;
                 }
             } catch (e) {
-                showAlert($texts.errorDeviceState);
+                showAlert($texts.errorDeviceConfig);
             }
             loadedDone.set(true);
             if (!sucess) {
-                pollTimer = setTimeout(tick, 2500);
+                devicePollTimer = setTimeout(tick, 2500);
+            }
+        };
+        tick();
+    }
+
+    // Function to fetch device nodes (variables)
+    function fetchDeviceNodesConfig(name: string, id: number): void {
+        const tick = async () => {
+            let sucess = false;
+            try {
+                const { status, data }: { status: number; data: any } = await getDeviceNodesConfig(
+                    name,
+                    id
+                );
+                if (status !== 200) {
+                    showAlert($texts.errorDeviceNodesConfig);
+                } else {
+                    deviceNodes = data;
+                    sucess = true;
+                }
+            } catch (e) {
+                showAlert($texts.errorDeviceNodesConfig);
+            }
+            if (!sucess) {
+                nodesPollTimer = setTimeout(tick, 2500);
             }
         };
         tick();
@@ -165,6 +195,7 @@
         let deviceId = params.get("deviceId");
         if (deviceName && deviceId) {
             fetchDeviceStatus(deviceName, Number(deviceId));
+            fetchDeviceNodesConfig(deviceName, Number(deviceId));
         } else {
             showAlert($texts.errorEditDeviceParams);
             loadedDone.set(true);
@@ -173,7 +204,8 @@
 
     // Cleanup function
     onDestroy(() => {
-        clearTimeout(pollTimer);
+        clearTimeout(devicePollTimer);
+        clearTimeout(nodesPollTimer);
     });
 </script>
 
@@ -906,7 +938,7 @@
                     <div class="input-div">
                         <Selector
                             options={types}
-                            bind:selectedOption={selectedType}
+                            bind:selectedOption={meter_type}
                             width="200px"
                             height="40px"
                             borderRadius="5px"
@@ -952,7 +984,7 @@
                     <div class="input-div">
                         <div class="input-content-div">
                             <SelectorButton
-                                bind:checked={readEnergyFromMeter}
+                                bind:checked={meter_options.read_energy_from_meter}
                                 width="75px"
                                 height="20px"
                                 knobWidth="32px"
@@ -994,7 +1026,7 @@
                     <div class="input-div">
                         <div class="input-content-div">
                             <SelectorButton
-                                bind:checked={readForwardReverseEnergySeparate}
+                                bind:checked={meter_options.read_separate_forward_reverse_energy}
                                 width="75px"
                                 height="20px"
                                 knobWidth="32px"
@@ -1038,7 +1070,7 @@
                     <div class="input-div">
                         <div class="input-content-div">
                             <SelectorButton
-                                bind:checked={negativeReactivePower}
+                                bind:checked={meter_options.negative_reactive_power}
                                 width="75px"
                                 height="20px"
                                 knobWidth="32px"
@@ -1080,7 +1112,7 @@
                     <div class="input-div">
                         <div class="input-content-div">
                             <SelectorButton
-                                bind:checked={frequencyReading}
+                                bind:checked={meter_options.frequency_reading}
                                 width="75px"
                                 height="20px"
                                 knobWidth="32px"
