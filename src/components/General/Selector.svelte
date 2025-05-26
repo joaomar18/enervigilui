@@ -26,7 +26,7 @@
     // Variables
     let isOpen: boolean = false;
     let selDivEl: Node;
-    $: selectedKey = Object.entries(options).find(([_, value]) => value === selectedOption)?.[0];
+    $: selectedKey = Object.entries(options).find(([_, value]) => value == selectedOption)?.[0];
 
     // Functions
     function toggleSelector(): void {

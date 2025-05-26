@@ -29,18 +29,60 @@
 
     let pollTimer: ReturnType<typeof setTimeout>;
     let deviceData: any;
-    let protocols = { "OPC UA": "OPC_UA", "MODBUS RTU": "MODBUS_RTU" };
-    let types = { "1F": "SINGLE_PHASE", "3F": "THREE_PHASE" };
+    let protocols: Record<string, string> = { "OPC UA": "OPC_UA", "MODBUS RTU": "MODBUS_RTU" };
+    let types: Record<string, string> = { "1F": "SINGLE_PHASE", "3F": "THREE_PHASE" };
+
+    //modbus rtu options
+    let baudrateOptions: Record<string, string> = {
+        "1200": "1200",
+        "2400": "2400",
+        "4800": "4800",
+        "9600": "9600",
+        "19200": "19200",
+        "38400": "38400",
+        "57600": "57600",
+        "115200": "115200",
+    };
+
+    let parityOptions: Record<string, string> = {
+        None: "N",
+        Even: "E",
+        Odd: "O",
+    };
+
+    let bytesizeOptions: Record<string, string> = {
+        "7": "7",
+        "8": "8",
+    };
+
+    let stopbitsOptions: Record<string, string> = {
+        "1": "1",
+        "2": "2",
+    };
+
     let deviceName: string;
     let deviceImage: File | undefined;
 
     // Variables for device communication
     let selectedProtocol: string;
-    let deviceAddress: string = "";
-    let readPeriod: string = "";
-    let commTimeout: string = "";
-    let commUsername: string = "";
-    let commPassword: string = "";
+    let opcua_options: Record<string, string> = {
+        url: "opc.tcp://", // OPC UA server URL
+        read_period: "10", // polling interval in seconds
+        timeout: "10", // communication timeout in seconds
+        username: "", // authentication username
+        password: "", // authentication password
+    };
+    let modbus_rtu_options: Record<string, string> = {
+        port: "", // COM port (e.g., "COM1", "/dev/ttyUSB0")
+        slave_id: "1", // 1-247 (slave address)
+        baudrate: "9600", // 1200, 2400, 4800, 9600, 19200, 38400, 57600, 115200
+        parity: "N", // "none", "even", "odd"
+        stopbits: "1", // "1", "2"
+        bytesize: "8", // "7", "8"
+        read_period: "10", // polling interval in seconds
+        timeout: "10", // communication timeout in seconds
+        retries: "3", // number of retry attemps
+    };
 
     // Variables for device options
     let selectedType: string;
@@ -66,15 +108,25 @@
                     deviceName = deviceData.name;
 
                     selectedProtocol = deviceData.protocol;
-                    deviceAddress = deviceData.communication_options.url;
-                    readPeriod = deviceData.communication_options.read_period;
-                    commTimeout = deviceData.communication_options.timeout;
-                    commUsername = deviceData.communication_options.username || "";
-                    commPassword = deviceData.communication_options.password || "";
+                    if (selectedProtocol === "OPC_UA") {
+                        for (let option in deviceData.communication_options) {
+                            if (opcua_options.hasOwnProperty(option)) {
+                                opcua_options[option] = deviceData.communication_options[option];
+                            }
+                        }
+                    } else if (selectedProtocol === "MODBUS_RTU") {
+                        for (let option in deviceData.communication_options) {
+                            if (modbus_rtu_options.hasOwnProperty(option)) {
+                                modbus_rtu_options[option] =
+                                    deviceData.communication_options[option];
+                            }
+                        }
+                    }
 
                     selectedType = deviceData.type;
                     readEnergyFromMeter = deviceData.options.read_energy_from_meter;
-                    readForwardReverseEnergySeparate = deviceData.options.read_separate_forward_reverse_energy;
+                    readForwardReverseEnergySeparate =
+                        deviceData.options.read_separate_forward_reverse_energy;
                     negativeReactivePower = deviceData.options.negative_reactive_power;
                     frequencyReading = deviceData.options.frequency_reading;
                     sucess = true;
@@ -209,11 +261,11 @@
                         <div class="input-div">
                             <div class="input-content-div">
                                 <InputField
-                                    bind:inputValue={deviceAddress}
+                                    bind:inputValue={opcua_options.url}
                                     width="100%"
                                     height="40px"
                                     borderRadius="5px"
-                                    backgroundColor="#23272f"
+                                    backgroundColor="#252b33"
                                     borderColor="#323a45"
                                     selectedBackgroundColor="#252b33"
                                     selectedBorderColor="#2F80ED"
@@ -252,7 +304,7 @@
                         <div class="input-div">
                             <div class="input-content-div">
                                 <InputField
-                                    bind:inputValue={readPeriod}
+                                    bind:inputValue={opcua_options.read_period}
                                     inputType="POSITIVE_INT"
                                     inputUnit={$texts.secondsUnit[$selectedLang]}
                                     minValue={5.0}
@@ -266,7 +318,7 @@
                                     width="100%"
                                     height="40px"
                                     borderRadius="5px"
-                                    backgroundColor="#23272f"
+                                    backgroundColor="#252b33"
                                     borderColor="#323a45"
                                     selectedBackgroundColor="#252b33"
                                     selectedBorderColor="#2F80ED"
@@ -307,7 +359,7 @@
                         <div class="input-div">
                             <div class="input-content-div">
                                 <InputField
-                                    bind:inputValue={commTimeout}
+                                    bind:inputValue={opcua_options.timeout}
                                     inputType="POSITIVE_FLOAT"
                                     inputUnit={$texts.secondsUnit[$selectedLang]}
                                     minValue={5.0}
@@ -321,7 +373,7 @@
                                     width="100%"
                                     height="40px"
                                     borderRadius="5px"
-                                    backgroundColor="#23272f"
+                                    backgroundColor="#252b33"
                                     borderColor="#323a45"
                                     selectedBackgroundColor="#252b33"
                                     selectedBorderColor="#2F80ED"
@@ -366,11 +418,11 @@
                             <div class="input-div">
                                 <div class="input-content-div">
                                     <InputField
-                                        bind:inputValue={commUsername}
+                                        bind:inputValue={opcua_options.username}
                                         width="100%"
                                         height="40px"
                                         borderRadius="5px"
-                                        backgroundColor="#23272f"
+                                        backgroundColor="#252b33"
                                         borderColor="#323a45"
                                         selectedBackgroundColor="#252b33"
                                         selectedBorderColor="#2F80ED"
@@ -409,12 +461,12 @@
                             <div class="input-div">
                                 <div class="input-content-div">
                                     <InputField
-                                        bind:inputValue={commPassword}
+                                        bind:inputValue={opcua_options.password}
                                         inputType="PASSWORD"
                                         width="100%"
                                         height="40px"
                                         borderRadius="5px"
-                                        backgroundColor="#23272f"
+                                        backgroundColor="#252b33"
                                         borderColor="#323a45"
                                         selectedBackgroundColor="#252b33"
                                         selectedBorderColor="#2F80ED"
@@ -450,7 +502,397 @@
                         </div>
                     </div>
                 {:else if selectedProtocol === "MODBUS_RTU"}
-                    <div>MODBUS RTU</div>
+                    <div class="device-input-div">
+                        <span>{$texts.communicationPort[$selectedLang]}</span>
+                        <div class="input-div">
+                            <div class="input-content-div">
+                                <InputField
+                                    bind:inputValue={modbus_rtu_options.port}
+                                    width="100%"
+                                    height="40px"
+                                    borderRadius="5px"
+                                    backgroundColor="#252b33"
+                                    borderColor="#323a45"
+                                    selectedBackgroundColor="#252b33"
+                                    selectedBorderColor="#2F80ED"
+                                    fontSize="1rem"
+                                    fontColor="#f5f5f5"
+                                    fontWeight="300"
+                                />
+                            </div>
+                            <div class="info-div">
+                                <HintInfo
+                                    labelText=""
+                                    hintWidth="300px"
+                                    hintHeight="fit-content"
+                                    hintBackgroundColor="#1e242b"
+                                    hintBorderColor="#2c343d"
+                                    hintBorderRadius="10px"
+                                    textColor="#f5f5f5"
+                                    openBackgroundColor="rgba(255, 255, 255, 0.05)"
+                                    openHoverBackgroundColor="rgba(255, 255, 255, 0.1)"
+                                    openStrokeColor="#cccccc"
+                                    openHoverStrokeColor="#eeeeee"
+                                    closeBackgroundColor="rgba(255, 255, 255, 0.1)"
+                                    closeHoverBackgroundColor="rgba(255, 255, 255, 0.2)"
+                                    closeStrokeColor="white"
+                                    closeHoverStrokeColor="#eeeeee"
+                                >
+                                    <span class="info-text"
+                                        >{$texts.communicationPortInfo[$selectedLang]}</span
+                                    >
+                                </HintInfo>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="device-input-div">
+                        <span>{$texts.baudrate[$selectedLang]}</span>
+                        <div class="input-div">
+                            <Selector
+                                options={baudrateOptions}
+                                bind:selectedOption={modbus_rtu_options.baudrate}
+                                width="200px"
+                                height="40px"
+                                borderRadius="5px"
+                                backgroundColor="#252b33"
+                                borderColor="#323a45"
+                                selectedColor="#14566b"
+                                optionsBackgroundColor="#1e242b"
+                                optionsBorderColor="#323a45"
+                                letterSpacing="0.5px"
+                                wordSpacing="1px"
+                                arrowWidth="16px"
+                                arrowHeight="16px"
+                                arrowRightPos="10px"
+                            />
+                            <div class="info-div">
+                                <HintInfo
+                                    labelText=""
+                                    hintWidth="300px"
+                                    hintHeight="fit-content"
+                                    hintBackgroundColor="#1e242b"
+                                    hintBorderColor="#2c343d"
+                                    hintBorderRadius="10px"
+                                    textColor="#f5f5f5"
+                                    openBackgroundColor="rgba(255, 255, 255, 0.05)"
+                                    openHoverBackgroundColor="rgba(255, 255, 255, 0.1)"
+                                    openStrokeColor="#cccccc"
+                                    openHoverStrokeColor="#eeeeee"
+                                    closeBackgroundColor="rgba(255, 255, 255, 0.1)"
+                                    closeHoverBackgroundColor="rgba(255, 255, 255, 0.2)"
+                                    closeStrokeColor="white"
+                                    closeHoverStrokeColor="#eeeeee"
+                                >
+                                    <span class="info-text"
+                                        >{$texts.baudrateInfo[$selectedLang]}</span
+                                    >
+                                </HintInfo>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="device-input-div">
+                        <span>{$texts.parity[$selectedLang]}</span>
+                        <div class="input-div">
+                            <Selector
+                                options={parityOptions}
+                                bind:selectedOption={modbus_rtu_options.parity}
+                                width="200px"
+                                height="40px"
+                                borderRadius="5px"
+                                backgroundColor="#252b33"
+                                borderColor="#323a45"
+                                selectedColor="#14566b"
+                                optionsBackgroundColor="#1e242b"
+                                optionsBorderColor="#323a45"
+                                letterSpacing="0.5px"
+                                wordSpacing="1px"
+                                arrowWidth="16px"
+                                arrowHeight="16px"
+                                arrowRightPos="10px"
+                            />
+                            <div class="info-div">
+                                <HintInfo
+                                    labelText=""
+                                    hintWidth="300px"
+                                    hintHeight="fit-content"
+                                    hintBackgroundColor="#1e242b"
+                                    hintBorderColor="#2c343d"
+                                    hintBorderRadius="10px"
+                                    textColor="#f5f5f5"
+                                    openBackgroundColor="rgba(255, 255, 255, 0.05)"
+                                    openHoverBackgroundColor="rgba(255, 255, 255, 0.1)"
+                                    openStrokeColor="#cccccc"
+                                    openHoverStrokeColor="#eeeeee"
+                                    closeBackgroundColor="rgba(255, 255, 255, 0.1)"
+                                    closeHoverBackgroundColor="rgba(255, 255, 255, 0.2)"
+                                    closeStrokeColor="white"
+                                    closeHoverStrokeColor="#eeeeee"
+                                >
+                                    <span class="info-text">{$texts.parityInfo[$selectedLang]}</span
+                                    >
+                                </HintInfo>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="device-input-div">
+                        <span>{$texts.bytesize[$selectedLang]}</span>
+                        <div class="input-div">
+                            <Selector
+                                options={bytesizeOptions}
+                                bind:selectedOption={modbus_rtu_options.bytesize}
+                                width="200px"
+                                height="40px"
+                                borderRadius="5px"
+                                backgroundColor="#252b33"
+                                borderColor="#323a45"
+                                selectedColor="#14566b"
+                                optionsBackgroundColor="#1e242b"
+                                optionsBorderColor="#323a45"
+                                letterSpacing="0.5px"
+                                wordSpacing="1px"
+                                arrowWidth="16px"
+                                arrowHeight="16px"
+                                arrowRightPos="10px"
+                            />
+                            <div class="info-div">
+                                <HintInfo
+                                    labelText=""
+                                    hintWidth="300px"
+                                    hintHeight="fit-content"
+                                    hintBackgroundColor="#1e242b"
+                                    hintBorderColor="#2c343d"
+                                    hintBorderRadius="10px"
+                                    textColor="#f5f5f5"
+                                    openBackgroundColor="rgba(255, 255, 255, 0.05)"
+                                    openHoverBackgroundColor="rgba(255, 255, 255, 0.1)"
+                                    openStrokeColor="#cccccc"
+                                    openHoverStrokeColor="#eeeeee"
+                                    closeBackgroundColor="rgba(255, 255, 255, 0.1)"
+                                    closeHoverBackgroundColor="rgba(255, 255, 255, 0.2)"
+                                    closeStrokeColor="white"
+                                    closeHoverStrokeColor="#eeeeee"
+                                >
+                                    <span class="info-text"
+                                        >{$texts.bytesizeInfo[$selectedLang]}</span
+                                    >
+                                </HintInfo>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="device-input-div">
+                        <span>{$texts.stopbits[$selectedLang]}</span>
+                        <div class="input-div">
+                            <Selector
+                                options={stopbitsOptions}
+                                bind:selectedOption={modbus_rtu_options.stopbits}
+                                width="200px"
+                                height="40px"
+                                borderRadius="5px"
+                                backgroundColor="#252b33"
+                                borderColor="#323a45"
+                                selectedColor="#14566b"
+                                optionsBackgroundColor="#1e242b"
+                                optionsBorderColor="#323a45"
+                                letterSpacing="0.5px"
+                                wordSpacing="1px"
+                                arrowWidth="16px"
+                                arrowHeight="16px"
+                                arrowRightPos="10px"
+                            />
+                            <div class="info-div">
+                                <HintInfo
+                                    labelText=""
+                                    hintWidth="300px"
+                                    hintHeight="fit-content"
+                                    hintBackgroundColor="#1e242b"
+                                    hintBorderColor="#2c343d"
+                                    hintBorderRadius="10px"
+                                    textColor="#f5f5f5"
+                                    openBackgroundColor="rgba(255, 255, 255, 0.05)"
+                                    openHoverBackgroundColor="rgba(255, 255, 255, 0.1)"
+                                    openStrokeColor="#cccccc"
+                                    openHoverStrokeColor="#eeeeee"
+                                    closeBackgroundColor="rgba(255, 255, 255, 0.1)"
+                                    closeHoverBackgroundColor="rgba(255, 255, 255, 0.2)"
+                                    closeStrokeColor="white"
+                                    closeHoverStrokeColor="#eeeeee"
+                                >
+                                    <span class="info-text"
+                                        >{$texts.stopbitsInfo[$selectedLang]}</span
+                                    >
+                                </HintInfo>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="device-input-div">
+                        <span>{$texts.readPeriod[$selectedLang]}</span>
+                        <div class="input-div">
+                            <div class="input-content-div">
+                                <InputField
+                                    bind:inputValue={modbus_rtu_options.read_period}
+                                    inputType="POSITIVE_INT"
+                                    inputUnit={$texts.secondsUnit[$selectedLang]}
+                                    minValue={5.0}
+                                    maxValue={300.0}
+                                    limitsPassed={() => {
+                                        showAlert($texts.readPeriodError, {
+                                            minValue: 5,
+                                            maxValue: 300,
+                                        });
+                                    }}
+                                    width="100%"
+                                    height="40px"
+                                    borderRadius="5px"
+                                    backgroundColor="#252b33"
+                                    borderColor="#323a45"
+                                    selectedBackgroundColor="#252b33"
+                                    selectedBorderColor="#2F80ED"
+                                    fontSize="1rem"
+                                    fontColor="#f5f5f5"
+                                    fontWeight="300"
+                                    textAlign="center"
+                                    unitTextColor="rgb(170,170,170)"
+                                />
+                            </div>
+                            <div class="info-div">
+                                <HintInfo
+                                    labelText=""
+                                    hintWidth="300px"
+                                    hintHeight="fit-content"
+                                    hintBackgroundColor="#1e242b"
+                                    hintBorderColor="#2c343d"
+                                    hintBorderRadius="10px"
+                                    textColor="#f5f5f5"
+                                    openBackgroundColor="rgba(255, 255, 255, 0.05)"
+                                    openHoverBackgroundColor="rgba(255, 255, 255, 0.1)"
+                                    openStrokeColor="#cccccc"
+                                    openHoverStrokeColor="#eeeeee"
+                                    closeBackgroundColor="rgba(255, 255, 255, 0.1)"
+                                    closeHoverBackgroundColor="rgba(255, 255, 255, 0.2)"
+                                    closeStrokeColor="white"
+                                    closeHoverStrokeColor="#eeeeee"
+                                >
+                                    <span class="info-text"
+                                        >{$texts.readPeriodInfo[$selectedLang]}</span
+                                    >
+                                </HintInfo>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="device-input-div">
+                        <span>{$texts.commTimeout[$selectedLang]}</span>
+                        <div class="input-div">
+                            <div class="input-content-div">
+                                <InputField
+                                    bind:inputValue={modbus_rtu_options.timeout}
+                                    inputType="POSITIVE_FLOAT"
+                                    inputUnit={$texts.secondsUnit[$selectedLang]}
+                                    minValue={5.0}
+                                    maxValue={300.0}
+                                    limitsPassed={() => {
+                                        showAlert($texts.commTimeoutError, {
+                                            minValue: 5,
+                                            maxValue: 300,
+                                        });
+                                    }}
+                                    width="100%"
+                                    height="40px"
+                                    borderRadius="5px"
+                                    backgroundColor="#252b33"
+                                    borderColor="#323a45"
+                                    selectedBackgroundColor="#252b33"
+                                    selectedBorderColor="#2F80ED"
+                                    fontSize="1rem"
+                                    fontColor="#f5f5f5"
+                                    fontWeight="300"
+                                    textAlign="center"
+                                    unitTextColor="rgb(170,170,170)"
+                                />
+                            </div>
+                            <div class="info-div">
+                                <HintInfo
+                                    labelText=""
+                                    hintWidth="300px"
+                                    hintHeight="fit-content"
+                                    hintBackgroundColor="#1e242b"
+                                    hintBorderColor="#2c343d"
+                                    hintBorderRadius="10px"
+                                    textColor="#f5f5f5"
+                                    openBackgroundColor="rgba(255, 255, 255, 0.05)"
+                                    openHoverBackgroundColor="rgba(255, 255, 255, 0.1)"
+                                    openStrokeColor="#cccccc"
+                                    openHoverStrokeColor="#eeeeee"
+                                    closeBackgroundColor="rgba(255, 255, 255, 0.1)"
+                                    closeHoverBackgroundColor="rgba(255, 255, 255, 0.2)"
+                                    closeStrokeColor="white"
+                                    closeHoverStrokeColor="#eeeeee"
+                                >
+                                    <span class="info-text"
+                                        >{$texts.commTimeoutInfo[$selectedLang]}</span
+                                    >
+                                </HintInfo>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="device-input-div">
+                        <span>{$texts.retries[$selectedLang]}</span>
+                        <div class="input-div">
+                            <div class="input-content-div">
+                                <InputField
+                                    bind:inputValue={modbus_rtu_options.retries}
+                                    inputType="POSITIVE_INT"
+                                    minValue={0.0}
+                                    maxValue={5.0}
+                                    limitsPassed={() => {
+                                        showAlert($texts.retriesError, {
+                                            minValue: 0,
+                                            maxValue: 5,
+                                        });
+                                    }}
+                                    width="100%"
+                                    height="40px"
+                                    borderRadius="5px"
+                                    backgroundColor="#252b33"
+                                    borderColor="#323a45"
+                                    selectedBackgroundColor="#252b33"
+                                    selectedBorderColor="#2F80ED"
+                                    fontSize="1rem"
+                                    fontColor="#f5f5f5"
+                                    fontWeight="300"
+                                    textAlign="center"
+                                    unitTextColor="rgb(170,170,170)"
+                                />
+                            </div>
+                            <div class="info-div">
+                                <HintInfo
+                                    labelText=""
+                                    hintWidth="300px"
+                                    hintHeight="fit-content"
+                                    hintBackgroundColor="#1e242b"
+                                    hintBorderColor="#2c343d"
+                                    hintBorderRadius="10px"
+                                    textColor="#f5f5f5"
+                                    openBackgroundColor="rgba(255, 255, 255, 0.05)"
+                                    openHoverBackgroundColor="rgba(255, 255, 255, 0.1)"
+                                    openStrokeColor="#cccccc"
+                                    openHoverStrokeColor="#eeeeee"
+                                    closeBackgroundColor="rgba(255, 255, 255, 0.1)"
+                                    closeHoverBackgroundColor="rgba(255, 255, 255, 0.2)"
+                                    closeStrokeColor="white"
+                                    closeHoverStrokeColor="#eeeeee"
+                                >
+                                    <span class="info-text"
+                                        >{$texts.retriesInfo[$selectedLang]}</span
+                                    >
+                                </HintInfo>
+                            </div>
+                        </div>
+                    </div>
                 {/if}
             </div>
             <div class="device-section-div">

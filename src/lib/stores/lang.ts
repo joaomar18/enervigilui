@@ -336,6 +336,58 @@ const textsObject: TextsObject = {
         PT: "O tempo limite de comunicação deve estar compreendido entre {minValue} e {maxValue} segundos.",
         EN: "The communication timeout must be between {minValue} and {maxValue} seconds.",
     },
+    communicationPort: {
+        PT: "Porta de Comunicação",
+        EN: "Communication Port",
+    },
+    communicationPortInfo: {
+        PT: "A porta de comunicação utilizada para estabelecer a ligação com o dispositivo.",
+        EN: "The communication port used to establish the connection with the device.",
+    },
+    baudrate: {
+        PT: "Baudrate",
+        EN: "Baudrate",
+    },
+    baudrateInfo: {
+        PT: "A taxa de transmissão de dados utilizada na comunicação com o dispositivo.",
+        EN: "The data transmission rate used in communication with the device.",
+    },
+    parity: {
+        PT: "Paridade",
+        EN: "Parity",
+    },
+    parityInfo: {
+        PT: "O método de verificação de erros utilizado na comunicação com o dispositivo.",
+        EN: "The error checking method used in communication with the device.",
+    },
+    bytesize: {
+        PT: "Tamanho do Byte (bits)",
+        EN: "Byte Size (bits)",
+    },
+    bytesizeInfo: {
+        PT: "O tamanho do byte (em bits) utilizado na comunicação com o dispositivo.",
+        EN: "The byte size (in bits) used in communication with the device.",
+    },
+    stopbits: {
+        PT: "Bits de Paragem",
+        EN: "Stop Bits",
+    },
+    stopbitsInfo: {
+        PT: "O número de bits de paragem utilizados na comunicação com o dispositivo.",
+        EN: "The number of stop bits used in communication with the device.",
+    },
+    retries: {
+        PT: "Tentativas de Reenvio",
+        EN: "Retries Number",
+    },
+    retriesInfo: {
+        PT: "O número de tentativas de reenvio em caso de falha na comunicação com o dispositivo.",
+        EN: "The number of retries in case of communication failure with the device.",
+    },
+    retriesError: {
+        PT: "O número de tentativas de reenvio deve estar compreendido entre {minValue} e {maxValue}.",
+        EN: "The number of retries must be between {minValue} and {maxValue}.",
+    },
 };
 
 export const texts = readable<TextsObject>(textsObject);
