@@ -9,6 +9,7 @@
     import Button from "../../../components/General/Button.svelte";
     import ConfirmWindow from "../../../components/General/ConfirmWindow.svelte";
     import InputField from "../../../components/General/InputField.svelte";
+    import NodesGrid from "../../../components/Devices/Nodes/NodesGrid.svelte";
 
     // Navigation
     import { navigateTo } from "$lib/ts/navigation";
@@ -1155,6 +1156,15 @@
                     <h3>{$texts.deviceNodes[$selectedLang]}</h3>
                     <span>{$texts.deviceNodesSub[$selectedLang]}</span>
                 </div>
+                <div class="nodes-grid-div">
+                    <NodesGrid
+                        width="100%"
+                        height="100px"
+                        borderRadius="10px"
+                        backgroundColor="#252b33"
+                        borderColor="#323a45"
+                    />
+                </div>
             </div>
             <div class="action-buttons-div">
                 <Button
@@ -1401,6 +1411,15 @@
         width: 100%;
         border-bottom: 1px solid rgba(255, 255, 255, 0.2);
         padding-bottom: 5px;
+    }
+
+    .device-section-div .nodes-grid-div {
+        width: 100%;
+        height: fit-content;
+        padding: 10px;
+        padding-left: 0px;
+        padding-right: 0px;
+        box-sizing: border-box;
     }
 
     .device-input-div {
