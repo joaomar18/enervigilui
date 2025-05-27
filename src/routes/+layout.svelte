@@ -550,7 +550,6 @@
         margin: 0;
         padding: 30px;
         height: 100%;
-        min-height: inherit;
     }
 
     /* Content div */
@@ -560,7 +559,6 @@
         margin: 0;
         padding: 0;
         position: relative;
-        min-height: inherit;
     }
 
     /* Loader overlay: full-screen dark backdrop with centered spinner */
