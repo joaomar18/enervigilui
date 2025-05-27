@@ -1,0 +1,1841 @@
+2025-05-27T20:36:52.860Z vite:config config file loaded in 408.22ms
+2025-05-27T20:36:52.880Z vite:env loading env files: [
+  '/home/joao/Desktop/enervigilui/.env',
+  '/home/joao/Desktop/enervigilui/.env.local',
+  '/home/joao/Desktop/enervigilui/.env.production',
+  '/home/joao/Desktop/enervigilui/.env.production.local'
+]
+2025-05-27T20:36:52.880Z vite:env env files loaded in 0.86ms
+2025-05-27T20:36:52.880Z vite:env using resolved env: {
+  GJS_DEBUG_TOPICS: 'JS ERROR;JS LOG',
+  LESSOPEN: '| /usr/bin/lesspipe %s',
+  USER: 'joao',
+  npm_config_user_agent: 'npm/10.8.2 node/v20.19.2 linux x64 workspaces/false',
+  XDG_SESSION_TYPE: 'x11',
+  GIT_ASKPASS: '/usr/share/code/resources/app/extensions/git/dist/askpass.sh',
+  npm_node_execpath: '/usr/bin/node',
+  CLUTTER_DISABLE_MIPMAPPED_TEXT: '1',
+  SHLVL: '1',
+  npm_config_noproxy: '',
+  HOME: '/home/joao',
+  CHROME_DESKTOP: 'code.desktop',
+  TERM_PROGRAM_VERSION: '1.100.2',
+  DESKTOP_SESSION: 'ubuntu',
+  npm_package_json: '/home/joao/Desktop/enervigilui/package.json',
+  GIO_LAUNCHED_DESKTOP_FILE: '/usr/share/applications/code.desktop',
+  GNOME_SHELL_SESSION_MODE: 'ubuntu',
+  GTK_MODULES: 'gail:atk-bridge',
+  VSCODE_GIT_ASKPASS_MAIN: '/usr/share/code/resources/app/extensions/git/dist/askpass-main.js',
+  VSCODE_GIT_ASKPASS_NODE: '/usr/share/code/code',
+  MANAGERPID: '2849',
+  npm_config_userconfig: '/home/joao/.npmrc',
+  npm_config_local_prefix: '/home/joao/Desktop/enervigilui',
+  PYDEVD_DISABLE_FILE_VALIDATION: '1',
+  SYSTEMD_EXEC_PID: '3280',
+  BUNDLED_DEBUGPY_PATH: '/home/joao/.vscode/extensions/ms-python.debugpy-2025.8.0-linux-x64/bundled/libs/debugpy',
+  GSM_SKIP_SSH_AGENT_WORKAROUND: 'true',
+  DBUS_SESSION_BUS_ADDRESS: 'unix:path=/run/user/1000/bus',
+  npm_config_engine_strict: 'true',
+  COLORTERM: 'truecolor',
+  GIO_LAUNCHED_DESKTOP_FILE_PID: '4180',
+  COLOR: '0',
+  DEBUGINFOD_URLS: 'https://debuginfod.ubuntu.com ',
+  LOGNAME: 'joao',
+  JOURNAL_STREAM: '9:30901',
+  _: '/usr/bin/npx',
+  npm_config_prefix: '/usr',
+  npm_config_npm_version: '10.8.2',
+  MEMORY_PRESSURE_WATCH: '/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/session.slice/org.gnome.Shell@x11.service/memory.pressure',
+  XDG_SESSION_CLASS: 'user',
+  USERNAME: 'joao',
+  TERM: 'xterm-256color',
+  npm_config_cache: '/home/joao/.npm',
+  GNOME_DESKTOP_SESSION_ID: 'this-is-deprecated',
+  WINDOWPATH: '2',
+  npm_config_node_gyp: '/usr/lib/node_modules/npm/node_modules/node-gyp/bin/node-gyp.js',
+  PATH: '/home/joao/Desktop/enervigilui/node_modules/.bin:/home/joao/Desktop/enervigilui/node_modules/.bin:/home/joao/Desktop/node_modules/.bin:/home/joao/node_modules/.bin:/home/node_modules/.bin:/node_modules/.bin:/usr/lib/node_modules/npm/node_modules/@npmcli/run-script/lib/node-gyp-bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin:/snap/bin:/home/joao/.config/Code/User/globalStorage/github.copilot-chat/debugCommand:/home/joao/.vscode/extensions/ms-python.debugpy-2025.8.0-linux-x64/bundled/scripts/noConfigScripts',
+  SESSION_MANAGER: 'local/joao-MS-7D98:@/tmp/.ICE-unix/3247,unix/joao-MS-7D98:/tmp/.ICE-unix/3247',
+  INVOCATION_ID: '20fd1a8da7f14f85b6a6d78c384b19de',
+  NODE: '/usr/bin/node',
+  npm_package_name: 'enervigilui',
+  XDG_MENU_PREFIX: 'gnome-',
+  XDG_RUNTIME_DIR: '/run/user/1000',
+  GDK_BACKEND: 'x11',
+  DISPLAY: ':1',
+  VSCODE_DEBUGPY_ADAPTER_ENDPOINTS: '/home/joao/.vscode/extensions/ms-python.debugpy-2025.8.0-linux-x64/.noConfigDebugAdapterEndpoints/endpoint-786d78c1d6a7da09.txt',
+  LANG: 'en_US.UTF-8',
+  XDG_CURRENT_DESKTOP: 'Unity',
+  XMODIFIERS: '@im=ibus',
+  XDG_SESSION_DESKTOP: 'ubuntu',
+  XAUTHORITY: '/run/user/1000/gdm/Xauthority',
+  LS_COLORS: 'rs=0:di=01;34:ln=01;36:mh=00:pi=40;33:so=01;35:do=01;35:bd=40;33;01:cd=40;33;01:or=40;31;01:mi=00:su=37;41:sg=30;43:ca=00:tw=30;42:ow=34;42:st=37;44:ex=01;32:*.tar=01;31:*.tgz=01;31:*.arc=01;31:*.arj=01;31:*.taz=01;31:*.lha=01;31:*.lz4=01;31:*.lzh=01;31:*.lzma=01;31:*.tlz=01;31:*.txz=01;31:*.tzo=01;31:*.t7z=01;31:*.zip=01;31:*.z=01;31:*.dz=01;31:*.gz=01;31:*.lrz=01;31:*.lz=01;31:*.lzo=01;31:*.xz=01;31:*.zst=01;31:*.tzst=01;31:*.bz2=01;31:*.bz=01;31:*.tbz=01;31:*.tbz2=01;31:*.tz=01;31:*.deb=01;31:*.rpm=01;31:*.jar=01;31:*.war=01;31:*.ear=01;31:*.sar=01;31:*.rar=01;31:*.alz=01;31:*.ace=01;31:*.zoo=01;31:*.cpio=01;31:*.7z=01;31:*.rz=01;31:*.cab=01;31:*.wim=01;31:*.swm=01;31:*.dwm=01;31:*.esd=01;31:*.avif=01;35:*.jpg=01;35:*.jpeg=01;35:*.mjpg=01;35:*.mjpeg=01;35:*.gif=01;35:*.bmp=01;35:*.pbm=01;35:*.pgm=01;35:*.ppm=01;35:*.tga=01;35:*.xbm=01;35:*.xpm=01;35:*.tif=01;35:*.tiff=01;35:*.png=01;35:*.svg=01;35:*.svgz=01;35:*.mng=01;35:*.pcx=01;35:*.mov=01;35:*.mpg=01;35:*.mpeg=01;35:*.m2v=01;35:*.mkv=01;35:*.webm=01;35:*.webp=01;35:*.ogm=01;35:*.mp4=01;35:*.m4v=01;35:*.mp4v=01;35:*.vob=01;35:*.qt=01;35:*.nuv=01;35:*.wmv=01;35:*.asf=01;35:*.rm=01;35:*.rmvb=01;35:*.flc=01;35:*.avi=01;35:*.fli=01;35:*.flv=01;35:*.gl=01;35:*.dl=01;35:*.xcf=01;35:*.xwd=01;35:*.yuv=01;35:*.cgm=01;35:*.emf=01;35:*.ogv=01;35:*.ogx=01;35:*.aac=00;36:*.au=00;36:*.flac=00;36:*.m4a=00;36:*.mid=00;36:*.midi=00;36:*.mka=00;36:*.mp3=00;36:*.mpc=00;36:*.ogg=00;36:*.ra=00;36:*.wav=00;36:*.oga=00;36:*.opus=00;36:*.spx=00;36:*.xspf=00;36:*~=00;90:*#=00;90:*.bak=00;90:*.crdownload=00;90:*.dpkg-dist=00;90:*.dpkg-new=00;90:*.dpkg-old=00;90:*.dpkg-tmp=00;90:*.old=00;90:*.orig=00;90:*.part=00;90:*.rej=00;90:*.rpmnew=00;90:*.rpmorig=00;90:*.rpmsave=00;90:*.swp=00;90:*.tmp=00;90:*.ucf-dist=00;90:*.ucf-new=00;90:*.ucf-old=00;90:',
+  VSCODE_GIT_IPC_HANDLE: '/run/user/1000/vscode-git-c7baabbd04.sock',
+  TERM_PROGRAM: 'vscode',
+  npm_lifecycle_script: 'vite',
+  SSH_AUTH_SOCK: '/run/user/1000/keyring/ssh',
+  ORIGINAL_XDG_CURRENT_DESKTOP: 'ubuntu:GNOME',
+  SHELL: '/bin/bash',
+  npm_package_version: '0.0.1',
+  npm_lifecycle_event: 'npx',
+  QT_ACCESSIBILITY: '1',
+  GDMSESSION: 'ubuntu',
+  LESSCLOSE: '/usr/bin/lesspipe %s %s',
+  GPG_AGENT_INFO: '/run/user/1000/gnupg/S.gpg-agent:0:1',
+  GJS_DEBUG_OUTPUT: 'stderr',
+  VSCODE_GIT_ASKPASS_EXTRA_ARGS: '',
+  QT_IM_MODULE: 'ibus',
+  npm_config_globalconfig: '/usr/etc/npmrc',
+  npm_config_init_module: '/home/joao/.npm-init.js',
+  PWD: '/home/joao/Desktop/enervigilui',
+  npm_execpath: '/usr/lib/node_modules/npm/bin/npm-cli.js',
+  XDG_CONFIG_DIRS: '/etc/xdg/xdg-ubuntu:/etc/xdg',
+  XDG_DATA_DIRS: '/usr/share/ubuntu:/usr/share/gnome:/usr/local/share/:/usr/share/:/var/lib/snapd/desktop',
+  npm_config_global_prefix: '/usr',
+  npm_command: 'exec',
+  MEMORY_PRESSURE_WRITE: 'c29tZSAyMDAwMDAgMjAwMDAwMAA=',
+  INIT_CWD: '/home/joao/Desktop/enervigilui',
+  EDITOR: 'vi',
+  DEBUG: 'vite:*',
+  NODE_ENV: 'production'
+}
+2025-05-27T20:36:52.882Z vite:env loading env files: [
+  '/home/joao/Desktop/enervigilui/.env',
+  '/home/joao/Desktop/enervigilui/.env.local',
+  '/home/joao/Desktop/enervigilui/.env.production',
+  '/home/joao/Desktop/enervigilui/.env.production.local'
+]
+2025-05-27T20:36:52.882Z vite:env env files loaded in 0.10ms
+2025-05-27T20:36:52.882Z vite:env using resolved env: {
+  GJS_DEBUG_TOPICS: 'JS ERROR;JS LOG',
+  LESSOPEN: '| /usr/bin/lesspipe %s',
+  USER: 'joao',
+  npm_config_user_agent: 'npm/10.8.2 node/v20.19.2 linux x64 workspaces/false',
+  XDG_SESSION_TYPE: 'x11',
+  GIT_ASKPASS: '/usr/share/code/resources/app/extensions/git/dist/askpass.sh',
+  npm_node_execpath: '/usr/bin/node',
+  CLUTTER_DISABLE_MIPMAPPED_TEXT: '1',
+  SHLVL: '1',
+  npm_config_noproxy: '',
+  HOME: '/home/joao',
+  CHROME_DESKTOP: 'code.desktop',
+  TERM_PROGRAM_VERSION: '1.100.2',
+  DESKTOP_SESSION: 'ubuntu',
+  npm_package_json: '/home/joao/Desktop/enervigilui/package.json',
+  GIO_LAUNCHED_DESKTOP_FILE: '/usr/share/applications/code.desktop',
+  GNOME_SHELL_SESSION_MODE: 'ubuntu',
+  GTK_MODULES: 'gail:atk-bridge',
+  VSCODE_GIT_ASKPASS_MAIN: '/usr/share/code/resources/app/extensions/git/dist/askpass-main.js',
+  VSCODE_GIT_ASKPASS_NODE: '/usr/share/code/code',
+  MANAGERPID: '2849',
+  npm_config_userconfig: '/home/joao/.npmrc',
+  npm_config_local_prefix: '/home/joao/Desktop/enervigilui',
+  PYDEVD_DISABLE_FILE_VALIDATION: '1',
+  SYSTEMD_EXEC_PID: '3280',
+  BUNDLED_DEBUGPY_PATH: '/home/joao/.vscode/extensions/ms-python.debugpy-2025.8.0-linux-x64/bundled/libs/debugpy',
+  GSM_SKIP_SSH_AGENT_WORKAROUND: 'true',
+  DBUS_SESSION_BUS_ADDRESS: 'unix:path=/run/user/1000/bus',
+  npm_config_engine_strict: 'true',
+  COLORTERM: 'truecolor',
+  GIO_LAUNCHED_DESKTOP_FILE_PID: '4180',
+  COLOR: '0',
+  DEBUGINFOD_URLS: 'https://debuginfod.ubuntu.com ',
+  LOGNAME: 'joao',
+  JOURNAL_STREAM: '9:30901',
+  _: '/usr/bin/npx',
+  npm_config_prefix: '/usr',
+  npm_config_npm_version: '10.8.2',
+  MEMORY_PRESSURE_WATCH: '/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/session.slice/org.gnome.Shell@x11.service/memory.pressure',
+  XDG_SESSION_CLASS: 'user',
+  USERNAME: 'joao',
+  TERM: 'xterm-256color',
+  npm_config_cache: '/home/joao/.npm',
+  GNOME_DESKTOP_SESSION_ID: 'this-is-deprecated',
+  WINDOWPATH: '2',
+  npm_config_node_gyp: '/usr/lib/node_modules/npm/node_modules/node-gyp/bin/node-gyp.js',
+  PATH: '/home/joao/Desktop/enervigilui/node_modules/.bin:/home/joao/Desktop/enervigilui/node_modules/.bin:/home/joao/Desktop/node_modules/.bin:/home/joao/node_modules/.bin:/home/node_modules/.bin:/node_modules/.bin:/usr/lib/node_modules/npm/node_modules/@npmcli/run-script/lib/node-gyp-bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin:/snap/bin:/home/joao/.config/Code/User/globalStorage/github.copilot-chat/debugCommand:/home/joao/.vscode/extensions/ms-python.debugpy-2025.8.0-linux-x64/bundled/scripts/noConfigScripts',
+  SESSION_MANAGER: 'local/joao-MS-7D98:@/tmp/.ICE-unix/3247,unix/joao-MS-7D98:/tmp/.ICE-unix/3247',
+  INVOCATION_ID: '20fd1a8da7f14f85b6a6d78c384b19de',
+  NODE: '/usr/bin/node',
+  npm_package_name: 'enervigilui',
+  XDG_MENU_PREFIX: 'gnome-',
+  XDG_RUNTIME_DIR: '/run/user/1000',
+  GDK_BACKEND: 'x11',
+  DISPLAY: ':1',
+  VSCODE_DEBUGPY_ADAPTER_ENDPOINTS: '/home/joao/.vscode/extensions/ms-python.debugpy-2025.8.0-linux-x64/.noConfigDebugAdapterEndpoints/endpoint-786d78c1d6a7da09.txt',
+  LANG: 'en_US.UTF-8',
+  XDG_CURRENT_DESKTOP: 'Unity',
+  XMODIFIERS: '@im=ibus',
+  XDG_SESSION_DESKTOP: 'ubuntu',
+  XAUTHORITY: '/run/user/1000/gdm/Xauthority',
+  LS_COLORS: 'rs=0:di=01;34:ln=01;36:mh=00:pi=40;33:so=01;35:do=01;35:bd=40;33;01:cd=40;33;01:or=40;31;01:mi=00:su=37;41:sg=30;43:ca=00:tw=30;42:ow=34;42:st=37;44:ex=01;32:*.tar=01;31:*.tgz=01;31:*.arc=01;31:*.arj=01;31:*.taz=01;31:*.lha=01;31:*.lz4=01;31:*.lzh=01;31:*.lzma=01;31:*.tlz=01;31:*.txz=01;31:*.tzo=01;31:*.t7z=01;31:*.zip=01;31:*.z=01;31:*.dz=01;31:*.gz=01;31:*.lrz=01;31:*.lz=01;31:*.lzo=01;31:*.xz=01;31:*.zst=01;31:*.tzst=01;31:*.bz2=01;31:*.bz=01;31:*.tbz=01;31:*.tbz2=01;31:*.tz=01;31:*.deb=01;31:*.rpm=01;31:*.jar=01;31:*.war=01;31:*.ear=01;31:*.sar=01;31:*.rar=01;31:*.alz=01;31:*.ace=01;31:*.zoo=01;31:*.cpio=01;31:*.7z=01;31:*.rz=01;31:*.cab=01;31:*.wim=01;31:*.swm=01;31:*.dwm=01;31:*.esd=01;31:*.avif=01;35:*.jpg=01;35:*.jpeg=01;35:*.mjpg=01;35:*.mjpeg=01;35:*.gif=01;35:*.bmp=01;35:*.pbm=01;35:*.pgm=01;35:*.ppm=01;35:*.tga=01;35:*.xbm=01;35:*.xpm=01;35:*.tif=01;35:*.tiff=01;35:*.png=01;35:*.svg=01;35:*.svgz=01;35:*.mng=01;35:*.pcx=01;35:*.mov=01;35:*.mpg=01;35:*.mpeg=01;35:*.m2v=01;35:*.mkv=01;35:*.webm=01;35:*.webp=01;35:*.ogm=01;35:*.mp4=01;35:*.m4v=01;35:*.mp4v=01;35:*.vob=01;35:*.qt=01;35:*.nuv=01;35:*.wmv=01;35:*.asf=01;35:*.rm=01;35:*.rmvb=01;35:*.flc=01;35:*.avi=01;35:*.fli=01;35:*.flv=01;35:*.gl=01;35:*.dl=01;35:*.xcf=01;35:*.xwd=01;35:*.yuv=01;35:*.cgm=01;35:*.emf=01;35:*.ogv=01;35:*.ogx=01;35:*.aac=00;36:*.au=00;36:*.flac=00;36:*.m4a=00;36:*.mid=00;36:*.midi=00;36:*.mka=00;36:*.mp3=00;36:*.mpc=00;36:*.ogg=00;36:*.ra=00;36:*.wav=00;36:*.oga=00;36:*.opus=00;36:*.spx=00;36:*.xspf=00;36:*~=00;90:*#=00;90:*.bak=00;90:*.crdownload=00;90:*.dpkg-dist=00;90:*.dpkg-new=00;90:*.dpkg-old=00;90:*.dpkg-tmp=00;90:*.old=00;90:*.orig=00;90:*.part=00;90:*.rej=00;90:*.rpmnew=00;90:*.rpmorig=00;90:*.rpmsave=00;90:*.swp=00;90:*.tmp=00;90:*.ucf-dist=00;90:*.ucf-new=00;90:*.ucf-old=00;90:',
+  VSCODE_GIT_IPC_HANDLE: '/run/user/1000/vscode-git-c7baabbd04.sock',
+  TERM_PROGRAM: 'vscode',
+  npm_lifecycle_script: 'vite',
+  SSH_AUTH_SOCK: '/run/user/1000/keyring/ssh',
+  ORIGINAL_XDG_CURRENT_DESKTOP: 'ubuntu:GNOME',
+  SHELL: '/bin/bash',
+  npm_package_version: '0.0.1',
+  npm_lifecycle_event: 'npx',
+  QT_ACCESSIBILITY: '1',
+  GDMSESSION: 'ubuntu',
+  LESSCLOSE: '/usr/bin/lesspipe %s %s',
+  GPG_AGENT_INFO: '/run/user/1000/gnupg/S.gpg-agent:0:1',
+  GJS_DEBUG_OUTPUT: 'stderr',
+  VSCODE_GIT_ASKPASS_EXTRA_ARGS: '',
+  QT_IM_MODULE: 'ibus',
+  npm_config_globalconfig: '/usr/etc/npmrc',
+  npm_config_init_module: '/home/joao/.npm-init.js',
+  PWD: '/home/joao/Desktop/enervigilui',
+  npm_execpath: '/usr/lib/node_modules/npm/bin/npm-cli.js',
+  XDG_CONFIG_DIRS: '/etc/xdg/xdg-ubuntu:/etc/xdg',
+  XDG_DATA_DIRS: '/usr/share/ubuntu:/usr/share/gnome:/usr/local/share/:/usr/share/:/var/lib/snapd/desktop',
+  npm_config_global_prefix: '/usr',
+  npm_command: 'exec',
+  MEMORY_PRESSURE_WRITE: 'c29tZSAyMDAwMDAgMjAwMDAwMAA=',
+  INIT_CWD: '/home/joao/Desktop/enervigilui',
+  EDITOR: 'vi',
+  DEBUG: 'vite:*',
+  NODE_ENV: 'production'
+}
+2025-05-27T20:36:52.890Z vite:env loading env files: [
+  '/home/joao/Desktop/enervigilui/.env',
+  '/home/joao/Desktop/enervigilui/.env.local',
+  '/home/joao/Desktop/enervigilui/.env.production',
+  '/home/joao/Desktop/enervigilui/.env.production.local'
+]
+2025-05-27T20:36:52.890Z vite:env env files loaded in 0.12ms
+2025-05-27T20:36:52.891Z vite:env using resolved env: {}
+2025-05-27T20:36:52.904Z vite:config using resolved config: {
+  plugins: [
+    'vite:build-metadata',
+    'vite:watch-package-data',
+    'alias',
+    'vite-plugin-svelte',
+    'vite:modulepreload-polyfill',
+    'vite:resolve',
+    'vite:html-inline-proxy',
+    'vite:css',
+    'vite:esbuild',
+    'vite:json',
+    'vite:wasm-helper',
+    'vite:worker',
+    'vite:asset',
+    'vite-plugin-sveltekit-setup',
+    'vite-plugin-sveltekit-virtual-modules',
+    'vite-plugin-sveltekit-guard',
+    'vite-plugin-sveltekit-compile',
+    'vite:wasm-fallback',
+    'vite:define',
+    'vite:css-post',
+    'vite:build-html',
+    'vite:worker-import-meta-url',
+    'vite:asset-import-meta-url',
+    'vite:force-systemjs-wrap-complete',
+    'commonjs',
+    'vite:data-uri',
+    'vite:rollup-options-plugins',
+    'vite:dynamic-import-vars',
+    'vite:import-glob',
+    'vite-plugin-svelte-module',
+    'vite:build-import-analysis',
+    'vite:esbuild-transpile',
+    'vite:terser',
+    'vite:manifest',
+    'vite:ssr-manifest',
+    'vite:reporter',
+    'vite:load-fallback'
+  ],
+  server: {
+    port: 5173,
+    strictPort: false,
+    host: undefined,
+    allowedHosts: [],
+    https: undefined,
+    open: false,
+    proxy: {
+      '/api': {
+        target: 'http://192.168.0.20:8000',
+        changeOrigin: true,
+        secure: false,
+        rewrite: [Function: rewrite]
+      }
+    },
+    cors: {
+      origin: /^https?:\/\/(?:(?:[^:]+\.)?localhost|127\.0\.0\.1|\[::1\])(?::\d+)?$/,
+      preflightContinue: true
+    },
+    headers: {},
+    warmup: { clientFiles: [], ssrFiles: [] },
+    middlewareMode: false,
+    fs: {
+      strict: true,
+      deny: [ '.env', '.env.*', '*.{crt,pem}', '**/.git/**' ],
+      allow: [
+        '/home/joao/Desktop/enervigilui/src/lib',
+        '/home/joao/Desktop/enervigilui/src/routes',
+        '/home/joao/Desktop/enervigilui/.svelte-kit',
+        '/home/joao/Desktop/enervigilui/src',
+        '/home/joao/Desktop/enervigilui/node_modules'
+      ]
+    },
+    preTransformRequests: true,
+    perEnvironmentStartEndDuringDev: false,
+    sourcemapIgnoreList: [Function: sourcemapIgnoreList],
+    watch: {
+      ignored: [ '/home/joao/Desktop/enervigilui/.svelte-kit/!(generated)' ]
+    }
+  },
+  build: {
+    target: 'node18.13',
+    polyfillModulePreload: true,
+    modulePreload: { polyfill: true },
+    outDir: '/home/joao/Desktop/enervigilui/.svelte-kit/output/server',
+    assetsDir: 'assets',
+    assetsInlineLimit: 4096,
+    sourcemap: false,
+    terserOptions: {},
+    rollupOptions: {
+      input: {
+        index: '/home/joao/Desktop/enervigilui/node_modules/@sveltejs/kit/src/runtime/server/index.js',
+        internal: '/home/joao/Desktop/enervigilui/.svelte-kit/generated/server/internal.js',
+        'entries/pages/+layout.svelte': '/home/joao/Desktop/enervigilui/src/routes/+layout.svelte',
+        'entries/fallbacks/error.svelte': '/home/joao/Desktop/enervigilui/node_modules/@sveltejs/kit/src/runtime/components/svelte-5/error.svelte',
+        'entries/pages/+page.svelte': '/home/joao/Desktop/enervigilui/src/routes/+page.svelte',
+        'entries/pages/backup/+page.svelte': '/home/joao/Desktop/enervigilui/src/routes/backup/+page.svelte',
+        'entries/pages/devices/+page.svelte': '/home/joao/Desktop/enervigilui/src/routes/devices/+page.svelte',
+        'entries/pages/devices/edit/+page.svelte': '/home/joao/Desktop/enervigilui/src/routes/devices/edit/+page.svelte',
+        'entries/pages/health/+page.svelte': '/home/joao/Desktop/enervigilui/src/routes/health/+page.svelte',
+        'entries/pages/login/+page.svelte': '/home/joao/Desktop/enervigilui/src/routes/login/+page.svelte',
+        'entries/pages/logs/+page.svelte': '/home/joao/Desktop/enervigilui/src/routes/logs/+page.svelte',
+        'entries/pages/mqtt/+page.svelte': '/home/joao/Desktop/enervigilui/src/routes/mqtt/+page.svelte',
+        'entries/pages/settings/+page.svelte': '/home/joao/Desktop/enervigilui/src/routes/settings/+page.svelte'
+      },
+      output: {
+        format: 'esm',
+        name: '__sveltekit_6mdw46.app',
+        entryFileNames: '[name].js',
+        chunkFileNames: 'chunks/[name].js',
+        assetFileNames: '_app/immutable/assets/[name].[hash][extname]',
+        hoistTransitiveImports: false,
+        sourcemapIgnoreList: [Function: sourcemapIgnoreList],
+        manualChunks: undefined,
+        inlineDynamicImports: false
+      },
+      preserveEntrySignatures: 'strict',
+      onwarn: [Function: onwarn]
+    },
+    commonjsOptions: { include: [ /node_modules/ ], extensions: [ '.js', '.cjs' ] },
+    dynamicImportVarsOptions: { warnOnError: true, exclude: [ /node_modules/ ] },
+    write: true,
+    emptyOutDir: null,
+    copyPublicDir: false,
+    manifest: '.vite/manifest.json',
+    lib: false,
+    ssrManifest: false,
+    ssrEmitAssets: true,
+    reportCompressedSize: true,
+    chunkSizeWarningLimit: 500,
+    watch: null,
+    cssCodeSplit: true,
+    minify: false,
+    ssr: true,
+    emitAssets: true,
+    createEnvironment: [Function: createEnvironment],
+    cssMinify: true,
+    cssTarget: 'node18.13'
+  },
+  resolve: {
+    externalConditions: [ 'node' ],
+    extensions: [
+      '.mjs',  '.js',
+      '.mts',  '.ts',
+      '.jsx',  '.tsx',
+      '.json'
+    ],
+    dedupe: [
+      'svelte',
+      'svelte/animate',
+      'svelte/easing',
+      'svelte/internal',
+      'svelte/internal/client',
+      'svelte/internal/disclose-version',
+      'svelte/internal/flags/legacy',
+      'svelte/internal/flags/tracing',
+      'svelte/internal/server',
+      'svelte/legacy',
+      'svelte/motion',
+      'svelte/reactivity',
+      'svelte/reactivity/window',
+      'svelte/server',
+      'svelte/store',
+      'svelte/transition',
+      'svelte/events'
+    ],
+    noExternal: [],
+    external: [],
+    preserveSymlinks: false,
+    alias: [
+      {
+        find: '__SERVER__',
+        replacement: '/home/joao/Desktop/enervigilui/.svelte-kit/generated/server'
+      },
+      {
+        find: '$app',
+        replacement: '/home/joao/Desktop/enervigilui/node_modules/@sveltejs/kit/src/runtime/app'
+      },
+      {
+        find: '$lib',
+        replacement: '/home/joao/Desktop/enervigilui/src/lib'
+      },
+      {
+        find: '$app',
+        replacement: '/home/joao/Desktop/enervigilui/.svelte-kit/types/app'
+      },
+      {
+        find: '$lib',
+        replacement: '/home/joao/Desktop/enervigilui/src/lib'
+      },
+      {
+        find: /^\/?@vite\/env/,
+        replacement: '/@fs/home/joao/Desktop/enervigilui/node_modules/vite/dist/client/env.mjs'
+      },
+      {
+        find: /^\/?@vite\/client/,
+        replacement: '/@fs/home/joao/Desktop/enervigilui/node_modules/vite/dist/client/client.mjs'
+      }
+    ],
+    mainFields: [ 'svelte', 'browser', 'module', 'jsnext:main', 'jsnext' ],
+    conditions: [ 'module', 'browser', 'development|production', 'svelte' ],
+    builtins: []
+  },
+  optimizeDeps: {
+    include: [
+      'svelte',
+      'svelte/animate',
+      'svelte/easing',
+      'svelte/internal',
+      'svelte/internal/client',
+      'svelte/internal/disclose-version',
+      'svelte/internal/flags/legacy',
+      'svelte/internal/flags/tracing',
+      'svelte/legacy',
+      'svelte/motion',
+      'svelte/reactivity',
+      'svelte/reactivity/window',
+      'svelte/store',
+      'svelte/transition',
+      'svelte/events'
+    ],
+    exclude: [ '@sveltejs/kit', '$app', '$env' ],
+    needsInterop: [],
+    extensions: [],
+    disabled: undefined,
+    holdUntilCrawlEnd: true,
+    force: false,
+    noDiscovery: false,
+    esbuildOptions: { preserveSymlinks: false },
+    entries: [
+      '/home/joao/Desktop/enervigilui/src/routes/**/+*.{svelte,js,ts}',
+      '!/home/joao/Desktop/enervigilui/src/routes/**/+*server.*'
+    ]
+  },
+  ssr: {
+    target: 'node',
+    optimizeDeps: {
+      esbuildOptions: { preserveSymlinks: false },
+      include: [],
+      exclude: [],
+      needsInterop: [],
+      extensions: [],
+      holdUntilCrawlEnd: true,
+      force: false,
+      noDiscovery: true
+    },
+    external: [],
+    noExternal: [ 'svelte', /^svelte\//, 'esm-env', 'esm-env', '@sveltejs/kit' ],
+    resolve: {
+      conditions: [ 'module', 'node', 'development|production', 'svelte' ],
+      externalConditions: [ 'node' ]
+    }
+  },
+  experimental: { importGlobRestoreExtension: false, hmrPartialAccept: true },
+  root: '/home/joao/Desktop/enervigilui',
+  preview: {
+    port: 4173,
+    strictPort: false,
+    host: undefined,
+    allowedHosts: [],
+    https: undefined,
+    open: false,
+    proxy: {
+      '/api': {
+        target: 'http://192.168.0.20:8000',
+        changeOrigin: true,
+        secure: false,
+        rewrite: [Function: rewrite]
+      }
+    },
+    cors: { preflightContinue: true },
+    headers: {}
+  },
+  define: {
+    __SVELTEKIT_ADAPTER_NAME__: '"@sveltejs/adapter-auto"',
+    __SVELTEKIT_APP_VERSION_FILE__: '"_app/version.json"',
+    __SVELTEKIT_APP_VERSION_POLL_INTERVAL__: '0',
+    __SVELTEKIT_DEV__: 'false',
+    __SVELTEKIT_EMBEDDED__: 'false',
+    __SVELTEKIT_CLIENT_ROUTING__: 'true'
+  },
+  base: '/',
+  publicDir: '/home/joao/Desktop/enervigilui/static',
+  worker: {
+    format: 'iife',
+    plugins: '() => plugins',
+    rollupOptions: {
+      output: {
+        entryFileNames: '_app/immutable/workers/[name]-[hash].js',
+        chunkFileNames: '_app/immutable/workers/chunks/[hash].js',
+        assetFileNames: '_app/immutable/workers/assets/[name]-[hash][extname]',
+        hoistTransitiveImports: false
+      }
+    }
+  },
+  environments: {
+    client: {
+      define: {
+        __SVELTEKIT_ADAPTER_NAME__: '"@sveltejs/adapter-auto"',
+        __SVELTEKIT_APP_VERSION_FILE__: '"_app/version.json"',
+        __SVELTEKIT_APP_VERSION_POLL_INTERVAL__: '0',
+        __SVELTEKIT_DEV__: 'false',
+        __SVELTEKIT_EMBEDDED__: 'false',
+        __SVELTEKIT_CLIENT_ROUTING__: 'true'
+      },
+      resolve: {
+        externalConditions: [ 'node' ],
+        extensions: [
+          '.mjs',  '.js',
+          '.mts',  '.ts',
+          '.jsx',  '.tsx',
+          '.json'
+        ],
+        dedupe: [
+          'svelte',
+          'svelte/animate',
+          'svelte/easing',
+          'svelte/internal',
+          'svelte/internal/client',
+          'svelte/internal/disclose-version',
+          'svelte/internal/flags/legacy',
+          'svelte/internal/flags/tracing',
+          'svelte/internal/server',
+          'svelte/legacy',
+          'svelte/motion',
+          'svelte/reactivity',
+          'svelte/reactivity/window',
+          'svelte/server',
+          'svelte/store',
+          'svelte/transition',
+          'svelte/events'
+        ],
+        noExternal: [],
+        external: [],
+        preserveSymlinks: false,
+        alias: [
+          {
+            find: '__SERVER__',
+            replacement: '/home/joao/Desktop/enervigilui/.svelte-kit/generated/server'
+          },
+          {
+            find: '$app',
+            replacement: '/home/joao/Desktop/enervigilui/node_modules/@sveltejs/kit/src/runtime/app'
+          },
+          {
+            find: '$lib',
+            replacement: '/home/joao/Desktop/enervigilui/src/lib'
+          },
+          {
+            find: '$app',
+            replacement: '/home/joao/Desktop/enervigilui/.svelte-kit/types/app'
+          },
+          {
+            find: '$lib',
+            replacement: '/home/joao/Desktop/enervigilui/src/lib'
+          },
+          {
+            find: /^\/?@vite\/env/,
+            replacement: '/@fs/home/joao/Desktop/enervigilui/node_modules/vite/dist/client/env.mjs'
+          },
+          {
+            find: /^\/?@vite\/client/,
+            replacement: '/@fs/home/joao/Desktop/enervigilui/node_modules/vite/dist/client/client.mjs'
+          }
+        ],
+        mainFields: [ 'svelte', 'browser', 'module', 'jsnext:main', 'jsnext' ],
+        conditions: [ 'module', 'browser', 'development|production', 'svelte' ],
+        builtins: []
+      },
+      keepProcessEnv: false,
+      consumer: 'client',
+      optimizeDeps: {
+        include: [
+          'svelte',
+          'svelte/animate',
+          'svelte/easing',
+          'svelte/internal',
+          'svelte/internal/client',
+          'svelte/internal/disclose-version',
+          'svelte/internal/flags/legacy',
+          'svelte/internal/flags/tracing',
+          'svelte/legacy',
+          'svelte/motion',
+          'svelte/reactivity',
+          'svelte/reactivity/window',
+          'svelte/store',
+          'svelte/transition',
+          'svelte/events'
+        ],
+        exclude: [ '@sveltejs/kit', '$app', '$env' ],
+        needsInterop: [],
+        extensions: [],
+        disabled: undefined,
+        holdUntilCrawlEnd: true,
+        force: false,
+        noDiscovery: false,
+        esbuildOptions: { preserveSymlinks: false },
+        entries: [
+          '/home/joao/Desktop/enervigilui/src/routes/**/+*.{svelte,js,ts}',
+          '!/home/joao/Desktop/enervigilui/src/routes/**/+*server.*'
+        ]
+      },
+      dev: {
+        warmup: [],
+        sourcemap: { js: true },
+        sourcemapIgnoreList: [Function: isInNodeModules$1],
+        preTransformRequests: true,
+        createEnvironment: [Function: defaultCreateClientDevEnvironment],
+        recoverable: true,
+        moduleRunnerTransform: false
+      },
+      build: {
+        target: 'node18.13',
+        polyfillModulePreload: true,
+        modulePreload: { polyfill: true },
+        outDir: '/home/joao/Desktop/enervigilui/.svelte-kit/output/server',
+        assetsDir: 'assets',
+        assetsInlineLimit: 4096,
+        sourcemap: false,
+        terserOptions: {},
+        rollupOptions: {
+          input: {
+            index: '/home/joao/Desktop/enervigilui/node_modules/@sveltejs/kit/src/runtime/server/index.js',
+            internal: '/home/joao/Desktop/enervigilui/.svelte-kit/generated/server/internal.js',
+            'entries/pages/+layout.svelte': '/home/joao/Desktop/enervigilui/src/routes/+layout.svelte',
+            'entries/fallbacks/error.svelte': '/home/joao/Desktop/enervigilui/node_modules/@sveltejs/kit/src/runtime/components/svelte-5/error.svelte',
+            'entries/pages/+page.svelte': '/home/joao/Desktop/enervigilui/src/routes/+page.svelte',
+            'entries/pages/backup/+page.svelte': '/home/joao/Desktop/enervigilui/src/routes/backup/+page.svelte',
+            'entries/pages/devices/+page.svelte': '/home/joao/Desktop/enervigilui/src/routes/devices/+page.svelte',
+            'entries/pages/devices/edit/+page.svelte': '/home/joao/Desktop/enervigilui/src/routes/devices/edit/+page.svelte',
+            'entries/pages/health/+page.svelte': '/home/joao/Desktop/enervigilui/src/routes/health/+page.svelte',
+            'entries/pages/login/+page.svelte': '/home/joao/Desktop/enervigilui/src/routes/login/+page.svelte',
+            'entries/pages/logs/+page.svelte': '/home/joao/Desktop/enervigilui/src/routes/logs/+page.svelte',
+            'entries/pages/mqtt/+page.svelte': '/home/joao/Desktop/enervigilui/src/routes/mqtt/+page.svelte',
+            'entries/pages/settings/+page.svelte': '/home/joao/Desktop/enervigilui/src/routes/settings/+page.svelte'
+          },
+          output: {
+            format: 'esm',
+            name: '__sveltekit_6mdw46.app',
+            entryFileNames: '[name].js',
+            chunkFileNames: 'chunks/[name].js',
+            assetFileNames: '_app/immutable/assets/[name].[hash][extname]',
+            hoistTransitiveImports: false,
+            sourcemapIgnoreList: [Function: sourcemapIgnoreList],
+            manualChunks: undefined,
+            inlineDynamicImports: false
+          },
+          preserveEntrySignatures: 'strict',
+          onwarn: [Function: onwarn]
+        },
+        commonjsOptions: { include: [ /node_modules/ ], extensions: [ '.js', '.cjs' ] },
+        dynamicImportVarsOptions: { warnOnError: true, exclude: [ /node_modules/ ] },
+        write: true,
+        emptyOutDir: null,
+        copyPublicDir: false,
+        manifest: '.vite/manifest.json',
+        lib: false,
+        ssrManifest: false,
+        ssrEmitAssets: true,
+        reportCompressedSize: true,
+        chunkSizeWarningLimit: 500,
+        watch: null,
+        cssCodeSplit: true,
+        minify: 'esbuild',
+        ssr: true,
+        emitAssets: true,
+        createEnvironment: [Function: createEnvironment],
+        cssMinify: true,
+        cssTarget: 'node18.13'
+      }
+    },
+    ssr: {
+      define: {
+        __SVELTEKIT_ADAPTER_NAME__: '"@sveltejs/adapter-auto"',
+        __SVELTEKIT_APP_VERSION_FILE__: '"_app/version.json"',
+        __SVELTEKIT_APP_VERSION_POLL_INTERVAL__: '0',
+        __SVELTEKIT_DEV__: 'false',
+        __SVELTEKIT_EMBEDDED__: 'false',
+        __SVELTEKIT_CLIENT_ROUTING__: 'true'
+      },
+      resolve: {
+        externalConditions: [ 'node' ],
+        extensions: [
+          '.mjs',  '.js',
+          '.mts',  '.ts',
+          '.jsx',  '.tsx',
+          '.json'
+        ],
+        dedupe: [
+          'svelte',
+          'svelte/animate',
+          'svelte/easing',
+          'svelte/internal',
+          'svelte/internal/client',
+          'svelte/internal/disclose-version',
+          'svelte/internal/flags/legacy',
+          'svelte/internal/flags/tracing',
+          'svelte/internal/server',
+          'svelte/legacy',
+          'svelte/motion',
+          'svelte/reactivity',
+          'svelte/reactivity/window',
+          'svelte/server',
+          'svelte/store',
+          'svelte/transition',
+          'svelte/events'
+        ],
+        noExternal: [
+          'svelte',
+          /^svelte\//,
+          'esm-env',
+          'esm-env',
+          '@sveltejs/kit'
+        ],
+        external: [],
+        preserveSymlinks: false,
+        alias: [
+          {
+            find: '__SERVER__',
+            replacement: '/home/joao/Desktop/enervigilui/.svelte-kit/generated/server'
+          },
+          {
+            find: '$app',
+            replacement: '/home/joao/Desktop/enervigilui/node_modules/@sveltejs/kit/src/runtime/app'
+          },
+          {
+            find: '$lib',
+            replacement: '/home/joao/Desktop/enervigilui/src/lib'
+          },
+          {
+            find: '$app',
+            replacement: '/home/joao/Desktop/enervigilui/.svelte-kit/types/app'
+          },
+          {
+            find: '$lib',
+            replacement: '/home/joao/Desktop/enervigilui/src/lib'
+          },
+          {
+            find: /^\/?@vite\/env/,
+            replacement: '/@fs/home/joao/Desktop/enervigilui/node_modules/vite/dist/client/env.mjs'
+          },
+          {
+            find: /^\/?@vite\/client/,
+            replacement: '/@fs/home/joao/Desktop/enervigilui/node_modules/vite/dist/client/client.mjs'
+          }
+        ],
+        mainFields: [ 'svelte', 'module', 'jsnext:main', 'jsnext' ],
+        conditions: [ 'module', 'node', 'development|production', 'svelte' ],
+        builtins: [
+          '_http_agent',         '_http_client',        '_http_common',
+          '_http_incoming',      '_http_outgoing',      '_http_server',
+          '_stream_duplex',      '_stream_passthrough', '_stream_readable',
+          '_stream_transform',   '_stream_wrap',        '_stream_writable',
+          '_tls_common',         '_tls_wrap',           'assert',
+          'assert/strict',       'async_hooks',         'buffer',
+          'child_process',       'cluster',             'console',
+          'constants',           'crypto',              'dgram',
+          'diagnostics_channel', 'dns',                 'dns/promises',
+          'domain',              'events',              'fs',
+          'fs/promises',         'http',                'http2',
+          'https',               'inspector',           'inspector/promises',
+          'module',              'net',                 'os',
+          'path',                'path/posix',          'path/win32',
+          'perf_hooks',          'process',             'punycode',
+          'querystring',         'readline',            'readline/promises',
+          'repl',                'stream',              'stream/consumers',
+          'stream/promises',     'stream/web',          'string_decoder',
+          'sys',                 'timers',              'timers/promises',
+          'tls',                 'trace_events',        'tty',
+          'url',                 'util',                'util/types',
+          'v8',                  'vm',                  'wasi',
+          'worker_threads',      'zlib',                /^node:/,
+          /^npm:/,               /^bun:/
+        ]
+      },
+      keepProcessEnv: true,
+      consumer: 'server',
+      optimizeDeps: {
+        include: [],
+        exclude: [],
+        needsInterop: [],
+        extensions: [],
+        disabled: undefined,
+        holdUntilCrawlEnd: true,
+        force: false,
+        noDiscovery: true,
+        esbuildOptions: { preserveSymlinks: false }
+      },
+      dev: {
+        warmup: [],
+        sourcemap: { js: true },
+        sourcemapIgnoreList: [Function: isInNodeModules$1],
+        preTransformRequests: false,
+        createEnvironment: [Function: defaultCreateDevEnvironment],
+        recoverable: false,
+        moduleRunnerTransform: true
+      },
+      build: {
+        target: 'node18.13',
+        polyfillModulePreload: true,
+        modulePreload: { polyfill: true },
+        outDir: '/home/joao/Desktop/enervigilui/.svelte-kit/output/server',
+        assetsDir: 'assets',
+        assetsInlineLimit: 4096,
+        sourcemap: false,
+        terserOptions: {},
+        rollupOptions: {
+          input: {
+            index: '/home/joao/Desktop/enervigilui/node_modules/@sveltejs/kit/src/runtime/server/index.js',
+            internal: '/home/joao/Desktop/enervigilui/.svelte-kit/generated/server/internal.js',
+            'entries/pages/+layout.svelte': '/home/joao/Desktop/enervigilui/src/routes/+layout.svelte',
+            'entries/fallbacks/error.svelte': '/home/joao/Desktop/enervigilui/node_modules/@sveltejs/kit/src/runtime/components/svelte-5/error.svelte',
+            'entries/pages/+page.svelte': '/home/joao/Desktop/enervigilui/src/routes/+page.svelte',
+            'entries/pages/backup/+page.svelte': '/home/joao/Desktop/enervigilui/src/routes/backup/+page.svelte',
+            'entries/pages/devices/+page.svelte': '/home/joao/Desktop/enervigilui/src/routes/devices/+page.svelte',
+            'entries/pages/devices/edit/+page.svelte': '/home/joao/Desktop/enervigilui/src/routes/devices/edit/+page.svelte',
+            'entries/pages/health/+page.svelte': '/home/joao/Desktop/enervigilui/src/routes/health/+page.svelte',
+            'entries/pages/login/+page.svelte': '/home/joao/Desktop/enervigilui/src/routes/login/+page.svelte',
+            'entries/pages/logs/+page.svelte': '/home/joao/Desktop/enervigilui/src/routes/logs/+page.svelte',
+            'entries/pages/mqtt/+page.svelte': '/home/joao/Desktop/enervigilui/src/routes/mqtt/+page.svelte',
+            'entries/pages/settings/+page.svelte': '/home/joao/Desktop/enervigilui/src/routes/settings/+page.svelte'
+          },
+          output: {
+            format: 'esm',
+            name: '__sveltekit_6mdw46.app',
+            entryFileNames: '[name].js',
+            chunkFileNames: 'chunks/[name].js',
+            assetFileNames: '_app/immutable/assets/[name].[hash][extname]',
+            hoistTransitiveImports: false,
+            sourcemapIgnoreList: [Function: sourcemapIgnoreList],
+            manualChunks: undefined,
+            inlineDynamicImports: false
+          },
+          preserveEntrySignatures: 'strict',
+          onwarn: [Function: onwarn]
+        },
+        commonjsOptions: { include: [ /node_modules/ ], extensions: [ '.js', '.cjs' ] },
+        dynamicImportVarsOptions: { warnOnError: true, exclude: [ /node_modules/ ] },
+        write: true,
+        emptyOutDir: null,
+        copyPublicDir: false,
+        manifest: '.vite/manifest.json',
+        lib: false,
+        ssrManifest: false,
+        ssrEmitAssets: true,
+        reportCompressedSize: true,
+        chunkSizeWarningLimit: 500,
+        watch: null,
+        cssCodeSplit: true,
+        minify: false,
+        ssr: true,
+        emitAssets: true,
+        createEnvironment: [Function: createEnvironment],
+        cssMinify: true,
+        cssTarget: 'node18.13'
+      }
+    }
+  },
+  configFile: '/home/joao/Desktop/enervigilui/vite.config.ts',
+  configFileDependencies: [ '/home/joao/Desktop/enervigilui/vite.config.ts' ],
+  inlineConfig: {
+    root: undefined,
+    base: undefined,
+    mode: undefined,
+    configFile: undefined,
+    configLoader: undefined,
+    logLevel: undefined,
+    clearScreen: undefined,
+    build: {}
+  },
+  decodedBase: '/',
+  rawBase: '/',
+  cacheDir: '/home/joao/Desktop/enervigilui/node_modules/.vite',
+  command: 'build',
+  mode: 'production',
+  isWorker: false,
+  mainConfig: null,
+  bundleChain: [],
+  isProduction: true,
+  css: {
+    transformer: 'postcss',
+    preprocessorMaxWorkers: 0,
+    devSourcemap: false
+  },
+  json: { namedExports: true, stringify: 'auto' },
+  esbuild: { jsxDev: false },
+  builder: undefined,
+  envDir: '/home/joao/Desktop/enervigilui',
+  env: { BASE_URL: '/', MODE: 'production', DEV: false, PROD: true },
+  assetsInclude: [Function: assetsInclude],
+  logger: {
+    hasWarned: false,
+    info: [Function: info],
+    warn: [Function: warn],
+    warnOnce: [Function: warnOnce],
+    error: [Function: error],
+    clearScreen: [Function: clearScreen],
+    hasErrorLogged: [Function: hasErrorLogged]
+  },
+  packageCache: Map(1) {
+    'fnpd_/home/joao/Desktop/enervigilui' => {
+      dir: '/home/joao/Desktop/enervigilui',
+      data: {
+        name: 'enervigilui',
+        private: true,
+        version: '0.0.1',
+        type: 'module',
+        scripts: {
+          dev: 'vite dev',
+          build: 'vite build',
+          'build:trace': "NODE_OPTIONS='--trace-warnings --trace-deprecation' vite build",
+          preview: 'vite preview',
+          prepare: "svelte-kit sync || echo ''",
+          check: 'svelte-kit sync && svelte-check --tsconfig ./tsconfig.json',
+          'check:watch': 'svelte-kit sync && svelte-check --tsconfig ./tsconfig.json --watch'
+        },
+        devDependencies: {
+          '@sveltejs/adapter-auto': '^6.0.0',
+          '@sveltejs/kit': '^2.16.0',
+          '@sveltejs/vite-plugin-svelte': '^5.0.0',
+          svelte: '^5.0.0',
+          'svelte-check': '^4.0.0',
+          typescript: '^5.0.0',
+          vite: '^6.2.6'
+        }
+      },
+      hasSideEffects: [Function: hasSideEffects],
+      setResolvedCache: [Function: setResolvedCache],
+      getResolvedCache: [Function: getResolvedCache]
+    },
+    set: [Function (anonymous)]
+  },
+  appType: 'spa',
+  future: undefined,
+  dev: {
+    warmup: [],
+    sourcemap: { js: true },
+    sourcemapIgnoreList: [Function: isInNodeModules$1],
+    preTransformRequests: false,
+    createEnvironment: [Function: defaultCreateDevEnvironment],
+    recoverable: false,
+    moduleRunnerTransform: false
+  },
+  webSocketToken: 'CMlLAw3HktPJ',
+  getSortedPlugins: [Function: getSortedPlugins],
+  getSortedPluginHooks: [Function: getSortedPluginHooks],
+  createResolver: [Function: createResolver],
+  fsDenyGlob: [Function: arrayMatcher],
+  safeModulePaths: Set(0) {},
+  additionalAllowedHosts: []
+}
+vite v6.3.3 building SSR bundle for production...
+transforming...
+✓ 237 modules transformed.
+rendering chunks...
+2025-05-27T20:36:53.873Z vite:config config file loaded in 4.49ms
+2025-05-27T20:36:53.874Z vite:env loading env files: [
+  '/home/joao/Desktop/enervigilui/.env',
+  '/home/joao/Desktop/enervigilui/.env.local',
+  '/home/joao/Desktop/enervigilui/.env.production',
+  '/home/joao/Desktop/enervigilui/.env.production.local'
+]
+2025-05-27T20:36:53.874Z vite:env env files loaded in 0.09ms
+2025-05-27T20:36:53.874Z vite:env using resolved env: {
+  GJS_DEBUG_TOPICS: 'JS ERROR;JS LOG',
+  LESSOPEN: '| /usr/bin/lesspipe %s',
+  USER: 'joao',
+  npm_config_user_agent: 'npm/10.8.2 node/v20.19.2 linux x64 workspaces/false',
+  XDG_SESSION_TYPE: 'x11',
+  GIT_ASKPASS: '/usr/share/code/resources/app/extensions/git/dist/askpass.sh',
+  npm_node_execpath: '/usr/bin/node',
+  CLUTTER_DISABLE_MIPMAPPED_TEXT: '1',
+  SHLVL: '1',
+  npm_config_noproxy: '',
+  HOME: '/home/joao',
+  CHROME_DESKTOP: 'code.desktop',
+  TERM_PROGRAM_VERSION: '1.100.2',
+  DESKTOP_SESSION: 'ubuntu',
+  npm_package_json: '/home/joao/Desktop/enervigilui/package.json',
+  GIO_LAUNCHED_DESKTOP_FILE: '/usr/share/applications/code.desktop',
+  GNOME_SHELL_SESSION_MODE: 'ubuntu',
+  GTK_MODULES: 'gail:atk-bridge',
+  VSCODE_GIT_ASKPASS_MAIN: '/usr/share/code/resources/app/extensions/git/dist/askpass-main.js',
+  VSCODE_GIT_ASKPASS_NODE: '/usr/share/code/code',
+  MANAGERPID: '2849',
+  npm_config_userconfig: '/home/joao/.npmrc',
+  npm_config_local_prefix: '/home/joao/Desktop/enervigilui',
+  PYDEVD_DISABLE_FILE_VALIDATION: '1',
+  SYSTEMD_EXEC_PID: '3280',
+  BUNDLED_DEBUGPY_PATH: '/home/joao/.vscode/extensions/ms-python.debugpy-2025.8.0-linux-x64/bundled/libs/debugpy',
+  GSM_SKIP_SSH_AGENT_WORKAROUND: 'true',
+  DBUS_SESSION_BUS_ADDRESS: 'unix:path=/run/user/1000/bus',
+  npm_config_engine_strict: 'true',
+  COLORTERM: 'truecolor',
+  GIO_LAUNCHED_DESKTOP_FILE_PID: '4180',
+  COLOR: '0',
+  DEBUGINFOD_URLS: 'https://debuginfod.ubuntu.com ',
+  LOGNAME: 'joao',
+  JOURNAL_STREAM: '9:30901',
+  _: '/usr/bin/npx',
+  npm_config_prefix: '/usr',
+  npm_config_npm_version: '10.8.2',
+  MEMORY_PRESSURE_WATCH: '/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/session.slice/org.gnome.Shell@x11.service/memory.pressure',
+  XDG_SESSION_CLASS: 'user',
+  USERNAME: 'joao',
+  TERM: 'xterm-256color',
+  npm_config_cache: '/home/joao/.npm',
+  GNOME_DESKTOP_SESSION_ID: 'this-is-deprecated',
+  WINDOWPATH: '2',
+  npm_config_node_gyp: '/usr/lib/node_modules/npm/node_modules/node-gyp/bin/node-gyp.js',
+  PATH: '/home/joao/Desktop/enervigilui/node_modules/.bin:/home/joao/Desktop/enervigilui/node_modules/.bin:/home/joao/Desktop/node_modules/.bin:/home/joao/node_modules/.bin:/home/node_modules/.bin:/node_modules/.bin:/usr/lib/node_modules/npm/node_modules/@npmcli/run-script/lib/node-gyp-bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin:/snap/bin:/home/joao/.config/Code/User/globalStorage/github.copilot-chat/debugCommand:/home/joao/.vscode/extensions/ms-python.debugpy-2025.8.0-linux-x64/bundled/scripts/noConfigScripts',
+  SESSION_MANAGER: 'local/joao-MS-7D98:@/tmp/.ICE-unix/3247,unix/joao-MS-7D98:/tmp/.ICE-unix/3247',
+  INVOCATION_ID: '20fd1a8da7f14f85b6a6d78c384b19de',
+  NODE: '/usr/bin/node',
+  npm_package_name: 'enervigilui',
+  XDG_MENU_PREFIX: 'gnome-',
+  XDG_RUNTIME_DIR: '/run/user/1000',
+  GDK_BACKEND: 'x11',
+  DISPLAY: ':1',
+  VSCODE_DEBUGPY_ADAPTER_ENDPOINTS: '/home/joao/.vscode/extensions/ms-python.debugpy-2025.8.0-linux-x64/.noConfigDebugAdapterEndpoints/endpoint-786d78c1d6a7da09.txt',
+  LANG: 'en_US.UTF-8',
+  XDG_CURRENT_DESKTOP: 'Unity',
+  XMODIFIERS: '@im=ibus',
+  XDG_SESSION_DESKTOP: 'ubuntu',
+  XAUTHORITY: '/run/user/1000/gdm/Xauthority',
+  LS_COLORS: 'rs=0:di=01;34:ln=01;36:mh=00:pi=40;33:so=01;35:do=01;35:bd=40;33;01:cd=40;33;01:or=40;31;01:mi=00:su=37;41:sg=30;43:ca=00:tw=30;42:ow=34;42:st=37;44:ex=01;32:*.tar=01;31:*.tgz=01;31:*.arc=01;31:*.arj=01;31:*.taz=01;31:*.lha=01;31:*.lz4=01;31:*.lzh=01;31:*.lzma=01;31:*.tlz=01;31:*.txz=01;31:*.tzo=01;31:*.t7z=01;31:*.zip=01;31:*.z=01;31:*.dz=01;31:*.gz=01;31:*.lrz=01;31:*.lz=01;31:*.lzo=01;31:*.xz=01;31:*.zst=01;31:*.tzst=01;31:*.bz2=01;31:*.bz=01;31:*.tbz=01;31:*.tbz2=01;31:*.tz=01;31:*.deb=01;31:*.rpm=01;31:*.jar=01;31:*.war=01;31:*.ear=01;31:*.sar=01;31:*.rar=01;31:*.alz=01;31:*.ace=01;31:*.zoo=01;31:*.cpio=01;31:*.7z=01;31:*.rz=01;31:*.cab=01;31:*.wim=01;31:*.swm=01;31:*.dwm=01;31:*.esd=01;31:*.avif=01;35:*.jpg=01;35:*.jpeg=01;35:*.mjpg=01;35:*.mjpeg=01;35:*.gif=01;35:*.bmp=01;35:*.pbm=01;35:*.pgm=01;35:*.ppm=01;35:*.tga=01;35:*.xbm=01;35:*.xpm=01;35:*.tif=01;35:*.tiff=01;35:*.png=01;35:*.svg=01;35:*.svgz=01;35:*.mng=01;35:*.pcx=01;35:*.mov=01;35:*.mpg=01;35:*.mpeg=01;35:*.m2v=01;35:*.mkv=01;35:*.webm=01;35:*.webp=01;35:*.ogm=01;35:*.mp4=01;35:*.m4v=01;35:*.mp4v=01;35:*.vob=01;35:*.qt=01;35:*.nuv=01;35:*.wmv=01;35:*.asf=01;35:*.rm=01;35:*.rmvb=01;35:*.flc=01;35:*.avi=01;35:*.fli=01;35:*.flv=01;35:*.gl=01;35:*.dl=01;35:*.xcf=01;35:*.xwd=01;35:*.yuv=01;35:*.cgm=01;35:*.emf=01;35:*.ogv=01;35:*.ogx=01;35:*.aac=00;36:*.au=00;36:*.flac=00;36:*.m4a=00;36:*.mid=00;36:*.midi=00;36:*.mka=00;36:*.mp3=00;36:*.mpc=00;36:*.ogg=00;36:*.ra=00;36:*.wav=00;36:*.oga=00;36:*.opus=00;36:*.spx=00;36:*.xspf=00;36:*~=00;90:*#=00;90:*.bak=00;90:*.crdownload=00;90:*.dpkg-dist=00;90:*.dpkg-new=00;90:*.dpkg-old=00;90:*.dpkg-tmp=00;90:*.old=00;90:*.orig=00;90:*.part=00;90:*.rej=00;90:*.rpmnew=00;90:*.rpmorig=00;90:*.rpmsave=00;90:*.swp=00;90:*.tmp=00;90:*.ucf-dist=00;90:*.ucf-new=00;90:*.ucf-old=00;90:',
+  VSCODE_GIT_IPC_HANDLE: '/run/user/1000/vscode-git-c7baabbd04.sock',
+  TERM_PROGRAM: 'vscode',
+  npm_lifecycle_script: 'vite',
+  SSH_AUTH_SOCK: '/run/user/1000/keyring/ssh',
+  ORIGINAL_XDG_CURRENT_DESKTOP: 'ubuntu:GNOME',
+  SHELL: '/bin/bash',
+  npm_package_version: '0.0.1',
+  npm_lifecycle_event: 'npx',
+  QT_ACCESSIBILITY: '1',
+  GDMSESSION: 'ubuntu',
+  LESSCLOSE: '/usr/bin/lesspipe %s %s',
+  GPG_AGENT_INFO: '/run/user/1000/gnupg/S.gpg-agent:0:1',
+  GJS_DEBUG_OUTPUT: 'stderr',
+  VSCODE_GIT_ASKPASS_EXTRA_ARGS: '',
+  QT_IM_MODULE: 'ibus',
+  npm_config_globalconfig: '/usr/etc/npmrc',
+  npm_config_init_module: '/home/joao/.npm-init.js',
+  PWD: '/home/joao/Desktop/enervigilui',
+  npm_execpath: '/usr/lib/node_modules/npm/bin/npm-cli.js',
+  XDG_CONFIG_DIRS: '/etc/xdg/xdg-ubuntu:/etc/xdg',
+  XDG_DATA_DIRS: '/usr/share/ubuntu:/usr/share/gnome:/usr/local/share/:/usr/share/:/var/lib/snapd/desktop',
+  npm_config_global_prefix: '/usr',
+  npm_command: 'exec',
+  MEMORY_PRESSURE_WRITE: 'c29tZSAyMDAwMDAgMjAwMDAwMAA=',
+  INIT_CWD: '/home/joao/Desktop/enervigilui',
+  EDITOR: 'vi',
+  DEBUG: 'vite:*',
+  NODE_ENV: 'production'
+}
+2025-05-27T20:36:53.875Z vite:env loading env files: [
+  '/home/joao/Desktop/enervigilui/.env',
+  '/home/joao/Desktop/enervigilui/.env.local',
+  '/home/joao/Desktop/enervigilui/.env.production',
+  '/home/joao/Desktop/enervigilui/.env.production.local'
+]
+2025-05-27T20:36:53.875Z vite:env env files loaded in 0.07ms
+2025-05-27T20:36:53.875Z vite:env using resolved env: {}
+2025-05-27T20:36:53.877Z vite:config using resolved config: {
+  plugins: [
+    'vite:build-metadata',
+    'vite:watch-package-data',
+    'alias',
+    'vite-plugin-svelte',
+    'vite:modulepreload-polyfill',
+    'vite:resolve',
+    'vite:html-inline-proxy',
+    'vite:css',
+    'vite:esbuild',
+    'vite:json',
+    'vite:wasm-helper',
+    'vite:worker',
+    'vite:asset',
+    'vite-plugin-sveltekit-setup',
+    'vite-plugin-sveltekit-virtual-modules',
+    'vite-plugin-sveltekit-guard',
+    'vite-plugin-sveltekit-compile',
+    'vite:wasm-fallback',
+    'vite:define',
+    'vite:css-post',
+    'vite:build-html',
+    'vite:worker-import-meta-url',
+    'vite:asset-import-meta-url',
+    'vite:force-systemjs-wrap-complete',
+    'commonjs',
+    'vite:data-uri',
+    'vite:rollup-options-plugins',
+    'vite:dynamic-import-vars',
+    'vite:import-glob',
+    'vite-plugin-svelte-module',
+    'vite:build-import-analysis',
+    'vite:esbuild-transpile',
+    'vite:terser',
+    'vite:manifest',
+    'vite:ssr-manifest',
+    'vite:reporter',
+    'vite:load-fallback'
+  ],
+  server: {
+    port: 5173,
+    strictPort: false,
+    host: undefined,
+    allowedHosts: [],
+    https: undefined,
+    open: false,
+    proxy: {
+      '/api': {
+        target: 'http://192.168.0.20:8000',
+        changeOrigin: true,
+        secure: false,
+        rewrite: [Function: rewrite]
+      }
+    },
+    cors: {
+      origin: /^https?:\/\/(?:(?:[^:]+\.)?localhost|127\.0\.0\.1|\[::1\])(?::\d+)?$/,
+      preflightContinue: true
+    },
+    headers: {},
+    warmup: { clientFiles: [], ssrFiles: [] },
+    middlewareMode: false,
+    fs: {
+      strict: true,
+      deny: [ '.env', '.env.*', '*.{crt,pem}', '**/.git/**' ],
+      allow: [
+        '/home/joao/Desktop/enervigilui/src/lib',
+        '/home/joao/Desktop/enervigilui/src/routes',
+        '/home/joao/Desktop/enervigilui/.svelte-kit',
+        '/home/joao/Desktop/enervigilui/src',
+        '/home/joao/Desktop/enervigilui/node_modules'
+      ]
+    },
+    preTransformRequests: true,
+    perEnvironmentStartEndDuringDev: false,
+    sourcemapIgnoreList: [Function: sourcemapIgnoreList],
+    watch: {
+      ignored: [ '/home/joao/Desktop/enervigilui/.svelte-kit/!(generated)' ]
+    }
+  },
+  configFile: '/home/joao/Desktop/enervigilui/vite.config.ts',
+  mode: 'production',
+  build: {
+    target: [ 'es2020', 'edge88', 'firefox78', 'chrome87', 'safari14' ],
+    polyfillModulePreload: true,
+    modulePreload: { polyfill: true },
+    outDir: '/home/joao/Desktop/enervigilui/.svelte-kit/output/client',
+    assetsDir: 'assets',
+    assetsInlineLimit: 4096,
+    sourcemap: false,
+    terserOptions: {},
+    rollupOptions: {
+      input: {
+        'entry/start': '/home/joao/Desktop/enervigilui/node_modules/@sveltejs/kit/src/runtime/client/entry.js',
+        'entry/app': '/home/joao/Desktop/enervigilui/.svelte-kit/generated/client-optimized/app.js',
+        'nodes/0': '/home/joao/Desktop/enervigilui/.svelte-kit/generated/client-optimized/nodes/0.js',
+        'nodes/1': '/home/joao/Desktop/enervigilui/.svelte-kit/generated/client-optimized/nodes/1.js',
+        'nodes/2': '/home/joao/Desktop/enervigilui/.svelte-kit/generated/client-optimized/nodes/2.js',
+        'nodes/3': '/home/joao/Desktop/enervigilui/.svelte-kit/generated/client-optimized/nodes/3.js',
+        'nodes/4': '/home/joao/Desktop/enervigilui/.svelte-kit/generated/client-optimized/nodes/4.js',
+        'nodes/5': '/home/joao/Desktop/enervigilui/.svelte-kit/generated/client-optimized/nodes/5.js',
+        'nodes/6': '/home/joao/Desktop/enervigilui/.svelte-kit/generated/client-optimized/nodes/6.js',
+        'nodes/7': '/home/joao/Desktop/enervigilui/.svelte-kit/generated/client-optimized/nodes/7.js',
+        'nodes/8': '/home/joao/Desktop/enervigilui/.svelte-kit/generated/client-optimized/nodes/8.js',
+        'nodes/9': '/home/joao/Desktop/enervigilui/.svelte-kit/generated/client-optimized/nodes/9.js',
+        'nodes/10': '/home/joao/Desktop/enervigilui/.svelte-kit/generated/client-optimized/nodes/10.js'
+      },
+      output: {
+        format: 'esm',
+        name: '__sveltekit_6mdw46.app',
+        entryFileNames: '_app/immutable/[name].[hash].js',
+        chunkFileNames: '_app/immutable/chunks/[hash].js',
+        assetFileNames: '_app/immutable/assets/[name].[hash][extname]',
+        hoistTransitiveImports: false,
+        sourcemapIgnoreList: [Function: sourcemapIgnoreList],
+        manualChunks: undefined,
+        inlineDynamicImports: false
+      },
+      preserveEntrySignatures: 'strict',
+      onwarn: [Function: onwarn]
+    },
+    commonjsOptions: { include: [ /node_modules/ ], extensions: [ '.js', '.cjs' ] },
+    dynamicImportVarsOptions: { warnOnError: true, exclude: [ /node_modules/ ] },
+    write: true,
+    emptyOutDir: null,
+    copyPublicDir: true,
+    manifest: '.vite/manifest.json',
+    lib: false,
+    ssrManifest: false,
+    ssrEmitAssets: true,
+    reportCompressedSize: true,
+    chunkSizeWarningLimit: 500,
+    watch: null,
+    cssCodeSplit: true,
+    minify: 'esbuild',
+    ssr: false,
+    emitAssets: true,
+    createEnvironment: [Function: createEnvironment],
+    cssMinify: true,
+    cssTarget: [ 'es2020', 'edge88', 'firefox78', 'chrome87', 'safari14' ]
+  },
+  optimizeDeps: {
+    include: [
+      'svelte',
+      'svelte/animate',
+      'svelte/easing',
+      'svelte/internal',
+      'svelte/internal/client',
+      'svelte/internal/disclose-version',
+      'svelte/internal/flags/legacy',
+      'svelte/internal/flags/tracing',
+      'svelte/legacy',
+      'svelte/motion',
+      'svelte/reactivity',
+      'svelte/reactivity/window',
+      'svelte/store',
+      'svelte/transition',
+      'svelte/events'
+    ],
+    exclude: [ '@sveltejs/kit', '$app', '$env' ],
+    needsInterop: [],
+    extensions: [],
+    disabled: undefined,
+    holdUntilCrawlEnd: true,
+    force: false,
+    noDiscovery: false,
+    esbuildOptions: { preserveSymlinks: false },
+    entries: [
+      '/home/joao/Desktop/enervigilui/src/routes/**/+*.{svelte,js,ts}',
+      '!/home/joao/Desktop/enervigilui/src/routes/**/+*server.*'
+    ]
+  },
+  resolve: {
+    externalConditions: [ 'node' ],
+    extensions: [
+      '.mjs',  '.js',
+      '.mts',  '.ts',
+      '.jsx',  '.tsx',
+      '.json'
+    ],
+    dedupe: [
+      'svelte',
+      'svelte/animate',
+      'svelte/easing',
+      'svelte/internal',
+      'svelte/internal/client',
+      'svelte/internal/disclose-version',
+      'svelte/internal/flags/legacy',
+      'svelte/internal/flags/tracing',
+      'svelte/internal/server',
+      'svelte/legacy',
+      'svelte/motion',
+      'svelte/reactivity',
+      'svelte/reactivity/window',
+      'svelte/server',
+      'svelte/store',
+      'svelte/transition',
+      'svelte/events'
+    ],
+    noExternal: [],
+    external: [],
+    preserveSymlinks: false,
+    alias: [
+      {
+        find: '__SERVER__',
+        replacement: '/home/joao/Desktop/enervigilui/.svelte-kit/generated/server'
+      },
+      {
+        find: '$app',
+        replacement: '/home/joao/Desktop/enervigilui/node_modules/@sveltejs/kit/src/runtime/app'
+      },
+      {
+        find: '$lib',
+        replacement: '/home/joao/Desktop/enervigilui/src/lib'
+      },
+      {
+        find: '$app',
+        replacement: '/home/joao/Desktop/enervigilui/.svelte-kit/types/app'
+      },
+      {
+        find: '$lib',
+        replacement: '/home/joao/Desktop/enervigilui/src/lib'
+      },
+      {
+        find: /^\/?@vite\/env/,
+        replacement: '/@fs/home/joao/Desktop/enervigilui/node_modules/vite/dist/client/env.mjs'
+      },
+      {
+        find: /^\/?@vite\/client/,
+        replacement: '/@fs/home/joao/Desktop/enervigilui/node_modules/vite/dist/client/client.mjs'
+      }
+    ],
+    mainFields: [ 'svelte', 'browser', 'module', 'jsnext:main', 'jsnext' ],
+    conditions: [ 'module', 'browser', 'development|production', 'svelte' ],
+    builtins: []
+  },
+  ssr: {
+    target: 'node',
+    optimizeDeps: {
+      esbuildOptions: { preserveSymlinks: false },
+      include: [],
+      exclude: [],
+      needsInterop: [],
+      extensions: [],
+      holdUntilCrawlEnd: true,
+      force: false,
+      noDiscovery: true
+    },
+    external: [],
+    noExternal: [ 'svelte', /^svelte\//, 'esm-env', 'esm-env', '@sveltejs/kit' ],
+    resolve: {
+      conditions: [ 'module', 'node', 'development|production', 'svelte' ],
+      externalConditions: [ 'node' ]
+    }
+  },
+  experimental: { importGlobRestoreExtension: false, hmrPartialAccept: true },
+  root: '/home/joao/Desktop/enervigilui',
+  preview: {
+    port: 4173,
+    strictPort: false,
+    host: undefined,
+    allowedHosts: [],
+    https: undefined,
+    open: false,
+    proxy: {
+      '/api': {
+        target: 'http://192.168.0.20:8000',
+        changeOrigin: true,
+        secure: false,
+        rewrite: [Function: rewrite]
+      }
+    },
+    cors: { preflightContinue: true },
+    headers: {}
+  },
+  define: {
+    __SVELTEKIT_ADAPTER_NAME__: '"@sveltejs/adapter-auto"',
+    __SVELTEKIT_APP_VERSION_FILE__: '"_app/version.json"',
+    __SVELTEKIT_APP_VERSION_POLL_INTERVAL__: '0',
+    __SVELTEKIT_DEV__: 'false',
+    __SVELTEKIT_EMBEDDED__: 'false',
+    __SVELTEKIT_CLIENT_ROUTING__: 'true'
+  },
+  base: './',
+  publicDir: '/home/joao/Desktop/enervigilui/static',
+  worker: {
+    format: 'iife',
+    plugins: '() => plugins',
+    rollupOptions: {
+      output: {
+        entryFileNames: '_app/immutable/workers/[name]-[hash].js',
+        chunkFileNames: '_app/immutable/workers/chunks/[hash].js',
+        assetFileNames: '_app/immutable/workers/assets/[name]-[hash][extname]',
+        hoistTransitiveImports: false
+      }
+    }
+  },
+  environments: {
+    client: {
+      define: {
+        __SVELTEKIT_ADAPTER_NAME__: '"@sveltejs/adapter-auto"',
+        __SVELTEKIT_APP_VERSION_FILE__: '"_app/version.json"',
+        __SVELTEKIT_APP_VERSION_POLL_INTERVAL__: '0',
+        __SVELTEKIT_DEV__: 'false',
+        __SVELTEKIT_EMBEDDED__: 'false',
+        __SVELTEKIT_CLIENT_ROUTING__: 'true'
+      },
+      resolve: {
+        externalConditions: [ 'node' ],
+        extensions: [
+          '.mjs',  '.js',
+          '.mts',  '.ts',
+          '.jsx',  '.tsx',
+          '.json'
+        ],
+        dedupe: [
+          'svelte',
+          'svelte/animate',
+          'svelte/easing',
+          'svelte/internal',
+          'svelte/internal/client',
+          'svelte/internal/disclose-version',
+          'svelte/internal/flags/legacy',
+          'svelte/internal/flags/tracing',
+          'svelte/internal/server',
+          'svelte/legacy',
+          'svelte/motion',
+          'svelte/reactivity',
+          'svelte/reactivity/window',
+          'svelte/server',
+          'svelte/store',
+          'svelte/transition',
+          'svelte/events'
+        ],
+        noExternal: [],
+        external: [],
+        preserveSymlinks: false,
+        alias: [
+          {
+            find: '__SERVER__',
+            replacement: '/home/joao/Desktop/enervigilui/.svelte-kit/generated/server'
+          },
+          {
+            find: '$app',
+            replacement: '/home/joao/Desktop/enervigilui/node_modules/@sveltejs/kit/src/runtime/app'
+          },
+          {
+            find: '$lib',
+            replacement: '/home/joao/Desktop/enervigilui/src/lib'
+          },
+          {
+            find: '$app',
+            replacement: '/home/joao/Desktop/enervigilui/.svelte-kit/types/app'
+          },
+          {
+            find: '$lib',
+            replacement: '/home/joao/Desktop/enervigilui/src/lib'
+          },
+          {
+            find: /^\/?@vite\/env/,
+            replacement: '/@fs/home/joao/Desktop/enervigilui/node_modules/vite/dist/client/env.mjs'
+          },
+          {
+            find: /^\/?@vite\/client/,
+            replacement: '/@fs/home/joao/Desktop/enervigilui/node_modules/vite/dist/client/client.mjs'
+          }
+        ],
+        mainFields: [ 'svelte', 'browser', 'module', 'jsnext:main', 'jsnext' ],
+        conditions: [ 'module', 'browser', 'development|production', 'svelte' ],
+        builtins: []
+      },
+      keepProcessEnv: false,
+      consumer: 'client',
+      optimizeDeps: {
+        include: [
+          'svelte',
+          'svelte/animate',
+          'svelte/easing',
+          'svelte/internal',
+          'svelte/internal/client',
+          'svelte/internal/disclose-version',
+          'svelte/internal/flags/legacy',
+          'svelte/internal/flags/tracing',
+          'svelte/legacy',
+          'svelte/motion',
+          'svelte/reactivity',
+          'svelte/reactivity/window',
+          'svelte/store',
+          'svelte/transition',
+          'svelte/events'
+        ],
+        exclude: [ '@sveltejs/kit', '$app', '$env' ],
+        needsInterop: [],
+        extensions: [],
+        disabled: undefined,
+        holdUntilCrawlEnd: true,
+        force: false,
+        noDiscovery: false,
+        esbuildOptions: { preserveSymlinks: false },
+        entries: [
+          '/home/joao/Desktop/enervigilui/src/routes/**/+*.{svelte,js,ts}',
+          '!/home/joao/Desktop/enervigilui/src/routes/**/+*server.*'
+        ]
+      },
+      dev: {
+        warmup: [],
+        sourcemap: { js: true },
+        sourcemapIgnoreList: [Function: isInNodeModules$1],
+        preTransformRequests: true,
+        createEnvironment: [Function: defaultCreateClientDevEnvironment],
+        recoverable: true,
+        moduleRunnerTransform: false
+      },
+      build: {
+        target: [ 'es2020', 'edge88', 'firefox78', 'chrome87', 'safari14' ],
+        polyfillModulePreload: true,
+        modulePreload: { polyfill: true },
+        outDir: '/home/joao/Desktop/enervigilui/.svelte-kit/output/client',
+        assetsDir: 'assets',
+        assetsInlineLimit: 4096,
+        sourcemap: false,
+        terserOptions: {},
+        rollupOptions: {
+          input: {
+            'entry/start': '/home/joao/Desktop/enervigilui/node_modules/@sveltejs/kit/src/runtime/client/entry.js',
+            'entry/app': '/home/joao/Desktop/enervigilui/.svelte-kit/generated/client-optimized/app.js',
+            'nodes/0': '/home/joao/Desktop/enervigilui/.svelte-kit/generated/client-optimized/nodes/0.js',
+            'nodes/1': '/home/joao/Desktop/enervigilui/.svelte-kit/generated/client-optimized/nodes/1.js',
+            'nodes/2': '/home/joao/Desktop/enervigilui/.svelte-kit/generated/client-optimized/nodes/2.js',
+            'nodes/3': '/home/joao/Desktop/enervigilui/.svelte-kit/generated/client-optimized/nodes/3.js',
+            'nodes/4': '/home/joao/Desktop/enervigilui/.svelte-kit/generated/client-optimized/nodes/4.js',
+            'nodes/5': '/home/joao/Desktop/enervigilui/.svelte-kit/generated/client-optimized/nodes/5.js',
+            'nodes/6': '/home/joao/Desktop/enervigilui/.svelte-kit/generated/client-optimized/nodes/6.js',
+            'nodes/7': '/home/joao/Desktop/enervigilui/.svelte-kit/generated/client-optimized/nodes/7.js',
+            'nodes/8': '/home/joao/Desktop/enervigilui/.svelte-kit/generated/client-optimized/nodes/8.js',
+            'nodes/9': '/home/joao/Desktop/enervigilui/.svelte-kit/generated/client-optimized/nodes/9.js',
+            'nodes/10': '/home/joao/Desktop/enervigilui/.svelte-kit/generated/client-optimized/nodes/10.js'
+          },
+          output: {
+            format: 'esm',
+            name: '__sveltekit_6mdw46.app',
+            entryFileNames: '_app/immutable/[name].[hash].js',
+            chunkFileNames: '_app/immutable/chunks/[hash].js',
+            assetFileNames: '_app/immutable/assets/[name].[hash][extname]',
+            hoistTransitiveImports: false,
+            sourcemapIgnoreList: [Function: sourcemapIgnoreList],
+            manualChunks: undefined,
+            inlineDynamicImports: false
+          },
+          preserveEntrySignatures: 'strict',
+          onwarn: [Function: onwarn]
+        },
+        commonjsOptions: { include: [ /node_modules/ ], extensions: [ '.js', '.cjs' ] },
+        dynamicImportVarsOptions: { warnOnError: true, exclude: [ /node_modules/ ] },
+        write: true,
+        emptyOutDir: null,
+        copyPublicDir: true,
+        manifest: '.vite/manifest.json',
+        lib: false,
+        ssrManifest: false,
+        ssrEmitAssets: true,
+        reportCompressedSize: true,
+        chunkSizeWarningLimit: 500,
+        watch: null,
+        cssCodeSplit: true,
+        minify: 'esbuild',
+        ssr: false,
+        emitAssets: true,
+        createEnvironment: [Function: createEnvironment],
+        cssMinify: true,
+        cssTarget: [ 'es2020', 'edge88', 'firefox78', 'chrome87', 'safari14' ]
+      }
+    },
+    ssr: {
+      define: {
+        __SVELTEKIT_ADAPTER_NAME__: '"@sveltejs/adapter-auto"',
+        __SVELTEKIT_APP_VERSION_FILE__: '"_app/version.json"',
+        __SVELTEKIT_APP_VERSION_POLL_INTERVAL__: '0',
+        __SVELTEKIT_DEV__: 'false',
+        __SVELTEKIT_EMBEDDED__: 'false',
+        __SVELTEKIT_CLIENT_ROUTING__: 'true'
+      },
+      resolve: {
+        externalConditions: [ 'node' ],
+        extensions: [
+          '.mjs',  '.js',
+          '.mts',  '.ts',
+          '.jsx',  '.tsx',
+          '.json'
+        ],
+        dedupe: [
+          'svelte',
+          'svelte/animate',
+          'svelte/easing',
+          'svelte/internal',
+          'svelte/internal/client',
+          'svelte/internal/disclose-version',
+          'svelte/internal/flags/legacy',
+          'svelte/internal/flags/tracing',
+          'svelte/internal/server',
+          'svelte/legacy',
+          'svelte/motion',
+          'svelte/reactivity',
+          'svelte/reactivity/window',
+          'svelte/server',
+          'svelte/store',
+          'svelte/transition',
+          'svelte/events'
+        ],
+        noExternal: [
+          'svelte',
+          /^svelte\//,
+          'esm-env',
+          'esm-env',
+          '@sveltejs/kit'
+        ],
+        external: [],
+        preserveSymlinks: false,
+        alias: [
+          {
+            find: '__SERVER__',
+            replacement: '/home/joao/Desktop/enervigilui/.svelte-kit/generated/server'
+          },
+          {
+            find: '$app',
+            replacement: '/home/joao/Desktop/enervigilui/node_modules/@sveltejs/kit/src/runtime/app'
+          },
+          {
+            find: '$lib',
+            replacement: '/home/joao/Desktop/enervigilui/src/lib'
+          },
+          {
+            find: '$app',
+            replacement: '/home/joao/Desktop/enervigilui/.svelte-kit/types/app'
+          },
+          {
+            find: '$lib',
+            replacement: '/home/joao/Desktop/enervigilui/src/lib'
+          },
+          {
+            find: /^\/?@vite\/env/,
+            replacement: '/@fs/home/joao/Desktop/enervigilui/node_modules/vite/dist/client/env.mjs'
+          },
+          {
+            find: /^\/?@vite\/client/,
+            replacement: '/@fs/home/joao/Desktop/enervigilui/node_modules/vite/dist/client/client.mjs'
+          }
+        ],
+        mainFields: [ 'svelte', 'module', 'jsnext:main', 'jsnext' ],
+        conditions: [ 'module', 'node', 'development|production', 'svelte' ],
+        builtins: [
+          '_http_agent',         '_http_client',        '_http_common',
+          '_http_incoming',      '_http_outgoing',      '_http_server',
+          '_stream_duplex',      '_stream_passthrough', '_stream_readable',
+          '_stream_transform',   '_stream_wrap',        '_stream_writable',
+          '_tls_common',         '_tls_wrap',           'assert',
+          'assert/strict',       'async_hooks',         'buffer',
+          'child_process',       'cluster',             'console',
+          'constants',           'crypto',              'dgram',
+          'diagnostics_channel', 'dns',                 'dns/promises',
+          'domain',              'events',              'fs',
+          'fs/promises',         'http',                'http2',
+          'https',               'inspector',           'inspector/promises',
+          'module',              'net',                 'os',
+          'path',                'path/posix',          'path/win32',
+          'perf_hooks',          'process',             'punycode',
+          'querystring',         'readline',            'readline/promises',
+          'repl',                'stream',              'stream/consumers',
+          'stream/promises',     'stream/web',          'string_decoder',
+          'sys',                 'timers',              'timers/promises',
+          'tls',                 'trace_events',        'tty',
+          'url',                 'util',                'util/types',
+          'v8',                  'vm',                  'wasi',
+          'worker_threads',      'zlib',                /^node:/,
+          /^npm:/,               /^bun:/
+        ]
+      },
+      keepProcessEnv: true,
+      consumer: 'server',
+      optimizeDeps: {
+        include: [],
+        exclude: [],
+        needsInterop: [],
+        extensions: [],
+        disabled: undefined,
+        holdUntilCrawlEnd: true,
+        force: false,
+        noDiscovery: true,
+        esbuildOptions: { preserveSymlinks: false }
+      },
+      dev: {
+        warmup: [],
+        sourcemap: { js: true },
+        sourcemapIgnoreList: [Function: isInNodeModules$1],
+        preTransformRequests: false,
+        createEnvironment: [Function: defaultCreateDevEnvironment],
+        recoverable: false,
+        moduleRunnerTransform: true
+      },
+      build: {
+        target: [ 'es2020', 'edge88', 'firefox78', 'chrome87', 'safari14' ],
+        polyfillModulePreload: true,
+        modulePreload: { polyfill: true },
+        outDir: '/home/joao/Desktop/enervigilui/.svelte-kit/output/client',
+        assetsDir: 'assets',
+        assetsInlineLimit: 4096,
+        sourcemap: false,
+        terserOptions: {},
+        rollupOptions: {
+          input: {
+            'entry/start': '/home/joao/Desktop/enervigilui/node_modules/@sveltejs/kit/src/runtime/client/entry.js',
+            'entry/app': '/home/joao/Desktop/enervigilui/.svelte-kit/generated/client-optimized/app.js',
+            'nodes/0': '/home/joao/Desktop/enervigilui/.svelte-kit/generated/client-optimized/nodes/0.js',
+            'nodes/1': '/home/joao/Desktop/enervigilui/.svelte-kit/generated/client-optimized/nodes/1.js',
+            'nodes/2': '/home/joao/Desktop/enervigilui/.svelte-kit/generated/client-optimized/nodes/2.js',
+            'nodes/3': '/home/joao/Desktop/enervigilui/.svelte-kit/generated/client-optimized/nodes/3.js',
+            'nodes/4': '/home/joao/Desktop/enervigilui/.svelte-kit/generated/client-optimized/nodes/4.js',
+            'nodes/5': '/home/joao/Desktop/enervigilui/.svelte-kit/generated/client-optimized/nodes/5.js',
+            'nodes/6': '/home/joao/Desktop/enervigilui/.svelte-kit/generated/client-optimized/nodes/6.js',
+            'nodes/7': '/home/joao/Desktop/enervigilui/.svelte-kit/generated/client-optimized/nodes/7.js',
+            'nodes/8': '/home/joao/Desktop/enervigilui/.svelte-kit/generated/client-optimized/nodes/8.js',
+            'nodes/9': '/home/joao/Desktop/enervigilui/.svelte-kit/generated/client-optimized/nodes/9.js',
+            'nodes/10': '/home/joao/Desktop/enervigilui/.svelte-kit/generated/client-optimized/nodes/10.js'
+          },
+          output: {
+            format: 'esm',
+            name: '__sveltekit_6mdw46.app',
+            entryFileNames: '_app/immutable/[name].[hash].js',
+            chunkFileNames: '_app/immutable/chunks/[hash].js',
+            assetFileNames: '_app/immutable/assets/[name].[hash][extname]',
+            hoistTransitiveImports: false,
+            sourcemapIgnoreList: [Function: sourcemapIgnoreList],
+            manualChunks: undefined,
+            inlineDynamicImports: false
+          },
+          preserveEntrySignatures: 'strict',
+          onwarn: [Function: onwarn]
+        },
+        commonjsOptions: { include: [ /node_modules/ ], extensions: [ '.js', '.cjs' ] },
+        dynamicImportVarsOptions: { warnOnError: true, exclude: [ /node_modules/ ] },
+        write: true,
+        emptyOutDir: null,
+        copyPublicDir: true,
+        manifest: '.vite/manifest.json',
+        lib: false,
+        ssrManifest: false,
+        ssrEmitAssets: true,
+        reportCompressedSize: true,
+        chunkSizeWarningLimit: 500,
+        watch: null,
+        cssCodeSplit: true,
+        minify: false,
+        ssr: false,
+        emitAssets: true,
+        createEnvironment: [Function: createEnvironment],
+        cssMinify: true,
+        cssTarget: [ 'es2020', 'edge88', 'firefox78', 'chrome87', 'safari14' ]
+      }
+    }
+  },
+  configFileDependencies: [ '/home/joao/Desktop/enervigilui/vite.config.ts' ],
+  inlineConfig: {
+    configFile: '/home/joao/Desktop/enervigilui/vite.config.ts',
+    mode: 'production',
+    logLevel: undefined,
+    clearScreen: undefined,
+    build: { minify: undefined, assetsInlineLimit: 4096, sourcemap: false },
+    optimizeDeps: { force: false }
+  },
+  decodedBase: './',
+  rawBase: './',
+  cacheDir: '/home/joao/Desktop/enervigilui/node_modules/.vite',
+  command: 'build',
+  isWorker: false,
+  mainConfig: null,
+  bundleChain: [],
+  isProduction: true,
+  css: {
+    transformer: 'postcss',
+    preprocessorMaxWorkers: 0,
+    devSourcemap: false
+  },
+  json: { namedExports: true, stringify: 'auto' },
+  esbuild: { jsxDev: false },
+  builder: undefined,
+  envDir: '/home/joao/Desktop/enervigilui',
+  env: { BASE_URL: './', MODE: 'production', DEV: false, PROD: true },
+  assetsInclude: [Function: assetsInclude],
+  logger: {
+    hasWarned: false,
+    info: [Function: info],
+    warn: [Function: warn],
+    warnOnce: [Function: warnOnce],
+    error: [Function: error],
+    clearScreen: [Function: clearScreen],
+    hasErrorLogged: [Function: hasErrorLogged]
+  },
+  packageCache: Map(1) {
+    'fnpd_/home/joao/Desktop/enervigilui' => {
+      dir: '/home/joao/Desktop/enervigilui',
+      data: {
+        name: 'enervigilui',
+        private: true,
+        version: '0.0.1',
+        type: 'module',
+        scripts: {
+          dev: 'vite dev',
+          build: 'vite build',
+          'build:trace': "NODE_OPTIONS='--trace-warnings --trace-deprecation' vite build",
+          preview: 'vite preview',
+          prepare: "svelte-kit sync || echo ''",
+          check: 'svelte-kit sync && svelte-check --tsconfig ./tsconfig.json',
+          'check:watch': 'svelte-kit sync && svelte-check --tsconfig ./tsconfig.json --watch'
+        },
+        devDependencies: {
+          '@sveltejs/adapter-auto': '^6.0.0',
+          '@sveltejs/kit': '^2.16.0',
+          '@sveltejs/vite-plugin-svelte': '^5.0.0',
+          svelte: '^5.0.0',
+          'svelte-check': '^4.0.0',
+          typescript: '^5.0.0',
+          vite: '^6.2.6'
+        }
+      },
+      hasSideEffects: [Function: hasSideEffects],
+      setResolvedCache: [Function: setResolvedCache],
+      getResolvedCache: [Function: getResolvedCache]
+    },
+    set: [Function (anonymous)]
+  },
+  appType: 'spa',
+  future: undefined,
+  dev: {
+    warmup: [],
+    sourcemap: { js: true },
+    sourcemapIgnoreList: [Function: isInNodeModules$1],
+    preTransformRequests: false,
+    createEnvironment: [Function: defaultCreateDevEnvironment],
+    recoverable: false,
+    moduleRunnerTransform: false
+  },
+  webSocketToken: 'iIT0IICYAAqY',
+  getSortedPlugins: [Function: getSortedPlugins],
+  getSortedPluginHooks: [Function: getSortedPluginHooks],
+  createResolver: [Function: createResolver],
+  fsDenyGlob: [Function: arrayMatcher],
+  safeModulePaths: Set(0) {},
+  additionalAllowedHosts: []
+}
+vite v6.3.3 building for production...
+transforming...
+✓ 220 modules transformed.
+✗ Build failed in 402ms
+✗ Build failed in 1.36s
+error during build:
+[vite-plugin-sveltekit-compile] [commonjs--resolver] Could not load /home/joao/Desktop/enervigilui/node_modules/@sveltejs/kit/src/runtime/app/server/index.js: Cannot import node_modules/@sveltejs/kit/src/runtime/app/server/index.js into client-side code. This could leak sensitive information.
+Tips:
+ - To resolve this error, ensure that no exports from node_modules/@sveltejs/kit/src/runtime/app/server/index.js are used, even transitively, in client-side code.
+ - If you're only using the import as a type, change it to `import type`.
+ - If you're not sure which module is causing this, try building your app -- it will create a more helpful error.
+[commonjs--resolver] Could not load /home/joao/Desktop/enervigilui/node_modules/@sveltejs/kit/src/runtime/app/server/index.js: Cannot import node_modules/@sveltejs/kit/src/runtime/app/server/index.js into client-side code. This could leak sensitive information.
+Tips:
+ - To resolve this error, ensure that no exports from node_modules/@sveltejs/kit/src/runtime/app/server/index.js are used, even transitively, in client-side code.
+ - If you're only using the import as a type, change it to `import type`.
+ - If you're not sure which module is causing this, try building your app -- it will create a more helpful error.
+    at Object.load (file:///home/joao/Desktop/enervigilui/node_modules/@sveltejs/kit/src/exports/vite/index.js:442:12)
+    at Object.handler (file:///home/joao/Desktop/enervigilui/node_modules/vite/dist/node/chunks/dep-BMIURPaQ.js:46436:15)
+    at file:///home/joao/Desktop/enervigilui/node_modules/rollup/dist/es/shared/node-entry.js:22193:40
+    at async PluginDriver.hookFirstAndGetPlugin (file:///home/joao/Desktop/enervigilui/node_modules/rollup/dist/es/shared/node-entry.js:22075:28)
+    at async file:///home/joao/Desktop/enervigilui/node_modules/rollup/dist/es/shared/node-entry.js:21080:33
+    at async Queue.work (file:///home/joao/Desktop/enervigilui/node_modules/rollup/dist/es/shared/node-entry.js:22303:32)

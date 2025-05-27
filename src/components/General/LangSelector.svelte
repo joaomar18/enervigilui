@@ -2,7 +2,6 @@
     import { browser } from "$app/environment";
     import { replaceState } from "$app/navigation";
     import { onMount, onDestroy } from "svelte";
-    import { page } from "$app/state";
 
     //Props
     export let invertOptions: boolean = false; //Invert Options div position

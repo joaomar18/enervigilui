@@ -1,4 +1,3 @@
-import { read } from "$app/server";
 import { writable, readable } from "svelte/store";
 
 // Type for the available languages
