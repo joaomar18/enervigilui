@@ -21,7 +21,7 @@
     import { showAlert } from "$lib/stores/alerts";
 
     // Stores for authorization
-    import { loadedDone } from "$lib/stores/auth";
+    import { loadedDone } from "$lib/stores/navigation";
 
     //Variables
     let showSaveWindow: boolean = false;

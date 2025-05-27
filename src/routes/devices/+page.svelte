@@ -9,7 +9,7 @@
     import { showAlert } from "$lib/stores/alerts";
 
     // Stores for authorization
-    import { loadedDone } from "$lib/stores/auth";
+    import { loadedDone } from "$lib/stores/navigation";
 
     import { onMount, onDestroy } from "svelte";
     import DeviceCard from "../../components/Devices/DeviceCard.svelte";

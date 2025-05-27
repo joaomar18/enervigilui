@@ -1,7 +1,7 @@
 import { goto } from "$app/navigation";
 
 // Splash screen store
-import { splashDone, loadedDone } from "../stores/auth";
+import { splashDone, loadedDone, leftPanelOpen } from "../stores/navigation";
 
 /**
  * Navigates the application to a new URL, appending any extra query parameters
@@ -54,6 +54,10 @@ export async function navigateTo(
     loadedDone.set(false);
 
     await goto(target);
+
+    if (!window.matchMedia("(min-width: 880px)").matches) {
+        leftPanelOpen.set(false);
+    }
 
     if (splashScreen) {
         await new Promise((res) => setTimeout(res, minSplashDuration));

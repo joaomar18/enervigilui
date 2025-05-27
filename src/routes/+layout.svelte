@@ -13,7 +13,7 @@
     import { displayAlert, alertText, alertTimeout } from "$lib/stores/alerts";
 
     // Authorization stores
-    import { splashDone, loadedDone } from "$lib/stores/auth";
+    import { splashDone, loadedDone, leftPanelOpen } from "$lib/stores/navigation";
 
     import LeftPanel from "../components/Dashboard/LeftPanel.svelte";
     import Logo from "../components/General/Logo.svelte";
@@ -28,7 +28,6 @@
     let shouldRedirect: boolean = false;
     let redirectTarget: string | undefined = undefined;
 
-    let leftPanelOpen: boolean;
     let mobileSearchOpen: boolean = false;
 
     let leftHeaderEl: Node;
@@ -91,7 +90,7 @@
 
     //On Mount Function
     onMount(() => {
-        leftPanelOpen = window.matchMedia("(min-width: 880px)").matches;
+        leftPanelOpen.set(window.matchMedia("(min-width: 880px)").matches);
 
         (async () => {
             await waitInitialSplash(300);
@@ -141,13 +140,13 @@
     </div>
 {:else if !page.url.pathname.startsWith("/login")}
     <div class="dashboard-container" in:fade={{ duration: 300 }}>
-        <LeftPanel bind:leftPanelOpen activeSection={page.url.pathname} />
+        <LeftPanel bind:leftPanelOpen={$leftPanelOpen} activeSection={page.url.pathname} />
         <div class="left-header-div" bind:this={leftHeaderEl}>
             <div class="menu-button-div" class:close={mobileSearchOpen}>
                 <MenuButton
                     backgroundColor="transparent"
                     hoverColor="#323a45"
-                    bind:menuOpen={leftPanelOpen}
+                    bind:menuOpen={$leftPanelOpen}
                 />
             </div>
             <div class="close-mobile-search-div" class:open={mobileSearchOpen}>
@@ -204,7 +203,7 @@
                             imageWidth="25px"
                             imageHeight="25px"
                             onClick={() => {
-                                leftPanelOpen = false;
+                                leftPanelOpen.set(false);
                                 mobileSearchOpen = true;
                             }}
                         />
@@ -239,11 +238,11 @@
                 </div>
             </div>
         </div>
-        <main class="content" class:open={leftPanelOpen}>
+        <main class="content" class:open={$leftPanelOpen}>
             <div
                 class="alerts-div"
                 class:prioritize={$displayAlert}
-                class:sidebar-open={leftPanelOpen}
+                class:sidebar-open={$leftPanelOpen}
             >
                 {#if $displayAlert}
                     <Alert
