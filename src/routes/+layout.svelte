@@ -118,6 +118,13 @@
         const { status } = await logoutUser();
         await navigateTo("/login", $selectedLang, {}, true);
     }
+
+    // Enable scrolling after splash screen and content loading
+    $: if ($splashDone && $loadedDone) {
+        document.body.style.overflow = "auto";
+    } else {
+        document.body.style.overflow = "hidden";
+    }
 </script>
 
 <!-- 
@@ -538,6 +545,7 @@
         margin: 0;
         padding: 30px;
         height: 100%;
+        min-height: inherit;
     }
 
     /* Content div */
@@ -547,6 +555,7 @@
         margin: 0;
         padding: 0;
         position: relative;
+        min-height: inherit;
     }
 
     /* Loader overlay: full-screen dark backdrop with centered spinner */
