@@ -5,6 +5,7 @@
     import { logoutUser } from "$lib/ts/login";
     import { navigateTo } from "$lib/ts/navigation";
     import { fade } from "svelte/transition";
+    import { browser } from "$app/environment";
 
     // Stores for multi-language support
     import { selectedLang, texts } from "$lib/stores/lang";
@@ -120,10 +121,14 @@
     }
 
     // Enable scrolling after splash screen and content loading
-    $: if ($splashDone && $loadedDone) {
-        document.body.style.overflow = "auto";
-    } else {
-        document.body.style.overflow = "hidden";
+    $: {
+        if (browser) {
+            if ($splashDone && $loadedDone) {
+                document.body.style.overflow = "auto";
+            } else {
+                document.body.style.overflow = "hidden";
+            }
+        }
     }
 </script>
 
