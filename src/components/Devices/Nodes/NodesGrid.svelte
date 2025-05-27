@@ -17,7 +17,21 @@
     "
     class="container"
 >
-    <div class="content"></div>
+    <div class="content">
+        <table>
+            <thead>
+                <tr>
+                    <th>Variable</th>
+                    <th>Unit</th>
+                    <th>Communication ID</th>
+                    <th>Logging Period</th>
+                    <th>Calculated</th>
+                    <th>Logging</th>
+                    <th>Enabled</th>
+                </tr>
+            </thead>
+        </table>
+    </div>
 </div>
 
 <style>
