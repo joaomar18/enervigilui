@@ -89,6 +89,9 @@
         background-color: var(--background-color);
         border: 1px solid var(--border-color);
         z-index: 2;
+        -webkit-tap-highlight-color: transparent;
+        -webkit-touch-callout: none;
+        user-select: none;
     }
 
     /* Flex container for alert text and close button */
@@ -100,6 +103,7 @@
         justify-content: space-between;
         align-items: flex-start;
         gap: 10px;
+        -webkit-tap-highlight-color: transparent;
     }
 
     /* Main alert message */
@@ -129,6 +133,8 @@
         display: flex;
         justify-content: center;
         align-items: center;
+        outline: none;
+        -webkit-tap-highlight-color: transparent;
     }
 
     .close-button:hover {

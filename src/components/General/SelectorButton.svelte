@@ -58,8 +58,8 @@
 <style>
     /* Toggle button container */
     button {
-        margin:0;
-        padding:0;
+        margin: 0;
+        padding: 0;
         width: var(--width);
         height: var(--height);
         background-color: var(--background-color);
@@ -68,6 +68,8 @@
         cursor: pointer;
         border: none;
         transition: background-color 0.2s ease;
+        outline: none;
+        -webkit-tap-highlight-color: transparent;
     }
 
     /* Optional hover state (Removes button effects when hovered) */

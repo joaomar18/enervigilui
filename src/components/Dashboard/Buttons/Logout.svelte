@@ -79,6 +79,9 @@
         border-radius: var(--border-radius, 0px);
         right: 20px;
         cursor: pointer;
+        -webkit-tap-highlight-color: transparent;
+        -webkit-touch-callout: none;
+        user-select: none;
     }
 
     /* Hover state: visual feedback on pointer-over */
@@ -100,6 +103,7 @@
         padding-left: var(--padding-left, 0px);
         padding-right: var(--padding-right, 0px);
         justify-content: flex-start;
+        -webkit-tap-highlight-color: transparent;
     }
 
     /* Text container: centers the label */
@@ -149,6 +153,8 @@
         padding: 0;
         margin: 0;
         cursor: pointer;
+        outline: none;
+        -webkit-tap-highlight-color: transparent;
     }
 
     /* Button hover: keep transparent */

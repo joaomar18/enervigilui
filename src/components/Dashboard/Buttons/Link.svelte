@@ -84,6 +84,9 @@
         border-radius: 4px;
         cursor: pointer;
         transition: background 0.2s;
+        -webkit-tap-highlight-color: transparent;
+        -webkit-touch-callout: none;
+        user-select: none;
     }
 
     /* Hover effect for the outter div */
@@ -139,6 +142,8 @@
         margin: 0;
         opacity: 0;
         cursor: pointer;
+        outline: none;
+        -webkit-tap-highlight-color: transparent;
     }
 
     /*  Optional positioned icon on the right side of the component */

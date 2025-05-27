@@ -67,6 +67,9 @@
     div {
         padding-top: var(--padding-top, 0px);
         padding-bottom: var(--padding-bottom, 0px);
+        -webkit-tap-highlight-color: transparent;
+        -webkit-touch-callout: none;
+        user-select: none;
     }
 
     /* Button appearance and color (default) */
@@ -85,6 +88,8 @@
         padding: 0;
         font-size: 1.25rem;
         cursor: pointer;
+        outline: none;
+        -webkit-tap-highlight-color: transparent;
     }
 
     /* Button color when login is processing */

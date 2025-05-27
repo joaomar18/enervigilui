@@ -137,6 +137,9 @@
         display: flex;
         justify-content: center;
         align-items: center;
+        -webkit-tap-highlight-color: transparent;
+        -webkit-touch-callout: none;
+        user-select: none;
     }
 
     /* Button hover: background change on hover */
@@ -160,5 +163,7 @@
         margin: 0;
         cursor: pointer;
         background: transparent;
+        outline: none;
+        -webkit-tap-highlight-color: transparent;
     }
 </style>

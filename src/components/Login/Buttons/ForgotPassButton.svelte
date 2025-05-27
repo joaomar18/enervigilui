@@ -45,6 +45,9 @@
         position: relative;
         padding-top: var(--padding-top, 0px);
         padding-bottom: var(--padding-bottom, 0px);
+        -webkit-tap-highlight-color: transparent;
+        -webkit-touch-callout: none;
+        user-select: none;
     }
 
     /* Text color on hover */
@@ -70,5 +73,7 @@
         top: 0;
         opacity: 0;
         cursor: pointer;
+        outline: none;
+        -webkit-tap-highlight-color: transparent;
     }
 </style>

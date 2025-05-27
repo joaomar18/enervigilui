@@ -69,6 +69,9 @@
         transition:
             transform 0.2s ease-in-out,
             box-shadow 0.2s ease-in-out;
+        -webkit-tap-highlight-color: transparent;
+        -webkit-touch-callout: none;
+        user-select: none;
     }
 
     /* Hover: scale up and apply subtle shadow */
@@ -88,6 +91,7 @@
         flex-direction: column;
         justify-content: flex-start;
         align-items: center;
+        -webkit-tap-highlight-color: transparent;
     }
 
     /* Title: centered, light-weight heading */
@@ -134,5 +138,7 @@
         height: 100%;
         background: transparent;
         border: none;
+        outline: none;
+        -webkit-tap-highlight-color: transparent;
     }
 </style>

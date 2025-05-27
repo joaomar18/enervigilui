@@ -61,6 +61,9 @@
         height: var(--height);
         border-radius: var(--border-radius);
         position: relative;
+        -webkit-tap-highlight-color: transparent;
+        -webkit-touch-callout: none;
+        user-select: none;
     }
 
     /* Hover state: provide visual feedback */
@@ -101,6 +104,8 @@
         position: absolute;
         width: 100%;
         height: 100%;
+        outline: none;
+        -webkit-tap-highlight-color: transparent;
     }
 
     /* Button hover: keep transparent to avoid color shift */

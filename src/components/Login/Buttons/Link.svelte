@@ -71,6 +71,9 @@
         position: relative;
         width: var(--div-width);
         height: var(--div-height);
+        -webkit-tap-highlight-color: transparent;
+        -webkit-touch-callout: none;
+        user-select: none;
     }
 
     /* Internal content container */
@@ -79,6 +82,7 @@
         padding: 0;
         width: 100%;
         height: 100%;
+        -webkit-tap-highlight-color: transparent;
     }
 
     /* Hover effect for the span background */
@@ -121,6 +125,8 @@
         margin: 0;
         opacity: 0;
         cursor: pointer;
+        outline: none;
+        -webkit-tap-highlight-color: transparent;
     }
 
     /*  Optional positioned icon on the right side of the component */

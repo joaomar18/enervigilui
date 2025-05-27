@@ -122,6 +122,9 @@
         background-color: var(--background-color);
         border-radius: var(--border-radius);
         border: 1px solid var(--border-color);
+        -webkit-tap-highlight-color: transparent;
+        -webkit-touch-callout: none;
+        user-select: none;
     }
 
     /* Inner content container with centered layout */
@@ -132,6 +135,7 @@
         display: flex;
         justify-content: center;
         align-items: center;
+        -webkit-tap-highlight-color: transparent;
     }
 
     /* Arrow icon (dropdown indicator) */
@@ -171,6 +175,8 @@
         margin: 0;
         opacity: 0;
         cursor: pointer;
+        outline: none;
+        -webkit-tap-highlight-color: transparent;
     }
 
     /* Dropdown container for options */
@@ -186,6 +192,9 @@
         justify-content: start;
         align-items: center;
         z-index: 1;
+        -webkit-tap-highlight-color: transparent;
+        -webkit-touch-callout: none;
+        user-select: none;
     }
 
     /* Dropdown opens below selector */
@@ -220,6 +229,7 @@
         word-spacing: var(--word-spacing);
         font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
         color: #b0bec5;
+        -webkit-tap-highlight-color: transparent;
     }
 
     /* Transparent overlay to make the option fully clickable */
@@ -231,6 +241,8 @@
         left: 0;
         opacity: 0;
         cursor: pointer;
+        outline: none;
+        -webkit-tap-highlight-color: transparent;
     }
 
     /* Styling for the currently selected option */

@@ -113,6 +113,9 @@
         height: 40px;
         width: 150px;
         top: 50%;
+        -webkit-tap-highlight-color: transparent;
+        -webkit-touch-callout: none;
+        user-select: none;
     }
 
     /* Inner content container */
@@ -120,6 +123,7 @@
         position: relative;
         width: 100%;
         height: 100%;
+        -webkit-tap-highlight-color: transparent;
     }
 
     /* Globe icon */
@@ -160,6 +164,8 @@
         height: 100%;
         opacity: 0;
         cursor: pointer;
+        outline: none;
+        -webkit-tap-highlight-color: transparent;
     }
 
     /* Dropdown options container */
@@ -175,6 +181,9 @@
         justify-content: start;
         align-items: center;
         z-index: 1;
+        -webkit-tap-highlight-color: transparent;
+        -webkit-touch-callout: none;
+        user-select: none;
     }
 
     /* Dropdown options position when normal (opens to the bottom) */
@@ -202,6 +211,7 @@
         font-weight: 400;
         font-size: 1.5rem;
         color: #b0bec5;
+        -webkit-tap-highlight-color: transparent;
     }
 
     /* Clickable transparent overlay for option */
@@ -213,6 +223,8 @@
         left: 0;
         opacity: 0;
         cursor: pointer;
+        outline: none;
+        -webkit-tap-highlight-color: transparent;
     }
 
     /* Styling for the currently selected option */

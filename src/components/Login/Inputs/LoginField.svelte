@@ -166,6 +166,9 @@
         right: calc((50px - 32px) / 2);
         transform: translateY(-50%);
         position: absolute;
+        -webkit-tap-highlight-color: transparent;
+        -webkit-touch-callout: none;
+        user-select: none;
     }
 
     /* Wrapper for the show/hide toggle button */
@@ -175,6 +178,7 @@
         width: 100%;
         height: 100%;
         position: relative;
+        -webkit-tap-highlight-color: transparent;
     }
 
     /* Toggle eye icon */
@@ -194,6 +198,8 @@
         width: 100%;
         height: 100%;
         cursor: pointer;
+        outline: none;
+        -webkit-tap-highlight-color: transparent;
     }
 
     /* Styled input field */

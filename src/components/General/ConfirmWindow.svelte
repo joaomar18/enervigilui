@@ -101,6 +101,9 @@
         border-radius: var(--border-radius);
         background-color: var(--background-color);
         border: 1px solid var(--border-color);
+        -webkit-tap-highlight-color: transparent;
+        -webkit-touch-callout: none;
+        user-select: none;
     }
 
     /* Content: flex column layout for header and content */
@@ -114,6 +117,7 @@
         flex-direction: column;
         justify-content: flex-start;
         align-items: center;
+        -webkit-tap-highlight-color: transparent;
     }
 
     /* Header: title and close button row */
@@ -153,6 +157,8 @@
         border: none;
         color: var(--title-color);
         cursor: pointer;
+        outline: none;
+        -webkit-tap-highlight-color: transparent;
     }
 
     /* SVG icon for close button */

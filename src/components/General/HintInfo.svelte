@@ -78,7 +78,12 @@
     >
         <slot />
     </div>
-    <button on:click={toogleHint} bind:this={buttonEl} aria-label="Show Hint" class:hint-opened={hintOpened}>
+    <button
+        on:click={toogleHint}
+        bind:this={buttonEl}
+        aria-label="Show Hint"
+        class:hint-opened={hintOpened}
+    >
         <div
             class="hint-button"
             style="
@@ -161,6 +166,9 @@
         align-items: end;
         position: relative;
         font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+        -webkit-tap-highlight-color: transparent;
+        -webkit-touch-callout: none;
+        user-select: none;
     }
 
     /* Info message */
@@ -178,10 +186,12 @@
         cursor: pointer;
         background-color: transparent;
         border: none;
+        outline: none;
+        -webkit-tap-highlight-color: transparent;
     }
 
     /* Places button on front when hint is opened */
-    button.hint-opened{
+    button.hint-opened {
         z-index: 1;
     }
 

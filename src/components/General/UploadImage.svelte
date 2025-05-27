@@ -64,6 +64,9 @@
         border-radius: var(--border-radius);
         background-color: var(--background-color);
         transition: background-color 0.2s ease;
+        -webkit-tap-highlight-color: transparent;
+        -webkit-touch-callout: none;
+        user-select: none;
     }
 
     /* Hover state: slightly lighten background */
@@ -90,6 +93,7 @@
         background-position: center;
         background-repeat: no-repeat;
         background-size: var(--image-width) var(--image-height);
+        -webkit-tap-highlight-color: transparent;
     }
 
     /* Pencil overlay: centered, semi-transparent, transitions on hover */
@@ -115,5 +119,7 @@
         background: transparent;
         border: none;
         cursor: pointer;
+        outline: none;
+        -webkit-tap-highlight-color: transparent;
     }
 </style>

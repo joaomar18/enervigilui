@@ -63,6 +63,9 @@
         border: 1px solid var(--border-color);
         border-radius: var(--border-radius, 0px);
         cursor: pointer;
+        -webkit-tap-highlight-color: transparent;
+        -webkit-touch-callout: none;
+        user-select: none;
     }
 
     /* Hover state: visual feedback on pointer-over */
@@ -80,6 +83,7 @@
         flex-direction: row;
         justify-content: center;
         align-items: center;
+        -webkit-tap-highlight-color: transparent;
     }
 
     /* Invisible overlay button: captures clicks */
@@ -93,6 +97,8 @@
         margin: 0;
         opacity: 0;
         cursor: pointer;
+        outline: none;
+        -webkit-tap-highlight-color: transparent;
     }
 
     /* Icon sizing: driven by CSS variables */

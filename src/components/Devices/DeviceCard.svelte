@@ -120,6 +120,9 @@
         transition:
             transform 0.2s ease-in-out,
             box-shadow 0.2s ease-in-out;
+        -webkit-tap-highlight-color: transparent;
+        -webkit-touch-callout: none;
+        user-select: none;
     }
 
     /* Hover state: lift and shadow for emphasis */
@@ -139,6 +142,7 @@
         flex-direction: column;
         justify-content: flex-start;
         align-items: center;
+        -webkit-tap-highlight-color: transparent;
     }
 
     /* Title: centered light-weight heading */
@@ -163,6 +167,7 @@
         background-position: center;
         background-size: auto 87.5%;
         border-radius: 50%;
+        -webkit-tap-highlight-color: transparent;
     }
 
     /* Image hover: slightly dim the device image on hover */
@@ -187,6 +192,8 @@
         transition:
             background-color 0.2s ease-in-out,
             opacity 0.2s ease-in-out;
+        outline: none;
+        -webkit-tap-highlight-color: transparent;
     }
 
     /* Overlay hover: show enter icon and translucent gray overlay */

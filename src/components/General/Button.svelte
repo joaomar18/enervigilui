@@ -92,6 +92,8 @@
         font-weight: var(--font-weight);
         cursor: pointer;
         transition: background-color 0.2s ease;
+        outline: none;
+        -webkit-tap-highlight-color: transparent;
     }
 
     /* Disabled state: muted colors and no pointer */
