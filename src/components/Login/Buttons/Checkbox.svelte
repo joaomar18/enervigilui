@@ -36,11 +36,16 @@
         align-items: center;
         cursor: pointer;
         margin-right: var(--margin-right, 0px);
+        -webkit-tap-highlight-color: transparent;
+        -webkit-touch-callout: none;
+        user-select: none;
     }
 
     /* Hide native checkbox */
     .label-checkbox input[type="checkbox"] {
         display: none;
+        outline: none;
+        -webkit-tap-highlight-color: transparent;
     }
 
     /* Custom checkbox visual (unchecked by default) */
