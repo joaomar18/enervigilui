@@ -146,20 +146,15 @@
         position: absolute;
         width: 100%;
         height: 100%;
-        background: transparent;
         border: none;
         left: 0;
         top: 0;
         padding: 0;
         margin: 0;
+        opacity: 0;
         cursor: pointer;
         outline: none;
         -webkit-tap-highlight-color: transparent;
-    }
-
-    /* Button hover: keep transparent */
-    button:hover {
-        background: transparent;
     }
 
     /* Tablet breakpoint: collapse text, same width and height container */
