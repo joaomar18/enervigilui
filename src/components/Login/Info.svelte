@@ -47,6 +47,9 @@
         display: flex;
         justify-content: center;
         align-items: center;
+        -webkit-tap-highlight-color: transparent;
+        -webkit-touch-callout: none;
+        user-select: none;
     }
 
     /* Content layout (stacked, centered) */
@@ -57,6 +60,7 @@
         justify-content: start;
         flex-direction: column;
         align-items: center;
+        -webkit-tap-highlight-color: transparent;
     }
 
     /* Main heading */

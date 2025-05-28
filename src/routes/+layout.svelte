@@ -123,10 +123,14 @@
     // Enable scrolling after splash screen and content loading
     $: {
         if (browser) {
-            if ($splashDone && $loadedDone) {
+            if (page.url.pathname.startsWith("/login")) {
                 document.body.style.overflow = "auto";
             } else {
-                document.body.style.overflow = "hidden";
+                if ($splashDone && $loadedDone) {
+                    document.body.style.overflow = "auto";
+                } else {
+                    document.body.style.overflow = "hidden";
+                }
             }
         }
     }
@@ -297,7 +301,7 @@
         padding: 0;
         width: 100%;
         height: 100vh;
-        min-width: 320px;
+        min-width: 350px;
         min-height: 760px;
         display: flex;
         align-items: center;
@@ -387,7 +391,7 @@
         margin: 0;
         padding: 0;
         width: 100%;
-        min-width: 320px;
+        min-width: 350px;
         min-height: 760px;
         display: flex;
         flex-direction: column;

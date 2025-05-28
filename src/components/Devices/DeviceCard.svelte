@@ -147,10 +147,14 @@
 
     /* Title: centered light-weight heading */
     h3 {
+        margin: 0;
+        padding: 0;
+        padding-top: 20px;
+        padding-bottom: 20px;
         color: #f5f5f5;
         width: 100%;
         text-align: center;
-        font-weight: 300;
+        font-weight: 400;
     }
 
     /* Image div: circular placeholder with bg image */

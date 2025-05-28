@@ -206,10 +206,17 @@
         align-items: center;
         margin-left: 0%;
         z-index: 1;
+        -webkit-tap-highlight-color: transparent;
+        -webkit-touch-callout: none;
+        user-select: none;
     }
 
     /* Login title */
     h3 {
+        margin: 0;
+        padding: 0;
+        padding-top: 30px;
+        padding-bottom: 30px;
         color: rgb(255, 255, 255);
         font-weight: 400;
         font-size: 1.5rem;

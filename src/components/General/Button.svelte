@@ -16,7 +16,7 @@
     export let fontColor: string;
     export let disabledFontColor: string = fontColor;
     export let fontSize: string = "1rem";
-    export let fontWeight: string = "300";
+    export let fontWeight: string = "400";
     export let imageURL: string = "";
     export let imageWidth: string = "";
     export let imageHeight: string = "";

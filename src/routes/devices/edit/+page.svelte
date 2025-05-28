@@ -304,7 +304,7 @@
                                     selectedBorderColor="#2F80ED"
                                     fontSize="1rem"
                                     fontColor="#f5f5f5"
-                                    fontWeight="300"
+                                    fontWeight="400"
                                 />
                             </div>
                             <div class="info-div">
@@ -357,7 +357,7 @@
                                     selectedBorderColor="#2F80ED"
                                     fontSize="1rem"
                                     fontColor="#f5f5f5"
-                                    fontWeight="300"
+                                    fontWeight="400"
                                     textAlign="center"
                                     unitTextColor="rgb(170,170,170)"
                                 />
@@ -412,7 +412,7 @@
                                     selectedBorderColor="#2F80ED"
                                     fontSize="1rem"
                                     fontColor="#f5f5f5"
-                                    fontWeight="300"
+                                    fontWeight="400"
                                     textAlign="center"
                                     unitTextColor="rgb(170,170,170)"
                                 />
@@ -461,7 +461,7 @@
                                         selectedBorderColor="#2F80ED"
                                         fontSize="1rem"
                                         fontColor="#f5f5f5"
-                                        fontWeight="300"
+                                        fontWeight="400"
                                     />
                                 </div>
                                 <div class="info-div">
@@ -505,7 +505,7 @@
                                         selectedBorderColor="#2F80ED"
                                         fontSize="1rem"
                                         fontColor="#f5f5f5"
-                                        fontWeight="300"
+                                        fontWeight="400"
                                     />
                                 </div>
                                 <div class="info-div">
@@ -550,7 +550,7 @@
                                     selectedBorderColor="#2F80ED"
                                     fontSize="1rem"
                                     fontColor="#f5f5f5"
-                                    fontWeight="300"
+                                    fontWeight="400"
                                 />
                             </div>
                             <div class="info-div">
@@ -787,7 +787,7 @@
                                     selectedBorderColor="#2F80ED"
                                     fontSize="1rem"
                                     fontColor="#f5f5f5"
-                                    fontWeight="300"
+                                    fontWeight="400"
                                     textAlign="center"
                                     unitTextColor="rgb(170,170,170)"
                                 />
@@ -842,7 +842,7 @@
                                     selectedBorderColor="#2F80ED"
                                     fontSize="1rem"
                                     fontColor="#f5f5f5"
-                                    fontWeight="300"
+                                    fontWeight="400"
                                     textAlign="center"
                                     unitTextColor="rgb(170,170,170)"
                                 />
@@ -896,7 +896,7 @@
                                     selectedBorderColor="#2F80ED"
                                     fontSize="1rem"
                                     fontColor="#f5f5f5"
-                                    fontWeight="300"
+                                    fontWeight="400"
                                     textAlign="center"
                                     unitTextColor="rgb(170,170,170)"
                                 />
@@ -1253,7 +1253,7 @@
                                     selectedBorderColor="#e74c3c"
                                     fontSize="1rem"
                                     fontColor="#f5f5f5"
-                                    fontWeight="300"
+                                    fontWeight="400"
                                     infoTextColor="rgb(170, 170, 170)"
                                     infoTextSize="0.95rem"
                                 />
@@ -1442,7 +1442,7 @@
         text-align: left;
         color: #f5f5f5;
         font-size: 1rem;
-        font-weight: 300;
+        font-weight: 400;
         margin: 0;
         padding: 0;
         width: 250px;
@@ -1471,7 +1471,7 @@
         padding: 10px;
         padding-right: 40px;
         font-size: 1rem;
-        font-weight: 300;
+        font-weight: 400;
         line-height: 1.5;
         color: white;
     }
@@ -1524,7 +1524,7 @@
 
     .overlay-device-div-content .window-div span {
         font-size: 1rem;
-        font-weight: 300;
+        font-weight: 400;
         color: #e74c3c;
         line-height: 1.5;
         text-align: left;

@@ -110,7 +110,7 @@
     .alert-text {
         font-size: 1.1rem;
         color: var(--text-color);
-        font-weight: 300;
+        font-weight: 400;
         line-height: 1.5;
         padding: 10px;
         flex: 1;
