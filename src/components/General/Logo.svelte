@@ -20,24 +20,31 @@
         flex-direction: row;
         align-items: center;
         justify-content: start;
+        -webkit-tap-highlight-color: transparent;
+        -webkit-touch-callout: none;
+        user-select: none;
     }
 
     /* Logo image size */
     .logo {
         height: 40px;
         width: auto;
+        outline: none;
+        -webkit-tap-highlight-color: transparent;
     }
 
     /* Gradient styled product name */
     .main-text {
         padding-left: 10px;
-        font-family: "Montserrat", Tahoma, Geneva, Verdana, sans-serif;
+        font-family: "MontserratCustom", Tahoma, Geneva, Verdana, sans-serif;
         font-size: 32px;
         text-align: center;
-        font-weight: 500;
+        font-weight: normal;
         background: linear-gradient(90deg, #4caf50, #2196f3);
         -webkit-background-clip: text;
         background-clip: text;
         -webkit-text-fill-color: transparent;
+        outline: none;
+        -webkit-tap-highlight-color: transparent;
     }
 </style>

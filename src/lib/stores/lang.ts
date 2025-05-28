@@ -391,6 +391,66 @@ const textsObject: TextsObject = {
         PT: "O número de tentativas de reenvio deve estar compreendido entre {minValue} e {maxValue}.",
         EN: "The number of retries must be between {minValue} and {maxValue}.",
     },
+    variable: {
+        PT: "Variável",
+        EN: "Variable",
+    },
+    type: {
+        PT: "Tipo",
+        EN: "Type",
+    },
+    unit: {
+        PT: "Unidade",
+        EN: "Unit",
+    },
+    opcuaID: {
+        PT: "ID OPC UA",
+        EN: "OPC UA ID",
+    },
+    modbusRegister: {
+        PT: "Registo Modbus",
+        EN: "Modbus Register",
+    },
+    custom: {
+        PT: "Próprio",
+        EN: "Custom",
+    },
+    publish: {
+        PT: "Publicar",
+        EN: "Publish",
+    },
+    loggingPeriod: {
+        PT: "Período de Registo",
+        EN: "Logging Period",
+    },
+    virtual: {
+        PT: "Virtual",
+        EN: "Virtual",
+    },
+    logging: {
+        PT: "Registo",
+        EN: "Logging",
+    },
+    enabled: {
+        PT: "Ativar",
+        EN: "Enabled",
+    },
+    l1Phase: {
+        PT: "Fase L1",
+        EN: "L1 Phase",
+    },
+    l2Phase: {
+        PT: "Fase L2",
+        EN: "L2 Phase",
+    },
+    l3Phase: {
+        PT: "Fase L3",
+        EN: "L3 Phase",
+    },
+    total: {
+        PT: "Total",
+        EN: "Total",
+    },
 };
 
 export const texts = readable<TextsObject>(textsObject);

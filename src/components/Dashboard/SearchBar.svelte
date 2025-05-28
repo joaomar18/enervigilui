@@ -117,7 +117,6 @@
         box-shadow: none;
         border: none;
         color: #eee;
-        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
     }
 
     /* Search button wrapper: fixed width, no left border */

@@ -145,7 +145,6 @@
         border: none;
         text-align: center;
         font-size: var(--font-size);
-        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
         color: var(--font-color);
     }
 

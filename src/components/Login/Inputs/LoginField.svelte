@@ -131,7 +131,6 @@
 
     /* Label text above input */
     .field-name {
-        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
         font-size: 1.25rem;
         font-weight: 300;
         color: rgb(255, 255, 255);
@@ -208,7 +207,6 @@
         padding: 0;
         width: 100%;
         height: 40px;
-        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
         font-size: 1.25rem;
         padding-left: 50px;
         outline: none;
@@ -228,7 +226,6 @@
     .warning-text {
         padding: 10px;
         padding-right: 40px;
-        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
         font-size: 1rem;
         font-weight: 300;
         line-height: 1.5;

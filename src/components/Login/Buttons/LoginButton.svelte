@@ -74,7 +74,6 @@
 
     /* Button appearance and color (default) */
     button {
-        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
         box-sizing: content-box;
         color: rgb(255, 255, 255);
         background-color: var(--background-color);

@@ -89,7 +89,6 @@
     /* Badge text: styled number inside badge */
     .notifications-number-text-div span {
         display: inline-block;
-        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
         color: #eee;
         font-weight: 500;
         font-size: 1rem;

@@ -7,6 +7,8 @@ body {
     width: 100%;
     height: 100%;
     font-size: 14px;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
 }
 
 @media (min-width: 520px) {
@@ -15,12 +17,104 @@ body {
     }
 }
 
+/*     F O N T S     */
+
+/* Montserrat */
+@font-face {
+    font-family: "MontserratCustom";
+    src: url("/fonts/montserrat/montserrat-regular.woff2") format("woff2"),
+        url("/fonts/montserrat/montserrat-regular.woff") format("woff");
+    font-weight: normal;
+    font-style: normal;
+    font-display: swap;
+}
+
+/* Inter */
+@font-face {
+    font-family: "InterCustom";
+    src: url("/fonts/inter/inter-light.woff2") format("woff2"),
+        url("/fonts/inter/inter-light.woff") format("woff");
+    font-weight: 300;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: "InterCustom";
+    src: url("/fonts/inter/inter-regular.woff2") format("woff2"),
+        url("/fonts/inter/inter-regular.woff") format("woff");
+    font-weight: 400;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: "InterCustom";
+    src: url("/fonts/inter/inter-semibold.woff2") format("woff2"),
+        url("/fonts/inter/inter-semibold.woff") format("woff");
+    font-weight: 600;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: "InterCustom";
+    src: url("/fonts/inter/inter-bold.woff2") format("woff2"),
+        url("/fonts/inter/inter-bold.woff") format("woff");
+    font-weight: 700;
+    font-style: normal;
+    font-display: swap;
+}
+
+/* Raleway */
+@font-face {
+    font-family: "Raleway";
+    src: url("/fonts/raleway/raleway-light.woff2") format("woff2"),
+        url("/fonts/raleway/raleway-light.woff") format("woff");
+    font-weight: 300;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: "Raleway";
+    src: url("/fonts/raleway/raleway-regular.woff2") format("woff2"),
+        url("/fonts/raleway/raleway-regular.woff") format("woff");
+    font-weight: 400;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: "Raleway";
+    src: url("/fonts/raleway/raleway-medium.woff2") format("woff2"),
+        url("/fonts/raleway/raleway-medium.woff") format("woff");
+    font-weight: 500;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: "Raleway";
+    src: url("/fonts/raleway/raleway-semibold.woff2") format("woff2"),
+        url("/fonts/raleway/raleway-semibold.woff") format("woff");
+    font-weight: 600;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: "Raleway";
+    src: url("/fonts/raleway/raleway-bold.woff2") format("woff2"),
+        url("/fonts/raleway/raleway-bold.woff") format("woff");
+    font-weight: 700;
+    font-style: normal;
+}
+
+/********************/
+
 body {
     color: #333;
     margin: 0;
     padding: 0;
     box-sizing: border-box;
-    font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+    font-family: "InterCustom", Tahoma, Geneva, Verdana, sans-serif;
     -webkit-font-smoothing: antialiased;
 }
 

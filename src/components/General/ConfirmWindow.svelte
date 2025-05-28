@@ -140,7 +140,6 @@
         padding-right: 50px;
         line-height: 1.5;
         text-wrap: wrap;
-        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
         font-size: var(--title-size);
         color: var(--title-color);
         font-weight: var(--title-weight);

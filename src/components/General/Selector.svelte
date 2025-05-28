@@ -159,7 +159,6 @@
         justify-content: center;
         color: #eeeeee;
         font-weight: 400;
-        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
         font-size: var(--font-size);
         letter-spacing: var(--leter-spacing);
         word-spacing: var(--word-spacing);
@@ -227,7 +226,6 @@
         font-size: var(--font-size);
         letter-spacing: var(--leter-spacing);
         word-spacing: var(--word-spacing);
-        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
         color: #b0bec5;
         -webkit-tap-highlight-color: transparent;
     }

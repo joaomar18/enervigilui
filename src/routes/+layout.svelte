@@ -353,7 +353,7 @@
 
     /* Base style for both ENERVIGIL and EDGE text */
     .splash-container .footer span {
-        font-family: "Montserrat", Tahoma, Geneva, Verdana, sans-serif;
+        font-family: "MontserratCustom", Tahoma, Geneva, Verdana, sans-serif;
         font-size: 32px;
         text-align: center;
         font-weight: 500;

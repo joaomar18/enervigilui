@@ -193,7 +193,6 @@
     /* Main container for the login modal */
     .login-modal {
         position: relative;
-        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
         box-sizing: content-box;
         margin: 0;
         padding: 0;
@@ -212,7 +211,6 @@
     /* Login title */
     h3 {
         color: rgb(255, 255, 255);
-        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
         font-weight: 400;
         font-size: 1.5rem;
     }

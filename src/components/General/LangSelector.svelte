@@ -204,12 +204,17 @@
     /* Individual option item */
     .option {
         position: relative;
+        height: 40px;
         width: 100%;
         padding: 5px;
         box-sizing: border-box;
         text-align: center;
         font-weight: 400;
         font-size: 1.5rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
         color: #b0bec5;
         -webkit-tap-highlight-color: transparent;
     }

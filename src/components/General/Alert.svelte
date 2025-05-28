@@ -108,7 +108,6 @@
 
     /* Main alert message */
     .alert-text {
-        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
         font-size: 1.1rem;
         color: var(--text-color);
         font-weight: 300;

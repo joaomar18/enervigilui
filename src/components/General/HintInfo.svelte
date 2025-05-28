@@ -165,7 +165,6 @@
         justify-content: flex-end;
         align-items: end;
         position: relative;
-        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
         -webkit-tap-highlight-color: transparent;
         -webkit-touch-callout: none;
         user-select: none;

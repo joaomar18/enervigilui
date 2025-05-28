@@ -86,7 +86,6 @@
         border-radius: var(--border-radius, 0px);
         background-color: var(--background-color);
         border: 1px solid var(--border-color);
-        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
         font-size: var(--font-size);
         color: var(--font-color);
         font-weight: var(--font-weight);

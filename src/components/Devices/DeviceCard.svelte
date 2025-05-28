@@ -150,7 +150,6 @@
         color: #f5f5f5;
         width: 100%;
         text-align: center;
-        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
         font-weight: 300;
     }
 
@@ -220,7 +219,6 @@
         left: 20px;
         bottom: 10px;
         color: #e0e0e0;
-        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
         font-size: 0.9rem;
         font-weight: 300;
     }
@@ -253,7 +251,6 @@
     /* Connection text: subtle label next to dot */
     .connection-state-div .connection-text {
         color: #e0e0e0;
-        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
         font-size: 0.9rem;
         font-weight: 300;
     }

@@ -1158,11 +1158,18 @@
                 </div>
                 <div class="nodes-grid-div">
                     <NodesGrid
+                        selectedProtocol={selectedProtocol}
+                        meterType={meter_type}
                         width="100%"
-                        height="100px"
+                        height="fit-content"
                         borderRadius="10px"
                         backgroundColor="#252b33"
                         borderColor="#323a45"
+                        headerBackgroundColor="#1e242b"
+                        headerTextColor="#f5f5f5"
+                        subSectionBackgroundColor="#1a2027"
+                        subSectionTextColor="#a0a7b2"
+                        subSectionBorderColor="#3a4451"
                     />
                 </div>
             </div>
@@ -1351,7 +1358,6 @@
         padding-top: 10px;
         padding-bottom: 10px;
         color: rgb(170, 170, 170);
-        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
         font-size: 0.9rem;
         font-weight: 300;
     }
@@ -1387,7 +1393,6 @@
     .device-section-div h3 {
         color: #f5f5f5;
         font-size: 1rem;
-        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
         font-weight: 500;
         margin: 0;
         padding: 0;
@@ -1395,7 +1400,6 @@
 
     .device-section-div span {
         color: rgb(170, 170, 170);
-        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
         font-weight: 400;
         margin: 0;
         padding: 0;
@@ -1438,7 +1442,6 @@
         text-align: left;
         color: #f5f5f5;
         font-size: 1rem;
-        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
         font-weight: 300;
         margin: 0;
         padding: 0;
@@ -1467,7 +1470,6 @@
     .info-div .info-text {
         padding: 10px;
         padding-right: 40px;
-        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
         font-size: 1rem;
         font-weight: 300;
         line-height: 1.5;
@@ -1521,7 +1523,6 @@
     }
 
     .overlay-device-div-content .window-div span {
-        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
         font-size: 1rem;
         font-weight: 300;
         color: #e74c3c;

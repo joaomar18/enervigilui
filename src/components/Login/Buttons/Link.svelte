@@ -108,7 +108,6 @@
         color: #eeeeee;
         font-size: var(--font-size, 1rem);
         font-weight: 400;
-        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
         outline: none;
         -webkit-font-smoothing: antialiased;
         -moz-osx-font-smoothing: grayscale;

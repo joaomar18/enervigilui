@@ -283,7 +283,6 @@
     .language-text {
         color: #eeeeee;
         font-weight: 300;
-        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
         font-size: 18px;
         padding-top: 10px;
     }

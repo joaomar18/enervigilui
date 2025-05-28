@@ -62,12 +62,12 @@
     /* Main heading */
     h1 {
         text-align: left;
-        font-size: 1.75rem;
-        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
-        font-weight: 400;
+        font-size: 1.6rem;
+        font-weight: 500;
         white-space: pre-line;
+        font-family: "Raleway", Tahoma, Geneva, Verdana, sans-serif;
         color: #eeee;
-        line-height: 50px;
+        line-height: 1.75;
         padding: 0;
         margin: 0;
         padding-bottom: 30px;
@@ -76,9 +76,9 @@
     /* Sub heading */
     h3 {
         text-align: left;
-        font-size: 1.25rem;
-        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+        font-size: 1.15rem;
         font-weight: 300;
+        font-family: "Raleway", Tahoma, Geneva, Verdana, sans-serif;
         white-space: pre-line;
         color: #eeee;
         padding: 0;

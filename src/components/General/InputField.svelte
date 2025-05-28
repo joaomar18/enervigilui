@@ -221,7 +221,6 @@
         padding: 0.5rem;
         padding-left: var(--padding-left);
         padding-right: var(--input-padding-right);
-        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
         font-size: var(--font-size);
         color: var(--font-color);
         font-weight: var(--font-weight);
@@ -244,7 +243,6 @@
     /* Info text above the input */
     .info-text {
         color: var(--info-text-color);
-        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
         font-size: var(--info-text-size);
         font-weight: var(--info-text-weight);
         padding-bottom: 10px;
@@ -256,7 +254,6 @@
         position: absolute;
         right: 10px;
         color: var(--unit-text-color);
-        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
         font-size: var(--font-size);
         white-space: nowrap;
         font-weight: var(--font-weight);
