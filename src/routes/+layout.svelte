@@ -279,8 +279,10 @@
             </div>
             <div class="container-div">
                 <div class="content-div">
-                    <div class="loader-div" class:close={$loadedDone}>
-                        <div class="spinner"></div>
+                    <div class="loader-div">
+                        <div class="loader-div-wrapper" class:close={$loadedDone}>
+                            <div class="spinner"></div>
+                        </div>
                     </div>
                     <div class="section-content-div" class:hide={!$loadedDone}>
                         <slot class="section-content-div" />
@@ -571,18 +573,29 @@
         inset: 0;
         margin: 0;
         padding: 0;
+        padding-bottom: 60px;
+        box-sizing: border-box;
         width: 100%;
         height: calc(100vh - 74px - 60px);
-        background-color: #181d23;
+    }
+
+    /* Loader wrapper for spinner */
+    .dashboard-container .container-div .content-div .loader-div .loader-div-wrapper {
+        margin: 0;
+        padding: 0;
+        position: relative;
+        width: 100%;
+        height: 100%;
         display: flex;
         justify-content: center;
         align-items: center;
+        background-color: #181d23;
         z-index: 1;
         opacity: 1;
     }
 
     /* Loader hidden state: fade out and drop behind content */
-    .dashboard-container .container-div .content-div .loader-div.close {
+    .dashboard-container .container-div .content-div .loader-div .loader-div-wrapper.close {
         transition: opacity 0.2s ease-in-out;
         opacity: 0;
         z-index: 0;
@@ -590,7 +603,7 @@
     }
 
     /* Spinner: circular border animation */
-    .dashboard-container .container-div .content-div .loader-div .spinner {
+    .dashboard-container .container-div .content-div .loader-div .loader-div-wrapper .spinner {
         width: 128px;
         height: 128px;
         border: 4px solid rgba(255, 255, 255, 0.2);
