@@ -27,6 +27,7 @@
     let isOpen: boolean = false;
     let selDivEl: Node;
     $: selectedKey = Object.entries(options).find(([_, value]) => value == selectedOption)?.[0];
+    $: shiftTextLeft = String(parseFloat(arrowRightPos) + parseFloat(arrowWidth)) + "px";
 
     // Functions
     function toggleSelector(): void {
@@ -85,7 +86,7 @@
         --arrow-width: {arrowWidth};
         --arrow-height: {arrowHeight};
         --arrow-right-position: {arrowRightPos};
-        --selected-option-shift-left: {arrowRightPos};
+        --selected-option-shift-left: {shiftTextLeft};
     "
 >
     <div class="content-div">

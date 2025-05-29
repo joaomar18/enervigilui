@@ -14,7 +14,7 @@
     import LoginField from "./Inputs/LoginField.svelte";
     import LoginButton from "./Buttons/LoginButton.svelte";
     import ForgotPassButton from "./Buttons/ForgotPassButton.svelte";
-    import Checkbox from "./Buttons/Checkbox.svelte";
+    import Checkbox from "../General/Checkbox.svelte";
     import Alert from "../General/Alert.svelte";
 
     // Form State
@@ -161,6 +161,10 @@
         <Checkbox
             bind:checked={autoLogin}
             inputName="auto-login"
+            width="1.5em"
+            height="1.5em"
+            checkMarkWidth={24}
+            checkMarkHeight={24}
             enabledbgColor="#4caf7f"
             enabledBorderColor="#5a646e"
             disabledbgColor="#42505f"

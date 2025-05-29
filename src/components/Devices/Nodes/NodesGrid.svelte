@@ -1,4 +1,8 @@
 <script lang="ts">
+    import Selector from "../../General/Selector.svelte";
+    import InputField from "../../General/InputField.svelte";
+    import Checkbox from "../../General/Checkbox.svelte";
+
     // Stores for multi-language support
     import { selectedLang, texts } from "$lib/stores/lang";
 
@@ -18,7 +22,9 @@
     export let subSectionTextColor: string = headerTextColor;
     export let subSectionBorderColor: string = borderColor;
 
-    $: console.log(`Meter Type: ${meterType}, Selected Protocol: ${selectedProtocol}`);
+    // Variables
+    let nodeIDDummy = "dummyNodeID"; // Dummy node ID for testing
+    let dummyChecked01 = false;
 </script>
 
 <div
@@ -62,9 +68,135 @@
                     <tr class="sub-section">
                         <td colspan="8">{$texts.l1Phase[$selectedLang]}</td>
                     </tr>
+                    <!-- Variable Elements Definition-->
                     <tr>
-                        <td></td>
+                        <td>
+                            <div class="cell-content">
+                                <Selector
+                                    options={[]}
+                                    selectedOption={null}
+                                    width="90%"
+                                    height="90%"
+                                    borderRadius="5px"
+                                    backgroundColor="#1a2027"
+                                    selectedColor="#14566b"
+                                    optionsBackgroundColor="#1e242b"
+                                    optionsBorderColor="#323a45"
+                                    fontSize="0.9rem"
+                                    letterSpacing="0.5px"
+                                    wordSpacing="1px"
+                                    arrowWidth="16px"
+                                    arrowHeight="16px"
+                                    arrowRightPos="5px"
+                                />
+                            </div>
+                        </td>
+                        <td>
+                            <div class="cell-content">
+                                <Selector
+                                    options={{ V: "V" }}
+                                    selectedOption={"V"}
+                                    width="90%"
+                                    height="90%"
+                                    borderRadius="5px"
+                                    backgroundColor="#1a2027"
+                                    selectedColor="#14566b"
+                                    optionsBackgroundColor="#1e242b"
+                                    optionsBorderColor="#323a45"
+                                    letterSpacing="0.5px"
+                                    fontSize="0.9rem"
+                                    wordSpacing="1px"
+                                    arrowWidth="16px"
+                                    arrowHeight="16px"
+                                    arrowRightPos="5px"
+                                />
+                            </div>
+                        </td>
+                        <td>
+                            <div class="cell-content">
+                                <InputField
+                                    bind:inputValue={nodeIDDummy}
+                                    inputType="STRING"
+                                    width="90%"
+                                    height="90%"
+                                    borderRadius="5px"
+                                    backgroundColor="#1a2027"
+                                    selectedBackgroundColor="#1a2027"
+                                    selectedBorderColor="#2F80ED"
+                                    fontSize="0.9rem"
+                                    fontColor="#f5f5f5"
+                                    fontWeight="400"
+                                    textAlign="center"
+                                    unitTextColor="rgb(170,170,170)"
+                                />
+                            </div>
+                        </td>
+                        <td>
+                            <div class="cell-content">
+                                <Checkbox
+                                    bind:checked={dummyChecked01}
+                                    inputName="custom-node"
+                                    width="1.5em"
+                                    height="1.5em"
+                                    checkMarkWidth={24}
+                                    checkMarkHeight={24}
+                                    enabledbgColor="#2f80ed"
+                                    enabledBorderColor="#5a646e"
+                                    disabledbgColor="#42505f"
+                                    disabledBorderColor="#5a646e"
+                                />
+                            </div>
+                        </td>
+                        <td>
+                            <div class="cell-content">
+                                <Checkbox
+                                    bind:checked={dummyChecked01}
+                                    inputName="publish-node"
+                                    width="1.5em"
+                                    height="1.5em"
+                                    checkMarkWidth={24}
+                                    checkMarkHeight={24}
+                                    enabledbgColor="#2f80ed"
+                                    enabledBorderColor="#5a646e"
+                                    disabledbgColor="#42505f"
+                                    disabledBorderColor="#5a646e"
+                                />
+                            </div>
+                        </td>
+                        <td>
+                            <div class="cell-content">
+                                <Checkbox
+                                    bind:checked={dummyChecked01}
+                                    inputName="virtual-node"
+                                    width="1.5em"
+                                    height="1.5em"
+                                    checkMarkWidth={24}
+                                    checkMarkHeight={24}
+                                    enabledbgColor="#2f80ed"
+                                    enabledBorderColor="#5a646e"
+                                    disabledbgColor="#42505f"
+                                    disabledBorderColor="#5a646e"
+                                />
+                            </div>
+                        </td>
+                        <td>
+                            <div class="cell-content">
+                                <Checkbox
+                                    bind:checked={dummyChecked01}
+                                    inputName="enable-node"
+                                    width="1.5em"
+                                    height="1.5em"
+                                    checkMarkWidth={24}
+                                    checkMarkHeight={24}
+                                    enabledbgColor="#2f80ed"
+                                    enabledBorderColor="#5a646e"
+                                    disabledbgColor="#42505f"
+                                    disabledBorderColor="#5a646e"
+                                />
+                            </div>
+                        </td>
                     </tr>
+                    <!--------------------------------->
 
                     <!--     L 2     N O D E S     -->
                     <tr class="sub-section">
@@ -146,6 +278,7 @@
         box-sizing: border-box;
         color: var(--header-text-color);
         font-weight: 500;
+        font-size: 1rem;
         white-space: nowrap;
         border-right: 1px solid var(--border-color);
     }
@@ -168,6 +301,16 @@
         height: 30px;
     }
 
+    table tr td .cell-content {
+        width: 100%;
+        height: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 0;
+        margin: 0;
+    }
+
     table th.max-width,
     table td.max-width {
         width: max-content;
@@ -176,7 +319,7 @@
 
     table th.min-width,
     table td.min-width {
-        width: 70px;
+        width: 80px;
     }
 
     table th.super-min-width,
@@ -190,6 +333,7 @@
         background-color: var(--sub-section-background-color);
         color: var(--sub-section-text-color);
         border: 1px solid var(--sub-section-border-color);
+        font-size: 0.9rem;
         border-left: none;
         border-right: none;
     }
