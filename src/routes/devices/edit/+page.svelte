@@ -1167,8 +1167,8 @@
                         borderColor="#323a45"
                         headerBackgroundColor="#1e242b"
                         headerTextColor="#f5f5f5"
-                        subSectionBackgroundColor="#1a2027"
-                        subSectionTextColor="#a0a7b2"
+                        subSectionBackgroundColor="#1e242b"
+                        subSectionTextColor="#F1F5F9"
                         subSectionBorderColor="#3a4451"
                     />
                 </div>
