@@ -1158,7 +1158,7 @@
                 </div>
                 <div class="nodes-grid-div">
                     <NodesGrid
-                        selectedProtocol={selectedProtocol}
+                        {selectedProtocol}
                         meterType={meter_type}
                         width="100%"
                         height="fit-content"
@@ -1167,9 +1167,9 @@
                         borderColor="#323a45"
                         headerBackgroundColor="#1e242b"
                         headerTextColor="#f5f5f5"
-                        subSectionBackgroundColor="#1e242b"
-                        subSectionTextColor="#F1F5F9"
-                        subSectionBorderColor="#3a4451"
+                        subSectionBackgroundColor="#1f2a31"
+                        subSectionTextColor="#cbd5e1"
+                        subSectionBorderColor="transparent"
                     />
                 </div>
             </div>
