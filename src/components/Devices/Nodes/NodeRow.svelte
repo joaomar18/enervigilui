@@ -29,6 +29,7 @@
             variableUnit = variable?.defaultUnit || "";
 
             publishVariable = variable?.defaultPublished || false;
+            logVariable = variable?.defaultLoggingEnabled || false;
             virtualVariable = false;
             enable = true;
         }
