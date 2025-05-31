@@ -431,6 +431,14 @@ const textsObject: TextsObject = {
         PT: "Registo",
         EN: "Logging",
     },
+    minAlarm: {
+        PT: "Minimo",
+        EN: "Minimum",
+    },
+    maxAlarm: {
+        PT: "Máximo",
+        EN: "Maximum",
+    },
     enabled: {
         PT: "Ativar",
         EN: "Enabled",
@@ -453,4 +461,64 @@ const textsObject: TextsObject = {
     },
 };
 
+const textsObjectsVariables: TextsObject = {
+    voltage: {
+        PT: "Tensão",
+        EN: "Voltage",
+    },
+    current: {
+        PT: "Corrente",
+        EN: "Current",
+    },
+    active_power: {
+        PT: "Potência Ativa",
+        EN: "Active Power",
+    },
+    reactive_power: {
+        PT: "Potência Reativa",
+        EN: "Reactive Power",
+    },
+    apparent_power: {
+        PT: "Potência Aparente",
+        EN: "Apparent Power",
+    },
+    power_factor: {
+        PT: "Fator de Potência",
+        EN: "Power Factor",
+    },
+    power_factor_direction: {
+        PT: "Direção do Fator de Potência",
+        EN: "Power Factor Direction",
+    },
+    frequency: {
+        PT: "Frequência",
+        EN: "Frequency",
+    },
+    active_energy: {
+        PT: "Energia Ativa",
+        EN: "Active Energy",
+    },
+    reactive_energy: {
+        PT: "Energia Reativa",
+        EN: "Reactive Energy",
+    },
+    forward_active_energy: {
+        PT: "Energia Ativa Direta",
+        EN: "Forward Active Energy",
+    },
+    forward_reactive_energy: {
+        PT: "Energia Reativa Direta",
+        EN: "Forward Reactive Energy",
+    },
+    reverse_active_energy: {
+        PT: "Energia Ativa Inversa",
+        EN: "Reverse Active Energy",
+    },
+    reverse_reactive_energy: {
+        PT: "Energia Reativa Inversa",
+        EN: "Reverse Reactive Energy",
+    },
+};
+
 export const texts = readable<TextsObject>(textsObject);
+export const variableNameTexts = readable<TextsObject>(textsObjectsVariables);

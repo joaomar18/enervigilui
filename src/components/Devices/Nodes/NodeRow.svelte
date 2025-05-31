@@ -3,19 +3,45 @@
     import InputField from "../../General/InputField.svelte";
     import Checkbox from "../../General/Checkbox.svelte";
 
-    let nodeIDDummy = "dummyNodeID"; // Dummy node ID for testing
-    let dummyChecked01 = false;
-    let dummyChecked02 = false;
-    let dummyChecked03 = false;
-    let dummyChecked04 = false;
+    import { defaultVariables } from "$lib/stores/nodes";
+    import { defaultVariableNames } from "$lib/stores/nodes";
+    import { defaultVariableUnits } from "$lib/stores/nodes";
+
+    // Stores for multi-language support
+    import { variableNameTexts } from "$lib/stores/lang";
+
+    // Props
+    export let variableName: string;
+    export let variableUnit: string;
+    export let communicationID: string;
+
+    export let customVariable: boolean;
+    export let publishVariable: boolean;
+    export let virtualVariable: boolean;
+    export let logVariable: boolean;
+    export let enableMinAlarm: boolean;
+    export let enableMaxAlarm: boolean;
+    export let enable: boolean;
+
+    $: {
+        if (variableName && !customVariable) {
+            const variable = $defaultVariables.find((v) => v.variable === variableName);
+            variableUnit = variable?.defaultUnit || "";
+
+            publishVariable = variable?.defaultPublished || false;
+            virtualVariable = false;
+            enable = true;
+        }
+    }
 </script>
 
 <tr class="editing">
     <td>
         <div class="cell-content">
             <Selector
-                options={{ Tensão: "Tensão" }}
-                selectedOption={"Tensão"}
+                useLang={true}
+                options={$variableNameTexts}
+                bind:selectedOption={variableName}
                 width="90%"
                 height="90%"
                 borderRadius="5px"
@@ -33,8 +59,10 @@
     <td>
         <div class="cell-content">
             <Selector
-                options={{ V: "V" }}
-                selectedOption={"V"}
+                options={Object.fromEntries(
+                    $defaultVariableUnits[variableName]?.map((unit) => [unit, unit]) || []
+                )}
+                bind:selectedOption={variableUnit}
                 width="90%"
                 height="90%"
                 borderRadius="5px"
@@ -52,7 +80,7 @@
     <td>
         <div class="cell-content">
             <InputField
-                bind:inputValue={nodeIDDummy}
+                bind:inputValue={communicationID}
                 inputType="STRING"
                 width="90%"
                 height="90%"
@@ -71,7 +99,7 @@
     <td>
         <div class="cell-content">
             <Checkbox
-                bind:checked={dummyChecked01}
+                bind:checked={customVariable}
                 inputName="custom-node"
                 width="1.5em"
                 height="1.5em"
@@ -87,7 +115,7 @@
     <td>
         <div class="cell-content">
             <Checkbox
-                bind:checked={dummyChecked02}
+                bind:checked={publishVariable}
                 inputName="publish-node"
                 width="1.5em"
                 height="1.5em"
@@ -103,7 +131,7 @@
     <td>
         <div class="cell-content">
             <Checkbox
-                bind:checked={dummyChecked03}
+                bind:checked={virtualVariable}
                 inputName="virtual-node"
                 width="1.5em"
                 height="1.5em"
@@ -119,7 +147,55 @@
     <td>
         <div class="cell-content">
             <Checkbox
-                bind:checked={dummyChecked04}
+                bind:checked={logVariable}
+                inputName="log-node"
+                width="1.5em"
+                height="1.5em"
+                checkMarkWidth={24}
+                checkMarkHeight={24}
+                enabledbgColor="#2f80ed"
+                enabledBorderColor="#5a646e"
+                disabledbgColor="#42505f"
+                disabledBorderColor="#5a646e"
+            />
+        </div>
+    </td>
+    <td>
+        <div class="cell-content">
+            <Checkbox
+                bind:checked={enableMinAlarm}
+                inputName="minimum-alarm-enabled"
+                width="1.5em"
+                height="1.5em"
+                checkMarkWidth={24}
+                checkMarkHeight={24}
+                enabledbgColor="#2f80ed"
+                enabledBorderColor="#5a646e"
+                disabledbgColor="#42505f"
+                disabledBorderColor="#5a646e"
+            />
+        </div>
+    </td>
+    <td>
+        <div class="cell-content">
+            <Checkbox
+                bind:checked={enableMaxAlarm}
+                inputName="maximum-alarm-enable"
+                width="1.5em"
+                height="1.5em"
+                checkMarkWidth={24}
+                checkMarkHeight={24}
+                enabledbgColor="#2f80ed"
+                enabledBorderColor="#5a646e"
+                disabledbgColor="#42505f"
+                disabledBorderColor="#5a646e"
+            />
+        </div>
+    </td>
+    <td>
+        <div class="cell-content">
+            <Checkbox
+                bind:checked={enable}
                 inputName="enable-node"
                 width="1.5em"
                 height="1.5em"

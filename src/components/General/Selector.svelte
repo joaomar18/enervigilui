@@ -2,7 +2,12 @@
     import { browser } from "$app/environment";
     import { onMount, onDestroy } from "svelte";
 
+    // Stores for multi-language support
+    import type { Language } from "$lib/stores/lang";
+    import { selectedLang } from "$lib/stores/lang";
+
     //Props
+    export let useLang: boolean = false; //use language texts in options and selected option
     export let options: Record<string, any>; //Record with options for the selector
     export let selectedOption: any; //Selected option
     export let invertOptions: boolean = false; //Invert Options div position
@@ -26,17 +31,27 @@
     // Variables
     let isOpen: boolean = false;
     let selDivEl: Node;
-    $: selectedKey = Object.entries(options).find(([_, value]) => value == selectedOption)?.[0];
+    $: selectedKey = useLang
+        ? Object.keys(options).find((key) => key === selectedOption)
+        : Object.entries(options).find(([_, value]) => value === selectedOption)?.[0];
     $: shiftTextLeft = String(parseFloat(arrowRightPos) + parseFloat(arrowWidth)) + "px";
 
     // Functions
+    function getDisplayText(key: string): string {
+        if (useLang && options[key] && typeof options[key] === "object") {
+            return options[key][$selectedLang] || key;
+        } else {
+            return key;
+        }
+    }
+
     function toggleSelector(): void {
         isOpen = !isOpen;
     }
 
     //Change Option Function
     function changeOption(optionKey: string): void {
-        selectedOption = options[optionKey];
+        selectedOption = useLang ? optionKey : options[optionKey];
         isOpen = false;
     }
 
@@ -90,7 +105,7 @@
     "
 >
     <div class="content-div">
-        <span class="selected-option">{selectedKey}</span>
+        <span class="selected-option">{getDisplayText(selectedKey || "")}</span>
         <img
             class="arrow"
             src={invertOptions
@@ -106,7 +121,7 @@
         <div class="options {isOpen ? '' : 'disabled'} {invertOptions ? 'inverted' : 'normal'}">
             {#each Object.entries(options) as [key, value]}
                 <div class="option {selectedOption == value ? 'selected-option' : ''}">
-                    <span class="option-name">{key}</span>
+                    <span class="option-name">{getDisplayText(key)}</span>
                     <button on:click={() => changeOption(key)} aria-label={key}></button>
                 </div>
             {/each}
@@ -164,6 +179,7 @@
         letter-spacing: var(--leter-spacing);
         word-spacing: var(--word-spacing);
         padding-right: var(--selected-option-shift-left);
+        line-height: normal;
     }
 
     /* Invisible button to trigger dropdown */
@@ -229,6 +245,7 @@
         word-spacing: var(--word-spacing);
         color: #b0bec5;
         -webkit-tap-highlight-color: transparent;
+        line-height: normal;
     }
 
     /* Transparent overlay to make the option fully clickable */

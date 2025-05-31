@@ -43,13 +43,20 @@
                     <th class="max-width">{$texts.variable[$selectedLang]}</th>
                     <th class="min-width">{$texts.unit[$selectedLang]}</th>
                     {#if selectedProtocol === "OPC_UA"}
-                        <th class="max-width">{$texts.opcuaID[$selectedLang]}</th>
+                        <th style="width: 150px;" class="mid-width"
+                            >{$texts.opcuaID[$selectedLang]}</th
+                        >
                     {:else if selectedProtocol === "MODBUS_RTU"}
-                        <th class="max-width">{$texts.modbusRegister[$selectedLang]}</th>
+                        <th style="width: 150px;" class="mid-width"
+                            >{$texts.modbusRegister[$selectedLang]}</th
+                        >
                     {/if}
                     <th class="min-width">{$texts.custom[$selectedLang]}</th>
                     <th class="min-width">{$texts.publish[$selectedLang]}</th>
                     <th class="min-width">{$texts.virtual[$selectedLang]}</th>
+                    <th class="min-width">{$texts.logging[$selectedLang]}</th>
+                    <th class="min-width">{$texts.minAlarm[$selectedLang]}</th>
+                    <th class="min-width">{$texts.maxAlarm[$selectedLang]}</th>
                     <th class="min-width">{$texts.enabled[$selectedLang]}</th>
                     <th class="super-min-width"
                         ><img src="/img/more.png" alt="More options" class="more-img" /></th
@@ -60,7 +67,7 @@
                 {#if meterType === "THREE_PHASE"}
                     <!--     L 1     N O D E S     -->
                     <tr class="sub-section">
-                        <td colspan="8">{$texts.l1Phase[$selectedLang]}</td>
+                        <td colspan="11">{$texts.l1Phase[$selectedLang]}</td>
                     </tr>
                     <!-- Variable Elements Definition-->
                     <NodeRow />
@@ -69,25 +76,25 @@
 
                     <!--     L 2     N O D E S     -->
                     <tr class="sub-section">
-                        <td colspan="8">{$texts.l2Phase[$selectedLang]}</td>
+                        <td colspan="11">{$texts.l2Phase[$selectedLang]}</td>
                     </tr>
                     <NodeRow />
 
                     <!--     L 3     N O D E S     -->
                     <tr class="sub-section">
-                        <td colspan="8">{$texts.l3Phase[$selectedLang]}</td>
+                        <td colspan="11">{$texts.l3Phase[$selectedLang]}</td>
                     </tr>
                     <NodeRow />
 
                     <!--     T O T A L     N O D E S     -->
                     <tr class="sub-section">
-                        <td colspan="8">{$texts.total[$selectedLang]}</td>
+                        <td colspan="11">{$texts.total[$selectedLang]}</td>
                     </tr>
                     <NodeRow />
 
                     <!--     G E N E R A L     N O D E S     -->
                     <tr class="sub-section">
-                        <td colspan="8">{$texts.general[$selectedLang]}</td>
+                        <td colspan="11">{$texts.general[$selectedLang]}</td>
                     </tr>
                     <NodeRow />
                 {:else if meterType === "SINGLE_PHASE"}
@@ -170,7 +177,7 @@
 
     table th.min-width,
     table td.min-width {
-        width: 80px;
+        width: 90px;
     }
 
     table th.super-min-width,
