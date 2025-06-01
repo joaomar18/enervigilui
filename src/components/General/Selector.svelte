@@ -3,7 +3,6 @@
     import { onMount, onDestroy } from "svelte";
 
     // Stores for multi-language support
-    import type { Language } from "$lib/stores/lang";
     import { selectedLang } from "$lib/stores/lang";
 
     //Props
@@ -11,6 +10,8 @@
     export let options: Record<string, any>; //Record with options for the selector
     export let selectedOption: any; //Selected option
     export let invertOptions: boolean = false; //Invert Options div position
+    export let scrollable: boolean = false; //makes the content scrollable
+    export let maxOptions: number = 0; //if the content is scrollable assigns the maximum number of visible options
 
     // Layout / styling props
     export let width: string;
@@ -21,6 +22,8 @@
     export let selectedColor: string = backgroundColor;
     export let optionsBackgroundColor: string = backgroundColor;
     export let optionsBorderColor: string = backgroundColor;
+    export let optionsInnerBorderColor: string = "transparent";
+    export let optionHeight: string = height;
     export let fontSize: string = "1rem";
     export let letterSpacing: string = "normal";
     export let wordSpacing: string = "normal";
@@ -30,11 +33,19 @@
 
     // Variables
     let isOpen: boolean = false;
+    let optionsHeight: string = "fit-content";
     let selDivEl: Node;
+
+    $: optionsLength = Object.keys(options || {}).length;
     $: selectedKey = useLang
         ? Object.keys(options).find((key) => key === selectedOption)
         : Object.entries(options).find(([_, value]) => value === selectedOption)?.[0];
     $: shiftTextLeft = String(parseFloat(arrowRightPos) + parseFloat(arrowWidth)) + "px";
+    $: {
+        if (scrollable && optionsLength > maxOptions) {
+            optionsHeight = String(parseFloat(height) * maxOptions) + "px";
+        }
+    }
 
     // Functions
     function getDisplayText(key: string): string {
@@ -95,13 +106,16 @@
         --selected-color: {selectedColor};
         --options-background-color: {optionsBackgroundColor};
         --options-border-color: {optionsBorderColor};
+        --options-inner-border-color: {optionsInnerBorderColor};
+        --option-height: {optionHeight};
         --font-size: {fontSize};
-        --leter-spacing: {letterSpacing};
+        --letter-spacing: {letterSpacing};
         --word-spacing: {wordSpacing};
         --arrow-width: {arrowWidth};
         --arrow-height: {arrowHeight};
         --arrow-right-position: {arrowRightPos};
         --selected-option-shift-left: {shiftTextLeft};
+        --options-height: {optionsHeight};
     "
 >
     <div class="content-div">
@@ -118,12 +132,23 @@
             alt={isOpen ? "up-arrow" : "down-arrow"}
         />
         <button class="open-selector" on:click={toggleSelector} aria-label="View options"></button>
-        <div class="options {isOpen ? '' : 'disabled'} {invertOptions ? 'inverted' : 'normal'}">
+        <div
+            class="options {isOpen ? '' : 'disabled'} {invertOptions
+                ? 'inverted'
+                : 'normal'} {scrollable ? 'scrollable' : ''}"
+        >
             {#each Object.entries(options) as [key, value]}
-                <div class="option {selectedOption == value ? 'selected-option' : ''}">
-                    <span class="option-name">{getDisplayText(key)}</span>
-                    <button on:click={() => changeOption(key)} aria-label={key}></button>
-                </div>
+                {#if useLang}
+                    <div class="option {selectedOption == key ? 'selected-option' : ''}">
+                        <span class="option-name">{getDisplayText(key)}</span>
+                        <button on:click={() => changeOption(key)} aria-label={key}></button>
+                    </div>
+                {:else}
+                    <div class="option {selectedOption == value ? 'selected-option' : ''}">
+                        <span class="option-name">{getDisplayText(key)}</span>
+                        <button on:click={() => changeOption(key)} aria-label={key}></button>
+                    </div>
+                {/if}
             {/each}
         </div>
     </div>
@@ -176,7 +201,7 @@
         color: #eeeeee;
         font-weight: 400;
         font-size: var(--font-size);
-        letter-spacing: var(--leter-spacing);
+        letter-spacing: var(--letter-spacing);
         word-spacing: var(--word-spacing);
         padding-right: var(--selected-option-shift-left);
         line-height: normal;
@@ -199,7 +224,7 @@
     .options {
         position: absolute;
         width: 100%;
-        height: fit-content;
+        height: var(--options-height);
         background-color: var(--options-background-color);
         border-radius: var(--border-radius);
         border: 1px solid var(--options-border-color);
@@ -208,9 +233,12 @@
         justify-content: start;
         align-items: center;
         z-index: 1;
+        overflow-y: hidden;
         -webkit-tap-highlight-color: transparent;
         -webkit-touch-callout: none;
         user-select: none;
+        scrollbar-width: thin;
+        scrollbar-color: #323a45 #1e242b;
     }
 
     /* Dropdown opens below selector */
@@ -228,12 +256,18 @@
         display: none;
     }
 
+    /* options are scrollable */
+    .options.scrollable {
+        overflow-y: auto;
+    }
+
     /* Individual option style */
     .option {
         position: relative;
         width: 100%;
-        height: var(--height);
-        padding: 5px;
+        min-height: var(--option-height);
+        max-height: var(--option-height);
+        padding: 0 5px;
         box-sizing: border-box;
         display: flex;
         align-items: center;
@@ -241,11 +275,18 @@
         text-align: center;
         font-weight: 400;
         font-size: var(--font-size);
-        letter-spacing: var(--leter-spacing);
+        letter-spacing: var(--letter-spacing);
         word-spacing: var(--word-spacing);
+        border-bottom: 1px solid var(--options-inner-border-color);
         color: #b0bec5;
         -webkit-tap-highlight-color: transparent;
         line-height: normal;
+    }
+
+    /* Individual option style border color */
+
+    .option:last-child {
+        border: 1px solid transparent;
     }
 
     /* Transparent overlay to make the option fully clickable */

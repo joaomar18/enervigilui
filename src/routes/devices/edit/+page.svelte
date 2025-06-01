@@ -248,6 +248,8 @@
                         <Selector
                             options={protocols}
                             bind:selectedOption={selectedProtocol}
+                            scrollable={true}
+                            maxOptions={5}
                             width="200px"
                             height="40px"
                             borderRadius="5px"
@@ -585,6 +587,8 @@
                             <Selector
                                 options={baudrateOptions}
                                 bind:selectedOption={modbus_rtu_options.baudrate}
+                                scrollable={true}
+                                maxOptions={5}
                                 width="200px"
                                 height="40px"
                                 borderRadius="5px"
@@ -631,6 +635,8 @@
                             <Selector
                                 options={parityOptions}
                                 bind:selectedOption={modbus_rtu_options.parity}
+                                scrollable={true}
+                                maxOptions={5}
                                 width="200px"
                                 height="40px"
                                 borderRadius="5px"
@@ -676,6 +682,8 @@
                             <Selector
                                 options={bytesizeOptions}
                                 bind:selectedOption={modbus_rtu_options.bytesize}
+                                scrollable={true}
+                                maxOptions={5}
                                 width="200px"
                                 height="40px"
                                 borderRadius="5px"
@@ -722,6 +730,8 @@
                             <Selector
                                 options={stopbitsOptions}
                                 bind:selectedOption={modbus_rtu_options.stopbits}
+                                scrollable={true}
+                                maxOptions={5}
                                 width="200px"
                                 height="40px"
                                 borderRadius="5px"
@@ -940,6 +950,8 @@
                         <Selector
                             options={types}
                             bind:selectedOption={meter_type}
+                            scrollable={true}
+                            maxOptions={5}
                             width="200px"
                             height="40px"
                             borderRadius="5px"

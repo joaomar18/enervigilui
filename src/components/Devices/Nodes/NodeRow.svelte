@@ -43,13 +43,16 @@
                 useLang={true}
                 options={$variableNameTexts}
                 bind:selectedOption={variableName}
+                scrollable={true}
+                maxOptions={5}
                 width="90%"
-                height="90%"
+                height="30px"
                 borderRadius="5px"
                 backgroundColor="#1a2027"
                 selectedColor="#14566b"
                 optionsBackgroundColor="#1e242b"
                 optionsBorderColor="#323a45"
+                optionsInnerBorderColor="#323a45"
                 fontSize="0.9rem"
                 arrowWidth="16px"
                 arrowHeight="16px"
@@ -64,8 +67,10 @@
                     $defaultVariableUnits[variableName]?.map((unit) => [unit, unit]) || []
                 )}
                 bind:selectedOption={variableUnit}
+                scrollable={true}
+                maxOptions={5}
                 width="90%"
-                height="90%"
+                height="30px"
                 borderRadius="5px"
                 backgroundColor="#1a2027"
                 selectedColor="#14566b"
