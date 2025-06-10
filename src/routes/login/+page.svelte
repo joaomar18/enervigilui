@@ -15,7 +15,7 @@
         <Login />
     </div>
     <div class="column" id="second-col">
-        <Info paddingTop="0px" paddingBottom="0px" appImageUrl="../img/smart-meter.png" />
+        <Info paddingTop="0px" paddingBottom="0px" appImageUrl="/img/smart-meter.png" />
     </div>
 </div>
 
