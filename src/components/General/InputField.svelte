@@ -12,8 +12,6 @@
     // Layout / styling props
     export let infoText: string = "";
     export let width: string;
-    export let minWidth: string = width;
-    export let maxWidth: string = width;
     export let height: string;
     export let borderRadius: string = "";
     export let backgroundColor: string;
