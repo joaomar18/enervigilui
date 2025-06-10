@@ -11,7 +11,7 @@ export default defineConfig({
                 target: "http://localhost:8000", // your FastAPI backend
                 changeOrigin: true,
                 secure: false, // if not using HTTPS
-				rewrite: path => path.replace(/^\/api/, '') // <- this line is critical!
+                rewrite: (path) => path.replace(/^\/api/, ""), // <- this line is critical!
             },
         },
     },
