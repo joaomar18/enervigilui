@@ -1172,6 +1172,7 @@
                     <NodesGrid
                         {selectedProtocol}
                         meterType={meter_type}
+                        bind:nodes={deviceNodes}
                         width="100%"
                         height="fit-content"
                         borderRadius="10px"

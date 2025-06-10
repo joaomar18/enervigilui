@@ -19,6 +19,8 @@
     export let borderRadius: string = "0px";
     export let backgroundColor: string;
     export let borderColor: string = backgroundColor;
+    export let disabledBackgroundColor: string = backgroundColor;
+    export let disabledBorderColor: string = disabledBackgroundColor;
     export let selectedColor: string = backgroundColor;
     export let optionsBackgroundColor: string = backgroundColor;
     export let optionsBorderColor: string = backgroundColor;
@@ -36,7 +38,8 @@
     let optionsHeight: string = "fit-content";
     let selDivEl: Node;
 
-    $: optionsLength = Object.keys(options || {}).length;
+    $: validOptions = Object.entries(options || {}).filter(([_, value]) => value !== "");
+    $: optionsLength = validOptions.length;
     $: selectedKey = useLang
         ? Object.keys(options).find((key) => key === selectedOption)
         : Object.entries(options).find(([_, value]) => value === selectedOption)?.[0];
@@ -44,6 +47,11 @@
     $: {
         if (scrollable && optionsLength > maxOptions) {
             optionsHeight = String(parseFloat(height) * maxOptions) + "px";
+        }
+    }
+    $: {
+        if (optionsLength == 0) {
+            isOpen = false;
         }
     }
 
@@ -103,6 +111,8 @@
         --border-radius: {borderRadius};
         --background-color: {backgroundColor};
         --border-color: {borderColor};
+        --disabled-background-color: {disabledBackgroundColor};
+        --disabled-border-color: {disabledBorderColor};
         --selected-color: {selectedColor};
         --options-background-color: {optionsBackgroundColor};
         --options-border-color: {optionsBorderColor};
@@ -117,6 +127,7 @@
         --selected-option-shift-left: {shiftTextLeft};
         --options-height: {optionsHeight};
     "
+    class:disabled={optionsLength == 0}
 >
     <div class="content-div">
         <span class="selected-option">{getDisplayText(selectedKey || "")}</span>
@@ -131,7 +142,13 @@
                   : "/img/down-arrow.png"}
             alt={isOpen ? "up-arrow" : "down-arrow"}
         />
-        <button class="open-selector" on:click={toggleSelector} aria-label="View options"></button>
+        <button
+            class="open-selector"
+            on:click={toggleSelector}
+            aria-label="View options"
+            disabled={optionsLength == 0}
+            class:disabled={optionsLength == 0}
+        ></button>
         <div
             class="options {isOpen ? '' : 'disabled'} {invertOptions
                 ? 'inverted'
@@ -157,6 +174,7 @@
 <style>
     /* Wrapper for the custom selector */
     .selector-div {
+        box-sizing: border-box;
         display: block;
         width: var(--width);
         height: var(--height);
@@ -166,6 +184,12 @@
         -webkit-tap-highlight-color: transparent;
         -webkit-touch-callout: none;
         user-select: none;
+    }
+
+    /* Selector is disabled */
+    .selector-div.disabled {
+        background-color: var(--disabled-background-color);
+        border: 1px solid var(--disabled-border-color);
     }
 
     /* Inner content container with centered layout */
@@ -218,6 +242,11 @@
         cursor: pointer;
         outline: none;
         -webkit-tap-highlight-color: transparent;
+    }
+
+    /* Buton to trigger dropdown is disabled */
+    .open-selector.disabled {
+        cursor: auto;
     }
 
     /* Dropdown container for options */

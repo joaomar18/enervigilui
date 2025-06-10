@@ -23,17 +23,6 @@
     export let enableMaxAlarm: boolean;
     export let enable: boolean;
 
-    $: {
-        if (variableName && !customVariable) {
-            const variable = $defaultVariables.find((v) => v.variable === variableName);
-            variableUnit = variable?.defaultUnit || "";
-
-            publishVariable = variable?.defaultPublished || false;
-            logVariable = variable?.defaultLoggingEnabled || false;
-            virtualVariable = false;
-            enable = true;
-        }
-    }
 </script>
 
 <tr class="editing">
@@ -73,6 +62,7 @@
                 height="30px"
                 borderRadius="5px"
                 backgroundColor="#1a2027"
+                disabledBackgroundColor="#42505f"
                 selectedColor="#14566b"
                 optionsBackgroundColor="#1e242b"
                 optionsBorderColor="#323a45"
@@ -86,12 +76,14 @@
     <td>
         <div class="cell-content">
             <InputField
+                disabled={virtualVariable}
                 bind:inputValue={communicationID}
                 inputType="STRING"
                 width="90%"
-                height="90%"
+                height="30px"
                 borderRadius="5px"
                 backgroundColor="#1a2027"
+                disabledBackgroundColor="#42505f"
                 selectedBackgroundColor="#1a2027"
                 selectedBorderColor="#2F80ED"
                 fontSize="0.9rem"
@@ -237,6 +229,9 @@
 
     tr td {
         height: 30px;
+        padding:5px;
+        padding-left:0px;
+        padding-right:0px;
     }
 
     tr td .cell-content {

@@ -2,6 +2,7 @@
     import { onMount, onDestroy, tick } from "svelte";
 
     // Props
+    export let disabled: boolean = false;
     export let inputValue: string;
     export let inputType: string = "STRING";
     export let inputUnit: string | null = null;
@@ -16,9 +17,11 @@
     export let height: string;
     export let borderRadius: string = "";
     export let backgroundColor: string;
-    export let borderColor: string = "transparent";
+    export let borderColor: string = backgroundColor;
+    export let disabledBackgroundColor: string = backgroundColor;
+    export let disabledBorderColor: string = disabledBackgroundColor;
     export let selectedBackgroundColor: string = backgroundColor;
-    export let selectedBorderColor: string = borderColor;
+    export let selectedBorderColor: string = selectedBackgroundColor;
     export let paddingLeft: string = "10px";
     export let fontSize: string = "1rem";
     export let fontColor: string;
@@ -120,12 +123,12 @@
 <div
     style="
         --width: {width};
-        --min-width: {minWidth};
-        --max-width: {maxWidth};
         --height: {height};
         --border-radius: {borderRadius};
         --background-color: {backgroundColor};
         --border-color: {borderColor};
+        --disabled-background-color: {disabledBackgroundColor};
+        --disabled-border-color: {disabledBorderColor};
         --selected-background-color: {selectedBackgroundColor};
         --selected-border-color: {selectedBorderColor};
         --input-padding-right: {unitWidth > 0 ? unitWidth + 10 + 'px' : '10px'};
@@ -173,6 +176,8 @@
                     }}
                     bind:value={inputValue}
                     on:input={handleInput}
+                    {disabled}
+                    class:disabled
                 />
             {/if}
             {#if inputUnit}
@@ -185,12 +190,11 @@
 <style>
     /* Container: main input wrapper */
     .container {
+        display: block;
         margin: 0;
         padding: 0;
         width: var(--width);
-        min-width: var(--min-width);
-        max-width: var(--max-width);
-        height: fit-content;
+        height: var(--height);
         display: flex;
         align-items: center;
     }
@@ -218,7 +222,6 @@
         width: 100%;
         height: var(--height);
         margin: 0;
-        padding: 0.5rem;
         padding-left: var(--padding-left);
         padding-right: var(--input-padding-right);
         font-size: var(--font-size);
@@ -232,6 +235,12 @@
         transition:
             background-color 0.2s,
             border 0.2s;
+    }
+
+    /* Input element disabled */
+    input.disabled {
+        background-color: var(--disabled-background-color);
+        border: 1px solid var(--disabled-border-color);
     }
 
     /* Input element when focused */
