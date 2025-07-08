@@ -7,8 +7,11 @@
 
     //Props
     export let useLang: boolean = false; //use language texts in options and selected option
+    export let inputBadFormat: boolean = false;
+    export let firstSubmission: boolean = false;
     export let options: Record<string, any>; //Record with options for the selector
     export let selectedOption: any; //Selected option
+    export let setSelectedOption: ((value: string) => void) | undefined = undefined; //Function to set the selected option, if not provided, the selectedOption will be updated directly
     export let invertOptions: boolean = false; //Invert Options div position
     export let scrollable: boolean = false; //makes the content scrollable
     export let maxOptions: number = 0; //if the content is scrollable assigns the maximum number of visible options
@@ -22,6 +25,8 @@
     export let disabledBackgroundColor: string = backgroundColor;
     export let disabledBorderColor: string = disabledBackgroundColor;
     export let selectedColor: string = backgroundColor;
+    export let badFormatBackgroundColor: string = backgroundColor;
+    export let badFormatBorderColor: string = badFormatBackgroundColor;
     export let optionsBackgroundColor: string = backgroundColor;
     export let optionsBorderColor: string = backgroundColor;
     export let optionsInnerBorderColor: string = "transparent";
@@ -70,7 +75,11 @@
 
     //Change Option Function
     function changeOption(optionKey: string): void {
-        selectedOption = useLang ? optionKey : options[optionKey];
+        if (setSelectedOption) {
+            setSelectedOption(useLang ? optionKey : options[optionKey]);
+        } else {
+            selectedOption = useLang ? optionKey : options[optionKey];
+        }
         isOpen = false;
     }
 
@@ -114,6 +123,8 @@
         --disabled-background-color: {disabledBackgroundColor};
         --disabled-border-color: {disabledBorderColor};
         --selected-color: {selectedColor};
+        --bad-format-background-color: {badFormatBackgroundColor};
+        --bad-format-border-color: {badFormatBorderColor};
         --options-background-color: {optionsBackgroundColor};
         --options-border-color: {optionsBorderColor};
         --options-inner-border-color: {optionsInnerBorderColor};
@@ -128,6 +139,7 @@
         --options-height: {optionsHeight};
     "
     class:disabled={optionsLength == 0}
+    class:bad-format={inputBadFormat && firstSubmission}
 >
     <div class="content-div">
         <span class="selected-option">{getDisplayText(selectedKey || "")}</span>
@@ -154,7 +166,7 @@
                 ? 'inverted'
                 : 'normal'} {scrollable ? 'scrollable' : ''}"
         >
-            {#each Object.entries(options) as [key, value]}
+            {#each Object.entries(options) as [key, value] (key)}
                 {#if useLang}
                     <div class="option {selectedOption == key ? 'selected-option' : ''}">
                         <span class="option-name">{getDisplayText(key)}</span>
@@ -190,6 +202,12 @@
     .selector-div.disabled {
         background-color: var(--disabled-background-color);
         border: 1px solid var(--disabled-border-color);
+    }
+
+    /* Selector has bad format */
+    .selector-div.bad-format {
+        background-color: var(--bad-format-background-color);
+        border: 1px solid var(--bad-format-border-color);
     }
 
     /* Inner content container with centered layout */

@@ -3,6 +3,8 @@
 
     // Props
     export let disabled: boolean = false;
+    export let inputBadFormat: boolean = false;
+    export let firstSubmission: boolean = false;
     export let inputValue: string;
     export let inputType: string = "STRING";
     export let inputUnit: string | null = null;
@@ -20,6 +22,8 @@
     export let disabledBorderColor: string = disabledBackgroundColor;
     export let selectedBackgroundColor: string = backgroundColor;
     export let selectedBorderColor: string = selectedBackgroundColor;
+    export let badFormatBackgroundColor: string = backgroundColor;
+    export let badFormatBorderColor: string = badFormatBackgroundColor;
     export let paddingLeft: string = "10px";
     export let fontSize: string = "1rem";
     export let fontColor: string;
@@ -129,6 +133,8 @@
         --disabled-border-color: {disabledBorderColor};
         --selected-background-color: {selectedBackgroundColor};
         --selected-border-color: {selectedBorderColor};
+        --bad-format-background-color: {badFormatBackgroundColor};
+        --bad-format-border-color: {badFormatBorderColor};
         --input-padding-right: {unitWidth > 0 ? unitWidth + 10 + 'px' : '10px'};
         --padding-left: {paddingLeft};
         --font-size: {fontSize};
@@ -167,7 +173,9 @@
                     class:selected
                     type="text"
                     name="Input Field"
-                    on:focus={() => (selected = true)}
+                    on:focus={() => {
+                        selected = true;
+                    }}
                     on:blur={() => {
                         selected = false;
                         validateBounds();
@@ -176,6 +184,7 @@
                     on:input={handleInput}
                     {disabled}
                     class:disabled
+                    class:bad-format={inputBadFormat && firstSubmission}
                 />
             {/if}
             {#if inputUnit}
@@ -245,6 +254,12 @@
     input.selected {
         background-color: var(--selected-background-color);
         border: 1px solid var(--selected-border-color);
+    }
+
+    /* Input element with bad format */
+    input.bad-format {
+        background-color: var(--bad-format-background-color);
+        border: 1px solid var(--bad-format-border-color);
     }
 
     /* Info text above the input */

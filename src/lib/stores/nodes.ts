@@ -1,6 +1,42 @@
 import { readable } from "svelte/store";
 import { derived } from "svelte/store";
 
+
+export enum Protocol {
+    MODBUS_RTU = "MODBUS_RTU",
+    OPC_UA = "OPC_UA",
+    NONE = "NONE"
+}
+
+export enum NodePrefix {
+    L1 = "l1_",
+    L2 = "l2_",
+    L3 = "l3_",
+    L1_L2 = "l1_l2_",
+    L1_L3 = "l1_l3_",
+    L2_L1 = "l2_l1_",
+    L2_L3 = "l2_l3_",
+    L3_L1 = "l3_l1_",
+    L3_L2 = "l3_l2_",
+    TOTAL = "total_",
+    GENERAL = ""
+}
+
+export enum NodePhase {
+    L1 = "L1",
+    L2 = "L2",
+    L3 = "L3",
+    TOTAL = "Total",
+    GENERAL = ""
+}
+
+export enum NodeType {
+    FLOAT = "FLOAT",
+    STRING = "STRING",
+    INT = "INT",
+    BOOLEAN = "BOOLEAN"
+}
+
 /**
  * Represents a default node variable type in the energy monitoring system.
  * This interface defines all properties needed to configure and display
@@ -11,7 +47,7 @@ export interface NodeVariableType {
     variable: string;
 
     /** Data type of the variable - determines how values are processed and displayed */
-    type: "INT" | "FLOAT" | "STRING" | "BOOLEAN";
+    type: NodeType;
 
     /** Number of decimal places to display for FLOAT type variables */
     defaultNumberOfDecimals?: number;
@@ -23,7 +59,7 @@ export interface NodeVariableType {
     availableUnits?: string[];
 
     /** Specifies which phases this variable can be applied to in power systems */
-    applicablePhases: ("L1" | "L2" | "L3" | "Total" | "")[];
+    applicablePhases: NodePhase[];
 
     /** Indicates if this variable can be calculated from other variables rather than measured directly */
     canBeVirtual: boolean;
@@ -61,10 +97,10 @@ export interface NodeVariableType {
 export const defaultVariables = readable<NodeVariableType[]>([
     {
         variable: "voltage",
-        type: "FLOAT",
+        type: NodeType.FLOAT,
         defaultNumberOfDecimals: 2,
         defaultUnit: "V",
-        applicablePhases: ["L1", "L2", "L3", ""],
+        applicablePhases: [NodePhase.L1, NodePhase.L2, NodePhase.L3, NodePhase.GENERAL],
         canBeVirtual: false,
         defaultPublished: true,
         defaultLoggingPeriod: 15,
@@ -77,11 +113,11 @@ export const defaultVariables = readable<NodeVariableType[]>([
     },
     {
         variable: "current",
-        type: "FLOAT",
+        type: NodeType.FLOAT,
         defaultNumberOfDecimals: 3,
         defaultUnit: "A",
         availableUnits: ["mA", "A"],
-        applicablePhases: ["L1", "L2", "L3", ""],
+        applicablePhases: [NodePhase.L1, NodePhase.L2, NodePhase.L3, NodePhase.GENERAL],
         canBeVirtual: false,
         defaultPublished: true,
         defaultLoggingPeriod: 15,
@@ -90,11 +126,11 @@ export const defaultVariables = readable<NodeVariableType[]>([
     },
     {
         variable: "active_power",
-        type: "FLOAT",
+        type: NodeType.FLOAT,
         defaultUnit: "kW",
         defaultNumberOfDecimals: 3,
         availableUnits: ["W", "kW"],
-        applicablePhases: ["L1", "L2", "L3", "Total", ""],
+        applicablePhases: [NodePhase.L1, NodePhase.L2, NodePhase.L3, NodePhase.TOTAL, NodePhase.GENERAL],
         canBeVirtual: true,
         defaultPublished: true,
         defaultLoggingPeriod: 15,
@@ -103,11 +139,11 @@ export const defaultVariables = readable<NodeVariableType[]>([
     },
     {
         variable: "reactive_power",
-        type: "FLOAT",
+        type: NodeType.FLOAT,
         defaultNumberOfDecimals: 3,
         defaultUnit: "kVAr",
         availableUnits: ["VAr", "kVAr"],
-        applicablePhases: ["L1", "L2", "L3", "Total"],
+        applicablePhases: [NodePhase.L1, NodePhase.L2, NodePhase.L3, NodePhase.TOTAL, NodePhase.GENERAL],
         canBeVirtual: true,
         defaultPublished: true,
         defaultLoggingPeriod: 15,
@@ -116,11 +152,11 @@ export const defaultVariables = readable<NodeVariableType[]>([
     },
     {
         variable: "apparent_power",
-        type: "FLOAT",
+        type: NodeType.FLOAT,
         defaultNumberOfDecimals: 3,
         defaultUnit: "kVA",
         availableUnits: ["VA", "kVA"],
-        applicablePhases: ["L1", "L2", "L3", "Total", ""],
+        applicablePhases: [NodePhase.L1, NodePhase.L2, NodePhase.L3, NodePhase.TOTAL, NodePhase.GENERAL],
         canBeVirtual: true,
         defaultPublished: true,
         defaultLoggingPeriod: 15,
@@ -129,10 +165,10 @@ export const defaultVariables = readable<NodeVariableType[]>([
     },
     {
         variable: "power_factor",
-        type: "FLOAT",
+        type: NodeType.FLOAT,
         defaultNumberOfDecimals: 2,
         defaultUnit: "",
-        applicablePhases: ["L1", "L2", "L3", "Total", ""],
+        applicablePhases: [NodePhase.L1, NodePhase.L2, NodePhase.L3, NodePhase.TOTAL, NodePhase.GENERAL],
         canBeVirtual: true,
         defaultPublished: true,
         defaultLoggingPeriod: 15,
@@ -141,9 +177,9 @@ export const defaultVariables = readable<NodeVariableType[]>([
     },
     {
         variable: "power_factor_direction",
-        type: "STRING",
+        type: NodeType.STRING,
         defaultUnit: "",
-        applicablePhases: ["L1", "L2", "L3", "Total", ""],
+        applicablePhases: [NodePhase.L1, NodePhase.L2, NodePhase.L3, NodePhase.TOTAL, NodePhase.GENERAL],
         canBeVirtual: true,
         defaultPublished: true,
         defaultLoggingPeriod: 15,
@@ -152,10 +188,10 @@ export const defaultVariables = readable<NodeVariableType[]>([
     },
     {
         variable: "frequency",
-        type: "FLOAT",
+        type: NodeType.FLOAT,
         defaultNumberOfDecimals: 2,
         defaultUnit: "Hz",
-        applicablePhases: ["L1", "L2", "L3", ""],
+        applicablePhases: [NodePhase.L1, NodePhase.L2, NodePhase.L3, NodePhase.GENERAL],
         canBeVirtual: false,
         defaultPublished: true,
         defaultLoggingPeriod: 15,
@@ -168,11 +204,11 @@ export const defaultVariables = readable<NodeVariableType[]>([
     },
     {
         variable: "active_energy",
-        type: "FLOAT",
+        type: NodeType.FLOAT,
         defaultUnit: "kWh",
         defaultNumberOfDecimals: 3,
         availableUnits: ["Wh", "kWh"],
-        applicablePhases: ["L1", "L2", "L3", "Total", ""],
+        applicablePhases: [NodePhase.L1, NodePhase.L2, NodePhase.L3, NodePhase.TOTAL, NodePhase.GENERAL],
         canBeVirtual: true,
         defaultPublished: true,
         defaultLoggingPeriod: 15,
@@ -181,11 +217,11 @@ export const defaultVariables = readable<NodeVariableType[]>([
     },
     {
         variable: "reactive_energy",
-        type: "FLOAT",
+        type: NodeType.FLOAT,
         defaultUnit: "kVArh",
         defaultNumberOfDecimals: 3,
         availableUnits: ["VArh", "kVArh"],
-        applicablePhases: ["L1", "L2", "L3", "Total", ""],
+        applicablePhases: [NodePhase.L1, NodePhase.L2, NodePhase.L3, NodePhase.TOTAL, NodePhase.GENERAL],
         canBeVirtual: true,
         defaultPublished: true,
         defaultLoggingPeriod: 15,
@@ -194,11 +230,11 @@ export const defaultVariables = readable<NodeVariableType[]>([
     },
     {
         variable: "forward_active_energy",
-        type: "FLOAT",
+        type: NodeType.FLOAT,
         defaultUnit: "kWh",
         defaultNumberOfDecimals: 3,
         availableUnits: ["Wh", "kWh"],
-        applicablePhases: ["L1", "L2", "L3", "Total", ""],
+        applicablePhases: [NodePhase.L1, NodePhase.L2, NodePhase.L3, NodePhase.TOTAL, NodePhase.GENERAL],
         canBeVirtual: false,
         defaultPublished: false,
         defaultLoggingPeriod: 15,
@@ -207,11 +243,11 @@ export const defaultVariables = readable<NodeVariableType[]>([
     },
     {
         variable: "forward_reactive_energy",
-        type: "FLOAT",
+        type: NodeType.FLOAT,
         defaultUnit: "kVArh",
         defaultNumberOfDecimals: 3,
         availableUnits: ["VArh", "kVArh"],
-        applicablePhases: ["L1", "L2", "L3", "Total", ""],
+        applicablePhases: [NodePhase.L1, NodePhase.L2, NodePhase.L3, NodePhase.TOTAL, NodePhase.GENERAL],
         canBeVirtual: false,
         defaultPublished: false,
         defaultLoggingPeriod: 15,
@@ -220,11 +256,11 @@ export const defaultVariables = readable<NodeVariableType[]>([
     },
     {
         variable: "reverse_active_energy",
-        type: "FLOAT",
+        type: NodeType.FLOAT,
         defaultUnit: "kWh",
         defaultNumberOfDecimals: 3,
         availableUnits: ["Wh", "kWh"],
-        applicablePhases: ["L1", "L2", "L3", "Total", ""],
+        applicablePhases: [NodePhase.L1, NodePhase.L2, NodePhase.L3, NodePhase.TOTAL, NodePhase.GENERAL],
         canBeVirtual: false,
         defaultPublished: false,
         defaultLoggingPeriod: 15,
@@ -233,11 +269,11 @@ export const defaultVariables = readable<NodeVariableType[]>([
     },
     {
         variable: "reverse_reactive_energy",
-        type: "FLOAT",
+        type: NodeType.FLOAT,
         defaultUnit: "kVArh",
         defaultNumberOfDecimals: 3,
         availableUnits: ["VArh", "kVArh"],
-        applicablePhases: ["L1", "L2", "L3", "Total", ""],
+        applicablePhases: [NodePhase.L1, NodePhase.L2, NodePhase.L3, NodePhase.TOTAL, NodePhase.GENERAL],
         canBeVirtual: false,
         defaultPublished: false,
         defaultLoggingPeriod: 15,

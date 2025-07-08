@@ -1,6 +1,10 @@
 <script lang="ts">
     import NodeRow from "./NodeRow.svelte";
 
+    // Stores for variable definitions
+    import { defaultVariables } from "$lib/stores/nodes";
+    import { NodePrefix } from "$lib/stores/nodes";
+
     // Stores for multi-language support
     import { selectedLang, texts } from "$lib/stores/lang";
 
@@ -21,13 +25,18 @@
     export let subSectionTextColor: string = headerTextColor;
     export let subSectionBorderColor: string = borderColor;
 
-    // Variables
-    let commID: string;
-
     // Functions
-
     function removePrefix(name: string) {
-        return name.replace(/^(l1_|l2_|l3_|total_)/, "");
+        for (const prefix of Object.values(NodePrefix)) {
+            if (name.startsWith(prefix)) {
+                return name.slice(prefix.length);
+            }
+        }
+        return name;
+    }
+
+    function addPrefix(name: string, prefix: string): string {
+        return prefix + name;
     }
 
     function getCommunicationID(node: any): string | undefined {
@@ -42,6 +51,8 @@
         return undefined;
     }
 
+    // Variables
+
     // Convert the nodes object to an array with the node names included
     $: nodesArray = Object.entries(nodes || {}).map(([name, node]) => ({
         name,
@@ -54,29 +65,29 @@
     $: l1Nodes = nodesArray
         .filter(
             (node) =>
-                node.name?.startsWith("l1_") &&
-                !node.name?.startsWith("l1_l2") &&
-                !node.name?.startsWith("l1_l3")
+                node.name?.startsWith(NodePrefix.L1) &&
+                !node.name?.startsWith(NodePrefix.L1_L2) &&
+                !node.name?.startsWith(NodePrefix.L1_L3),
         )
         .sort((a, b) => a.displayName.localeCompare(b.displayName));
     $: l2Nodes = nodesArray
         .filter(
             (node) =>
-                node.name?.startsWith("l2_") &&
-                !node.name?.startsWith("l2_l1") &&
-                !node.name?.startsWith("l2_l3")
+                node.name?.startsWith(NodePrefix.L2) &&
+                !node.name?.startsWith(NodePrefix.L2_L1) &&
+                !node.name?.startsWith(NodePrefix.L2_L3),
         )
         .sort((a, b) => a.displayName.localeCompare(b.displayName));
     $: l3Nodes = nodesArray
         .filter(
             (node) =>
-                node.name?.startsWith("l3_") &&
-                !node.name?.startsWith("l3_l1") &&
-                !node.name?.startsWith("l3_l2")
+                node.name?.startsWith(NodePrefix.L3) &&
+                !node.name?.startsWith(NodePrefix.L3_L1) &&
+                !node.name?.startsWith(NodePrefix.L3_L2),
         )
         .sort((a, b) => a.displayName.localeCompare(b.displayName));
     $: totalNodes = nodesArray
-        .filter((node) => node.name?.startsWith("total_"))
+        .filter((node) => node.name?.startsWith(NodePrefix.TOTAL))
         .sort((a, b) => a.displayName.localeCompare(b.displayName));
 
     $: usedNames = new Set([
@@ -90,10 +101,7 @@
         .filter((node) => !usedNames.has(node.name))
         .sort((a, b) => a.displayName.localeCompare(b.displayName));
 
-
-    $: console.log("L1 Communication IDs:", l1Nodes.map(n => n.communicationID));
-
-    $: console.log(nodes);
+    $: console.log(nodesArray);
 </script>
 
 <div
@@ -118,13 +126,9 @@
                     <th class="max-width">{$texts.variable[$selectedLang]}</th>
                     <th class="min-width">{$texts.unit[$selectedLang]}</th>
                     {#if selectedProtocol === "OPC_UA"}
-                        <th style="width: 150px;" class="mid-width"
-                            >{$texts.opcuaID[$selectedLang]}</th
-                        >
+                        <th style="width: 150px;" class="mid-width">{$texts.opcuaID[$selectedLang]}</th>
                     {:else if selectedProtocol === "MODBUS_RTU"}
-                        <th style="width: 150px;" class="mid-width"
-                            >{$texts.modbusRegister[$selectedLang]}</th
-                        >
+                        <th style="width: 150px;" class="mid-width">{$texts.modbusRegister[$selectedLang]}</th>
                     {/if}
                     <th class="min-width">{$texts.custom[$selectedLang]}</th>
                     <th class="min-width">{$texts.publish[$selectedLang]}</th>
@@ -133,9 +137,7 @@
                     <th class="min-width">{$texts.minAlarm[$selectedLang]}</th>
                     <th class="min-width">{$texts.maxAlarm[$selectedLang]}</th>
                     <th class="min-width">{$texts.enabled[$selectedLang]}</th>
-                    <th class="super-min-width"
-                        ><img src="/img/more.png" alt="More options" class="more-img" /></th
-                    >
+                    <th class="super-min-width"><img src="/img/more.png" alt="More options" class="more-img" /></th>
                 </tr>
             </thead>
             <tbody>
@@ -147,16 +149,56 @@
                     <!-- Variable Elements Definition-->
                     {#each l1Nodes as node (node.name)}
                         <NodeRow
-                            bind:variableName={node.displayName}
-                            bind:variableUnit={node.config.unit}
-                            bind:communicationID={node.communicationID}
-                            customVariable={false}
-                            bind:publishVariable={node.config.publish}
-                            bind:virtualVariable={node.config.calculated}
+                            onVariableNameChanged={(newName) => {
+                                node.name = addPrefix(newName, NodePrefix.L1);
+                                node.displayName = newName;
+                                const defaultNodeProps = Object.values($defaultVariables).find(
+                                    (v) => v.variable === newName,
+                                );
+                                node.config.unit = defaultNodeProps?.defaultUnit || "";
+                            }}
+                            variableName={node.displayName}
+                            onVariableUnitChanged={(newUnit) => {
+                                node.config.unit = newUnit;
+                            }}
+                            variableUnit={node.config.unit}
+                            onCommunicationIDChanged={(newID) => {
+                                node.communicationID = newID;
+                            }}
+                            variableType={node.config.type}
+                            onVariableTypeChanged={(newType) => {
+                                node.config.type = newType;
+                            }}
+                            communicationID={node.communicationID}
+                            onCustomVariableChanged={(newValue) => {
+                                node.config.custom = newValue;
+                            }}
+                            customVariable={node.config.custom}
+                            onPublishVariableChanged={(newValue) => {
+                                node.config.publish = newValue;
+                            }}
+                            publishVariable={node.config.publish}
+                            onVirtualVariableChanged={(newValue) => {
+                                node.config.calculated = newValue;
+                            }}
+                            virtualVariable={node.config.calculated}
+                            onLogVariableChanged={(newValue) => {
+                                node.config.logging = newValue;
+                            }}
                             logVariable={node.config.logging}
+                            onEnableMinAlarmChanged={(newValue) => {
+                                node.config.min_alarm = newValue;
+                            }}
                             enableMinAlarm={node.config.min_alarm}
+                            onEnableMaxAlarmChanged={(newValue) => {
+                                node.config.max_alarm = newValue;
+                            }}
                             enableMaxAlarm={node.config.max_alarm}
-                            enable={true}
+                            onEnableChanged={(newValue) => {
+                                node.config.enabled = newValue;
+                            }}
+                            enable={node.config.enabled}
+                            variableProtocol={node.protocol}
                         />
                     {/each}
                     <!--------------------------------->
@@ -167,16 +209,56 @@
                     </tr>
                     {#each l2Nodes as node (node.name)}
                         <NodeRow
-                            bind:variableName={node.displayName}
-                            bind:variableUnit={node.config.unit}
-                            bind:communicationID={node.communicationID}
-                            customVariable={false}
-                            bind:publishVariable={node.config.publish}
-                            bind:virtualVariable={node.config.calculated}
-                            bind:logVariable={node.config.logging}
-                            bind:enableMinAlarm={node.config.min_alarm}
-                            bind:enableMaxAlarm={node.config.max_alarm}
-                            enable={true}
+                            onVariableNameChanged={(newName) => {
+                                node.name = addPrefix(newName, NodePrefix.L2);
+                                node.displayName = newName;
+                                const defaultNodeProps = Object.values($defaultVariables).find(
+                                    (v) => v.variable === newName,
+                                );
+                                node.config.unit = defaultNodeProps?.defaultUnit || "";
+                            }}
+                            variableName={node.displayName}
+                            onVariableUnitChanged={(newUnit) => {
+                                node.config.unit = newUnit;
+                            }}
+                            variableUnit={node.config.unit}
+                            onCommunicationIDChanged={(newID) => {
+                                node.communicationID = newID;
+                            }}
+                            variableType={node.config.type}
+                            onVariableTypeChanged={(newType) => {
+                                node.config.type = newType;
+                            }}
+                            communicationID={node.communicationID}
+                            onCustomVariableChanged={(newValue) => {
+                                node.config.custom = newValue;
+                            }}
+                            customVariable={node.config.custom}
+                            onPublishVariableChanged={(newValue) => {
+                                node.config.publish = newValue;
+                            }}
+                            publishVariable={node.config.publish}
+                            onVirtualVariableChanged={(newValue) => {
+                                node.config.calculated = newValue;
+                            }}
+                            virtualVariable={node.config.calculated}
+                            onLogVariableChanged={(newValue) => {
+                                node.config.logging = newValue;
+                            }}
+                            logVariable={node.config.logging}
+                            onEnableMinAlarmChanged={(newValue) => {
+                                node.config.min_alarm = newValue;
+                            }}
+                            enableMinAlarm={node.config.min_alarm}
+                            onEnableMaxAlarmChanged={(newValue) => {
+                                node.config.max_alarm = newValue;
+                            }}
+                            enableMaxAlarm={node.config.max_alarm}
+                            onEnableChanged={(newValue) => {
+                                node.config.enabled = newValue;
+                            }}
+                            enable={node.config.enabled}
+                            variableProtocol={node.protocol}
                         />
                     {/each}
                     <!--     L 3     N O D E S     -->
@@ -185,16 +267,56 @@
                     </tr>
                     {#each l3Nodes as node (node.name)}
                         <NodeRow
-                            bind:variableName={node.displayName}
-                            bind:variableUnit={node.config.unit}
-                            bind:communicationID={node.communicationID}
-                            customVariable={false}
-                            bind:publishVariable={node.config.publish}
-                            bind:virtualVariable={node.config.calculated}
-                            bind:logVariable={node.config.logging}
-                            bind:enableMinAlarm={node.config.min_alarm}
-                            bind:enableMaxAlarm={node.config.max_alarm}
-                            enable={true}
+                            onVariableNameChanged={(newName) => {
+                                node.name = addPrefix(newName, NodePrefix.L3);
+                                node.displayName = newName;
+                                const defaultNodeProps = Object.values($defaultVariables).find(
+                                    (v) => v.variable === newName,
+                                );
+                                node.config.unit = defaultNodeProps?.defaultUnit || "";
+                            }}
+                            variableName={node.displayName}
+                            onVariableUnitChanged={(newUnit) => {
+                                node.config.unit = newUnit;
+                            }}
+                            variableUnit={node.config.unit}
+                            onCommunicationIDChanged={(newID) => {
+                                node.communicationID = newID;
+                            }}
+                            variableType={node.config.type}
+                            onVariableTypeChanged={(newType) => {
+                                node.config.type = newType;
+                            }}
+                            communicationID={node.communicationID}
+                            onCustomVariableChanged={(newValue) => {
+                                node.config.custom = newValue;
+                            }}
+                            customVariable={node.config.custom}
+                            onPublishVariableChanged={(newValue) => {
+                                node.config.publish = newValue;
+                            }}
+                            publishVariable={node.config.publish}
+                            onVirtualVariableChanged={(newValue) => {
+                                node.config.calculated = newValue;
+                            }}
+                            virtualVariable={node.config.calculated}
+                            onLogVariableChanged={(newValue) => {
+                                node.config.logging = newValue;
+                            }}
+                            logVariable={node.config.logging}
+                            onEnableMinAlarmChanged={(newValue) => {
+                                node.config.min_alarm = newValue;
+                            }}
+                            enableMinAlarm={node.config.min_alarm}
+                            onEnableMaxAlarmChanged={(newValue) => {
+                                node.config.max_alarm = newValue;
+                            }}
+                            enableMaxAlarm={node.config.max_alarm}
+                            onEnableChanged={(newValue) => {
+                                node.config.enabled = newValue;
+                            }}
+                            enable={node.config.enabled}
+                            variableProtocol={node.protocol}
                         />
                     {/each}
 
@@ -204,16 +326,56 @@
                     </tr>
                     {#each totalNodes as node (node.name)}
                         <NodeRow
-                            bind:variableName={node.displayName}
-                            bind:variableUnit={node.config.unit}
-                            bind:communicationID={node.communicationID}
-                            customVariable={false}
-                            bind:publishVariable={node.config.publish}
-                            bind:virtualVariable={node.config.calculated}
-                            bind:logVariable={node.config.logging}
-                            bind:enableMinAlarm={node.config.min_alarm}
-                            bind:enableMaxAlarm={node.config.max_alarm}
-                            enable={true}
+                            onVariableNameChanged={(newName) => {
+                                node.name = addPrefix(newName, NodePrefix.TOTAL);
+                                node.displayName = newName;
+                                const defaultNodeProps = Object.values($defaultVariables).find(
+                                    (v) => v.variable === newName,
+                                );
+                                node.config.unit = defaultNodeProps?.defaultUnit || "";
+                            }}
+                            variableName={node.displayName}
+                            onVariableUnitChanged={(newUnit) => {
+                                node.config.unit = newUnit;
+                            }}
+                            variableUnit={node.config.unit}
+                            onCommunicationIDChanged={(newID) => {
+                                node.communicationID = newID;
+                            }}
+                            variableType={node.config.type}
+                            onVariableTypeChanged={(newType) => {
+                                node.config.type = newType;
+                            }}
+                            communicationID={node.communicationID}
+                            onCustomVariableChanged={(newValue) => {
+                                node.config.custom = newValue;
+                            }}
+                            customVariable={node.config.custom}
+                            onPublishVariableChanged={(newValue) => {
+                                node.config.publish = newValue;
+                            }}
+                            publishVariable={node.config.publish}
+                            onVirtualVariableChanged={(newValue) => {
+                                node.config.calculated = newValue;
+                            }}
+                            virtualVariable={node.config.calculated}
+                            onLogVariableChanged={(newValue) => {
+                                node.config.logging = newValue;
+                            }}
+                            logVariable={node.config.logging}
+                            onEnableMinAlarmChanged={(newValue) => {
+                                node.config.min_alarm = newValue;
+                            }}
+                            enableMinAlarm={node.config.min_alarm}
+                            onEnableMaxAlarmChanged={(newValue) => {
+                                node.config.max_alarm = newValue;
+                            }}
+                            enableMaxAlarm={node.config.max_alarm}
+                            onEnableChanged={(newValue) => {
+                                node.config.enabled = newValue;
+                            }}
+                            enable={node.config.enabled}
+                            variableProtocol={node.protocol}
                         />
                     {/each}
 
@@ -223,32 +385,61 @@
                     </tr>
                     {#each generalNodes as node (node.name)}
                         <NodeRow
-                            bind:variableName={node.displayName}
-                            bind:variableUnit={node.config.unit}
-                            bind:communicationID={node.communicationID}
-                            customVariable={false}
-                            bind:publishVariable={node.config.publish}
-                            bind:virtualVariable={node.config.calculated}
-                            bind:logVariable={node.config.logging}
-                            bind:enableMinAlarm={node.config.min_alarm}
-                            bind:enableMaxAlarm={node.config.max_alarm}
-                            enable={true}
+                            onVariableNameChanged={(newName) => {
+                                node.name = addPrefix(newName, NodePrefix.GENERAL);
+                                node.displayName = newName;
+                                const defaultNodeProps = Object.values($defaultVariables).find(
+                                    (v) => v.variable === newName,
+                                );
+                                node.config.unit = defaultNodeProps?.defaultUnit || "";
+                            }}
+                            variableName={node.displayName}
+                            onVariableUnitChanged={(newUnit) => {
+                                node.config.unit = newUnit;
+                            }}
+                            variableUnit={node.config.unit}
+                            onCommunicationIDChanged={(newID) => {
+                                node.communicationID = newID;
+                            }}
+                            variableType={node.config.type}
+                            onVariableTypeChanged={(newType) => {
+                                node.config.type = newType;
+                            }}
+                            communicationID={node.communicationID}
+                            onCustomVariableChanged={(newValue) => {
+                                node.config.custom = newValue;
+                            }}
+                            customVariable={node.config.custom}
+                            onPublishVariableChanged={(newValue) => {
+                                node.config.publish = newValue;
+                            }}
+                            publishVariable={node.config.publish}
+                            onVirtualVariableChanged={(newValue) => {
+                                node.config.calculated = newValue;
+                            }}
+                            virtualVariable={node.config.calculated}
+                            onLogVariableChanged={(newValue) => {
+                                node.config.logging = newValue;
+                            }}
+                            logVariable={node.config.logging}
+                            onEnableMinAlarmChanged={(newValue) => {
+                                node.config.min_alarm = newValue;
+                            }}
+                            enableMinAlarm={node.config.min_alarm}
+                            onEnableMaxAlarmChanged={(newValue) => {
+                                node.config.max_alarm = newValue;
+                            }}
+                            enableMaxAlarm={node.config.max_alarm}
+                            onEnableChanged={(newValue) => {
+                                node.config.enabled = newValue;
+                            }}
+                            enable={node.config.enabled}
+                            variableProtocol={node.protocol}
                         />
                     {/each}
                 {:else if meterType === "SINGLE_PHASE"}
                     {#each nodesArray as node (node.name)}
-                        <NodeRow
-                            bind:variableName={node.variable}
-                            bind:variableUnit={node.config.unit}
-                            bind:communicationID={node.communicationID}
-                            customVariable={false}
-                            bind:publishVariable={node.config.publish}
-                            bind:virtualVariable={node.config.calculated}
-                            bind:logVariable={node.config.logging}
-                            bind:enableMinAlarm={node.config.min_alarm}
-                            bind:enableMaxAlarm={node.config.max_alarm}
-                            enable={true}
-                        />
+                        <tr><td>To Implement</td></tr>
                     {/each}
                 {/if}
             </tbody>
@@ -336,8 +527,8 @@
 
     table .sub-section {
         width: 100%;
-        margin:0;
-        padding:0;
+        margin: 0;
+        padding: 0;
         height: 25px;
         background-color: var(--sub-section-background-color);
         color: var(--sub-section-text-color);
