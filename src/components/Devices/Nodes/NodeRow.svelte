@@ -4,15 +4,14 @@
     import Checkbox from "../../General/Checkbox.svelte";
     import { validateNodeName, validateNodeUnit, validateCommunicationID } from "$lib/ts/nodes";
 
-    import { Protocol, NodeType } from "$lib/stores/nodes";
-    import { defaultVariables } from "$lib/stores/nodes";
-    import { defaultVariableNames } from "$lib/stores/nodes";
+    import { Protocol, NodeType, NodePhase } from "$lib/stores/nodes";
     import { defaultVariableUnits } from "$lib/stores/nodes";
 
     // Stores for multi-language support
-    import { variableNameTexts } from "$lib/stores/lang";
+    import { variableNameTexts, variableNameTextsByPhase } from "$lib/stores/lang";
 
     // Props
+    export let variablePhase: NodePhase;
     export let variableName: string;
     export let variableUnit: string;
     export let variableProtocol: Protocol;
@@ -31,6 +30,8 @@
     let oldVariableUnit: string = variableUnit;
     let customVariableChanged: boolean = customVariable;
 
+    let disabledUnit: boolean = false;
+
     // Export Funcions
     export let onVariableNameChanged: (variableName: string) => void = () => {};
     export let onVariableUnitChanged: (variableUnit: string) => void = () => {};
@@ -47,6 +48,19 @@
     // Reactive statements
     $: onVariableNameChanged(variableName);
     $: onVariableUnitChanged(variableUnit);
+    $: {
+        if (variableType === NodeType.FLOAT || variableType === NodeType.INT) {
+            if ($defaultVariableUnits[variableName]) {
+                variableUnit = $defaultVariableUnits[variableName][0];
+            } else {
+                variableUnit = "";
+                disabledUnit = false;
+            }
+        } else if (variableType === NodeType.STRING || variableType === NodeType.BOOLEAN) {
+            variableUnit = "";
+            disabledUnit = true;
+        }
+    }
     $: onVariableTypeChanged(variableType);
     $: onCommunicationIDChanged(communicationID);
     $: {
@@ -82,7 +96,7 @@
             {#if !customVariable}
                 <Selector
                     useLang={true}
-                    options={$variableNameTexts}
+                    options={$variableNameTextsByPhase[variablePhase]}
                     bind:selectedOption={variableName}
                     inputBadFormat={!validateNodeName(variableName, customVariable)}
                     firstSubmission={true}
@@ -152,6 +166,7 @@
             {:else}
                 <InputField
                     bind:inputValue={variableUnit}
+                    disabled={disabledUnit}
                     inputBadFormat={!validateNodeUnit(variableName, variableType, variableUnit, customVariable)}
                     firstSubmission={true}
                     inputType="STRING"

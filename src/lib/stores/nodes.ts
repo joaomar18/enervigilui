@@ -1,13 +1,20 @@
 import { readable } from "svelte/store";
 import { derived } from "svelte/store";
 
-
+/**
+ * Communication protocols supported by the energy monitoring system.
+ * Defines the available protocols for communicating with external devices and systems.
+ */
 export enum Protocol {
     MODBUS_RTU = "MODBUS_RTU",
     OPC_UA = "OPC_UA",
     NONE = "NONE"
 }
 
+/**
+ * Prefixes used to identify the electrical phase or type of a node variable.
+ * These prefixes are prepended to variable names to organize them by phase in three-phase power systems.
+ */
 export enum NodePrefix {
     L1 = "l1_",
     L2 = "l2_",
@@ -22,6 +29,10 @@ export enum NodePrefix {
     GENERAL = ""
 }
 
+/**
+ * Electrical phases in a three-phase power system.
+ * Used to specify which phases a variable can be applied to or measured from.
+ */
 export enum NodePhase {
     L1 = "L1",
     L2 = "L2",
@@ -30,6 +41,10 @@ export enum NodePhase {
     GENERAL = ""
 }
 
+/**
+ * Data types supported for node variables in the energy monitoring system.
+ * Determines how values are processed, validated, and displayed in the UI.
+ */
 export enum NodeType {
     FLOAT = "FLOAT",
     STRING = "STRING",
@@ -43,49 +58,20 @@ export enum NodeType {
  * typical measurement variables (e.g., voltage, current, power) in the system.
  */
 export interface NodeVariableType {
-    /** Unique identifier name of the variable (e.g., "voltage", "current") */
     variable: string;
-
-    /** Data type of the variable - determines how values are processed and displayed */
     type: NodeType;
-
-    /** Number of decimal places to display for FLOAT type variables */
     defaultNumberOfDecimals?: number;
-
-    /** Primary unit of measurement for the variable (e.g., "V" for voltage) */
     defaultUnit: string;
-
-    /** Alternative units that can be selected for this variable (e.g., ["W", "kW"]) */
     availableUnits?: string[];
-
-    /** Specifies which phases this variable can be applied to in power systems */
     applicablePhases: NodePhase[];
-
-    /** Indicates if this variable can be calculated from other variables rather than measured directly */
     canBeVirtual: boolean;
-
-    /** Whether this variable should be published to external systems by default */
     defaultPublished: boolean;
-
-    /** Default period (in minutes) at which values should be logged */
     defaultLoggingPeriod: number;
-
-    /** Whether logging is enabled by default for this variable */
     defaultLoggingEnabled: boolean;
-
-    /** Indicates if the variable accumulates over time (like energy readings) vs. instantaneous values */
     isIncrementalNode: boolean;
-
-    /** Default minimum threshold for triggering alarms */
     defaultMinAlarm?: number;
-
-    /** Default maximum threshold for triggering alarms */
     defaultMaxAlarm?: number;
-
-    /** Whether the minimum alarm is enabled by default */
     defaultMinAlarmEnabled?: boolean;
-
-    /** Whether the maximum alarm is enabled by default */
     defaultMaxAlarmEnabled?: boolean;
 }
 
@@ -108,6 +94,54 @@ export const defaultVariables = readable<NodeVariableType[]>([
         isIncrementalNode: false,
         defaultMinAlarm: 230 * 0.9,
         defaultMaxAlarm: 230 * 1.1,
+        defaultMinAlarmEnabled: true,
+        defaultMaxAlarmEnabled: true,
+    },
+    {
+        variable: "l1_l2_voltage",
+        type: NodeType.FLOAT,
+        defaultNumberOfDecimals: 2,
+        defaultUnit: "V",
+        applicablePhases: [NodePhase.GENERAL],
+        canBeVirtual: false,
+        defaultPublished: true,
+        defaultLoggingPeriod: 15,
+        defaultLoggingEnabled: true,
+        isIncrementalNode: false,
+        defaultMinAlarm: 400 * 0.9,
+        defaultMaxAlarm: 400 * 1.1,
+        defaultMinAlarmEnabled: true,
+        defaultMaxAlarmEnabled: true,
+    },
+    {
+        variable: "l2_l3_voltage",
+        type: NodeType.FLOAT,
+        defaultNumberOfDecimals: 2,
+        defaultUnit: "V",
+        applicablePhases: [NodePhase.GENERAL],
+        canBeVirtual: false,
+        defaultPublished: true,
+        defaultLoggingPeriod: 15,
+        defaultLoggingEnabled: true,
+        isIncrementalNode: false,
+        defaultMinAlarm: 400 * 0.9,
+        defaultMaxAlarm: 400 * 1.1,
+        defaultMinAlarmEnabled: true,
+        defaultMaxAlarmEnabled: true,
+    },
+    {
+        variable: "l3_l1_voltage",
+        type: NodeType.FLOAT,
+        defaultNumberOfDecimals: 2,
+        defaultUnit: "V",
+        applicablePhases: [NodePhase.GENERAL],
+        canBeVirtual: false,
+        defaultPublished: true,
+        defaultLoggingPeriod: 15,
+        defaultLoggingEnabled: true,
+        isIncrementalNode: false,
+        defaultMinAlarm: 400 * 0.9,
+        defaultMaxAlarm: 400 * 1.1,
         defaultMinAlarmEnabled: true,
         defaultMaxAlarmEnabled: true,
     },
@@ -290,6 +324,29 @@ export const defaultVariables = readable<NodeVariableType[]>([
 export const defaultVariableNames = derived(defaultVariables, ($defaultVariables) =>
     $defaultVariables.map((type) => type.variable)
 );
+
+/**
+ * A derived store that filters variable names by their applicable phases.
+ * Returns an object where each key is a phase (e.g., "L1", "L2", "L3", "Total", "") 
+ * and each value is an array of variable names that can be applied to that phase.
+ * Useful for creating phase-specific variable selectors.
+ */
+export const defaultVariableNamesByPhase = derived(defaultVariables, ($defaultVariables) => {
+    const phaseMap: Record<string, string[]> = {};
+
+    // Initialize all phases
+    Object.values(NodePhase).forEach(phase => {
+        phaseMap[phase] = [];
+    });
+
+    $defaultVariables.forEach((variable) => {
+        variable.applicablePhases.forEach(phase => {
+            phaseMap[phase].push(variable.variable);
+        });
+    });
+
+    return phaseMap;
+});
 
 /**
  * A derived store mapping variable names to their available units.

@@ -1,4 +1,5 @@
-import { writable, readable } from "svelte/store";
+import { writable, readable, derived } from "svelte/store";
+import { defaultVariables, NodePhase } from "./nodes";
 
 // Type for the available languages
 export type Language = "PT" | "EN";
@@ -466,6 +467,18 @@ const textsObjectsVariables: TextsObject = {
         PT: "Tensão",
         EN: "Voltage",
     },
+    l1_l2_voltage: {
+        PT: "Tensão L1-L2",
+        EN: "L1-L2 Voltage",
+    },
+    l2_l3_voltage: {
+        PT: "Tensão L2-L3",
+        EN: "L2-L3 Voltage",
+    },
+    l3_l1_voltage: {
+        PT: "Tensão L3-L1",
+        EN: "L3-L1 Voltage",
+    },
     current: {
         PT: "Corrente",
         EN: "Current",
@@ -522,3 +535,31 @@ const textsObjectsVariables: TextsObject = {
 
 export const texts = readable<TextsObject>(textsObject);
 export const variableNameTexts = readable<TextsObject>(textsObjectsVariables);
+
+/**
+ * A derived store that filters variable name texts by their applicable phases.
+ * Returns an object where each key is a phase (e.g., "L1", "L2", "L3", "Total", "") 
+ * and each value is a TextsObject containing only the variable names that can be applied to that phase.
+ * Useful for creating phase-specific variable selectors with proper translations.
+ */
+export const variableNameTextsByPhase = derived(
+    [defaultVariables],
+    ([$defaultVariables]) => {
+        const phaseMap: Record<string, TextsObject> = {};
+        
+        // Initialize all phases
+        Object.values(NodePhase).forEach(phase => {
+            phaseMap[phase] = {};
+        });
+        
+        $defaultVariables.forEach((variable) => {
+            variable.applicablePhases.forEach(phase => {
+                if (textsObjectsVariables[variable.variable]) {
+                    phaseMap[phase][variable.variable] = textsObjectsVariables[variable.variable];
+                }
+            });
+        });
+        
+        return phaseMap;
+    }
+);

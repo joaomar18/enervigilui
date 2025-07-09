@@ -3,7 +3,7 @@
 
     // Stores for variable definitions
     import { defaultVariables } from "$lib/stores/nodes";
-    import { NodePrefix } from "$lib/stores/nodes";
+    import { NodePrefix, NodePhase } from "$lib/stores/nodes";
 
     // Stores for multi-language support
     import { selectedLang, texts } from "$lib/stores/lang";
@@ -27,10 +27,37 @@
 
     // Functions
     function removePrefix(name: string) {
-        for (const prefix of Object.values(NodePrefix)) {
-            if (name.startsWith(prefix)) {
-                return name.slice(prefix.length);
-            }
+        if (name.startsWith(NodePrefix.L1) && !name.startsWith(NodePrefix.L1_L2) && !name.startsWith(NodePrefix.L1_L3)) {
+            // L1 Nodes
+            return name.slice(NodePrefix.L1.length);
+        } else if (
+            name.startsWith(NodePrefix.L2) &&
+            !name.startsWith(NodePrefix.L2_L1) &&
+            !name.startsWith(NodePrefix.L2_L3)
+        ) {
+            // L2 Nodes
+            return name.slice(NodePrefix.L2.length);
+        } else if (
+            name.startsWith(NodePrefix.L3) &&
+            !name.startsWith(NodePrefix.L3_L1) &&
+            !name.startsWith(NodePrefix.L3_L2)
+        ) {
+            // L3 Nodes
+            return name.slice(NodePrefix.L3.length);
+        } else if (name.startsWith(NodePrefix.TOTAL)) {
+            // Total Nodes
+            return name.slice(NodePrefix.TOTAL.length);
+        } else if (
+            name.startsWith(NodePrefix.GENERAL) ||
+            name.startsWith(NodePrefix.L1_L2) ||
+            name.startsWith(NodePrefix.L1_L3) ||
+            name.startsWith(NodePrefix.L2_L1) ||
+            name.startsWith(NodePrefix.L2_L3) ||
+            name.startsWith(NodePrefix.L3_L1) ||
+            name.startsWith(NodePrefix.L3_L2)
+        ) {
+            // General or Complex Voltage Nodes
+            return name;
         }
         return name;
     }
@@ -101,7 +128,7 @@
         .filter((node) => !usedNames.has(node.name))
         .sort((a, b) => a.displayName.localeCompare(b.displayName));
 
-    $: console.log(nodesArray);
+    $: console.log(generalNodes);
 </script>
 
 <div
@@ -149,6 +176,7 @@
                     <!-- Variable Elements Definition-->
                     {#each l1Nodes as node (node.name)}
                         <NodeRow
+                            variablePhase = {NodePhase.L1}
                             onVariableNameChanged={(newName) => {
                                 node.name = addPrefix(newName, NodePrefix.L1);
                                 node.displayName = newName;
@@ -209,6 +237,7 @@
                     </tr>
                     {#each l2Nodes as node (node.name)}
                         <NodeRow
+                            variablePhase={NodePhase.L2}
                             onVariableNameChanged={(newName) => {
                                 node.name = addPrefix(newName, NodePrefix.L2);
                                 node.displayName = newName;
@@ -267,6 +296,7 @@
                     </tr>
                     {#each l3Nodes as node (node.name)}
                         <NodeRow
+                            variablePhase = {NodePhase.L3}
                             onVariableNameChanged={(newName) => {
                                 node.name = addPrefix(newName, NodePrefix.L3);
                                 node.displayName = newName;
@@ -326,6 +356,7 @@
                     </tr>
                     {#each totalNodes as node (node.name)}
                         <NodeRow
+                            variablePhase = {NodePhase.TOTAL}
                             onVariableNameChanged={(newName) => {
                                 node.name = addPrefix(newName, NodePrefix.TOTAL);
                                 node.displayName = newName;
@@ -385,6 +416,7 @@
                     </tr>
                     {#each generalNodes as node (node.name)}
                         <NodeRow
+                            variablePhase = {NodePhase.GENERAL}
                             onVariableNameChanged={(newName) => {
                                 node.name = addPrefix(newName, NodePrefix.GENERAL);
                                 node.displayName = newName;
