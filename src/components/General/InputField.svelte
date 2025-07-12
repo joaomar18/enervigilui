@@ -73,10 +73,7 @@
 
     function validateBounds(): void {
         // Convert to number for validation if input is numeric
-        if (
-            ["INT", "POSITIVE_INT", "FLOAT", "POSITIVE_FLOAT"].includes(inputType) &&
-            inputValue !== ""
-        ) {
+        if (["INT", "POSITIVE_INT", "FLOAT", "POSITIVE_FLOAT"].includes(inputType) && inputValue !== "") {
             const numericValue = parseFloat(inputValue.toString());
             if (numericValue < minValue) {
                 inputValue = minValue.toString();
@@ -184,7 +181,7 @@
                     on:input={handleInput}
                     {disabled}
                     class:disabled
-                    class:bad-format={inputBadFormat && firstSubmission}
+                    class:bad-format={inputBadFormat && firstSubmission && !disabled}
                 />
             {/if}
             {#if inputUnit}

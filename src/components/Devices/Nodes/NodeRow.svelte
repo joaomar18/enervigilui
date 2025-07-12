@@ -2,7 +2,7 @@
     import Selector from "../../General/Selector.svelte";
     import InputField from "../../General/InputField.svelte";
     import Checkbox from "../../General/Checkbox.svelte";
-    import { validateNodeName, validateNodeUnit, validateCommunicationID } from "$lib/ts/nodes";
+    import { validateNodeName, validateNodeUnit, validateCommunicationID, validateNodeType } from "$lib/ts/nodes";
 
     import { Protocol, NodeType, NodePhase } from "$lib/stores/nodes";
     import { defaultVariableUnits } from "$lib/stores/nodes";
@@ -11,6 +11,8 @@
     import { variableNameTexts, variableNameTextsByPhase } from "$lib/stores/lang";
 
     // Props
+    export let selectedProtocol: Protocol;
+
     export let variablePhase: NodePhase;
     export let variableName: string;
     export let variableUnit: string;
@@ -24,6 +26,9 @@
     export let enableMinAlarm: boolean;
     export let enableMaxAlarm: boolean;
     export let enable: boolean;
+
+    // Layout / styling props
+    export let backgroundColor: string;
 
     // Variables
     let oldVariableName: string = variableName;
@@ -44,6 +49,21 @@
     export let onEnableMinAlarmChanged: (enableMinAlarm: boolean) => void = () => {};
     export let onEnableMaxAlarmChanged: (enableMaxAlarm: boolean) => void = () => {};
     export let onEnableChanged: (enable: boolean) => void = () => {};
+    export let onDelete: () => void;
+    export let onConfig: () => void;
+
+    // Functions
+    function handleOnDelete(): void {
+        if (onDelete) {
+            onDelete();
+        }
+    }
+
+    function handleOnConfig(): void {
+        if (onConfig) {
+            onConfig();
+        }
+    }
 
     // Reactive statements
     $: onVariableNameChanged(variableName);
@@ -54,8 +74,8 @@
                 variableUnit = $defaultVariableUnits[variableName][0];
             } else {
                 variableUnit = "";
-                disabledUnit = false;
             }
+            disabledUnit = false;
         } else if (variableType === NodeType.STRING || variableType === NodeType.BOOLEAN) {
             variableUnit = "";
             disabledUnit = true;
@@ -81,6 +101,10 @@
     $: {
         if (virtualVariable) {
             communicationID = "";
+            variableProtocol = Protocol.NONE;
+        }
+        else{
+            variableProtocol = selectedProtocol;
         }
         onVirtualVariableChanged(virtualVariable);
     }
@@ -90,7 +114,12 @@
     $: onEnableChanged(enable);
 </script>
 
-<tr class="editing">
+<tr
+    style="
+        --background-color: {backgroundColor};
+    "
+    class="edit-node"
+>
     <td>
         <div class="cell-content">
             {#if !customVariable}
@@ -145,6 +174,7 @@
                 <Selector
                     options={Object.fromEntries($defaultVariableUnits[variableName]?.map((unit) => [unit, unit]) || [])}
                     bind:selectedOption={variableUnit}
+                    disabled={disabledUnit}
                     inputBadFormat={!validateNodeUnit(variableName, variableType, variableUnit, customVariable)}
                     firstSubmission={true}
                     scrollable={true}
@@ -208,6 +238,31 @@
                 fontWeight="400"
                 textAlign="center"
                 unitTextColor="rgb(170,170,170)"
+            />
+        </div>
+    </td>
+    <td>
+        <div class="cell-content">
+            <Selector
+                options={Object.fromEntries(Object.entries(NodeType).map(([key, value]) => [value, value]))}
+                bind:selectedOption={variableType}
+                inputBadFormat={!validateNodeType(variableType, variableName, customVariable)}
+                firstSubmission={true}
+                scrollable={true}
+                maxOptions={5}
+                width="90%"
+                height="30px"
+                borderRadius="5px"
+                backgroundColor="#1a2027"
+                disabledBackgroundColor="#42505f"
+                selectedColor="#14566b"
+                badFormatBorderColor="#e74c3c"
+                optionsBackgroundColor="#1e242b"
+                optionsBorderColor="#323a45"
+                fontSize="0.9rem"
+                arrowWidth="16px"
+                arrowHeight="16px"
+                arrowRightPos="5px"
             />
         </div>
     </td>
@@ -278,38 +333,6 @@
     <td>
         <div class="cell-content">
             <Checkbox
-                bind:checked={enableMinAlarm}
-                inputName="minimum-alarm-enabled"
-                width="1.5em"
-                height="1.5em"
-                checkMarkWidth={24}
-                checkMarkHeight={24}
-                enabledbgColor="#2f80ed"
-                enabledBorderColor="#5a646e"
-                disabledbgColor="#42505f"
-                disabledBorderColor="#5a646e"
-            />
-        </div>
-    </td>
-    <td>
-        <div class="cell-content">
-            <Checkbox
-                bind:checked={enableMaxAlarm}
-                inputName="maximum-alarm-enable"
-                width="1.5em"
-                height="1.5em"
-                checkMarkWidth={24}
-                checkMarkHeight={24}
-                enabledbgColor="#2f80ed"
-                enabledBorderColor="#5a646e"
-                disabledbgColor="#42505f"
-                disabledBorderColor="#5a646e"
-            />
-        </div>
-    </td>
-    <td>
-        <div class="cell-content">
-            <Checkbox
                 bind:checked={enable}
                 inputName="enable-node"
                 width="1.5em"
@@ -324,8 +347,15 @@
         </div>
     </td>
     <td>
-        <div class="cell-content">
-            <button class="btn-more-options" aria-label="More Options">
+        <div class="cell-content gap-items">
+            <button class="btn-delete" aria-label="Delete Node" on:click={handleOnDelete}>
+                <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px"
+                    ><path
+                        d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM8 9h8v10H8V9zm2 2v6h1v-6h-1zm3 0v6h1v-6h-1zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"
+                    /></svg
+                >
+            </button>
+            <button class="btn-more-options" aria-label="More Options" on:click={handleOnConfig}>
                 <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px"
                     ><path
                         d="m370-80-16-128q-13-5-24.5-12T307-235l-119 50L78-375l103-78q-1-7-1-13.5v-27q0-6.5 1-13.5L78-585l110-190 119 50q11-8 23-15t24-12l16-128h220l16 128q13 5 24.5 12t22.5 15l119-50 110 190-103 78q1 7 1 13.5v27q0 6.5-2 13.5l103 78-110 190-118-50q-11 8-23 15t-24 12L590-80H370Zm70-80h79l14-106q31-8 57.5-23.5T639-327l99 41 39-68-86-65q5-14 7-29.5t2-31.5q0-16-2-31.5t-7-29.5l86-65-39-68-99 42q-22-23-48.5-38.5T533-694l-13-106h-79l-14 106q-31 8-57.5 23.5T321-633l-99-41-39 68 86 64q-5 15-7 30t-2 32q0 16 2 31t7 30l-86 65 39 68 99-42q22 23 48.5 38.5T427-266l13 106Zm42-180q58 0 99-41t41-99q0-58-41-99t-99-41q-59 0-99.5 41T342-480q0 58 40.5 99t99.5 41Zm-2-140Z"
@@ -337,8 +367,8 @@
 </tr>
 
 <style>
-    tr.editing {
-        background-color: rgba(255, 255, 255, 0.05);
+    tr.edit-node {
+        background-color: var(--background-color);
     }
 
     tr td {
@@ -358,10 +388,22 @@
         margin: 0;
     }
 
-    .btn-more-options {
+    tr td .cell-content.gap-items {
+        gap: 15px;
+    }
+
+    button {
         background-color: transparent;
         cursor: pointer;
         border: none;
+    }
+
+    .btn-delete svg {
+        fill: rgb(192, 192, 192);
+    }
+
+    .btn-delete:hover svg {
+        fill: #e74c3c;
     }
 
     .btn-more-options svg {

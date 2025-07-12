@@ -5,6 +5,8 @@
     // Layout / styling props
     export let buttonText: string;
     export let width: string;
+    export let minWidth: string = "";
+    export let maxWidth: string = ""; 
     export let height: string;
     export let borderRadius: string = "";
     export let backgroundColor: string;
@@ -46,6 +48,8 @@
 <button
     style="
         --width: {width};
+        --min-width: {minWidth};
+        --max-width: {maxWidth};
         --height: {height};
         --border-radius: {borderRadius};
         --background-color: {backgroundColor};
@@ -82,6 +86,8 @@
         padding: 0;
         position: relative;
         width: var(--width);
+        min-width: var(--min-width, 0px);
+        max-width: var(--max-width, --width);
         height: var(--height);
         border-radius: var(--border-radius, 0px);
         background-color: var(--background-color);

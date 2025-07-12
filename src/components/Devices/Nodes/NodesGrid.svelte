@@ -1,17 +1,18 @@
 <script lang="ts">
     import NodeRow from "./NodeRow.svelte";
+    import AddNode from "./AddNode.svelte";
 
     // Stores for variable definitions
     import { defaultVariables } from "$lib/stores/nodes";
-    import { NodePrefix, NodePhase } from "$lib/stores/nodes";
+    import { Protocol, NodePrefix, NodePhase } from "$lib/stores/nodes";
 
     // Stores for multi-language support
     import { selectedLang, texts } from "$lib/stores/lang";
 
     // Props
-    export let selectedProtocol: string;
+    export let selectedProtocol: Protocol;
     export let meterType: string;
-    export let nodes: Object = {};
+    export let nodes: Record<string, any> = {};
 
     // Layout / styling props
     export let width: string;
@@ -26,39 +27,32 @@
     export let subSectionBorderColor: string = borderColor;
 
     // Functions
-    function removePrefix(name: string) {
-        if (name.startsWith(NodePrefix.L1) && !name.startsWith(NodePrefix.L1_L2) && !name.startsWith(NodePrefix.L1_L3)) {
-            // L1 Nodes
-            return name.slice(NodePrefix.L1.length);
-        } else if (
-            name.startsWith(NodePrefix.L2) &&
-            !name.startsWith(NodePrefix.L2_L1) &&
-            !name.startsWith(NodePrefix.L2_L3)
-        ) {
-            // L2 Nodes
-            return name.slice(NodePrefix.L2.length);
-        } else if (
-            name.startsWith(NodePrefix.L3) &&
-            !name.startsWith(NodePrefix.L3_L1) &&
-            !name.startsWith(NodePrefix.L3_L2)
-        ) {
-            // L3 Nodes
-            return name.slice(NodePrefix.L3.length);
-        } else if (name.startsWith(NodePrefix.TOTAL)) {
-            // Total Nodes
-            return name.slice(NodePrefix.TOTAL.length);
-        } else if (
-            name.startsWith(NodePrefix.GENERAL) ||
-            name.startsWith(NodePrefix.L1_L2) ||
-            name.startsWith(NodePrefix.L1_L3) ||
-            name.startsWith(NodePrefix.L2_L1) ||
-            name.startsWith(NodePrefix.L2_L3) ||
-            name.startsWith(NodePrefix.L3_L1) ||
-            name.startsWith(NodePrefix.L3_L2)
-        ) {
-            // General or Complex Voltage Nodes
-            return name;
+    function removePrefix(name: string): string {
+        const prefixes = Object.values(NodePrefix).sort((a, b) => b.length - a.length);
+
+        for (const prefix of prefixes) {
+            if (name.startsWith(prefix)) {
+                if (name.startsWith(NodePrefix.L1) && !name.startsWith(NodePrefix.L1_L2) && !name.startsWith(NodePrefix.L1_L3)) {
+                    return name.slice(prefix.length);
+                } else if (name.startsWith(NodePrefix.L2) && !name.startsWith(NodePrefix.L2_L1) && !name.startsWith(NodePrefix.L2_L3)) {
+                    return name.slice(prefix.length);
+                } else if (name.startsWith(NodePrefix.L3) && !name.startsWith(NodePrefix.L3_L1) && !name.startsWith(NodePrefix.L3_L2)) {
+                    return name.slice(prefix.length);
+                } else if (
+                    name.startsWith(NodePrefix.L1_L2) ||
+                    name.startsWith(NodePrefix.L1_L3) ||
+                    name.startsWith(NodePrefix.L2_L1) ||
+                    name.startsWith(NodePrefix.L2_L3) ||
+                    name.startsWith(NodePrefix.L3_L1) ||
+                    name.startsWith(NodePrefix.L3_L2)
+                ) {
+                    return name;
+                } else {
+                    return name.slice(prefix.length);
+                }
+            }
         }
+
         return name;
     }
 
@@ -78,9 +72,101 @@
         return undefined;
     }
 
+    function createNodeRowProps(node: any, phase: NodePhase, prefix: NodePrefix) {
+        return {
+            variablePhase: phase,
+            onVariableNameChanged: (newName: string) => {
+                node.name = addPrefix(newName, prefix);
+                node.displayName = newName;
+                const defaultNodeProps = Object.values($defaultVariables).find((v) => v.variable === newName);
+                node.config.unit = defaultNodeProps?.defaultUnit || "";
+            },
+            variableName: node.displayName,
+            onVariableUnitChanged: (newUnit: string) => {
+                node.config.unit = newUnit;
+            },
+            variableUnit: node.config.unit,
+            onCommunicationIDChanged: (newID: string) => {
+                node.communicationID = newID;
+            },
+            variableType: node.config.type,
+            onVariableTypeChanged: (newType: string) => {
+                node.config.type = newType;
+            },
+            communicationID: node.communicationID,
+            onCustomVariableChanged: (newValue: boolean) => {
+                node.config.custom = newValue;
+            },
+            customVariable: node.config.custom,
+            onPublishVariableChanged: (newValue: boolean) => {
+                node.config.publish = newValue;
+            },
+            publishVariable: node.config.publish,
+            onVirtualVariableChanged: (newValue: boolean) => {
+                node.config.calculated = newValue;
+            },
+            virtualVariable: node.config.calculated,
+            onLogVariableChanged: (newValue: boolean) => {
+                node.config.logging = newValue;
+            },
+            logVariable: node.config.logging,
+            onEnableMinAlarmChanged: (newValue: boolean) => {
+                node.config.min_alarm = newValue;
+            },
+            enableMinAlarm: node.config.min_alarm,
+            onEnableMaxAlarmChanged: (newValue: boolean) => {
+                node.config.max_alarm = newValue;
+            },
+            enableMaxAlarm: node.config.max_alarm,
+            onEnableChanged: (newValue: boolean) => {
+                node.config.enabled = newValue;
+            },
+            enable: node.config.enabled,
+            variableProtocol: node.protocol,
+        };
+    }
+
+    function addNodeToSection(sectionPrefix: NodePrefix) {
+        // Generate a unique node name for the new empty node
+        const timestamp = Date.now();
+        const nodeBaseName = `new_node_${timestamp}`;
+        const fullNodeName = addPrefix(nodeBaseName, sectionPrefix);
+
+        // Create a new empty node with default configuration
+        const newNode = {
+            config: {
+                type: "FLOAT",
+                unit: "",
+                custom: false,
+                publish: true,
+                calculated: false,
+                logging: false,
+                enabled: true,
+                min_alarm: false,
+                max_alarm: false,
+            },
+            protocol: selectedProtocol,
+            name: fullNodeName,
+            displayName: nodeBaseName,
+            communicationID: "",
+        };
+
+        // Add the new node to the nodes object
+        nodes = {
+            ...nodes,
+            [fullNodeName]: newNode,
+        };
+    }
+
+    function deleteNode(nodeName: string) {
+        // Create a new nodes object without the deleted node
+        const { [nodeName]: deletedNode, ...remainingNodes } = nodes;
+        nodes = remainingNodes;
+    }
+
     // Variables
 
-    // Convert the nodes object to an array with the node names included
+    // Nodes organized in an array and with processed display name and communication id
     $: nodesArray = Object.entries(nodes || {}).map(([name, node]) => ({
         name,
         displayName: removePrefix(name),
@@ -88,47 +174,82 @@
         ...node,
     }));
 
-    // Nodes separated by section and ordered alphabetically
-    $: l1Nodes = nodesArray
-        .filter(
-            (node) =>
-                node.name?.startsWith(NodePrefix.L1) &&
-                !node.name?.startsWith(NodePrefix.L1_L2) &&
-                !node.name?.startsWith(NodePrefix.L1_L3),
-        )
-        .sort((a, b) => a.displayName.localeCompare(b.displayName));
-    $: l2Nodes = nodesArray
-        .filter(
-            (node) =>
-                node.name?.startsWith(NodePrefix.L2) &&
-                !node.name?.startsWith(NodePrefix.L2_L1) &&
-                !node.name?.startsWith(NodePrefix.L2_L3),
-        )
-        .sort((a, b) => a.displayName.localeCompare(b.displayName));
-    $: l3Nodes = nodesArray
-        .filter(
-            (node) =>
-                node.name?.startsWith(NodePrefix.L3) &&
-                !node.name?.startsWith(NodePrefix.L3_L1) &&
-                !node.name?.startsWith(NodePrefix.L3_L2),
-        )
-        .sort((a, b) => a.displayName.localeCompare(b.displayName));
-    $: totalNodes = nodesArray
-        .filter((node) => node.name?.startsWith(NodePrefix.TOTAL))
-        .sort((a, b) => a.displayName.localeCompare(b.displayName));
+    // Nodes sections for 3F meters (L1, L2, L3, Total, General)
+    const nodeSections = [
+        {
+            key: NodePhase.L1,
+            phase: NodePhase.L1,
+            prefix: NodePrefix.L1,
+            labelKey: "l1Phase",
+            filter: (node: any) =>
+                node.name?.startsWith(NodePrefix.L1) && !node.name?.startsWith(NodePrefix.L1_L2) && !node.name?.startsWith(NodePrefix.L1_L3),
+        },
+        {
+            key: NodePhase.L2,
+            phase: NodePhase.L2,
+            prefix: NodePrefix.L2,
+            labelKey: "l2Phase",
+            filter: (node: any) =>
+                node.name?.startsWith(NodePrefix.L2) && !node.name?.startsWith(NodePrefix.L2_L1) && !node.name?.startsWith(NodePrefix.L2_L3),
+        },
+        {
+            key: NodePhase.L3,
+            phase: NodePhase.L3,
+            prefix: NodePrefix.L3,
+            labelKey: "l3Phase",
+            filter: (node: any) =>
+                node.name?.startsWith(NodePrefix.L3) && !node.name?.startsWith(NodePrefix.L3_L1) && !node.name?.startsWith(NodePrefix.L3_L2),
+        },
+        {
+            key: NodePhase.TOTAL,
+            phase: NodePhase.TOTAL,
+            prefix: NodePrefix.TOTAL,
+            labelKey: "total",
+            filter: (node: any) => node.name?.startsWith(NodePrefix.TOTAL),
+        },
+        {
+            key: NodePhase.GENERAL,
+            phase: NodePhase.GENERAL,
+            prefix: NodePrefix.GENERAL,
+            labelKey: "general",
+            filter: (node: any) => {
+                // General nodes are those that don't match any of the specific patterns above
+                const isL1 =
+                    node.name?.startsWith(NodePrefix.L1) && !node.name?.startsWith(NodePrefix.L1_L2) && !node.name?.startsWith(NodePrefix.L1_L3);
+                const isL2 =
+                    node.name?.startsWith(NodePrefix.L2) && !node.name?.startsWith(NodePrefix.L2_L1) && !node.name?.startsWith(NodePrefix.L2_L3);
+                const isL3 =
+                    node.name?.startsWith(NodePrefix.L3) && !node.name?.startsWith(NodePrefix.L3_L1) && !node.name?.startsWith(NodePrefix.L3_L2);
+                const isTotal = node.name?.startsWith(NodePrefix.TOTAL);
 
-    $: usedNames = new Set([
-        ...l1Nodes.map((n) => n.name),
-        ...l2Nodes.map((n) => n.name),
-        ...l3Nodes.map((n) => n.name),
-        ...totalNodes.map((n) => n.name),
-    ]);
+                return !isL1 && !isL2 && !isL3 && !isTotal;
+            },
+        },
+    ];
 
-    $: generalNodes = nodesArray
-        .filter((node) => !usedNames.has(node.name))
-        .sort((a, b) => a.displayName.localeCompare(b.displayName));
+    // Get nodes from the original nodes array by section
+    $: nodesBySection = nodeSections.reduce((acc: Record<string, any[]>, section) => {
+        acc[section.key] = nodesArray.filter(section.filter).sort((a, b) => {
+            // Check if either node is a newly created node (starts with "new_node_")
+            const aIsNew = a.displayName.startsWith("new_node_");
+            const bIsNew = b.displayName.startsWith("new_node_");
 
-    $: console.log(generalNodes);
+            // If one is new and the other isn't, put the new one at the end
+            if (aIsNew && !bIsNew) return 1;
+            if (!aIsNew && bIsNew) return -1;
+
+            // If both are new, sort by creation time (timestamp in the name)
+            if (aIsNew && bIsNew) {
+                const aTimestamp = a.displayName.split("_").pop();
+                const bTimestamp = b.displayName.split("_").pop();
+                return parseInt(aTimestamp || "0") - parseInt(bTimestamp || "0");
+            }
+
+            // Otherwise, sort alphabetically
+            return a.displayName.localeCompare(b.displayName);
+        });
+        return acc;
+    }, {});
 </script>
 
 <div
@@ -157,322 +278,46 @@
                     {:else if selectedProtocol === "MODBUS_RTU"}
                         <th style="width: 150px;" class="mid-width">{$texts.modbusRegister[$selectedLang]}</th>
                     {/if}
+                    <th style="width: 150px;" class="mid-width">{$texts.type[$selectedLang]}</th>
                     <th class="min-width">{$texts.custom[$selectedLang]}</th>
                     <th class="min-width">{$texts.publish[$selectedLang]}</th>
                     <th class="min-width">{$texts.virtual[$selectedLang]}</th>
                     <th class="min-width">{$texts.logging[$selectedLang]}</th>
-                    <th class="min-width">{$texts.minAlarm[$selectedLang]}</th>
-                    <th class="min-width">{$texts.maxAlarm[$selectedLang]}</th>
                     <th class="min-width">{$texts.enabled[$selectedLang]}</th>
-                    <th class="super-min-width"><img src="/img/more.png" alt="More options" class="more-img" /></th>
+                    <th class="min-width">{$texts.actions[$selectedLang]}</th>
                 </tr>
             </thead>
             <tbody>
+                <!--     T H R E E     P H A S E     M E T E R S     -->
                 {#if meterType === "THREE_PHASE"}
-                    <!--     L 1     N O D E S     -->
-                    <tr class="sub-section">
-                        <td colspan="11">{$texts.l1Phase[$selectedLang]}</td>
-                    </tr>
-                    <!-- Variable Elements Definition-->
-                    {#each l1Nodes as node (node.name)}
-                        <NodeRow
-                            variablePhase = {NodePhase.L1}
-                            onVariableNameChanged={(newName) => {
-                                node.name = addPrefix(newName, NodePrefix.L1);
-                                node.displayName = newName;
-                                const defaultNodeProps = Object.values($defaultVariables).find(
-                                    (v) => v.variable === newName,
-                                );
-                                node.config.unit = defaultNodeProps?.defaultUnit || "";
-                            }}
-                            variableName={node.displayName}
-                            onVariableUnitChanged={(newUnit) => {
-                                node.config.unit = newUnit;
-                            }}
-                            variableUnit={node.config.unit}
-                            onCommunicationIDChanged={(newID) => {
-                                node.communicationID = newID;
-                            }}
-                            variableType={node.config.type}
-                            onVariableTypeChanged={(newType) => {
-                                node.config.type = newType;
-                            }}
-                            communicationID={node.communicationID}
-                            onCustomVariableChanged={(newValue) => {
-                                node.config.custom = newValue;
-                            }}
-                            customVariable={node.config.custom}
-                            onPublishVariableChanged={(newValue) => {
-                                node.config.publish = newValue;
-                            }}
-                            publishVariable={node.config.publish}
-                            onVirtualVariableChanged={(newValue) => {
-                                node.config.calculated = newValue;
-                            }}
-                            virtualVariable={node.config.calculated}
-                            onLogVariableChanged={(newValue) => {
-                                node.config.logging = newValue;
-                            }}
-                            logVariable={node.config.logging}
-                            onEnableMinAlarmChanged={(newValue) => {
-                                node.config.min_alarm = newValue;
-                            }}
-                            enableMinAlarm={node.config.min_alarm}
-                            onEnableMaxAlarmChanged={(newValue) => {
-                                node.config.max_alarm = newValue;
-                            }}
-                            enableMaxAlarm={node.config.max_alarm}
-                            onEnableChanged={(newValue) => {
-                                node.config.enabled = newValue;
-                            }}
-                            enable={node.config.enabled}
-                            variableProtocol={node.protocol}
-                        />
+                    <!-- Render each node section -->
+                    {#each nodeSections as section (section.key)}
+                        <tr class="sub-section">
+                            <td colspan="10">{$texts[section.labelKey][$selectedLang]}</td>
+                        </tr>
+                        {#each nodesBySection[section.key] as node (node.name)}
+                            <NodeRow
+                                backgroundColor="rgba(255, 255, 255, 0.05)"
+                                onDelete={() => deleteNode(node.name)}
+                                onConfig={() => {}}
+                                {selectedProtocol}
+                                {...createNodeRowProps(node, section.phase, section.prefix)}
+                            />
+                        {/each}
+                        <AddNode backgroundColor="rgba(255, 255, 255, 0.05)" onAddNode={() => addNodeToSection(section.prefix)} />
                     {/each}
-                    <!--------------------------------->
-
-                    <!--     L 2     N O D E S     -->
-                    <tr class="sub-section">
-                        <td colspan="11">{$texts.l2Phase[$selectedLang]}</td>
-                    </tr>
-                    {#each l2Nodes as node (node.name)}
-                        <NodeRow
-                            variablePhase={NodePhase.L2}
-                            onVariableNameChanged={(newName) => {
-                                node.name = addPrefix(newName, NodePrefix.L2);
-                                node.displayName = newName;
-                                const defaultNodeProps = Object.values($defaultVariables).find(
-                                    (v) => v.variable === newName,
-                                );
-                                node.config.unit = defaultNodeProps?.defaultUnit || "";
-                            }}
-                            variableName={node.displayName}
-                            onVariableUnitChanged={(newUnit) => {
-                                node.config.unit = newUnit;
-                            }}
-                            variableUnit={node.config.unit}
-                            onCommunicationIDChanged={(newID) => {
-                                node.communicationID = newID;
-                            }}
-                            variableType={node.config.type}
-                            onVariableTypeChanged={(newType) => {
-                                node.config.type = newType;
-                            }}
-                            communicationID={node.communicationID}
-                            onCustomVariableChanged={(newValue) => {
-                                node.config.custom = newValue;
-                            }}
-                            customVariable={node.config.custom}
-                            onPublishVariableChanged={(newValue) => {
-                                node.config.publish = newValue;
-                            }}
-                            publishVariable={node.config.publish}
-                            onVirtualVariableChanged={(newValue) => {
-                                node.config.calculated = newValue;
-                            }}
-                            virtualVariable={node.config.calculated}
-                            onLogVariableChanged={(newValue) => {
-                                node.config.logging = newValue;
-                            }}
-                            logVariable={node.config.logging}
-                            onEnableMinAlarmChanged={(newValue) => {
-                                node.config.min_alarm = newValue;
-                            }}
-                            enableMinAlarm={node.config.min_alarm}
-                            onEnableMaxAlarmChanged={(newValue) => {
-                                node.config.max_alarm = newValue;
-                            }}
-                            enableMaxAlarm={node.config.max_alarm}
-                            onEnableChanged={(newValue) => {
-                                node.config.enabled = newValue;
-                            }}
-                            enable={node.config.enabled}
-                            variableProtocol={node.protocol}
-                        />
-                    {/each}
-                    <!--     L 3     N O D E S     -->
-                    <tr class="sub-section">
-                        <td colspan="11">{$texts.l3Phase[$selectedLang]}</td>
-                    </tr>
-                    {#each l3Nodes as node (node.name)}
-                        <NodeRow
-                            variablePhase = {NodePhase.L3}
-                            onVariableNameChanged={(newName) => {
-                                node.name = addPrefix(newName, NodePrefix.L3);
-                                node.displayName = newName;
-                                const defaultNodeProps = Object.values($defaultVariables).find(
-                                    (v) => v.variable === newName,
-                                );
-                                node.config.unit = defaultNodeProps?.defaultUnit || "";
-                            }}
-                            variableName={node.displayName}
-                            onVariableUnitChanged={(newUnit) => {
-                                node.config.unit = newUnit;
-                            }}
-                            variableUnit={node.config.unit}
-                            onCommunicationIDChanged={(newID) => {
-                                node.communicationID = newID;
-                            }}
-                            variableType={node.config.type}
-                            onVariableTypeChanged={(newType) => {
-                                node.config.type = newType;
-                            }}
-                            communicationID={node.communicationID}
-                            onCustomVariableChanged={(newValue) => {
-                                node.config.custom = newValue;
-                            }}
-                            customVariable={node.config.custom}
-                            onPublishVariableChanged={(newValue) => {
-                                node.config.publish = newValue;
-                            }}
-                            publishVariable={node.config.publish}
-                            onVirtualVariableChanged={(newValue) => {
-                                node.config.calculated = newValue;
-                            }}
-                            virtualVariable={node.config.calculated}
-                            onLogVariableChanged={(newValue) => {
-                                node.config.logging = newValue;
-                            }}
-                            logVariable={node.config.logging}
-                            onEnableMinAlarmChanged={(newValue) => {
-                                node.config.min_alarm = newValue;
-                            }}
-                            enableMinAlarm={node.config.min_alarm}
-                            onEnableMaxAlarmChanged={(newValue) => {
-                                node.config.max_alarm = newValue;
-                            }}
-                            enableMaxAlarm={node.config.max_alarm}
-                            onEnableChanged={(newValue) => {
-                                node.config.enabled = newValue;
-                            }}
-                            enable={node.config.enabled}
-                            variableProtocol={node.protocol}
-                        />
-                    {/each}
-
-                    <!--     T O T A L     N O D E S     -->
-                    <tr class="sub-section">
-                        <td colspan="11">{$texts.total[$selectedLang]}</td>
-                    </tr>
-                    {#each totalNodes as node (node.name)}
-                        <NodeRow
-                            variablePhase = {NodePhase.TOTAL}
-                            onVariableNameChanged={(newName) => {
-                                node.name = addPrefix(newName, NodePrefix.TOTAL);
-                                node.displayName = newName;
-                                const defaultNodeProps = Object.values($defaultVariables).find(
-                                    (v) => v.variable === newName,
-                                );
-                                node.config.unit = defaultNodeProps?.defaultUnit || "";
-                            }}
-                            variableName={node.displayName}
-                            onVariableUnitChanged={(newUnit) => {
-                                node.config.unit = newUnit;
-                            }}
-                            variableUnit={node.config.unit}
-                            onCommunicationIDChanged={(newID) => {
-                                node.communicationID = newID;
-                            }}
-                            variableType={node.config.type}
-                            onVariableTypeChanged={(newType) => {
-                                node.config.type = newType;
-                            }}
-                            communicationID={node.communicationID}
-                            onCustomVariableChanged={(newValue) => {
-                                node.config.custom = newValue;
-                            }}
-                            customVariable={node.config.custom}
-                            onPublishVariableChanged={(newValue) => {
-                                node.config.publish = newValue;
-                            }}
-                            publishVariable={node.config.publish}
-                            onVirtualVariableChanged={(newValue) => {
-                                node.config.calculated = newValue;
-                            }}
-                            virtualVariable={node.config.calculated}
-                            onLogVariableChanged={(newValue) => {
-                                node.config.logging = newValue;
-                            }}
-                            logVariable={node.config.logging}
-                            onEnableMinAlarmChanged={(newValue) => {
-                                node.config.min_alarm = newValue;
-                            }}
-                            enableMinAlarm={node.config.min_alarm}
-                            onEnableMaxAlarmChanged={(newValue) => {
-                                node.config.max_alarm = newValue;
-                            }}
-                            enableMaxAlarm={node.config.max_alarm}
-                            onEnableChanged={(newValue) => {
-                                node.config.enabled = newValue;
-                            }}
-                            enable={node.config.enabled}
-                            variableProtocol={node.protocol}
-                        />
-                    {/each}
-
-                    <!--     G E N E R A L     N O D E S     -->
-                    <tr class="sub-section">
-                        <td colspan="11">{$texts.general[$selectedLang]}</td>
-                    </tr>
-                    {#each generalNodes as node (node.name)}
-                        <NodeRow
-                            variablePhase = {NodePhase.GENERAL}
-                            onVariableNameChanged={(newName) => {
-                                node.name = addPrefix(newName, NodePrefix.GENERAL);
-                                node.displayName = newName;
-                                const defaultNodeProps = Object.values($defaultVariables).find(
-                                    (v) => v.variable === newName,
-                                );
-                                node.config.unit = defaultNodeProps?.defaultUnit || "";
-                            }}
-                            variableName={node.displayName}
-                            onVariableUnitChanged={(newUnit) => {
-                                node.config.unit = newUnit;
-                            }}
-                            variableUnit={node.config.unit}
-                            onCommunicationIDChanged={(newID) => {
-                                node.communicationID = newID;
-                            }}
-                            variableType={node.config.type}
-                            onVariableTypeChanged={(newType) => {
-                                node.config.type = newType;
-                            }}
-                            communicationID={node.communicationID}
-                            onCustomVariableChanged={(newValue) => {
-                                node.config.custom = newValue;
-                            }}
-                            customVariable={node.config.custom}
-                            onPublishVariableChanged={(newValue) => {
-                                node.config.publish = newValue;
-                            }}
-                            publishVariable={node.config.publish}
-                            onVirtualVariableChanged={(newValue) => {
-                                node.config.calculated = newValue;
-                            }}
-                            virtualVariable={node.config.calculated}
-                            onLogVariableChanged={(newValue) => {
-                                node.config.logging = newValue;
-                            }}
-                            logVariable={node.config.logging}
-                            onEnableMinAlarmChanged={(newValue) => {
-                                node.config.min_alarm = newValue;
-                            }}
-                            enableMinAlarm={node.config.min_alarm}
-                            onEnableMaxAlarmChanged={(newValue) => {
-                                node.config.max_alarm = newValue;
-                            }}
-                            enableMaxAlarm={node.config.max_alarm}
-                            onEnableChanged={(newValue) => {
-                                node.config.enabled = newValue;
-                            }}
-                            enable={node.config.enabled}
-                            variableProtocol={node.protocol}
-                        />
-                    {/each}
+                    <!--     S I N G L E     P H A S E     M E T E R S     -->
                 {:else if meterType === "SINGLE_PHASE"}
                     {#each nodesArray as node (node.name)}
-                        <tr><td>To Implement</td></tr>
+                        <NodeRow
+                            backgroundColor="rgba(255, 255, 255, 0.05)"
+                            onDelete={() => deleteNode(node.name)}
+                            onConfig={() => {}}
+                            {selectedProtocol}
+                            {...createNodeRowProps(node, NodePhase.SINGLEPHASE, NodePrefix.SINGLEPHASE)}
+                        />
                     {/each}
+                    <AddNode backgroundColor="rgba(255, 255, 255, 0.05)" onAddNode={() => addNodeToSection(NodePrefix.SINGLEPHASE)} />
                 {/if}
             </tbody>
         </table>
@@ -532,29 +377,25 @@
         border-right: none;
     }
 
-    table thead th .more-img {
-        width: 16px;
-        height: 16px;
-    }
-
     table tr td {
         height: 30px;
     }
 
-    table th.max-width,
-    table td.max-width {
+    table th.max-width {
         width: max-content;
         min-width: 100px;
     }
 
-    table th.min-width,
-    table td.min-width {
-        width: 90px;
+    table th.mid-width {
+        width: 150px;
+        min-width: 150px;
+        max-width: 150px;
     }
 
-    table th.super-min-width,
-    table td.super-min-width {
-        width: 50px;
+    table th.min-width {
+        width: 85px;
+        min-width: 85px;
+        max-width: 85px;
     }
 
     table .sub-section {

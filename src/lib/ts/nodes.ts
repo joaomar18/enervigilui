@@ -85,3 +85,31 @@ export function validateCommunicationID(communicationID: string, protocol: Proto
     }
     return false;
 }
+
+/**
+ * Validates the type of a node variable based on whether it is a custom variable or a default variable.
+ *
+ * - For custom variables: Always returns true (custom variables can have any type).
+ * - For default variables: Checks that the specified type is included in the applicable types
+ *   for the given variable name (from the defaultVariables Svelte store).
+ *
+ * @param type - The NodeType to validate (e.g., NodeType.FLOAT, NodeType.INT, NodeType.STRING, NodeType.BOOLEAN).
+ * @param name - The name of the node variable to validate the type for.
+ * @param custom - Whether the node is a custom variable (true) or a default variable (false).
+ * @returns True if the type is valid according to the rules above, otherwise false.
+ */
+export function validateNodeType(type: NodeType, name: string, custom: boolean): boolean {
+    if (custom) {
+        return true;
+    } else {
+        // For default variables, check if the type is in the applicable types
+        const variables = get(defaultVariables);
+        const variable = Object.values(variables).find(v => v.variable === name);
+
+        if (variable && variable.applicableTypes) {
+            return variable.applicableTypes.includes(type);
+        }
+
+        return false;
+    }
+}

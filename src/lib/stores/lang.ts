@@ -460,6 +460,14 @@ const textsObject: TextsObject = {
         PT: "Total",
         EN: "Total",
     },
+    addNode: {
+        PT: "Adicionar Variável",
+        EN: "Add Variable",
+    },
+    actions: {
+        PT: "Ações",
+        EN: "Actions",
+    },
 };
 
 const textsObjectsVariables: TextsObject = {
@@ -546,12 +554,12 @@ export const variableNameTextsByPhase = derived(
     [defaultVariables],
     ([$defaultVariables]) => {
         const phaseMap: Record<string, TextsObject> = {};
-        
+
         // Initialize all phases
         Object.values(NodePhase).forEach(phase => {
             phaseMap[phase] = {};
         });
-        
+
         $defaultVariables.forEach((variable) => {
             variable.applicablePhases.forEach(phase => {
                 if (textsObjectsVariables[variable.variable]) {
@@ -559,7 +567,7 @@ export const variableNameTextsByPhase = derived(
                 }
             });
         });
-        
+
         return phaseMap;
     }
 );

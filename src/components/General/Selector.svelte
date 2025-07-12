@@ -6,6 +6,7 @@
     import { selectedLang } from "$lib/stores/lang";
 
     //Props
+    export let disabled: boolean = false;
     export let useLang: boolean = false; //use language texts in options and selected option
     export let inputBadFormat: boolean = false;
     export let firstSubmission: boolean = false;
@@ -40,10 +41,17 @@
 
     // Variables
     let isOpen: boolean = false;
+    let validOptions: [string, any][];
     let optionsHeight: string = "fit-content";
     let selDivEl: Node;
 
-    $: validOptions = Object.entries(options || {}).filter(([_, value]) => value !== "");
+    $: {
+        if (disabled) {
+            validOptions = Object.entries({});
+        } else {
+            validOptions = Object.entries(options || {}).filter(([_, value]) => value !== "");
+        }
+    }
     $: optionsLength = validOptions.length;
     $: selectedKey = useLang
         ? Object.keys(options).find((key) => key === selectedOption)
@@ -55,7 +63,7 @@
         }
     }
     $: {
-        if (optionsLength == 0) {
+        if (optionsLength == 0 || disabled) {
             isOpen = false;
         }
     }
@@ -138,34 +146,24 @@
         --selected-option-shift-left: {shiftTextLeft};
         --options-height: {optionsHeight};
     "
-    class:disabled={optionsLength == 0}
-    class:bad-format={inputBadFormat && firstSubmission}
+    class:disabled={optionsLength == 0 || disabled}
+    class:bad-format={inputBadFormat && firstSubmission && !disabled}
 >
     <div class="content-div">
         <span class="selected-option">{getDisplayText(selectedKey || "")}</span>
         <img
             class="arrow"
-            src={invertOptions
-                ? isOpen
-                    ? "/img/down-arrow.png"
-                    : "/img/up-arrow.png"
-                : isOpen
-                  ? "/img/up-arrow.png"
-                  : "/img/down-arrow.png"}
+            src={invertOptions ? (isOpen ? "/img/down-arrow.png" : "/img/up-arrow.png") : isOpen ? "/img/up-arrow.png" : "/img/down-arrow.png"}
             alt={isOpen ? "up-arrow" : "down-arrow"}
         />
         <button
             class="open-selector"
             on:click={toggleSelector}
             aria-label="View options"
-            disabled={optionsLength == 0}
-            class:disabled={optionsLength == 0}
+            disabled={optionsLength == 0 || disabled}
+            class:disabled={optionsLength == 0 || disabled}
         ></button>
-        <div
-            class="options {isOpen ? '' : 'disabled'} {invertOptions
-                ? 'inverted'
-                : 'normal'} {scrollable ? 'scrollable' : ''}"
-        >
+        <div class="options {isOpen ? '' : 'disabled'} {invertOptions ? 'inverted' : 'normal'} {scrollable ? 'scrollable' : ''}">
             {#each Object.entries(options) as [key, value] (key)}
                 {#if useLang}
                     <div class="option {selectedOption == key ? 'selected-option' : ''}">

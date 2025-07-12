@@ -14,6 +14,20 @@ export enum Protocol {
 /**
  * Prefixes used to identify the electrical phase or type of a node variable.
  * These prefixes are prepended to variable names to organize them by phase in three-phase power systems.
+ * 
+ * @enum {string}
+ * @property {string} L1 - Prefix for Line 1 phase variables (e.g., "l1_voltage")
+ * @property {string} L2 - Prefix for Line 2 phase variables (e.g., "l2_voltage")
+ * @property {string} L3 - Prefix for Line 3 phase variables (e.g., "l3_voltage")
+ * @property {string} L1_L2 - Prefix for line-to-line measurements between L1 and L2 (e.g., "l1_l2_voltage")
+ * @property {string} L1_L3 - Prefix for line-to-line measurements between L1 and L3 (e.g., "l1_l3_voltage")
+ * @property {string} L2_L1 - Prefix for line-to-line measurements between L2 and L1 (e.g., "l2_l1_voltage")
+ * @property {string} L2_L3 - Prefix for line-to-line measurements between L2 and L3 (e.g., "l2_l3_voltage")
+ * @property {string} L3_L1 - Prefix for line-to-line measurements between L3 and L1 (e.g., "l3_l1_voltage")
+ * @property {string} L3_L2 - Prefix for line-to-line measurements between L3 and L2 (e.g., "l3_l2_voltage")
+ * @property {string} TOTAL - Prefix for aggregated measurements across all phases (e.g., "total_power")
+ * @property {string} GENERAL - No prefix for phase-independent or system-wide variables
+ * @property {string} SINGLEPHASE - No prefix for single-phase electrical system variables
  */
 export enum NodePrefix {
     L1 = "l1_",
@@ -26,19 +40,29 @@ export enum NodePrefix {
     L3_L1 = "l3_l1_",
     L3_L2 = "l3_l2_",
     TOTAL = "total_",
-    GENERAL = ""
+    GENERAL = "",
+    SINGLEPHASE = ""
 }
 
 /**
  * Electrical phases in a three-phase power system.
  * Used to specify which phases a variable can be applied to or measured from.
+ * 
+ * @enum {string}
+ * @property {string} L1 - Line 1 phase in a three-phase system
+ * @property {string} L2 - Line 2 phase in a three-phase system  
+ * @property {string} L3 - Line 3 phase in a three-phase system
+ * @property {string} TOTAL - Aggregated measurement across all three phases
+ * @property {string} GENERAL - Phase-independent variables or system-wide measurements
+ * @property {string} SINGLEPHASE - Variables applicable to single-phase electrical systems
  */
 export enum NodePhase {
     L1 = "L1",
     L2 = "L2",
     L3 = "L3",
     TOTAL = "Total",
-    GENERAL = ""
+    GENERAL = "General",
+    SINGLEPHASE = "1F"
 }
 
 /**
@@ -64,6 +88,7 @@ export interface NodeVariableType {
     defaultUnit: string;
     availableUnits?: string[];
     applicablePhases: NodePhase[];
+    applicableTypes: NodeType[];
     canBeVirtual: boolean;
     defaultPublished: boolean;
     defaultLoggingPeriod: number;
@@ -86,7 +111,8 @@ export const defaultVariables = readable<NodeVariableType[]>([
         type: NodeType.FLOAT,
         defaultNumberOfDecimals: 2,
         defaultUnit: "V",
-        applicablePhases: [NodePhase.L1, NodePhase.L2, NodePhase.L3, NodePhase.GENERAL],
+        applicablePhases: [NodePhase.L1, NodePhase.L2, NodePhase.L3, NodePhase.SINGLEPHASE],
+        applicableTypes: [NodeType.FLOAT, NodeType.INT],
         canBeVirtual: false,
         defaultPublished: true,
         defaultLoggingPeriod: 15,
@@ -103,6 +129,7 @@ export const defaultVariables = readable<NodeVariableType[]>([
         defaultNumberOfDecimals: 2,
         defaultUnit: "V",
         applicablePhases: [NodePhase.GENERAL],
+        applicableTypes: [NodeType.FLOAT, NodeType.INT],
         canBeVirtual: false,
         defaultPublished: true,
         defaultLoggingPeriod: 15,
@@ -119,6 +146,7 @@ export const defaultVariables = readable<NodeVariableType[]>([
         defaultNumberOfDecimals: 2,
         defaultUnit: "V",
         applicablePhases: [NodePhase.GENERAL],
+        applicableTypes: [NodeType.FLOAT, NodeType.INT],
         canBeVirtual: false,
         defaultPublished: true,
         defaultLoggingPeriod: 15,
@@ -135,6 +163,7 @@ export const defaultVariables = readable<NodeVariableType[]>([
         defaultNumberOfDecimals: 2,
         defaultUnit: "V",
         applicablePhases: [NodePhase.GENERAL],
+        applicableTypes: [NodeType.FLOAT, NodeType.INT],
         canBeVirtual: false,
         defaultPublished: true,
         defaultLoggingPeriod: 15,
@@ -151,7 +180,8 @@ export const defaultVariables = readable<NodeVariableType[]>([
         defaultNumberOfDecimals: 3,
         defaultUnit: "A",
         availableUnits: ["mA", "A"],
-        applicablePhases: [NodePhase.L1, NodePhase.L2, NodePhase.L3, NodePhase.GENERAL],
+        applicablePhases: [NodePhase.L1, NodePhase.L2, NodePhase.L3, NodePhase.SINGLEPHASE],
+        applicableTypes: [NodeType.FLOAT, NodeType.INT],
         canBeVirtual: false,
         defaultPublished: true,
         defaultLoggingPeriod: 15,
@@ -164,7 +194,8 @@ export const defaultVariables = readable<NodeVariableType[]>([
         defaultUnit: "kW",
         defaultNumberOfDecimals: 3,
         availableUnits: ["W", "kW"],
-        applicablePhases: [NodePhase.L1, NodePhase.L2, NodePhase.L3, NodePhase.TOTAL, NodePhase.GENERAL],
+        applicablePhases: [NodePhase.L1, NodePhase.L2, NodePhase.L3, NodePhase.TOTAL, NodePhase.SINGLEPHASE],
+        applicableTypes: [NodeType.FLOAT, NodeType.INT],
         canBeVirtual: true,
         defaultPublished: true,
         defaultLoggingPeriod: 15,
@@ -177,7 +208,8 @@ export const defaultVariables = readable<NodeVariableType[]>([
         defaultNumberOfDecimals: 3,
         defaultUnit: "kVAr",
         availableUnits: ["VAr", "kVAr"],
-        applicablePhases: [NodePhase.L1, NodePhase.L2, NodePhase.L3, NodePhase.TOTAL, NodePhase.GENERAL],
+        applicablePhases: [NodePhase.L1, NodePhase.L2, NodePhase.L3, NodePhase.TOTAL, NodePhase.SINGLEPHASE],
+        applicableTypes: [NodeType.FLOAT, NodeType.INT],
         canBeVirtual: true,
         defaultPublished: true,
         defaultLoggingPeriod: 15,
@@ -190,7 +222,8 @@ export const defaultVariables = readable<NodeVariableType[]>([
         defaultNumberOfDecimals: 3,
         defaultUnit: "kVA",
         availableUnits: ["VA", "kVA"],
-        applicablePhases: [NodePhase.L1, NodePhase.L2, NodePhase.L3, NodePhase.TOTAL, NodePhase.GENERAL],
+        applicablePhases: [NodePhase.L1, NodePhase.L2, NodePhase.L3, NodePhase.TOTAL, NodePhase.SINGLEPHASE],
+        applicableTypes: [NodeType.FLOAT, NodeType.INT],
         canBeVirtual: true,
         defaultPublished: true,
         defaultLoggingPeriod: 15,
@@ -202,7 +235,8 @@ export const defaultVariables = readable<NodeVariableType[]>([
         type: NodeType.FLOAT,
         defaultNumberOfDecimals: 2,
         defaultUnit: "",
-        applicablePhases: [NodePhase.L1, NodePhase.L2, NodePhase.L3, NodePhase.TOTAL, NodePhase.GENERAL],
+        applicablePhases: [NodePhase.L1, NodePhase.L2, NodePhase.L3, NodePhase.TOTAL, NodePhase.SINGLEPHASE],
+        applicableTypes: [NodeType.FLOAT],
         canBeVirtual: true,
         defaultPublished: true,
         defaultLoggingPeriod: 15,
@@ -213,7 +247,8 @@ export const defaultVariables = readable<NodeVariableType[]>([
         variable: "power_factor_direction",
         type: NodeType.STRING,
         defaultUnit: "",
-        applicablePhases: [NodePhase.L1, NodePhase.L2, NodePhase.L3, NodePhase.TOTAL, NodePhase.GENERAL],
+        applicablePhases: [NodePhase.L1, NodePhase.L2, NodePhase.L3, NodePhase.TOTAL, NodePhase.SINGLEPHASE],
+        applicableTypes: [NodeType.STRING],
         canBeVirtual: true,
         defaultPublished: true,
         defaultLoggingPeriod: 15,
@@ -225,7 +260,8 @@ export const defaultVariables = readable<NodeVariableType[]>([
         type: NodeType.FLOAT,
         defaultNumberOfDecimals: 2,
         defaultUnit: "Hz",
-        applicablePhases: [NodePhase.L1, NodePhase.L2, NodePhase.L3, NodePhase.GENERAL],
+        applicablePhases: [NodePhase.L1, NodePhase.L2, NodePhase.L3, NodePhase.GENERAL, NodePhase.SINGLEPHASE],
+        applicableTypes: [NodeType.FLOAT, NodeType.INT],
         canBeVirtual: false,
         defaultPublished: true,
         defaultLoggingPeriod: 15,
@@ -242,7 +278,8 @@ export const defaultVariables = readable<NodeVariableType[]>([
         defaultUnit: "kWh",
         defaultNumberOfDecimals: 3,
         availableUnits: ["Wh", "kWh"],
-        applicablePhases: [NodePhase.L1, NodePhase.L2, NodePhase.L3, NodePhase.TOTAL, NodePhase.GENERAL],
+        applicablePhases: [NodePhase.L1, NodePhase.L2, NodePhase.L3, NodePhase.TOTAL, NodePhase.SINGLEPHASE],
+        applicableTypes: [NodeType.FLOAT, NodeType.INT],
         canBeVirtual: true,
         defaultPublished: true,
         defaultLoggingPeriod: 15,
@@ -255,7 +292,8 @@ export const defaultVariables = readable<NodeVariableType[]>([
         defaultUnit: "kVArh",
         defaultNumberOfDecimals: 3,
         availableUnits: ["VArh", "kVArh"],
-        applicablePhases: [NodePhase.L1, NodePhase.L2, NodePhase.L3, NodePhase.TOTAL, NodePhase.GENERAL],
+        applicablePhases: [NodePhase.L1, NodePhase.L2, NodePhase.L3, NodePhase.TOTAL, NodePhase.SINGLEPHASE],
+        applicableTypes: [NodeType.FLOAT, NodeType.INT],
         canBeVirtual: true,
         defaultPublished: true,
         defaultLoggingPeriod: 15,
@@ -268,7 +306,8 @@ export const defaultVariables = readable<NodeVariableType[]>([
         defaultUnit: "kWh",
         defaultNumberOfDecimals: 3,
         availableUnits: ["Wh", "kWh"],
-        applicablePhases: [NodePhase.L1, NodePhase.L2, NodePhase.L3, NodePhase.TOTAL, NodePhase.GENERAL],
+        applicablePhases: [NodePhase.L1, NodePhase.L2, NodePhase.L3, NodePhase.TOTAL, NodePhase.SINGLEPHASE],
+        applicableTypes: [NodeType.FLOAT, NodeType.INT],
         canBeVirtual: false,
         defaultPublished: false,
         defaultLoggingPeriod: 15,
@@ -281,7 +320,8 @@ export const defaultVariables = readable<NodeVariableType[]>([
         defaultUnit: "kVArh",
         defaultNumberOfDecimals: 3,
         availableUnits: ["VArh", "kVArh"],
-        applicablePhases: [NodePhase.L1, NodePhase.L2, NodePhase.L3, NodePhase.TOTAL, NodePhase.GENERAL],
+        applicablePhases: [NodePhase.L1, NodePhase.L2, NodePhase.L3, NodePhase.TOTAL, NodePhase.SINGLEPHASE],
+        applicableTypes: [NodeType.FLOAT, NodeType.INT],
         canBeVirtual: false,
         defaultPublished: false,
         defaultLoggingPeriod: 15,
@@ -294,7 +334,8 @@ export const defaultVariables = readable<NodeVariableType[]>([
         defaultUnit: "kWh",
         defaultNumberOfDecimals: 3,
         availableUnits: ["Wh", "kWh"],
-        applicablePhases: [NodePhase.L1, NodePhase.L2, NodePhase.L3, NodePhase.TOTAL, NodePhase.GENERAL],
+        applicablePhases: [NodePhase.L1, NodePhase.L2, NodePhase.L3, NodePhase.TOTAL, NodePhase.SINGLEPHASE],
+        applicableTypes: [NodeType.FLOAT, NodeType.INT],
         canBeVirtual: false,
         defaultPublished: false,
         defaultLoggingPeriod: 15,
@@ -307,7 +348,8 @@ export const defaultVariables = readable<NodeVariableType[]>([
         defaultUnit: "kVArh",
         defaultNumberOfDecimals: 3,
         availableUnits: ["VArh", "kVArh"],
-        applicablePhases: [NodePhase.L1, NodePhase.L2, NodePhase.L3, NodePhase.TOTAL, NodePhase.GENERAL],
+        applicablePhases: [NodePhase.L1, NodePhase.L2, NodePhase.L3, NodePhase.TOTAL, NodePhase.SINGLEPHASE],
+        applicableTypes: [NodeType.FLOAT, NodeType.INT],
         canBeVirtual: false,
         defaultPublished: false,
         defaultLoggingPeriod: 15,
