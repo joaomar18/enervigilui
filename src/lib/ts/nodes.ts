@@ -3,26 +3,55 @@ import { Protocol, NodeType } from "$lib/stores/nodes";
 import { defaultVariables } from "$lib/stores/nodes";
 import { defaultVariableNames } from "$lib/stores/nodes";
 import { defaultVariableUnits } from "$lib/stores/nodes";
+import type { FormattedNode } from "$lib/stores/nodes";
 
 /**
  * Validates a node name based on whether it is a custom variable or a default variable.
- *
- * - For custom variables, checks that the node name is a non-empty, non-whitespace string.
- * - For default variables, checks that the node name exists in the defaultVariableNames Svelte store.
- *
- * @param nodeName - The name of the node to validate.
- * @param customVariable - Whether the node is a custom variable (true) or a default variable (false).
- * @returns True if the node name is valid according to the rules above, otherwise false.
+ * 
+ * For custom variables, the function performs the following validations:
+ * - Ensures the name is not already used in the defaultVariableNames store
+ * - Verifies the name is non-empty and contains no whitespace
+ * - Confirms the name contains only alphabetical characters or underscores
+ * 
+ * For default variables:
+ * - Verifies the name exists in the defaultVariableNames store
+ * 
+ * For both types:
+ * - If currentNodes is provided, checks that the displayName doesn't appear more than once
+ * 
+ * @param nodeName - The display name of the node to validate (without prefix)
+ * @param customVariable - If true, validates as custom variable, if false, validates as default variable
+ * @param currentNodes - Optional array of formatted nodes to check for duplicate display names
+ * @returns {boolean} True if the node name is valid according to all applicable rules
  */
-export function validateNodeName(nodeName: string, customVariable: boolean): boolean {
-    if (customVariable) {
-        return Boolean(nodeName && nodeName.trim().length > 0);
-    } else {
-        const names: Array<string> = get(defaultVariableNames);
-        if (names.includes(nodeName)) {
-            return true;
+export function validateNodeName(nodeName: string, customVariable: boolean, currentNodes?: Array<FormattedNode>): boolean {
+    const names: Array<string> = get(defaultVariableNames);
+
+    // Check for duplicates in current nodes
+    if (currentNodes) {
+        const nodeCount = Object.values(currentNodes).filter((node: FormattedNode) => node.displayName === nodeName).length;
+        if (nodeCount >= 2) {
+            return false;
         }
-        return false;
+    }
+
+    if (customVariable) {
+        // For custom variables, check if name exists in default names
+        if (names.includes(nodeName)) {
+            return false;
+        }
+
+        // Check if name is empty or contains any whitespace
+        if (!nodeName || nodeName.length === 0 || /\s/.test(nodeName)) {
+            return false;
+        }
+
+        // Check if name contains only alphabetical characters or underscore
+        const namePattern = /^[a-zA-Z_]+$/;
+        return namePattern.test(nodeName);
+    } else {
+        // For default variables, just check if it exists in the default names
+        return names.includes(nodeName);
     }
 }
 
@@ -60,30 +89,57 @@ export function validateNodeUnit(nodeName: string, nodeType: NodeType, nodeUnit:
 
 /**
  * Validates the communication ID for a node based on the selected protocol.
+ * 
+ * Protocol-specific validation rules:
+ * - Protocol.NONE: 
+ *   - The communication ID must be empty or undefined
+ * 
+ * - Protocol.MODBUS_RTU:
+ *   - Must be a hexadecimal string starting with "0x"
+ *   - Must be between 0x0000 and 0xFFFF (0-65535)
+ *   - Example: "0x00A1" or "0x1234"
+ * 
+ * - Protocol.OPC_UA:
+ *   - Must match one of these OPC UA node ID formats:
+ *     - ns=<number>;i=<number> (numeric identifier)
+ *     - ns=<number>;s=<string> (string identifier)
+ *     - ns=<number>;g=<guid> (GUID identifier)
+ *     - ns=<number>;b=<base64> (opaque identifier)
+ *   - The namespace (ns) must be a valid number
+ *   - Example: "ns=1;i=1234" or "ns=2;s=Temperature"
  *
- * - For Protocol.NONE: The communication ID must be empty (returns true if empty, false otherwise).
- * - For Protocol.MODBUS_RTU: Always returns true (no validation logic implemented).
- * - For Protocol.OPC_UA: The communication ID must match the OPC UA node ID format:
- *   - ns=<number>;i=<number> (numeric identifier)
- *   - ns=<number>;s=<string> (string identifier)
- *   - ns=<number>;g=<guid> (GUID identifier)
- *   - ns=<number>;b=<base64> (opaque identifier)
- *
- * @param communicationID - The communication ID string to validate.
- * @param protocol - The protocol type (e.g., Protocol.NONE, Protocol.MODBUS_RTU, Protocol.OPC_UA).
- * @returns True if the communication ID is valid for the given protocol, otherwise false.
+ * @param communicationID - The communication ID string to validate, can be undefined
+ * @param protocol - The protocol type (Protocol.NONE, Protocol.MODBUS_RTU, or Protocol.OPC_UA)
+ * @returns {boolean} True if the communication ID is valid for the given protocol
  */
-export function validateCommunicationID(communicationID: string, protocol: Protocol): boolean {
-    if (protocol === Protocol.NONE) {
-        // For NONE, communicationID should be empty
-        return !(communicationID && communicationID.trim().length > 0);
-    } else if (protocol === Protocol.MODBUS_RTU) {
-        return true;
-    } else if (protocol === Protocol.OPC_UA) {
-        const opcuaPattern = /^ns=\d+;(i=\d+|s=[^;]+|g=[0-9a-fA-F-]+|b=[A-Za-z0-9+/=]+)$/;
-        return opcuaPattern.test(communicationID.trim());
+export function validateCommunicationID(communicationID: string | undefined, protocol: Protocol): boolean {
+
+    if (!communicationID) {
+        return protocol === Protocol.NONE;
     }
-    return false;
+
+    const trimmedId = communicationID.trim();
+
+    switch (protocol) {
+        case Protocol.NONE:
+            return trimmedId.length === 0;
+
+        case Protocol.MODBUS_RTU:
+            // Check format: must be "0x" followed by 1-4 hex digits
+            const modbusPattern = /^0x[0-9A-Fa-f]{1,4}$/;
+            if (!modbusPattern.test(trimmedId)) {
+                return false;
+            }
+            const value = parseInt(trimmedId.substring(2), 16);
+            return value >= 0 && value <= 0xFFFF;
+
+        case Protocol.OPC_UA:
+            const opcuaPattern = /^ns=\d+;(i=\d+|s=[^;]+|g=[0-9a-fA-F-]{8}-[0-9a-fA-F-]{4}-[0-9a-fA-F-]{4}-[0-9a-fA-F-]{4}-[0-9a-fA-F-]{12}|b=[A-Za-z0-9+/=]+)$/;
+            return opcuaPattern.test(trimmedId);
+
+        default:
+            return false;
+    }
 }
 
 /**

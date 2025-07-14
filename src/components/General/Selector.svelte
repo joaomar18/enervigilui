@@ -6,10 +6,10 @@
     import { selectedLang } from "$lib/stores/lang";
 
     //Props
-    export let disabled: boolean = false;
+    export let disabled: boolean = false; // Selector is di0sabled
     export let useLang: boolean = false; //use language texts in options and selected option
-    export let inputBadFormat: boolean = false;
-    export let firstSubmission: boolean = false;
+    export let inputInvalid: boolean = false; // Input is invalid
+    export let enableInputInvalid: boolean = false; // Enable Input is Invalid property
     export let options: Record<string, any>; //Record with options for the selector
     export let selectedOption: any; //Selected option
     export let setSelectedOption: ((value: string) => void) | undefined = undefined; //Function to set the selected option, if not provided, the selectedOption will be updated directly
@@ -147,7 +147,7 @@
         --options-height: {optionsHeight};
     "
     class:disabled={optionsLength == 0 || disabled}
-    class:bad-format={inputBadFormat && firstSubmission && !disabled}
+    class:bad-format={inputInvalid && enableInputInvalid && !disabled}
 >
     <div class="content-div">
         <span class="selected-option">{getDisplayText(selectedKey || "")}</span>

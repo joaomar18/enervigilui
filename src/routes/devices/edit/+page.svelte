@@ -10,6 +10,8 @@
     import ConfirmWindow from "../../../components/General/ConfirmWindow.svelte";
     import InputField from "../../../components/General/InputField.svelte";
     import NodesGrid from "../../../components/Devices/Nodes/NodesGrid.svelte";
+    import { Protocol } from "$lib/stores/nodes";
+    import type { DeviceNode } from "$lib/stores/nodes";
 
     // Navigation
     import { navigateTo } from "$lib/ts/navigation";
@@ -31,7 +33,9 @@
     let devicePollTimer: ReturnType<typeof setTimeout>;
     let nodesPollTimer: ReturnType<typeof setTimeout>;
     let deviceData: any;
+    //let deviceNodes: Record<string, DeviceNode>;
     let deviceNodes: any;
+    let getDevicesNodesDone: boolean = false;
     let protocols: Record<string, string> = { "OPC UA": "OPC_UA", "MODBUS RTU": "MODBUS_RTU" };
     let types: Record<string, string> = { "1F": "SINGLE_PHASE", "3F": "THREE_PHASE" };
 
@@ -67,7 +71,7 @@
     let deviceImage: File | undefined;
 
     // Variables for device communication
-    let selectedProtocol: string;
+    let selectedProtocol: Protocol;
     let opcua_options: Record<string, string> = {
         url: "opc.tcp://", // OPC UA server URL
         read_period: "10", // polling interval in seconds
@@ -102,10 +106,7 @@
         const tick = async () => {
             let sucess = false;
             try {
-                const { status, data }: { status: number; data: any } = await getDeviceState(
-                    name,
-                    id
-                );
+                const { status, data }: { status: number; data: any } = await getDeviceState(name, id);
                 if (status !== 200) {
                     showAlert($texts.errorDeviceConfig);
                 } else {
@@ -113,17 +114,16 @@
                     deviceName = deviceData.name;
 
                     selectedProtocol = deviceData.protocol;
-                    if (selectedProtocol === "OPC_UA") {
+                    if (selectedProtocol === Protocol.OPC_UA) {
                         for (let option in deviceData.communication_options) {
                             if (opcua_options.hasOwnProperty(option)) {
                                 opcua_options[option] = deviceData.communication_options[option];
                             }
                         }
-                    } else if (selectedProtocol === "MODBUS_RTU") {
+                    } else if (selectedProtocol === Protocol.MODBUS_RTU) {
                         for (let option in deviceData.communication_options) {
                             if (modbus_rtu_options.hasOwnProperty(option)) {
-                                modbus_rtu_options[option] =
-                                    deviceData.communication_options[option];
+                                modbus_rtu_options[option] = deviceData.communication_options[option];
                             }
                         }
                     }
@@ -151,22 +151,21 @@
     // Function to fetch device nodes (variables)
     function fetchDeviceNodesConfig(name: string, id: number): void {
         const tick = async () => {
-            let sucess = false;
             try {
-                const { status, data }: { status: number; data: any } = await getDeviceNodesConfig(
-                    name,
-                    id
-                );
+                const { status, data }: { status: number; data: any } = await getDeviceNodesConfig(name, id);
                 if (status !== 200) {
                     showAlert($texts.errorDeviceNodesConfig);
                 } else {
                     deviceNodes = data;
-                    sucess = true;
+                    console.log({ ...data });
+                    console.log(deviceNodes["l1_current"]);
+                    console.log(Object.keys(deviceNodes["l1_current"].config));
+                    getDevicesNodesDone = true;
                 }
             } catch (e) {
                 showAlert($texts.errorDeviceNodesConfig);
             }
-            if (!sucess) {
+            if (!getDevicesNodesDone) {
                 nodesPollTimer = setTimeout(tick, 2500);
             }
         };
@@ -282,15 +281,13 @@
                                 closeStrokeColor="white"
                                 closeHoverStrokeColor="#eeeeee"
                             >
-                                <span class="info-text"
-                                    >{$texts.communicationProtocolInfo[$selectedLang]}</span
-                                >
+                                <span class="info-text">{$texts.communicationProtocolInfo[$selectedLang]}</span>
                             </HintInfo>
                         </div>
                     </div>
                 </div>
 
-                {#if selectedProtocol === "OPC_UA"}
+                {#if selectedProtocol === Protocol.OPC_UA}
                     <div class="device-input-div">
                         <span>{$texts.networkAddress[$selectedLang]}</span>
                         <div class="input-div">
@@ -327,9 +324,7 @@
                                     closeStrokeColor="white"
                                     closeHoverStrokeColor="#eeeeee"
                                 >
-                                    <span class="info-text"
-                                        >{$texts.networkAddressInfo[$selectedLang]}</span
-                                    >
+                                    <span class="info-text">{$texts.networkAddressInfo[$selectedLang]}</span>
                                 </HintInfo>
                             </div>
                         </div>
@@ -382,9 +377,7 @@
                                     closeStrokeColor="white"
                                     closeHoverStrokeColor="#eeeeee"
                                 >
-                                    <span class="info-text"
-                                        >{$texts.readPeriodInfo[$selectedLang]}</span
-                                    >
+                                    <span class="info-text">{$texts.readPeriodInfo[$selectedLang]}</span>
                                 </HintInfo>
                             </div>
                         </div>
@@ -437,17 +430,13 @@
                                     closeStrokeColor="white"
                                     closeHoverStrokeColor="#eeeeee"
                                 >
-                                    <span class="info-text"
-                                        >{$texts.commTimeoutInfo[$selectedLang]}</span
-                                    >
+                                    <span class="info-text">{$texts.commTimeoutInfo[$selectedLang]}</span>
                                 </HintInfo>
                             </div>
                         </div>
                     </div>
                     <div class="optional-div">
-                        <span class="optional-text"
-                            >{$texts.authenticationOptional[$selectedLang]}</span
-                        >
+                        <span class="optional-text">{$texts.authenticationOptional[$selectedLang]}</span>
                         <div class="device-input-div">
                             <span>{$texts.username[$selectedLang]}</span>
                             <div class="input-div">
@@ -484,9 +473,7 @@
                                         closeStrokeColor="white"
                                         closeHoverStrokeColor="#eeeeee"
                                     >
-                                        <span class="info-text"
-                                            >{$texts.commUsernameInfo[$selectedLang]}</span
-                                        >
+                                        <span class="info-text">{$texts.commUsernameInfo[$selectedLang]}</span>
                                     </HintInfo>
                                 </div>
                             </div>
@@ -528,15 +515,13 @@
                                         closeStrokeColor="white"
                                         closeHoverStrokeColor="#eeeeee"
                                     >
-                                        <span class="info-text"
-                                            >{$texts.commPasswordInfo[$selectedLang]}</span
-                                        >
+                                        <span class="info-text">{$texts.commPasswordInfo[$selectedLang]}</span>
                                     </HintInfo>
                                 </div>
                             </div>
                         </div>
                     </div>
-                {:else if selectedProtocol === "MODBUS_RTU"}
+                {:else if selectedProtocol === Protocol.MODBUS_RTU}
                     <div class="device-input-div">
                         <span>{$texts.communicationPort[$selectedLang]}</span>
                         <div class="input-div">
@@ -573,9 +558,7 @@
                                     closeStrokeColor="white"
                                     closeHoverStrokeColor="#eeeeee"
                                 >
-                                    <span class="info-text"
-                                        >{$texts.communicationPortInfo[$selectedLang]}</span
-                                    >
+                                    <span class="info-text">{$texts.communicationPortInfo[$selectedLang]}</span>
                                 </HintInfo>
                             </div>
                         </div>
@@ -621,9 +604,7 @@
                                     closeStrokeColor="white"
                                     closeHoverStrokeColor="#eeeeee"
                                 >
-                                    <span class="info-text"
-                                        >{$texts.baudrateInfo[$selectedLang]}</span
-                                    >
+                                    <span class="info-text">{$texts.baudrateInfo[$selectedLang]}</span>
                                 </HintInfo>
                             </div>
                         </div>
@@ -669,8 +650,7 @@
                                     closeStrokeColor="white"
                                     closeHoverStrokeColor="#eeeeee"
                                 >
-                                    <span class="info-text">{$texts.parityInfo[$selectedLang]}</span
-                                    >
+                                    <span class="info-text">{$texts.parityInfo[$selectedLang]}</span>
                                 </HintInfo>
                             </div>
                         </div>
@@ -716,9 +696,7 @@
                                     closeStrokeColor="white"
                                     closeHoverStrokeColor="#eeeeee"
                                 >
-                                    <span class="info-text"
-                                        >{$texts.bytesizeInfo[$selectedLang]}</span
-                                    >
+                                    <span class="info-text">{$texts.bytesizeInfo[$selectedLang]}</span>
                                 </HintInfo>
                             </div>
                         </div>
@@ -764,9 +742,7 @@
                                     closeStrokeColor="white"
                                     closeHoverStrokeColor="#eeeeee"
                                 >
-                                    <span class="info-text"
-                                        >{$texts.stopbitsInfo[$selectedLang]}</span
-                                    >
+                                    <span class="info-text">{$texts.stopbitsInfo[$selectedLang]}</span>
                                 </HintInfo>
                             </div>
                         </div>
@@ -820,9 +796,7 @@
                                     closeStrokeColor="white"
                                     closeHoverStrokeColor="#eeeeee"
                                 >
-                                    <span class="info-text"
-                                        >{$texts.readPeriodInfo[$selectedLang]}</span
-                                    >
+                                    <span class="info-text">{$texts.readPeriodInfo[$selectedLang]}</span>
                                 </HintInfo>
                             </div>
                         </div>
@@ -875,9 +849,7 @@
                                     closeStrokeColor="white"
                                     closeHoverStrokeColor="#eeeeee"
                                 >
-                                    <span class="info-text"
-                                        >{$texts.commTimeoutInfo[$selectedLang]}</span
-                                    >
+                                    <span class="info-text">{$texts.commTimeoutInfo[$selectedLang]}</span>
                                 </HintInfo>
                             </div>
                         </div>
@@ -929,9 +901,7 @@
                                     closeStrokeColor="white"
                                     closeHoverStrokeColor="#eeeeee"
                                 >
-                                    <span class="info-text"
-                                        >{$texts.retriesInfo[$selectedLang]}</span
-                                    >
+                                    <span class="info-text">{$texts.retriesInfo[$selectedLang]}</span>
                                 </HintInfo>
                             </div>
                         </div>
@@ -984,9 +954,7 @@
                                 closeStrokeColor="white"
                                 closeHoverStrokeColor="#eeeeee"
                             >
-                                <span class="info-text"
-                                    >{$texts.connectionTypeInfo[$selectedLang]}</span
-                                >
+                                <span class="info-text">{$texts.connectionTypeInfo[$selectedLang]}</span>
                             </HintInfo>
                         </div>
                     </div>
@@ -1027,9 +995,7 @@
                                 closeStrokeColor="white"
                                 closeHoverStrokeColor="#eeeeee"
                             >
-                                <span class="info-text"
-                                    >{$texts.readEnergyFromMeterInfo[$selectedLang]}</span
-                                >
+                                <span class="info-text">{$texts.readEnergyFromMeterInfo[$selectedLang]}</span>
                             </HintInfo>
                         </div>
                     </div>
@@ -1069,11 +1035,7 @@
                                 closeStrokeColor="white"
                                 closeHoverStrokeColor="#eeeeee"
                             >
-                                <span class="info-text"
-                                    >{$texts.readForwardReverseEnergySeparateInfo[
-                                        $selectedLang
-                                    ]}</span
-                                >
+                                <span class="info-text">{$texts.readForwardReverseEnergySeparateInfo[$selectedLang]}</span>
                             </HintInfo>
                         </div>
                     </div>
@@ -1113,9 +1075,7 @@
                                 closeStrokeColor="white"
                                 closeHoverStrokeColor="#eeeeee"
                             >
-                                <span class="info-text"
-                                    >{$texts.negativeReactivePowerInfo[$selectedLang]}</span
-                                >
+                                <span class="info-text">{$texts.negativeReactivePowerInfo[$selectedLang]}</span>
                             </HintInfo>
                         </div>
                     </div>
@@ -1155,9 +1115,7 @@
                                 closeStrokeColor="white"
                                 closeHoverStrokeColor="#eeeeee"
                             >
-                                <span class="info-text"
-                                    >{$texts.frequencyReadingInfo[$selectedLang]}</span
-                                >
+                                <span class="info-text">{$texts.frequencyReadingInfo[$selectedLang]}</span>
                             </HintInfo>
                         </div>
                     </div>
@@ -1169,10 +1127,13 @@
                     <span>{$texts.deviceNodesSub[$selectedLang]}</span>
                 </div>
                 <div class="nodes-grid-div">
+                    <!--
                     <NodesGrid
                         {selectedProtocol}
+                        meterID={deviceData?.id}
                         meterType={meter_type}
                         bind:nodes={deviceNodes}
+                        nodesFetched={getDevicesNodesDone}
                         width="100%"
                         height="fit-content"
                         borderRadius="10px"
@@ -1184,6 +1145,7 @@
                         subSectionTextColor="#cbd5e1"
                         subSectionBorderColor="transparent"
                     />
+                    -->
                 </div>
             </div>
             <div class="action-buttons-div">
@@ -1310,9 +1272,7 @@
                                 showSaveWindow = false;
                             }}
                         >
-                            <span class="save-window-text"
-                                >{$texts.saveDeviceInfo[$selectedLang]}</span
-                            >
+                            <span class="save-window-text">{$texts.saveDeviceInfo[$selectedLang]}</span>
                             <div class="button-div save-window-button">
                                 <Button
                                     buttonText={$texts.confirm[$selectedLang]}

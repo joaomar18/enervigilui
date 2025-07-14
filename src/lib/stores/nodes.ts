@@ -101,6 +101,129 @@ export interface NodeVariableType {
 }
 
 /**
+ * Configuration specific to Modbus RTU protocol nodes.
+ * Defines the protocol-specific settings required for Modbus RTU communication.
+ * 
+ * @interface
+ * @property {number} register - Register address for Modbus communication
+ */
+export interface ModbusRTUConfig {
+    register: number;
+}
+
+/**
+ * Configuration specific to OPC UA protocol nodes.
+ * Defines the protocol-specific settings required for OPC UA communication.
+ * 
+ * @interface
+ * @property {string} node_id - Node identifier in OPC UA format
+ */
+export interface OPCUAConfig {
+    node_id: string;
+}
+
+/**
+ * Configuration for nodes without communication protocol.
+ * Used for virtual or calculated nodes that don't require external communication.
+ * 
+ * @interface
+ */
+export interface NoProtocolConfig {
+    // No protocol-specific properties
+}
+
+/**
+ * Base configuration shared by all node types regardless of protocol.
+ * Defines common settings and parameters used across all nodes in the system.
+ * 
+ * @interface
+ * @property {boolean} calculate_increment - If true, increment is calculated internally for incremental nodes
+ * @property {boolean} calculated - True if the node value is calculated rather than obtained via communication
+ * @property {boolean} custom - True if this is a custom user-defined node
+ * @property {number} decimal_places - Number of decimal places to display for numeric values
+ * @property {boolean} enabled - Whether the node is currently enabled
+ * @property {boolean} incremental_node - True if the node value accumulates over time
+ * @property {boolean} logging - Whether data logging is enabled for this node
+ * @property {number} logging_period - Logging frequency in minutes
+ * @property {boolean} max_alarm - Whether maximum threshold alarm is enabled
+ * @property {number} max_alarm_value - Value that triggers maximum threshold alarm
+ * @property {boolean} min_alarm - Whether minimum threshold alarm is enabled
+ * @property {number} min_alarm_value - Value that triggers minimum threshold alarm
+ * @property {boolean} positive_incremental - For incremental nodes, whether to add or subtract from initial value
+ * @property {Protocol} protocol - Communication protocol used by this node
+ * @property {boolean} publish - Whether the node's value should be published to external systems or services
+ * @property {NodeType} type - Data type of the node value
+ * @property {string} unit - Measurement unit (e.g., V, A, kW)
+ */
+export interface BaseNodeConfig {
+    calculate_increment: boolean;
+    calculated: boolean;
+    custom: boolean;
+    decimal_places: number;
+    enabled: boolean;
+    incremental_node: boolean;
+    logging: boolean;
+    logging_period: number;
+    max_alarm: boolean;
+    max_alarm_value: number;
+    min_alarm: boolean;
+    min_alarm_value: number;
+    positive_incremental: boolean;
+    protocol: Protocol;
+    publish: boolean;
+    type: NodeType;
+    unit: string;
+}
+
+/**
+ * Complete node configuration combining base config with protocol-specific settings.
+ * Uses TypeScript discriminated union to ensure protocol-specific settings match the protocol type.
+ * 
+ * @type
+ */
+export type NodeConfiguration = BaseNodeConfig & (ModbusRTUConfig | OPCUAConfig | NoProtocolConfig);
+
+/**
+ * Represents a complete node in a device's configuration.
+ * Contains all information needed to identify, configure, and communicate with a node.
+ * 
+ * @interface
+ * @property {number} device_id - Unique identifier for the device this node belongs to
+ * @property {string} name - Name of the node, typically includes phase prefix
+ * @property {Protocol} protocol - Communication protocol used by this node
+ * @property {NodeConfiguration} config - Complete configuration including protocol-specific settings
+ */
+export interface DeviceNode {
+    device_id: number;
+    name: string;
+    protocol: Protocol;
+    config: NodeConfiguration;
+}
+
+/**
+ * Extended formatting information for a device node.
+ * Used to provide additional display and communication information.
+ * 
+ * @interface
+ * @property {string} displayName - Display name of the node (without prefix)
+ * @property {string | number} communicationID - Communication ID of the node (type dependent on protocol)
+ */
+interface DeviceNodeFormatting {
+    displayName: string;
+    communicationID: string | undefined;
+}
+
+/**
+ * Combines DeviceNode with formatting information.
+ * Provides a complete representation of a node with both configuration and display properties.
+ * 
+ * @type
+ * @extends {DeviceNode}
+ * @extends {DeviceNodeFormatted}
+ */
+export type FormattedNode = DeviceNode & DeviceNodeFormatting;
+
+/**
  * A readable store containing predefined variable types for energy monitoring systems.
  * Includes electrical measurements like voltage, current, power, and energy variables
  * with their default configuration settings.

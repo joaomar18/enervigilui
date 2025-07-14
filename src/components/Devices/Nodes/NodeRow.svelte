@@ -5,50 +5,43 @@
     import { validateNodeName, validateNodeUnit, validateCommunicationID, validateNodeType } from "$lib/ts/nodes";
 
     import { Protocol, NodeType, NodePhase } from "$lib/stores/nodes";
+    import type { FormattedNode } from "$lib/stores/nodes";
     import { defaultVariableUnits } from "$lib/stores/nodes";
 
     // Stores for multi-language support
     import { variableNameTexts, variableNameTextsByPhase } from "$lib/stores/lang";
 
     // Props
+    export let sectionNodes: Array<FormattedNode>;
     export let selectedProtocol: Protocol;
-
     export let variablePhase: NodePhase;
-    export let variableName: string;
-    export let variableUnit: string;
-    export let variableProtocol: Protocol;
-    export let communicationID: string;
-    export let variableType: NodeType;
-    export let customVariable: boolean;
-    export let publishVariable: boolean;
-    export let virtualVariable: boolean;
-    export let logVariable: boolean;
-    export let enableMinAlarm: boolean;
-    export let enableMaxAlarm: boolean;
-    export let enable: boolean;
+    export let node: FormattedNode;
 
     // Layout / styling props
     export let backgroundColor: string;
 
     // Variables
-    let oldVariableName: string = variableName;
-    let oldVariableUnit: string = variableUnit;
-    let customVariableChanged: boolean = customVariable;
+    let publish: boolean;
+
+    let oldVariableName: string = node.displayName;
+    let oldVariableUnit: string = node.config.unit;
+    let customVariableChanged: boolean = node.config.custom;
 
     let disabledUnit: boolean = false;
+    let disabledCommIDString: string = "";
 
     // Export Funcions
     export let onVariableNameChanged: (variableName: string) => void = () => {};
     export let onVariableUnitChanged: (variableUnit: string) => void = () => {};
     export let onVariableTypeChanged: (variableType: NodeType) => void = () => {};
-    export let onCommunicationIDChanged: (communicationID: string) => void = () => {};
+    export let onCommunicationIDChanged: (communicationID: string | undefined) => void = () => {};
     export let onCustomVariableChanged: (customVariable: boolean) => void = () => {};
-    export let onPublishVariableChanged: (publishVariable: boolean) => void = () => {};
     export let onVirtualVariableChanged: (virtualVariable: boolean) => void = () => {};
     export let onLogVariableChanged: (logVariable: boolean) => void = () => {};
     export let onEnableMinAlarmChanged: (enableMinAlarm: boolean) => void = () => {};
     export let onEnableMaxAlarmChanged: (enableMaxAlarm: boolean) => void = () => {};
     export let onEnableChanged: (enable: boolean) => void = () => {};
+    export let onProtocolChanged: (newProtocol: Protocol) => void = () => {};
     export let onDelete: () => void;
     export let onConfig: () => void;
 
@@ -66,52 +59,51 @@
     }
 
     // Reactive statements
-    $: onVariableNameChanged(variableName);
-    $: onVariableUnitChanged(variableUnit);
+    $: onVariableNameChanged(node.displayName);
+    $: onVariableUnitChanged(node.config.unit);
     $: {
-        if (variableType === NodeType.FLOAT || variableType === NodeType.INT) {
-            if ($defaultVariableUnits[variableName]) {
-                variableUnit = $defaultVariableUnits[variableName][0];
+        if (node.config.type === NodeType.FLOAT || node.config.type === NodeType.INT) {
+            if ($defaultVariableUnits[node.displayName]) {
+                node.config.unit = $defaultVariableUnits[node.displayName][0];
             } else {
-                variableUnit = "";
+                node.config.unit = "";
             }
             disabledUnit = false;
-        } else if (variableType === NodeType.STRING || variableType === NodeType.BOOLEAN) {
-            variableUnit = "";
+        } else if (node.config.type === NodeType.STRING || node.config.type === NodeType.BOOLEAN) {
+            node.config.unit = "";
             disabledUnit = true;
         }
     }
-    $: onVariableTypeChanged(variableType);
-    $: onCommunicationIDChanged(communicationID);
+    $: onVariableTypeChanged(node.config.type);
+    $: onCommunicationIDChanged(node.communicationID);
     $: {
-        if (customVariable && !customVariableChanged) {
-            oldVariableName = variableName;
-            oldVariableUnit = variableUnit;
-            variableName = "";
-            variableUnit = "";
+        if (node.config.custom && !customVariableChanged) {
+            oldVariableName = node.displayName;
+            oldVariableUnit = node.config.unit;
+            node.displayName = "";
+            node.config.unit = "";
             customVariableChanged = true;
-        } else if (!customVariable && customVariableChanged) {
-            variableName = oldVariableName;
-            variableUnit = oldVariableUnit;
+        } else if (!node.config.custom && customVariableChanged) {
+            node.displayName = oldVariableName;
+            node.config.unit = oldVariableUnit;
             customVariableChanged = false;
         }
-        onCustomVariableChanged(customVariable);
+        onCustomVariableChanged(node.config.custom);
     }
-    $: onPublishVariableChanged(publishVariable);
     $: {
-        if (virtualVariable) {
-            communicationID = "";
-            variableProtocol = Protocol.NONE;
+        if (node.config.calculated) {
+            node.communicationID = "";
+            node.config.protocol = Protocol.NONE;
+        } else {
+            node.config.protocol = selectedProtocol;
         }
-        else{
-            variableProtocol = selectedProtocol;
-        }
-        onVirtualVariableChanged(virtualVariable);
+        onVirtualVariableChanged(node.config.calculated);
     }
-    $: onLogVariableChanged(logVariable);
-    $: onEnableMinAlarmChanged(enableMinAlarm);
-    $: onEnableMaxAlarmChanged(enableMaxAlarm);
-    $: onEnableChanged(enable);
+    $: onLogVariableChanged(node.config.logging);
+    $: onEnableMinAlarmChanged(node.config.min_alarm);
+    $: onEnableMaxAlarmChanged(node.config.max_alarm);
+    $: onEnableChanged(node.config.enabled);
+    $: onProtocolChanged(node.config.protocol);
 </script>
 
 <tr
@@ -122,13 +114,13 @@
 >
     <td>
         <div class="cell-content">
-            {#if !customVariable}
+            {#if !node.config.custom}
                 <Selector
                     useLang={true}
                     options={$variableNameTextsByPhase[variablePhase]}
-                    bind:selectedOption={variableName}
-                    inputBadFormat={!validateNodeName(variableName, customVariable)}
-                    firstSubmission={true}
+                    bind:selectedOption={node.displayName}
+                    enableInputInvalid={!validateNodeName(node.displayName, node.config.custom, sectionNodes)}
+                    inputInvalid={true}
                     scrollable={true}
                     maxOptions={5}
                     width="90%"
@@ -147,9 +139,9 @@
                 />
             {:else}
                 <InputField
-                    bind:inputValue={variableName}
-                    inputBadFormat={!validateNodeName(variableName, customVariable)}
-                    firstSubmission={true}
+                    bind:inputValue={node.displayName}
+                    inputInvalid={!validateNodeName(node.displayName, node.config.custom, sectionNodes)}
+                    enableInputInvalid={true}
                     inputType="STRING"
                     width="90%"
                     height="30px"
@@ -170,13 +162,13 @@
     </td>
     <td>
         <div class="cell-content">
-            {#if !customVariable}
+            {#if !node.config.custom}
                 <Selector
-                    options={Object.fromEntries($defaultVariableUnits[variableName]?.map((unit) => [unit, unit]) || [])}
-                    bind:selectedOption={variableUnit}
+                    options={Object.fromEntries($defaultVariableUnits[node.displayName]?.map((unit) => [unit, unit]) || [])}
+                    bind:selectedOption={node.config.unit}
                     disabled={disabledUnit}
-                    inputBadFormat={!validateNodeUnit(variableName, variableType, variableUnit, customVariable)}
-                    firstSubmission={true}
+                    inputInvalid={!validateNodeUnit(node.displayName, node.config.type, node.config.unit, node.config.custom)}
+                    enableInputInvalid={true}
                     scrollable={true}
                     maxOptions={5}
                     width="90%"
@@ -195,10 +187,10 @@
                 />
             {:else}
                 <InputField
-                    bind:inputValue={variableUnit}
+                    bind:inputValue={node.config.unit}
                     disabled={disabledUnit}
-                    inputBadFormat={!validateNodeUnit(variableName, variableType, variableUnit, customVariable)}
-                    firstSubmission={true}
+                    inputInvalid={!validateNodeUnit(node.displayName, node.config.type, node.config.unit, node.config.custom)}
+                    enableInputInvalid={true}
                     inputType="STRING"
                     width="90%"
                     height="30px"
@@ -219,35 +211,58 @@
     </td>
     <td>
         <div class="cell-content">
-            <InputField
-                disabled={virtualVariable}
-                bind:inputValue={communicationID}
-                inputBadFormat={!validateCommunicationID(communicationID, variableProtocol)}
-                firstSubmission={true}
-                inputType="STRING"
-                width="90%"
-                height="30px"
-                borderRadius="5px"
-                backgroundColor="#1a2027"
-                disabledBackgroundColor="#42505f"
-                selectedBackgroundColor="#1a2027"
-                selectedBorderColor="#2F80ED"
-                badFormatBorderColor="#e74c3c"
-                fontSize="0.9rem"
-                fontColor="#f5f5f5"
-                fontWeight="400"
-                textAlign="center"
-                unitTextColor="rgb(170,170,170)"
-            />
+            {#if node.communicationID !== undefined}
+                <InputField
+                    disabled={node.config.calculated}
+                    bind:inputValue={node.communicationID}
+                    inputInvalid={!validateCommunicationID(node.communicationID, node.config.protocol)}
+                    enableInputInvalid={true}
+                    inputType="STRING"
+                    width="90%"
+                    height="30px"
+                    borderRadius="5px"
+                    backgroundColor="#1a2027"
+                    disabledBackgroundColor="#42505f"
+                    selectedBackgroundColor="#1a2027"
+                    selectedBorderColor="#2F80ED"
+                    badFormatBorderColor="#e74c3c"
+                    fontSize="0.9rem"
+                    fontColor="#f5f5f5"
+                    fontWeight="400"
+                    textAlign="center"
+                    unitTextColor="rgb(170,170,170)"
+                />
+            {:else}
+                <InputField
+                    disabled={node.config.calculated}
+                    bind:inputValue={disabledCommIDString}
+                    inputInvalid={!validateCommunicationID(node.communicationID, node.config.protocol)}
+                    enableInputInvalid={true}
+                    inputType="STRING"
+                    width="90%"
+                    height="30px"
+                    borderRadius="5px"
+                    backgroundColor="#1a2027"
+                    disabledBackgroundColor="#42505f"
+                    selectedBackgroundColor="#1a2027"
+                    selectedBorderColor="#2F80ED"
+                    badFormatBorderColor="#e74c3c"
+                    fontSize="0.9rem"
+                    fontColor="#f5f5f5"
+                    fontWeight="400"
+                    textAlign="center"
+                    unitTextColor="rgb(170,170,170)"
+                />
+            {/if}
         </div>
     </td>
     <td>
         <div class="cell-content">
             <Selector
                 options={Object.fromEntries(Object.entries(NodeType).map(([key, value]) => [value, value]))}
-                bind:selectedOption={variableType}
-                inputBadFormat={!validateNodeType(variableType, variableName, customVariable)}
-                firstSubmission={true}
+                bind:selectedOption={node.config.type}
+                inputInvalid={!validateNodeType(node.config.type, node.displayName, node.config.custom)}
+                enableInputInvalid={true}
                 scrollable={true}
                 maxOptions={5}
                 width="90%"
@@ -269,7 +284,7 @@
     <td>
         <div class="cell-content">
             <Checkbox
-                bind:checked={customVariable}
+                bind:checked={node.config.custom}
                 inputName="custom-node"
                 width="1.5em"
                 height="1.5em"
@@ -285,7 +300,7 @@
     <td>
         <div class="cell-content">
             <Checkbox
-                bind:checked={publishVariable}
+                bind:checked={publish}
                 inputName="publish-node"
                 width="1.5em"
                 height="1.5em"
@@ -301,7 +316,7 @@
     <td>
         <div class="cell-content">
             <Checkbox
-                bind:checked={virtualVariable}
+                bind:checked={node.config.calculated}
                 inputName="virtual-node"
                 width="1.5em"
                 height="1.5em"
@@ -317,7 +332,7 @@
     <td>
         <div class="cell-content">
             <Checkbox
-                bind:checked={logVariable}
+                bind:checked={node.config.logging}
                 inputName="log-node"
                 width="1.5em"
                 height="1.5em"
@@ -333,7 +348,7 @@
     <td>
         <div class="cell-content">
             <Checkbox
-                bind:checked={enable}
+                bind:checked={node.config.enabled}
                 inputName="enable-node"
                 width="1.5em"
                 height="1.5em"
@@ -411,6 +426,6 @@
     }
 
     .btn-more-options:hover svg {
-        fill: rgb(255, 255, 255);
+        fill: #2f80ed;
     }
 </style>

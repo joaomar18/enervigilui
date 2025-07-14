@@ -3,8 +3,8 @@
 
     // Props
     export let disabled: boolean = false;
-    export let inputBadFormat: boolean = false;
-    export let firstSubmission: boolean = false;
+    export let inputInvalid: boolean = false;
+    export let enableInputInvalid: boolean = false;
     export let inputValue: string;
     export let inputType: string = "STRING";
     export let inputUnit: string | null = null;
@@ -90,9 +90,11 @@
     }
 
     async function updateUnitWidth() {
-        await tick();
-        if (unitElement) {
-            unitWidth = unitElement.offsetWidth;
+        if (!disabled) {
+            await tick();
+            if (unitElement) {
+                unitWidth = unitElement.offsetWidth;
+            }
         }
     }
 
@@ -181,7 +183,7 @@
                     on:input={handleInput}
                     {disabled}
                     class:disabled
-                    class:bad-format={inputBadFormat && firstSubmission && !disabled}
+                    class:bad-format={inputInvalid && enableInputInvalid && !disabled}
                 />
             {/if}
             {#if inputUnit}
