@@ -1,15 +1,6 @@
 import { readable } from "svelte/store";
 import { derived } from "svelte/store";
-
-/**
- * Communication protocols supported by the energy monitoring system.
- * Defines the available protocols for communicating with external devices and systems.
- */
-export enum Protocol {
-    MODBUS_RTU = "MODBUS_RTU",
-    OPC_UA = "OPC_UA",
-    NONE = "NONE"
-}
+import { Protocol } from "$lib/stores/devices";
 
 /**
  * Prefixes used to identify the electrical phase or type of a node variable.
@@ -77,12 +68,31 @@ export enum NodeType {
 }
 
 /**
- * Represents a default node variable type in the energy monitoring system.
- * This interface defines all properties needed to configure and display
- * typical measurement variables (e.g., voltage, current, power) in the system.
+ * Contains the default information for typical nodes in the energy monitoring system.
+ * This interface defines all default properties and configuration settings needed to 
+ * configure and display typical measurement variables (e.g., voltage, current, power).
+ * These defaults are used as templates when creating new nodes or resetting node configurations.
+ * 
+ * @interface DefaultNodeInfo
+ * @property {string} name - The variable name identifier (e.g., "voltage", "current", "active_power")
+ * @property {NodeType} type - The default data type for this variable
+ * @property {number} [defaultNumberOfDecimals] - Default number of decimal places for display
+ * @property {string} defaultUnit - Default measurement unit (e.g., "V", "A", "kW")
+ * @property {string[]} [availableUnits] - Array of available units for this variable
+ * @property {NodePhase[]} applicablePhases - Phases where this variable can be applied
+ * @property {NodeType[]} applicableTypes - Data types that this variable supports
+ * @property {boolean} canBeVirtual - Whether this variable can be calculated/virtual
+ * @property {boolean} defaultPublished - Default publish state for MQTT/external systems
+ * @property {number} defaultLoggingPeriod - Default logging interval in minutes
+ * @property {boolean} defaultLoggingEnabled - Whether logging is enabled by default
+ * @property {boolean} isIncrementalNode - Whether this variable accumulates over time
+ * @property {number} [defaultMinAlarm] - Default minimum alarm threshold value
+ * @property {number} [defaultMaxAlarm] - Default maximum alarm threshold value
+ * @property {boolean} [defaultMinAlarmEnabled] - Whether minimum alarm is enabled by default
+ * @property {boolean} [defaultMaxAlarmEnabled] - Whether maximum alarm is enabled by default
  */
-export interface NodeVariableType {
-    variable: string;
+export interface DefaultNodeInfo {
+    name: string;
     type: NodeType;
     defaultNumberOfDecimals?: number;
     defaultUnit: string;
@@ -150,7 +160,6 @@ export interface NoProtocolConfig {
  * @property {boolean} min_alarm - Whether minimum threshold alarm is enabled
  * @property {number} min_alarm_value - Value that triggers minimum threshold alarm
  * @property {boolean} positive_incremental - For incremental nodes, whether to add or subtract from initial value
- * @property {Protocol} protocol - Communication protocol used by this node
  * @property {boolean} publish - Whether the node's value should be published to external systems or services
  * @property {NodeType} type - Data type of the node value
  * @property {string} unit - Measurement unit (e.g., V, A, kW)
@@ -169,7 +178,6 @@ export interface BaseNodeConfig {
     min_alarm: boolean;
     min_alarm_value: number;
     positive_incremental: boolean;
-    protocol: Protocol;
     publish: boolean;
     type: NodeType;
     unit: string;
@@ -228,9 +236,9 @@ export type FormattedNode = DeviceNode & DeviceNodeFormatting;
  * Includes electrical measurements like voltage, current, power, and energy variables
  * with their default configuration settings.
  */
-export const defaultVariables = readable<NodeVariableType[]>([
+export const defaultVariables = readable<DefaultNodeInfo[]>([
     {
-        variable: "voltage",
+        name: "voltage",
         type: NodeType.FLOAT,
         defaultNumberOfDecimals: 2,
         defaultUnit: "V",
@@ -247,7 +255,7 @@ export const defaultVariables = readable<NodeVariableType[]>([
         defaultMaxAlarmEnabled: true,
     },
     {
-        variable: "l1_l2_voltage",
+        name: "l1_l2_voltage",
         type: NodeType.FLOAT,
         defaultNumberOfDecimals: 2,
         defaultUnit: "V",
@@ -264,7 +272,7 @@ export const defaultVariables = readable<NodeVariableType[]>([
         defaultMaxAlarmEnabled: true,
     },
     {
-        variable: "l2_l3_voltage",
+        name: "l2_l3_voltage",
         type: NodeType.FLOAT,
         defaultNumberOfDecimals: 2,
         defaultUnit: "V",
@@ -281,7 +289,7 @@ export const defaultVariables = readable<NodeVariableType[]>([
         defaultMaxAlarmEnabled: true,
     },
     {
-        variable: "l3_l1_voltage",
+        name: "l3_l1_voltage",
         type: NodeType.FLOAT,
         defaultNumberOfDecimals: 2,
         defaultUnit: "V",
@@ -298,7 +306,7 @@ export const defaultVariables = readable<NodeVariableType[]>([
         defaultMaxAlarmEnabled: true,
     },
     {
-        variable: "current",
+        name: "current",
         type: NodeType.FLOAT,
         defaultNumberOfDecimals: 3,
         defaultUnit: "A",
@@ -312,7 +320,7 @@ export const defaultVariables = readable<NodeVariableType[]>([
         isIncrementalNode: false,
     },
     {
-        variable: "active_power",
+        name: "active_power",
         type: NodeType.FLOAT,
         defaultUnit: "kW",
         defaultNumberOfDecimals: 3,
@@ -326,7 +334,7 @@ export const defaultVariables = readable<NodeVariableType[]>([
         isIncrementalNode: false,
     },
     {
-        variable: "reactive_power",
+        name: "reactive_power",
         type: NodeType.FLOAT,
         defaultNumberOfDecimals: 3,
         defaultUnit: "kVAr",
@@ -340,7 +348,7 @@ export const defaultVariables = readable<NodeVariableType[]>([
         isIncrementalNode: false,
     },
     {
-        variable: "apparent_power",
+        name: "apparent_power",
         type: NodeType.FLOAT,
         defaultNumberOfDecimals: 3,
         defaultUnit: "kVA",
@@ -354,7 +362,7 @@ export const defaultVariables = readable<NodeVariableType[]>([
         isIncrementalNode: false,
     },
     {
-        variable: "power_factor",
+        name: "power_factor",
         type: NodeType.FLOAT,
         defaultNumberOfDecimals: 2,
         defaultUnit: "",
@@ -367,7 +375,7 @@ export const defaultVariables = readable<NodeVariableType[]>([
         isIncrementalNode: false,
     },
     {
-        variable: "power_factor_direction",
+        name: "power_factor_direction",
         type: NodeType.STRING,
         defaultUnit: "",
         applicablePhases: [NodePhase.L1, NodePhase.L2, NodePhase.L3, NodePhase.TOTAL, NodePhase.SINGLEPHASE],
@@ -379,7 +387,7 @@ export const defaultVariables = readable<NodeVariableType[]>([
         isIncrementalNode: false,
     },
     {
-        variable: "frequency",
+        name: "frequency",
         type: NodeType.FLOAT,
         defaultNumberOfDecimals: 2,
         defaultUnit: "Hz",
@@ -396,7 +404,7 @@ export const defaultVariables = readable<NodeVariableType[]>([
         defaultMaxAlarmEnabled: true,
     },
     {
-        variable: "active_energy",
+        name: "active_energy",
         type: NodeType.FLOAT,
         defaultUnit: "kWh",
         defaultNumberOfDecimals: 3,
@@ -410,7 +418,7 @@ export const defaultVariables = readable<NodeVariableType[]>([
         isIncrementalNode: true,
     },
     {
-        variable: "reactive_energy",
+        name: "reactive_energy",
         type: NodeType.FLOAT,
         defaultUnit: "kVArh",
         defaultNumberOfDecimals: 3,
@@ -424,7 +432,7 @@ export const defaultVariables = readable<NodeVariableType[]>([
         isIncrementalNode: true,
     },
     {
-        variable: "forward_active_energy",
+        name: "forward_active_energy",
         type: NodeType.FLOAT,
         defaultUnit: "kWh",
         defaultNumberOfDecimals: 3,
@@ -438,7 +446,7 @@ export const defaultVariables = readable<NodeVariableType[]>([
         isIncrementalNode: true,
     },
     {
-        variable: "forward_reactive_energy",
+        name: "forward_reactive_energy",
         type: NodeType.FLOAT,
         defaultUnit: "kVArh",
         defaultNumberOfDecimals: 3,
@@ -452,7 +460,7 @@ export const defaultVariables = readable<NodeVariableType[]>([
         isIncrementalNode: true,
     },
     {
-        variable: "reverse_active_energy",
+        name: "reverse_active_energy",
         type: NodeType.FLOAT,
         defaultUnit: "kWh",
         defaultNumberOfDecimals: 3,
@@ -466,7 +474,7 @@ export const defaultVariables = readable<NodeVariableType[]>([
         isIncrementalNode: true,
     },
     {
-        variable: "reverse_reactive_energy",
+        name: "reverse_reactive_energy",
         type: NodeType.FLOAT,
         defaultUnit: "kVArh",
         defaultNumberOfDecimals: 3,
@@ -487,7 +495,7 @@ export const defaultVariables = readable<NodeVariableType[]>([
  * Useful for generating selectors, dropdowns, or filtering operations.
  */
 export const defaultVariableNames = derived(defaultVariables, ($defaultVariables) =>
-    $defaultVariables.map((type) => type.variable)
+    $defaultVariables.map((type) => type.name)
 );
 
 /**
@@ -506,7 +514,7 @@ export const defaultVariableNamesByPhase = derived(defaultVariables, ($defaultVa
 
     $defaultVariables.forEach((variable) => {
         variable.applicablePhases.forEach(phase => {
-            phaseMap[phase].push(variable.variable);
+            phaseMap[phase].push(variable.name);
         });
     });
 
@@ -523,7 +531,7 @@ export const defaultVariableUnits = derived(defaultVariables, ($defaultVariables
     const unitsMap: Record<string, string[]> = {};
 
     $defaultVariables.forEach((variable) => {
-        unitsMap[variable.variable] = variable.availableUnits || [variable.defaultUnit];
+        unitsMap[variable.name] = variable.availableUnits || [variable.defaultUnit];
     });
 
     return unitsMap;

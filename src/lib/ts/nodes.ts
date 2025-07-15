@@ -1,5 +1,6 @@
 import { get } from "svelte/store";
-import { Protocol, NodeType } from "$lib/stores/nodes";
+import { Protocol } from "$lib/stores/devices";
+import { NodeType } from "$lib/stores/nodes";
 import { defaultVariables } from "$lib/stores/nodes";
 import { defaultVariableNames } from "$lib/stores/nodes";
 import { defaultVariableUnits } from "$lib/stores/nodes";
@@ -46,8 +47,8 @@ export function validateNodeName(nodeName: string, customVariable: boolean, curr
             return false;
         }
 
-        // Check if name contains only alphabetical characters or underscore
-        const namePattern = /^[a-zA-Z_]+$/;
+        // Check if name contains only alphabetical characters, underscores, and numbers (but can't start with a number)
+        const namePattern = /^[a-zA-Z_][a-zA-Z0-9_]*$/;
         return namePattern.test(nodeName);
     } else {
         // For default variables, just check if it exists in the default names
@@ -160,7 +161,7 @@ export function validateNodeType(type: NodeType, name: string, custom: boolean):
     } else {
         // For default variables, check if the type is in the applicable types
         const variables = get(defaultVariables);
-        const variable = Object.values(variables).find(v => v.variable === name);
+        const variable = Object.values(variables).find(v => v.name === name);
 
         if (variable && variable.applicableTypes) {
             return variable.applicableTypes.includes(type);
@@ -169,3 +170,4 @@ export function validateNodeType(type: NodeType, name: string, custom: boolean):
         return false;
     }
 }
+

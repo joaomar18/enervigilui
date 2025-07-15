@@ -25,7 +25,7 @@
     export let imageRightPos: string = "auto";
     export let imageLeftPos: string = "auto";
 
-    // Click Export Funcion
+    // Click Export Function
     export let onClick: () => void;
 
     // Functions

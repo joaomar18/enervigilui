@@ -1,6 +1,6 @@
 <script lang="ts">
     import { onMount, onDestroy } from "svelte";
-    import { getDeviceState, getDeviceNodesConfig } from "$lib/ts/devices";
+    import { getDeviceState, getDeviceNodesConfig, convertToEditableDevice } from "$lib/ts/devices";
     import Selector from "../../../components/General/Selector.svelte";
     import SelectorButton from "../../../components/General/SelectorButton.svelte";
     import HintInfo from "../../../components/General/HintInfo.svelte";
@@ -10,14 +10,19 @@
     import ConfirmWindow from "../../../components/General/ConfirmWindow.svelte";
     import InputField from "../../../components/General/InputField.svelte";
     import NodesGrid from "../../../components/Devices/Nodes/NodesGrid.svelte";
-    import { Protocol } from "$lib/stores/nodes";
-    import type { DeviceNode } from "$lib/stores/nodes";
+    import { Protocol } from "$lib/stores/devices";
+    import { defaultOPCUAOptions, defaultModbusRTUOptions } from "$lib/stores/devices";
+
+    // Types
+    import type { DeviceMeter, EditableDeviceMeter, EditableOPCUAConfig, EditableModbusRTUConfig } from "$lib/stores/devices";
+    import type { DeviceNode, FormattedNode } from "$lib/stores/nodes";
 
     // Navigation
     import { navigateTo } from "$lib/ts/navigation";
 
     // Stores for multi-language support
     import { texts, selectedLang } from "$lib/stores/lang";
+    import { protocolTexts, meterTypeTexts, baudrateTexts, parityTexts, bytesizeTexts, stopbitsTexts } from "$lib/stores/lang";
 
     // Stores for alerts
     import { showAlert } from "$lib/stores/alerts";
@@ -25,84 +30,35 @@
     // Stores for authorization
     import { loadedDone } from "$lib/stores/navigation";
 
-    //Variables
+    // Variables
     let showSaveWindow: boolean = false;
     let showDeleteWindow: boolean = false;
     let deleteDeviceName: string;
-
     let devicePollTimer: ReturnType<typeof setTimeout>;
     let nodesPollTimer: ReturnType<typeof setTimeout>;
-    let deviceData: any;
-    //let deviceNodes: Record<string, DeviceNode>;
-    let deviceNodes: any;
-    let getDevicesNodesDone: boolean = false;
-    let protocols: Record<string, string> = { "OPC UA": "OPC_UA", "MODBUS RTU": "MODBUS_RTU" };
-    let types: Record<string, string> = { "1F": "SINGLE_PHASE", "3F": "THREE_PHASE" };
 
-    //modbus rtu options
-    let baudrateOptions: Record<string, string> = {
-        "1200": "1200",
-        "2400": "2400",
-        "4800": "4800",
-        "9600": "9600",
-        "19200": "19200",
-        "38400": "38400",
-        "57600": "57600",
-        "115200": "115200",
-    };
-
-    let parityOptions: Record<string, string> = {
-        None: "N",
-        Even: "E",
-        Odd: "O",
-    };
-
-    let bytesizeOptions: Record<string, string> = {
-        "7": "7",
-        "8": "8",
-    };
-
-    let stopbitsOptions: Record<string, string> = {
-        "1": "1",
-        "2": "2",
-    };
-
-    let deviceName: string;
+    let deviceData: EditableDeviceMeter;
+    let opcuaConfig: EditableOPCUAConfig | null;
+    let modbusRTUConfig: EditableModbusRTUConfig | null;
+    let deviceNodes: Record<string, DeviceNode>;
+    let editedNodes: Array<FormattedNode>;
     let deviceImage: File | undefined;
 
-    // Variables for device communication
-    let selectedProtocol: Protocol;
-    let opcua_options: Record<string, string> = {
-        url: "opc.tcp://", // OPC UA server URL
-        read_period: "10", // polling interval in seconds
-        timeout: "10", // communication timeout in seconds
-        username: "", // authentication username
-        password: "", // authentication password
-    };
-    let modbus_rtu_options: Record<string, string> = {
-        port: "", // COM port (e.g., "COM1", "/dev/ttyUSB0")
-        slave_id: "1", // 1-247 (slave address)
-        baudrate: "9600", // 1200, 2400, 4800, 9600, 19200, 38400, 57600, 115200
-        parity: "N", // "none", "even", "odd"
-        stopbits: "1", // "1", "2"
-        bytesize: "8", // "7", "8"
-        read_period: "10", // polling interval in seconds
-        timeout: "10", // communication timeout in seconds
-        retries: "3", // number of retry attemps
-    };
+    // Reactive Statements
 
-    // Variables for device options
-    let meter_type: "SINGLE_PHASE" | "THREE_PHASE" = "SINGLE_PHASE";
+    //Synchronize communication configuration with device data
+    $: opcuaConfig = deviceData?.protocol === Protocol.OPC_UA ? (deviceData.communication_options as EditableOPCUAConfig) : null;
+    $: modbusRTUConfig = deviceData?.protocol === Protocol.MODBUS_RTU ? (deviceData.communication_options as EditableModbusRTUConfig) : null;
 
-    let meter_options: Record<string, any> = {
-        read_energy_from_meter: true, // Read energy from meter
-        read_separate_forward_reverse_energy: false, // Read forward and reverse energy separately
-        negative_reactive_power: false, // Read negative reactive power
-        frequency_reading: false, // Read frequency
-    };
+    $: if (opcuaConfig) {
+        deviceData.communication_options = opcuaConfig;
+    }
+    $: if (modbusRTUConfig) {
+        deviceData.communication_options = modbusRTUConfig;
+    }
 
-    //Function to fetch device status and configuration
-    function fetchDeviceStatus(name: string, id: number): void {
+    //Function to fetch device configuration
+    function fetchDeviceConfig(name: string, id: number): void {
         const tick = async () => {
             let sucess = false;
             try {
@@ -110,31 +66,8 @@
                 if (status !== 200) {
                     showAlert($texts.errorDeviceConfig);
                 } else {
-                    deviceData = data;
-                    deviceName = deviceData.name;
-
-                    selectedProtocol = deviceData.protocol;
-                    if (selectedProtocol === Protocol.OPC_UA) {
-                        for (let option in deviceData.communication_options) {
-                            if (opcua_options.hasOwnProperty(option)) {
-                                opcua_options[option] = deviceData.communication_options[option];
-                            }
-                        }
-                    } else if (selectedProtocol === Protocol.MODBUS_RTU) {
-                        for (let option in deviceData.communication_options) {
-                            if (modbus_rtu_options.hasOwnProperty(option)) {
-                                modbus_rtu_options[option] = deviceData.communication_options[option];
-                            }
-                        }
-                    }
-
-                    meter_type = deviceData.type;
-                    for (let option in deviceData.options) {
-                        if (meter_options.hasOwnProperty(option)) {
-                            meter_options[option] = deviceData.options[option];
-                        }
-                    }
-
+                    let requestDeviceData: DeviceMeter = data;
+                    deviceData = convertToEditableDevice(requestDeviceData);
                     sucess = true;
                 }
             } catch (e) {
@@ -151,21 +84,19 @@
     // Function to fetch device nodes (variables)
     function fetchDeviceNodesConfig(name: string, id: number): void {
         const tick = async () => {
+            let sucess = false;
             try {
                 const { status, data }: { status: number; data: any } = await getDeviceNodesConfig(name, id);
                 if (status !== 200) {
                     showAlert($texts.errorDeviceNodesConfig);
                 } else {
                     deviceNodes = data;
-                    console.log({ ...data });
-                    console.log(deviceNodes["l1_current"]);
-                    console.log(Object.keys(deviceNodes["l1_current"].config));
-                    getDevicesNodesDone = true;
+                    sucess = true;
                 }
             } catch (e) {
                 showAlert($texts.errorDeviceNodesConfig);
             }
-            if (!getDevicesNodesDone) {
+            if (!sucess) {
                 nodesPollTimer = setTimeout(tick, 2500);
             }
         };
@@ -194,7 +125,7 @@
         let deviceName = params.get("deviceName");
         let deviceId = params.get("deviceId");
         if (deviceName && deviceId) {
-            fetchDeviceStatus(deviceName, Number(deviceId));
+            fetchDeviceConfig(deviceName, Number(deviceId));
             fetchDeviceNodesConfig(deviceName, Number(deviceId));
         } else {
             showAlert($texts.errorEditDeviceParams);
@@ -214,7 +145,7 @@
         <div class="edit-device-div">
             <div class="device-identification-div">
                 <EditableText
-                    bind:text={deviceName}
+                    bind:text={deviceData.name}
                     fontSize="1.1rem"
                     fontColor="#f5f5f5"
                     borderColorBottom="rgba(255, 255, 255, 0.2)"
@@ -245,8 +176,18 @@
                     <span>{$texts.communicationProtocol[$selectedLang]}</span>
                     <div class="input-div">
                         <Selector
-                            options={protocols}
-                            bind:selectedOption={selectedProtocol}
+                            useLang={true}
+                            options={$protocolTexts}
+                            bind:selectedOption={deviceData.protocol}
+                            onChange={() => {
+                                if (deviceData.protocol === Protocol.OPC_UA) {
+                                    // Protocol changed to OPC UA
+                                    deviceData.communication_options = defaultOPCUAOptions;
+                                } else if (deviceData.protocol === Protocol.MODBUS_RTU) {
+                                    // Protocol changed to Modbus RTU
+                                    deviceData.communication_options = defaultModbusRTUOptions;
+                                }
+                            }}
                             scrollable={true}
                             maxOptions={5}
                             width="200px"
@@ -287,13 +228,13 @@
                     </div>
                 </div>
 
-                {#if selectedProtocol === Protocol.OPC_UA}
+                {#if opcuaConfig}
                     <div class="device-input-div">
                         <span>{$texts.networkAddress[$selectedLang]}</span>
                         <div class="input-div">
                             <div class="input-content-div">
                                 <InputField
-                                    bind:inputValue={opcua_options.url}
+                                    bind:inputValue={opcuaConfig.url}
                                     width="100%"
                                     height="40px"
                                     borderRadius="5px"
@@ -334,7 +275,7 @@
                         <div class="input-div">
                             <div class="input-content-div">
                                 <InputField
-                                    bind:inputValue={opcua_options.read_period}
+                                    bind:inputValue={opcuaConfig.read_period}
                                     inputType="POSITIVE_INT"
                                     inputUnit={$texts.secondsUnit[$selectedLang]}
                                     minValue={5.0}
@@ -387,7 +328,7 @@
                         <div class="input-div">
                             <div class="input-content-div">
                                 <InputField
-                                    bind:inputValue={opcua_options.timeout}
+                                    bind:inputValue={opcuaConfig.timeout}
                                     inputType="POSITIVE_FLOAT"
                                     inputUnit={$texts.secondsUnit[$selectedLang]}
                                     minValue={5.0}
@@ -442,7 +383,7 @@
                             <div class="input-div">
                                 <div class="input-content-div">
                                     <InputField
-                                        bind:inputValue={opcua_options.username}
+                                        bind:inputValue={opcuaConfig.username}
                                         width="100%"
                                         height="40px"
                                         borderRadius="5px"
@@ -483,7 +424,7 @@
                             <div class="input-div">
                                 <div class="input-content-div">
                                     <InputField
-                                        bind:inputValue={opcua_options.password}
+                                        bind:inputValue={opcuaConfig.password}
                                         inputType="PASSWORD"
                                         width="100%"
                                         height="40px"
@@ -521,13 +462,13 @@
                             </div>
                         </div>
                     </div>
-                {:else if selectedProtocol === Protocol.MODBUS_RTU}
+                {:else if modbusRTUConfig}
                     <div class="device-input-div">
                         <span>{$texts.communicationPort[$selectedLang]}</span>
                         <div class="input-div">
                             <div class="input-content-div">
                                 <InputField
-                                    bind:inputValue={modbus_rtu_options.port}
+                                    bind:inputValue={modbusRTUConfig.port}
                                     width="100%"
                                     height="40px"
                                     borderRadius="5px"
@@ -568,8 +509,9 @@
                         <span>{$texts.baudrate[$selectedLang]}</span>
                         <div class="input-div">
                             <Selector
-                                options={baudrateOptions}
-                                bind:selectedOption={modbus_rtu_options.baudrate}
+                                useLang={true}
+                                options={$baudrateTexts}
+                                bind:selectedOption={modbusRTUConfig.baudrate}
                                 scrollable={true}
                                 maxOptions={5}
                                 width="200px"
@@ -614,8 +556,9 @@
                         <span>{$texts.parity[$selectedLang]}</span>
                         <div class="input-div">
                             <Selector
-                                options={parityOptions}
-                                bind:selectedOption={modbus_rtu_options.parity}
+                                useLang={true}
+                                options={$parityTexts}
+                                bind:selectedOption={modbusRTUConfig.parity}
                                 scrollable={true}
                                 maxOptions={5}
                                 width="200px"
@@ -660,8 +603,9 @@
                         <span>{$texts.bytesize[$selectedLang]}</span>
                         <div class="input-div">
                             <Selector
-                                options={bytesizeOptions}
-                                bind:selectedOption={modbus_rtu_options.bytesize}
+                                useLang={true}
+                                options={$bytesizeTexts}
+                                bind:selectedOption={modbusRTUConfig.bytesize}
                                 scrollable={true}
                                 maxOptions={5}
                                 width="200px"
@@ -706,8 +650,9 @@
                         <span>{$texts.stopbits[$selectedLang]}</span>
                         <div class="input-div">
                             <Selector
-                                options={stopbitsOptions}
-                                bind:selectedOption={modbus_rtu_options.stopbits}
+                                useLang={true}
+                                options={$stopbitsTexts}
+                                bind:selectedOption={modbusRTUConfig.stopbits}
                                 scrollable={true}
                                 maxOptions={5}
                                 width="200px"
@@ -753,7 +698,7 @@
                         <div class="input-div">
                             <div class="input-content-div">
                                 <InputField
-                                    bind:inputValue={modbus_rtu_options.read_period}
+                                    bind:inputValue={modbusRTUConfig.read_period}
                                     inputType="POSITIVE_INT"
                                     inputUnit={$texts.secondsUnit[$selectedLang]}
                                     minValue={5.0}
@@ -806,7 +751,7 @@
                         <div class="input-div">
                             <div class="input-content-div">
                                 <InputField
-                                    bind:inputValue={modbus_rtu_options.timeout}
+                                    bind:inputValue={modbusRTUConfig.timeout}
                                     inputType="POSITIVE_FLOAT"
                                     inputUnit={$texts.secondsUnit[$selectedLang]}
                                     minValue={5.0}
@@ -859,7 +804,7 @@
                         <div class="input-div">
                             <div class="input-content-div">
                                 <InputField
-                                    bind:inputValue={modbus_rtu_options.retries}
+                                    bind:inputValue={modbusRTUConfig.retries}
                                     inputType="POSITIVE_INT"
                                     minValue={0.0}
                                     maxValue={5.0}
@@ -918,8 +863,9 @@
                     <span>{$texts.connectionType[$selectedLang]}</span>
                     <div class="input-div">
                         <Selector
-                            options={types}
-                            bind:selectedOption={meter_type}
+                            useLang={true}
+                            options={$meterTypeTexts}
+                            bind:selectedOption={deviceData.type}
                             scrollable={true}
                             maxOptions={5}
                             width="200px"
@@ -965,7 +911,7 @@
                     <div class="input-div">
                         <div class="input-content-div">
                             <SelectorButton
-                                bind:checked={meter_options.read_energy_from_meter}
+                                bind:checked={deviceData.options.read_energy_from_meter}
                                 width="75px"
                                 height="20px"
                                 knobWidth="32px"
@@ -1005,7 +951,7 @@
                     <div class="input-div">
                         <div class="input-content-div">
                             <SelectorButton
-                                bind:checked={meter_options.read_separate_forward_reverse_energy}
+                                bind:checked={deviceData.options.read_separate_forward_reverse_energy}
                                 width="75px"
                                 height="20px"
                                 knobWidth="32px"
@@ -1045,7 +991,7 @@
                     <div class="input-div">
                         <div class="input-content-div">
                             <SelectorButton
-                                bind:checked={meter_options.negative_reactive_power}
+                                bind:checked={deviceData.options.negative_reactive_power}
                                 width="75px"
                                 height="20px"
                                 knobWidth="32px"
@@ -1085,7 +1031,7 @@
                     <div class="input-div">
                         <div class="input-content-div">
                             <SelectorButton
-                                bind:checked={meter_options.frequency_reading}
+                                bind:checked={deviceData.options.frequency_reading}
                                 width="75px"
                                 height="20px"
                                 knobWidth="32px"
@@ -1127,13 +1073,10 @@
                     <span>{$texts.deviceNodesSub[$selectedLang]}</span>
                 </div>
                 <div class="nodes-grid-div">
-                    <!--
                     <NodesGrid
-                        {selectedProtocol}
-                        meterID={deviceData?.id}
-                        meterType={meter_type}
+                        {deviceData}
                         bind:nodes={deviceNodes}
-                        nodesFetched={getDevicesNodesDone}
+                        bind:formattedNodes={editedNodes}
                         width="100%"
                         height="fit-content"
                         borderRadius="10px"
@@ -1145,7 +1088,6 @@
                         subSectionTextColor="#cbd5e1"
                         subSectionBorderColor="transparent"
                     />
-                    -->
                 </div>
             </div>
             <div class="action-buttons-div">
@@ -1202,7 +1144,7 @@
                 <div class="overlay-device-div-content">
                     <div class="window-div">
                         <ConfirmWindow
-                            title={`${$texts.deleteDevice[$selectedLang]} ${deviceName}`}
+                            title={`${$texts.deleteDevice[$selectedLang]} ${deviceData.name}`}
                             width="80%"
                             minWidth="300px"
                             maxWidth="550px"
@@ -1235,7 +1177,7 @@
                             </div>
                             <div class="button-div">
                                 <Button
-                                    enabled={deleteDeviceName === deviceName}
+                                    enabled={deleteDeviceName === deviceData.name}
                                     buttonText={$texts.confirm[$selectedLang]}
                                     width="150px"
                                     height="40px"

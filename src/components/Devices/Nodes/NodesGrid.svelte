@@ -4,18 +4,16 @@
 
     // Stores for variable definitions
     import { defaultVariables } from "$lib/stores/nodes";
-    import { Protocol, NodePrefix, NodePhase, NodeType } from "$lib/stores/nodes";
-    import type { DeviceNode, FormattedNode, NodeConfiguration, BaseNodeConfig, OPCUAConfig, ModbusRTUConfig } from "$lib/stores/nodes";
+    import { MeterType, Protocol, type EditableDeviceMeter } from "$lib/stores/devices";
+    import { NodePrefix, NodePhase, NodeType } from "$lib/stores/nodes";
+    import type { DeviceNode, FormattedNode, NodeConfiguration, BaseNodeConfig } from "$lib/stores/nodes";
 
     // Stores for multi-language support
     import { selectedLang, texts } from "$lib/stores/lang";
 
     // Props
-    export let selectedProtocol: Protocol;
-    export let meterID: number;
-    export let meterType: string;
+    export let deviceData: EditableDeviceMeter;
     export let nodes: Record<string, DeviceNode> = {}; // Input Nodes Configuration
-    export let nodesFetched: boolean; // Nodes were fetched from the server
     export let formattedNodes: Array<FormattedNode> = []; // Output Nodes Configuration (Formatted)
 
     // Layout / styling props
@@ -65,90 +63,19 @@
     }
 
     function getCommunicationID(node: DeviceNode): string | undefined {
-        try {
-            if (!node || !node.config) return undefined;
+        if (!node) return undefined;
 
-            //console.log("Node Config: ", { ...node.config });
-            //console.log("Keys:", Object.keys(node.config));
-            //console.log("Protocol from config:", node.config.protocol);
+        const protocol = node.protocol;
 
-            const protocol = node.config.protocol;
-
-            if (protocol === Protocol.OPC_UA && "node_id" in node.config) {
-                const nodeId = node.config.node_id;
-                return nodeId;
-            } else if (protocol === Protocol.MODBUS_RTU && "register" in node.config) {
-                const reg = node.config.register;
-                return "0x" + Number(reg).toString(16).toUpperCase().padStart(4, "0");
-            }
-
-            return undefined;
-        } catch (err) {
-            console.error("[getComID] ERROR", err);
-            return undefined;
-        }
-    }
-
-    function handleNodePropertyUpdate(node: FormattedNode, newValue: any, propertyPath: string) {
-        /*
-        const paths = propertyPath.split(".");
-        const updatedNode: FormattedNode = { ...node };
-        let current: Record<string, any> = updatedNode;
-
-        for (let i = 0; i < paths.length - 1; i++) {
-            const key = paths[i];
-
-            if (key === "config") {
-                current[key] = { ...current[key] };
-            }
-
-            if (!(key in current)) {
-                throw new Error(`Invalid property path: ${propertyPath}`);
-            }
-
-            current = current[key];
+        if (protocol === Protocol.OPC_UA && "node_id" in node.config) {
+            const nodeId = node.config.node_id;
+            return nodeId;
+        } else if (protocol === Protocol.MODBUS_RTU && "register" in node.config) {
+            const reg = node.config.register;
+            return "0x" + Number(reg).toString(16).toUpperCase().padStart(4, "0");
         }
 
-        const lastKey = paths[paths.length - 1];
-        const oldValue = current[lastKey];
-
-        if (newValue !== oldValue) {
-            current[lastKey] = newValue;
-            updateNode(updatedNode);
-        }
-        */
-    }
-
-    function createNodeRowProps(node: FormattedNode, phase: NodePhase, prefix: NodePrefix) {
-        return {
-            variablePhase: phase,
-            onVariableNameChanged: (newBaseName: string) => {
-                /*
-                const newName = addPrefix(newBaseName, prefix);
-                const oldName = node.name;
-                const defaultNodeProps = Object.values($defaultVariables).find((v) => v.variable === newName);
-
-                if (oldName !== newName) {
-                    node.name = newName;
-                    node.displayName = newBaseName;
-                    node.config.unit = defaultNodeProps?.defaultUnit || "";
-                    updateNode(node);
-                }
-                */
-            },
-            onVariableUnitChanged: (newUnit: string) => handleNodePropertyUpdate(node, newUnit, "config.unit"),
-            onCommunicationIDChanged: (newID: string | undefined) => handleNodePropertyUpdate(node, newID, "communicationID"),
-            onVariableTypeChanged: (newType: string) => handleNodePropertyUpdate(node, newType, "config.type"),
-            onCustomVariableChanged: (newValue: boolean) => handleNodePropertyUpdate(node, newValue, "config.custom"),
-            onPublishVariableChanged: (newValue: boolean) => handleNodePropertyUpdate(node, newValue, "config.logging"),
-            onVirtualVariableChanged: (newValue: boolean) => handleNodePropertyUpdate(node, newValue, "config.calculated"),
-            onLogVariableChanged: (newValue: boolean) => handleNodePropertyUpdate(node, newValue, "config.logging"),
-            onEnableMinAlarmChanged: (newValue: boolean) => handleNodePropertyUpdate(node, newValue, "config.min_alarm"),
-            onEnableMaxAlarmChanged: (newValue: boolean) => handleNodePropertyUpdate(node, newValue, "config.max_alarm"),
-            onEnableChanged: (newValue: boolean) => handleNodePropertyUpdate(node, newValue, "config.enabled"),
-            onProtocolChanged: (newValue: Protocol) => handleNodePropertyUpdate(node, newValue, "protocol"),
-            node: node,
-        };
+        return undefined;
     }
 
     function updateNode(node: FormattedNode) {
@@ -162,8 +89,6 @@
     function addNode(sectionPrefix: NodePrefix) {
         const nodeBaseName = ``;
         const fullNodeName = addPrefix(nodeBaseName, sectionPrefix);
-
-        console.log("Selected protocol in addNode:", selectedProtocol);
 
         const newBaseConfiguration: BaseNodeConfig = {
             calculate_increment: true,
@@ -182,21 +107,17 @@
             type: NodeType.FLOAT,
             unit: "",
             publish: true,
-            protocol: selectedProtocol,
         };
-
-        console.log("Base configuration:", newBaseConfiguration);
-        console.log("Base configuration keys:", Object.keys(newBaseConfiguration));
 
         let newNodeConfiguration: NodeConfiguration;
 
-        if (selectedProtocol === Protocol.MODBUS_RTU) {
+        if (deviceData.protocol === Protocol.MODBUS_RTU) {
             // Modbus RTU Protocol
             newNodeConfiguration = {
                 ...newBaseConfiguration,
                 register: 0,
             };
-        } else if (selectedProtocol === Protocol.OPC_UA) {
+        } else if (deviceData.protocol === Protocol.OPC_UA) {
             // OPC UA Protocol
             newNodeConfiguration = {
                 ...newBaseConfiguration,
@@ -206,17 +127,12 @@
             throw new Error("Unsupported protocol");
         }
 
-        //console.log("Final node configuration:", newNodeConfiguration);
-        //console.log("Final node configuration keys:", Object.keys(newNodeConfiguration));
-
         const newNode: DeviceNode = {
-            device_id: meterID,
+            device_id: deviceData.id,
             name: fullNodeName,
-            protocol: selectedProtocol,
+            protocol: deviceData.protocol,
             config: newNodeConfiguration,
         };
-
-        //console.log("New node before getCommunicationID:", newNode);
 
         const newFormattedNode: FormattedNode = {
             ...newNode,
@@ -238,18 +154,15 @@
     let initialized: boolean = false;
 
     // Format and sort nodes only on initial load
-    $: if (nodesFetched && !initialized) {
+    $: if (!initialized && Object.keys(nodes).length > 0) {
         initialized = true;
         formattedNodes = Object.entries(nodes)
             .map(([name, node]) => {
-                //console.log("Node ", node.name, " Keys: ", Object.keys(node.config));
-
                 const formatted: FormattedNode = {
                     ...node,
                     displayName: removePrefix(name),
                     communicationID: getCommunicationID(node),
                 };
-                //console.log("Created formatted node:", formatted);
                 return formatted;
             })
             .sort((a, b) => a.displayName.localeCompare(b.displayName));
@@ -310,7 +223,7 @@
 
     // Get nodes from the original nodes array by section
     $: nodesBySection = nodeSections.reduce(
-        (acc: Record<NodePhase, Array<any>>, section) => {
+        (acc: Record<NodePhase, Array<FormattedNode>>, section) => {
             acc[section.key] = formattedNodes.filter(section.filter);
             return acc;
         },
@@ -339,9 +252,9 @@
                 <tr class="header">
                     <th class="max-width">{$texts.variable[$selectedLang]}</th>
                     <th class="min-width">{$texts.unit[$selectedLang]}</th>
-                    {#if selectedProtocol === "OPC_UA"}
+                    {#if deviceData.protocol === Protocol.OPC_UA}
                         <th style="width: 150px;" class="mid-width">{$texts.opcuaID[$selectedLang]}</th>
-                    {:else if selectedProtocol === "MODBUS_RTU"}
+                    {:else if deviceData.protocol === Protocol.MODBUS_RTU}
                         <th style="width: 150px;" class="mid-width">{$texts.modbusRegister[$selectedLang]}</th>
                     {/if}
                     <th style="width: 150px;" class="mid-width">{$texts.type[$selectedLang]}</th>
@@ -355,7 +268,7 @@
             </thead>
             <tbody>
                 <!--     T H R E E     P H A S E     M E T E R S     -->
-                {#if meterType === "THREE_PHASE"}
+                {#if deviceData.type === MeterType.THREE_PHASE}
                     <!-- Render each node section -->
                     {#each nodeSections as section (section.key)}
                         <tr class="sub-section">
@@ -363,26 +276,38 @@
                         </tr>
                         {#each nodesBySection[section.key] as node, i (i)}
                             <NodeRow
+                                nodePhase={section.key}
+                                nodePrefix={section.prefix}
+                                {node}
                                 sectionNodes={nodesBySection[section.key]}
                                 backgroundColor="rgba(255, 255, 255, 0.05)"
+                                disabledBackgroundColor="rgba(255, 255, 255, 0.22)"
                                 onDelete={() => deleteNode(node)}
                                 onConfig={() => {}}
-                                {selectedProtocol}
-                                {...createNodeRowProps(node, section.phase, section.prefix)}
+                                selectedProtocol={deviceData.protocol}
+                                onPropertyChanged={() => {
+                                    updateNode(node);
+                                }}
                             />
                         {/each}
                         <AddNode backgroundColor="rgba(255, 255, 255, 0.05)" onAddNode={() => addNode(section.prefix)} />
                     {/each}
                     <!--     S I N G L E     P H A S E     M E T E R S     -->
-                {:else if meterType === "SINGLE_PHASE"}
+                {:else if deviceData.type === MeterType.SINGLE_PHASE}
                     {#each formattedNodes as node, i (i)}
                         <NodeRow
+                            nodePhase={NodePhase.SINGLEPHASE}
+                            nodePrefix={NodePrefix.SINGLEPHASE}
+                            {node}
                             sectionNodes={formattedNodes}
                             backgroundColor="rgba(255, 255, 255, 0.05)"
+                            disabledBackgroundColor="rgba(255, 255, 255, 0.22)"
                             onDelete={() => deleteNode(node)}
                             onConfig={() => {}}
-                            {selectedProtocol}
-                            {...createNodeRowProps(node, NodePhase.SINGLEPHASE, NodePrefix.SINGLEPHASE)}
+                            selectedProtocol={deviceData.protocol}
+                            onPropertyChanged={() => {
+                                updateNode(node);
+                            }}
                         />
                     {/each}
                     <AddNode backgroundColor="rgba(255, 255, 255, 0.05)" onAddNode={() => addNode(NodePrefix.SINGLEPHASE)} />

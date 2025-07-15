@@ -6,7 +6,7 @@
     import { selectedLang } from "$lib/stores/lang";
 
     //Props
-    export let disabled: boolean = false; // Selector is di0sabled
+    export let disabled: boolean = false; // Selector is disabled
     export let useLang: boolean = false; //use language texts in options and selected option
     export let inputInvalid: boolean = false; // Input is invalid
     export let enableInputInvalid: boolean = false; // Enable Input is Invalid property
@@ -68,6 +68,9 @@
         }
     }
 
+    // Change Export Function
+    export let onChange: (() => void) | undefined = undefined;
+
     // Functions
     function getDisplayText(key: string): string {
         if (useLang && options[key] && typeof options[key] === "object") {
@@ -87,6 +90,9 @@
             setSelectedOption(useLang ? optionKey : options[optionKey]);
         } else {
             selectedOption = useLang ? optionKey : options[optionKey];
+        }
+        if (onChange) {
+            onChange();
         }
         isOpen = false;
     }

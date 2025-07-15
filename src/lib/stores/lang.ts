@@ -14,6 +14,8 @@ export interface TextsObject {
 
 export const selectedLang = writable<Language>("PT"); //Current selected language: Starts with PT - Portuguese
 
+//////////     G E N E R A L     T E X T S     //////////
+
 const textsObject: TextsObject = {
     notFound: {
         PT: "Não encontrado",
@@ -470,6 +472,104 @@ const textsObject: TextsObject = {
     },
 };
 
+//////////     D E V I C E     T E X T S     //////////
+
+const textsObjectsProtocols: TextsObject = {
+    OPC_UA: {
+        PT: "OPC UA",
+        EN: "OPC UA",
+    },
+    MODBUS_RTU: {
+        PT: "MODBUS RTU",
+        EN: "MODBUS RTU",
+    },
+};
+
+const textsObjectsConnectionTypes: TextsObject = {
+    SINGLE_PHASE: {
+        PT: "1F",
+        EN: "1F",
+    },
+    THREE_PHASE: {
+        PT: "3F",
+        EN: "3F",
+    },
+};
+
+const textsObjectsBaudrates: TextsObject = {
+    "1200": {
+        PT: "1200",
+        EN: "1200",
+    },
+    "2400": {
+        PT: "2400",
+        EN: "2400",
+    },
+    "4800": {
+        PT: "4800",
+        EN: "4800",
+    },
+    "9600": {
+        PT: "9600",
+        EN: "9600",
+    },
+    "19200": {
+        PT: "19200",
+        EN: "19200",
+    },
+    "38400": {
+        PT: "38400",
+        EN: "38400",
+    },
+    "57600": {
+        PT: "57600",
+        EN: "57600",
+    },
+    "115200": {
+        PT: "115200",
+        EN: "115200",
+    },
+};
+
+const textsObjectsParities: TextsObject = {
+    N: {
+        PT: "Nenhuma",
+        EN: "None",
+    },
+    E: {
+        PT: "Par",
+        EN: "Even",
+    },
+    O: {
+        PT: "Impar",
+        EN: "Odd",
+    },
+};
+
+const textsObjectsBytesizes: TextsObject = {
+    "7": {
+        PT: "7",
+        EN: "7",
+    },
+    "8": {
+        PT: "8",
+        EN: "8",
+    },
+};
+
+const textsObjectsStopbits: TextsObject = {
+    "1": {
+        PT: "1",
+        EN: "1",
+    },
+    "2": {
+        PT: "2",
+        EN: "2",
+    },
+};
+
+//////////     V A R I A B L E S     T E X T S     //////////
+
 const textsObjectsVariables: TextsObject = {
     voltage: {
         PT: "Tensão",
@@ -542,6 +642,12 @@ const textsObjectsVariables: TextsObject = {
 };
 
 export const texts = readable<TextsObject>(textsObject);
+export const protocolTexts = readable<TextsObject>(textsObjectsProtocols);
+export const meterTypeTexts = readable<TextsObject>(textsObjectsConnectionTypes);
+export const baudrateTexts = readable<TextsObject>(textsObjectsBaudrates);
+export const parityTexts = readable<TextsObject>(textsObjectsParities);
+export const bytesizeTexts = readable<TextsObject>(textsObjectsBytesizes);
+export const stopbitsTexts = readable<TextsObject>(textsObjectsStopbits);
 export const variableNameTexts = readable<TextsObject>(textsObjectsVariables);
 
 /**
@@ -562,8 +668,8 @@ export const variableNameTextsByPhase = derived(
 
         $defaultVariables.forEach((variable) => {
             variable.applicablePhases.forEach(phase => {
-                if (textsObjectsVariables[variable.variable]) {
-                    phaseMap[phase][variable.variable] = textsObjectsVariables[variable.variable];
+                if (textsObjectsVariables[variable.name]) {
+                    phaseMap[phase][variable.name] = textsObjectsVariables[variable.name];
                 }
             });
         });

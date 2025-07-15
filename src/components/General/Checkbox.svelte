@@ -16,6 +16,15 @@
     export let enabledBorderColor: string; // border color when checked
     export let disabledCheckmarkColor: string = "rgb(170,170,170)"; // checkmark color when unchecked
     export let enabledCheckmarkColor: string = "rgb(255,255,255)"; // checkmark color when checked
+
+    // Change Export Function
+    export let onChange: (() => void) | undefined = undefined;
+
+    function handleChange() {
+        if (onChange) {
+            onChange();
+        }
+    }
 </script>
 
 <!-- 
@@ -36,7 +45,7 @@
         --disabled-checkmark-color: {disabledCheckmarkColor};
     "
 >
-    <input type="checkbox" name={inputName} bind:checked />
+    <input type="checkbox" name={inputName} bind:checked on:change={handleChange} />
     <span>
         <svg
             xmlns="http://www.w3.org/2000/svg"

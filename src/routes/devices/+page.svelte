@@ -11,13 +11,16 @@
     // Stores for authorization
     import { loadedDone } from "$lib/stores/navigation";
 
+    //Types
+    import type { DeviceMeter } from "$lib/stores/devices";
+
     import { onMount, onDestroy } from "svelte";
     import DeviceCard from "../../components/Devices/DeviceCard.svelte";
     import AddDevice from "../../components/Devices/AddDevice.svelte";
 
     // Variables
     let pollTimer: ReturnType<typeof setTimeout>;
-    let devices: any;
+    let devices: Array<DeviceMeter>;
 
     // Sorted devices
     $: sortedDevices = Array.isArray(devices) ? [...devices].sort((a, b) => a.id - b.id) : [];
@@ -71,7 +74,7 @@
             deviceID={device.id}
             deviceName={device.name}
             connected={device.connected}
-            notifications={device.notifications ?? ""}
+            notifications={""}
             width="300px"
             height="400px"
             borderRadius="20px"

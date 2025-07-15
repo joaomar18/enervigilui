@@ -42,6 +42,9 @@
     // Detected Limits Violation Export Funcion
     export let limitsPassed: (() => void) | null = null;
 
+    // Change Export Function
+    export let onChange: (() => void) | undefined = undefined;
+
     // Functions
     function handleInput(event: Event): void {
         let input = (event.target as HTMLInputElement).value;
@@ -111,6 +114,13 @@
     $: {
         if (inputUnit) {
             updateUnitWidth();
+        }
+    }
+
+    // Reactive statement to handle changes
+    $: if (!disabled && (inputValue !== undefined || inputUnit !== null)) {
+        if (onChange) {
+            onChange();
         }
     }
 </script>

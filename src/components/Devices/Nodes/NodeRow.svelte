@@ -3,10 +3,10 @@
     import InputField from "../../General/InputField.svelte";
     import Checkbox from "../../General/Checkbox.svelte";
     import { validateNodeName, validateNodeUnit, validateCommunicationID, validateNodeType } from "$lib/ts/nodes";
-
-    import { Protocol, NodeType, NodePhase } from "$lib/stores/nodes";
-    import type { FormattedNode } from "$lib/stores/nodes";
-    import { defaultVariableUnits } from "$lib/stores/nodes";
+    import { Protocol } from "$lib/stores/devices";
+    import { NodeType, NodePhase } from "$lib/stores/nodes";
+    import type { FormattedNode, NodePrefix } from "$lib/stores/nodes";
+    import { defaultVariables, defaultVariableUnits } from "$lib/stores/nodes";
 
     // Stores for multi-language support
     import { variableNameTexts, variableNameTextsByPhase } from "$lib/stores/lang";
@@ -14,34 +14,25 @@
     // Props
     export let sectionNodes: Array<FormattedNode>;
     export let selectedProtocol: Protocol;
-    export let variablePhase: NodePhase;
+    export let nodePhase: NodePhase;
+    export let nodePrefix: NodePrefix;
     export let node: FormattedNode;
 
     // Layout / styling props
     export let backgroundColor: string;
+    export let disabledBackgroundColor: string = backgroundColor;
 
     // Variables
-    let publish: boolean;
-
     let oldVariableName: string = node.displayName;
     let oldVariableUnit: string = node.config.unit;
-    let customVariableChanged: boolean = node.config.custom;
+    let oldVariableType: NodeType = node.config.type;
+    let oldCommunicationID: string | undefined = node.communicationID;
 
     let disabledUnit: boolean = false;
     let disabledCommIDString: string = "";
 
     // Export Funcions
-    export let onVariableNameChanged: (variableName: string) => void = () => {};
-    export let onVariableUnitChanged: (variableUnit: string) => void = () => {};
-    export let onVariableTypeChanged: (variableType: NodeType) => void = () => {};
-    export let onCommunicationIDChanged: (communicationID: string | undefined) => void = () => {};
-    export let onCustomVariableChanged: (customVariable: boolean) => void = () => {};
-    export let onVirtualVariableChanged: (virtualVariable: boolean) => void = () => {};
-    export let onLogVariableChanged: (logVariable: boolean) => void = () => {};
-    export let onEnableMinAlarmChanged: (enableMinAlarm: boolean) => void = () => {};
-    export let onEnableMaxAlarmChanged: (enableMaxAlarm: boolean) => void = () => {};
-    export let onEnableChanged: (enable: boolean) => void = () => {};
-    export let onProtocolChanged: (newProtocol: Protocol) => void = () => {};
+    export let onPropertyChanged: () => void;
     export let onDelete: () => void;
     export let onConfig: () => void;
 
@@ -58,69 +49,74 @@
         }
     }
 
-    // Reactive statements
-    $: onVariableNameChanged(node.displayName);
-    $: onVariableUnitChanged(node.config.unit);
-    $: {
-        if (node.config.type === NodeType.FLOAT || node.config.type === NodeType.INT) {
-            if ($defaultVariableUnits[node.displayName]) {
-                node.config.unit = $defaultVariableUnits[node.displayName][0];
-            } else {
-                node.config.unit = "";
-            }
-            disabledUnit = false;
-        } else if (node.config.type === NodeType.STRING || node.config.type === NodeType.BOOLEAN) {
-            node.config.unit = "";
-            disabledUnit = true;
+    function nodeNameChange(): void {
+        const newName = nodePrefix + node.displayName;
+        node.name = newName;
+        if (!node.config.custom) {
+            const defaultNodeProps = Object.values($defaultVariables).find((v) => v.name === node.displayName);
+            node.config.unit = defaultNodeProps?.defaultUnit || "";
         }
     }
-    $: onVariableTypeChanged(node.config.type);
-    $: onCommunicationIDChanged(node.communicationID);
-    $: {
-        if (node.config.custom && !customVariableChanged) {
+
+    function nodeTypeChange(): void {
+        if (!node.config.custom && oldVariableType !== node.config.type) {
+            if (node.config.type === NodeType.FLOAT || node.config.type === NodeType.INT) {
+                const defaultNodeProps = Object.values($defaultVariables).find((v) => v.name === node.displayName);
+                node.config.unit = defaultNodeProps?.defaultUnit || "";
+                disabledUnit = false;
+            } else if (node.config.type === NodeType.STRING || node.config.type === NodeType.BOOLEAN) {
+                node.config.unit = "";
+                disabledUnit = true;
+            }
+            oldVariableType = node.config.type;
+        }
+    }
+
+    function customNodeChange(): void {
+        if (node.config.custom) {
             oldVariableName = node.displayName;
             oldVariableUnit = node.config.unit;
             node.displayName = "";
             node.config.unit = "";
-            customVariableChanged = true;
-        } else if (!node.config.custom && customVariableChanged) {
+        } else {
             node.displayName = oldVariableName;
             node.config.unit = oldVariableUnit;
-            customVariableChanged = false;
         }
-        onCustomVariableChanged(node.config.custom);
     }
-    $: {
-        if (node.config.calculated) {
-            node.communicationID = "";
-            node.config.protocol = Protocol.NONE;
-        } else {
-            node.config.protocol = selectedProtocol;
+
+    function virtualNodeChange(): void {
+        if (node.config.calculated && node.communicationID !== undefined) {
+            oldCommunicationID = node.communicationID;
+            node.communicationID = undefined;
+            node.protocol = Protocol.NONE;
+        } else if (node.communicationID === undefined) {
+            node.communicationID = oldCommunicationID;
+            node.protocol = selectedProtocol;
         }
-        onVirtualVariableChanged(node.config.calculated);
     }
-    $: onLogVariableChanged(node.config.logging);
-    $: onEnableMinAlarmChanged(node.config.min_alarm);
-    $: onEnableMaxAlarmChanged(node.config.max_alarm);
-    $: onEnableChanged(node.config.enabled);
-    $: onProtocolChanged(node.config.protocol);
 </script>
 
 <tr
     style="
         --background-color: {backgroundColor};
+        --disabled-background-color: {disabledBackgroundColor};
     "
     class="edit-node"
+    class:disabled={!node.config.enabled}
 >
     <td>
         <div class="cell-content">
             {#if !node.config.custom}
                 <Selector
                     useLang={true}
-                    options={$variableNameTextsByPhase[variablePhase]}
+                    options={$variableNameTextsByPhase[nodePhase]}
                     bind:selectedOption={node.displayName}
-                    enableInputInvalid={!validateNodeName(node.displayName, node.config.custom, sectionNodes)}
-                    inputInvalid={true}
+                    onChange={() => {
+                        nodeNameChange();
+                        onPropertyChanged();
+                    }}
+                    inputInvalid={!validateNodeName(node.displayName, node.config.custom, sectionNodes)}
+                    enableInputInvalid={true}
                     scrollable={true}
                     maxOptions={5}
                     width="90%"
@@ -140,6 +136,9 @@
             {:else}
                 <InputField
                     bind:inputValue={node.displayName}
+                    onChange={() => {
+                        onPropertyChanged();
+                    }}
                     inputInvalid={!validateNodeName(node.displayName, node.config.custom, sectionNodes)}
                     enableInputInvalid={true}
                     inputType="STRING"
@@ -166,6 +165,9 @@
                 <Selector
                     options={Object.fromEntries($defaultVariableUnits[node.displayName]?.map((unit) => [unit, unit]) || [])}
                     bind:selectedOption={node.config.unit}
+                    onChange={() => {
+                        onPropertyChanged();
+                    }}
                     disabled={disabledUnit}
                     inputInvalid={!validateNodeUnit(node.displayName, node.config.type, node.config.unit, node.config.custom)}
                     enableInputInvalid={true}
@@ -188,6 +190,9 @@
             {:else}
                 <InputField
                     bind:inputValue={node.config.unit}
+                    onChange={() => {
+                        onPropertyChanged();
+                    }}
                     disabled={disabledUnit}
                     inputInvalid={!validateNodeUnit(node.displayName, node.config.type, node.config.unit, node.config.custom)}
                     enableInputInvalid={true}
@@ -215,7 +220,10 @@
                 <InputField
                     disabled={node.config.calculated}
                     bind:inputValue={node.communicationID}
-                    inputInvalid={!validateCommunicationID(node.communicationID, node.config.protocol)}
+                    onChange={() => {
+                        onPropertyChanged();
+                    }}
+                    inputInvalid={!validateCommunicationID(node.communicationID, node.protocol)}
                     enableInputInvalid={true}
                     inputType="STRING"
                     width="90%"
@@ -236,7 +244,10 @@
                 <InputField
                     disabled={node.config.calculated}
                     bind:inputValue={disabledCommIDString}
-                    inputInvalid={!validateCommunicationID(node.communicationID, node.config.protocol)}
+                    onChange={() => {
+                        onPropertyChanged();
+                    }}
+                    inputInvalid={!validateCommunicationID(node.communicationID, node.protocol)}
                     enableInputInvalid={true}
                     inputType="STRING"
                     width="90%"
@@ -261,6 +272,10 @@
             <Selector
                 options={Object.fromEntries(Object.entries(NodeType).map(([key, value]) => [value, value]))}
                 bind:selectedOption={node.config.type}
+                onChange={() => {
+                    nodeTypeChange();
+                    onPropertyChanged();
+                }}
                 inputInvalid={!validateNodeType(node.config.type, node.displayName, node.config.custom)}
                 enableInputInvalid={true}
                 scrollable={true}
@@ -285,6 +300,10 @@
         <div class="cell-content">
             <Checkbox
                 bind:checked={node.config.custom}
+                onChange={() => {
+                    customNodeChange();
+                    onPropertyChanged();
+                }}
                 inputName="custom-node"
                 width="1.5em"
                 height="1.5em"
@@ -300,7 +319,10 @@
     <td>
         <div class="cell-content">
             <Checkbox
-                bind:checked={publish}
+                bind:checked={node.config.publish}
+                onChange={() => {
+                    onPropertyChanged();
+                }}
                 inputName="publish-node"
                 width="1.5em"
                 height="1.5em"
@@ -317,6 +339,10 @@
         <div class="cell-content">
             <Checkbox
                 bind:checked={node.config.calculated}
+                onChange={() => {
+                    virtualNodeChange();
+                    onPropertyChanged();
+                }}
                 inputName="virtual-node"
                 width="1.5em"
                 height="1.5em"
@@ -333,6 +359,9 @@
         <div class="cell-content">
             <Checkbox
                 bind:checked={node.config.logging}
+                onChange={() => {
+                    onPropertyChanged();
+                }}
                 inputName="log-node"
                 width="1.5em"
                 height="1.5em"
@@ -349,6 +378,9 @@
         <div class="cell-content">
             <Checkbox
                 bind:checked={node.config.enabled}
+                onChange={() => {
+                    onPropertyChanged();
+                }}
                 inputName="enable-node"
                 width="1.5em"
                 height="1.5em"
@@ -384,6 +416,10 @@
 <style>
     tr.edit-node {
         background-color: var(--background-color);
+    }
+
+    tr.edit-node.disabled {
+        background-color: var(--disabled-background-color);
     }
 
     tr td {
