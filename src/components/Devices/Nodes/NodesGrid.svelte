@@ -276,6 +276,7 @@
                         </tr>
                         {#each nodesBySection[section.key] as node, i (i)}
                             <NodeRow
+                                meterConfig={deviceData.options}
                                 nodePhase={section.key}
                                 nodePrefix={section.prefix}
                                 {node}
@@ -296,6 +297,7 @@
                 {:else if deviceData.type === MeterType.SINGLE_PHASE}
                     {#each formattedNodes as node, i (i)}
                         <NodeRow
+                            meterConfig={deviceData.options}
                             nodePhase={NodePhase.SINGLEPHASE}
                             nodePrefix={NodePrefix.SINGLEPHASE}
                             {node}

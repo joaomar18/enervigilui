@@ -4,7 +4,8 @@ import { NodeType } from "$lib/stores/nodes";
 import { defaultVariables } from "$lib/stores/nodes";
 import { defaultVariableNames } from "$lib/stores/nodes";
 import { defaultVariableUnits } from "$lib/stores/nodes";
-import type { FormattedNode } from "$lib/stores/nodes";
+import type { FormattedNode, NodePhase } from "$lib/stores/nodes";
+import type { MeterOptions } from "$lib/stores/devices";
 
 /**
  * Validates a node name based on whether it is a custom variable or a default variable.
@@ -171,3 +172,17 @@ export function validateNodeType(type: NodeType, name: string, custom: boolean):
     }
 }
 
+
+export function validateVirtualNode(name: string, custom: boolean, meterOptions: MeterOptions, phase: NodePhase, currentNodes?: Array<FormattedNode>): boolean {
+    if (custom) { // Custom nodes can't be virtual
+        return false;
+    }
+    const variables = get(defaultVariables);
+    const variable = Object.values(variables).find(v => v.name === name);
+    if (variable) {
+        if (variable.canBeVirtual) {
+            return true;
+        }
+    }
+    return false;
+}

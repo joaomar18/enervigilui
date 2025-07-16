@@ -2,16 +2,20 @@
     import Selector from "../../General/Selector.svelte";
     import InputField from "../../General/InputField.svelte";
     import Checkbox from "../../General/Checkbox.svelte";
-    import { validateNodeName, validateNodeUnit, validateCommunicationID, validateNodeType } from "$lib/ts/nodes";
+    import { validateNodeName, validateNodeUnit, validateCommunicationID, validateNodeType, validateVirtualNode } from "$lib/ts/nodes";
     import { Protocol } from "$lib/stores/devices";
     import { NodeType, NodePhase } from "$lib/stores/nodes";
-    import type { FormattedNode, NodePrefix } from "$lib/stores/nodes";
     import { defaultVariables, defaultVariableUnits } from "$lib/stores/nodes";
+
+    // Types
+    import type { MeterOptions } from "$lib/stores/devices";
+    import type { FormattedNode, NodePrefix } from "$lib/stores/nodes";
 
     // Stores for multi-language support
     import { variableNameTexts, variableNameTextsByPhase } from "$lib/stores/lang";
 
     // Props
+    export let meterConfig: MeterOptions;
     export let sectionNodes: Array<FormattedNode>;
     export let selectedProtocol: Protocol;
     export let nodePhase: NodePhase;
@@ -343,6 +347,8 @@
                     virtualNodeChange();
                     onPropertyChanged();
                 }}
+                inputInvalid={!validateVirtualNode(node.displayName, node.config.custom, meterConfig, nodePhase, sectionNodes)}
+                enableInputInvalid={true}
                 inputName="virtual-node"
                 width="1.5em"
                 height="1.5em"
@@ -352,6 +358,8 @@
                 enabledBorderColor="#5a646e"
                 disabledbgColor="#42505f"
                 disabledBorderColor="#5a646e"
+                badFormatBackgroundColor="#e74c3c"
+                badFormatBorderColor="#5a646e"
             />
         </div>
     </td>

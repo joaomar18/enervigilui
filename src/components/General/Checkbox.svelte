@@ -1,6 +1,8 @@
 <script lang="ts">
     // Props
     export let checked: boolean;
+    export let inputInvalid: boolean = false;
+    export let enableInputInvalid: boolean = false;
     export let inputName: string = ""; //Name of the input
 
     // Layout / styling props
@@ -14,6 +16,8 @@
     export let disabledBorderColor: string; // border color when unchecked
     export let enabledbgColor: string; // background color when checked
     export let enabledBorderColor: string; // border color when checked
+    export let badFormatBackgroundColor: string = disabledbgColor;
+    export let badFormatBorderColor: string = badFormatBackgroundColor;
     export let disabledCheckmarkColor: string = "rgb(170,170,170)"; // checkmark color when unchecked
     export let enabledCheckmarkColor: string = "rgb(255,255,255)"; // checkmark color when checked
 
@@ -41,12 +45,14 @@
         --disabled-border-color: {disabledBorderColor};
         --enabled-bg-color: {enabledbgColor};
         --enabled-border-color: {enabledBorderColor};
+        --bad-format-background-color: {badFormatBackgroundColor};
+        --bad-format-border-color: {badFormatBorderColor};
         --enabled-checkmark-color: {enabledCheckmarkColor};
         --disabled-checkmark-color: {disabledCheckmarkColor};
     "
 >
-    <input type="checkbox" name={inputName} bind:checked on:change={handleChange} />
-    <span>
+    <input type="checkbox" name={inputName} bind:checked on:change={handleChange} class:bad-format={inputInvalid && enableInputInvalid && checked} />
+    <span class:bad-format={inputInvalid && enableInputInvalid && checked}>
         <svg
             xmlns="http://www.w3.org/2000/svg"
             viewBox="0 0 24 24"
@@ -112,5 +118,11 @@
     .label-checkbox input[type="checkbox"]:checked + span {
         border: 1px solid var(--enabled-border-color, #5a646e);
         background-color: var(--enabled-bg-color, #4caf7f);
+    }
+
+    /* Checkbox appeareance when input is invalid */
+    .label-checkbox input[type="checkbox"]:checked.bad-format + span.bad-format {
+        border: 1px solid var(--bad-format-border-color);
+        background-color: var(--bad-format-background-color);
     }
 </style>
