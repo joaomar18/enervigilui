@@ -1247,7 +1247,7 @@
 
     .edit-device-div {
         height: 100%;
-        width: 80%;
+        width: 100%;
         min-width: 250px;
         display: flex;
         flex-direction: column;
@@ -1422,6 +1422,7 @@
         background: rgba(24, 29, 35, 0.25);
         backdrop-filter: blur(8px);
         -webkit-backdrop-filter: blur(8px);
+        z-index: 2;
     }
 
     .overlay-device-div-content .window-div {
@@ -1486,6 +1487,12 @@
     @media (max-width: 769px) {
         .action-buttons-div {
             grid-template-columns: 1fr;
+        }
+    }
+
+    @media (min-width: 880px) {
+        .edit-device-div {
+            width: 80%;
         }
     }
 </style>

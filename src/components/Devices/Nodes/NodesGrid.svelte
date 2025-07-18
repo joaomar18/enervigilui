@@ -158,23 +158,25 @@
         if (containerElement) {
             currentWidth = containerElement.clientWidth;
         }
+        windowWidth = window.innerWidth;
     }
 
     // Variables
     let initialized: boolean = false;
     let containerElement: HTMLDivElement;
     let currentWidth: number;
+    let windowWidth: number;
 
     let columnVisibility: ColumnVisibilityMap = {
         name: { hideWidth: undefined, visible: true },
-        unit: { hideWidth: undefined, visible: true },
-        type: { hideWidth: undefined, visible: true },
-        communicationID: { hideWidth: undefined, visible: true },
-        custom: { hideWidth: undefined, visible: true },
-        publish: { hideWidth: 1175, visible: true },
-        virtual: { hideWidth: undefined, visible: true },
-        logging: { hideWidth: undefined, visible: true },
-        enable: { hideWidth: undefined, visible: true },
+        unit: { hideWidth: 530, visible: true },
+        type: { hideWidth: 915, visible: true },
+        communicationID: { hideWidth: 680, visible: true },
+        custom: { hideWidth: 765, visible: true },
+        publish: { hideWidth: 1170, visible: true },
+        virtual: { hideWidth: 1000, visible: true },
+        logging: { hideWidth: 1085, visible: true },
+        enable: { hideWidth: 445, visible: true },
         actions: { hideWidth: undefined, visible: true },
     };
 
@@ -334,7 +336,11 @@
                         <th class="min-width">{$texts.enabled[$selectedLang]}</th>
                     {/if}
                     {#if columnVisibility.actions.visible}
-                        <th class="min-width">{$texts.actions[$selectedLang]}</th>
+                        {#if currentWidth > 325}
+                            <th class="min-width">{$texts.actions[$selectedLang]}</th>
+                        {:else}
+                            <th class="super-min-width"><img src="/img/more.png" style="width:20px; height: 20px;" alt="More" /></th>
+                        {/if}
                     {/if}
                 </tr>
             </thead>
@@ -353,6 +359,8 @@
                                 sectionNodes={nodesBySection[section.key]}
                                 backgroundColor="rgba(255, 255, 255, 0.05)"
                                 disabledBackgroundColor="rgba(255, 255, 255, 0.22)"
+                                {windowWidth}
+                                currentGridWidth={currentWidth}
                                 {columnVisibility}
                                 onDelete={() => deleteNode(node)}
                                 onConfig={() => {}}
@@ -362,7 +370,7 @@
                                 }}
                             />
                         {/each}
-                        <AddNode backgroundColor="rgba(255, 255, 255, 0.05)" onAddNode={() => addNode(section.prefix)} />
+                        <AddNode {windowWidth} backgroundColor="rgba(255, 255, 255, 0.05)" onAddNode={() => addNode(section.prefix)} />
                     {/each}
                     <!--     S I N G L E     P H A S E     M E T E R S     -->
                 {:else if deviceData.type === MeterType.SINGLE_PHASE}
@@ -371,9 +379,11 @@
                             nodePhase={NodePhase.SINGLEPHASE}
                             {node}
                             sectionNodes={formattedNodes}
+                            currentGridWidth={currentWidth}
                             {columnVisibility}
                             backgroundColor="rgba(255, 255, 255, 0.05)"
                             disabledBackgroundColor="rgba(255, 255, 255, 0.22)"
+                            {windowWidth}
                             onDelete={() => deleteNode(node)}
                             onConfig={() => {}}
                             selectedProtocol={deviceData.protocol}
@@ -382,7 +392,7 @@
                             }}
                         />
                     {/each}
-                    <AddNode backgroundColor="rgba(255, 255, 255, 0.05)" onAddNode={() => addNode(NodePrefix.SINGLEPHASE)} />
+                    <AddNode {windowWidth} backgroundColor="rgba(255, 255, 255, 0.05)" onAddNode={() => addNode(NodePrefix.SINGLEPHASE)} />
                 {/if}
             </tbody>
         </table>
@@ -415,6 +425,12 @@
         text-align: center;
     }
 
+    table thead {
+        position: sticky;
+        top: 74px;
+        z-index: 1;
+    }
+
     table thead .header {
         background-color: var(--header-background-color);
         height: 40px;
@@ -443,7 +459,7 @@
     }
 
     table tr td {
-        height: 30px;
+        height: 40px;
     }
 
     table th.max-width {
@@ -463,16 +479,39 @@
         max-width: 85px;
     }
 
+    table th.super-min-width {
+        width: 50px;
+        min-width: 50px;
+        max-width: 50px;
+    }
+
     table .sub-section {
         width: 100%;
         margin: 0;
         padding: 0;
-        height: 25px;
         background-color: var(--sub-section-background-color);
         color: var(--sub-section-text-color);
         border: 1px solid var(--sub-section-border-color);
         font-size: 0.9rem;
         border-left: none;
         border-right: none;
+    }
+
+    table .sub-section td {
+        height: 35px;
+    }
+
+    @media (min-width: 880px) {
+        tr td {
+            height: 30px;
+        }
+
+        tr th {
+            height: 30px;
+        }
+
+        table .sub-section td {
+            height: 25px;
+        }
     }
 </style>

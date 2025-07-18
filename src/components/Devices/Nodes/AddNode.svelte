@@ -4,11 +4,17 @@
     // Stores for multi-language support
     import { selectedLang, texts } from "$lib/stores/lang";
 
+    // Props
+    export let windowWidth: number;
+
     // Layout / styling props
     export let backgroundColor: string;
 
     // Export Funcions
     export let onAddNode: () => void;
+
+    // Variables
+    $: buttonHeight = windowWidth <= 880 ? "40px" : "32px";
 </script>
 
 <tr
@@ -21,7 +27,7 @@
         <Button
             buttonText={$texts.addNode[$selectedLang]}
             width="100%"
-            height="32px"
+            height={buttonHeight}
             backgroundColor="#1a2027"
             hoverColor="#1f242b"
             fontSize="0.9rem"

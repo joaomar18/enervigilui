@@ -412,7 +412,7 @@
         display: flex;
         justify-content: center;
         align-items: center;
-        z-index: 1;
+        z-index: 100;
     }
 
     /* Left side header (menu/logo/actions) */
@@ -425,7 +425,7 @@
         display: flex;
         justify-content: center;
         align-items: center;
-        z-index: 3;
+        z-index: 103;
     }
 
     /* Hidden logo slot until enabled */
@@ -475,7 +475,7 @@
         display: flex;
         align-items: center;
         justify-content: flex-end;
-        z-index: 0;
+        z-index: 99;
     }
 
     .dashboard-container .header-div .main-header-div.collapse {
@@ -499,13 +499,13 @@
         bottom: 50px;
         width: 100%;
         left: 0;
-        z-index: 0;
+        z-index: 99;
         transition: margin-left 0.2s ease-in-out;
     }
 
     /* Send alerts div to front */
     .dashboard-container .content .alerts-div.prioritize {
-        z-index: 2;
+        z-index: 102;
     }
 
     /* Hidden search bar on mobile, flex on desktop */

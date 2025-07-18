@@ -88,7 +88,7 @@
         min-height: 50px;
         background-color: var(--background-color);
         border: 1px solid var(--border-color);
-        z-index: 2;
+        z-index: 102;
         -webkit-tap-highlight-color: transparent;
         -webkit-touch-callout: none;
         user-select: none;
