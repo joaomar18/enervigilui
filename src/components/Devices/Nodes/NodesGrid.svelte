@@ -1,12 +1,16 @@
 <script lang="ts">
     import NodeRow from "./NodeRow.svelte";
     import AddNode from "./AddNode.svelte";
+    import { onMount, onDestroy } from "svelte";
 
     // Stores for variable definitions
     import { defaultVariables } from "$lib/stores/nodes";
     import { MeterType, Protocol, type EditableDeviceMeter } from "$lib/stores/devices";
     import { NodePrefix, NodePhase, NodeType } from "$lib/stores/nodes";
+
+    // Types
     import type { DeviceNode, FormattedNode, NodeConfiguration, BaseNodeConfig } from "$lib/stores/nodes";
+    import type { ColumnVisibilityMap } from "$lib/ts/nodes_gid";
 
     // Stores for multi-language support
     import { selectedLang, texts } from "$lib/stores/lang";
@@ -150,8 +154,29 @@
         }
     }
 
+    function handleResize() {
+        if (containerElement) {
+            currentWidth = containerElement.clientWidth;
+        }
+    }
+
     // Variables
     let initialized: boolean = false;
+    let containerElement: HTMLDivElement;
+    let currentWidth: number;
+
+    let columnVisibility: ColumnVisibilityMap = {
+        name: { hideWidth: undefined, visible: true },
+        unit: { hideWidth: undefined, visible: true },
+        type: { hideWidth: undefined, visible: true },
+        communicationID: { hideWidth: undefined, visible: true },
+        custom: { hideWidth: undefined, visible: true },
+        publish: { hideWidth: 1175, visible: true },
+        virtual: { hideWidth: undefined, visible: true },
+        logging: { hideWidth: undefined, visible: true },
+        enable: { hideWidth: undefined, visible: true },
+        actions: { hideWidth: undefined, visible: true },
+    };
 
     // Format and sort nodes only on initial load
     $: if (!initialized && Object.keys(nodes).length > 0) {
@@ -166,6 +191,12 @@
                 return formatted;
             })
             .sort((a, b) => a.displayName.localeCompare(b.displayName));
+    }
+
+    $: if (currentWidth) {
+        for (let key of Object.keys(columnVisibility) as (keyof ColumnVisibilityMap)[]) {
+            columnVisibility[key].visible = columnVisibility[key].hideWidth === undefined || currentWidth >= columnVisibility[key].hideWidth;
+        }
     }
 
     // Nodes sections for 3F meters (L1, L2, L3, Total, General)
@@ -229,9 +260,30 @@
         },
         {} as Record<NodePhase, Array<FormattedNode>>,
     );
+
+    onMount(() => {
+        handleResize();
+        let resizeObserver: ResizeObserver | undefined;
+        if (containerElement) {
+            resizeObserver = new ResizeObserver(() => {
+                handleResize();
+            });
+            resizeObserver.observe(containerElement);
+        }
+        (window as any)._nodesGridResizeObserver = resizeObserver;
+    });
+
+    onDestroy(() => {
+        const resizeObserver = (window as any)._nodesGridResizeObserver as ResizeObserver | undefined;
+        if (resizeObserver) {
+            resizeObserver.disconnect();
+            (window as any)._nodesGridResizeObserver = undefined;
+        }
+    });
 </script>
 
 <div
+    bind:this={containerElement}
     style="
         --width: {width};
         --height: {height};
@@ -250,20 +302,40 @@
         <table>
             <thead>
                 <tr class="header">
-                    <th class="max-width">{$texts.variable[$selectedLang]}</th>
-                    <th class="min-width">{$texts.unit[$selectedLang]}</th>
-                    {#if deviceData.protocol === Protocol.OPC_UA}
-                        <th style="width: 150px;" class="mid-width">{$texts.opcuaID[$selectedLang]}</th>
-                    {:else if deviceData.protocol === Protocol.MODBUS_RTU}
-                        <th style="width: 150px;" class="mid-width">{$texts.modbusRegister[$selectedLang]}</th>
+                    {#if columnVisibility.name.visible}
+                        <th class="max-width">{$texts.variable[$selectedLang]}</th>
                     {/if}
-                    <th style="width: 150px;" class="mid-width">{$texts.type[$selectedLang]}</th>
-                    <th class="min-width">{$texts.custom[$selectedLang]}</th>
-                    <th class="min-width">{$texts.publish[$selectedLang]}</th>
-                    <th class="min-width">{$texts.virtual[$selectedLang]}</th>
-                    <th class="min-width">{$texts.logging[$selectedLang]}</th>
-                    <th class="min-width">{$texts.enabled[$selectedLang]}</th>
-                    <th class="min-width">{$texts.actions[$selectedLang]}</th>
+                    {#if columnVisibility.unit.visible}
+                        <th class="min-width">{$texts.unit[$selectedLang]}</th>
+                    {/if}
+                    {#if columnVisibility.communicationID.visible}
+                        {#if deviceData.protocol === Protocol.OPC_UA}
+                            <th style="width: 150px;" class="mid-width">{$texts.opcuaID[$selectedLang]}</th>
+                        {:else if deviceData.protocol === Protocol.MODBUS_RTU}
+                            <th style="width: 150px;" class="mid-width">{$texts.modbusRegister[$selectedLang]}</th>
+                        {/if}
+                    {/if}
+                    {#if columnVisibility.type.visible}
+                        <th style="width: 150px;" class="mid-width">{$texts.type[$selectedLang]}</th>
+                    {/if}
+                    {#if columnVisibility.custom.visible}
+                        <th class="min-width">{$texts.custom[$selectedLang]}</th>
+                    {/if}
+                    {#if columnVisibility.publish.visible}
+                        <th class="min-width">{$texts.publish[$selectedLang]}</th>
+                    {/if}
+                    {#if columnVisibility.virtual.visible}
+                        <th class="min-width">{$texts.virtual[$selectedLang]}</th>
+                    {/if}
+                    {#if columnVisibility.logging.visible}
+                        <th class="min-width">{$texts.logging[$selectedLang]}</th>
+                    {/if}
+                    {#if columnVisibility.enable.visible}
+                        <th class="min-width">{$texts.enabled[$selectedLang]}</th>
+                    {/if}
+                    {#if columnVisibility.actions.visible}
+                        <th class="min-width">{$texts.actions[$selectedLang]}</th>
+                    {/if}
                 </tr>
             </thead>
             <tbody>
@@ -276,13 +348,12 @@
                         </tr>
                         {#each nodesBySection[section.key] as node, i (i)}
                             <NodeRow
-                                meterConfig={deviceData.options}
                                 nodePhase={section.key}
-                                nodePrefix={section.prefix}
                                 {node}
                                 sectionNodes={nodesBySection[section.key]}
                                 backgroundColor="rgba(255, 255, 255, 0.05)"
                                 disabledBackgroundColor="rgba(255, 255, 255, 0.22)"
+                                {columnVisibility}
                                 onDelete={() => deleteNode(node)}
                                 onConfig={() => {}}
                                 selectedProtocol={deviceData.protocol}
@@ -297,11 +368,10 @@
                 {:else if deviceData.type === MeterType.SINGLE_PHASE}
                     {#each formattedNodes as node, i (i)}
                         <NodeRow
-                            meterConfig={deviceData.options}
                             nodePhase={NodePhase.SINGLEPHASE}
-                            nodePrefix={NodePrefix.SINGLEPHASE}
                             {node}
                             sectionNodes={formattedNodes}
+                            {columnVisibility}
                             backgroundColor="rgba(255, 255, 255, 0.05)"
                             disabledBackgroundColor="rgba(255, 255, 255, 0.22)"
                             onDelete={() => deleteNode(node)}

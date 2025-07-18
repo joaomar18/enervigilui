@@ -11,9 +11,9 @@ import type { MeterOptions } from "$lib/stores/devices";
  * Validates a node name based on whether it is a custom variable or a default variable.
  * 
  * For custom variables, the function performs the following validations:
- * - Ensures the name is not already used in the defaultVariableNames store
+ * - Ensures the name is NOT already used in the defaultVariableNames store (custom nodes cannot use default names)
  * - Verifies the name is non-empty and contains no whitespace
- * - Confirms the name contains only alphabetical characters or underscores
+ * - Confirms the name contains only alphabetical characters, underscores, and numbers (but can't start with a number)
  * 
  * For default variables:
  * - Verifies the name exists in the defaultVariableNames store
@@ -38,7 +38,7 @@ export function validateNodeName(nodeName: string, customVariable: boolean, curr
     }
 
     if (customVariable) {
-        // For custom variables, check if name exists in default names
+        // For custom variables, check if name exists in default names (custom nodes can't use default names)
         if (names.includes(nodeName)) {
             return false;
         }
@@ -173,7 +173,38 @@ export function validateNodeType(type: NodeType, name: string, custom: boolean):
 }
 
 
-export function validateVirtualNode(name: string, custom: boolean, meterOptions: MeterOptions, phase: NodePhase, currentNodes?: Array<FormattedNode>): boolean {
+/**
+ * Validates if a node can potentially be virtual based on basic criteria.
+ * 
+ * This function performs a basic validation to determine if a node variable
+ * is eligible to be virtual, but does NOT perform comprehensive dependency checking.
+ * 
+ * Validation rules:
+ * - Custom nodes: Always returns false (custom nodes cannot be virtual)
+ * - Default nodes: Returns true if the variable exists in defaultVariables and has canBeVirtual = true
+ * 
+ * IMPORTANT LIMITATION: This function does not validate whether all the required
+ * dependencies (meter options, other nodes, phase configurations) are actually
+ * in place for the node to be virtual. It only checks if the node type is
+ * theoretically capable of being virtual.
+ * 
+ * For complete virtual node validation including dependency checking, use the
+ * comprehensive validation system in virtualNodeRules.ts instead.
+ * 
+ * @param name - The display name of the node variable (without prefix)
+ * @param custom - Whether this is a custom user-defined variable (true) or default variable (false)
+ * @returns {boolean} True if the node type can potentially be virtual, false otherwise
+ * 
+ * @example
+ * ```typescript
+ * // Check if apparent_power can potentially be virtual (basic check only)
+ * const canBeVirtual = validateVirtualNode("apparent_power", false); // true
+ * 
+ * // Custom nodes are never virtual
+ * const customCanBeVirtual = validateVirtualNode("my_custom_var", true); // false
+ * ```
+ */
+export function validateVirtualNode(name: string, custom: boolean): boolean {
     if (custom) { // Custom nodes can't be virtual
         return false;
     }

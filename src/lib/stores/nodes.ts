@@ -1,6 +1,8 @@
 import { readable } from "svelte/store";
 import { derived } from "svelte/store";
 import { Protocol } from "$lib/stores/devices";
+import { MeterType } from "$lib/stores/devices";
+import type { MeterOptions } from "$lib/stores/devices";
 
 /**
  * Prefixes used to identify the electrical phase or type of a node variable.
@@ -536,3 +538,25 @@ export const defaultVariableUnits = derived(defaultVariables, ($defaultVariables
 
     return unitsMap;
 });
+
+/**
+ * Maps NodePhase enum to the corresponding prefix used in node names.
+ */
+export function getNodePrefix(phase: NodePhase): string {
+    switch (phase) {
+        case NodePhase.L1:
+            return NodePrefix.L1;
+        case NodePhase.L2:
+            return NodePrefix.L2;
+        case NodePhase.L3:
+            return NodePrefix.L3;
+        case NodePhase.TOTAL:
+            return NodePrefix.TOTAL;
+        case NodePhase.GENERAL:
+            return NodePrefix.GENERAL;
+        case NodePhase.SINGLEPHASE:
+            return NodePrefix.SINGLEPHASE;
+        default:
+            return "";
+    }
+}
