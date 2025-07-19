@@ -7,13 +7,14 @@
     import { Protocol } from "$lib/stores/devices";
     import { NodeType, NodePhase } from "$lib/stores/nodes";
     import { defaultVariables, defaultVariableUnits } from "$lib/stores/nodes";
+    import { showAlert } from "$lib/stores/alerts";
 
     // Types
     import type { FormattedNode } from "$lib/stores/nodes";
     import type { ColumnVisibilityMap } from "$lib/ts/nodes_gid";
 
     // Stores for multi-language support
-    import { variableNameTextsByPhase } from "$lib/stores/lang";
+    import { texts, variableNameTextsByPhase } from "$lib/stores/lang";
 
     // Props
     export let sectionNodes: Array<FormattedNode>;
@@ -36,6 +37,9 @@
 
     let disabledUnit: boolean = false;
     let disabledCommIDString: string = "";
+    let strloggingPeriod: string = String(node.config.logging_period);
+    let strMinAlarm: string = String(node.config.min_alarm_value);
+    let strMaxAlarm: string = String(node.config.max_alarm_value);
 
     let rowHeight: string;
     let buttonSize: string;
@@ -321,6 +325,88 @@
             </div>
         </td>
     {/if}
+    {#if columnVisibility.logging_period.visible}
+        <td>
+            <div class="cell-content">
+                <InputField
+                    bind:inputValue={strloggingPeriod}
+                    inputType="POSITIVE_INT"
+                    minValue={1}
+                    maxValue={1440}
+                    limitsPassed={() => {
+                        showAlert($texts.loggingPeriodError, {
+                            minValue: 1,
+                            maxValue: 1440,
+                        });
+                    }}
+                    inputUnit="min."
+                    width="90%"
+                    height={rowHeight}
+                    borderRadius="5px"
+                    backgroundColor="#1a2027"
+                    disabledBackgroundColor="#42505f"
+                    selectedBackgroundColor="#1a2027"
+                    selectedBorderColor="#2F80ED"
+                    badFormatBorderColor="#e74c3c"
+                    fontSize="0.9rem"
+                    fontColor="#f5f5f5"
+                    fontWeight="400"
+                    textAlign="center"
+                    unitTextColor="rgb(170,170,170)"
+                />
+            </div>
+        </td>
+    {/if}
+    {#if columnVisibility.min_alarm.visible}
+        <td>
+            <div class="cell-content">
+                <InputField
+                    disabled={(node.config.type !== NodeType.FLOAT && node.config.type !== NodeType.INT) || !node.config.min_alarm}
+                    bind:inputValue={strMinAlarm}
+                    inputType={node.config.type}
+                    inputUnit={node.config.unit}
+                    width="90%"
+                    height={rowHeight}
+                    borderRadius="5px"
+                    backgroundColor="#1a2027"
+                    disabledBackgroundColor="#42505f"
+                    selectedBackgroundColor="#1a2027"
+                    selectedBorderColor="#2F80ED"
+                    badFormatBorderColor="#e74c3c"
+                    fontSize="0.9rem"
+                    fontColor="#f5f5f5"
+                    fontWeight="400"
+                    textAlign="center"
+                    unitTextColor="rgb(170,170,170)"
+                />
+            </div>
+        </td>
+    {/if}
+    {#if columnVisibility.max_alarm.visible}
+        <td>
+            <div class="cell-content">
+                <InputField
+                    disabled={(node.config.type !== NodeType.FLOAT && node.config.type !== NodeType.INT) || !node.config.max_alarm}
+                    bind:inputValue={strMaxAlarm}
+                    inputType={node.config.type}
+                    inputUnit={node.config.unit}
+                    width="90%"
+                    height={rowHeight}
+                    borderRadius="5px"
+                    backgroundColor="#1a2027"
+                    disabledBackgroundColor="#42505f"
+                    selectedBackgroundColor="#1a2027"
+                    selectedBorderColor="#2F80ED"
+                    badFormatBorderColor="#e74c3c"
+                    fontSize="0.9rem"
+                    fontColor="#f5f5f5"
+                    fontWeight="400"
+                    textAlign="center"
+                    unitTextColor="rgb(170,170,170)"
+                />
+            </div>
+        </td>
+    {/if}
     {#if columnVisibility.custom.visible}
         <td>
             <div class="cell-content">
@@ -395,6 +481,48 @@
             <div class="cell-content">
                 <Checkbox
                     bind:checked={node.config.logging}
+                    onChange={() => {
+                        onPropertyChanged();
+                    }}
+                    inputName="log-node"
+                    width="1.5em"
+                    height="1.5em"
+                    checkMarkWidth={24}
+                    checkMarkHeight={24}
+                    enabledbgColor="#2f80ed"
+                    enabledBorderColor="#5a646e"
+                    disabledbgColor="#42505f"
+                    disabledBorderColor="#5a646e"
+                />
+            </div>
+        </td>
+    {/if}
+    {#if columnVisibility.enable_min_alarm.visible}
+        <td>
+            <div class="cell-content">
+                <Checkbox
+                    bind:checked={node.config.min_alarm}
+                    onChange={() => {
+                        onPropertyChanged();
+                    }}
+                    inputName="log-node"
+                    width="1.5em"
+                    height="1.5em"
+                    checkMarkWidth={24}
+                    checkMarkHeight={24}
+                    enabledbgColor="#2f80ed"
+                    enabledBorderColor="#5a646e"
+                    disabledbgColor="#42505f"
+                    disabledBorderColor="#5a646e"
+                />
+            </div>
+        </td>
+    {/if}
+    {#if columnVisibility.enable_max_alarm.visible}
+        <td>
+            <div class="cell-content">
+                <Checkbox
+                    bind:checked={node.config.max_alarm}
                     onChange={() => {
                         onPropertyChanged();
                     }}

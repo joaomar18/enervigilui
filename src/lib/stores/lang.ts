@@ -470,6 +470,18 @@ const textsObject: TextsObject = {
         PT: "Ações",
         EN: "Actions",
     },
+    loggingPeriodError: {
+        PT: "O período de registo deve estar compreendido entre {minValue} e {maxValue}.",
+        EN: "The logging period must be between {minValue} and {maxValue}.",
+    },
+    minValue: {
+        PT: "Valor Mínimo",
+        EN: "Minimum Value",
+    },
+    maxValue: {
+        PT: "Valor Máximo",
+        EN: "Maximum Value",
+    },
 };
 
 //////////     D E V I C E     T E X T S     //////////

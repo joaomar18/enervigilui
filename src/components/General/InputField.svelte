@@ -93,11 +93,11 @@
     }
 
     async function updateUnitWidth() {
-        if (!disabled) {
-            await tick();
-            if (unitElement) {
-                unitWidth = unitElement.offsetWidth;
-            }
+        await tick();
+        if (unitElement) {
+            unitWidth = unitElement.offsetWidth;
+        } else {
+            unitWidth = 0;
         }
     }
 
@@ -112,7 +112,7 @@
 
     // Reactive statement to update unit width when inputUnit changes
     $: {
-        if (inputUnit) {
+        if (inputUnit !== null) {
             updateUnitWidth();
         }
     }

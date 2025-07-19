@@ -23,7 +23,7 @@
     "
     class="add-node"
 >
-    <td colspan="10">
+    <td colspan="20">
         <Button
             buttonText={$texts.addNode[$selectedLang]}
             width="100%"

@@ -169,14 +169,19 @@
 
     let columnVisibility: ColumnVisibilityMap = {
         name: { hideWidth: undefined, visible: true },
-        unit: { hideWidth: 530, visible: true },
-        type: { hideWidth: 915, visible: true },
-        communicationID: { hideWidth: 680, visible: true },
-        custom: { hideWidth: 765, visible: true },
-        publish: { hideWidth: 1170, visible: true },
-        virtual: { hideWidth: 1000, visible: true },
-        logging: { hideWidth: 1085, visible: true },
-        enable: { hideWidth: 445, visible: true },
+        unit: { hideWidth: 540, visible: true },
+        type: { hideWidth: 975, visible: true },
+        communicationID: { hideWidth: 715, visible: true },
+        custom: { hideWidth: 800, visible: true },
+        publish: { hideWidth: 1230, visible: true },
+        virtual: { hideWidth: 1060, visible: true },
+        logging: { hideWidth: 1145, visible: true },
+        logging_period: { hideWidth: 1405, visible: true },
+        enable_min_alarm: { hideWidth: 1490, visible: true },
+        enable_max_alarm: { hideWidth: 1575, visible: true },
+        min_alarm: { hideWidth: 1750, visible: true },
+        max_alarm: { hideWidth: 1925, visible: true },
+        enable: { hideWidth: 455, visible: true },
         actions: { hideWidth: undefined, visible: true },
     };
 
@@ -312,14 +317,22 @@
                     {/if}
                     {#if columnVisibility.communicationID.visible}
                         {#if deviceData.protocol === Protocol.OPC_UA}
-                            <th style="width: 150px;" class="mid-width">{$texts.opcuaID[$selectedLang]}</th>
+                            <th class="mid-width">{$texts.opcuaID[$selectedLang]}</th>
                         {:else if deviceData.protocol === Protocol.MODBUS_RTU}
-                            <th style="width: 150px;" class="mid-width">{$texts.modbusRegister[$selectedLang]}</th>
+                            <th class="mid-width">{$texts.modbusRegister[$selectedLang]}</th>
                         {/if}
                     {/if}
                     {#if columnVisibility.type.visible}
-                        <th style="width: 150px;" class="mid-width">{$texts.type[$selectedLang]}</th>
+                        <th class="mid-width">{$texts.type[$selectedLang]}</th>
                     {/if}
+                    {#if columnVisibility.logging_period.visible}
+                        <th class="mid-width">{$texts.loggingPeriod[$selectedLang]}</th>
+                    {/if}
+                    {#if columnVisibility.min_alarm.visible}
+                        <th class="mid-width">{$texts.minValue[$selectedLang]} </th>
+                    {/if}
+                    {#if columnVisibility.max_alarm.visible}
+                        <th class="mid-width">{$texts.maxValue[$selectedLang]} </th>{/if}
                     {#if columnVisibility.custom.visible}
                         <th class="min-width">{$texts.custom[$selectedLang]}</th>
                     {/if}
@@ -331,6 +344,12 @@
                     {/if}
                     {#if columnVisibility.logging.visible}
                         <th class="min-width">{$texts.logging[$selectedLang]}</th>
+                    {/if}
+                    {#if columnVisibility.enable_min_alarm.visible}
+                        <th class="min-width">{$texts.minAlarm[$selectedLang]}</th>
+                    {/if}
+                    {#if columnVisibility.enable_max_alarm.visible}
+                        <th class="min-width">{$texts.maxAlarm[$selectedLang]}</th>
                     {/if}
                     {#if columnVisibility.enable.visible}
                         <th class="min-width">{$texts.enabled[$selectedLang]}</th>
@@ -350,7 +369,7 @@
                     <!-- Render each node section -->
                     {#each nodeSections as section (section.key)}
                         <tr class="sub-section">
-                            <td colspan="10">{$texts[section.labelKey][$selectedLang]}</td>
+                            <td colspan="20">{$texts[section.labelKey][$selectedLang]}</td>
                         </tr>
                         {#each nodesBySection[section.key] as node, i (i)}
                             <NodeRow
@@ -464,13 +483,13 @@
 
     table th.max-width {
         width: max-content;
-        min-width: 100px;
+        min-width: 200px;
     }
 
     table th.mid-width {
-        width: 150px;
-        min-width: 150px;
-        max-width: 150px;
+        width: 175px;
+        min-width: 175px;
+        max-width: 175px;
     }
 
     table th.min-width {
