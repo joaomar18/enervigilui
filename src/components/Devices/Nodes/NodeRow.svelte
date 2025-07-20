@@ -108,6 +108,11 @@
         }
     }
 
+    $: if (selectedProtocol && selectedProtocol !== node.protocol) {
+        node.protocol = selectedProtocol;
+        node.communicationID = "";
+    }
+
     $: if (windowWidth) {
         rowHeight = windowWidth <= 880 ? "40px" : "30px";
         buttonSize = windowWidth <= 880 ? "2em" : "1.5em";

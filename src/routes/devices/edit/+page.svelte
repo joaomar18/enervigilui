@@ -7,9 +7,10 @@
     import EditableText from "../../../components/General/EditableText.svelte";
     import UploadImage from "../../../components/General/UploadImage.svelte";
     import Button from "../../../components/General/Button.svelte";
-    import ConfirmWindow from "../../../components/General/ConfirmWindow.svelte";
+    import ModalWindow from "../../../components/General/ModalWindow.svelte";
     import InputField from "../../../components/General/InputField.svelte";
     import NodesGrid from "../../../components/Devices/Nodes/NodesGrid.svelte";
+    import NodeConfigWindow from "../../../components/Devices/Nodes/NodeConfigWindow.svelte";
     import { Protocol } from "$lib/stores/devices";
     import { defaultOPCUAOptions, defaultModbusRTUOptions } from "$lib/stores/devices";
 
@@ -33,6 +34,8 @@
     // Variables
     let showSaveWindow: boolean = false;
     let showDeleteWindow: boolean = false;
+    let showConfigNodeWindow: boolean = false;
+    let editingNode: FormattedNode;
     let deleteDeviceName: string;
     let devicePollTimer: ReturnType<typeof setTimeout>;
     let nodesPollTimer: ReturnType<typeof setTimeout>;
@@ -1077,6 +1080,10 @@
                         {deviceData}
                         bind:nodes={deviceNodes}
                         bind:formattedNodes={editedNodes}
+                        onShowConfigPopup={(nodeToEdit: FormattedNode) => {
+                            editingNode = nodeToEdit;
+                            showConfigNodeWindow = true;
+                        }}
                         width="100%"
                         height="fit-content"
                         borderRadius="10px"
@@ -1139,11 +1146,20 @@
                 />
             </div>
         </div>
+        {#if showConfigNodeWindow}
+            <div class="overlay-device-div">
+                <div class="overlay-device-div-content">
+                    <div class="window-div">
+                        <NodeConfigWindow bind:visible={showConfigNodeWindow} node={editingNode} />
+                    </div>
+                </div>
+            </div>
+        {/if}
         {#if showDeleteWindow}
             <div class="overlay-device-div">
                 <div class="overlay-device-div-content">
                     <div class="window-div">
-                        <ConfirmWindow
+                        <ModalWindow
                             title={`${$texts.deleteDevice[$selectedLang]} ${deviceData.name}`}
                             width="80%"
                             minWidth="300px"
@@ -1192,7 +1208,7 @@
                                     onClick={deleteDevice}
                                 />
                             </div>
-                        </ConfirmWindow>
+                        </ModalWindow>
                     </div>
                 </div>
             </div>
@@ -1201,7 +1217,7 @@
             <div class="overlay-device-div">
                 <div class="overlay-device-div-content">
                     <div class="window-div">
-                        <ConfirmWindow
+                        <ModalWindow
                             title={`${$texts.saveDevice[$selectedLang]}`}
                             width="80%"
                             minWidth="300px"
@@ -1228,7 +1244,7 @@
                                     onClick={saveEdit}
                                 />
                             </div>
-                        </ConfirmWindow>
+                        </ModalWindow>
                     </div>
                 </div>
             </div>

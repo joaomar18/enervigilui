@@ -32,6 +32,9 @@
     export let subSectionTextColor: string = headerTextColor;
     export let subSectionBorderColor: string = borderColor;
 
+    // Export Functions
+    export let onShowConfigPopup: (nodeToEdit: FormattedNode) => void;
+
     // Functions
     function removePrefix(name: string): string {
         const prefixes = Object.values(NodePrefix).sort((a, b) => b.length - a.length);
@@ -382,7 +385,9 @@
                                 currentGridWidth={currentWidth}
                                 {columnVisibility}
                                 onDelete={() => deleteNode(node)}
-                                onConfig={() => {}}
+                                onConfig={() => {
+                                    onShowConfigPopup(node);
+                                }}
                                 selectedProtocol={deviceData.protocol}
                                 onPropertyChanged={() => {
                                     updateNode(node);
@@ -404,7 +409,9 @@
                             disabledBackgroundColor="rgba(255, 255, 255, 0.22)"
                             {windowWidth}
                             onDelete={() => deleteNode(node)}
-                            onConfig={() => {}}
+                            onConfig={() => {
+                                onShowConfigPopup(node);
+                            }}
                             selectedProtocol={deviceData.protocol}
                             onPropertyChanged={() => {
                                 updateNode(node);

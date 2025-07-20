@@ -1,12 +1,12 @@
 <script lang="ts">
     import { browser } from "$app/environment";
-    import { onMount, onDestroy, tick } from "svelte";
+    import { onMount, onDestroy } from "svelte";
 
     // Layout / styling props
     export let title: string = "";
     export let width: string;
-    export let minWidth: string = width;
-    export let maxWidth: string = width;
+    export let minWidth: string | null = null;
+    export let maxWidth: string | null = null;
     export let height: string;
     export let borderRadius: string = "";
     export let backgroundColor: string;
@@ -46,7 +46,7 @@
 </script>
 
 <!--
-  ConfirmWindow component
+  ModalWindow component
 
   A customizable modal window with a title, close button, and slot for content.
 -->
@@ -70,16 +70,7 @@
         <div class="header-div">
             <h3>{title}</h3>
             <button class="close-button" on:click={closeWindow} aria-label="Close Window">
-                <svg
-                    width="24"
-                    height="24"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke=""
-                    stroke-width="2"
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                >
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                     <line x1="6" y1="6" x2="18" y2="18" />
                     <line x1="18" y1="6" x2="6" y2="18" />
                 </svg></button
@@ -95,8 +86,8 @@
     /* Container: modal window box */
     .container {
         width: var(--width);
-        min-width: var(--min-width);
-        max-width: var(--max-width);
+        min-width: var(--min-width, min-content);
+        max-width: var(--max-width, max-content);
         height: var(--height);
         border-radius: var(--border-radius);
         background-color: var(--background-color);
