@@ -482,6 +482,14 @@ const textsObject: TextsObject = {
         PT: "Valor Máximo",
         EN: "Maximum Value",
     },
+    section: {
+        PT: "Secção",
+        EN: "Section",
+    },
+    protocol: {
+        PT: "Protocolo",
+        EN: "Protocol",
+    },
 };
 
 //////////     D E V I C E     T E X T S     //////////

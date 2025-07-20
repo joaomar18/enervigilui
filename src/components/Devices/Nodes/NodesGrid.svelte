@@ -33,7 +33,7 @@
     export let subSectionBorderColor: string = borderColor;
 
     // Export Functions
-    export let onShowConfigPopup: (nodeToEdit: FormattedNode) => void;
+    export let onShowConfigPopup: (nodeToEdit: FormattedNode, section: NodePhase) => void;
 
     // Functions
     function removePrefix(name: string): string {
@@ -386,7 +386,7 @@
                                 {columnVisibility}
                                 onDelete={() => deleteNode(node)}
                                 onConfig={() => {
-                                    onShowConfigPopup(node);
+                                    onShowConfigPopup(node, section.phase);
                                 }}
                                 selectedProtocol={deviceData.protocol}
                                 onPropertyChanged={() => {
@@ -410,7 +410,7 @@
                             {windowWidth}
                             onDelete={() => deleteNode(node)}
                             onConfig={() => {
-                                onShowConfigPopup(node);
+                                onShowConfigPopup(node, NodePhase.SINGLEPHASE);
                             }}
                             selectedProtocol={deviceData.protocol}
                             onPropertyChanged={() => {

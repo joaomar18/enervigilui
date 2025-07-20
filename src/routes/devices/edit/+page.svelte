@@ -16,7 +16,7 @@
 
     // Types
     import type { DeviceMeter, EditableDeviceMeter, EditableOPCUAConfig, EditableModbusRTUConfig } from "$lib/stores/devices";
-    import type { DeviceNode, FormattedNode } from "$lib/stores/nodes";
+    import type { DeviceNode, FormattedNode, NodePhase } from "$lib/stores/nodes";
 
     // Navigation
     import { navigateTo } from "$lib/ts/navigation";
@@ -36,6 +36,7 @@
     let showDeleteWindow: boolean = false;
     let showConfigNodeWindow: boolean = false;
     let editingNode: FormattedNode;
+    let editingNodeSection: NodePhase;
     let deleteDeviceName: string;
     let devicePollTimer: ReturnType<typeof setTimeout>;
     let nodesPollTimer: ReturnType<typeof setTimeout>;
@@ -1080,8 +1081,9 @@
                         {deviceData}
                         bind:nodes={deviceNodes}
                         bind:formattedNodes={editedNodes}
-                        onShowConfigPopup={(nodeToEdit: FormattedNode) => {
+                        onShowConfigPopup={(nodeToEdit: FormattedNode, section: NodePhase) => {
                             editingNode = nodeToEdit;
+                            editingNodeSection = section;
                             showConfigNodeWindow = true;
                         }}
                         width="100%"
@@ -1150,7 +1152,7 @@
             <div class="overlay-device-div">
                 <div class="overlay-device-div-content">
                     <div class="window-div">
-                        <NodeConfigWindow bind:visible={showConfigNodeWindow} node={editingNode} />
+                        <NodeConfigWindow bind:visible={showConfigNodeWindow} node={editingNode} section={editingNodeSection} />
                     </div>
                 </div>
             </div>
