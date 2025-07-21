@@ -9,6 +9,7 @@
     export let minWidth: string | null = null;
     export let maxWidth: string | null = null;
     export let height: string;
+    export let maxHeight: string | null = null;
     export let borderRadius: string = "";
     export let backgroundColor: string;
     export let borderColor: string = "transparent";
@@ -16,8 +17,14 @@
     export let titleColor: string = "#f5f5f5";
     export let titleWeight: string = "400";
 
-    //Variables
+    // Constants
+    const smallScreenHeightTolerance: number = 225;
+    const screenHeightTolerance: number = 175;
+    const smallScreenTreshold: number = 420;
+
+    // Variables
     let containerEl: HTMLElement;
+    let procMaxHeight: string;
 
     // Close Window Export Funcion
     export let closeWindow: () => void;
@@ -31,17 +38,39 @@
         }
     }
 
+    function updateWindowHeight() {
+        let maxWindowHeight: number;
+        if (window.innerHeight > screenHeightTolerance) {
+            let screenHeightTol = window.innerWidth > smallScreenTreshold ? screenHeightTolerance : smallScreenHeightTolerance;
+            maxWindowHeight = window.innerHeight - screenHeightTol;
+        } else {
+            maxWindowHeight = 0;
+        }
+        if (maxHeight) {
+            if (parseInt(maxHeight) > maxWindowHeight) {
+                procMaxHeight = `${maxWindowHeight}px`;
+            } else {
+                procMaxHeight = maxHeight;
+            }
+        } else {
+            procMaxHeight = `${maxWindowHeight}px`;
+        }
+    }
+
     onMount(() => {
         if (browser) {
             requestAnimationFrame(() => {
                 window.addEventListener("click", handleClickOutside);
             });
+            updateWindowHeight();
+            window.addEventListener("resize", updateWindowHeight);
         }
     });
 
     onDestroy(() => {
         if (browser) {
             window.removeEventListener("click", handleClickOutside);
+            window.removeEventListener("resize", updateWindowHeight);
         }
     });
 </script>
@@ -57,6 +86,7 @@
         --min-width: {minWidth};
         --max-width: {maxWidth};
         --height: {height};
+        --max-height: {procMaxHeight};
         --border-radius: {borderRadius};
         --background-color: {backgroundColor};
         --border-color: {borderColor};
@@ -90,6 +120,10 @@
 <style>
     /* Container: modal window box */
     .container {
+        position: absolute;
+        left: 50%;
+        top: 50%;
+        transform: translate(-50%, -50%);
         width: var(--width);
         min-width: var(--min-width, min-content);
         max-width: var(--max-width, max-content);
@@ -177,5 +211,10 @@
         flex-direction: column;
         justify-content: flex-start;
         align-items: center;
+        overflow-y: auto;
+        overflow-x: hidden;
+        max-height: var(--max-height, max-content);
+        scrollbar-width: thin;
+        scrollbar-color: #323a45 #1e242b;
     }
 </style>

@@ -37,6 +37,7 @@
     let showConfigNodeWindow: boolean = false;
     let editingNode: FormattedNode;
     let editingNodeSection: NodePhase;
+    let editingSectionNodes: Array<FormattedNode>;
     let deleteDeviceName: string;
     let devicePollTimer: ReturnType<typeof setTimeout>;
     let nodesPollTimer: ReturnType<typeof setTimeout>;
@@ -121,6 +122,15 @@
     async function deleteDevice(): Promise<void> {
         deleteDeviceName = "";
         showDeleteWindow = false;
+    }
+
+    // Function to update nodes structure when a node is updated
+    function updateNode(node: FormattedNode) {
+        const editNodesIndex = editedNodes.findIndex((n) => n === node);
+        if (editNodesIndex !== -1) {
+            editedNodes[editNodesIndex] = node;
+            editedNodes = [...editedNodes];
+        }
     }
 
     // Mount function
@@ -1081,9 +1091,13 @@
                         {deviceData}
                         bind:nodes={deviceNodes}
                         bind:formattedNodes={editedNodes}
-                        onShowConfigPopup={(nodeToEdit: FormattedNode, section: NodePhase) => {
+                        onPropertyChanged={(node: FormattedNode) => {
+                            updateNode(node);
+                        }}
+                        onShowConfigPopup={(nodeToEdit: FormattedNode, section: NodePhase, sectionNodes: Array<FormattedNode>) => {
                             editingNode = nodeToEdit;
                             editingNodeSection = section;
+                            editingSectionNodes = sectionNodes;
                             showConfigNodeWindow = true;
                         }}
                         width="100%"
@@ -1152,7 +1166,16 @@
             <div class="overlay-device-div">
                 <div class="overlay-device-div-content">
                     <div class="window-div">
-                        <NodeConfigWindow bind:visible={showConfigNodeWindow} node={editingNode} section={editingNodeSection} />
+                        <NodeConfigWindow
+                            bind:visible={showConfigNodeWindow}
+                            onPropertyChanged={() => {
+                                updateNode(editingNode);
+                            }}
+                            {deviceData}
+                            node={editingNode}
+                            section={editingNodeSection}
+                            sectionNodes={editingSectionNodes}
+                        />
                     </div>
                 </div>
             </div>
@@ -1450,7 +1473,7 @@
         padding: 0;
         position: sticky;
         top: 50%;
-        transform: translateY(-50%);
+        transform: translateY(calc(-50% + 37px));
         display: flex;
         justify-content: center;
         align-items: center;

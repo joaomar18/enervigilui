@@ -33,7 +33,8 @@
     export let subSectionBorderColor: string = borderColor;
 
     // Export Functions
-    export let onShowConfigPopup: (nodeToEdit: FormattedNode, section: NodePhase) => void;
+    export let onPropertyChanged: (node: FormattedNode) => void;
+    export let onShowConfigPopup: (nodeToEdit: FormattedNode, section: NodePhase, sectionNodes: Array<FormattedNode>) => void;
 
     // Functions
     function removePrefix(name: string): string {
@@ -83,14 +84,6 @@
         }
 
         return undefined;
-    }
-
-    function updateNode(node: FormattedNode) {
-        const formattedNodeIndex = formattedNodes.findIndex((n) => n === node);
-        if (formattedNodeIndex !== -1) {
-            formattedNodes[formattedNodeIndex] = node;
-            formattedNodes = [...formattedNodes];
-        }
     }
 
     function addNode(sectionPrefix: NodePrefix) {
@@ -386,11 +379,11 @@
                                 {columnVisibility}
                                 onDelete={() => deleteNode(node)}
                                 onConfig={() => {
-                                    onShowConfigPopup(node, section.phase);
+                                    onShowConfigPopup(node, section.phase, nodesBySection[section.key]);
                                 }}
                                 selectedProtocol={deviceData.protocol}
                                 onPropertyChanged={() => {
-                                    updateNode(node);
+                                    onPropertyChanged(node);
                                 }}
                             />
                         {/each}
@@ -410,11 +403,11 @@
                             {windowWidth}
                             onDelete={() => deleteNode(node)}
                             onConfig={() => {
-                                onShowConfigPopup(node, NodePhase.SINGLEPHASE);
+                                onShowConfigPopup(node, NodePhase.SINGLEPHASE, formattedNodes);
                             }}
                             selectedProtocol={deviceData.protocol}
                             onPropertyChanged={() => {
-                                updateNode(node);
+                                onPropertyChanged(node);
                             }}
                         />
                     {/each}

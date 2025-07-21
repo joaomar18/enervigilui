@@ -2,6 +2,9 @@
     import { onMount, onDestroy } from "svelte";
     import { browser } from "$app/environment";
 
+    // Props
+    export let openInverted: boolean = false;
+
     // Layout / styling props
     export let labelText: string = "";
     export let hintWidth: string;
@@ -27,13 +30,7 @@
 
     // Functions
     function handleClickOutside(event: MouseEvent): void {
-        if (
-            hintOpened &&
-            hintDiv &&
-            buttonEl &&
-            !hintDiv.contains(event.target as Node) &&
-            !buttonEl.contains(event.target as Node)
-        ) {
+        if (hintOpened && hintDiv && buttonEl && !hintDiv.contains(event.target as Node) && !buttonEl.contains(event.target as Node)) {
             hintOpened = false;
         }
     }
@@ -75,15 +72,11 @@
             --hint-border-radius: {hintBorderRadius};
         "
         class:open={hintOpened}
+        class:inverted={openInverted}
     >
         <slot />
     </div>
-    <button
-        on:click={toogleHint}
-        bind:this={buttonEl}
-        aria-label="Show Hint"
-        class:hint-opened={hintOpened}
-    >
+    <button on:click={toogleHint} bind:this={buttonEl} aria-label="Show Hint" class:hint-opened={hintOpened}>
         <div
             class="hint-button"
             style="
@@ -99,56 +92,20 @@
             "
         >
             <div class="info-button-div" class:hide={hintOpened}>
-                <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    width="32"
-                    height="32"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                >
+                <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none">
                     <circle class="info-circle" cx="12" cy="12" r="10" stroke-width="1.5" />
 
                     <circle class="i-dot" cx="12" cy="8" r="0.9" />
 
-                    <line
-                        class="i-line"
-                        x1="12"
-                        y1="11"
-                        x2="12"
-                        y2="16.5"
-                        stroke-width="1.5"
-                        stroke-linecap="round"
-                    />
+                    <line class="i-line" x1="12" y1="11" x2="12" y2="16.5" stroke-width="1.5" stroke-linecap="round" />
                 </svg>
             </div>
             <div class="close-button-div" class:hide={!hintOpened}>
-                <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    width="32"
-                    height="32"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                >
+                <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none">
                     <circle class="close-circle" cx="12" cy="12" r="10" stroke-width="1.5" />
 
-                    <line
-                        class="close-line"
-                        x1="9"
-                        y1="9"
-                        x2="15"
-                        y2="15"
-                        stroke-width="1.5"
-                        stroke-linecap="round"
-                    />
-                    <line
-                        class="close-line"
-                        x1="15"
-                        y1="9"
-                        x2="9"
-                        y2="15"
-                        stroke-width="1.5"
-                        stroke-linecap="round"
-                    />
+                    <line class="close-line" x1="9" y1="9" x2="15" y2="15" stroke-width="1.5" stroke-linecap="round" />
+                    <line class="close-line" x1="15" y1="9" x2="9" y2="15" stroke-width="1.5" stroke-linecap="round" />
                 </svg>
             </div>
         </div>
@@ -291,6 +248,12 @@
         box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
         display: none;
         z-index: 1;
+    }
+
+    /* Open hint message from bottom to top (inverted) */
+    .hint-div.inverted {
+        top: auto;
+        bottom: 0px;
     }
 
     /* Display hint box when open */

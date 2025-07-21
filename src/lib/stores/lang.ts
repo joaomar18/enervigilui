@@ -490,6 +490,106 @@ const textsObject: TextsObject = {
         PT: "Protocolo",
         EN: "Protocol",
     },
+    l1: {
+        PT: "L1",
+        EN: "L1",
+    },
+    l2: {
+        PT: "L2",
+        EN: "L2",
+    },
+    l3: {
+        PT: "L3",
+        EN: "L3",
+    },
+    singlephase: {
+        PT: "Monofásico",
+        EN: "Single-phase",
+    },
+    incrementalNode: {
+        PT: "Variável Incremental",
+        EN: "Incremental Variable",
+    },
+    positiveIncrement: {
+        PT: "Incremento Positivo",
+        EN: "Positive Increment",
+    },
+    calculateIncrement: {
+        PT: "Calcular Incremento",
+        EN: "Calculate Increment",
+    },
+    variableInfo: {
+        PT: "Selecione a variável que pretende medir ou monitorizar. Cada variável representa um tipo de dado elétrico, como tensão, corrente, potência, energia, etc.",
+        EN: "Select the variable you want to measure or monitor. Each variable represents a type of electrical data, such as voltage, current, power, energy, etc."
+    },
+    variableCustomInfo: {
+        PT: "Defina um nome personalizado para a variável. Use esta opção para variáveis que não se enquadram nas categorias pré-definidas.",
+        EN: "Set a custom name for the variable. Use this option for variables that do not fit into the predefined categories.",
+    },
+    unitInfo: {
+        PT: "Indique a unidade de medida associada à variável (por exemplo: V, A, kWh, %). Certifique-se de que a unidade corresponde ao tipo de dado selecionado.",
+        EN: "Specify the measurement unit associated with the variable (e.g., V, A, kWh, %). Make sure the unit matches the selected data type.",
+    },
+    unitCustomInfo: {
+        PT: "Indique a unidade de medida para esta variável personalizada (ex: rpm, %, m³, etc.).",
+        EN: "Specify the measurement unit for this custom variable (e.g., rpm, %, m³, etc.).",
+    },
+    nodespaceInfo: {
+        PT: "Indique o ID OPC UA utilizado para aceder à variável no dispositivo.",
+        EN: "Specify the OPC UA ID used to acess the variable on the device.",
+    },
+    registerInfo: {
+        PT: "Indique o registo modbus utilizado para aceder à variável no dispositivo.",
+        EN: "Specify the modbus register used to access the variable on the device.",
+    },
+    nocommInfo: {
+        PT: "Esta variável é virtual e não possui registo de comunicação ou identificador associado.",
+        EN: "This variable is virtual and does not have a communication register or identifier.",
+    },
+    typeInfo: {
+        PT: "Selecione o tipo de dado da variável: FLOAT (número decimal), INT (número inteiro), STRING (texto) ou BOOLEAN (verdadeiro/falso).",
+        EN: "Select the variable data type: FLOAT (decimal number), INT (integer number), STRING (text), or BOOLEAN (true/false).",
+    },
+    loggingInfo: {
+        PT: "Defina o período de registo (em minutos) para guardar periodicamente os dados desta variável. Ative ou desative o registo utilizando a caixa de seleção.",
+        EN: "Set the logging period (in minutes) to store this variable's data periodically. Enable or disable logging using the checkbox.",
+    },
+    minValueInfo: {
+        PT: "Defina o valor mínimo permitido para esta variável. O sistema irá sinalizar se o valor medido for inferior a este limite. Ative ou desative esta função utilizando a caixa de seleção.",
+        EN: "Set the minimum allowed value for this variable. The system will alert if the measured value falls below this limit. Enable or disable this function using the checkbox.",
+    },
+    maxValueInfo: {
+        PT: "Defina o valor máximo permitido para esta variável. O sistema irá sinalizar se o valor medido exceder este limite. Ative ou desative esta função utilizando a caixa de seleção.",
+        EN: "Set the maximum allowed value for this variable. The system will alert if the measured value exceeds this limit. Enable or disable this function using the checkbox.",
+    },
+    customInfo: {
+        PT: "Ative esta opção para definir a variável como personalizada (definida pelo utilizador) em vez de uma variável padrão do sistema.",
+        EN: "Enable this option to set the variable as custom (user-defined) instead of a system default variable.",
+    },
+    publishInfo: {
+        PT: "Ative esta opção para permitir que a variável seja acedida externamente (por outras aplicações ou sistemas).",
+        EN: "Enable this option to allow the variable to be accessed externally (by other applications or systems).",
+    },
+    virtualInfo: {
+        PT: "Esta opção indica que a variável é calculada internamente pelo sistema e não está disponível para variáveis personalizadas.",
+        EN: "This option indicates that the variable is calculated internally by the system and is not available for custom variables.",
+    },
+    incrementalNodeInfo: {
+        PT: "Esta opção indica que a variável é incremental, acumulando o seu valor ao longo do tempo. O valor acumulado é reiniciado a cada registo. Exemplo: variáveis de energia.",
+        EN: "This option indicates that the node is incremental, accumulating its value over time. The accumulated value resets on each logging. Example: energy nodes.",
+    },
+    positiveIncrementInfo: {
+        PT: "Quando ativado: acumulação = acumulação + novo valor. Quando desativado: acumulação = novo valor - valor inicial.",
+        EN: "If enabled: accumulation = accumulation + new value. If not: accumulation = new value - initial value.",
+    },
+    calculateIncrementInfo: {
+        PT: "Ative para calcular o incremento entre leituras. Se desativado, a variável não calcula a acumulação (será incremental, mas calculada externamente).",
+        EN: "Enable to calculate the increment between readings. If off, the variable will not calculate its own accumulation (it remains incremental, but is likely calculated externally).",
+    },
+    enabledInfo: {
+        PT: "Ative para que a variável seja gerida. Se desativada, a variável apenas existe na configuração e não é processada.",
+        EN: "Enable for the variable to be managed. If disabled, the variable only exists in the configuration and is not processed.",
+    }
 };
 
 //////////     D E V I C E     T E X T S     //////////

@@ -102,15 +102,17 @@
             oldCommunicationID = node.communicationID;
             node.communicationID = undefined;
             node.protocol = Protocol.NONE;
-        } else if (node.communicationID === undefined) {
-            node.communicationID = oldCommunicationID;
+        } else if (!node.config.calculated && node.communicationID === undefined) {
+            node.communicationID = oldCommunicationID ? oldCommunicationID : "";
             node.protocol = selectedProtocol;
         }
     }
 
-    $: if (selectedProtocol && selectedProtocol !== node.protocol) {
-        node.protocol = selectedProtocol;
-        node.communicationID = "";
+    $: if (selectedProtocol) {
+        if (selectedProtocol !== node.protocol && !node.config.calculated) {
+            node.protocol = selectedProtocol;
+            node.communicationID = "";
+        }
     }
 
     $: if (windowWidth) {
@@ -274,11 +276,6 @@
                     <InputField
                         disabled={node.config.calculated}
                         bind:inputValue={disabledCommIDString}
-                        onChange={() => {
-                            onPropertyChanged();
-                        }}
-                        inputInvalid={!validateCommunicationID(node.communicationID, node.protocol)}
-                        enableInputInvalid={true}
                         inputType="STRING"
                         width="90%"
                         height={rowHeight}
@@ -510,7 +507,7 @@
                     onChange={() => {
                         onPropertyChanged();
                     }}
-                    inputName="log-node"
+                    inputName="node-min-alarm"
                     width="1.5em"
                     height="1.5em"
                     checkMarkWidth={24}
@@ -531,7 +528,7 @@
                     onChange={() => {
                         onPropertyChanged();
                     }}
-                    inputName="log-node"
+                    inputName="node-max-alarm"
                     width="1.5em"
                     height="1.5em"
                     checkMarkWidth={24}

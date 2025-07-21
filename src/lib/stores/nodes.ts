@@ -55,7 +55,7 @@ export enum NodePhase {
     L3 = "L3",
     TOTAL = "Total",
     GENERAL = "General",
-    SINGLEPHASE = "1F"
+    SINGLEPHASE = "Singlephase"
 }
 
 /**
