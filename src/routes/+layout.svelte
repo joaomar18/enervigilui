@@ -610,6 +610,7 @@
         border-top-color: #fff;
         border-radius: 50%;
         animation: content-spin 1s linear infinite;
+        opacity: 0; /* Disable spinner between sub-pages */
     }
 
     /* Hide Section Content div */
