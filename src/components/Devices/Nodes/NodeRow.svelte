@@ -3,6 +3,7 @@
     import InputField from "../../General/InputField.svelte";
     import Checkbox from "../../General/Checkbox.svelte";
     import { validateNodeName, validateNodeUnit, validateCommunicationID, validateNodeType, validateVirtualNode } from "$lib/ts/nodes";
+    import { nodeNameChange } from "$lib/ts/nodes";
     import { getNodePrefix } from "$lib/stores/nodes";
     import { Protocol } from "$lib/stores/devices";
     import { NodeType, NodePhase } from "$lib/stores/nodes";
@@ -37,9 +38,13 @@
 
     let disabledUnit: boolean = false;
     let disabledCommIDString: string = "";
-    let strloggingPeriod: string = String(node.config.logging_period);
-    let strMinAlarm: string = String(node.config.min_alarm_value);
-    let strMaxAlarm: string = String(node.config.max_alarm_value);
+    let strloggingPeriod: string;
+    let strMinAlarm: string;
+    let strMaxAlarm: string;
+
+    $: strloggingPeriod = String(node.config.logging_period);
+    $: strMinAlarm = String(node.config.min_alarm_value);
+    $: strMaxAlarm = String(node.config.max_alarm_value);
 
     let rowHeight: string;
     let buttonSize: string;
@@ -59,15 +64,6 @@
     function handleOnConfig(): void {
         if (onConfig) {
             onConfig();
-        }
-    }
-
-    function nodeNameChange(): void {
-        const newName = getNodePrefix(nodePhase) + node.displayName;
-        node.name = newName;
-        if (!node.config.custom) {
-            const defaultNodeProps = Object.values($defaultVariables).find((v) => v.name === node.displayName);
-            node.config.unit = defaultNodeProps?.defaultUnit || "";
         }
     }
 
@@ -138,7 +134,7 @@
                         options={$variableNameTextsByPhase[nodePhase]}
                         bind:selectedOption={node.displayName}
                         onChange={() => {
-                            nodeNameChange();
+                            nodeNameChange(node, nodePhase);
                             onPropertyChanged();
                         }}
                         inputInvalid={!validateNodeName(node.displayName, node.config.custom, sectionNodes)}
@@ -331,7 +327,12 @@
         <td>
             <div class="cell-content">
                 <InputField
+                    disabled={!node.config.logging}
                     bind:inputValue={strloggingPeriod}
+                    onChange={() => {
+                        node.config.logging_period = Number(strloggingPeriod);
+                        onPropertyChanged();
+                    }}
                     inputType="POSITIVE_INT"
                     minValue={1}
                     maxValue={1440}
@@ -365,6 +366,10 @@
                 <InputField
                     disabled={(node.config.type !== NodeType.FLOAT && node.config.type !== NodeType.INT) || !node.config.min_alarm}
                     bind:inputValue={strMinAlarm}
+                    onChange={() => {
+                        node.config.min_alarm_value = Number(strMinAlarm);
+                        onPropertyChanged();
+                    }}
                     inputType={node.config.type}
                     inputUnit={node.config.unit}
                     width="90%"
@@ -390,6 +395,10 @@
                 <InputField
                     disabled={(node.config.type !== NodeType.FLOAT && node.config.type !== NodeType.INT) || !node.config.max_alarm}
                     bind:inputValue={strMaxAlarm}
+                    onChange={() => {
+                        node.config.max_alarm_value = Number(strMaxAlarm);
+                        onPropertyChanged();
+                    }}
                     inputType={node.config.type}
                     inputUnit={node.config.unit}
                     width="90%"

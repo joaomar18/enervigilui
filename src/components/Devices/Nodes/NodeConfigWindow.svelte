@@ -9,6 +9,7 @@
     import { Protocol } from "$lib/stores/devices";
     import ModalWindow from "../../General/ModalWindow.svelte";
     import { getNodePrefix } from "$lib/stores/nodes";
+    import { nodeNameChange } from "$lib/ts/nodes";
     import { validateNodeName, validateNodeUnit, validateCommunicationID, validateNodeType, validateVirtualNode } from "$lib/ts/nodes";
     import { showAlert } from "$lib/stores/alerts";
 
@@ -37,9 +38,14 @@
 
     let disabledUnit: boolean = false;
     let disabledCommIDString: string = "";
-    let strloggingPeriod: string = String(node.config.logging_period);
-    let strMinAlarm: string = String(node.config.min_alarm_value);
-    let strMaxAlarm: string = String(node.config.max_alarm_value);
+    let strloggingPeriod: string;
+    let strMinAlarm: string;
+    let strMaxAlarm: string;
+
+    $: strloggingPeriod = String(node.config.logging_period);
+    $: strMinAlarm = String(node.config.min_alarm_value);
+    $: strMaxAlarm = String(node.config.max_alarm_value);
+    $: sectionName = $texts[section.toLowerCase()];
 
     $: if (node) {
         if (node.config.custom) {
@@ -54,21 +60,10 @@
         }
     }
 
-    $: sectionName = $texts[section.toLowerCase()];
-
     // Export Funcions
     export let onPropertyChanged: () => void;
 
     // Functions
-    function nodeNameChange(): void {
-        const newName = getNodePrefix(section) + node.displayName;
-        node.name = newName;
-        if (!node.config.custom) {
-            const defaultNodeProps = Object.values($defaultVariables).find((v) => v.name === node.displayName);
-            node.config.unit = defaultNodeProps?.defaultUnit || "";
-        }
-    }
-
     function nodeTypeChange(): void {
         if (!node.config.custom && oldVariableType !== node.config.type) {
             if (node.config.type === NodeType.FLOAT || node.config.type === NodeType.INT) {
@@ -150,7 +145,7 @@
                                 options={$variableNameTextsByPhase[section]}
                                 bind:selectedOption={node.displayName}
                                 onChange={() => {
-                                    nodeNameChange();
+                                    nodeNameChange(node, section);
                                     onPropertyChanged();
                                 }}
                                 inputInvalid={!validateNodeName(node.displayName, node.config.custom, sectionNodes)}
@@ -466,7 +461,12 @@
                 <span class="row-input">
                     <span class="row-entry">
                         <InputField
+                            disabled={!node.config.logging}
                             bind:inputValue={strloggingPeriod}
+                            onChange={() => {
+                                node.config.logging_period = Number(strloggingPeriod);
+                                onPropertyChanged();
+                            }}
                             inputType="POSITIVE_INT"
                             minValue={1}
                             maxValue={1440}
@@ -539,6 +539,10 @@
                         <InputField
                             disabled={(node.config.type !== NodeType.FLOAT && node.config.type !== NodeType.INT) || !node.config.min_alarm}
                             bind:inputValue={strMinAlarm}
+                            onChange={() => {
+                                node.config.min_alarm_value = Number(strMinAlarm);
+                                onPropertyChanged();
+                            }}
                             inputType={node.config.type}
                             inputUnit={node.config.unit}
                             width="100%"
@@ -603,6 +607,10 @@
                         <InputField
                             disabled={(node.config.type !== NodeType.FLOAT && node.config.type !== NodeType.INT) || !node.config.max_alarm}
                             bind:inputValue={strMaxAlarm}
+                            onChange={() => {
+                                node.config.max_alarm_value = Number(strMaxAlarm);
+                                onPropertyChanged();
+                            }}
                             inputType={node.config.type}
                             inputUnit={node.config.unit}
                             width="100%"

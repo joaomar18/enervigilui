@@ -4,8 +4,8 @@ import { NodeType } from "$lib/stores/nodes";
 import { defaultVariables } from "$lib/stores/nodes";
 import { defaultVariableNames } from "$lib/stores/nodes";
 import { defaultVariableUnits } from "$lib/stores/nodes";
+import { getNodePrefix } from "$lib/stores/nodes";
 import type { FormattedNode, NodePhase } from "$lib/stores/nodes";
-import type { MeterOptions } from "$lib/stores/devices";
 
 /**
  * Validates a node name based on whether it is a custom variable or a default variable.
@@ -172,7 +172,6 @@ export function validateNodeType(type: NodeType, name: string, custom: boolean):
     }
 }
 
-
 /**
  * Validates if a node can potentially be virtual based on basic criteria.
  * 
@@ -216,4 +215,24 @@ export function validateVirtualNode(name: string, custom: boolean): boolean {
         }
     }
     return false;
+}
+
+/**
+ * Handles nodes in case of a detected node name change.
+ *
+ * Updates the node's name and unit based on the selected section (phase) and whether it is a custom or default variable.
+ * - Sets the node's name by prefixing the displayName with the section prefix.
+ * - If the node is a default variable (not custom), updates its unit to the default unit for that variable.
+ *
+ * @param node - The node object to update (FormattedNode)
+ * @param phase - The phase to use for the name prefix (NodePhase)
+ */
+export function nodeNameChange(node: FormattedNode, phase: NodePhase): void {
+    const newName = getNodePrefix(phase) + node.displayName;
+    const currentDefaultVariables = get(defaultVariables);
+    node.name = newName;
+    if (!node.config.custom) {
+        const defaultNodeProps = Object.values(currentDefaultVariables).find((v) => v.name === node.displayName);
+        node.config.unit = defaultNodeProps?.defaultUnit || "";
+    }
 }
