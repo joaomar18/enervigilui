@@ -6,16 +6,6 @@
     import { navigateTo } from "$lib/ts/navigation";
     import { fade } from "svelte/transition";
     import { browser } from "$app/environment";
-
-    // Stores for multi-language support
-    import { selectedLang, texts } from "$lib/stores/lang";
-
-    // Stores for alerts
-    import { displayAlert, alertText, alertTimeout } from "$lib/stores/alerts";
-
-    // Authorization stores
-    import { splashDone, loadedDone, leftPanelOpen } from "$lib/stores/navigation";
-
     import LeftPanel from "../components/Dashboard/LeftPanel.svelte";
     import Logo from "../components/General/Logo.svelte";
     import MenuButton from "../components/General/MenuButton.svelte";
@@ -24,6 +14,15 @@
     import SearchBar from "../components/Dashboard/SearchBar.svelte";
     import Action from "../components/General/Action.svelte";
     import Alert from "../components/General/Alert.svelte";
+
+    // Stores for multi-language support
+    import { selectedLang, texts } from "$lib/stores/lang";
+
+    // Stores for alerts
+    import { displayAlert, alertText, alertTimeout } from "$lib/stores/alerts";
+
+    // Authorization stores
+    import { splashDone, loadedDone, showSubLoader, leftPanelOpen } from "$lib/stores/navigation";
 
     //Variables
     let shouldRedirect: boolean = false;
@@ -66,25 +65,21 @@
 
     //Function to wait for authentication while showing an initial loader screen with minimum display time
     async function waitInitialSplash(minSplashDuration: number): Promise<void> {
-        await checkAuthentication();
+        const authPromise = checkAuthentication();
+        const timerPromise = new Promise((res) => setTimeout(res, minSplashDuration));
+
+        await Promise.all([authPromise, timerPromise]);
 
         if (shouldRedirect && redirectTarget) {
             await navigateTo(redirectTarget, $selectedLang);
         }
-
-        await new Promise((res) => setTimeout(res, minSplashDuration));
 
         splashDone.set(true);
     }
 
     //Function to handle clicks outside header element
     function handleClickOutsideHeader(event: MouseEvent): void {
-        if (
-            leftHeaderEl &&
-            headerEl &&
-            !leftHeaderEl.contains(event.target as Node) &&
-            !headerEl.contains(event.target as Node)
-        ) {
+        if (leftHeaderEl && headerEl && !leftHeaderEl.contains(event.target as Node) && !headerEl.contains(event.target as Node)) {
             mobileSearchOpen = false;
         }
     }
@@ -159,11 +154,7 @@
         <LeftPanel bind:leftPanelOpen={$leftPanelOpen} activeSection={page.url.pathname} />
         <div class="left-header-div" bind:this={leftHeaderEl}>
             <div class="menu-button-div" class:close={mobileSearchOpen}>
-                <MenuButton
-                    backgroundColor="transparent"
-                    hoverColor="#323a45"
-                    bind:menuOpen={$leftPanelOpen}
-                />
+                <MenuButton backgroundColor="transparent" hoverColor="#323a45" bind:menuOpen={$leftPanelOpen} />
             </div>
             <div class="close-mobile-search-div" class:open={mobileSearchOpen}>
                 <Action
@@ -255,11 +246,7 @@
             </div>
         </div>
         <main class="content" class:open={$leftPanelOpen}>
-            <div
-                class="alerts-div"
-                class:prioritize={$displayAlert}
-                class:sidebar-open={$leftPanelOpen}
-            >
+            <div class="alerts-div" class:prioritize={$displayAlert} class:sidebar-open={$leftPanelOpen}>
                 {#if $displayAlert}
                     <Alert
                         bottomPos="0px"
@@ -281,7 +268,7 @@
                 <div class="content-div">
                     <div class="loader-div">
                         <div class="loader-div-wrapper" class:close={$loadedDone}>
-                            <div class="spinner"></div>
+                            <div class="spinner" class:show={$showSubLoader}></div>
                         </div>
                     </div>
                     <div class="section-content-div" class:hide={!$loadedDone}>
@@ -610,7 +597,12 @@
         border-top-color: #fff;
         border-radius: 50%;
         animation: content-spin 1s linear infinite;
-        opacity: 0; /* Disable spinner between sub-pages */
+        opacity: 0;
+    }
+
+    /* Spinner: show loader when page takes too long to load */
+    .dashboard-container .container-div .content-div .loader-div .loader-div-wrapper .spinner.show {
+        opacity: 1;
     }
 
     /* Hide Section Content div */
