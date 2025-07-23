@@ -133,10 +133,10 @@
 </script>
 
 <!--
-  InputField component
+InputField component
 
-  A flexible input field with customizable size, colors, and info text.
-  Applies special styling when focused.
+A flexible input field with customizable size, colors, and info text.
+Applies special styling when focused.
 -->
 <div
     style="
