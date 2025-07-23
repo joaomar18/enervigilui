@@ -3,25 +3,23 @@
     import InputField from "../../General/InputField.svelte";
     import Checkbox from "../../General/Checkbox.svelte";
     import { validateNodeName, validateNodeUnit, validateCommunicationID, validateNodeType, validateVirtualNode } from "$lib/ts/nodes";
-    import { nodeNameChange } from "$lib/ts/nodes";
-    import { getNodePrefix } from "$lib/stores/nodes";
-    import { Protocol } from "$lib/stores/devices";
-    import { NodeType, NodePhase } from "$lib/stores/nodes";
-    import { defaultVariables, defaultVariableUnits } from "$lib/stores/nodes";
+    import { nodeNameChange, nodeTypeChange, customNodeChange, virtualNodeChange } from "$lib/ts/nodes";
+    import { NodeType } from "$lib/stores/nodes";
+    import { defaultVariableUnits } from "$lib/stores/nodes";
     import { showAlert } from "$lib/stores/alerts";
 
     // Types
-    import type { FormattedNode } from "$lib/stores/nodes";
+    import type { EditableDeviceMeter } from "$lib/stores/devices";
+    import type { EditableDeviceNode, NodeEditState } from "$lib/stores/nodes";
     import type { ColumnVisibilityMap } from "$lib/ts/nodes_gid";
 
     // Stores for multi-language support
     import { texts, variableNameTextsByPhase } from "$lib/stores/lang";
 
     // Props
-    export let sectionNodes: Array<FormattedNode>;
-    export let selectedProtocol: Protocol;
-    export let nodePhase: NodePhase;
-    export let node: FormattedNode;
+    export let sectionNodes: Array<EditableDeviceNode>;
+    export let deviceData: EditableDeviceMeter;
+    export let node: EditableDeviceNode;
 
     // Layout / styling props
     export let windowWidth: number;
@@ -31,20 +29,12 @@
     export let disabledBackgroundColor: string = backgroundColor;
 
     // Variables
-    let oldVariableName: string = node.displayName;
-    let oldVariableUnit: string = node.config.unit;
-    let oldVariableType: NodeType = node.config.type;
-    let oldCommunicationID: string | undefined = node.communicationID;
-
-    let disabledUnit: boolean = false;
-    let disabledCommIDString: string = "";
-    let strloggingPeriod: string;
-    let strMinAlarm: string;
-    let strMaxAlarm: string;
-
-    $: strloggingPeriod = String(node.config.logging_period);
-    $: strMinAlarm = String(node.config.min_alarm_value);
-    $: strMaxAlarm = String(node.config.max_alarm_value);
+    let nodeEditingState: NodeEditState = {
+        oldVariableName: node.display_name,
+        oldVariableType: node.config.type,
+        oldVariableUnit: node.config.unit,
+        oldCommunicationID: node.communication_id,
+    };
 
     let rowHeight: string;
     let buttonSize: string;
@@ -52,7 +42,7 @@
     // Export Funcions
     export let onPropertyChanged: () => void;
     export let onDelete: () => void;
-    export let onConfig: () => void;
+    export let onConfig: (nodeEditingState: NodeEditState) => void;
 
     // Functions
     function handleOnDelete(): void {
@@ -63,51 +53,7 @@
 
     function handleOnConfig(): void {
         if (onConfig) {
-            onConfig();
-        }
-    }
-
-    function nodeTypeChange(): void {
-        if (!node.config.custom && oldVariableType !== node.config.type) {
-            if (node.config.type === NodeType.FLOAT || node.config.type === NodeType.INT) {
-                const defaultNodeProps = Object.values($defaultVariables).find((v) => v.name === node.displayName);
-                node.config.unit = defaultNodeProps?.defaultUnit || "";
-                disabledUnit = false;
-            } else if (node.config.type === NodeType.STRING || node.config.type === NodeType.BOOLEAN) {
-                node.config.unit = "";
-                disabledUnit = true;
-            }
-            oldVariableType = node.config.type;
-        }
-    }
-
-    function customNodeChange(): void {
-        if (node.config.custom) {
-            oldVariableName = node.displayName;
-            oldVariableUnit = node.config.unit;
-            node.displayName = "";
-            node.config.unit = "";
-        } else {
-            node.displayName = oldVariableName;
-            node.config.unit = oldVariableUnit;
-        }
-    }
-
-    function virtualNodeChange(): void {
-        if (node.config.calculated && node.communicationID !== undefined) {
-            oldCommunicationID = node.communicationID;
-            node.communicationID = undefined;
-            node.protocol = Protocol.NONE;
-        } else if (!node.config.calculated && node.communicationID === undefined) {
-            node.communicationID = oldCommunicationID ? oldCommunicationID : "";
-            node.protocol = selectedProtocol;
-        }
-    }
-
-    $: if (selectedProtocol) {
-        if (selectedProtocol !== node.protocol && !node.config.calculated) {
-            node.protocol = selectedProtocol;
-            node.communicationID = "";
+            onConfig(nodeEditingState);
         }
     }
 
@@ -117,6 +63,9 @@
     }
 </script>
 
+<!-- NodeRow Component: renders a table row for a device node, displaying editable fields for 
+name, unit, communication ID, type, alarms, and options. Includes checkboxes for node 
+properties and action buttons for configuration and deletion. -->
 <tr
     style="
         --background-color: {backgroundColor};
@@ -131,13 +80,13 @@
                 {#if !node.config.custom}
                     <Selector
                         useLang={true}
-                        options={$variableNameTextsByPhase[nodePhase]}
-                        bind:selectedOption={node.displayName}
+                        options={$variableNameTextsByPhase[node.phase]}
+                        bind:selectedOption={node.display_name}
                         onChange={() => {
-                            nodeNameChange(node, nodePhase);
+                            nodeNameChange(node, node.phase);
                             onPropertyChanged();
                         }}
-                        inputInvalid={!validateNodeName(node.displayName, node.config.custom, sectionNodes)}
+                        inputInvalid={!validateNodeName(node.display_name, node.config.custom, sectionNodes)}
                         enableInputInvalid={true}
                         scrollable={true}
                         maxOptions={5}
@@ -158,11 +107,11 @@
                     />
                 {:else}
                     <InputField
-                        bind:inputValue={node.displayName}
+                        bind:inputValue={node.display_name}
                         onChange={() => {
                             onPropertyChanged();
                         }}
-                        inputInvalid={!validateNodeName(node.displayName, node.config.custom, sectionNodes)}
+                        inputInvalid={!validateNodeName(node.display_name, node.config.custom, sectionNodes)}
                         enableInputInvalid={true}
                         inputType="STRING"
                         width="90%"
@@ -188,13 +137,13 @@
             <div class="cell-content">
                 {#if !node.config.custom}
                     <Selector
-                        options={Object.fromEntries($defaultVariableUnits[node.displayName]?.map((unit) => [unit, unit]) || [])}
+                        options={Object.fromEntries($defaultVariableUnits[node.display_name]?.map((unit) => [unit, unit]) || [])}
                         bind:selectedOption={node.config.unit}
                         onChange={() => {
                             onPropertyChanged();
                         }}
-                        disabled={disabledUnit}
-                        inputInvalid={!validateNodeUnit(node.displayName, node.config.type, node.config.unit, node.config.custom)}
+                        disabled={node.config.type === NodeType.STRING || node.config.type === NodeType.BOOLEAN}
+                        inputInvalid={!validateNodeUnit(node.display_name, node.config.type, node.config.unit, node.config.custom)}
                         enableInputInvalid={true}
                         scrollable={true}
                         maxOptions={5}
@@ -219,8 +168,8 @@
                         onChange={() => {
                             onPropertyChanged();
                         }}
-                        disabled={disabledUnit}
-                        inputInvalid={!validateNodeUnit(node.displayName, node.config.type, node.config.unit, node.config.custom)}
+                        disabled={node.config.type === NodeType.STRING || node.config.type === NodeType.BOOLEAN}
+                        inputInvalid={!validateNodeUnit(node.display_name, node.config.type, node.config.unit, node.config.custom)}
                         enableInputInvalid={true}
                         inputType="STRING"
                         width="90%"
@@ -244,50 +193,29 @@
     {#if columnVisibility.communicationID.visible}
         <td>
             <div class="cell-content">
-                {#if node.communicationID !== undefined}
-                    <InputField
-                        disabled={node.config.calculated}
-                        bind:inputValue={node.communicationID}
-                        onChange={() => {
-                            onPropertyChanged();
-                        }}
-                        inputInvalid={!validateCommunicationID(node.communicationID, node.protocol)}
-                        enableInputInvalid={true}
-                        inputType="STRING"
-                        width="90%"
-                        height={rowHeight}
-                        borderRadius="5px"
-                        backgroundColor="#1a2027"
-                        disabledBackgroundColor="#42505f"
-                        selectedBackgroundColor="#1a2027"
-                        selectedBorderColor="#2F80ED"
-                        badFormatBorderColor="#e74c3c"
-                        fontSize="0.9rem"
-                        fontColor="#f5f5f5"
-                        fontWeight="400"
-                        textAlign="center"
-                        unitTextColor="rgb(170,170,170)"
-                    />
-                {:else}
-                    <InputField
-                        disabled={node.config.calculated}
-                        bind:inputValue={disabledCommIDString}
-                        inputType="STRING"
-                        width="90%"
-                        height={rowHeight}
-                        borderRadius="5px"
-                        backgroundColor="#1a2027"
-                        disabledBackgroundColor="#42505f"
-                        selectedBackgroundColor="#1a2027"
-                        selectedBorderColor="#2F80ED"
-                        badFormatBorderColor="#e74c3c"
-                        fontSize="0.9rem"
-                        fontColor="#f5f5f5"
-                        fontWeight="400"
-                        textAlign="center"
-                        unitTextColor="rgb(170,170,170)"
-                    />
-                {/if}
+                <InputField
+                    disabled={node.config.calculated}
+                    bind:inputValue={node.communication_id}
+                    onChange={() => {
+                        onPropertyChanged();
+                    }}
+                    inputInvalid={!validateCommunicationID(node.communication_id, node.protocol)}
+                    enableInputInvalid={true}
+                    inputType="STRING"
+                    width="90%"
+                    height={rowHeight}
+                    borderRadius="5px"
+                    backgroundColor="#1a2027"
+                    disabledBackgroundColor="#42505f"
+                    selectedBackgroundColor="#1a2027"
+                    selectedBorderColor="#2F80ED"
+                    badFormatBorderColor="#e74c3c"
+                    fontSize="0.9rem"
+                    fontColor="#f5f5f5"
+                    fontWeight="400"
+                    textAlign="center"
+                    unitTextColor="rgb(170,170,170)"
+                />
             </div>
         </td>
     {/if}
@@ -298,10 +226,10 @@
                     options={Object.fromEntries(Object.entries(NodeType).map(([key, value]) => [value, value]))}
                     bind:selectedOption={node.config.type}
                     onChange={() => {
-                        nodeTypeChange();
+                        nodeTypeChange(node, nodeEditingState);
                         onPropertyChanged();
                     }}
-                    inputInvalid={!validateNodeType(node.config.type, node.displayName, node.config.custom)}
+                    inputInvalid={!validateNodeType(node.config.type, node.display_name, node.config.custom)}
                     enableInputInvalid={true}
                     scrollable={true}
                     maxOptions={5}
@@ -328,9 +256,8 @@
             <div class="cell-content">
                 <InputField
                     disabled={!node.config.logging}
-                    bind:inputValue={strloggingPeriod}
+                    bind:inputValue={node.config.logging_period}
                     onChange={() => {
-                        node.config.logging_period = Number(strloggingPeriod);
                         onPropertyChanged();
                     }}
                     inputType="POSITIVE_INT"
@@ -365,9 +292,8 @@
             <div class="cell-content">
                 <InputField
                     disabled={(node.config.type !== NodeType.FLOAT && node.config.type !== NodeType.INT) || !node.config.min_alarm}
-                    bind:inputValue={strMinAlarm}
+                    bind:inputValue={node.config.min_alarm_value}
                     onChange={() => {
-                        node.config.min_alarm_value = Number(strMinAlarm);
                         onPropertyChanged();
                     }}
                     inputType={node.config.type}
@@ -394,9 +320,8 @@
             <div class="cell-content">
                 <InputField
                     disabled={(node.config.type !== NodeType.FLOAT && node.config.type !== NodeType.INT) || !node.config.max_alarm}
-                    bind:inputValue={strMaxAlarm}
+                    bind:inputValue={node.config.max_alarm_value}
                     onChange={() => {
-                        node.config.max_alarm_value = Number(strMaxAlarm);
                         onPropertyChanged();
                     }}
                     inputType={node.config.type}
@@ -424,7 +349,7 @@
                 <Checkbox
                     bind:checked={node.config.custom}
                     onChange={() => {
-                        customNodeChange();
+                        customNodeChange(node, nodeEditingState, node.phase);
                         onPropertyChanged();
                     }}
                     inputName="custom-node"
@@ -467,10 +392,10 @@
                 <Checkbox
                     bind:checked={node.config.calculated}
                     onChange={() => {
-                        virtualNodeChange();
+                        virtualNodeChange(node, nodeEditingState, deviceData.protocol);
                         onPropertyChanged();
                     }}
-                    inputInvalid={!validateVirtualNode(node.displayName, node.config.custom)}
+                    inputInvalid={!validateVirtualNode(node.display_name, node.config.custom)}
                     enableInputInvalid={true}
                     inputName="virtual-node"
                     width="1.5em"
@@ -596,14 +521,17 @@
 </tr>
 
 <style>
+    /* Table row for editable node */
     tr.edit-node {
         background-color: var(--background-color);
     }
 
+    /* Disabled node row styling */
     tr.edit-node.disabled {
         background-color: var(--disabled-background-color);
     }
 
+    /* Table cell styling for node fields */
     tr td {
         height: 40px;
         padding: 5px;
@@ -611,6 +539,7 @@
         padding-right: 0px;
     }
 
+    /* Content container for each cell */
     tr td .cell-content {
         width: 100%;
         height: 100%;
@@ -621,32 +550,39 @@
         margin: 0;
     }
 
+    /* Adds gap between action buttons */
     tr td .cell-content.gap-items {
         gap: 15px;
     }
 
+    /* Button base styling for actions */
     button {
         background-color: transparent;
         cursor: pointer;
         border: none;
     }
 
+    /* Delete button icon color */
     .btn-delete svg {
         fill: rgb(192, 192, 192);
     }
 
+    /* Delete button icon color on hover */
     .btn-delete:hover svg {
         fill: #e74c3c;
     }
 
+    /* More options button icon color */
     .btn-more-options svg {
         fill: rgb(192, 192, 192);
     }
 
+    /* More options button icon color on hover */
     .btn-more-options:hover svg {
         fill: #2f80ed;
     }
 
+    /* Responsive: reduce row height on wide screens */
     @media (min-width: 880px) {
         tr td {
             height: 30px;

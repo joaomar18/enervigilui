@@ -3,18 +3,19 @@
     import InputField from "../../General/InputField.svelte";
     import Checkbox from "../../General/Checkbox.svelte";
     import Selector from "../../General/Selector.svelte";
-    import type { EditableDeviceMeter } from "$lib/stores/devices";
-    import type { FormattedNode, NodePhase } from "$lib/stores/nodes";
     import { NodeType } from "$lib/stores/nodes";
     import { Protocol } from "$lib/stores/devices";
     import ModalWindow from "../../General/ModalWindow.svelte";
-    import { getNodePrefix } from "$lib/stores/nodes";
-    import { nodeNameChange } from "$lib/ts/nodes";
+    import { nodeNameChange, nodeTypeChange, customNodeChange, virtualNodeChange } from "$lib/ts/nodes";
     import { validateNodeName, validateNodeUnit, validateCommunicationID, validateNodeType, validateVirtualNode } from "$lib/ts/nodes";
     import { showAlert } from "$lib/stores/alerts";
 
+    // Types
+    import type { EditableDeviceMeter } from "$lib/stores/devices";
+    import type { EditableDeviceNode, NodeEditState } from "$lib/stores/nodes";
+
     // Stores for variable definitions
-    import { defaultVariables, defaultVariableUnits } from "$lib/stores/nodes";
+    import { defaultVariableUnits } from "$lib/stores/nodes";
 
     // Stores for multi-language support
     import { texts, variableNameTextsByPhase, selectedLang } from "$lib/stores/lang";
@@ -22,86 +23,17 @@
     // Props
     export let visible: boolean;
     export let deviceData: EditableDeviceMeter;
-    export let node: FormattedNode;
-    export let section: NodePhase;
-    export let sectionNodes: Array<FormattedNode>;
-
-    // Variables
-    let langVariableName: Record<string, string>;
-    let variableName: string;
-    let sectionName: Record<string, string>;
-
-    let oldVariableName: string = node.displayName;
-    let oldVariableUnit: string = node.config.unit;
-    let oldVariableType: NodeType = node.config.type;
-    let oldCommunicationID: string | undefined = node.communicationID;
-
-    let disabledUnit: boolean = false;
-    let disabledCommIDString: string = "";
-    let strloggingPeriod: string;
-    let strMinAlarm: string;
-    let strMaxAlarm: string;
-
-    $: strloggingPeriod = String(node.config.logging_period);
-    $: strMinAlarm = String(node.config.min_alarm_value);
-    $: strMaxAlarm = String(node.config.max_alarm_value);
-    $: sectionName = $texts[section.toLowerCase()];
-
-    $: if (node) {
-        if (node.config.custom) {
-            variableName = node.displayName;
-        } else {
-            const defaultVariable = Object.values($defaultVariables).filter((variable) => variable.name === node.displayName);
-            if (defaultVariable) {
-                langVariableName = $variableNameTextsByPhase[section][node.displayName];
-            } else {
-                langVariableName = $texts.notFound;
-            }
-        }
-    }
+    export let node: EditableDeviceNode;
+    export let nodeEditingState: NodeEditState;
+    export let sectionNodes: Array<EditableDeviceNode>;
 
     // Export Funcions
     export let onPropertyChanged: () => void;
-
-    // Functions
-    function nodeTypeChange(): void {
-        if (!node.config.custom && oldVariableType !== node.config.type) {
-            if (node.config.type === NodeType.FLOAT || node.config.type === NodeType.INT) {
-                const defaultNodeProps = Object.values($defaultVariables).find((v) => v.name === node.displayName);
-                node.config.unit = defaultNodeProps?.defaultUnit || "";
-                disabledUnit = false;
-            } else if (node.config.type === NodeType.STRING || node.config.type === NodeType.BOOLEAN) {
-                node.config.unit = "";
-                disabledUnit = true;
-            }
-            oldVariableType = node.config.type;
-        }
-    }
-
-    function customNodeChange(): void {
-        if (node.config.custom) {
-            oldVariableName = node.displayName;
-            oldVariableUnit = node.config.unit;
-            node.displayName = "";
-            node.config.unit = "";
-        } else {
-            node.displayName = oldVariableName;
-            node.config.unit = oldVariableUnit;
-        }
-    }
-
-    function virtualNodeChange(): void {
-        if (node.config.calculated && node.communicationID !== undefined) {
-            oldCommunicationID = node.communicationID;
-            node.communicationID = undefined;
-            node.protocol = Protocol.NONE;
-        } else if (!node.config.calculated && node.communicationID === undefined) {
-            node.communicationID = oldCommunicationID ? oldCommunicationID : "";
-            node.protocol = deviceData.protocol;
-        }
-    }
 </script>
 
+<!-- NodeConfigWindow Component: renders a modal window for editing a device node's configuration, including 
+variable name, unit, communication ID, type, logging, alarms, and advanced options. 
+Displays contextual hints and supports multi-language labels for all fields. -->
 <ModalWindow
     customTitle={true}
     width="100%"
@@ -119,14 +51,18 @@
         <span class="header-section">
             <span class="main-text">{`${$texts.variable[$selectedLang]}:`}</span>
             {#if !node.config.custom}
-                <span class="sub-text">{langVariableName[$selectedLang]}</span>
+                <span class="sub-text">
+                    {#if node.display_name !== "" && node.display_name !== undefined}
+                        {$variableNameTextsByPhase[node.phase][node.display_name][$selectedLang] || $texts.notFound[$selectedLang]}
+                    {/if}
+                </span>
             {:else}
-                <span class="sub-text">{variableName}</span>
+                <span class="sub-text">{node.display_name}</span>
             {/if}
         </span>
         <span class="header-section">
             <span class="main-text">{`${$texts.section[$selectedLang]}:`}</span>
-            <span class="sub-text">{sectionName[$selectedLang]}</span>
+            <span class="sub-text">{$texts[node.phase.toLocaleLowerCase()][$selectedLang]}</span>
         </span>
         <span class="header-section">
             <span class="main-text">{`${$texts.protocol[$selectedLang]}:`}</span>
@@ -142,13 +78,13 @@
                         {#if !node.config.custom}
                             <Selector
                                 useLang={true}
-                                options={$variableNameTextsByPhase[section]}
-                                bind:selectedOption={node.displayName}
+                                options={$variableNameTextsByPhase[node.phase]}
+                                bind:selectedOption={node.display_name}
                                 onChange={() => {
-                                    nodeNameChange(node, section);
+                                    nodeNameChange(node, node.phase);
                                     onPropertyChanged();
                                 }}
-                                inputInvalid={!validateNodeName(node.displayName, node.config.custom, sectionNodes)}
+                                inputInvalid={!validateNodeName(node.display_name, node.config.custom, sectionNodes)}
                                 enableInputInvalid={true}
                                 scrollable={true}
                                 maxOptions={5}
@@ -169,11 +105,11 @@
                             />
                         {:else}
                             <InputField
-                                bind:inputValue={node.displayName}
+                                bind:inputValue={node.display_name}
                                 onChange={() => {
                                     onPropertyChanged();
                                 }}
-                                inputInvalid={!validateNodeName(node.displayName, node.config.custom, sectionNodes)}
+                                inputInvalid={!validateNodeName(node.display_name, node.config.custom, sectionNodes)}
                                 enableInputInvalid={true}
                                 inputType="STRING"
                                 width="100%"
@@ -230,13 +166,13 @@
                     <span class="row-entry">
                         {#if !node.config.custom}
                             <Selector
-                                options={Object.fromEntries($defaultVariableUnits[node.displayName]?.map((unit) => [unit, unit]) || [])}
+                                options={Object.fromEntries($defaultVariableUnits[node.display_name]?.map((unit) => [unit, unit]) || [])}
                                 bind:selectedOption={node.config.unit}
                                 onChange={() => {
                                     onPropertyChanged();
                                 }}
-                                disabled={disabledUnit}
-                                inputInvalid={!validateNodeUnit(node.displayName, node.config.type, node.config.unit, node.config.custom)}
+                                disabled={node.config.type === NodeType.STRING || node.config.type === NodeType.BOOLEAN}
+                                inputInvalid={!validateNodeUnit(node.display_name, node.config.type, node.config.unit, node.config.custom)}
                                 enableInputInvalid={true}
                                 scrollable={true}
                                 maxOptions={5}
@@ -257,11 +193,12 @@
                             />
                         {:else}
                             <InputField
-                                bind:inputValue={node.displayName}
+                                bind:inputValue={node.config.unit}
                                 onChange={() => {
                                     onPropertyChanged();
                                 }}
-                                inputInvalid={!validateNodeName(node.displayName, node.config.custom, sectionNodes)}
+                                disabled={node.config.type === NodeType.STRING || node.config.type === NodeType.BOOLEAN}
+                                inputInvalid={!validateNodeUnit(node.display_name, node.config.type, node.config.unit, node.config.custom)}
                                 enableInputInvalid={true}
                                 inputType="STRING"
                                 width="100%"
@@ -313,6 +250,66 @@
 
         <div class="row">
             <span class="row-variable">
+                <span class="row-identifier">{$texts.decimalPlaces[$selectedLang]}</span>
+                <span class="row-input">
+                    <span class="row-entry">
+                        <InputField
+                            bind:inputValue={node.config.decimal_places}
+                            onChange={() => {
+                                onPropertyChanged();
+                            }}
+                            enableInputInvalid={true}
+                            inputType="POSITIVE_INT"
+                            minValue={0}
+                            maxValue={6}
+                            limitsPassed={() => {
+                                showAlert($texts.decimalPlacesError, {
+                                    minValue: 0,
+                                    maxValue: 6,
+                                });
+                            }}
+                            width="100%"
+                            height="40px"
+                            borderRadius="5px"
+                            backgroundColor="#1a2027"
+                            disabledBackgroundColor="#42505f"
+                            selectedBackgroundColor="#1a2027"
+                            selectedBorderColor="#2F80ED"
+                            badFormatBorderColor="#e74c3c"
+                            fontSize="0.9rem"
+                            fontColor="#f5f5f5"
+                            fontWeight="400"
+                            textAlign="center"
+                            unitTextColor="rgb(170,170,170)"
+                        />
+                    </span>
+                    <span class="row-hint">
+                        <HintInfo
+                            labelText=""
+                            hintWidth="250px"
+                            hintHeight="fit-content"
+                            hintBackgroundColor="#1e242b"
+                            hintBorderColor="#2c343d"
+                            hintBorderRadius="10px"
+                            textColor="#f5f5f5"
+                            openBackgroundColor="rgba(255, 255, 255, 0.05)"
+                            openHoverBackgroundColor="rgba(255, 255, 255, 0.1)"
+                            openStrokeColor="#cccccc"
+                            openHoverStrokeColor="#eeeeee"
+                            closeBackgroundColor="rgba(255, 255, 255, 0.1)"
+                            closeHoverBackgroundColor="rgba(255, 255, 255, 0.2)"
+                            closeStrokeColor="white"
+                            closeHoverStrokeColor="#eeeeee"
+                        >
+                            <span class="info-text"> {$texts.decimalPlacesInfo[$selectedLang]}</span>
+                        </HintInfo>
+                    </span>
+                </span>
+            </span>
+        </div>
+
+        <div class="row">
+            <span class="row-variable">
                 <span class="row-identifier">
                     {#if deviceData.protocol === Protocol.OPC_UA}
                         {$texts.opcuaID[$selectedLang]}
@@ -322,50 +319,29 @@
                 >
                 <span class="row-input">
                     <span class="row-entry">
-                        {#if node.communicationID !== undefined}
-                            <InputField
-                                disabled={node.config.calculated}
-                                bind:inputValue={node.communicationID}
-                                onChange={() => {
-                                    onPropertyChanged();
-                                }}
-                                inputInvalid={!validateCommunicationID(node.communicationID, node.protocol)}
-                                enableInputInvalid={true}
-                                inputType="STRING"
-                                width="100%"
-                                height="40px"
-                                borderRadius="5px"
-                                backgroundColor="#1a2027"
-                                disabledBackgroundColor="#42505f"
-                                selectedBackgroundColor="#1a2027"
-                                selectedBorderColor="#2F80ED"
-                                badFormatBorderColor="#e74c3c"
-                                fontSize="0.9rem"
-                                fontColor="#f5f5f5"
-                                fontWeight="400"
-                                textAlign="center"
-                                unitTextColor="rgb(170,170,170)"
-                            />
-                        {:else}
-                            <InputField
-                                disabled={node.config.calculated}
-                                bind:inputValue={disabledCommIDString}
-                                inputType="STRING"
-                                width="100%"
-                                height="40px"
-                                borderRadius="5px"
-                                backgroundColor="#1a2027"
-                                disabledBackgroundColor="#42505f"
-                                selectedBackgroundColor="#1a2027"
-                                selectedBorderColor="#2F80ED"
-                                badFormatBorderColor="#e74c3c"
-                                fontSize="0.9rem"
-                                fontColor="#f5f5f5"
-                                fontWeight="400"
-                                textAlign="center"
-                                unitTextColor="rgb(170,170,170)"
-                            />
-                        {/if}
+                        <InputField
+                            disabled={node.config.calculated}
+                            bind:inputValue={node.communication_id}
+                            onChange={() => {
+                                onPropertyChanged();
+                            }}
+                            inputInvalid={!validateCommunicationID(node.communication_id, node.protocol)}
+                            enableInputInvalid={true}
+                            inputType="STRING"
+                            width="100%"
+                            height="40px"
+                            borderRadius="5px"
+                            backgroundColor="#1a2027"
+                            disabledBackgroundColor="#42505f"
+                            selectedBackgroundColor="#1a2027"
+                            selectedBorderColor="#2F80ED"
+                            badFormatBorderColor="#e74c3c"
+                            fontSize="0.9rem"
+                            fontColor="#f5f5f5"
+                            fontWeight="400"
+                            textAlign="center"
+                            unitTextColor="rgb(170,170,170)"
+                        />
                     </span>
                     <span class="row-hint">
                         <HintInfo
@@ -408,10 +384,10 @@
                             options={Object.fromEntries(Object.entries(NodeType).map(([key, value]) => [value, value]))}
                             bind:selectedOption={node.config.type}
                             onChange={() => {
-                                nodeTypeChange();
+                                nodeTypeChange(node, nodeEditingState);
                                 onPropertyChanged();
                             }}
-                            inputInvalid={!validateNodeType(node.config.type, node.displayName, node.config.custom)}
+                            inputInvalid={!validateNodeType(node.config.type, node.display_name, node.config.custom)}
                             enableInputInvalid={true}
                             scrollable={true}
                             maxOptions={5}
@@ -462,9 +438,8 @@
                     <span class="row-entry">
                         <InputField
                             disabled={!node.config.logging}
-                            bind:inputValue={strloggingPeriod}
+                            bind:inputValue={node.config.logging_period}
                             onChange={() => {
-                                node.config.logging_period = Number(strloggingPeriod);
                                 onPropertyChanged();
                             }}
                             inputType="POSITIVE_INT"
@@ -538,9 +513,8 @@
                     <span class="row-entry">
                         <InputField
                             disabled={(node.config.type !== NodeType.FLOAT && node.config.type !== NodeType.INT) || !node.config.min_alarm}
-                            bind:inputValue={strMinAlarm}
+                            bind:inputValue={node.config.min_alarm_value}
                             onChange={() => {
-                                node.config.min_alarm_value = Number(strMinAlarm);
                                 onPropertyChanged();
                             }}
                             inputType={node.config.type}
@@ -606,9 +580,8 @@
                     <span class="row-entry">
                         <InputField
                             disabled={(node.config.type !== NodeType.FLOAT && node.config.type !== NodeType.INT) || !node.config.max_alarm}
-                            bind:inputValue={strMaxAlarm}
+                            bind:inputValue={node.config.max_alarm_value}
                             onChange={() => {
-                                node.config.max_alarm_value = Number(strMaxAlarm);
                                 onPropertyChanged();
                             }}
                             inputType={node.config.type}
@@ -675,7 +648,7 @@
                         <Checkbox
                             bind:checked={node.config.custom}
                             onChange={() => {
-                                customNodeChange();
+                                customNodeChange(node, nodeEditingState, node.phase);
                                 onPropertyChanged();
                             }}
                             inputName="custom-node"
@@ -766,10 +739,10 @@
                         <Checkbox
                             bind:checked={node.config.calculated}
                             onChange={() => {
-                                virtualNodeChange();
+                                virtualNodeChange(node, nodeEditingState, deviceData.protocol);
                                 onPropertyChanged();
                             }}
-                            inputInvalid={!validateVirtualNode(node.displayName, node.config.custom)}
+                            inputInvalid={!validateVirtualNode(node.display_name, node.config.custom)}
                             enableInputInvalid={true}
                             inputName="virtual-node"
                             width="38px"
@@ -1005,6 +978,7 @@
 </ModalWindow>
 
 <style>
+    /* Modal header container for node config */
     .header {
         margin: 0;
         padding: 15px;
@@ -1018,17 +992,20 @@
         flex-wrap: wrap;
     }
 
+    /* Header section grouping for variable, section, protocol */
     .header .header-section {
         padding: 0;
         margin: 0;
     }
 
+    /* Main label text in header */
     .header .header-section .main-text {
         font-size: 1rem;
         color: #f5f5f5;
         font-weight: 400;
     }
 
+    /* Sub-label text in header */
     .header .header-section .sub-text {
         padding-left: 5px;
         padding-right: 10px;
@@ -1037,6 +1014,7 @@
         font-weight: 300;
     }
 
+    /* Main container for all node config rows */
     .node-config-div {
         margin: 0;
         padding: 0;
@@ -1048,6 +1026,7 @@
         gap: 15px;
     }
 
+    /* Individual row for each config field */
     .row {
         padding: 0;
         margin: 0;
@@ -1060,6 +1039,7 @@
         position: relative;
     }
 
+    /* Variable label and input container in each row */
     .row .row-variable {
         padding: 0;
         margin: 0;
@@ -1071,6 +1051,7 @@
         max-width: 500px;
     }
 
+    /* No-wrap style for horizontal layout of some rows */
     .row .row-variable.no-wrap {
         flex-direction: row;
         padding-top: 10px;
@@ -1078,6 +1059,7 @@
         min-width: 250px;
     }
 
+    /* Identifier label for each config field */
     .row .row-variable .row-identifier {
         font-size: 1rem;
         color: #f5f5f5;
@@ -1091,12 +1073,14 @@
         width: 100%;
     }
 
+    /* Identifier label adjustment for no-wrap rows */
     .row .row-variable.no-wrap .row-identifier {
         padding-bottom: 0px;
         padding-top: 0px;
         text-align: left;
     }
 
+    /* Input area for each config field */
     .row .row-variable .row-input {
         width: 100%;
         display: flex;
@@ -1106,11 +1090,13 @@
         min-width: 250px;
     }
 
+    /* Input area adjustment for no-wrap rows */
     .row .row-variable.no-wrap .row-input {
         width: fit-content;
         min-width: auto;
     }
 
+    /* Entry field container for selectors, checkboxes, etc. */
     .row .row-variable .row-input .row-entry {
         display: flex;
         align-items: center;
@@ -1120,6 +1106,7 @@
         width: 100%;
     }
 
+    /* Entry field adjustment for no-wrap rows */
     .row .row-variable.no-wrap .row-input .row-entry {
         width: 100%;
         min-width: auto;
@@ -1127,16 +1114,19 @@
         gap: 0px;
     }
 
+    /* Responsive: horizontal row layout on wide screens */
     @media (min-width: 880px) {
         .row {
             flex-direction: row;
         }
 
+        /* Add spacing for hint on wide screens */
         .row .row-variable .row-input .row-hint {
             padding-left: 20px;
         }
     }
 
+    /* Info text styling for hints in each row */
     .row-hint .info-text {
         padding: 10px;
         padding-right: 40px;

@@ -589,7 +589,19 @@ const textsObject: TextsObject = {
     enabledInfo: {
         PT: "Ative para que a variável seja gerida. Se desativada, a variável apenas existe na configuração e não é processada.",
         EN: "Enable for the variable to be managed. If disabled, the variable only exists in the configuration and is not processed.",
-    }
+    },
+    decimalPlaces: {
+        PT: "Número de casas decimais",
+        EN: "Number of decimal places",
+    },
+    decimalPlacesInfo: {
+        PT: "Defina o número de casas decimais para apresentar os valores desta variável. Use para ajustar a precisão da visualização.",
+        EN: "Set the number of decimal places to display for this variable's values. Use to adjust the precision of visualization",
+    },
+    decimalPlacesError: {
+        PT: "O número de casas decimais deve estar compreendido entre {minValue} e {maxValue}.",
+        EN: "The number of decimal places must be between {minValue} and {maxValue}.",
+    },
 };
 
 //////////     D E V I C E     T E X T S     //////////

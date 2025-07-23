@@ -2,14 +2,15 @@
     import NodeRow from "./NodeRow.svelte";
     import AddNode from "./AddNode.svelte";
     import { onMount, onDestroy } from "svelte";
+    import { addNode, getNodeIndex } from "$lib/ts/nodes";
+    import { nodeSections } from "$lib/stores/nodes";
 
     // Stores for variable definitions
-    import { defaultVariables } from "$lib/stores/nodes";
     import { MeterType, Protocol, type EditableDeviceMeter } from "$lib/stores/devices";
-    import { NodePrefix, NodePhase, NodeType } from "$lib/stores/nodes";
+    import { NodePrefix, NodePhase } from "$lib/stores/nodes";
 
     // Types
-    import type { DeviceNode, FormattedNode, NodeConfiguration, BaseNodeConfig } from "$lib/stores/nodes";
+    import type { EditableDeviceNode, NodeEditState } from "$lib/stores/nodes";
     import type { ColumnVisibilityMap } from "$lib/ts/nodes_gid";
 
     // Stores for multi-language support
@@ -17,8 +18,8 @@
 
     // Props
     export let deviceData: EditableDeviceMeter;
-    export let nodes: Record<string, DeviceNode> = {}; // Input Nodes Configuration
-    export let formattedNodes: Array<FormattedNode> = []; // Output Nodes Configuration (Formatted)
+    export let nodes: Array<EditableDeviceNode> = []; // Nodes Configuration (Formatted)
+    export let nodesBySection: Record<NodePhase, Array<EditableDeviceNode>>; // Nodes Configuration by Section
 
     // Layout / styling props
     export let width: string;
@@ -33,123 +34,10 @@
     export let subSectionBorderColor: string = borderColor;
 
     // Export Functions
-    export let onPropertyChanged: (node: FormattedNode) => void;
-    export let onShowConfigPopup: (nodeToEdit: FormattedNode, section: NodePhase, sectionNodes: Array<FormattedNode>) => void;
+    export let onPropertyChanged: (node: EditableDeviceNode) => void;
+    export let onShowConfigPopup: (node: EditableDeviceNode, nodeEditingState: NodeEditState) => void;
 
     // Functions
-    function removePrefix(name: string): string {
-        const prefixes = Object.values(NodePrefix).sort((a, b) => b.length - a.length);
-
-        for (const prefix of prefixes) {
-            if (name.startsWith(prefix)) {
-                if (name.startsWith(NodePrefix.L1) && !name.startsWith(NodePrefix.L1_L2) && !name.startsWith(NodePrefix.L1_L3)) {
-                    return name.slice(prefix.length);
-                } else if (name.startsWith(NodePrefix.L2) && !name.startsWith(NodePrefix.L2_L1) && !name.startsWith(NodePrefix.L2_L3)) {
-                    return name.slice(prefix.length);
-                } else if (name.startsWith(NodePrefix.L3) && !name.startsWith(NodePrefix.L3_L1) && !name.startsWith(NodePrefix.L3_L2)) {
-                    return name.slice(prefix.length);
-                } else if (
-                    name.startsWith(NodePrefix.L1_L2) ||
-                    name.startsWith(NodePrefix.L1_L3) ||
-                    name.startsWith(NodePrefix.L2_L1) ||
-                    name.startsWith(NodePrefix.L2_L3) ||
-                    name.startsWith(NodePrefix.L3_L1) ||
-                    name.startsWith(NodePrefix.L3_L2)
-                ) {
-                    return name;
-                } else {
-                    return name.slice(prefix.length);
-                }
-            }
-        }
-
-        return name;
-    }
-
-    function addPrefix(name: string, prefix: string): string {
-        return prefix + name;
-    }
-
-    function getCommunicationID(node: DeviceNode): string | undefined {
-        if (!node) return undefined;
-
-        const protocol = node.protocol;
-
-        if (protocol === Protocol.OPC_UA && "node_id" in node.config) {
-            const nodeId = node.config.node_id;
-            return nodeId;
-        } else if (protocol === Protocol.MODBUS_RTU && "register" in node.config) {
-            const reg = node.config.register;
-            return "0x" + Number(reg).toString(16).toUpperCase().padStart(4, "0");
-        }
-
-        return undefined;
-    }
-
-    function addNode(sectionPrefix: NodePrefix) {
-        const nodeBaseName = ``;
-        const fullNodeName = addPrefix(nodeBaseName, sectionPrefix);
-
-        const newBaseConfiguration: BaseNodeConfig = {
-            calculate_increment: true,
-            calculated: false,
-            custom: true,
-            decimal_places: 2,
-            enabled: true,
-            incremental_node: false,
-            logging: false,
-            logging_period: 15,
-            max_alarm: false,
-            max_alarm_value: 0.0,
-            min_alarm: false,
-            min_alarm_value: 0.0,
-            positive_incremental: true,
-            type: NodeType.FLOAT,
-            unit: "",
-            publish: true,
-        };
-
-        let newNodeConfiguration: NodeConfiguration;
-
-        if (deviceData.protocol === Protocol.MODBUS_RTU) {
-            // Modbus RTU Protocol
-            newNodeConfiguration = {
-                ...newBaseConfiguration,
-                register: 0,
-            };
-        } else if (deviceData.protocol === Protocol.OPC_UA) {
-            // OPC UA Protocol
-            newNodeConfiguration = {
-                ...newBaseConfiguration,
-                node_id: "",
-            };
-        } else {
-            throw new Error("Unsupported protocol");
-        }
-
-        const newNode: DeviceNode = {
-            device_id: deviceData.id,
-            name: fullNodeName,
-            protocol: deviceData.protocol,
-            config: newNodeConfiguration,
-        };
-
-        const newFormattedNode: FormattedNode = {
-            ...newNode,
-            displayName: nodeBaseName,
-            communicationID: getCommunicationID(newNode),
-        };
-
-        formattedNodes = [...formattedNodes, newFormattedNode];
-    }
-
-    function deleteNode(node: FormattedNode) {
-        const formattedNodeIndex = formattedNodes.findIndex((n) => n === node);
-        if (formattedNodeIndex !== -1) {
-            formattedNodes = [...formattedNodes.slice(0, formattedNodeIndex), ...formattedNodes.slice(formattedNodeIndex + 1)];
-        }
-    }
-
     function handleResize() {
         if (containerElement) {
             currentWidth = containerElement.clientWidth;
@@ -158,7 +46,6 @@
     }
 
     // Variables
-    let initialized: boolean = false;
     let containerElement: HTMLDivElement;
     let currentWidth: number;
     let windowWidth: number;
@@ -181,88 +68,11 @@
         actions: { hideWidth: undefined, visible: true },
     };
 
-    // Format and sort nodes only on initial load
-    $: if (!initialized && Object.keys(nodes).length > 0) {
-        initialized = true;
-        formattedNodes = Object.entries(nodes)
-            .map(([name, node]) => {
-                const formatted: FormattedNode = {
-                    ...node,
-                    displayName: removePrefix(name),
-                    communicationID: getCommunicationID(node),
-                };
-                return formatted;
-            })
-            .sort((a, b) => a.displayName.localeCompare(b.displayName));
-    }
-
     $: if (currentWidth) {
         for (let key of Object.keys(columnVisibility) as (keyof ColumnVisibilityMap)[]) {
             columnVisibility[key].visible = columnVisibility[key].hideWidth === undefined || currentWidth >= columnVisibility[key].hideWidth;
         }
     }
-
-    // Nodes sections for 3F meters (L1, L2, L3, Total, General)
-    const nodeSections = [
-        {
-            key: NodePhase.L1,
-            phase: NodePhase.L1,
-            prefix: NodePrefix.L1,
-            labelKey: "l1Phase",
-            filter: (node: any) =>
-                node.name?.startsWith(NodePrefix.L1) && !node.name?.startsWith(NodePrefix.L1_L2) && !node.name?.startsWith(NodePrefix.L1_L3),
-        },
-        {
-            key: NodePhase.L2,
-            phase: NodePhase.L2,
-            prefix: NodePrefix.L2,
-            labelKey: "l2Phase",
-            filter: (node: any) =>
-                node.name?.startsWith(NodePrefix.L2) && !node.name?.startsWith(NodePrefix.L2_L1) && !node.name?.startsWith(NodePrefix.L2_L3),
-        },
-        {
-            key: NodePhase.L3,
-            phase: NodePhase.L3,
-            prefix: NodePrefix.L3,
-            labelKey: "l3Phase",
-            filter: (node: any) =>
-                node.name?.startsWith(NodePrefix.L3) && !node.name?.startsWith(NodePrefix.L3_L1) && !node.name?.startsWith(NodePrefix.L3_L2),
-        },
-        {
-            key: NodePhase.TOTAL,
-            phase: NodePhase.TOTAL,
-            prefix: NodePrefix.TOTAL,
-            labelKey: "total",
-            filter: (node: any) => node.name?.startsWith(NodePrefix.TOTAL),
-        },
-        {
-            key: NodePhase.GENERAL,
-            phase: NodePhase.GENERAL,
-            prefix: NodePrefix.GENERAL,
-            labelKey: "general",
-            filter: (node: any) => {
-                // General nodes are those that don't match any of the specific patterns above
-                const isL1 =
-                    node.name?.startsWith(NodePrefix.L1) && !node.name?.startsWith(NodePrefix.L1_L2) && !node.name?.startsWith(NodePrefix.L1_L3);
-                const isL2 =
-                    node.name?.startsWith(NodePrefix.L2) && !node.name?.startsWith(NodePrefix.L2_L1) && !node.name?.startsWith(NodePrefix.L2_L3);
-                const isL3 =
-                    node.name?.startsWith(NodePrefix.L3) && !node.name?.startsWith(NodePrefix.L3_L1) && !node.name?.startsWith(NodePrefix.L3_L2);
-                const isTotal = node.name?.startsWith(NodePrefix.TOTAL);
-
-                return !isL1 && !isL2 && !isL3 && !isTotal;
-            },
-        },
-    ];
-
-    // Get nodes from the original nodes array by section
-    $: nodesBySection = nodeSections.reduce(
-        (acc: Record<NodePhase, Array<FormattedNode>>, section) => {
-            acc[section.key] = formattedNodes.filter(section.filter);
-            return acc;
-        },
-        {} as Record<NodePhase, Array<FormattedNode>>,
-    );
 
     onMount(() => {
         handleResize();
@@ -285,6 +95,9 @@
     });
 </script>
 
+<!-- NodesGrid Component: displays a responsive table of device nodes, grouped by section for three-phase meters. 
+Supports dynamic column visibility, node editing, configuration popups, and node addition/removal. 
+Includes multi-language headers and adapts layout to container size. -->
 <div
     bind:this={containerElement}
     style="
@@ -361,7 +174,7 @@
             </thead>
             <tbody>
                 <!--     T H R E E     P H A S E     M E T E R S     -->
-                {#if deviceData.type === MeterType.THREE_PHASE}
+                {#if deviceData.type === MeterType.THREE_PHASE && nodesBySection}
                     <!-- Render each node section -->
                     {#each nodeSections as section (section.key)}
                         <tr class="sub-section">
@@ -369,7 +182,6 @@
                         </tr>
                         {#each nodesBySection[section.key] as node, i (i)}
                             <NodeRow
-                                nodePhase={section.key}
                                 {node}
                                 sectionNodes={nodesBySection[section.key]}
                                 backgroundColor="rgba(255, 255, 255, 0.05)"
@@ -377,41 +189,62 @@
                                 {windowWidth}
                                 currentGridWidth={currentWidth}
                                 {columnVisibility}
-                                onDelete={() => deleteNode(node)}
-                                onConfig={() => {
-                                    onShowConfigPopup(node, section.phase, nodesBySection[section.key]);
+                                onDelete={() => {
+                                    let deletedNodeIndex = getNodeIndex(node, nodes);
+                                    if (deletedNodeIndex !== -1) {
+                                        nodes = [...nodes.slice(0, deletedNodeIndex), ...nodes.slice(deletedNodeIndex + 1)];
+                                    }
                                 }}
-                                selectedProtocol={deviceData.protocol}
+                                onConfig={(nodeEditingState: NodeEditState) => {
+                                    onShowConfigPopup(node, nodeEditingState);
+                                }}
+                                {deviceData}
                                 onPropertyChanged={() => {
                                     onPropertyChanged(node);
                                 }}
                             />
                         {/each}
-                        <AddNode {windowWidth} backgroundColor="rgba(255, 255, 255, 0.05)" onAddNode={() => addNode(section.prefix)} />
+                        <AddNode
+                            {windowWidth}
+                            backgroundColor="rgba(255, 255, 255, 0.05)"
+                            onAddNode={() => {
+                                nodes = [...nodes, addNode(section.prefix, deviceData)];
+                            }}
+                        />
                     {/each}
                     <!--     S I N G L E     P H A S E     M E T E R S     -->
                 {:else if deviceData.type === MeterType.SINGLE_PHASE}
-                    {#each formattedNodes as node, i (i)}
+                    {#each nodes as node, i (i)}
                         <NodeRow
-                            nodePhase={NodePhase.SINGLEPHASE}
                             {node}
-                            sectionNodes={formattedNodes}
+                            sectionNodes={nodes}
                             currentGridWidth={currentWidth}
                             {columnVisibility}
                             backgroundColor="rgba(255, 255, 255, 0.05)"
                             disabledBackgroundColor="rgba(255, 255, 255, 0.22)"
                             {windowWidth}
-                            onDelete={() => deleteNode(node)}
-                            onConfig={() => {
-                                onShowConfigPopup(node, NodePhase.SINGLEPHASE, formattedNodes);
+                            onDelete={() => {
+                                let deletedNodeIndex = getNodeIndex(node, nodes);
+                                if (deletedNodeIndex !== -1) {
+                                    nodes = [...nodes.slice(0, deletedNodeIndex), ...nodes.slice(deletedNodeIndex + 1)];
+                                }
                             }}
-                            selectedProtocol={deviceData.protocol}
+                            onConfig={(nodeEditingState: NodeEditState) => {
+                                onShowConfigPopup(node, nodeEditingState);
+                            }}
+                            {deviceData}
                             onPropertyChanged={() => {
                                 onPropertyChanged(node);
                             }}
                         />
                     {/each}
-                    <AddNode {windowWidth} backgroundColor="rgba(255, 255, 255, 0.05)" onAddNode={() => addNode(NodePrefix.SINGLEPHASE)} />
+                    <AddNode
+                        {windowWidth}
+                        backgroundColor="rgba(255, 255, 255, 0.05)"
+                        onAddNode={() => {
+                            nodes = [...nodes, addNode(NodePrefix.SINGLEPHASE, deviceData)];
+                        }}
+                    />
                 {/if}
             </tbody>
         </table>
@@ -419,6 +252,7 @@
 </div>
 
 <style>
+    /* Main container for the nodes grid table */
     .container {
         width: var(--width);
         height: var(--height);
@@ -427,6 +261,7 @@
         border: 1px solid var(--border-color);
     }
 
+    /* Content wrapper for table and sections */
     .content {
         width: 100%;
         height: 100%;
@@ -438,24 +273,28 @@
         justify-content: start;
     }
 
+    /* Table layout for nodes grid */
     table {
         width: 100%;
         border-collapse: collapse;
         text-align: center;
     }
 
+    /* Sticky table header for scrolling */
     table thead {
         position: sticky;
         top: 74px;
         z-index: 1;
     }
 
+    /* Header row styling */
     table thead .header {
         background-color: var(--header-background-color);
         height: 40px;
         color: var(--header-text-color);
     }
 
+    /* Header cell styling */
     table thead th {
         padding: 10px;
         padding-left: 0px;
@@ -468,6 +307,7 @@
         border-right: 1px solid var(--border-color);
     }
 
+    /* Rounded corners for first and last header cells */
     table thead .header th:first-child {
         border-top-left-radius: var(--border-radius);
     }
@@ -477,10 +317,12 @@
         border-right: none;
     }
 
+    /* Table cell height for node rows */
     table tr td {
         height: 40px;
     }
 
+    /* Column width classes for header cells */
     table th.max-width {
         width: max-content;
         min-width: 200px;
@@ -504,6 +346,7 @@
         max-width: 50px;
     }
 
+    /* Sub-section row styling for grouped nodes */
     table .sub-section {
         width: 100%;
         margin: 0;
@@ -516,10 +359,12 @@
         border-right: none;
     }
 
+    /* Sub-section cell height */
     table .sub-section td {
         height: 35px;
     }
 
+    /* Responsive: reduce row and header height on wide screens */
     @media (min-width: 880px) {
         tr td {
             height: 30px;

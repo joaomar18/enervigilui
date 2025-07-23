@@ -22,7 +22,7 @@ export enum MeterType {
  * Defines all the serial communication parameters required to establish
  * and maintain a connection with Modbus RTU devices.
  * 
- * @interface ModbusRTUConfig
+ * @interface DeviceModbusRTUConfig
  * @property {number} baudrate - Data transmission rate in bits per second (e.g., 9600, 19200, 115200)
  * @property {number} bytesize - Number of data bits per character (typically 7 or 8)
  * @property {string} parity - Error checking method ("N" for None, "E" for Even, "O" for Odd)
@@ -33,7 +33,7 @@ export enum MeterType {
  * @property {number} stopbits - Number of stop bits used to signal end of character (1 or 2)
  * @property {number} timeout - Maximum time in seconds to wait for device response
  */
-export interface ModbusRTUConfig {
+export interface DeviceModbusRTUConfig {
     baudrate: number,
     bytesize: number,
     parity: string,
@@ -51,7 +51,7 @@ export interface ModbusRTUConfig {
  * to support form input handling and validation before conversion to the final numeric types.
  * Used primarily in UI components where users input configuration values as text.
  */
-export interface EditableModbusRTUConfig {
+export interface EditableDeviceModbusRTUConfig {
     baudrate: string,
     bytesize: string,
     parity: string,
@@ -67,7 +67,7 @@ export interface EditableModbusRTUConfig {
  * Default configuration values for Modbus RTU communication options.
  * Provides sensible defaults for form initialization and new device creation.
  */
-export const defaultModbusRTUOptions: EditableModbusRTUConfig = {
+export const defaultModbusRTUOptions: EditableDeviceModbusRTUConfig = {
     port: "",
     slave_id: "1",
     baudrate: "9600",
@@ -84,14 +84,14 @@ export const defaultModbusRTUOptions: EditableModbusRTUConfig = {
  * Defines all the network communication parameters and authentication settings
  * required to establish and maintain a connection with OPC UA servers.
  * 
- * @interface OPCUAConfig
+ * @interface DeviceOPCUAConfig
  * @property {string | null} username - Username for server authentication (null if no authentication required)
  * @property {string | null} password - Password for server authentication (null if no authentication required)
  * @property {number} read_period - Time interval in seconds between consecutive data readings from the server
  * @property {number} timeout - Maximum time in seconds to wait for server response before considering request failed
  * @property {string} url - OPC UA server endpoint URL (e.g., "opc.tcp://192.168.1.100:4840")
  */
-export interface OPCUAConfig {
+export interface DeviceOPCUAConfig {
     username: string | null,
     password: string | null,
     read_period: number,
@@ -105,7 +105,7 @@ export interface OPCUAConfig {
  * form input handling and validation before conversion to the final types. Used primarily
  * in UI components where users input configuration values as text.
  */
-export interface EditableOPCUAConfig {
+export interface EditableDeviceOPCUAConfig {
     username: string,
     password: string,
     read_period: string,
@@ -117,7 +117,7 @@ export interface EditableOPCUAConfig {
  * Default configuration values for OPC UA communication options.
  * Provides sensible defaults for form initialization and new device creation.
  */
-export const defaultOPCUAOptions: EditableOPCUAConfig = {
+export const defaultOPCUAOptions: EditableDeviceOPCUAConfig = {
     url: "opc.tcp://",
     read_period: "10",
     timeout: "10",
@@ -135,7 +135,7 @@ export const defaultOPCUAOptions: EditableOPCUAConfig = {
  * multiple communication protocols. TypeScript will provide type checking
  * to ensure the correct configuration properties are used for each protocol.
  */
-export type CommunicationOptions = OPCUAConfig | ModbusRTUConfig;
+export type CommunicationOptions = DeviceOPCUAConfig | DeviceModbusRTUConfig;
 
 /**
  * Union type representing all possible editable communication configuration options.
@@ -148,7 +148,7 @@ export type CommunicationOptions = OPCUAConfig | ModbusRTUConfig;
  * values as text. All numeric properties are represented as strings to support input
  * validation and error handling before converting to the final configuration types.
  */
-export type EditableCommunicationOptions = EditableOPCUAConfig | EditableModbusRTUConfig;
+export type EditableCommunicationOptions = EditableDeviceOPCUAConfig | EditableDeviceModbusRTUConfig;
 
 /**
  * Configuration interface for energy meter-specific operational options.

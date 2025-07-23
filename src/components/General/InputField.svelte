@@ -75,18 +75,25 @@
     }
 
     function validateBounds(): void {
-        // Convert to number for validation if input is numeric
-        if (["INT", "POSITIVE_INT", "FLOAT", "POSITIVE_FLOAT"].includes(inputType) && inputValue !== "") {
-            const numericValue = parseFloat(inputValue.toString());
-            if (numericValue < minValue) {
-                inputValue = minValue.toString();
+        // For numeric input types, do not allow empty string
+        if (["INT", "POSITIVE_INT", "FLOAT", "POSITIVE_FLOAT"].includes(inputType)) {
+            if (inputValue === "") {
+                inputValue = "0";
                 if (limitsPassed) {
                     limitsPassed();
                 }
-            } else if (numericValue > maxValue) {
-                inputValue = maxValue.toString();
-                if (limitsPassed) {
-                    limitsPassed();
+            } else {
+                const numericValue = parseFloat(inputValue.toString());
+                if (numericValue < minValue) {
+                    inputValue = minValue.toString();
+                    if (limitsPassed) {
+                        limitsPassed();
+                    }
+                } else if (numericValue > maxValue) {
+                    inputValue = maxValue.toString();
+                    if (limitsPassed) {
+                        limitsPassed();
+                    }
                 }
             }
         }

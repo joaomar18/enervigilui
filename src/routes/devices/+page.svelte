@@ -67,7 +67,6 @@
   Devices Page: renders a loading spinner until `loaded` is true,
   then displays a grid of DeviceCard components followed by the AddDevice button.
 -->
-
 <div class="content">
     {#each sortedDevices as device (device.id)}
         <DeviceCard
@@ -106,6 +105,7 @@
 </div>
 
 <style>
+    /* Main content grid for device cards and AddDevice button */
     .content {
         padding: 0;
         margin: 0;

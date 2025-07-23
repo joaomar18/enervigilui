@@ -1,8 +1,6 @@
 import { readable } from "svelte/store";
 import { derived } from "svelte/store";
 import { Protocol } from "$lib/stores/devices";
-import { MeterType } from "$lib/stores/devices";
-import type { MeterOptions } from "$lib/stores/devices";
 
 /**
  * Prefixes used to identify the electrical phase or type of a node variable.
@@ -70,6 +68,72 @@ export enum NodeType {
 }
 
 /**
+ * Represents a section of nodes grouped by phase or type in the energy monitoring system.
+ * Used to organize, filter, and label nodes for display and configuration.
+ *
+ * @property {NodePhase} key - Unique key identifying the section (phase)
+ * @property {NodePhase} phase - The phase associated with this section
+ * @property {NodePrefix} prefix - The prefix used for node names in this section
+ * @property {string} labelKey - The translation key for the section label
+ * @property {(node: FormattedNode) => boolean} filter - Function to filter nodes belonging to this section
+ */
+export interface NodeSection {
+    key: NodePhase;
+    phase: NodePhase;
+    prefix: NodePrefix;
+    labelKey: string;
+    filter: (node: EditableDeviceNode) => boolean;
+}
+
+/**
+ * Array of node section definitions used to group and filter nodes by phase or type.
+ * Each section specifies its phase, prefix, label key, and filtering logic for organizing nodes in the UI.
+ */
+export const nodeSections: Array<NodeSection> = [
+    {
+        key: NodePhase.L1,
+        phase: NodePhase.L1,
+        prefix: NodePrefix.L1,
+        labelKey: "l1Phase",
+        filter: (node) => node.name?.startsWith(NodePrefix.L1) && !node.name?.startsWith(NodePrefix.L1_L2) && !node.name?.startsWith(NodePrefix.L1_L3),
+    },
+    {
+        key: NodePhase.L2,
+        phase: NodePhase.L2,
+        prefix: NodePrefix.L2,
+        labelKey: "l2Phase",
+        filter: (node) => node.name?.startsWith(NodePrefix.L2) && !node.name?.startsWith(NodePrefix.L2_L1) && !node.name?.startsWith(NodePrefix.L2_L3),
+    },
+    {
+        key: NodePhase.L3,
+        phase: NodePhase.L3,
+        prefix: NodePrefix.L3,
+        labelKey: "l3Phase",
+        filter: (node) => node.name?.startsWith(NodePrefix.L3) && !node.name?.startsWith(NodePrefix.L3_L1) && !node.name?.startsWith(NodePrefix.L3_L2),
+    },
+    {
+        key: NodePhase.TOTAL,
+        phase: NodePhase.TOTAL,
+        prefix: NodePrefix.TOTAL,
+        labelKey: "total",
+        filter: (node) => node.name?.startsWith(NodePrefix.TOTAL),
+    },
+    {
+        key: NodePhase.GENERAL,
+        phase: NodePhase.GENERAL,
+        prefix: NodePrefix.GENERAL,
+        labelKey: "general",
+        filter: (node: any) => {
+            const isL1 = node.name?.startsWith(NodePrefix.L1) && !node.name?.startsWith(NodePrefix.L1_L2) && !node.name?.startsWith(NodePrefix.L1_L3);
+            const isL2 = node.name?.startsWith(NodePrefix.L2) && !node.name?.startsWith(NodePrefix.L2_L1) && !node.name?.startsWith(NodePrefix.L2_L3);
+            const isL3 = node.name?.startsWith(NodePrefix.L3) && !node.name?.startsWith(NodePrefix.L3_L1) && !node.name?.startsWith(NodePrefix.L3_L2);
+            const isTotal = node.name?.startsWith(NodePrefix.TOTAL);
+            return !isL1 && !isL2 && !isL3 && !isTotal;
+        },
+    },
+];
+
+/**
  * Contains the default information for typical nodes in the energy monitoring system.
  * This interface defines all default properties and configuration settings needed to 
  * configure and display typical measurement variables (e.g., voltage, current, power).
@@ -119,8 +183,18 @@ export interface DefaultNodeInfo {
  * @interface
  * @property {number} register - Register address for Modbus communication
  */
-export interface ModbusRTUConfig {
+export interface NodeModbusRTUConfig {
     register: number;
+}
+
+/**
+ * Editable configuration for Modbus RTU protocol nodes.
+ * Used for UI forms where the register is entered as a string.
+ *
+ * @property {string} register - Register address as a string for user input
+ */
+export interface EditableNodeModbusRTUConfig {
+    register: string;
 }
 
 /**
@@ -130,7 +204,17 @@ export interface ModbusRTUConfig {
  * @interface
  * @property {string} node_id - Node identifier in OPC UA format
  */
-export interface OPCUAConfig {
+export interface NodeOPCUAConfig {
+    node_id: string;
+}
+
+/**
+ * Editable configuration for OPC UA protocol nodes.
+ * Used for UI forms where the node_id is entered as a string.
+ *
+ * @property {string} node_id - Node identifier as a string for user input
+ */
+export interface EditableNodeOPCUAConfig {
     node_id: string;
 }
 
@@ -140,7 +224,7 @@ export interface OPCUAConfig {
  * 
  * @interface
  */
-export interface NoProtocolConfig {
+export interface NodeNoProtocolConfig {
     // No protocol-specific properties
 }
 
@@ -186,12 +270,42 @@ export interface BaseNodeConfig {
 }
 
 /**
+ * Editable version of the base node configuration for UI forms.
+ * All numeric fields are represented as strings to support user input and validation.
+ */
+export interface EditableBaseNodeConfig {
+    calculate_increment: boolean;
+    calculated: boolean;
+    custom: boolean;
+    decimal_places: string;
+    enabled: boolean;
+    incremental_node: boolean;
+    logging: boolean;
+    logging_period: string;
+    max_alarm: boolean;
+    max_alarm_value: string;
+    min_alarm: boolean;
+    min_alarm_value: string;
+    positive_incremental: boolean;
+    publish: boolean;
+    type: NodeType;
+    unit: string;
+}
+
+/**
  * Complete node configuration combining base config with protocol-specific settings.
  * Uses TypeScript discriminated union to ensure protocol-specific settings match the protocol type.
  * 
  * @type
  */
-export type NodeConfiguration = BaseNodeConfig & (ModbusRTUConfig | OPCUAConfig | NoProtocolConfig);
+export type NodeConfiguration = BaseNodeConfig & (NodeModbusRTUConfig | NodeOPCUAConfig | NodeNoProtocolConfig);
+
+
+/**
+ * Editable version of the complete node configuration for UI forms.
+ * Combines editable base config with protocol-specific editable settings for user input and validation.
+ */
+export type EditableNodeConfiguration = EditableBaseNodeConfig & (EditableNodeModbusRTUConfig | EditableNodeOPCUAConfig | NodeNoProtocolConfig);
 
 /**
  * Represents a complete node in a device's configuration.
@@ -211,27 +325,34 @@ export interface DeviceNode {
 }
 
 /**
- * Extended formatting information for a device node.
- * Used to provide additional display and communication information.
- * 
- * @interface
- * @property {string} displayName - Display name of the node (without prefix)
- * @property {string | number} communicationID - Communication ID of the node (type dependent on protocol)
+ * Editable version of the device node for UI forms.
+ * Used to represent device node data with editable fields for user input and validation.
  */
-interface DeviceNodeFormatting {
-    displayName: string;
-    communicationID: string | undefined;
+export interface EditableDeviceNode {
+    device_id: number;
+    name: string;
+    protocol: Protocol;
+    config: EditableNodeConfiguration;
+    display_name: string;
+    phase: NodePhase;
+    communication_id: string;
 }
 
 /**
- * Combines DeviceNode with formatting information.
- * Provides a complete representation of a node with both configuration and display properties.
- * 
- * @type
- * @extends {DeviceNode}
- * @extends {DeviceNodeFormatted}
+ * Represents the previous state of a node's editable properties during configuration changes.
+ * Used to track and restore values when editing node type, name, unit, section, or communication ID.
+ *
+ * @property {string} oldVariableName - The previous variable name of the node being edited
+ * @property {NodeType} oldVariableType - The previous variable type of the node being edited
+ * @property {string} oldVariableUnit - The previous unit value before 
+ * @property {string | undefined} oldCommunicationID - The previous communication ID before the edit
  */
-export type FormattedNode = DeviceNode & DeviceNodeFormatting;
+export interface NodeEditState {
+    oldVariableName: string;
+    oldVariableType: NodeType;
+    oldVariableUnit: string;
+    oldCommunicationID: string | undefined;
+}
 
 /**
  * A readable store containing predefined variable types for energy monitoring systems.
@@ -538,25 +659,3 @@ export const defaultVariableUnits = derived(defaultVariables, ($defaultVariables
 
     return unitsMap;
 });
-
-/**
- * Maps NodePhase enum to the corresponding prefix used in node names.
- */
-export function getNodePrefix(phase: NodePhase): string {
-    switch (phase) {
-        case NodePhase.L1:
-            return NodePrefix.L1;
-        case NodePhase.L2:
-            return NodePrefix.L2;
-        case NodePhase.L3:
-            return NodePrefix.L3;
-        case NodePhase.TOTAL:
-            return NodePrefix.TOTAL;
-        case NodePhase.GENERAL:
-            return NodePrefix.GENERAL;
-        case NodePhase.SINGLEPHASE:
-            return NodePrefix.SINGLEPHASE;
-        default:
-            return "";
-    }
-}

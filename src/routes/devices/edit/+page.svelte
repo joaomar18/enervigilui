@@ -1,6 +1,8 @@
 <script lang="ts">
     import { onMount, onDestroy } from "svelte";
     import { getDeviceState, getDeviceNodesConfig, convertToEditableDevice } from "$lib/ts/devices";
+    import { getNodeIndex, convertToEditableNodes } from "$lib/ts/nodes";
+    import { nodeSections } from "$lib/stores/nodes";
     import Selector from "../../../components/General/Selector.svelte";
     import SelectorButton from "../../../components/General/SelectorButton.svelte";
     import HintInfo from "../../../components/General/HintInfo.svelte";
@@ -11,12 +13,11 @@
     import InputField from "../../../components/General/InputField.svelte";
     import NodesGrid from "../../../components/Devices/Nodes/NodesGrid.svelte";
     import NodeConfigWindow from "../../../components/Devices/Nodes/NodeConfigWindow.svelte";
-    import { Protocol } from "$lib/stores/devices";
-    import { defaultOPCUAOptions, defaultModbusRTUOptions } from "$lib/stores/devices";
+    import { Protocol, defaultOPCUAOptions, defaultModbusRTUOptions } from "$lib/stores/devices";
 
     // Types
-    import type { DeviceMeter, EditableDeviceMeter, EditableOPCUAConfig, EditableModbusRTUConfig } from "$lib/stores/devices";
-    import type { DeviceNode, FormattedNode, NodePhase } from "$lib/stores/nodes";
+    import type { DeviceMeter, EditableDeviceMeter, EditableDeviceOPCUAConfig, EditableDeviceModbusRTUConfig } from "$lib/stores/devices";
+    import type { DeviceNode, EditableDeviceNode, NodeEditState, NodePhase } from "$lib/stores/nodes";
 
     // Navigation
     import { navigateTo } from "$lib/ts/navigation";
@@ -32,28 +33,32 @@
     import { loadedDone } from "$lib/stores/navigation";
 
     // Variables
-    let showSaveWindow: boolean = false;
-    let showDeleteWindow: boolean = false;
-    let showConfigNodeWindow: boolean = false;
-    let editingNode: FormattedNode;
-    let editingNodeSection: NodePhase;
-    let editingSectionNodes: Array<FormattedNode>;
-    let deleteDeviceName: string;
-    let devicePollTimer: ReturnType<typeof setTimeout>;
-    let nodesPollTimer: ReturnType<typeof setTimeout>;
+    let showSaveWindow: boolean = false; // Show Save Configuration Window
+    let showDeleteWindow: boolean = false; // Show Delete Device Window
+    let showConfigNodeWindow: boolean = false; // Show Node Full Configuration Window
 
-    let deviceData: EditableDeviceMeter;
-    let opcuaConfig: EditableOPCUAConfig | null;
-    let modbusRTUConfig: EditableModbusRTUConfig | null;
-    let deviceNodes: Record<string, DeviceNode>;
-    let editedNodes: Array<FormattedNode>;
+    let deleteDeviceName: string; // Variable to confirm device delete (must match device name)
+
+    let devicePollTimer: ReturnType<typeof setTimeout>; // Timeout for device configuration request
+    let nodesPollTimer: ReturnType<typeof setTimeout>; // Timeout for device nodes configuration request
+
+    let deviceData: EditableDeviceMeter; // Device Data
+    let opcuaConfig: EditableDeviceOPCUAConfig | null; // OPC UA Configuration
+    let modbusRTUConfig: EditableDeviceModbusRTUConfig | null; // Modbus RTU Configuration
+
+    let nodes: Array<EditableDeviceNode>;
+    let nodesBySection: Record<NodePhase, Array<EditableDeviceNode>>;
+
+    let editingNode: EditableDeviceNode; // Current Node being edited in Configuration Window
+    let editingNodeState: NodeEditState; // Current state of the Node being edited
+
     let deviceImage: File | undefined;
 
     // Reactive Statements
 
     //Synchronize communication configuration with device data
-    $: opcuaConfig = deviceData?.protocol === Protocol.OPC_UA ? (deviceData.communication_options as EditableOPCUAConfig) : null;
-    $: modbusRTUConfig = deviceData?.protocol === Protocol.MODBUS_RTU ? (deviceData.communication_options as EditableModbusRTUConfig) : null;
+    $: opcuaConfig = deviceData?.protocol === Protocol.OPC_UA ? (deviceData.communication_options as EditableDeviceOPCUAConfig) : null;
+    $: modbusRTUConfig = deviceData?.protocol === Protocol.MODBUS_RTU ? (deviceData.communication_options as EditableDeviceModbusRTUConfig) : null;
 
     $: if (opcuaConfig) {
         deviceData.communication_options = opcuaConfig;
@@ -61,6 +66,19 @@
     $: if (modbusRTUConfig) {
         deviceData.communication_options = modbusRTUConfig;
     }
+
+    // Get nodes from the nodes array by section
+    $: if (nodes) {
+        nodesBySection = nodeSections.reduce(
+            (acc: Record<NodePhase, Array<EditableDeviceNode>>, section) => {
+                acc[section.key] = nodes.filter(section.filter);
+                return acc;
+            },
+            {} as Record<NodePhase, Array<EditableDeviceNode>>,
+        );
+    }
+
+    // Functions
 
     //Function to fetch device configuration
     function fetchDeviceConfig(name: string, id: number): void {
@@ -95,7 +113,8 @@
                 if (status !== 200) {
                     showAlert($texts.errorDeviceNodesConfig);
                 } else {
-                    deviceNodes = data;
+                    let requestDeviceNodes: Record<string, DeviceNode> = data;
+                    nodes = convertToEditableNodes(requestDeviceNodes);
                     sucess = true;
                 }
             } catch (e) {
@@ -124,15 +143,6 @@
         showDeleteWindow = false;
     }
 
-    // Function to update nodes structure when a node is updated
-    function updateNode(node: FormattedNode) {
-        const editNodesIndex = editedNodes.findIndex((n) => n === node);
-        if (editNodesIndex !== -1) {
-            editedNodes[editNodesIndex] = node;
-            editedNodes = [...editedNodes];
-        }
-    }
-
     // Mount function
     onMount(() => {
         const params = new URLSearchParams(window.location.search);
@@ -154,6 +164,8 @@
     });
 </script>
 
+<!-- Edit Device Page: displays the selected device's details and configuration options, including editable fields for device name, image, communication settings, and meter options. 
+Shows input forms for protocol-specific parameters and organizes device nodes for editing. Includes action buttons for saving, canceling, and deleting the device. -->
 <div class="content">
     {#if deviceData}
         <div class="edit-device-div">
@@ -195,12 +207,18 @@
                             bind:selectedOption={deviceData.protocol}
                             onChange={() => {
                                 if (deviceData.protocol === Protocol.OPC_UA) {
-                                    // Protocol changed to OPC UA
                                     deviceData.communication_options = defaultOPCUAOptions;
                                 } else if (deviceData.protocol === Protocol.MODBUS_RTU) {
-                                    // Protocol changed to Modbus RTU
                                     deviceData.communication_options = defaultModbusRTUOptions;
                                 }
+                                for (let node of nodes) {
+                                    if (deviceData.protocol !== node.protocol && !node.config.calculated) {
+                                        console.log(node.protocol);
+                                        node.protocol = deviceData.protocol;
+                                        node.communication_id = "";
+                                    }
+                                }
+                                nodes = [...nodes];
                             }}
                             scrollable={true}
                             maxOptions={5}
@@ -1089,15 +1107,21 @@
                 <div class="nodes-grid-div">
                     <NodesGrid
                         {deviceData}
-                        bind:nodes={deviceNodes}
-                        bind:formattedNodes={editedNodes}
-                        onPropertyChanged={(node: FormattedNode) => {
-                            updateNode(node);
+                        bind:nodes
+                        bind:nodesBySection
+                        onPropertyChanged={(node: EditableDeviceNode) => {
+                            const editNodesIndex = getNodeIndex(node, nodes);
+                            if (editNodesIndex !== -1) {
+                                nodes[editNodesIndex] = node;
+                                nodes = [...nodes];
+                            }
+                            if (nodes[editNodesIndex] === editingNode) {
+                                editingNode = nodes[editNodesIndex];
+                            }
                         }}
-                        onShowConfigPopup={(nodeToEdit: FormattedNode, section: NodePhase, sectionNodes: Array<FormattedNode>) => {
-                            editingNode = nodeToEdit;
-                            editingNodeSection = section;
-                            editingSectionNodes = sectionNodes;
+                        onShowConfigPopup={(node: EditableDeviceNode, nodeEditingState: NodeEditState) => {
+                            editingNode = node;
+                            editingNodeState = nodeEditingState;
                             showConfigNodeWindow = true;
                         }}
                         width="100%"
@@ -1116,8 +1140,8 @@
             <div class="action-buttons-div">
                 <Button
                     buttonText={$texts.save[$selectedLang]}
-                    width="150px"
-                    height="40px"
+                    width="250px"
+                    height="50px"
                     borderRadius="5px"
                     backgroundColor="#2F80ED"
                     hoverColor="#1C6DD0"
@@ -1132,8 +1156,8 @@
                 />
                 <Button
                     buttonText={$texts.cancel[$selectedLang]}
-                    width="150px"
-                    height="40px"
+                    width="250px"
+                    height="50px"
                     borderRadius="5px"
                     backgroundColor="#707070"
                     hoverColor="#5A5A5A"
@@ -1146,8 +1170,8 @@
                 />
                 <Button
                     buttonText={$texts.delete[$selectedLang]}
-                    width="150px"
-                    height="40px"
+                    width="250px"
+                    height="50px"
                     borderRadius="5px"
                     backgroundColor="#E74C3C"
                     hoverColor="#C0392B"
@@ -1169,12 +1193,19 @@
                         <NodeConfigWindow
                             bind:visible={showConfigNodeWindow}
                             onPropertyChanged={() => {
-                                updateNode(editingNode);
+                                const editNodesIndex = getNodeIndex(editingNode, nodes);
+                                if (editNodesIndex !== -1) {
+                                    nodes[editNodesIndex] = editingNode;
+                                    nodes = [...nodes];
+                                }
+                                if (nodes[editNodesIndex] === editingNode) {
+                                    editingNode = nodes[editNodesIndex];
+                                }
                             }}
                             {deviceData}
                             node={editingNode}
-                            section={editingNodeSection}
-                            sectionNodes={editingSectionNodes}
+                            bind:nodeEditingState={editingNodeState}
+                            sectionNodes={nodesBySection[editingNode.phase]}
                         />
                     </div>
                 </div>
@@ -1278,6 +1309,7 @@
 </div>
 
 <style>
+    /* Main content container for the edit device page */
     .content {
         display: flex;
         justify-content: flex-start;
@@ -1286,6 +1318,7 @@
         width: 100%;
     }
 
+    /* Container for all editable device sections */
     .edit-device-div {
         height: 100%;
         width: 100%;
@@ -1296,6 +1329,7 @@
         align-items: center;
     }
 
+    /* Device identification section: name, ID, image */
     .device-identification-div {
         width: 100%;
         height: 100%;
@@ -1309,6 +1343,7 @@
         border-bottom: 1px solid rgba(255, 255, 255, 0.2);
     }
 
+    /* Device ID text styling */
     .device-identification-div .id-text {
         padding: 0px;
         padding-top: 10px;
@@ -1318,10 +1353,12 @@
         font-weight: 300;
     }
 
+    /* Device image container styling */
     .device-identification-div .device-image-div {
         padding-top: 10px;
     }
 
+    /* Section for device configuration options */
     .device-section-div {
         width: 100%;
         height: 100%;
@@ -1335,6 +1372,7 @@
         border-bottom: 1px solid rgba(255, 255, 255, 0.2);
     }
 
+    /* Title area for each device section */
     .device-section-div .title {
         display: flex;
         flex-direction: column;
@@ -1346,6 +1384,7 @@
         width: 100%;
     }
 
+    /* Section title text styling */
     .device-section-div h3 {
         color: #f5f5f5;
         font-size: 1rem;
@@ -1354,6 +1393,7 @@
         padding: 0;
     }
 
+    /* Section subtitle text styling */
     .device-section-div span {
         color: rgb(170, 170, 170);
         font-weight: 400;
@@ -1362,10 +1402,12 @@
         line-height: 1.5;
     }
 
+    /* Optional authentication section styling */
     .device-section-div .optional-div {
         padding-top: 50px;
     }
 
+    /* Optional authentication label styling */
     .device-section-div .optional-div .optional-text {
         display: block;
         width: 100%;
@@ -1373,6 +1415,7 @@
         padding-bottom: 5px;
     }
 
+    /* Nodes grid container styling */
     .device-section-div .nodes-grid-div {
         width: 100%;
         height: fit-content;
@@ -1382,6 +1425,7 @@
         box-sizing: border-box;
     }
 
+    /* Device input row styling */
     .device-input-div {
         position: relative;
         margin-top: 30px;
@@ -1394,6 +1438,7 @@
         gap: 20px;
     }
 
+    /* Label text for device input fields */
     .device-input-div span {
         text-align: left;
         color: #f5f5f5;
@@ -1404,6 +1449,7 @@
         width: 250px;
     }
 
+    /* Input field container styling */
     .input-div {
         position: relative;
         display: flex;
@@ -1416,6 +1462,7 @@
         height: 100%;
     }
 
+    /* Content area for input fields */
     .input-div .input-content-div {
         width: 200px;
         display: flex;
@@ -1423,6 +1470,7 @@
         align-items: center;
     }
 
+    /* Info text styling for hints */
     .info-div .info-text {
         padding: 10px;
         padding-right: 40px;
@@ -1432,6 +1480,7 @@
         color: white;
     }
 
+    /* Action buttons container (save, cancel, delete) */
     .action-buttons-div {
         margin: 0;
         padding: 0;
@@ -1440,17 +1489,19 @@
         width: 100%;
         height: 100%;
         display: grid;
-        grid-template-columns: repeat(3, 150px);
+        grid-template-columns: repeat(3, 250px);
         gap: 30px;
         justify-content: center;
         justify-items: center;
     }
 
+    /* Overlay for modal windows (node config, delete, save) */
     .overlay-device-div {
         position: absolute;
         inset: 0;
     }
 
+    /* Overlay content container for modals */
     .overlay-device-div-content {
         margin: 0;
         padding: 0;
@@ -1466,6 +1517,7 @@
         z-index: 2;
     }
 
+    /* Modal window container styling */
     .overlay-device-div-content .window-div {
         width: 100%;
         height: fit-content;
@@ -1479,6 +1531,7 @@
         align-items: center;
     }
 
+    /* Modal window text styling */
     .overlay-device-div-content .window-div span {
         font-size: 1rem;
         font-weight: 400;
@@ -1488,10 +1541,12 @@
         word-break: break-word;
     }
 
+    /* Save window text color override */
     .overlay-device-div-content .window-div span.save-window-text {
         color: rgb(170, 170, 170);
     }
 
+    /* Input field container inside modal windows */
     .overlay-device-div-content .window-div .input-field-div {
         margin: 0;
         width: 100%;
@@ -1505,6 +1560,7 @@
         padding-right: 0px;
     }
 
+    /* Button container inside modal windows */
     .overlay-device-div-content .window-div .button-div {
         margin: 0;
         width: 100%;
@@ -1518,6 +1574,7 @@
         padding-right: 0px;
     }
 
+    /* Button container for save window modal */
     .overlay-device-div-content .window-div .button-div.save-window-button {
         padding: 10px;
         padding-top: 20px;
@@ -1525,12 +1582,14 @@
         padding-right: 0px;
     }
 
-    @media (max-width: 769px) {
+    /* Responsive: stack action buttons vertically on small screens */
+    @media (max-width: 1200px) {
         .action-buttons-div {
             grid-template-columns: 1fr;
         }
     }
 
+    /* Responsive: limit edit device container width on large screens */
     @media (min-width: 880px) {
         .edit-device-div {
             width: 80%;
