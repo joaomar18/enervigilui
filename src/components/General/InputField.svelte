@@ -78,7 +78,7 @@
         // For numeric input types, do not allow empty string
         if (["INT", "POSITIVE_INT", "FLOAT", "POSITIVE_FLOAT"].includes(inputType)) {
             if (inputValue === "") {
-                inputValue = "0";
+                inputValue = minValue.toString();
                 if (limitsPassed) {
                     limitsPassed();
                 }
