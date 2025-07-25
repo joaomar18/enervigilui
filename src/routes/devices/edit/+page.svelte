@@ -46,6 +46,7 @@
     let opcuaConfig: EditableDeviceOPCUAConfig | null; // OPC UA Configuration
     let modbusRTUConfig: EditableDeviceModbusRTUConfig | null; // Modbus RTU Configuration
 
+    let nodesInitialized: boolean = false; // Nodes are initialized (fetched) from server
     let nodes: Array<EditableDeviceNode>;
     let nodesBySection: Record<NodePhase, Array<EditableDeviceNode>>;
 
@@ -115,6 +116,7 @@
                 } else {
                     let requestDeviceNodes: Record<string, DeviceNode> = data;
                     nodes = convertToEditableNodes(requestDeviceNodes);
+                    nodesInitialized = true;
                     sucess = true;
                 }
             } catch (e) {
@@ -1107,6 +1109,7 @@ Shows input forms for protocol-specific parameters and organizes device nodes fo
                 <div class="nodes-grid-div">
                     <NodesGrid
                         {deviceData}
+                        {nodesInitialized}
                         bind:nodes
                         bind:nodesBySection
                         onPropertyChanged={(node: EditableDeviceNode) => {

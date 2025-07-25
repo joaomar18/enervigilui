@@ -18,6 +18,7 @@
 
     // Props
     export let deviceData: EditableDeviceMeter;
+    export let nodesInitialized: boolean; // Nodes are initialized
     export let nodes: Array<EditableDeviceNode> = []; // Nodes Configuration (Formatted)
     export let nodesBySection: Record<NodePhase, Array<EditableDeviceNode>>; // Nodes Configuration by Section
 
@@ -115,6 +116,9 @@ Includes multi-language headers and adapts layout to container size. -->
     class="container"
 >
     <div class="content">
+        <div class="loader-overlay" class:close={nodesInitialized}>
+            <div class="spinner"></div>
+        </div>
         <table>
             <thead>
                 <tr class="header">
@@ -267,10 +271,50 @@ Includes multi-language headers and adapts layout to container size. -->
         height: 100%;
         padding: 0;
         margin: 0;
+        position: relative;
         display: flex;
         flex-direction: column;
         align-items: center;
         justify-content: start;
+    }
+
+    /* Overlay when nodes are not yet initialized */
+    .content .loader-overlay {
+        margin: 0;
+        padding: 0;
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        display: flex;
+        flex-direction: row;
+        justify-content: center;
+        align-items: center;
+        background: rgba(24, 29, 35, 0.25);
+        backdrop-filter: blur(8px);
+        -webkit-backdrop-filter: blur(8px);
+        z-index: 2;
+    }
+
+    /* Close overlay and loader when content is initialized */
+    .content .loader-overlay.close {
+        display: none;
+    }
+
+    /* Spinner for loading visualization of nodes grid */
+    .content .loader-overlay .spinner {
+        width: 128px;
+        height: 128px;
+        border: 4px solid rgba(255, 255, 255, 0.2);
+        border-top-color: #fff;
+        border-radius: 50%;
+        animation: content-spin 1s linear infinite;
+    }
+
+    /* Spin animation: full rotation */
+    @keyframes content-spin {
+        to {
+            transform: rotate(360deg);
+        }
     }
 
     /* Table layout for nodes grid */
