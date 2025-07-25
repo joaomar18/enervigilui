@@ -1142,12 +1142,17 @@ Shows input forms for protocol-specific parameters and organizes device nodes fo
             </div>
             <div class="action-buttons-div">
                 <Button
+                    enabled={$loadedDone && nodesInitialized}
                     buttonText={$texts.save[$selectedLang]}
                     width="250px"
                     height="50px"
                     borderRadius="5px"
-                    backgroundColor="#2F80ED"
-                    hoverColor="#1C6DD0"
+                    backgroundColor="#1a2233"
+                    borderColor="#2F80ED"
+                    hoverColor="#203046"
+                    disabledBackgroundColor="#282828"
+                    disabledBorderColor="#444444"
+                    disabledHoverColor="#282828"
                     fontColor="#f5f5f5"
                     imageURL="/img/save.png"
                     imageWidth="22px"
@@ -1162,8 +1167,9 @@ Shows input forms for protocol-specific parameters and organizes device nodes fo
                     width="250px"
                     height="50px"
                     borderRadius="5px"
-                    backgroundColor="#707070"
-                    hoverColor="#5A5A5A"
+                    backgroundColor="#232528"
+                    borderColor="#8A8C91"
+                    hoverColor="#2C2E34"
                     fontColor="#f5f5f5"
                     imageURL="/img/previous.png"
                     imageWidth="22px"
@@ -1172,12 +1178,17 @@ Shows input forms for protocol-specific parameters and organizes device nodes fo
                     onClick={cancelEdit}
                 />
                 <Button
+                    enabled={$loadedDone && nodesInitialized}
                     buttonText={$texts.delete[$selectedLang]}
                     width="250px"
                     height="50px"
                     borderRadius="5px"
-                    backgroundColor="#E74C3C"
-                    hoverColor="#C0392B"
+                    backgroundColor="#23171a"
+                    borderColor="#FF3B30"
+                    hoverColor="#3b181a"
+                    disabledBackgroundColor="#282828"
+                    disabledBorderColor="#444444"
+                    disabledHoverColor="#282828"
                     fontColor="#f5f5f5"
                     imageURL="/img/delete.png"
                     imageWidth="22px"
