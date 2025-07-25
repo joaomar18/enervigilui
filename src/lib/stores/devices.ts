@@ -208,3 +208,37 @@ export interface EditableDeviceMeter {
     options: MeterOptions,
     communication_options: EditableCommunicationOptions;
 }
+
+/**
+ * Interface for creating a new device meter (device creation payload).
+ * Used when adding a new device to the backend, omitting properties managed by the backend (id, connected).
+ *
+ * @interface NewDeviceMeter
+ * @property {string} name - Human-readable name/label for the device (e.g., "Main Building Meter")
+ * @property {Protocol} protocol - Communication protocol used by this device (MODBUS_RTU, OPC_UA, or NONE)
+ * @property {MeterType} type - Electrical connection type (SINGLE_PHASE or THREE_PHASE)
+ * @property {MeterOptions} options - Operational settings controlling measurement capabilities and data acquisition
+ * @property {EditableCommunicationOptions} communication_options - Protocol-specific communication parameters and settings (as strings for form input)
+ */
+export interface NewDeviceMeter {
+    name: string,
+    protocol: Protocol,
+    type: MeterType,
+    options: MeterOptions,
+    communication_options: EditableCommunicationOptions;
+}
+
+/**
+ * Default device options for initializing new device forms or objects.
+ * Provides default protocol, meter type, and measurement options for convenience.
+ */
+export const defaultDeviceOptions = {
+    protocol: Protocol.OPC_UA,
+    type: MeterType.THREE_PHASE,
+    options: {
+        frequency_reading: true,
+        negative_reactive_power: true,
+        read_energy_from_meter: true,
+        read_separate_forward_reverse_energy: false,
+    } as MeterOptions
+}

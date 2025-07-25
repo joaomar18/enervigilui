@@ -14,6 +14,8 @@
     // Layout / styling props
     export let infoText: string = "";
     export let width: string;
+    export let minWidth: string | null = null;
+    export let maxWidth: string | null = null;
     export let height: string;
     export let borderRadius: string = "";
     export let backgroundColor: string;
@@ -141,6 +143,8 @@ Applies special styling when focused.
 <div
     style="
         --width: {width};
+        --min-width: {minWidth};
+        --max-width: {maxWidth};
         --height: {height};
         --border-radius: {borderRadius};
         --background-color: {backgroundColor};
@@ -217,6 +221,8 @@ Applies special styling when focused.
         margin: 0;
         padding: 0;
         width: var(--width);
+        min-width: var(--min-width, min-content);
+        max-width: var(--max-width, max-content);
         height: var(--height);
         display: flex;
         align-items: center;

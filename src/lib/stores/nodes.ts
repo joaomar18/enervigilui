@@ -156,6 +156,7 @@ export const nodeSections: Array<NodeSection> = [
  * @property {number} [defaultMaxAlarm] - Default maximum alarm threshold value
  * @property {boolean} [defaultMinAlarmEnabled] - Whether minimum alarm is enabled by default
  * @property {boolean} [defaultMaxAlarmEnabled] - Whether maximum alarm is enabled by default
+ * @property {boolean} useByDefault - The node is by default used
  */
 export interface DefaultNodeInfo {
     name: string;
@@ -174,6 +175,7 @@ export interface DefaultNodeInfo {
     defaultMaxAlarm?: number;
     defaultMinAlarmEnabled?: boolean;
     defaultMaxAlarmEnabled?: boolean;
+    useByDefault: boolean;
 }
 
 /**
@@ -308,28 +310,37 @@ export type NodeConfiguration = BaseNodeConfig & (NodeModbusRTUConfig | NodeOPCU
 export type EditableNodeConfiguration = EditableBaseNodeConfig & (EditableNodeModbusRTUConfig | EditableNodeOPCUAConfig | NodeNoProtocolConfig);
 
 /**
- * Represents a complete node in a device's configuration.
+ * Represents a complete node in a device's configuration (as stored or sent to the backend).
  * Contains all information needed to identify, configure, and communicate with a node.
- * 
+ *
  * @interface
- * @property {number} device_id - Unique identifier for the device this node belongs to
+ * @property {number | undefined} device_id - Unique identifier for the device this node belongs to. May be undefined for new nodes before assignment.
  * @property {string} name - Name of the node, typically includes phase prefix
  * @property {Protocol} protocol - Communication protocol used by this node
  * @property {NodeConfiguration} config - Complete configuration including protocol-specific settings
  */
 export interface DeviceNode {
-    device_id: number;
+    device_id?: number;
     name: string;
     protocol: Protocol;
     config: NodeConfiguration;
 }
 
 /**
- * Editable version of the device node for UI forms.
- * Used to represent device node data with editable fields for user input and validation.
+ * Editable version of the device node for UI forms and user input.
+ * Used to represent device node data with editable fields for user input and validation in the UI.
+ *
+ * @interface
+ * @property {number | undefined} device_id - Unique identifier for the device this node belongs to. May be undefined for new nodes before assignment.
+ * @property {string} name - Full node name, typically includes phase prefix
+ * @property {Protocol} protocol - Communication protocol used by this node
+ * @property {EditableNodeConfiguration} config - Editable configuration for user input and validation
+ * @property {string} display_name - Display name of the node (without prefix)
+ * @property {NodePhase} phase - Electrical phase associated with this node
+ * @property {string} communication_id - Protocol-specific communication identifier (e.g., register or node_id)
  */
 export interface EditableDeviceNode {
-    device_id: number;
+    device_id?: number;
     name: string;
     protocol: Protocol;
     config: EditableNodeConfiguration;
@@ -376,6 +387,7 @@ export const defaultVariables = readable<DefaultNodeInfo[]>([
         defaultMaxAlarm: 230 * 1.1,
         defaultMinAlarmEnabled: true,
         defaultMaxAlarmEnabled: true,
+        useByDefault: true,
     },
     {
         name: "l1_l2_voltage",
@@ -393,6 +405,7 @@ export const defaultVariables = readable<DefaultNodeInfo[]>([
         defaultMaxAlarm: 400 * 1.1,
         defaultMinAlarmEnabled: true,
         defaultMaxAlarmEnabled: true,
+        useByDefault: true,
     },
     {
         name: "l2_l3_voltage",
@@ -410,6 +423,7 @@ export const defaultVariables = readable<DefaultNodeInfo[]>([
         defaultMaxAlarm: 400 * 1.1,
         defaultMinAlarmEnabled: true,
         defaultMaxAlarmEnabled: true,
+        useByDefault: true,
     },
     {
         name: "l3_l1_voltage",
@@ -427,6 +441,7 @@ export const defaultVariables = readable<DefaultNodeInfo[]>([
         defaultMaxAlarm: 400 * 1.1,
         defaultMinAlarmEnabled: true,
         defaultMaxAlarmEnabled: true,
+        useByDefault: true,
     },
     {
         name: "current",
@@ -441,6 +456,7 @@ export const defaultVariables = readable<DefaultNodeInfo[]>([
         defaultLoggingPeriod: 15,
         defaultLoggingEnabled: false,
         isIncrementalNode: false,
+        useByDefault: true,
     },
     {
         name: "active_power",
@@ -455,6 +471,7 @@ export const defaultVariables = readable<DefaultNodeInfo[]>([
         defaultLoggingPeriod: 15,
         defaultLoggingEnabled: false,
         isIncrementalNode: false,
+        useByDefault: true,
     },
     {
         name: "reactive_power",
@@ -469,6 +486,7 @@ export const defaultVariables = readable<DefaultNodeInfo[]>([
         defaultLoggingPeriod: 15,
         defaultLoggingEnabled: false,
         isIncrementalNode: false,
+        useByDefault: true,
     },
     {
         name: "apparent_power",
@@ -483,6 +501,7 @@ export const defaultVariables = readable<DefaultNodeInfo[]>([
         defaultLoggingPeriod: 15,
         defaultLoggingEnabled: false,
         isIncrementalNode: false,
+        useByDefault: true,
     },
     {
         name: "power_factor",
@@ -496,6 +515,7 @@ export const defaultVariables = readable<DefaultNodeInfo[]>([
         defaultLoggingPeriod: 15,
         defaultLoggingEnabled: false,
         isIncrementalNode: false,
+        useByDefault: true,
     },
     {
         name: "power_factor_direction",
@@ -508,6 +528,7 @@ export const defaultVariables = readable<DefaultNodeInfo[]>([
         defaultLoggingPeriod: 15,
         defaultLoggingEnabled: false,
         isIncrementalNode: false,
+        useByDefault: true,
     },
     {
         name: "frequency",
@@ -525,6 +546,7 @@ export const defaultVariables = readable<DefaultNodeInfo[]>([
         defaultMaxAlarm: 50 * 1.01,
         defaultMinAlarmEnabled: true,
         defaultMaxAlarmEnabled: true,
+        useByDefault: false,
     },
     {
         name: "active_energy",
@@ -539,6 +561,7 @@ export const defaultVariables = readable<DefaultNodeInfo[]>([
         defaultLoggingPeriod: 15,
         defaultLoggingEnabled: true,
         isIncrementalNode: true,
+        useByDefault: true,
     },
     {
         name: "reactive_energy",
@@ -553,6 +576,7 @@ export const defaultVariables = readable<DefaultNodeInfo[]>([
         defaultLoggingPeriod: 15,
         defaultLoggingEnabled: true,
         isIncrementalNode: true,
+        useByDefault: true,
     },
     {
         name: "forward_active_energy",
@@ -567,6 +591,7 @@ export const defaultVariables = readable<DefaultNodeInfo[]>([
         defaultLoggingPeriod: 15,
         defaultLoggingEnabled: false,
         isIncrementalNode: true,
+        useByDefault: false,
     },
     {
         name: "forward_reactive_energy",
@@ -581,6 +606,7 @@ export const defaultVariables = readable<DefaultNodeInfo[]>([
         defaultLoggingPeriod: 15,
         defaultLoggingEnabled: false,
         isIncrementalNode: true,
+        useByDefault: false,
     },
     {
         name: "reverse_active_energy",
@@ -595,6 +621,7 @@ export const defaultVariables = readable<DefaultNodeInfo[]>([
         defaultLoggingPeriod: 15,
         defaultLoggingEnabled: false,
         isIncrementalNode: true,
+        useByDefault: false,
     },
     {
         name: "reverse_reactive_energy",
@@ -609,6 +636,7 @@ export const defaultVariables = readable<DefaultNodeInfo[]>([
         defaultLoggingPeriod: 15,
         defaultLoggingEnabled: false,
         isIncrementalNode: true,
+        useByDefault: false,
     },
 ]);
 

@@ -11,7 +11,7 @@
     import { showAlert } from "$lib/stores/alerts";
 
     // Types
-    import type { EditableDeviceMeter } from "$lib/stores/devices";
+    import type { EditableDeviceMeter, NewDeviceMeter } from "$lib/stores/devices";
     import type { EditableDeviceNode, NodeEditState } from "$lib/stores/nodes";
 
     // Stores for variable definitions
@@ -22,7 +22,7 @@
 
     // Props
     export let visible: boolean;
-    export let deviceData: EditableDeviceMeter;
+    export let deviceData: EditableDeviceMeter | NewDeviceMeter;
     export let node: EditableDeviceNode;
     export let nodeEditingState: NodeEditState;
     export let sectionNodes: Array<EditableDeviceNode>;

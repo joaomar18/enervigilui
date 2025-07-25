@@ -18,9 +18,16 @@
     export let backgroundColor: string;
     export let borderColor: string = backgroundColor;
     export let imageURL: string;
+    export let defaultImageURL: string | null = null;
     export let imageBackgroundColor: string;
     export let imageWidth: string;
     export let imageHeight: string;
+
+    // Variables
+
+    let currentImageUrl: string;
+
+    $: currentImageUrl = imageURL;
 
     // Export Funcions
     export let onEdit: () => void;
@@ -35,6 +42,12 @@
     function handleEnter(): void {
         if (onEnter) {
             onEnter();
+        }
+    }
+
+    function handleImageError() {
+        if (defaultImageURL && currentImageUrl !== defaultImageURL) {
+            currentImageUrl = defaultImageURL;
         }
     }
 </script>
@@ -55,9 +68,9 @@
 >
     <div class="content">
         <h3>{deviceName}</h3>
-        <div style="background-image: url('{imageURL}');" class="device-image-div">
-            <button class="device-image-mask" onclick={handleEnter} aria-label="Enter Device"
-            ></button>
+        <div style="background-image: url('{currentImageUrl}');" class="device-image-div">
+            <img src={currentImageUrl} alt="Url Checker" style="display:none" on:error={handleImageError} />
+            <button class="device-image-mask" on:click={handleEnter} aria-label="Enter Device"></button>
         </div>
         <div class="actions-div">
             <Notification
@@ -145,16 +158,19 @@
         -webkit-tap-highlight-color: transparent;
     }
 
-    /* Title: centered light-weight heading */
+    /* Title: centered light-weight heading, truncate if too long */
     h3 {
         margin: 0;
-        padding: 0;
-        padding-top: 20px;
-        padding-bottom: 20px;
+        padding: 20px;
         color: #f5f5f5;
         width: 100%;
         text-align: center;
         font-weight: 400;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        max-width: 100%;
+        box-sizing: border-box;
     }
 
     /* Image div: circular placeholder with bg image */

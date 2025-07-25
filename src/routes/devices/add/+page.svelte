@@ -1,14 +1,7 @@
 <script lang="ts">
-    import { onMount, onDestroy } from "svelte";
-    import {
-        getDeviceState,
-        getDeviceNodesConfig,
-        convertToEditableDevice,
-        validateDeviceName,
-        validateOpcUaUrl,
-        validateModbusRtuPort,
-    } from "$lib/ts/devices";
-    import { getNodeIndex, convertToEditableNodes, getDefaultNodesList, changeNodeProtocol } from "$lib/ts/nodes";
+    import { onMount } from "svelte";
+    import { validateDeviceName, validateOpcUaUrl, validateModbusRtuPort, createNewDevice } from "$lib/ts/devices";
+    import { getNodeIndex, getDefaultNodesList, changeNodeProtocol } from "$lib/ts/nodes";
     import { nodeSections } from "$lib/stores/nodes";
     import Selector from "../../../components/General/Selector.svelte";
     import SelectorButton from "../../../components/General/SelectorButton.svelte";
@@ -20,11 +13,11 @@
     import InputField from "../../../components/General/InputField.svelte";
     import NodesGrid from "../../../components/Devices/Nodes/NodesGrid.svelte";
     import NodeConfigWindow from "../../../components/Devices/Nodes/NodeConfigWindow.svelte";
-    import { Protocol, defaultOPCUAOptions, defaultModbusRTUOptions } from "$lib/stores/devices";
+    import { Protocol, defaultOPCUAOptions, defaultModbusRTUOptions, defaultDeviceOptions } from "$lib/stores/devices";
 
     // Types
-    import type { DeviceMeter, EditableDeviceMeter, EditableDeviceOPCUAConfig, EditableDeviceModbusRTUConfig } from "$lib/stores/devices";
-    import type { DeviceNode, EditableDeviceNode, NodeEditState, NodePhase } from "$lib/stores/nodes";
+    import type { NewDeviceMeter, EditableDeviceOPCUAConfig, EditableDeviceModbusRTUConfig } from "$lib/stores/devices";
+    import type { EditableDeviceNode, NodeEditState, NodePhase } from "$lib/stores/nodes";
 
     // Navigation
     import { navigateTo } from "$lib/ts/navigation";
@@ -40,16 +33,10 @@
     import { loadedDone } from "$lib/stores/navigation";
 
     // Variables
-    let showSaveWindow: boolean = false; // Show Save Configuration Window
-    let showDeleteWindow: boolean = false; // Show Delete Device Window
+    let showAddWindow: boolean = false; // Show Add Device Window
     let showConfigNodeWindow: boolean = false; // Show Node Full Configuration Window
 
-    let deleteDeviceName: string; // Variable to confirm device delete (must match device name)
-
-    let devicePollTimer: ReturnType<typeof setTimeout>; // Timeout for device configuration request
-    let nodesPollTimer: ReturnType<typeof setTimeout>; // Timeout for device nodes configuration request
-
-    let deviceData: EditableDeviceMeter; // Device Data
+    let deviceData: NewDeviceMeter; // Device Data
     let opcuaConfig: EditableDeviceOPCUAConfig | null; // OPC UA Configuration
     let modbusRTUConfig: EditableDeviceModbusRTUConfig | null; // Modbus RTU Configuration
 
@@ -61,7 +48,6 @@
     let editingNodeState: NodeEditState; // Current state of the Node being edited
 
     let deviceImage: File | undefined;
-    let deviceImageUrl: string;
 
     let validOpcUaUrl: boolean; // Valid OPC UA Url
     let validModbusRtuPort: boolean; // Valid Modbus RTU Port
@@ -94,104 +80,39 @@
 
     // Functions
 
-    //Function to fetch device configuration
-    function fetchDeviceConfig(name: string, id: number): void {
-        const tick = async () => {
-            let sucess = false;
-            try {
-                const { status, data }: { status: number; data: any } = await getDeviceState(name, id);
-                if (status !== 200) {
-                    showAlert($texts.errorDeviceConfig);
-                } else {
-                    let requestDeviceData: DeviceMeter = data;
-                    deviceData = convertToEditableDevice(requestDeviceData);
-                    deviceImageUrl = `/devices/${deviceData?.name}_${deviceData?.id}.png`;
-                    sucess = true;
-                }
-            } catch (e) {
-                showAlert($texts.errorDeviceConfig);
-            }
-            loadedDone.set(true);
-            if (!sucess) {
-                devicePollTimer = setTimeout(tick, 2500);
-            }
-        };
-        tick();
-    }
-
-    // Function to fetch device nodes (variables)
-    function fetchDeviceNodesConfig(name: string, id: number): void {
-        const tick = async () => {
-            let sucess = false;
-            try {
-                const { status, data }: { status: number; data: any } = await getDeviceNodesConfig(name, id);
-                if (status !== 200) {
-                    showAlert($texts.errorDeviceNodesConfig);
-                } else {
-                    let requestDeviceNodes: Record<string, DeviceNode> = data;
-                    nodes = convertToEditableNodes(requestDeviceNodes);
-                    nodesInitialized = true;
-                    sucess = true;
-                }
-            } catch (e) {
-                showAlert($texts.errorDeviceNodesConfig);
-            }
-            if (!sucess) {
-                nodesPollTimer = setTimeout(tick, 2500);
-            }
-        };
-        tick();
-    }
-
     //Function to save device changes
-    async function saveEdit(): Promise<void> {
-        showSaveWindow = false;
+    async function addDevice(): Promise<void> {
+        showAddWindow = false;
     }
 
-    // Function to cancel edit device (go to devices page)
-    async function cancelEdit(): Promise<void> {
+    // Function to cancel add device (go to devices page)
+    async function cancelAdd(): Promise<void> {
         await navigateTo("/devices", $selectedLang, {});
-    }
-
-    // Function to open popup to confirm device delete
-    async function deleteDevice(): Promise<void> {
-        deleteDeviceName = "";
-        showDeleteWindow = false;
     }
 
     // Mount function
     onMount(() => {
-        const params = new URLSearchParams(window.location.search);
-        let deviceName = params.get("deviceName");
-        let deviceId = params.get("deviceId");
-        if (deviceName && deviceId) {
-            fetchDeviceConfig(deviceName, Number(deviceId));
-            fetchDeviceNodesConfig(deviceName, Number(deviceId));
-        } else {
-            showAlert($texts.errorEditDeviceParams);
-            loadedDone.set(true);
-        }
-    });
-
-    // Cleanup function
-    onDestroy(() => {
-        clearTimeout(devicePollTimer);
-        clearTimeout(nodesPollTimer);
+        deviceData = createNewDevice(defaultDeviceOptions.protocol, defaultDeviceOptions.type, defaultDeviceOptions.options);
+        nodes = getDefaultNodesList(deviceData);
+        loadedDone.set(true);
+        nodesInitialized = true;
     });
 </script>
 
-<!-- Edit Device Page: displays the selected device's details and configuration options, including editable fields for device name, image, communication settings, and meter options. 
-Shows input forms for protocol-specific parameters and organizes device nodes for editing. Includes action buttons for saving, canceling, and deleting the device. -->
+<!-- Add Device Page: allows the user to create a new device by entering its details and configuration options, including editable fields for device name, image, communication settings, and meter options.
+Shows input forms for protocol-specific parameters and organizes device nodes for initial setup. Includes action buttons for saving or canceling the new device. -->
 <div class="content">
     {#if deviceData}
-        <div class="edit-device-div">
+        <div class="add-device-div">
             <div class="device-identification-div">
                 <EditableText
                     bind:text={deviceData.name}
+                    placeHolder={$texts.deviceName[$selectedLang]}
+                    allwaysEnabled={true}
                     enableTextInvalid={true}
                     textInvalid={!validateDeviceName(deviceData.name)}
                     width="75%"
-                    minWidth="200px"
+                    minWidth="250px"
                     maxWidth="500px"
                     fontSize="1.1rem"
                     fontColor="#f5f5f5"
@@ -200,15 +121,13 @@ Shows input forms for protocol-specific parameters and organizes device nodes fo
                     buttonImageWidth="22px"
                     buttonImageHeight="22px"
                 />
-                <span class="id-text">ID: {String(deviceData?.id).padStart(3, "0")}</span>
                 <div class="device-image-div">
                     <UploadImage
                         bind:imageFile={deviceImage}
                         width="200px"
                         height="200px"
                         borderRadius="50%"
-                        imageUrl={deviceImageUrl}
-                        defaultImageUrl={`/img/default-device.png`}
+                        imageUrl={`/img/default-device.png`}
                         imageHeight="87.5%"
                         backgroundColor="rgba(255, 255, 255, 0.1)"
                         hoverColor="rgba(255, 255, 255, 0.13)"
@@ -1182,48 +1101,27 @@ Shows input forms for protocol-specific parameters and organizes device nodes fo
                     imageWidth="22px"
                     imageHeight="22px"
                     imageLeftPos="20px"
-                    onClick={cancelEdit}
+                    onClick={cancelAdd}
                 />
                 <Button
                     enabled={$loadedDone && nodesInitialized}
-                    buttonText={$texts.save[$selectedLang]}
+                    buttonText={$texts.add[$selectedLang]}
                     width="250px"
                     height="50px"
                     borderRadius="5px"
-                    backgroundColor="#1a2233"
-                    borderColor="#2F80ED"
-                    hoverColor="#203046"
+                    backgroundColor="#16281a"
+                    borderColor="#1a8d46"
+                    hoverColor="#1c3922"
                     disabledBackgroundColor="#282828"
                     disabledBorderColor="#444444"
                     disabledHoverColor="#282828"
                     fontColor="#f5f5f5"
-                    imageURL="/img/save.png"
+                    imageURL="/img/plus.png"
                     imageWidth="22px"
                     imageHeight="22px"
                     imageLeftPos="20px"
                     onClick={() => {
-                        showSaveWindow = true;
-                    }}
-                />
-                <Button
-                    enabled={$loadedDone && nodesInitialized}
-                    buttonText={$texts.delete[$selectedLang]}
-                    width="250px"
-                    height="50px"
-                    borderRadius="5px"
-                    backgroundColor="#23171a"
-                    borderColor="#FF3B30"
-                    hoverColor="#3b181a"
-                    disabledBackgroundColor="#282828"
-                    disabledBorderColor="#444444"
-                    disabledHoverColor="#282828"
-                    fontColor="#f5f5f5"
-                    imageURL="/img/delete.png"
-                    imageWidth="22px"
-                    imageHeight="22px"
-                    imageLeftPos="20px"
-                    onClick={() => {
-                        showDeleteWindow = true;
+                        showAddWindow = true;
                     }}
                 />
             </div>
@@ -1253,12 +1151,12 @@ Shows input forms for protocol-specific parameters and organizes device nodes fo
                 </div>
             </div>
         {/if}
-        {#if showDeleteWindow}
+        {#if showAddWindow}
             <div class="overlay-device-div">
                 <div class="overlay-device-div-content">
                     <div class="window-div">
                         <ModalWindow
-                            title={`${$texts.deleteDevice[$selectedLang]} ${deviceData.name}`}
+                            title={`${$texts.addNewDevice[$selectedLang]}`}
                             width="80%"
                             minWidth="300px"
                             maxWidth="550px"
@@ -1267,79 +1165,21 @@ Shows input forms for protocol-specific parameters and organizes device nodes fo
                             borderColor="#2a2e3a"
                             backgroundColor="#14161c"
                             closeWindow={() => {
-                                showDeleteWindow = false;
+                                showAddWindow = false;
                             }}
                         >
-                            <span>{$texts.deleteDeviceInfo[$selectedLang]}</span>
-                            <div class="input-field-div">
-                                <InputField
-                                    bind:inputValue={deleteDeviceName}
-                                    infoText={$texts.confirmDeleteDevice[$selectedLang]}
-                                    width="100%"
-                                    height="40px"
-                                    borderRadius="5px"
-                                    backgroundColor="#23272f"
-                                    borderColor="#323a45"
-                                    selectedBackgroundColor="#252b33"
-                                    selectedBorderColor="#e74c3c"
-                                    fontSize="1rem"
-                                    fontColor="#f5f5f5"
-                                    fontWeight="400"
-                                    infoTextColor="rgb(170, 170, 170)"
-                                    infoTextSize="0.95rem"
-                                />
-                            </div>
-                            <div class="button-div">
-                                <Button
-                                    enabled={deleteDeviceName === deviceData.name}
-                                    buttonText={$texts.confirm[$selectedLang]}
-                                    width="150px"
-                                    height="40px"
-                                    borderRadius="5px"
-                                    backgroundColor="#E74C3C"
-                                    hoverColor="#C0392B"
-                                    borderColor="#A93226"
-                                    disabledBackgroundColor="#3a2323"
-                                    disabledHoverColor="#2a1818"
-                                    disabledBorderColor="#5a3a3a"
-                                    fontColor="#f5f5f5"
-                                    onClick={deleteDevice}
-                                />
-                            </div>
-                        </ModalWindow>
-                    </div>
-                </div>
-            </div>
-        {/if}
-        {#if showSaveWindow}
-            <div class="overlay-device-div">
-                <div class="overlay-device-div-content">
-                    <div class="window-div">
-                        <ModalWindow
-                            title={`${$texts.saveDevice[$selectedLang]}`}
-                            width="80%"
-                            minWidth="300px"
-                            maxWidth="550px"
-                            height="fit-content"
-                            borderRadius="10px"
-                            borderColor="#2a2e3a"
-                            backgroundColor="#14161c"
-                            closeWindow={() => {
-                                showSaveWindow = false;
-                            }}
-                        >
-                            <span class="save-window-text">{$texts.saveDeviceInfo[$selectedLang]}</span>
+                            <span class="add-window-text">{$texts.addNewDeviceInfo[$selectedLang]}</span>
                             <div class="button-div save-window-button">
                                 <Button
                                     buttonText={$texts.confirm[$selectedLang]}
                                     width="150px"
                                     height="40px"
                                     borderRadius="5px"
-                                    backgroundColor="#2F80ED"
-                                    hoverColor="#1C6DD0"
-                                    borderColor="#1456B0"
+                                    backgroundColor="#1a8d46"
+                                    hoverColor="#17673a"
+                                    borderColor="#145a36"
                                     fontColor="#f5f5f5"
-                                    onClick={saveEdit}
+                                    onClick={addDevice}
                                 />
                             </div>
                         </ModalWindow>
@@ -1360,8 +1200,8 @@ Shows input forms for protocol-specific parameters and organizes device nodes fo
         width: 100%;
     }
 
-    /* Container for all editable device sections */
-    .edit-device-div {
+    /* Container for all add device sections */
+    .add-device-div {
         height: 100%;
         width: 100%;
         min-width: 250px;
@@ -1383,16 +1223,6 @@ Shows input forms for protocol-specific parameters and organizes device nodes fo
         padding: 0;
         padding-bottom: 20px;
         border-bottom: 1px solid rgba(255, 255, 255, 0.2);
-    }
-
-    /* Device ID text styling */
-    .device-identification-div .id-text {
-        padding: 0px;
-        padding-top: 10px;
-        padding-bottom: 10px;
-        color: rgb(170, 170, 170);
-        font-size: 0.9rem;
-        font-weight: 300;
     }
 
     /* Device image container styling */
@@ -1531,7 +1361,7 @@ Shows input forms for protocol-specific parameters and organizes device nodes fo
         width: 100%;
         height: 100%;
         display: grid;
-        grid-template-columns: repeat(3, 250px);
+        grid-template-columns: repeat(2, 250px);
         gap: 30px;
         justify-content: center;
         justify-items: center;
@@ -1583,23 +1413,9 @@ Shows input forms for protocol-specific parameters and organizes device nodes fo
         word-break: break-word;
     }
 
-    /* Save window text color override */
-    .overlay-device-div-content .window-div span.save-window-text {
+    /* Add window text color override */
+    .overlay-device-div-content .window-div span.add-window-text {
         color: rgb(170, 170, 170);
-    }
-
-    /* Input field container inside modal windows */
-    .overlay-device-div-content .window-div .input-field-div {
-        margin: 0;
-        width: 100%;
-        height: fit-content;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        flex-direction: column;
-        padding: 20px;
-        padding-left: 0px;
-        padding-right: 0px;
     }
 
     /* Button container inside modal windows */
@@ -1631,9 +1447,9 @@ Shows input forms for protocol-specific parameters and organizes device nodes fo
         }
     }
 
-    /* Responsive: limit edit device container width on large screens */
+    /* Responsive: limit add device container width on large screens */
     @media (min-width: 880px) {
-        .edit-device-div {
+        .add-device-div {
             width: 80%;
         }
     }

@@ -54,12 +54,17 @@
         clearTimeout(pollTimer);
     });
 
-    //Go to edit device page
-    async function editDevice(deviceId: number, deviceName: string) {
+    // Go to edit device page
+    async function editDevice(deviceId: number, deviceName: string): Promise<void> {
         await navigateTo("devices/edit", $selectedLang, {
             deviceId: String(deviceId),
             deviceName: deviceName,
         });
+    }
+
+    // Go to add device page
+    async function addDevice(): Promise<void> {
+        await navigateTo("devices/add", $selectedLang);
     }
 </script>
 
@@ -80,6 +85,7 @@
             backgroundColor="#14161c"
             borderColor="rgba(255,255,255,0.07)"
             imageURL={`/devices/${device.name}_${device.id}.png`}
+            defaultImageURL="/img/default-device.png"
             imageBackgroundColor="rgba(255, 255, 255, 0.1)"
             imageWidth="200px"
             imageHeight="200px"
@@ -100,7 +106,7 @@
         imageHeight="200px"
         strokeColor="#9E9E9E"
         strokeSelectedColor="#e0e0e0"
-        onClick={() => {}}
+        onClick={() => addDevice()}
     />
 </div>
 

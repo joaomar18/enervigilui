@@ -7,14 +7,19 @@
     export let height: string;
     export let borderRadius: string = "0px";
     export let imageUrl: string;
+    export let defaultImageUrl: string | null = null;
     export let imageWidth: string = "auto";
     export let imageHeight: string = "auto";
     export let backgroundColor: string;
     export let hoverColor: string = backgroundColor;
 
-    //Functions
+    // Variables
     let fileInput: HTMLInputElement;
+    let currentImageUrl: string;
 
+    $: currentImageUrl = imageUrl;
+
+    // Functions
     function openPicker() {
         fileInput.click();
     }
@@ -24,6 +29,12 @@
         if (!file) return;
         imageFile = file;
         imageUrl = URL.createObjectURL(imageFile);
+    }
+
+    function handleImageError() {
+        if (defaultImageUrl && currentImageUrl !== defaultImageUrl) {
+            currentImageUrl = defaultImageUrl;
+        }
     }
 </script>
 
@@ -40,19 +51,13 @@
     "
     class="container"
 >
-    <div class="content" style="background-image: url('{imageUrl}')">
+    <div class="content" style="background-image: url('{currentImageUrl}')">
+        <img src={currentImageUrl} alt="Url Checker" style="display:none" on:error={handleImageError} />
         <img class="edit-pencil-img" src="/img/edit_pencil.png" alt="Edit Pencil" />
 
-        <input
-            type="file"
-            accept="image/*"
-            bind:this={fileInput}
-            on:change={onFileChange}
-            style="display:none"
-        />
+        <input type="file" accept="image/*" bind:this={fileInput} on:change={onFileChange} style="display:none" />
 
-        <button class="upload-image-btn" aria-label="Upload Image Button" on:click={openPicker}
-        ></button>
+        <button class="upload-image-btn" aria-label="Upload Image Button" on:click={openPicker}></button>
     </div>
 </div>
 

@@ -1,11 +1,11 @@
 import { get } from "svelte/store";
-import { Protocol, type EditableDeviceMeter } from "$lib/stores/devices";
-import { NodeType } from "$lib/stores/nodes";
+import { MeterType, Protocol, type EditableDeviceMeter, type NewDeviceMeter } from "$lib/stores/devices";
+import { nodeSections, NodeType } from "$lib/stores/nodes";
 import { defaultVariables } from "$lib/stores/nodes";
 import { defaultVariableNames } from "$lib/stores/nodes";
 import { defaultVariableUnits } from "$lib/stores/nodes";
 import { NodePrefix, NodePhase } from "$lib/stores/nodes";
-import type { NodeConfiguration, EditableBaseNodeConfig, NodeModbusRTUConfig, NodeOPCUAConfig, EditableNodeConfiguration, DeviceNode, EditableDeviceNode, NodeEditState } from "$lib/stores/nodes";
+import type { NodeConfiguration, EditableBaseNodeConfig, NodeModbusRTUConfig, NodeOPCUAConfig, EditableNodeConfiguration, DeviceNode, EditableDeviceNode, NodeEditState, DefaultNodeInfo, EditableNodeOPCUAConfig, EditableNodeModbusRTUConfig } from "$lib/stores/nodes";
 
 /**
  * Converts a record of DeviceNode objects into an array of EditableDeviceNode objects for UI editing.
@@ -33,9 +33,9 @@ export function convertToEditableNodes(nodes: Record<string, DeviceNode>): Array
             logging: node.config.logging,
             logging_period: node.config.logging_period.toString(),
             max_alarm: node.config.max_alarm,
-            max_alarm_value: node.config.max_alarm_value.toString(),
+            max_alarm_value: node.config.max_alarm_value.toFixed(node.config.decimal_places),
             min_alarm: node.config.min_alarm,
-            min_alarm_value: node.config.min_alarm_value.toString(),
+            min_alarm_value: node.config.min_alarm_value.toFixed(node.config.decimal_places),
             positive_incremental: node.config.positive_incremental,
             publish: node.config.publish,
             type: node.config.type,
@@ -75,11 +75,117 @@ export function convertToEditableNodes(nodes: Record<string, DeviceNode>): Array
 
     }
 
-    editableNodes = editableNodes.sort((a, b) => a.display_name.localeCompare(b.display_name));
-
-    return editableNodes;
+    return editableNodes.sort((a, b) => a.display_name.localeCompare(b.display_name));
 }
 
+/**
+ * Generates the default list of editable device nodes for a given device configuration.
+ *
+ * Accepts either an EditableDeviceMeter or NewDeviceMeter (for new or existing devices).
+ * For single-phase meters, includes all default variables applicable to single-phase and marked for default use.
+ * For three-phase meters, includes all default variables for each phase section, filtered by applicability and default use.
+ * Each node is initialized with default configuration and sorted by display name for consistent UI ordering.
+ *
+ * @param device_data The device meter configuration (EditableDeviceMeter or NewDeviceMeter)
+ * @returns Array of editable device nodes with default configuration, sorted by display name
+ */
+export function getDefaultNodesList(device_data: EditableDeviceMeter | NewDeviceMeter): Array<EditableDeviceNode> {
+    const nodes: Array<EditableDeviceNode> = [];
+    const defaultVars = get(defaultVariables);
+
+
+    if (device_data.type === MeterType.SINGLE_PHASE) {
+
+        const singlePhaseVars = defaultVars.filter((v) => v.applicablePhases.includes(NodePhase.SINGLEPHASE) && v.useByDefault);
+
+        for (const variable of singlePhaseVars) {
+            nodes.push(createDefaultEditableDeviceNode(variable, NodePhase.SINGLEPHASE, device_data));
+        }
+
+    }
+
+    else if (device_data.type === MeterType.THREE_PHASE) {
+
+        for (const section of nodeSections) {
+            const phaseVars = defaultVars.filter((v) => v.useByDefault && v.applicablePhases.includes(section.phase));
+            for (const variable of phaseVars) {
+                nodes.push(createDefaultEditableDeviceNode(variable, section.phase, device_data));
+            }
+        }
+
+    }
+
+    return nodes.sort((a, b) => a.display_name.localeCompare(b.display_name));
+}
+
+/**
+ * Creates a default editable device node for a given variable, phase, and device configuration.
+ *
+ * Accepts either an EditableDeviceMeter (for editing an existing device) or a NewDeviceMeter (for creating a new device).
+ * Initializes the node's name, configuration, and communication ID based on the selected protocol and phase.
+ * The node is set up with default values for all editable fields, ready for use in device configuration UIs.
+ *
+ * If the provided device_data is an EditableDeviceMeter (with an 'id' property), its id is assigned to the node's device_id (can also be undefined).
+ * If device_data is a NewDeviceMeter (no 'id'), device_id will be set to undefined.
+ *
+ * @param variable The default variable information to use for the node
+ * @param phase The phase (L1, L2, L3, etc.) to use for the node's name and configuration
+ * @param device_data The device meter configuration (EditableDeviceMeter or NewDeviceMeter)
+ * @returns A fully initialized EditableDeviceNode object with default configuration
+ */
+function createDefaultEditableDeviceNode(variable: DefaultNodeInfo, phase: NodePhase, device_data: EditableDeviceMeter | NewDeviceMeter): EditableDeviceNode {
+
+    const full_name = getNodePrefix(phase) + variable.name;
+
+    let nodeConfiguration: EditableNodeConfiguration;
+
+    const nodeBaseConfiguration: EditableBaseNodeConfig = {
+        calculate_increment: variable.isIncrementalNode && !(device_data.options.read_energy_from_meter),
+        calculated: false,
+        custom: false,
+        decimal_places: variable.defaultNumberOfDecimals !== undefined ? String(variable.defaultNumberOfDecimals) : '',
+        enabled: true,
+        incremental_node: variable.isIncrementalNode,
+        logging: variable.defaultLoggingEnabled,
+        logging_period: String(variable.defaultLoggingPeriod),
+        max_alarm: variable.defaultMaxAlarmEnabled ? true : false,
+        max_alarm_value: variable.defaultMaxAlarm !== undefined ? variable.defaultMaxAlarm.toFixed(variable.defaultNumberOfDecimals) : '',
+        min_alarm: variable.defaultMinAlarmEnabled !== undefined ? true : false,
+        min_alarm_value: variable.defaultMinAlarm !== undefined ? variable.defaultMinAlarm.toFixed(variable.defaultNumberOfDecimals) : '',
+        positive_incremental: variable.isIncrementalNode && !(device_data.options.read_energy_from_meter),
+        publish: variable.defaultPublished,
+        type: variable.type,
+        unit: variable.defaultUnit,
+    };
+
+    if (device_data.protocol === Protocol.MODBUS_RTU) {
+        // Modbus RTU Protocol
+        nodeConfiguration = {
+            ...nodeBaseConfiguration,
+            register: getInitialCommunicationID(Protocol.MODBUS_RTU),
+        };
+    } else if (device_data.protocol === Protocol.OPC_UA) {
+        // OPC UA Protocol
+        nodeConfiguration = {
+            ...nodeBaseConfiguration,
+            node_id: getInitialCommunicationID(Protocol.OPC_UA),
+        };
+    } else {
+        throw new Error("Unsupported protocol");
+    }
+
+    let node: EditableDeviceNode = {
+        device_id: "id" in device_data ? device_data.id : undefined,
+        name: full_name,
+        protocol: device_data.protocol,
+        config: nodeConfiguration,
+        display_name: variable.name,
+        phase: phase,
+        communication_id: getCommunicationID(device_data.protocol, nodeConfiguration, true),
+    }
+
+    return node;
+}
 
 /**
  * Validates a node name based on whether it is a custom or default variable.
@@ -424,14 +530,64 @@ export function addPrefix(name: string, prefix: NodePrefix): string {
 }
 
 /**
- * Retrieves the communication ID for a device node based on its protocol and configuration.
- * For OPC UA nodes, returns the node_id string. For Modbus RTU nodes, returns the register as a hex string. Otherwise returns empty string.
+ * Returns the initial (default) communication ID string for the specified protocol.
  *
- * @param protocol Node protocol
- * @param config Node configuration
- * @returns Communication ID string or empty string
+ * For OPC UA, returns "ns=;i=". For Modbus RTU, returns "0x".
+ * Throws an error for unsupported protocols.
+ *
+ * @param protocol The protocol type (OPC_UA or MODBUS_RTU)
+ * @returns The initial communication ID string for the protocol
  */
-export function getCommunicationID(protocol: Protocol, config: NodeConfiguration | EditableNodeConfiguration): string {
+export function getInitialCommunicationID(protocol: Protocol): string {
+    if (protocol === Protocol.OPC_UA) {
+        return "ns=;i=";
+    } else if (protocol === Protocol.MODBUS_RTU) {
+        return "0x";
+    } else {
+        throw new Error("Unsupported protocol");
+    }
+}
+
+/**
+ * Updates the protocol and communication ID of an editable device node.
+ *
+ * Sets the node's protocol to the specified value and updates the relevant communication field
+ * (`register` for Modbus RTU, `node_id` for OPC UA) to the initial default value for that protocol.
+ * Also updates the node's `communication_id` property accordingly.
+ * Throws an error for unsupported protocols.
+ *
+ * @param protocol The new protocol to set (OPC_UA or MODBUS_RTU)
+ * @param node The editable device node to update
+ */
+export function changeNodeProtocol(protocol: Protocol, node: EditableDeviceNode): void {
+
+    if (protocol === Protocol.MODBUS_RTU) {
+        (node.config as EditableNodeModbusRTUConfig).register = getInitialCommunicationID(Protocol.MODBUS_RTU);
+    } else if (protocol === Protocol.OPC_UA) {
+        (node.config as EditableNodeOPCUAConfig).node_id = getInitialCommunicationID(Protocol.OPC_UA);
+    }
+    else {
+        throw new Error("Unsupported protocol");
+    }
+
+    node.protocol = protocol
+    node.communication_id = getCommunicationID(protocol, node.config, true);
+}
+
+/**
+ * Returns the communication ID string for a device node based on its protocol and configuration.
+ *
+ * For OPC UA nodes, returns the `node_id` string from the configuration.
+ * For Modbus RTU nodes, returns the `register` as a hexadecimal string (e.g., "0x000A").
+ * If `no_format` is true for Modbus RTU, returns the register as a plain number string instead of hex.
+ * For unsupported protocols or missing configuration, returns an empty string.
+ *
+ * @param protocol The protocol of the node (e.g., OPC_UA, MODBUS_RTU)
+ * @param config The node configuration object (NodeConfiguration or EditableNodeConfiguration)
+ * @param no_format (Optional) If true and protocol is MODBUS_RTU, returns register as a plain number string instead of hex (default: false)
+ * @returns The communication ID string for the node, or an empty string if not applicable
+ */
+export function getCommunicationID(protocol: Protocol, config: NodeConfiguration | EditableNodeConfiguration, no_format: boolean = false): string {
     if (!config) return '';
 
     if (protocol === Protocol.OPC_UA && "node_id" in config) {
@@ -439,7 +595,7 @@ export function getCommunicationID(protocol: Protocol, config: NodeConfiguration
         return nodeId;
     } else if (protocol === Protocol.MODBUS_RTU && "register" in config) {
         const reg = config.register;
-        return "0x" + Number(reg).toString(16).toUpperCase().padStart(4, "0");
+        return no_format ? String(reg) : "0x" + Number(reg).toString(16).toUpperCase().padStart(4, "0");
     }
 
     return '';
@@ -447,14 +603,19 @@ export function getCommunicationID(protocol: Protocol, config: NodeConfiguration
 
 /**
  * Creates and returns a new node object for the specified section and device data.
+ *
+ * Accepts either an EditableDeviceMeter (for editing an existing device) or a NewDeviceMeter (for creating a new device).
  * Initializes the node with default configuration based on the selected protocol.
  * The returned node can be appended to your nodes array for further configuration or display.
  *
+ * If the provided device_data has an 'id' property (EditableDeviceMeter), it is assigned to the node's device_id.
+ * If device_data is a NewDeviceMeter (no 'id'), device_id will be set to undefined.
+ *
  * @param sectionPrefix Prefix to use for the node name
- * @param deviceData Device data containing protocol and device ID
+ * @param device_data Device data containing protocol and (optionally) device ID (EditableDeviceMeter or NewDeviceMeter)
  * @returns Newly created node ready to be appended to the nodes array
  */
-export function addNode(sectionPrefix: NodePrefix, deviceData: EditableDeviceMeter): EditableDeviceNode {
+export function addNode(sectionPrefix: NodePrefix, device_data: EditableDeviceMeter | NewDeviceMeter): EditableDeviceNode {
     const nodeBaseName = ``;
     const fullNodeName = addPrefix(nodeBaseName, sectionPrefix);
 
@@ -479,30 +640,30 @@ export function addNode(sectionPrefix: NodePrefix, deviceData: EditableDeviceMet
 
     let newNodeConfiguration: EditableNodeConfiguration;
 
-    if (deviceData.protocol === Protocol.MODBUS_RTU) {
+    if (device_data.protocol === Protocol.MODBUS_RTU) {
         // Modbus RTU Protocol
         newNodeConfiguration = {
             ...newBaseConfiguration,
-            register: "0x" + Number(0).toString(16).toUpperCase().padStart(4, "0"),
+            register: getInitialCommunicationID(Protocol.MODBUS_RTU),
         };
-    } else if (deviceData.protocol === Protocol.OPC_UA) {
+    } else if (device_data.protocol === Protocol.OPC_UA) {
         // OPC UA Protocol
         newNodeConfiguration = {
             ...newBaseConfiguration,
-            node_id: "",
+            node_id: getInitialCommunicationID(Protocol.OPC_UA),
         };
     } else {
         throw new Error("Unsupported protocol");
     }
 
     const newFormattedNode: EditableDeviceNode = {
-        device_id: deviceData.id,
+        device_id: "id" in device_data ? device_data.id : undefined,
         name: fullNodeName,
-        protocol: deviceData.protocol,
+        protocol: device_data.protocol,
         config: newNodeConfiguration,
         display_name: nodeBaseName,
         phase: getNodePhase(fullNodeName),
-        communication_id: getCommunicationID(deviceData.protocol, newNodeConfiguration),
+        communication_id: getCommunicationID(device_data.protocol, newNodeConfiguration, true),
     };
 
     return newFormattedNode;

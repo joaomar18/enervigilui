@@ -6,10 +6,11 @@
     import { nodeSections } from "$lib/stores/nodes";
 
     // Stores for variable definitions
-    import { MeterType, Protocol, type EditableDeviceMeter } from "$lib/stores/devices";
+    import { MeterType, Protocol } from "$lib/stores/devices";
     import { NodePrefix, NodePhase } from "$lib/stores/nodes";
 
     // Types
+    import type { EditableDeviceMeter, NewDeviceMeter } from "$lib/stores/devices";
     import type { EditableDeviceNode, NodeEditState } from "$lib/stores/nodes";
     import type { ColumnVisibilityMap } from "$lib/ts/nodes_gid";
 
@@ -17,7 +18,7 @@
     import { selectedLang, texts } from "$lib/stores/lang";
 
     // Props
-    export let deviceData: EditableDeviceMeter;
+    export let deviceData: EditableDeviceMeter | NewDeviceMeter;
     export let nodesInitialized: boolean; // Nodes are initialized
     export let nodes: Array<EditableDeviceNode> = []; // Nodes Configuration (Formatted)
     export let nodesBySection: Record<NodePhase, Array<EditableDeviceNode>>; // Nodes Configuration by Section

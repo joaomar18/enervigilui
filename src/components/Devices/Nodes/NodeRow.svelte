@@ -9,7 +9,7 @@
     import { showAlert } from "$lib/stores/alerts";
 
     // Types
-    import type { EditableDeviceMeter } from "$lib/stores/devices";
+    import type { EditableDeviceMeter, NewDeviceMeter } from "$lib/stores/devices";
     import type { EditableDeviceNode, NodeEditState } from "$lib/stores/nodes";
     import type { ColumnVisibilityMap } from "$lib/ts/nodes_gid";
 
@@ -18,7 +18,7 @@
 
     // Props
     export let sectionNodes: Array<EditableDeviceNode>;
-    export let deviceData: EditableDeviceMeter;
+    export let deviceData: EditableDeviceMeter | NewDeviceMeter;
     export let node: EditableDeviceNode;
 
     // Layout / styling props

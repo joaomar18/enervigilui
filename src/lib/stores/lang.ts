@@ -602,6 +602,22 @@ const textsObject: TextsObject = {
         PT: "O número de casas decimais deve estar compreendido entre {minValue} e {maxValue}.",
         EN: "The number of decimal places must be between {minValue} and {maxValue}.",
     },
+    deviceName: {
+        PT: "Nome do dispositivo",
+        EN: "Device name",
+    },
+    add: {
+        PT: "Adicionar",
+        EN: "Add",
+    },
+    addNewDevice: {
+        PT: "Adicionar novo dispositivo",
+        EN: "Add new device",
+    },
+    addNewDeviceInfo: {
+        PT: "Confirmar a adição irá criar um novo dispositivo. Tem a certeza que pretende continuar?",
+        EN: "Confirming will create a new device. Are you sure you want to continue?",
+    },
 };
 
 //////////     D E V I C E     T E X T S     //////////
