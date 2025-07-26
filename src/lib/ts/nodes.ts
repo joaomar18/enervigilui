@@ -27,15 +27,15 @@ export function convertToEditableNodes(nodes: Record<string, DeviceNode>): Array
             calculate_increment: node.config.calculate_increment,
             calculated: node.config.calculated,
             custom: node.config.custom,
-            decimal_places: node.config.decimal_places.toString(),
+            decimal_places: (node.config.type === NodeType.FLOAT || node.config.type === NodeType.INT) ? node.config.decimal_places.toString() : "",
             enabled: node.config.enabled,
             incremental_node: node.config.incremental_node,
             logging: node.config.logging,
             logging_period: node.config.logging_period.toString(),
             max_alarm: node.config.max_alarm,
-            max_alarm_value: node.config.max_alarm_value.toFixed(node.config.decimal_places),
+            max_alarm_value: (node.config.type === NodeType.FLOAT || node.config.type === NodeType.INT) ? node.config.max_alarm_value.toFixed(node.config.decimal_places) : "",
             min_alarm: node.config.min_alarm,
-            min_alarm_value: node.config.min_alarm_value.toFixed(node.config.decimal_places),
+            min_alarm_value: (node.config.type === NodeType.FLOAT || node.config.type === NodeType.INT) ? node.config.min_alarm_value.toFixed(node.config.decimal_places) : "",
             positive_incremental: node.config.positive_incremental,
             publish: node.config.publish,
             type: node.config.type,
@@ -385,6 +385,11 @@ export function nodeTypeChange(node: EditableDeviceNode, nodeState: NodeEditStat
         } else if (node.config.type === NodeType.STRING || node.config.type === NodeType.BOOLEAN) {
 
             nodeState.oldVariableUnit = node.config.unit;
+            node.config.decimal_places = "";
+            node.config.min_alarm_value = "";
+            node.config.max_alarm_value = "";
+            node.config.min_alarm = false;
+            node.config.max_alarm = false;
             node.config.unit = "";
 
         }

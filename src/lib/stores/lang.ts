@@ -350,6 +350,18 @@ const textsObject: TextsObject = {
         PT: "A porta de comunicação utilizada para estabelecer a ligação com o dispositivo.",
         EN: "The communication port used to establish the connection with the device.",
     },
+    slaveID: {
+        PT: "ID do Dispositivo",
+        EN: "Device ID",
+    },
+    slaveIDInfo: {
+        PT: "Identificador único do dispositivo na rede Modbus. Deve ser um número entre 1 e 247.",
+        EN: "Unique identifier of the device on the Modbus network. Must be a number between 1 and 247.",
+    },
+    slaveIDError: {
+        PT: "O ID do dispositivo deve estar compreendido entre {minValue} e {maxValue}.",
+        EN: "The device ID must be between {minValue} and {maxValue}.",
+    },
     baudrate: {
         PT: "Baudrate",
         EN: "Baudrate",
