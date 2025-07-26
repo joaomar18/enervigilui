@@ -247,67 +247,67 @@ Displays contextual hints and supports multi-language labels for all fields. -->
                 </span>
             </span>
         </div>
-
-        <div class="row">
-            <span class="row-variable">
-                <span class="row-identifier">{$texts.decimalPlaces[$selectedLang]}</span>
-                <span class="row-input">
-                    <span class="row-entry">
-                        <InputField
-                            bind:inputValue={node.config.decimal_places}
-                            onChange={() => {
-                                onPropertyChanged();
-                            }}
-                            enableInputInvalid={true}
-                            inputType="POSITIVE_INT"
-                            minValue={0}
-                            maxValue={6}
-                            limitsPassed={() => {
-                                showAlert($texts.decimalPlacesError, {
-                                    minValue: 0,
-                                    maxValue: 6,
-                                });
-                            }}
-                            width="100%"
-                            height="40px"
-                            borderRadius="5px"
-                            backgroundColor="#1a2027"
-                            disabledBackgroundColor="#42505f"
-                            selectedBackgroundColor="#1a2027"
-                            selectedBorderColor="#2F80ED"
-                            badFormatBorderColor="#e74c3c"
-                            fontSize="0.9rem"
-                            fontColor="#f5f5f5"
-                            fontWeight="400"
-                            textAlign="center"
-                            unitTextColor="rgb(170,170,170)"
-                        />
-                    </span>
-                    <span class="row-hint">
-                        <HintInfo
-                            labelText=""
-                            hintWidth="250px"
-                            hintHeight="fit-content"
-                            hintBackgroundColor="#1e242b"
-                            hintBorderColor="#2c343d"
-                            hintBorderRadius="10px"
-                            textColor="#f5f5f5"
-                            openBackgroundColor="rgba(255, 255, 255, 0.05)"
-                            openHoverBackgroundColor="rgba(255, 255, 255, 0.1)"
-                            openStrokeColor="#cccccc"
-                            openHoverStrokeColor="#eeeeee"
-                            closeBackgroundColor="rgba(255, 255, 255, 0.1)"
-                            closeHoverBackgroundColor="rgba(255, 255, 255, 0.2)"
-                            closeStrokeColor="white"
-                            closeHoverStrokeColor="#eeeeee"
-                        >
-                            <span class="info-text"> {$texts.decimalPlacesInfo[$selectedLang]}</span>
-                        </HintInfo>
+        {#if node.config.type === NodeType.FLOAT || node.config.type === NodeType.INT}
+            <div class="row">
+                <span class="row-variable">
+                    <span class="row-identifier">{$texts.decimalPlaces[$selectedLang]}</span>
+                    <span class="row-input">
+                        <span class="row-entry">
+                            <InputField
+                                bind:inputValue={node.config.decimal_places}
+                                onChange={() => {
+                                    onPropertyChanged();
+                                }}
+                                enableInputInvalid={true}
+                                inputType="POSITIVE_INT"
+                                minValue={0}
+                                maxValue={6}
+                                limitsPassed={() => {
+                                    showAlert($texts.decimalPlacesError, {
+                                        minValue: 0,
+                                        maxValue: 6,
+                                    });
+                                }}
+                                width="100%"
+                                height="40px"
+                                borderRadius="5px"
+                                backgroundColor="#1a2027"
+                                disabledBackgroundColor="#42505f"
+                                selectedBackgroundColor="#1a2027"
+                                selectedBorderColor="#2F80ED"
+                                badFormatBorderColor="#e74c3c"
+                                fontSize="0.9rem"
+                                fontColor="#f5f5f5"
+                                fontWeight="400"
+                                textAlign="center"
+                                unitTextColor="rgb(170,170,170)"
+                            />
+                        </span>
+                        <span class="row-hint">
+                            <HintInfo
+                                labelText=""
+                                hintWidth="250px"
+                                hintHeight="fit-content"
+                                hintBackgroundColor="#1e242b"
+                                hintBorderColor="#2c343d"
+                                hintBorderRadius="10px"
+                                textColor="#f5f5f5"
+                                openBackgroundColor="rgba(255, 255, 255, 0.05)"
+                                openHoverBackgroundColor="rgba(255, 255, 255, 0.1)"
+                                openStrokeColor="#cccccc"
+                                openHoverStrokeColor="#eeeeee"
+                                closeBackgroundColor="rgba(255, 255, 255, 0.1)"
+                                closeHoverBackgroundColor="rgba(255, 255, 255, 0.2)"
+                                closeStrokeColor="white"
+                                closeHoverStrokeColor="#eeeeee"
+                            >
+                                <span class="info-text"> {$texts.decimalPlacesInfo[$selectedLang]}</span>
+                            </HintInfo>
+                        </span>
                     </span>
                 </span>
-            </span>
-        </div>
-
+            </div>
+        {/if}
         <div class="row">
             <span class="row-variable">
                 <span class="row-identifier">
@@ -506,140 +506,142 @@ Displays contextual hints and supports multi-language labels for all fields. -->
                 </span>
             </span>
         </div>
-        <div class="row">
-            <span class="row-variable">
-                <span class="row-identifier">{$texts.minValue[$selectedLang]}</span>
-                <span class="row-input">
-                    <span class="row-entry">
-                        <InputField
-                            disabled={(node.config.type !== NodeType.FLOAT && node.config.type !== NodeType.INT) || !node.config.min_alarm}
-                            bind:inputValue={node.config.min_alarm_value}
-                            onChange={() => {
-                                onPropertyChanged();
-                            }}
-                            inputType={node.config.type}
-                            inputUnit={node.config.unit}
-                            width="100%"
-                            height="40px"
-                            borderRadius="5px"
-                            backgroundColor="#1a2027"
-                            disabledBackgroundColor="#42505f"
-                            selectedBackgroundColor="#1a2027"
-                            selectedBorderColor="#2F80ED"
-                            badFormatBorderColor="#e74c3c"
-                            fontSize="0.9rem"
-                            fontColor="#f5f5f5"
-                            fontWeight="400"
-                            textAlign="center"
-                            unitTextColor="rgb(170,170,170)"
-                        />
-                        <Checkbox
-                            bind:checked={node.config.min_alarm}
-                            onChange={() => {
-                                onPropertyChanged();
-                            }}
-                            inputName="node-min-alarm"
-                            width="38px"
-                            height="38px"
-                            checkMarkWidth={24}
-                            checkMarkHeight={24}
-                            enabledbgColor="#2f80ed"
-                            enabledBorderColor="#5a646e"
-                            disabledbgColor="#42505f"
-                            disabledBorderColor="#5a646e"
-                        />
-                    </span>
-                    <span class="row-hint">
-                        <HintInfo
-                            labelText=""
-                            hintWidth="250px"
-                            hintHeight="fit-content"
-                            hintBackgroundColor="#1e242b"
-                            hintBorderColor="#2c343d"
-                            hintBorderRadius="10px"
-                            textColor="#f5f5f5"
-                            openBackgroundColor="rgba(255, 255, 255, 0.05)"
-                            openHoverBackgroundColor="rgba(255, 255, 255, 0.1)"
-                            openStrokeColor="#cccccc"
-                            openHoverStrokeColor="#eeeeee"
-                            closeBackgroundColor="rgba(255, 255, 255, 0.1)"
-                            closeHoverBackgroundColor="rgba(255, 255, 255, 0.2)"
-                            closeStrokeColor="white"
-                            closeHoverStrokeColor="#eeeeee"
-                        >
-                            <span class="info-text">{$texts.minValueInfo[$selectedLang]}</span>
-                        </HintInfo>
-                    </span>
-                </span>
-            </span>
-        </div>
-        <div class="row">
-            <span class="row-variable">
-                <span class="row-identifier">{$texts.maxValue[$selectedLang]}</span>
-                <span class="row-input">
-                    <span class="row-entry">
-                        <InputField
-                            disabled={(node.config.type !== NodeType.FLOAT && node.config.type !== NodeType.INT) || !node.config.max_alarm}
-                            bind:inputValue={node.config.max_alarm_value}
-                            onChange={() => {
-                                onPropertyChanged();
-                            }}
-                            inputType={node.config.type}
-                            inputUnit={node.config.unit}
-                            width="100%"
-                            height="40px"
-                            borderRadius="5px"
-                            backgroundColor="#1a2027"
-                            disabledBackgroundColor="#42505f"
-                            selectedBackgroundColor="#1a2027"
-                            selectedBorderColor="#2F80ED"
-                            badFormatBorderColor="#e74c3c"
-                            fontSize="0.9rem"
-                            fontColor="#f5f5f5"
-                            fontWeight="400"
-                            textAlign="center"
-                            unitTextColor="rgb(170,170,170)"
-                        />
-                        <Checkbox
-                            bind:checked={node.config.max_alarm}
-                            onChange={() => {
-                                onPropertyChanged();
-                            }}
-                            inputName="node-max-alarm"
-                            width="38px"
-                            height="38px"
-                            checkMarkWidth={24}
-                            checkMarkHeight={24}
-                            enabledbgColor="#2f80ed"
-                            enabledBorderColor="#5a646e"
-                            disabledbgColor="#42505f"
-                            disabledBorderColor="#5a646e"
-                        />
-                    </span>
-                    <span class="row-hint">
-                        <HintInfo
-                            labelText=""
-                            hintWidth="250px"
-                            hintHeight="fit-content"
-                            hintBackgroundColor="#1e242b"
-                            hintBorderColor="#2c343d"
-                            hintBorderRadius="10px"
-                            textColor="#f5f5f5"
-                            openBackgroundColor="rgba(255, 255, 255, 0.05)"
-                            openHoverBackgroundColor="rgba(255, 255, 255, 0.1)"
-                            openStrokeColor="#cccccc"
-                            openHoverStrokeColor="#eeeeee"
-                            closeBackgroundColor="rgba(255, 255, 255, 0.1)"
-                            closeHoverBackgroundColor="rgba(255, 255, 255, 0.2)"
-                            closeStrokeColor="white"
-                            closeHoverStrokeColor="#eeeeee"
-                        >
-                            <span class="info-text">{$texts.maxValueInfo[$selectedLang]}</span>
-                        </HintInfo>
+        {#if node.config.type === NodeType.FLOAT || node.config.type == NodeType.INT}
+            <div class="row">
+                <span class="row-variable">
+                    <span class="row-identifier">{$texts.minValue[$selectedLang]}</span>
+                    <span class="row-input">
+                        <span class="row-entry">
+                            <InputField
+                                disabled={(node.config.type !== NodeType.FLOAT && node.config.type !== NodeType.INT) || !node.config.min_alarm}
+                                bind:inputValue={node.config.min_alarm_value}
+                                onChange={() => {
+                                    onPropertyChanged();
+                                }}
+                                inputType={node.config.type}
+                                inputUnit={node.config.unit}
+                                width="100%"
+                                height="40px"
+                                borderRadius="5px"
+                                backgroundColor="#1a2027"
+                                disabledBackgroundColor="#42505f"
+                                selectedBackgroundColor="#1a2027"
+                                selectedBorderColor="#2F80ED"
+                                badFormatBorderColor="#e74c3c"
+                                fontSize="0.9rem"
+                                fontColor="#f5f5f5"
+                                fontWeight="400"
+                                textAlign="center"
+                                unitTextColor="rgb(170,170,170)"
+                            />
+                            <Checkbox
+                                bind:checked={node.config.min_alarm}
+                                onChange={() => {
+                                    onPropertyChanged();
+                                }}
+                                inputName="node-min-alarm"
+                                width="38px"
+                                height="38px"
+                                checkMarkWidth={24}
+                                checkMarkHeight={24}
+                                enabledbgColor="#2f80ed"
+                                enabledBorderColor="#5a646e"
+                                disabledbgColor="#42505f"
+                                disabledBorderColor="#5a646e"
+                            />
+                        </span>
+                        <span class="row-hint">
+                            <HintInfo
+                                labelText=""
+                                hintWidth="250px"
+                                hintHeight="fit-content"
+                                hintBackgroundColor="#1e242b"
+                                hintBorderColor="#2c343d"
+                                hintBorderRadius="10px"
+                                textColor="#f5f5f5"
+                                openBackgroundColor="rgba(255, 255, 255, 0.05)"
+                                openHoverBackgroundColor="rgba(255, 255, 255, 0.1)"
+                                openStrokeColor="#cccccc"
+                                openHoverStrokeColor="#eeeeee"
+                                closeBackgroundColor="rgba(255, 255, 255, 0.1)"
+                                closeHoverBackgroundColor="rgba(255, 255, 255, 0.2)"
+                                closeStrokeColor="white"
+                                closeHoverStrokeColor="#eeeeee"
+                            >
+                                <span class="info-text">{$texts.minValueInfo[$selectedLang]}</span>
+                            </HintInfo>
+                        </span>
                     </span>
                 </span>
-            </span>
-        </div>
+            </div>
+            <div class="row">
+                <span class="row-variable">
+                    <span class="row-identifier">{$texts.maxValue[$selectedLang]}</span>
+                    <span class="row-input">
+                        <span class="row-entry">
+                            <InputField
+                                disabled={(node.config.type !== NodeType.FLOAT && node.config.type !== NodeType.INT) || !node.config.max_alarm}
+                                bind:inputValue={node.config.max_alarm_value}
+                                onChange={() => {
+                                    onPropertyChanged();
+                                }}
+                                inputType={node.config.type}
+                                inputUnit={node.config.unit}
+                                width="100%"
+                                height="40px"
+                                borderRadius="5px"
+                                backgroundColor="#1a2027"
+                                disabledBackgroundColor="#42505f"
+                                selectedBackgroundColor="#1a2027"
+                                selectedBorderColor="#2F80ED"
+                                badFormatBorderColor="#e74c3c"
+                                fontSize="0.9rem"
+                                fontColor="#f5f5f5"
+                                fontWeight="400"
+                                textAlign="center"
+                                unitTextColor="rgb(170,170,170)"
+                            />
+                            <Checkbox
+                                bind:checked={node.config.max_alarm}
+                                onChange={() => {
+                                    onPropertyChanged();
+                                }}
+                                inputName="node-max-alarm"
+                                width="38px"
+                                height="38px"
+                                checkMarkWidth={24}
+                                checkMarkHeight={24}
+                                enabledbgColor="#2f80ed"
+                                enabledBorderColor="#5a646e"
+                                disabledbgColor="#42505f"
+                                disabledBorderColor="#5a646e"
+                            />
+                        </span>
+                        <span class="row-hint">
+                            <HintInfo
+                                labelText=""
+                                hintWidth="250px"
+                                hintHeight="fit-content"
+                                hintBackgroundColor="#1e242b"
+                                hintBorderColor="#2c343d"
+                                hintBorderRadius="10px"
+                                textColor="#f5f5f5"
+                                openBackgroundColor="rgba(255, 255, 255, 0.05)"
+                                openHoverBackgroundColor="rgba(255, 255, 255, 0.1)"
+                                openStrokeColor="#cccccc"
+                                openHoverStrokeColor="#eeeeee"
+                                closeBackgroundColor="rgba(255, 255, 255, 0.1)"
+                                closeHoverBackgroundColor="rgba(255, 255, 255, 0.2)"
+                                closeStrokeColor="white"
+                                closeHoverStrokeColor="#eeeeee"
+                            >
+                                <span class="info-text">{$texts.maxValueInfo[$selectedLang]}</span>
+                            </HintInfo>
+                        </span>
+                    </span>
+                </span>
+            </div>
+        {/if}
         <div class="row">
             <span class="row-variable no-wrap">
                 <span class="row-identifier">{$texts.custom[$selectedLang]}</span>
@@ -782,54 +784,56 @@ Displays contextual hints and supports multi-language labels for all fields. -->
                 </span>
             </span>
         </div>
-        <div class="row">
-            <span class="row-variable no-wrap">
-                <span class="row-identifier">{$texts.incrementalNode[$selectedLang]}</span>
-                <span class="row-input">
-                    <span class="row-entry">
-                        <Checkbox
-                            bind:checked={node.config.incremental_node}
-                            onChange={() => {
-                                onPropertyChanged();
-                            }}
-                            inputName="incremental-node"
-                            width="38px"
-                            height="38px"
-                            checkMarkWidth={24}
-                            checkMarkHeight={24}
-                            enabledbgColor="#2f80ed"
-                            enabledBorderColor="#5a646e"
-                            disabledbgColor="#42505f"
-                            disabledBorderColor="#5a646e"
-                            badFormatBackgroundColor="#e74c3c"
-                            badFormatBorderColor="#5a646e"
-                        />
-                    </span>
-                    <span class="row-hint">
-                        <HintInfo
-                            openInverted={true}
-                            labelText=""
-                            hintWidth="250px"
-                            hintHeight="fit-content"
-                            hintBackgroundColor="#1e242b"
-                            hintBorderColor="#2c343d"
-                            hintBorderRadius="10px"
-                            textColor="#f5f5f5"
-                            openBackgroundColor="rgba(255, 255, 255, 0.05)"
-                            openHoverBackgroundColor="rgba(255, 255, 255, 0.1)"
-                            openStrokeColor="#cccccc"
-                            openHoverStrokeColor="#eeeeee"
-                            closeBackgroundColor="rgba(255, 255, 255, 0.1)"
-                            closeHoverBackgroundColor="rgba(255, 255, 255, 0.2)"
-                            closeStrokeColor="white"
-                            closeHoverStrokeColor="#eeeeee"
-                        >
-                            <span class="info-text">{$texts.incrementalNodeInfo[$selectedLang]}</span>
-                        </HintInfo>
+        {#if node.config.type === NodeType.FLOAT || node.config.type === NodeType.INT}
+            <div class="row">
+                <span class="row-variable no-wrap">
+                    <span class="row-identifier">{$texts.incrementalNode[$selectedLang]}</span>
+                    <span class="row-input">
+                        <span class="row-entry">
+                            <Checkbox
+                                bind:checked={node.config.incremental_node}
+                                onChange={() => {
+                                    onPropertyChanged();
+                                }}
+                                inputName="incremental-node"
+                                width="38px"
+                                height="38px"
+                                checkMarkWidth={24}
+                                checkMarkHeight={24}
+                                enabledbgColor="#2f80ed"
+                                enabledBorderColor="#5a646e"
+                                disabledbgColor="#42505f"
+                                disabledBorderColor="#5a646e"
+                                badFormatBackgroundColor="#e74c3c"
+                                badFormatBorderColor="#5a646e"
+                            />
+                        </span>
+                        <span class="row-hint">
+                            <HintInfo
+                                openInverted={true}
+                                labelText=""
+                                hintWidth="250px"
+                                hintHeight="fit-content"
+                                hintBackgroundColor="#1e242b"
+                                hintBorderColor="#2c343d"
+                                hintBorderRadius="10px"
+                                textColor="#f5f5f5"
+                                openBackgroundColor="rgba(255, 255, 255, 0.05)"
+                                openHoverBackgroundColor="rgba(255, 255, 255, 0.1)"
+                                openStrokeColor="#cccccc"
+                                openHoverStrokeColor="#eeeeee"
+                                closeBackgroundColor="rgba(255, 255, 255, 0.1)"
+                                closeHoverBackgroundColor="rgba(255, 255, 255, 0.2)"
+                                closeStrokeColor="white"
+                                closeHoverStrokeColor="#eeeeee"
+                            >
+                                <span class="info-text">{$texts.incrementalNodeInfo[$selectedLang]}</span>
+                            </HintInfo>
+                        </span>
                     </span>
                 </span>
-            </span>
-        </div>
+            </div>
+        {/if}
         {#if node.config.incremental_node}
             <div class="row">
                 <span class="row-variable no-wrap">

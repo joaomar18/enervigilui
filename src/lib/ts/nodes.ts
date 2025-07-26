@@ -22,20 +22,31 @@ export function convertToEditableNodes(nodes: Record<string, DeviceNode>): Array
     for (let node of Object.values(nodes)) {
         let editableNode: EditableDeviceNode;
         let protocol = node.protocol;
+
+        let decimal_places: string = "";
+        let min_alarm_value: string = "";
+        let max_alarm_value: string = "";
+
+        if (node.config.type === NodeType.FLOAT || node.config.type === NodeType.INT) {
+            decimal_places = node.config.decimal_places.toString();
+            min_alarm_value = node.config.min_alarm_value.toFixed(node.config.min_alarm_value);
+            max_alarm_value = node.config.max_alarm_value.toFixed(node.config.max_alarm_value);
+        }
+
         let editableConfig: EditableNodeConfiguration;
         let editableBaseConfig: EditableBaseNodeConfig = {
             calculate_increment: node.config.calculate_increment,
             calculated: node.config.calculated,
             custom: node.config.custom,
-            decimal_places: (node.config.type === NodeType.FLOAT || node.config.type === NodeType.INT) ? node.config.decimal_places.toString() : "",
+            decimal_places: decimal_places,
             enabled: node.config.enabled,
             incremental_node: node.config.incremental_node,
             logging: node.config.logging,
             logging_period: node.config.logging_period.toString(),
             max_alarm: node.config.max_alarm,
-            max_alarm_value: (node.config.type === NodeType.FLOAT || node.config.type === NodeType.INT) ? node.config.max_alarm_value.toFixed(node.config.decimal_places) : "",
+            max_alarm_value: max_alarm_value,
             min_alarm: node.config.min_alarm,
-            min_alarm_value: (node.config.type === NodeType.FLOAT || node.config.type === NodeType.INT) ? node.config.min_alarm_value.toFixed(node.config.decimal_places) : "",
+            min_alarm_value: min_alarm_value,
             positive_incremental: node.config.positive_incremental,
             publish: node.config.publish,
             type: node.config.type,
@@ -93,7 +104,6 @@ export function getDefaultNodesList(device_data: EditableDeviceMeter | NewDevice
     const nodes: Array<EditableDeviceNode> = [];
     const defaultVars = get(defaultVariables);
 
-
     if (device_data.type === MeterType.SINGLE_PHASE) {
 
         const singlePhaseVars = defaultVars.filter((v) => v.applicablePhases.includes(NodePhase.SINGLEPHASE) && v.useByDefault);
@@ -139,19 +149,30 @@ function createDefaultEditableDeviceNode(variable: DefaultNodeInfo, phase: NodeP
 
     let nodeConfiguration: EditableNodeConfiguration;
 
+    let decimal_places: string = "";
+    let min_alarm_value: string = "";
+    let max_alarm_value: string = "";
+
+    if (variable.type === NodeType.FLOAT || variable.type === NodeType.INT) {
+
+        decimal_places = variable.defaultNumberOfDecimals ? variable.defaultNumberOfDecimals.toString() : "0";
+        min_alarm_value = variable.defaultMinAlarm ? variable.defaultMinAlarm.toFixed(parseInt(decimal_places)) : Number(0).toFixed(parseInt(decimal_places));
+        max_alarm_value = variable.defaultMaxAlarm ? variable.defaultMaxAlarm.toFixed(parseInt(decimal_places)) : Number(0).toFixed(parseInt(decimal_places));
+    }
+
     const nodeBaseConfiguration: EditableBaseNodeConfig = {
         calculate_increment: variable.isIncrementalNode && !(device_data.options.read_energy_from_meter),
         calculated: false,
         custom: false,
-        decimal_places: variable.defaultNumberOfDecimals !== undefined ? String(variable.defaultNumberOfDecimals) : '',
+        decimal_places: decimal_places,
         enabled: true,
         incremental_node: variable.isIncrementalNode,
         logging: variable.defaultLoggingEnabled,
         logging_period: String(variable.defaultLoggingPeriod),
         max_alarm: variable.defaultMaxAlarmEnabled ? true : false,
-        max_alarm_value: variable.defaultMaxAlarm !== undefined ? variable.defaultMaxAlarm.toFixed(variable.defaultNumberOfDecimals) : '',
+        max_alarm_value: max_alarm_value,
         min_alarm: variable.defaultMinAlarmEnabled !== undefined ? true : false,
-        min_alarm_value: variable.defaultMinAlarm !== undefined ? variable.defaultMinAlarm.toFixed(variable.defaultNumberOfDecimals) : '',
+        min_alarm_value: min_alarm_value,
         positive_incremental: variable.isIncrementalNode && !(device_data.options.read_energy_from_meter),
         publish: variable.defaultPublished,
         type: variable.type,
@@ -634,9 +655,9 @@ export function addNode(sectionPrefix: NodePrefix, device_data: EditableDeviceMe
         logging: false,
         logging_period: String(15),
         max_alarm: false,
-        max_alarm_value: String(0.0),
+        max_alarm_value: Number(0).toFixed(2),
         min_alarm: false,
-        min_alarm_value: String(0.0),
+        min_alarm_value: Number(0).toFixed(2),
         positive_incremental: true,
         type: NodeType.FLOAT,
         unit: "",

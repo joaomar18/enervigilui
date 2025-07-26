@@ -1,5 +1,6 @@
 <script lang="ts">
     // Props
+    export let disabled: boolean = false;
     export let checked: boolean;
     export let inputInvalid: boolean = false;
     export let enableInputInvalid: boolean = false;
@@ -50,8 +51,16 @@
         --enabled-checkmark-color: {enabledCheckmarkColor};
         --disabled-checkmark-color: {disabledCheckmarkColor};
     "
+    class:disabled
 >
-    <input type="checkbox" name={inputName} bind:checked on:change={handleChange} class:bad-format={inputInvalid && enableInputInvalid && checked} />
+    <input
+        type="checkbox"
+        name={inputName}
+        bind:checked
+        on:change={handleChange}
+        class:bad-format={inputInvalid && enableInputInvalid && checked}
+        {disabled}
+    />
     <span class:bad-format={inputInvalid && enableInputInvalid && checked}>
         <svg
             xmlns="http://www.w3.org/2000/svg"
@@ -79,6 +88,11 @@
         -webkit-tap-highlight-color: transparent;
         -webkit-touch-callout: none;
         user-select: none;
+    }
+
+    /* Disable cursor pointer when input is disabled */
+    .label-checkbox.disabled {
+        cursor: auto;
     }
 
     /* Hide native checkbox */

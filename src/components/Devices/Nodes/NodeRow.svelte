@@ -437,6 +437,7 @@ properties and action buttons for configuration and deletion. -->
         <td>
             <div class="cell-content">
                 <Checkbox
+                    disabled={node.config.type === NodeType.STRING || node.config.type === NodeType.BOOLEAN}
                     bind:checked={node.config.min_alarm}
                     onChange={() => {
                         onPropertyChanged();
@@ -458,6 +459,7 @@ properties and action buttons for configuration and deletion. -->
         <td>
             <div class="cell-content">
                 <Checkbox
+                    disabled={node.config.type === NodeType.STRING || node.config.type === NodeType.BOOLEAN}
                     bind:checked={node.config.max_alarm}
                     onChange={() => {
                         onPropertyChanged();
