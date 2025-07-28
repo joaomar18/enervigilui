@@ -1,6 +1,11 @@
 import { readable } from "svelte/store";
 import { derived } from "svelte/store";
 import { Protocol } from "$lib/stores/devices";
+import { getNodePhase } from "$lib/ts/nodes";
+
+/*****     C O N S T A N T S     *****/
+export const DECIMAL_PLACES_LIM: Record<string, number> = { MIN: 0, MAX: 6 };
+export const LOGGING_PERIOD_LIM: Record<string, number> = { MIN: 1, MAX: 1440 };
 
 /**
  * Prefixes used to identify the electrical phase or type of a node variable.
@@ -95,28 +100,28 @@ export const nodeSections: Array<NodeSection> = [
         phase: NodePhase.L1,
         prefix: NodePrefix.L1,
         labelKey: "l1Phase",
-        filter: (node) => node.name?.startsWith(NodePrefix.L1) && !node.name?.startsWith(NodePrefix.L1_L2) && !node.name?.startsWith(NodePrefix.L1_L3),
+        filter: (node) => getNodePhase(node.name) === NodePhase.L1,
     },
     {
         key: NodePhase.L2,
         phase: NodePhase.L2,
         prefix: NodePrefix.L2,
         labelKey: "l2Phase",
-        filter: (node) => node.name?.startsWith(NodePrefix.L2) && !node.name?.startsWith(NodePrefix.L2_L1) && !node.name?.startsWith(NodePrefix.L2_L3),
+        filter: (node) => getNodePhase(node.name) === NodePhase.L2,
     },
     {
         key: NodePhase.L3,
         phase: NodePhase.L3,
         prefix: NodePrefix.L3,
         labelKey: "l3Phase",
-        filter: (node) => node.name?.startsWith(NodePrefix.L3) && !node.name?.startsWith(NodePrefix.L3_L1) && !node.name?.startsWith(NodePrefix.L3_L2),
+        filter: (node) => getNodePhase(node.name) === NodePhase.L3,
     },
     {
         key: NodePhase.TOTAL,
         phase: NodePhase.TOTAL,
         prefix: NodePrefix.TOTAL,
         labelKey: "total",
-        filter: (node) => node.name?.startsWith(NodePrefix.TOTAL),
+        filter: (node) => getNodePhase(node.name) === NodePhase.TOTAL,
     },
     {
         key: NodePhase.GENERAL,
@@ -124,10 +129,10 @@ export const nodeSections: Array<NodeSection> = [
         prefix: NodePrefix.GENERAL,
         labelKey: "general",
         filter: (node: any) => {
-            const isL1 = node.name?.startsWith(NodePrefix.L1) && !node.name?.startsWith(NodePrefix.L1_L2) && !node.name?.startsWith(NodePrefix.L1_L3);
-            const isL2 = node.name?.startsWith(NodePrefix.L2) && !node.name?.startsWith(NodePrefix.L2_L1) && !node.name?.startsWith(NodePrefix.L2_L3);
-            const isL3 = node.name?.startsWith(NodePrefix.L3) && !node.name?.startsWith(NodePrefix.L3_L1) && !node.name?.startsWith(NodePrefix.L3_L2);
-            const isTotal = node.name?.startsWith(NodePrefix.TOTAL);
+            const isL1 = getNodePhase(node.name) === NodePhase.L1;
+            const isL2 = getNodePhase(node.name) === NodePhase.L2;
+            const isL3 = getNodePhase(node.name) === NodePhase.L3;
+            const isTotal = getNodePhase(node.name) === NodePhase.TOTAL;
             return !isL1 && !isL2 && !isL3 && !isTotal;
         },
     },
@@ -347,6 +352,7 @@ export interface EditableDeviceNode {
     display_name: string;
     phase: NodePhase;
     communication_id: string;
+    validation: NodeValidation;
 }
 
 /**
@@ -363,6 +369,72 @@ export interface NodeEditState {
     oldVariableType: NodeType;
     oldVariableUnit: string;
     oldCommunicationID: string | undefined;
+}
+
+/**
+ * Represents the validation state for all editable properties of a node.
+ * Each boolean property indicates whether the corresponding node field passes validation.
+ * Used to provide real-time feedback in the UI and prevent invalid configurations from being saved.
+ *
+ * @interface
+ * @property {boolean} variableName - True if the variable name is valid (follows naming rules, unique, etc.)
+ * @property {boolean} variableType - True if the selected variable type is valid for the current variable
+ * @property {boolean} variableUnit - True if the unit is valid for the selected variable and type
+ * @property {boolean} decimalPlaces - True if the decimal places value is within valid range
+ * @property {boolean} communicationID - True if the communication ID is valid for the selected protocol
+ * @property {boolean} loggingPeriod - True if the logging period is within valid range
+ * @property {boolean} minAlarm - True if the minimum alarm value is valid
+ * @property {boolean} maxAlarm - True if the maximum alarm value is valid
+ * @property {boolean} calculated - True if the calculated/virtual node configuration is valid
+ * @property {boolean} incremental - True if the incremental node configuration is valid
+ * @method isValid - Returns true if all validation checks pass (logical AND of all other properties)
+ */
+export interface NodeValidation {
+    variableName: boolean;
+    variableType: boolean;
+    variableUnit: boolean;
+    communicationID: boolean;
+    protocol: boolean;
+    type: boolean;
+    decimalPlaces: boolean;
+    loggingPeriod: boolean;
+    minAlarm: boolean;
+    maxAlarm: boolean;
+    calculated: boolean;
+    incremental: boolean;
+    calculate_increment: boolean;
+    positive_incremental: boolean;
+    isValid(): boolean;
+}
+
+/**
+ * Creates and returns a new NodeValidation object with all validation properties set to false.
+ * Used to initialize the validation state for new nodes or reset validation during editing.
+ * 
+ * @returns {NodeValidation} A fresh validation object with all checks set to false
+ */
+export function getInitialNodeValidation(): NodeValidation {
+    return {
+        variableName: false,
+        variableType: false,
+        variableUnit: false,
+        communicationID: false,
+        protocol: false,
+        type: false,
+        decimalPlaces: false,
+        loggingPeriod: false,
+        minAlarm: false,
+        maxAlarm: false,
+        calculated: false,
+        incremental: false,
+        calculate_increment: false,
+        positive_incremental: false,
+        isValid() {
+            return this.variableName && this.variableType && this.variableUnit &&
+                this.decimalPlaces && this.communicationID && this.loggingPeriod &&
+                this.minAlarm && this.maxAlarm && this.calculated && this.incremental;
+        }
+    };
 }
 
 /**

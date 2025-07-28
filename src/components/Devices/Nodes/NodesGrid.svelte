@@ -188,9 +188,10 @@ Includes multi-language headers and adapts layout to container size. -->
                         {#each nodesBySection[section.key] as node, i (i)}
                             <NodeRow
                                 {node}
-                                sectionNodes={nodesBySection[section.key]}
                                 backgroundColor="rgba(255, 255, 255, 0.05)"
                                 disabledBackgroundColor="rgba(255, 255, 255, 0.22)"
+                                hoverColor="rgba(255, 255, 255, 0.09)"
+                                disabledHoverColor="rgba(255, 255, 255, 0.28)"
                                 {windowWidth}
                                 currentGridWidth={currentWidth}
                                 {columnVisibility}
@@ -222,11 +223,12 @@ Includes multi-language headers and adapts layout to container size. -->
                     {#each nodes as node, i (i)}
                         <NodeRow
                             {node}
-                            sectionNodes={nodes}
                             currentGridWidth={currentWidth}
                             {columnVisibility}
                             backgroundColor="rgba(255, 255, 255, 0.05)"
                             disabledBackgroundColor="rgba(255, 255, 255, 0.22)"
+                            hoverColor="rgba(255, 255, 255, 0.09)"
+                            disabledHoverColor="rgba(255, 255, 255, 0.28)"
                             {windowWidth}
                             onDelete={() => {
                                 let deletedNodeIndex = getNodeIndex(node, nodes);

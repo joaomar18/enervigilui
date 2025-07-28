@@ -59,9 +59,10 @@
         bind:checked
         on:change={handleChange}
         class:bad-format={inputInvalid && enableInputInvalid && checked}
+        class:bad-format-off={inputInvalid && enableInputInvalid && !checked}
         {disabled}
     />
-    <span class:bad-format={inputInvalid && enableInputInvalid && checked}>
+    <span class:bad-format={inputInvalid && enableInputInvalid && checked} class:bad-format-off={inputInvalid && enableInputInvalid && !checked}>
         <svg
             xmlns="http://www.w3.org/2000/svg"
             viewBox="0 0 24 24"
@@ -134,9 +135,15 @@
         background-color: var(--enabled-bg-color, #4caf7f);
     }
 
-    /* Checkbox appeareance when input is invalid */
+    /* Checkbox appeareance when input is invalid and checked */
     .label-checkbox input[type="checkbox"]:checked.bad-format + span.bad-format {
         border: 1px solid var(--bad-format-border-color);
         background-color: var(--bad-format-background-color);
+    }
+
+    /* Checkbox appeareance when input is invalid and unchecked */
+    .label-checkbox input[type="checkbox"].bad-format-off + span.bad-format-off {
+        border: 1px solid var(--bad-format-background-color);
+        background-color: var(--disabled-bg-color, #42505f);
     }
 </style>

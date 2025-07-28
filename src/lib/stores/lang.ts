@@ -630,6 +630,27 @@ const textsObject: TextsObject = {
         PT: "Confirmar a adição irá criar um novo dispositivo. Tem a certeza que pretende continuar?",
         EN: "Confirming will create a new device. Are you sure you want to continue?",
     },
+    invalidDeviceName: {
+        PT: "O nome do dispositivo é inválido.",
+        EN: "The device name is invalid.",
+    },
+    invalidProtocol: {
+        PT: "O protocolo de comunicação selecionado é inválido ou não suportado.",
+        EN: "The selected communication protocol is invalid or not supported.",
+    },
+    invalidCommunicationOptions: {
+        PT: "As opções relacionadas com a comunicação do dispositivo são inválidas.",
+        EN: "The options related to device communication are invalid.",
+    },
+    invalidMeterOptions: {
+        PT: "As opções relacionadas com o tipo e gestão do dispositivo são inválidas.",
+        EN: "The options related to device type and management are invalid.",
+    },
+    invalidDeviceNodes: {
+        PT: "Existem variáveis do dispositivo com configurações inválidas.",
+        EN: "There are device variables with invalid configurations.",
+    },
+
 };
 
 //////////     D E V I C E     T E X T S     //////////

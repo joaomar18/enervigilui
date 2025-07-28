@@ -1,0 +1,300 @@
+<script lang="ts">
+    import Selector from "../General/Selector.svelte";
+    import SelectorButton from "../General/SelectorButton.svelte";
+    import HintInfo from "../General/HintInfo.svelte";
+    import { getDefaultNodesList } from "$lib/ts/nodes";
+
+    // Types
+    import type { EditableDeviceMeter, NewDeviceMeter } from "$lib/stores/devices";
+    import type { EditableDeviceNode } from "$lib/stores/nodes";
+
+    // Stores for multi-language support
+    import { texts, meterTypeTexts, selectedLang } from "$lib/stores/lang";
+
+    // Props
+    export let deviceData: EditableDeviceMeter | NewDeviceMeter;
+    export let nodes: Array<EditableDeviceNode>;
+    export let meterOptionsValid: boolean;
+
+    // Variables
+    let validMeterType: boolean;
+
+    $: validMeterType = Object.keys($meterTypeTexts).includes(deviceData.type);
+    $: meterOptionsValid = validMeterType;
+</script>
+
+<!--
+  MeterOptionsConfig: This component renders the configuration options for energy meter devices,
+  including connection type, energy reading options, and various meter-specific settings.
+-->
+<div class="device-input-div">
+    <span>{$texts.connectionType[$selectedLang]}</span>
+    <div class="input-div">
+        <Selector
+            useLang={true}
+            options={$meterTypeTexts}
+            bind:selectedOption={deviceData.type}
+            inputInvalid={!validMeterType}
+            enableInputInvalid={true}
+            onChange={() => {
+                nodes = getDefaultNodesList(deviceData);
+            }}
+            scrollable={true}
+            maxOptions={5}
+            width="200px"
+            height="40px"
+            borderRadius="5px"
+            backgroundColor="#252b33"
+            borderColor="#323a45"
+            selectedColor="#14566b"
+            badFormatBorderColor="#e74c3c"
+            optionsBackgroundColor="#1e242b"
+            optionsBorderColor="#323a45"
+            letterSpacing="0.5px"
+            wordSpacing="1px"
+            arrowWidth="16px"
+            arrowHeight="16px"
+            arrowRightPos="10px"
+        />
+        <div class="info-div">
+            <HintInfo
+                labelText=""
+                hintWidth="300px"
+                hintHeight="fit-content"
+                hintBackgroundColor="#1e242b"
+                hintBorderColor="#2c343d"
+                hintBorderRadius="10px"
+                textColor="#f5f5f5"
+                openBackgroundColor="rgba(255, 255, 255, 0.05)"
+                openHoverBackgroundColor="rgba(255, 255, 255, 0.1)"
+                openStrokeColor="#cccccc"
+                openHoverStrokeColor="#eeeeee"
+                closeBackgroundColor="rgba(255, 255, 255, 0.1)"
+                closeHoverBackgroundColor="rgba(255, 255, 255, 0.2)"
+                closeStrokeColor="white"
+                closeHoverStrokeColor="#eeeeee"
+            >
+                <span class="info-text">{$texts.connectionTypeInfo[$selectedLang]}</span>
+            </HintInfo>
+        </div>
+    </div>
+</div>
+
+<div class="device-input-div">
+    <span>{$texts.readEnergyFromMeter[$selectedLang]}</span>
+    <div class="input-div">
+        <div class="input-content-div">
+            <SelectorButton
+                bind:checked={deviceData.options.read_energy_from_meter}
+                width="75px"
+                height="20px"
+                knobWidth="32px"
+                knobHeight="32px"
+                borderRadius="10px"
+                backgroundColor="#3a3a3a"
+                selectedBackgroundColor="#4a4a4a"
+                knobBackgroundColor="#e0e0e0"
+                knobSelectedBackgroundColor="#2f80ed"
+            />
+        </div>
+        <div class="info-div">
+            <HintInfo
+                labelText=""
+                hintWidth="300px"
+                hintHeight="fit-content"
+                hintBackgroundColor="#1e242b"
+                hintBorderColor="#2c343d"
+                hintBorderRadius="10px"
+                textColor="#f5f5f5"
+                openBackgroundColor="rgba(255, 255, 255, 0.05)"
+                openHoverBackgroundColor="rgba(255, 255, 255, 0.1)"
+                openStrokeColor="#cccccc"
+                openHoverStrokeColor="#eeeeee"
+                closeBackgroundColor="rgba(255, 255, 255, 0.1)"
+                closeHoverBackgroundColor="rgba(255, 255, 255, 0.2)"
+                closeStrokeColor="white"
+                closeHoverStrokeColor="#eeeeee"
+            >
+                <span class="info-text">{$texts.readEnergyFromMeterInfo[$selectedLang]}</span>
+            </HintInfo>
+        </div>
+    </div>
+</div>
+<div class="device-input-div">
+    <span>{$texts.readForwardReverseEnergySeparate[$selectedLang]}</span>
+    <div class="input-div">
+        <div class="input-content-div">
+            <SelectorButton
+                bind:checked={deviceData.options.read_separate_forward_reverse_energy}
+                width="75px"
+                height="20px"
+                knobWidth="32px"
+                knobHeight="32px"
+                borderRadius="10px"
+                backgroundColor="#3a3a3a"
+                selectedBackgroundColor="#4a4a4a"
+                knobBackgroundColor="#e0e0e0"
+                knobSelectedBackgroundColor="#2f80ed"
+            />
+        </div>
+        <div class="info-div">
+            <HintInfo
+                labelText=""
+                hintWidth="300px"
+                hintHeight="fit-content"
+                hintBackgroundColor="#1e242b"
+                hintBorderColor="#2c343d"
+                hintBorderRadius="10px"
+                textColor="#f5f5f5"
+                openBackgroundColor="rgba(255, 255, 255, 0.05)"
+                openHoverBackgroundColor="rgba(255, 255, 255, 0.1)"
+                openStrokeColor="#cccccc"
+                openHoverStrokeColor="#eeeeee"
+                closeBackgroundColor="rgba(255, 255, 255, 0.1)"
+                closeHoverBackgroundColor="rgba(255, 255, 255, 0.2)"
+                closeStrokeColor="white"
+                closeHoverStrokeColor="#eeeeee"
+            >
+                <span class="info-text">{$texts.readForwardReverseEnergySeparateInfo[$selectedLang]}</span>
+            </HintInfo>
+        </div>
+    </div>
+</div>
+<div class="device-input-div">
+    <span>{$texts.negativeReactivePower[$selectedLang]}</span>
+    <div class="input-div">
+        <div class="input-content-div">
+            <SelectorButton
+                bind:checked={deviceData.options.negative_reactive_power}
+                width="75px"
+                height="20px"
+                knobWidth="32px"
+                knobHeight="32px"
+                borderRadius="10px"
+                backgroundColor="#3a3a3a"
+                selectedBackgroundColor="#4a4a4a"
+                knobBackgroundColor="#e0e0e0"
+                knobSelectedBackgroundColor="#2f80ed"
+            />
+        </div>
+        <div class="info-div">
+            <HintInfo
+                labelText=""
+                hintWidth="300px"
+                hintHeight="fit-content"
+                hintBackgroundColor="#1e242b"
+                hintBorderColor="#2c343d"
+                hintBorderRadius="10px"
+                textColor="#f5f5f5"
+                openBackgroundColor="rgba(255, 255, 255, 0.05)"
+                openHoverBackgroundColor="rgba(255, 255, 255, 0.1)"
+                openStrokeColor="#cccccc"
+                openHoverStrokeColor="#eeeeee"
+                closeBackgroundColor="rgba(255, 255, 255, 0.1)"
+                closeHoverBackgroundColor="rgba(255, 255, 255, 0.2)"
+                closeStrokeColor="white"
+                closeHoverStrokeColor="#eeeeee"
+            >
+                <span class="info-text">{$texts.negativeReactivePowerInfo[$selectedLang]}</span>
+            </HintInfo>
+        </div>
+    </div>
+</div>
+<div class="device-input-div">
+    <span>{$texts.frequencyReading[$selectedLang]}</span>
+    <div class="input-div">
+        <div class="input-content-div">
+            <SelectorButton
+                bind:checked={deviceData.options.frequency_reading}
+                width="75px"
+                height="20px"
+                knobWidth="32px"
+                knobHeight="32px"
+                borderRadius="10px"
+                backgroundColor="#3a3a3a"
+                selectedBackgroundColor="#4a4a4a"
+                knobBackgroundColor="#e0e0e0"
+                knobSelectedBackgroundColor="#2f80ed"
+            />
+        </div>
+        <div class="info-div">
+            <HintInfo
+                labelText=""
+                hintWidth="300px"
+                hintHeight="fit-content"
+                hintBackgroundColor="#1e242b"
+                hintBorderColor="#2c343d"
+                hintBorderRadius="10px"
+                textColor="#f5f5f5"
+                openBackgroundColor="rgba(255, 255, 255, 0.05)"
+                openHoverBackgroundColor="rgba(255, 255, 255, 0.1)"
+                openStrokeColor="#cccccc"
+                openHoverStrokeColor="#eeeeee"
+                closeBackgroundColor="rgba(255, 255, 255, 0.1)"
+                closeHoverBackgroundColor="rgba(255, 255, 255, 0.2)"
+                closeStrokeColor="white"
+                closeHoverStrokeColor="#eeeeee"
+            >
+                <span class="info-text">{$texts.frequencyReadingInfo[$selectedLang]}</span>
+            </HintInfo>
+        </div>
+    </div>
+</div>
+
+<style>
+    /* Device input row styling */
+    .device-input-div {
+        position: relative;
+        margin-top: 30px;
+        min-height: 50px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        flex-direction: row;
+        flex-wrap: wrap;
+        gap: 20px;
+    }
+
+    /* Label text for device input fields */
+    .device-input-div span {
+        text-align: left;
+        color: #f5f5f5;
+        font-size: 1rem;
+        line-height: 1.5;
+        font-weight: 400;
+        margin: 0;
+        padding: 0;
+        width: 250px;
+    }
+
+    /* Input field container styling */
+    .input-div {
+        position: relative;
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        gap: 10px;
+        margin: 0;
+        padding: 0;
+        width: fit-content;
+        height: 100%;
+    }
+
+    /* Content area for input fields */
+    .input-div .input-content-div {
+        width: 200px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+
+    /* Info text styling for hints */
+    .info-div .info-text {
+        padding: 10px;
+        padding-right: 40px;
+        font-size: 1rem;
+        font-weight: 400;
+        line-height: 1.5;
+        color: white;
+    }
+</style>

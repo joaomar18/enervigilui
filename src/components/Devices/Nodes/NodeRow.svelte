@@ -2,9 +2,8 @@
     import Selector from "../../General/Selector.svelte";
     import InputField from "../../General/InputField.svelte";
     import Checkbox from "../../General/Checkbox.svelte";
-    import { validateNodeName, validateNodeUnit, validateCommunicationID, validateNodeType, validateVirtualNode } from "$lib/ts/nodes";
     import { nodeNameChange, nodeTypeChange, customNodeChange, virtualNodeChange } from "$lib/ts/nodes";
-    import { NodeType } from "$lib/stores/nodes";
+    import { LOGGING_PERIOD_LIM, NodeType } from "$lib/stores/nodes";
     import { defaultVariableUnits } from "$lib/stores/nodes";
     import { showAlert } from "$lib/stores/alerts";
 
@@ -17,7 +16,6 @@
     import { texts, variableNameTextsByPhase } from "$lib/stores/lang";
 
     // Props
-    export let sectionNodes: Array<EditableDeviceNode>;
     export let deviceData: EditableDeviceMeter | NewDeviceMeter;
     export let node: EditableDeviceNode;
 
@@ -26,7 +24,9 @@
     export let currentGridWidth: number;
     export let columnVisibility: ColumnVisibilityMap;
     export let backgroundColor: string;
+    export let hoverColor: string = backgroundColor;
     export let disabledBackgroundColor: string = backgroundColor;
+    export let disabledHoverColor: string = disabledBackgroundColor;
 
     // Variables
     let nodeEditingState: NodeEditState = {
@@ -69,7 +69,9 @@ properties and action buttons for configuration and deletion. -->
 <tr
     style="
         --background-color: {backgroundColor};
+        --hover-color: {hoverColor};
         --disabled-background-color: {disabledBackgroundColor};
+        --disabled-hover-color: {disabledHoverColor};
     "
     class="edit-node"
     class:disabled={!node.config.enabled}
@@ -86,7 +88,7 @@ properties and action buttons for configuration and deletion. -->
                             nodeNameChange(node, node.phase);
                             onPropertyChanged();
                         }}
-                        inputInvalid={!validateNodeName(node.display_name, node.config.custom, sectionNodes)}
+                        inputInvalid={!node.validation.variableName}
                         enableInputInvalid={true}
                         scrollable={true}
                         maxOptions={5}
@@ -111,7 +113,7 @@ properties and action buttons for configuration and deletion. -->
                         onChange={() => {
                             onPropertyChanged();
                         }}
-                        inputInvalid={!validateNodeName(node.display_name, node.config.custom, sectionNodes)}
+                        inputInvalid={!node.validation.variableName}
                         enableInputInvalid={true}
                         inputType="STRING"
                         width="90%"
@@ -143,7 +145,7 @@ properties and action buttons for configuration and deletion. -->
                             onPropertyChanged();
                         }}
                         disabled={node.config.type === NodeType.STRING || node.config.type === NodeType.BOOLEAN}
-                        inputInvalid={!validateNodeUnit(node.display_name, node.config.type, node.config.unit, node.config.custom)}
+                        inputInvalid={!node.validation.variableUnit}
                         enableInputInvalid={true}
                         scrollable={true}
                         maxOptions={5}
@@ -169,7 +171,7 @@ properties and action buttons for configuration and deletion. -->
                             onPropertyChanged();
                         }}
                         disabled={node.config.type === NodeType.STRING || node.config.type === NodeType.BOOLEAN}
-                        inputInvalid={!validateNodeUnit(node.display_name, node.config.type, node.config.unit, node.config.custom)}
+                        inputInvalid={!node.validation.variableUnit}
                         enableInputInvalid={true}
                         inputType="STRING"
                         width="90%"
@@ -199,7 +201,7 @@ properties and action buttons for configuration and deletion. -->
                     onChange={() => {
                         onPropertyChanged();
                     }}
-                    inputInvalid={!validateCommunicationID(node.communication_id, node.protocol)}
+                    inputInvalid={!node.validation.communicationID}
                     enableInputInvalid={true}
                     inputType="STRING"
                     width="90%"
@@ -229,7 +231,7 @@ properties and action buttons for configuration and deletion. -->
                         nodeTypeChange(node, nodeEditingState);
                         onPropertyChanged();
                     }}
-                    inputInvalid={!validateNodeType(node.config.type, node.display_name, node.config.custom)}
+                    inputInvalid={!node.validation.variableType}
                     enableInputInvalid={true}
                     scrollable={true}
                     maxOptions={5}
@@ -257,16 +259,18 @@ properties and action buttons for configuration and deletion. -->
                 <InputField
                     disabled={!node.config.logging}
                     bind:inputValue={node.config.logging_period}
+                    inputInvalid={!node.validation.loggingPeriod}
+                    enableInputInvalid={true}
                     onChange={() => {
                         onPropertyChanged();
                     }}
                     inputType="POSITIVE_INT"
-                    minValue={1}
-                    maxValue={1440}
+                    minValue={LOGGING_PERIOD_LIM.MIN}
+                    maxValue={LOGGING_PERIOD_LIM.MAX}
                     limitsPassed={() => {
                         showAlert($texts.loggingPeriodError, {
-                            minValue: 1,
-                            maxValue: 1440,
+                            minValue: LOGGING_PERIOD_LIM.MIN,
+                            maxValue: LOGGING_PERIOD_LIM.MAX,
                         });
                     }}
                     inputUnit="min."
@@ -293,6 +297,8 @@ properties and action buttons for configuration and deletion. -->
                 <InputField
                     disabled={(node.config.type !== NodeType.FLOAT && node.config.type !== NodeType.INT) || !node.config.min_alarm}
                     bind:inputValue={node.config.min_alarm_value}
+                    inputInvalid={!node.validation.type}
+                    enableInputInvalid={true}
                     onChange={() => {
                         onPropertyChanged();
                     }}
@@ -321,6 +327,8 @@ properties and action buttons for configuration and deletion. -->
                 <InputField
                     disabled={(node.config.type !== NodeType.FLOAT && node.config.type !== NodeType.INT) || !node.config.max_alarm}
                     bind:inputValue={node.config.max_alarm_value}
+                    inputInvalid={!node.validation.maxAlarm}
+                    enableInputInvalid={true}
                     onChange={() => {
                         onPropertyChanged();
                     }}
@@ -395,7 +403,7 @@ properties and action buttons for configuration and deletion. -->
                         virtualNodeChange(node, nodeEditingState, deviceData.protocol);
                         onPropertyChanged();
                     }}
-                    inputInvalid={!validateVirtualNode(node.display_name, node.config.custom)}
+                    inputInvalid={!node.validation.calculated}
                     enableInputInvalid={true}
                     inputName="virtual-node"
                     width="1.5em"
@@ -420,6 +428,7 @@ properties and action buttons for configuration and deletion. -->
                     onChange={() => {
                         onPropertyChanged();
                     }}
+                    inputInvalid={!node.validation.loggingPeriod}
                     inputName="log-node"
                     width="1.5em"
                     height="1.5em"
@@ -429,6 +438,8 @@ properties and action buttons for configuration and deletion. -->
                     enabledBorderColor="#5a646e"
                     disabledbgColor="#42505f"
                     disabledBorderColor="#5a646e"
+                    badFormatBackgroundColor="#e74c3c"
+                    badFormatBorderColor="#5a646e"
                 />
             </div>
         </td>
@@ -442,6 +453,8 @@ properties and action buttons for configuration and deletion. -->
                     onChange={() => {
                         onPropertyChanged();
                     }}
+                    inputInvalid={!node.validation.minAlarm}
+                    enableInputInvalid={true}
                     inputName="node-min-alarm"
                     width="1.5em"
                     height="1.5em"
@@ -451,6 +464,8 @@ properties and action buttons for configuration and deletion. -->
                     enabledBorderColor="#5a646e"
                     disabledbgColor="#42505f"
                     disabledBorderColor="#5a646e"
+                    badFormatBackgroundColor="#e74c3c"
+                    badFormatBorderColor="#5a646e"
                 />
             </div>
         </td>
@@ -464,6 +479,8 @@ properties and action buttons for configuration and deletion. -->
                     onChange={() => {
                         onPropertyChanged();
                     }}
+                    inputInvalid={!node.validation.maxAlarm}
+                    enableInputInvalid={true}
                     inputName="node-max-alarm"
                     width="1.5em"
                     height="1.5em"
@@ -473,6 +490,8 @@ properties and action buttons for configuration and deletion. -->
                     enabledBorderColor="#5a646e"
                     disabledbgColor="#42505f"
                     disabledBorderColor="#5a646e"
+                    badFormatBackgroundColor="#e74c3c"
+                    badFormatBorderColor="#5a646e"
                 />
             </div>
         </td>
@@ -510,7 +529,7 @@ properties and action buttons for configuration and deletion. -->
                         >
                     </button>
                 {/if}
-                <button class="btn-more-options" aria-label="More Options" on:click={handleOnConfig}>
+                <button class="btn-more-options" class:not-valid={!node.validation.isValid()} aria-label="More Options" on:click={handleOnConfig}>
                     <svg xmlns="http://www.w3.org/2000/svg" height={buttonSize} viewBox="0 -960 960 960" width={buttonSize}
                         ><path
                             d="m370-80-16-128q-13-5-24.5-12T307-235l-119 50L78-375l103-78q-1-7-1-13.5v-27q0-6.5 1-13.5L78-585l110-190 119 50q11-8 23-15t24-12l16-128h220l16 128q13 5 24.5 12t22.5 15l119-50 110 190-103 78q1 7 1 13.5v27q0 6.5-2 13.5l103 78-110 190-118-50q-11 8-23 15t-24 12L590-80H370Zm70-80h79l14-106q31-8 57.5-23.5T639-327l99 41 39-68-86-65q5-14 7-29.5t2-31.5q0-16-2-31.5t-7-29.5l86-65-39-68-99 42q-22-23-48.5-38.5T533-694l-13-106h-79l-14 106q-31 8-57.5 23.5T321-633l-99-41-39 68 86 64q-5 15-7 30t-2 32q0 16 2 31t7 30l-86 65 39 68 99-42q22 23 48.5 38.5T427-266l13 106Zm42-180q58 0 99-41t41-99q0-58-41-99t-99-41q-59 0-99.5 41T342-480q0 58 40.5 99t99.5 41Zm-2-140Z"
@@ -528,9 +547,19 @@ properties and action buttons for configuration and deletion. -->
         background-color: var(--background-color);
     }
 
+    /* Node row hover styling */
+    tr.edit-node:hover {
+        background-color: var(--hover-color);
+    }
+
     /* Disabled node row styling */
     tr.edit-node.disabled {
         background-color: var(--disabled-background-color);
+    }
+
+    /* Disabled node row hover styling */
+    tr.edit-node.disabled:hover {
+        background-color: var(--disabled-hover-color);
     }
 
     /* Table cell styling for node fields */
@@ -582,6 +611,16 @@ properties and action buttons for configuration and deletion. -->
     /* More options button icon color on hover */
     .btn-more-options:hover svg {
         fill: #2f80ed;
+    }
+
+    /* Make more options button red if node is not valid */
+    .btn-more-options.not-valid svg {
+        fill: #e74c3c;
+    }
+
+    /* Hover color for more options button when node is not valid */
+    .btn-more-options.not-valid:hover svg {
+        fill: #c0392b;
     }
 
     /* Responsive: reduce row height on wide screens */

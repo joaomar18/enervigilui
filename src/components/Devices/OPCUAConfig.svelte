@@ -2,6 +2,7 @@
     import InputField from "../General/InputField.svelte";
     import HintInfo from "../General/HintInfo.svelte";
     import { validateOpcUaUrl } from "$lib/ts/devices";
+    import { READ_PERIOD_LIM, TIMEOUT_LIM } from "$lib/stores/devices";
 
     // Stores for multi-language support
     import { texts, selectedLang } from "$lib/stores/lang";
@@ -14,13 +15,16 @@
 
     // Props
     export let opcuaConfig: EditableDeviceOPCUAConfig; // OPC UA Configuration Object
-    export let opcuaConfigValid: boolean; // OPC UA Configuration is valid
 
     // Variables
     let validOpcUaUrl: boolean; // OPC UA Url is valid
+    let validReadPeriod: boolean; // Read Period is valid
+    let validTimeout: boolean; // Timeout is valid
 
     $: validOpcUaUrl = validateOpcUaUrl(opcuaConfig.url);
-    $: opcuaConfigValid = validOpcUaUrl;
+    $: validReadPeriod = parseInt(opcuaConfig.read_period) >= READ_PERIOD_LIM.MIN && parseInt(opcuaConfig.read_period) <= READ_PERIOD_LIM.MAX;
+    $: validTimeout = parseInt(opcuaConfig.timeout) >= TIMEOUT_LIM.MIN && parseInt(opcuaConfig.timeout) <= TIMEOUT_LIM.MAX;
+    $: opcuaConfig.valid = validOpcUaUrl && validReadPeriod && validTimeout;
 </script>
 
 <!--
@@ -77,14 +81,16 @@
         <div class="input-content-div">
             <InputField
                 bind:inputValue={opcuaConfig.read_period}
+                inputInvalid={!validReadPeriod}
+                enableInputInvalid={true}
                 inputType="POSITIVE_INT"
                 inputUnit={$texts.secondsUnit[$selectedLang]}
-                minValue={5.0}
-                maxValue={300.0}
+                minValue={READ_PERIOD_LIM.MIN}
+                maxValue={READ_PERIOD_LIM.MAX}
                 limitsPassed={() => {
                     showAlert($texts.readPeriodError, {
-                        minValue: 5,
-                        maxValue: 300,
+                        minValue: READ_PERIOD_LIM.MIN,
+                        maxValue: READ_PERIOD_LIM.MAX,
                     });
                 }}
                 width="100%"
@@ -94,6 +100,7 @@
                 borderColor="#323a45"
                 selectedBackgroundColor="#252b33"
                 selectedBorderColor="#2F80ED"
+                badFormatBorderColor="#e74c3c"
                 fontSize="1rem"
                 fontColor="#f5f5f5"
                 fontWeight="400"
@@ -130,14 +137,16 @@
         <div class="input-content-div">
             <InputField
                 bind:inputValue={opcuaConfig.timeout}
-                inputType="POSITIVE_FLOAT"
+                inputInvalid={!validTimeout}
+                enableInputInvalid={true}
+                inputType="POSITIVE_INT"
                 inputUnit={$texts.secondsUnit[$selectedLang]}
-                minValue={5.0}
-                maxValue={300.0}
+                minValue={TIMEOUT_LIM.MIN}
+                maxValue={TIMEOUT_LIM.MAX}
                 limitsPassed={() => {
                     showAlert($texts.commTimeoutError, {
-                        minValue: 5,
-                        maxValue: 300,
+                        minValue: TIMEOUT_LIM.MIN,
+                        maxValue: TIMEOUT_LIM.MAX,
                     });
                 }}
                 width="100%"
@@ -147,6 +156,7 @@
                 borderColor="#323a45"
                 selectedBackgroundColor="#252b33"
                 selectedBorderColor="#2F80ED"
+                badFormatBorderColor="#e74c3c"
                 fontSize="1rem"
                 fontColor="#f5f5f5"
                 fontWeight="400"

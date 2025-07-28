@@ -1,7 +1,14 @@
 import { makeAPIRequest } from "./api";
-import { Protocol } from "$lib/stores/devices";
+import { get } from "svelte/store";
+import { getInitialDeviceValidation, Protocol } from "$lib/stores/devices";
 import { defaultOPCUAOptions, defaultModbusRTUOptions } from "$lib/stores/devices";
 import type { DeviceMeter, EditableDeviceMeter, NewDeviceMeter, EditableCommunicationOptions, DeviceModbusRTUConfig, DeviceOPCUAConfig, MeterType, MeterOptions } from "$lib/stores/devices";
+import { protocolTexts } from "$lib/stores/lang";
+import type { EditableDeviceNode } from "$lib/stores/nodes";
+import { getAllNodesValidation } from "./nodes";
+import { showAlert } from "$lib/stores/alerts";
+
+import { texts } from "$lib/stores/lang";
 
 /**
  * Fetches the state and configuration of a specific device from the server.
@@ -82,6 +89,9 @@ export async function getDeviceNodesConfig(
  * - OPC UA username/password fields convert from `string | null` to `string`
  * - All numeric values are converted to strings for input field compatibility
  * - The original device structure is preserved except for communication options
+ * - Device image is initialized as undefined (can be set later in forms)
+ * - Current image URL is constructed from device name and ID for displaying existing images
+ * - Validation state is initialized with all checks set to false
  * 
  * @example
  * ```typescript
@@ -94,6 +104,7 @@ export async function getDeviceNodesConfig(
  * 
  * const editableDevice = convertToEditableDevice(device);
  * // Now suitable for form binding with string-based inputs
+ * // editableDevice.current_image_url will be "/devices/Test Meter_1.png"
  * ```
  */
 export function convertToEditableDevice(device: DeviceMeter): EditableDeviceMeter {
@@ -107,6 +118,7 @@ export function convertToEditableDevice(device: DeviceMeter): EditableDeviceMete
             read_period: opcuaConfig.read_period.toString(),
             timeout: opcuaConfig.timeout.toString(),
             url: opcuaConfig.url,
+            valid: false,
         };
     } else if (device.protocol === Protocol.MODBUS_RTU) {
         const modbusConfig = device.communication_options as DeviceModbusRTUConfig;
@@ -120,6 +132,7 @@ export function convertToEditableDevice(device: DeviceMeter): EditableDeviceMete
             slave_id: modbusConfig.slave_id.toString(),
             stopbits: modbusConfig.stopbits.toString(),
             timeout: modbusConfig.timeout.toString(),
+            valid: false,
         };
     } else {
         throw new Error("Unsupported Protocol");
@@ -133,20 +146,29 @@ export function convertToEditableDevice(device: DeviceMeter): EditableDeviceMete
         type: device.type,
         options: device.options,
         communication_options: editableCommunicationOptions,
+        device_image: undefined,
+        current_image_url: `/devices/${device.name}_${device.id}.png`,
+        validation: getInitialDeviceValidation(),
     };
 }
-
 
 /**
  * Creates a new device meter object for use in device creation forms or API requests.
  * Initializes the communication options with protocol-specific defaults and returns a NewDeviceMeter object
  * with empty name and the provided protocol, meter type, and options.
  *
- * @param protocol The communication protocol for the new device (MODBUS_RTU or OPC_UA)
- * @param meter_type The electrical connection type (SINGLE_PHASE or THREE_PHASE)
- * @param meter_options Operational settings for the device (measurement and acquisition options)
- * @returns A NewDeviceMeter object with default communication options and empty name
- * @throws Error if the protocol is not supported
+ * @param {Protocol} protocol - The communication protocol for the new device (MODBUS_RTU or OPC_UA)
+ * @param {MeterType} meter_type - The electrical connection type (SINGLE_PHASE or THREE_PHASE)
+ * @param {MeterOptions} meter_options - Operational settings for the device (measurement and acquisition options)
+ * @returns {NewDeviceMeter} A NewDeviceMeter object with default communication options, empty name, and initial validation state
+ * @throws {Error} Throws an error if the protocol is not supported
+ * 
+ * @description The returned object includes:
+ * - Empty name string (to be filled by user)
+ * - Protocol-specific default communication options
+ * - Device image initialized as undefined (can be set later in forms)
+ * - Initial validation state with all checks set to false
+ * - Provided meter type and options
  */
 export function createNewDevice(protocol: Protocol, meter_type: MeterType, meter_options: MeterOptions): NewDeviceMeter {
 
@@ -168,6 +190,8 @@ export function createNewDevice(protocol: Protocol, meter_type: MeterType, meter
         type: meter_type,
         options: meter_options,
         communication_options: communication_options,
+        device_image: undefined,
+        validation: getInitialDeviceValidation(),
     }
 
     return new_device;
@@ -278,4 +302,60 @@ export function validateModbusRtuPort(port: string): boolean {
     // Extra: reject if contains whitespace or non-printable chars
     if (/\s/.test(trimmed) || /[^\x20-\x7E]/.test(trimmed)) return false;
     return windowsPattern.test(trimmed) || unixPattern.test(trimmed);
+}
+
+/**
+ * Updates the validation state for all properties of a device configuration.
+ * Runs validation checks for device name, protocol, communication options, and associated nodes,
+ * updating the device's validation object with the results.
+ *
+ * @param deviceData Device configuration object (EditableDeviceMeter or NewDeviceMeter) to validate
+ * @param nodes Array of editable device nodes associated with this device
+ * 
+ */
+export function updateDeviceValidation(deviceData: EditableDeviceMeter | NewDeviceMeter, nodes: Array<EditableDeviceNode>): void {
+    deviceData.validation.deviceName = validateDeviceName(deviceData.name);
+    deviceData.validation.deviceProtocol = Object.keys(get(protocolTexts)).includes(deviceData.protocol);
+    deviceData.validation.communicationOptions = deviceData.communication_options.valid;
+    deviceData.validation.nodes = getAllNodesValidation(nodes);
+}
+
+/**
+ * Validates a device configuration and displays appropriate error alerts if validation fails.
+ * Checks all validation properties in order and shows the first error encountered.
+ * This function is typically called before performing device operations like save, create, or update.
+ *
+ * @param deviceData Device configuration object (EditableDeviceMeter or NewDeviceMeter) to validate
+ * @returns True if all validations pass, false if any validation fails (with alert shown)
+ * 
+ * @description Validation order and corresponding alerts:
+ * 1. Device name validation - shows invalidDeviceName alert
+ * 2. Protocol validation - shows invalidProtocol alert  
+ * 3. Communication options validation - shows invalidCommunicationOptions alert
+ * 4. Meter options validation - shows invalidMeterOptions alert
+ * 5. Device nodes validation - shows invalidDeviceNodes alert
+ * 
+ * Only the first validation failure is reported to avoid overwhelming the user with multiple alerts.
+ * Call updateDeviceValidation() before this function to ensure validation state is current.
+ */
+export function validDeviceOperation(deviceData: EditableDeviceMeter | NewDeviceMeter): boolean {
+    if (deviceData.validation.isValid()) {
+        return true;
+    }
+    if (!(deviceData.validation.deviceName)) {
+        showAlert(get(texts).invalidDeviceName); // Invalid device name
+    }
+    else if (!(deviceData.validation.deviceProtocol)) {
+        showAlert(get(texts).invalidProtocol); // Invalid device protocol
+    }
+    else if (!(deviceData.validation.communicationOptions)) {
+        showAlert(get(texts).invalidCommunicationOptions); // Invalid Communication Options
+    }
+    else if (!(deviceData.validation.meterOptions)) {
+        showAlert(get(texts).invalidMeterOptions); // Invalid Meter Options
+    }
+    else if (!(deviceData.validation.nodes)) {
+        showAlert(get(texts).invalidDeviceNodes); // Invalid Device Nodes
+    }
+    return false;
 }

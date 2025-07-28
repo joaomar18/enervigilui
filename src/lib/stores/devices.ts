@@ -1,3 +1,13 @@
+/*****     C O N S T A N T S     *****/
+
+// Communication Limits
+export const READ_PERIOD_LIM: Record<string, number> = { MIN: 5, MAX: 300 };
+export const TIMEOUT_LIM: Record<string, number> = { MIN: 1, MAX: 15 };
+
+// Modbus Limits
+export const SLAVE_ID_LIM: Record<string, number> = { MIN: 1, MAX: 247 };
+export const RETRIES_NUMBER_LIM: Record<string, number> = { MIN: 0, MAX: 5 };
+
 /**
  * Communication protocols supported by the energy monitoring system.
  * Defines the available protocols for communicating with external devices and systems.
@@ -50,6 +60,18 @@ export interface DeviceModbusRTUConfig {
  * This interface mirrors ModbusRTUConfig but uses string types for all properties
  * to support form input handling and validation before conversion to the final numeric types.
  * Used primarily in UI components where users input configuration values as text.
+ *
+ * @interface EditableDeviceModbusRTUConfig
+ * @property {string} baudrate - Data transmission rate in bits per second as string (e.g., "9600", "19200", "115200")
+ * @property {string} bytesize - Number of data bits per character as string (typically "7" or "8")
+ * @property {string} parity - Error checking method ("N" for None, "E" for Even, "O" for Odd)
+ * @property {string} port - Serial communication port identifier (e.g., "COM1", "/dev/ttyUSB0")
+ * @property {string} read_period - Time interval in seconds between consecutive data readings as string
+ * @property {string} retries - Number of retry attempts for failed communication requests as string
+ * @property {string} slave_id - Modbus slave device identifier (1-247) as string
+ * @property {string} stopbits - Number of stop bits used to signal end of character as string (1 or 2)
+ * @property {string} timeout - Maximum time in seconds to wait for device response as string
+ * @property {boolean} valid - Indicates whether all communication options are valid
  */
 export interface EditableDeviceModbusRTUConfig {
     baudrate: string,
@@ -61,6 +83,7 @@ export interface EditableDeviceModbusRTUConfig {
     slave_id: string,
     stopbits: string,
     timeout: string,
+    valid: boolean,
 }
 
 /**
@@ -77,6 +100,7 @@ export const defaultModbusRTUOptions: EditableDeviceModbusRTUConfig = {
     read_period: "10",
     timeout: "10",
     retries: "3",
+    valid: false,
 };
 
 /**
@@ -104,6 +128,14 @@ export interface DeviceOPCUAConfig {
  * This interface mirrors OPCUAConfig but uses string types for all properties to support
  * form input handling and validation before conversion to the final types. Used primarily
  * in UI components where users input configuration values as text.
+ * 
+ * @interface EditableDeviceOPCUAConfig
+ * @property {string} username - Authentication username (empty string if not required)
+ * @property {string} password - Authentication password (empty string if not required)
+ * @property {string} read_period - Data reading interval in seconds (string for form compatibility)
+ * @property {string} timeout - Connection timeout in seconds (string for form compatibility)
+ * @property {string} url - OPC UA server endpoint URL (e.g., "opc.tcp://192.168.1.100:4840")
+ * @property {boolean} valid - Validation flag indicating if configuration is complete and valid
  */
 export interface EditableDeviceOPCUAConfig {
     username: string,
@@ -111,6 +143,7 @@ export interface EditableDeviceOPCUAConfig {
     read_period: string,
     timeout: string,
     url: string,
+    valid: boolean,
 }
 
 /**
@@ -119,10 +152,11 @@ export interface EditableDeviceOPCUAConfig {
  */
 export const defaultOPCUAOptions: EditableDeviceOPCUAConfig = {
     url: "opc.tcp://",
-    read_period: "10",
+    read_period: "5",
     timeout: "10",
     username: "",
     password: "",
+    valid: false,
 };
 
 /**
@@ -198,6 +232,18 @@ export interface DeviceMeter {
  * This interface mirrors DeviceMeter but uses EditableCommunicationOptions to support
  * form input handling where communication parameters are entered as strings. Used primarily
  * in device configuration forms and editing components where user input validation is required.
+ *
+ * @interface EditableDeviceMeter
+ * @property {boolean} connected - Current connection status of the device (true if actively connected)
+ * @property {number} id - Unique numeric identifier for the device within the system
+ * @property {string} name - Human-readable name/label for the device (e.g., "Main Building Meter")
+ * @property {Protocol} protocol - Communication protocol used by this device (MODBUS_RTU, OPC_UA, or NONE)
+ * @property {MeterType} type - Electrical connection type (SINGLE_PHASE or THREE_PHASE)
+ * @property {MeterOptions} options - Operational settings controlling measurement capabilities and data acquisition
+ * @property {EditableCommunicationOptions} communication_options - Protocol-specific communication parameters and settings (as strings for form input)
+ * @property {File | undefined} device_image - Optional image file for the device (for visual identification in UI)
+ * @property {string} current_image_url - URL of the device's current image (for displaying existing images in forms)
+ * @property {DeviceValidation} validation - Validation state for all device configuration properties
  */
 export interface EditableDeviceMeter {
     connected: boolean,
@@ -207,6 +253,9 @@ export interface EditableDeviceMeter {
     type: MeterType,
     options: MeterOptions,
     communication_options: EditableCommunicationOptions;
+    device_image: File | undefined;
+    current_image_url: string;
+    validation: DeviceValidation;
 }
 
 /**
@@ -219,6 +268,8 @@ export interface EditableDeviceMeter {
  * @property {MeterType} type - Electrical connection type (SINGLE_PHASE or THREE_PHASE)
  * @property {MeterOptions} options - Operational settings controlling measurement capabilities and data acquisition
  * @property {EditableCommunicationOptions} communication_options - Protocol-specific communication parameters and settings (as strings for form input)
+ * @property {File | undefined} device_image - Optional image file for the device (for visual identification in UI)
+ * @property {DeviceValidation} validation - Validation state for all device configuration properties
  */
 export interface NewDeviceMeter {
     name: string,
@@ -226,6 +277,49 @@ export interface NewDeviceMeter {
     type: MeterType,
     options: MeterOptions,
     communication_options: EditableCommunicationOptions;
+    device_image: File | undefined;
+    validation: DeviceValidation;
+}
+
+/**
+ * Represents the validation state for all editable properties of a device.
+ * Each boolean property indicates whether the corresponding device configuration section passes validation.
+ * Used to provide real-time feedback in the UI and prevent invalid device configurations from being saved.
+ *
+ * @interface
+ * @property {boolean} deviceName - True if the device name is valid (non-empty, follows naming rules, etc.)
+ * @property {boolean} deviceProtocol - True if the selected communication protocol is valid
+ * @property {boolean} communicationOptions - True if all protocol-specific communication settings are valid
+ * @property {boolean} meterOptions - True if all meter operational options are configured correctly
+ * @property {boolean} nodes - True if all device nodes are properly configured and valid
+ * @method isValid - Returns true if all validation checks pass (logical AND of all other properties)
+ */
+export interface DeviceValidation {
+    deviceName: boolean;
+    deviceProtocol: boolean;
+    communicationOptions: boolean;
+    meterOptions: boolean;
+    nodes: boolean;
+    isValid(): boolean;
+}
+
+/**
+ * Creates and returns a new DeviceValidation object with all validation properties set to false.
+ * Used to initialize the validation state for new devices or reset validation during editing.
+ * 
+ * @returns {DeviceValidation} A fresh validation object with all checks set to false
+ */
+export function getInitialDeviceValidation(): DeviceValidation {
+    return {
+        deviceName: false,
+        deviceProtocol: false,
+        communicationOptions: false,
+        meterOptions: false,
+        nodes: false,
+        isValid() {
+            return this.deviceName && this.deviceProtocol && this.communicationOptions && this.meterOptions && this.nodes;
+        }
+    };
 }
 
 /**

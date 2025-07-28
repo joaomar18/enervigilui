@@ -1,7 +1,7 @@
 <script lang="ts">
     import { onMount, onDestroy } from "svelte";
-    import { getDeviceState, getDeviceNodesConfig, convertToEditableDevice, validateDeviceName, validateModbusRtuPort } from "$lib/ts/devices";
-    import { getNodeIndex, convertToEditableNodes, getDefaultNodesList, changeNodeProtocol } from "$lib/ts/nodes";
+    import { getDeviceState, getDeviceNodesConfig, convertToEditableDevice, updateDeviceValidation, validDeviceOperation } from "$lib/ts/devices";
+    import { getNodeIndex, convertToEditableNodes, changeNodeProtocol, updateNodesValidation } from "$lib/ts/nodes";
     import { nodeSections } from "$lib/stores/nodes";
     import Selector from "../../../components/General/Selector.svelte";
     import SelectorButton from "../../../components/General/SelectorButton.svelte";
@@ -15,6 +15,7 @@
     import NodeConfigWindow from "../../../components/Devices/Nodes/NodeConfigWindow.svelte";
     import OpcuaConfig from "../../../components/Devices/OPCUAConfig.svelte";
     import ModbusRtuConfig from "../../../components/Devices/ModbusRTUConfig.svelte";
+    import MeterOptionsConfig from "../../../components/Devices/MeterOptionsConfig.svelte";
     import { Protocol, defaultOPCUAOptions, defaultModbusRTUOptions } from "$lib/stores/devices";
 
     // Types
@@ -26,7 +27,7 @@
 
     // Stores for multi-language support
     import { texts, selectedLang } from "$lib/stores/lang";
-    import { protocolTexts, meterTypeTexts } from "$lib/stores/lang";
+    import { protocolTexts } from "$lib/stores/lang";
 
     // Stores for alerts
     import { showAlert } from "$lib/stores/alerts";
@@ -55,12 +56,6 @@
     let editingNode: EditableDeviceNode; // Current Node being edited in Configuration Window
     let editingNodeState: NodeEditState; // Current state of the Node being edited
 
-    let deviceImage: File | undefined;
-    let deviceImageUrl: string;
-
-    let validOpcUaConfig: boolean; // OPC UA Configuration is valid
-    let validModbusRTUConfig: boolean; // Modbus RTU Configuration is valid
-
     // Reactive Statements
 
     //Synchronize communication configuration with device data
@@ -75,7 +70,7 @@
     }
 
     // Get nodes from the nodes array by section
-    $: if (nodes) {
+    $: if (deviceData && nodes) {
         nodesBySection = nodeSections.reduce(
             (acc: Record<NodePhase, Array<EditableDeviceNode>>, section) => {
                 acc[section.key] = nodes.filter(section.filter);
@@ -83,6 +78,8 @@
             },
             {} as Record<NodePhase, Array<EditableDeviceNode>>,
         );
+        updateNodesValidation(nodes, nodesBySection);
+        updateDeviceValidation(deviceData, nodes);
     }
 
     // Functions
@@ -98,7 +95,6 @@
                 } else {
                     let requestDeviceData: DeviceMeter = data;
                     deviceData = convertToEditableDevice(requestDeviceData);
-                    deviceImageUrl = `/devices/${deviceData?.name}_${deviceData?.id}.png`;
                     sucess = true;
                 }
             } catch (e) {
@@ -181,8 +177,8 @@ Shows input forms for protocol-specific parameters and organizes device nodes fo
             <div class="device-identification-div">
                 <EditableText
                     bind:text={deviceData.name}
+                    textInvalid={!deviceData.validation.deviceName}
                     enableTextInvalid={true}
-                    textInvalid={!validateDeviceName(deviceData.name)}
                     width="75%"
                     minWidth="200px"
                     maxWidth="500px"
@@ -196,11 +192,11 @@ Shows input forms for protocol-specific parameters and organizes device nodes fo
                 <span class="id-text">ID: {String(deviceData?.id).padStart(3, "0")}</span>
                 <div class="device-image-div">
                     <UploadImage
-                        bind:imageFile={deviceImage}
+                        bind:imageFile={deviceData.device_image}
                         width="200px"
                         height="200px"
                         borderRadius="50%"
-                        imageUrl={deviceImageUrl}
+                        imageUrl={deviceData.current_image_url}
                         defaultImageUrl={`/img/default-device.png`}
                         imageHeight="87.5%"
                         backgroundColor="rgba(255, 255, 255, 0.1)"
@@ -221,6 +217,8 @@ Shows input forms for protocol-specific parameters and organizes device nodes fo
                             useLang={true}
                             options={$protocolTexts}
                             bind:selectedOption={deviceData.protocol}
+                            inputInvalid={!deviceData.validation.deviceProtocol}
+                            enableInputInvalid={true}
                             onChange={() => {
                                 if (deviceData.protocol === Protocol.OPC_UA) {
                                     deviceData.communication_options = defaultOPCUAOptions;
@@ -242,6 +240,7 @@ Shows input forms for protocol-specific parameters and organizes device nodes fo
                             backgroundColor="#252b33"
                             borderColor="#323a45"
                             selectedColor="#14566b"
+                            badFormatBorderColor="#e74c3c"
                             optionsBackgroundColor="#1e242b"
                             optionsBorderColor="#323a45"
                             letterSpacing="0.5px"
@@ -275,9 +274,9 @@ Shows input forms for protocol-specific parameters and organizes device nodes fo
                 </div>
 
                 {#if opcuaConfig}
-                    <OpcuaConfig bind:opcuaConfig bind:opcuaConfigValid={validOpcUaConfig} />
+                    <OpcuaConfig bind:opcuaConfig />
                 {:else if modbusRTUConfig}
-                    <ModbusRtuConfig bind:modbusRTUConfig bind:modbusRTUConfigValid={validModbusRTUConfig} />
+                    <ModbusRtuConfig bind:modbusRTUConfig />
                 {/if}
             </div>
             <div class="device-section-div">
@@ -285,217 +284,7 @@ Shows input forms for protocol-specific parameters and organizes device nodes fo
                     <h3>{$texts.deviceOptions[$selectedLang]}</h3>
                     <span>{$texts.deviceOptionsSub[$selectedLang]}</span>
                 </div>
-
-                <div class="device-input-div">
-                    <span>{$texts.connectionType[$selectedLang]}</span>
-                    <div class="input-div">
-                        <Selector
-                            useLang={true}
-                            options={$meterTypeTexts}
-                            bind:selectedOption={deviceData.type}
-                            onChange={() => {
-                                nodes = getDefaultNodesList(deviceData);
-                            }}
-                            scrollable={true}
-                            maxOptions={5}
-                            width="200px"
-                            height="40px"
-                            borderRadius="5px"
-                            backgroundColor="#252b33"
-                            borderColor="#323a45"
-                            selectedColor="#14566b"
-                            optionsBackgroundColor="#1e242b"
-                            optionsBorderColor="#323a45"
-                            letterSpacing="0.5px"
-                            wordSpacing="1px"
-                            arrowWidth="16px"
-                            arrowHeight="16px"
-                            arrowRightPos="10px"
-                        />
-                        <div class="info-div">
-                            <HintInfo
-                                labelText=""
-                                hintWidth="300px"
-                                hintHeight="fit-content"
-                                hintBackgroundColor="#1e242b"
-                                hintBorderColor="#2c343d"
-                                hintBorderRadius="10px"
-                                textColor="#f5f5f5"
-                                openBackgroundColor="rgba(255, 255, 255, 0.05)"
-                                openHoverBackgroundColor="rgba(255, 255, 255, 0.1)"
-                                openStrokeColor="#cccccc"
-                                openHoverStrokeColor="#eeeeee"
-                                closeBackgroundColor="rgba(255, 255, 255, 0.1)"
-                                closeHoverBackgroundColor="rgba(255, 255, 255, 0.2)"
-                                closeStrokeColor="white"
-                                closeHoverStrokeColor="#eeeeee"
-                            >
-                                <span class="info-text">{$texts.connectionTypeInfo[$selectedLang]}</span>
-                            </HintInfo>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="device-input-div">
-                    <span>{$texts.readEnergyFromMeter[$selectedLang]}</span>
-                    <div class="input-div">
-                        <div class="input-content-div">
-                            <SelectorButton
-                                bind:checked={deviceData.options.read_energy_from_meter}
-                                width="75px"
-                                height="20px"
-                                knobWidth="32px"
-                                knobHeight="32px"
-                                borderRadius="10px"
-                                backgroundColor="#3a3a3a"
-                                selectedBackgroundColor="#4a4a4a"
-                                knobBackgroundColor="#e0e0e0"
-                                knobSelectedBackgroundColor="#2f80ed"
-                            />
-                        </div>
-                        <div class="info-div">
-                            <HintInfo
-                                labelText=""
-                                hintWidth="300px"
-                                hintHeight="fit-content"
-                                hintBackgroundColor="#1e242b"
-                                hintBorderColor="#2c343d"
-                                hintBorderRadius="10px"
-                                textColor="#f5f5f5"
-                                openBackgroundColor="rgba(255, 255, 255, 0.05)"
-                                openHoverBackgroundColor="rgba(255, 255, 255, 0.1)"
-                                openStrokeColor="#cccccc"
-                                openHoverStrokeColor="#eeeeee"
-                                closeBackgroundColor="rgba(255, 255, 255, 0.1)"
-                                closeHoverBackgroundColor="rgba(255, 255, 255, 0.2)"
-                                closeStrokeColor="white"
-                                closeHoverStrokeColor="#eeeeee"
-                            >
-                                <span class="info-text">{$texts.readEnergyFromMeterInfo[$selectedLang]}</span>
-                            </HintInfo>
-                        </div>
-                    </div>
-                </div>
-                <div class="device-input-div">
-                    <span>{$texts.readForwardReverseEnergySeparate[$selectedLang]}</span>
-                    <div class="input-div">
-                        <div class="input-content-div">
-                            <SelectorButton
-                                bind:checked={deviceData.options.read_separate_forward_reverse_energy}
-                                width="75px"
-                                height="20px"
-                                knobWidth="32px"
-                                knobHeight="32px"
-                                borderRadius="10px"
-                                backgroundColor="#3a3a3a"
-                                selectedBackgroundColor="#4a4a4a"
-                                knobBackgroundColor="#e0e0e0"
-                                knobSelectedBackgroundColor="#2f80ed"
-                            />
-                        </div>
-                        <div class="info-div">
-                            <HintInfo
-                                labelText=""
-                                hintWidth="300px"
-                                hintHeight="fit-content"
-                                hintBackgroundColor="#1e242b"
-                                hintBorderColor="#2c343d"
-                                hintBorderRadius="10px"
-                                textColor="#f5f5f5"
-                                openBackgroundColor="rgba(255, 255, 255, 0.05)"
-                                openHoverBackgroundColor="rgba(255, 255, 255, 0.1)"
-                                openStrokeColor="#cccccc"
-                                openHoverStrokeColor="#eeeeee"
-                                closeBackgroundColor="rgba(255, 255, 255, 0.1)"
-                                closeHoverBackgroundColor="rgba(255, 255, 255, 0.2)"
-                                closeStrokeColor="white"
-                                closeHoverStrokeColor="#eeeeee"
-                            >
-                                <span class="info-text">{$texts.readForwardReverseEnergySeparateInfo[$selectedLang]}</span>
-                            </HintInfo>
-                        </div>
-                    </div>
-                </div>
-                <div class="device-input-div">
-                    <span>{$texts.negativeReactivePower[$selectedLang]}</span>
-                    <div class="input-div">
-                        <div class="input-content-div">
-                            <SelectorButton
-                                bind:checked={deviceData.options.negative_reactive_power}
-                                width="75px"
-                                height="20px"
-                                knobWidth="32px"
-                                knobHeight="32px"
-                                borderRadius="10px"
-                                backgroundColor="#3a3a3a"
-                                selectedBackgroundColor="#4a4a4a"
-                                knobBackgroundColor="#e0e0e0"
-                                knobSelectedBackgroundColor="#2f80ed"
-                            />
-                        </div>
-                        <div class="info-div">
-                            <HintInfo
-                                labelText=""
-                                hintWidth="300px"
-                                hintHeight="fit-content"
-                                hintBackgroundColor="#1e242b"
-                                hintBorderColor="#2c343d"
-                                hintBorderRadius="10px"
-                                textColor="#f5f5f5"
-                                openBackgroundColor="rgba(255, 255, 255, 0.05)"
-                                openHoverBackgroundColor="rgba(255, 255, 255, 0.1)"
-                                openStrokeColor="#cccccc"
-                                openHoverStrokeColor="#eeeeee"
-                                closeBackgroundColor="rgba(255, 255, 255, 0.1)"
-                                closeHoverBackgroundColor="rgba(255, 255, 255, 0.2)"
-                                closeStrokeColor="white"
-                                closeHoverStrokeColor="#eeeeee"
-                            >
-                                <span class="info-text">{$texts.negativeReactivePowerInfo[$selectedLang]}</span>
-                            </HintInfo>
-                        </div>
-                    </div>
-                </div>
-                <div class="device-input-div">
-                    <span>{$texts.frequencyReading[$selectedLang]}</span>
-                    <div class="input-div">
-                        <div class="input-content-div">
-                            <SelectorButton
-                                bind:checked={deviceData.options.frequency_reading}
-                                width="75px"
-                                height="20px"
-                                knobWidth="32px"
-                                knobHeight="32px"
-                                borderRadius="10px"
-                                backgroundColor="#3a3a3a"
-                                selectedBackgroundColor="#4a4a4a"
-                                knobBackgroundColor="#e0e0e0"
-                                knobSelectedBackgroundColor="#2f80ed"
-                            />
-                        </div>
-                        <div class="info-div">
-                            <HintInfo
-                                labelText=""
-                                hintWidth="300px"
-                                hintHeight="fit-content"
-                                hintBackgroundColor="#1e242b"
-                                hintBorderColor="#2c343d"
-                                hintBorderRadius="10px"
-                                textColor="#f5f5f5"
-                                openBackgroundColor="rgba(255, 255, 255, 0.05)"
-                                openHoverBackgroundColor="rgba(255, 255, 255, 0.1)"
-                                openStrokeColor="#cccccc"
-                                openHoverStrokeColor="#eeeeee"
-                                closeBackgroundColor="rgba(255, 255, 255, 0.1)"
-                                closeHoverBackgroundColor="rgba(255, 255, 255, 0.2)"
-                                closeStrokeColor="white"
-                                closeHoverStrokeColor="#eeeeee"
-                            >
-                                <span class="info-text">{$texts.frequencyReadingInfo[$selectedLang]}</span>
-                            </HintInfo>
-                        </div>
-                    </div>
-                </div>
+                <MeterOptionsConfig bind:deviceData bind:nodes bind:meterOptionsValid={deviceData.validation.meterOptions} />
             </div>
             <div class="device-section-div">
                 <div class="title">
@@ -570,7 +359,9 @@ Shows input forms for protocol-specific parameters and organizes device nodes fo
                     imageHeight="22px"
                     imageLeftPos="20px"
                     onClick={() => {
-                        showSaveWindow = true;
+                        if (validDeviceOperation(deviceData)) {
+                            showSaveWindow = true;
+                        }
                     }}
                 />
                 <Button
@@ -615,7 +406,6 @@ Shows input forms for protocol-specific parameters and organizes device nodes fo
                             {deviceData}
                             node={editingNode}
                             bind:nodeEditingState={editingNodeState}
-                            sectionNodes={nodesBySection[editingNode.phase]}
                         />
                     </div>
                 </div>
@@ -857,14 +647,6 @@ Shows input forms for protocol-specific parameters and organizes device nodes fo
         padding: 0;
         width: fit-content;
         height: 100%;
-    }
-
-    /* Content area for input fields */
-    .input-div .input-content-div {
-        width: 200px;
-        display: flex;
-        justify-content: center;
-        align-items: center;
     }
 
     /* Info text styling for hints */

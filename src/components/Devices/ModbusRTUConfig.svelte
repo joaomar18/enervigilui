@@ -3,6 +3,7 @@
     import HintInfo from "../General/HintInfo.svelte";
     import Selector from "../General/Selector.svelte";
     import { validateModbusRtuPort } from "$lib/ts/devices";
+    import { READ_PERIOD_LIM, TIMEOUT_LIM, SLAVE_ID_LIM, RETRIES_NUMBER_LIM } from "$lib/stores/devices";
 
     // Stores for multi-language support
     import { texts, baudrateTexts, parityTexts, bytesizeTexts, stopbitsTexts, selectedLang } from "$lib/stores/lang";
@@ -15,13 +16,38 @@
 
     // Props
     export let modbusRTUConfig: EditableDeviceModbusRTUConfig; // Modbus RTU Configuration Object
-    export let modbusRTUConfigValid: boolean; // Modbus RTU Configuration is valid
 
     // Variables
     let validModbusRtuPort: boolean; // Modbus RTU Port is valid
+    let validModbusSlaveID: boolean; // Modbus Slave ID is valid
+    let validBaudrate: boolean; // Modbus Baudrate is valid
+    let validParity: boolean; // Modbus Parity is valid
+    let validByteSize: boolean; // Modbus Byte Size is valid
+    let validStopBits: boolean; // Modbus Stop Bits is valid
+    let validReadPeriod: boolean; // Read Period is valid
+    let validTimeout: boolean; // Timeout is valid
+    let validRetriesNumber: boolean; // Number of retries is valid
 
     $: validModbusRtuPort = validateModbusRtuPort(modbusRTUConfig.port);
-    $: modbusRTUConfigValid = validModbusRtuPort;
+    $: validModbusSlaveID = parseInt(modbusRTUConfig.slave_id) >= SLAVE_ID_LIM.MIN && parseInt(modbusRTUConfig.slave_id) <= SLAVE_ID_LIM.MAX;
+    $: validBaudrate = Object.keys($baudrateTexts).includes(modbusRTUConfig.baudrate);
+    $: validParity = Object.keys($parityTexts).includes(modbusRTUConfig.parity);
+    $: validByteSize = Object.keys($bytesizeTexts).includes(modbusRTUConfig.bytesize);
+    $: validStopBits = Object.keys($stopbitsTexts).includes(modbusRTUConfig.stopbits);
+    $: validReadPeriod = parseInt(modbusRTUConfig.read_period) >= READ_PERIOD_LIM.MIN && parseInt(modbusRTUConfig.read_period) <= READ_PERIOD_LIM.MAX;
+    $: validTimeout = parseInt(modbusRTUConfig.timeout) >= TIMEOUT_LIM.MIN && parseInt(modbusRTUConfig.timeout) <= TIMEOUT_LIM.MAX;
+    $: validRetriesNumber = parseInt(modbusRTUConfig.retries) >= RETRIES_NUMBER_LIM.MIN && parseInt(modbusRTUConfig.retries) <= RETRIES_NUMBER_LIM.MAX;
+
+    $: modbusRTUConfig.valid =
+        validModbusRtuPort &&
+        validModbusSlaveID &&
+        validBaudrate &&
+        validParity &&
+        validByteSize &&
+        validStopBits &&
+        validReadPeriod &&
+        validTimeout &&
+        validRetriesNumber;
 </script>
 
 <div class="device-input-div">
@@ -75,13 +101,15 @@
         <div class="input-content-div">
             <InputField
                 bind:inputValue={modbusRTUConfig.slave_id}
+                inputInvalid={!validModbusSlaveID}
+                enableInputInvalid={true}
                 inputType="POSITIVE_INT"
-                minValue={1}
-                maxValue={247}
+                minValue={SLAVE_ID_LIM.MIN}
+                maxValue={SLAVE_ID_LIM.MAX}
                 limitsPassed={() => {
                     showAlert($texts.slaveIDError, {
-                        minValue: 1,
-                        maxValue: 247,
+                        minValue: SLAVE_ID_LIM.MIN,
+                        maxValue: SLAVE_ID_LIM.MAX,
                     });
                 }}
                 width="100%"
@@ -129,6 +157,8 @@
             useLang={true}
             options={$baudrateTexts}
             bind:selectedOption={modbusRTUConfig.baudrate}
+            inputInvalid={!validBaudrate}
+            enableInputInvalid={true}
             scrollable={true}
             maxOptions={5}
             width="200px"
@@ -137,6 +167,7 @@
             backgroundColor="#252b33"
             borderColor="#323a45"
             selectedColor="#14566b"
+            badFormatBorderColor="#e74c3c"
             optionsBackgroundColor="#1e242b"
             optionsBorderColor="#323a45"
             letterSpacing="0.5px"
@@ -176,6 +207,8 @@
             useLang={true}
             options={$parityTexts}
             bind:selectedOption={modbusRTUConfig.parity}
+            inputInvalid={!validParity}
+            enableInputInvalid={true}
             scrollable={true}
             maxOptions={5}
             width="200px"
@@ -184,6 +217,7 @@
             backgroundColor="#252b33"
             borderColor="#323a45"
             selectedColor="#14566b"
+            badFormatBorderColor="#e74c3c"
             optionsBackgroundColor="#1e242b"
             optionsBorderColor="#323a45"
             letterSpacing="0.5px"
@@ -223,6 +257,8 @@
             useLang={true}
             options={$bytesizeTexts}
             bind:selectedOption={modbusRTUConfig.bytesize}
+            inputInvalid={!validByteSize}
+            enableInputInvalid={true}
             scrollable={true}
             maxOptions={5}
             width="200px"
@@ -231,6 +267,7 @@
             backgroundColor="#252b33"
             borderColor="#323a45"
             selectedColor="#14566b"
+            badFormatBorderColor="#e74c3c"
             optionsBackgroundColor="#1e242b"
             optionsBorderColor="#323a45"
             letterSpacing="0.5px"
@@ -270,6 +307,8 @@
             useLang={true}
             options={$stopbitsTexts}
             bind:selectedOption={modbusRTUConfig.stopbits}
+            inputInvalid={!validStopBits}
+            enableInputInvalid={true}
             scrollable={true}
             maxOptions={5}
             width="200px"
@@ -278,6 +317,7 @@
             backgroundColor="#252b33"
             borderColor="#323a45"
             selectedColor="#14566b"
+            badFormatBorderColor="#e74c3c"
             optionsBackgroundColor="#1e242b"
             optionsBorderColor="#323a45"
             letterSpacing="0.5px"
@@ -316,14 +356,16 @@
         <div class="input-content-div">
             <InputField
                 bind:inputValue={modbusRTUConfig.read_period}
+                inputInvalid={!validReadPeriod}
+                enableInputInvalid={true}
                 inputType="POSITIVE_INT"
                 inputUnit={$texts.secondsUnit[$selectedLang]}
-                minValue={5.0}
-                maxValue={300.0}
+                minValue={READ_PERIOD_LIM.MIN}
+                maxValue={READ_PERIOD_LIM.MAX}
                 limitsPassed={() => {
                     showAlert($texts.readPeriodError, {
-                        minValue: 5,
-                        maxValue: 300,
+                        minValue: READ_PERIOD_LIM.MIN,
+                        maxValue: READ_PERIOD_LIM.MAX,
                     });
                 }}
                 width="100%"
@@ -333,6 +375,7 @@
                 borderColor="#323a45"
                 selectedBackgroundColor="#252b33"
                 selectedBorderColor="#2F80ED"
+                badFormatBorderColor="#e74c3c"
                 fontSize="1rem"
                 fontColor="#f5f5f5"
                 fontWeight="400"
@@ -369,14 +412,16 @@
         <div class="input-content-div">
             <InputField
                 bind:inputValue={modbusRTUConfig.timeout}
-                inputType="POSITIVE_FLOAT"
+                inputInvalid={!validTimeout}
+                enableInputInvalid={true}
+                inputType="POSITIVE_INT"
                 inputUnit={$texts.secondsUnit[$selectedLang]}
-                minValue={5.0}
-                maxValue={300.0}
+                minValue={TIMEOUT_LIM.MIN}
+                maxValue={TIMEOUT_LIM.MAX}
                 limitsPassed={() => {
                     showAlert($texts.commTimeoutError, {
-                        minValue: 5,
-                        maxValue: 300,
+                        minValue: TIMEOUT_LIM.MIN,
+                        maxValue: TIMEOUT_LIM.MAX,
                     });
                 }}
                 width="100%"
@@ -386,6 +431,7 @@
                 borderColor="#323a45"
                 selectedBackgroundColor="#252b33"
                 selectedBorderColor="#2F80ED"
+                badFormatBorderColor="#e74c3c"
                 fontSize="1rem"
                 fontColor="#f5f5f5"
                 fontWeight="400"
@@ -423,12 +469,14 @@
             <InputField
                 bind:inputValue={modbusRTUConfig.retries}
                 inputType="POSITIVE_INT"
-                minValue={0.0}
-                maxValue={5.0}
+                inputInvalid={!validRetriesNumber}
+                enableInputInvalid={true}
+                minValue={RETRIES_NUMBER_LIM.MIN}
+                maxValue={RETRIES_NUMBER_LIM.MAX}
                 limitsPassed={() => {
                     showAlert($texts.retriesError, {
-                        minValue: 0,
-                        maxValue: 5,
+                        minValue: RETRIES_NUMBER_LIM.MIN,
+                        maxValue: RETRIES_NUMBER_LIM.MAX,
                     });
                 }}
                 width="100%"
@@ -438,6 +486,7 @@
                 borderColor="#323a45"
                 selectedBackgroundColor="#252b33"
                 selectedBorderColor="#2F80ED"
+                badFormatBorderColor="#e74c3c"
                 fontSize="1rem"
                 fontColor="#f5f5f5"
                 fontWeight="400"

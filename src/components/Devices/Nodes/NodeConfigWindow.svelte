@@ -3,12 +3,11 @@
     import InputField from "../../General/InputField.svelte";
     import Checkbox from "../../General/Checkbox.svelte";
     import Selector from "../../General/Selector.svelte";
-    import { NodeType } from "$lib/stores/nodes";
     import { Protocol } from "$lib/stores/devices";
     import ModalWindow from "../../General/ModalWindow.svelte";
     import { nodeNameChange, nodeTypeChange, customNodeChange, virtualNodeChange } from "$lib/ts/nodes";
-    import { validateNodeName, validateNodeUnit, validateCommunicationID, validateNodeType, validateVirtualNode } from "$lib/ts/nodes";
     import { showAlert } from "$lib/stores/alerts";
+    import { DECIMAL_PLACES_LIM, LOGGING_PERIOD_LIM, NodeType } from "$lib/stores/nodes";
 
     // Types
     import type { EditableDeviceMeter, NewDeviceMeter } from "$lib/stores/devices";
@@ -25,7 +24,6 @@
     export let deviceData: EditableDeviceMeter | NewDeviceMeter;
     export let node: EditableDeviceNode;
     export let nodeEditingState: NodeEditState;
-    export let sectionNodes: Array<EditableDeviceNode>;
 
     // Export Funcions
     export let onPropertyChanged: () => void;
@@ -84,7 +82,7 @@ Displays contextual hints and supports multi-language labels for all fields. -->
                                     nodeNameChange(node, node.phase);
                                     onPropertyChanged();
                                 }}
-                                inputInvalid={!validateNodeName(node.display_name, node.config.custom, sectionNodes)}
+                                inputInvalid={!node.validation.variableName}
                                 enableInputInvalid={true}
                                 scrollable={true}
                                 maxOptions={5}
@@ -109,7 +107,7 @@ Displays contextual hints and supports multi-language labels for all fields. -->
                                 onChange={() => {
                                     onPropertyChanged();
                                 }}
-                                inputInvalid={!validateNodeName(node.display_name, node.config.custom, sectionNodes)}
+                                inputInvalid={!node.validation.variableName}
                                 enableInputInvalid={true}
                                 inputType="STRING"
                                 width="100%"
@@ -172,7 +170,7 @@ Displays contextual hints and supports multi-language labels for all fields. -->
                                     onPropertyChanged();
                                 }}
                                 disabled={node.config.type === NodeType.STRING || node.config.type === NodeType.BOOLEAN}
-                                inputInvalid={!validateNodeUnit(node.display_name, node.config.type, node.config.unit, node.config.custom)}
+                                inputInvalid={!node.validation.variableUnit}
                                 enableInputInvalid={true}
                                 scrollable={true}
                                 maxOptions={5}
@@ -198,7 +196,7 @@ Displays contextual hints and supports multi-language labels for all fields. -->
                                     onPropertyChanged();
                                 }}
                                 disabled={node.config.type === NodeType.STRING || node.config.type === NodeType.BOOLEAN}
-                                inputInvalid={!validateNodeUnit(node.display_name, node.config.type, node.config.unit, node.config.custom)}
+                                inputInvalid={!node.validation.variableUnit}
                                 enableInputInvalid={true}
                                 inputType="STRING"
                                 width="100%"
@@ -258,14 +256,15 @@ Displays contextual hints and supports multi-language labels for all fields. -->
                                 onChange={() => {
                                     onPropertyChanged();
                                 }}
+                                inputInvalid={!node.validation.decimalPlaces}
                                 enableInputInvalid={true}
                                 inputType="POSITIVE_INT"
-                                minValue={0}
-                                maxValue={6}
+                                minValue={DECIMAL_PLACES_LIM.MIN}
+                                maxValue={DECIMAL_PLACES_LIM.MAX}
                                 limitsPassed={() => {
                                     showAlert($texts.decimalPlacesError, {
-                                        minValue: 0,
-                                        maxValue: 6,
+                                        minValue: DECIMAL_PLACES_LIM.MIN,
+                                        maxValue: DECIMAL_PLACES_LIM.MAX,
                                     });
                                 }}
                                 width="100%"
@@ -325,7 +324,7 @@ Displays contextual hints and supports multi-language labels for all fields. -->
                             onChange={() => {
                                 onPropertyChanged();
                             }}
-                            inputInvalid={!validateCommunicationID(node.communication_id, node.protocol)}
+                            inputInvalid={!node.validation.communicationID}
                             enableInputInvalid={true}
                             inputType="STRING"
                             width="100%"
@@ -387,7 +386,7 @@ Displays contextual hints and supports multi-language labels for all fields. -->
                                 nodeTypeChange(node, nodeEditingState);
                                 onPropertyChanged();
                             }}
-                            inputInvalid={!validateNodeType(node.config.type, node.display_name, node.config.custom)}
+                            inputInvalid={!node.validation.variableType}
                             enableInputInvalid={true}
                             scrollable={true}
                             maxOptions={5}
@@ -442,13 +441,15 @@ Displays contextual hints and supports multi-language labels for all fields. -->
                             onChange={() => {
                                 onPropertyChanged();
                             }}
+                            inputInvalid={!node.validation.loggingPeriod}
+                            enableInputInvalid={true}
                             inputType="POSITIVE_INT"
-                            minValue={1}
-                            maxValue={1440}
+                            minValue={LOGGING_PERIOD_LIM.MIN}
+                            maxValue={LOGGING_PERIOD_LIM.MAX}
                             limitsPassed={() => {
                                 showAlert($texts.loggingPeriodError, {
-                                    minValue: 1,
-                                    maxValue: 1440,
+                                    minValue: LOGGING_PERIOD_LIM.MIN,
+                                    maxValue: LOGGING_PERIOD_LIM.MAX,
                                 });
                             }}
                             inputUnit="min."
@@ -471,6 +472,8 @@ Displays contextual hints and supports multi-language labels for all fields. -->
                             onChange={() => {
                                 onPropertyChanged();
                             }}
+                            inputInvalid={!node.validation.loggingPeriod}
+                            enableInputInvalid={true}
                             inputName="log-node"
                             width="38px"
                             height="38px"
@@ -480,6 +483,8 @@ Displays contextual hints and supports multi-language labels for all fields. -->
                             enabledBorderColor="#5a646e"
                             disabledbgColor="#42505f"
                             disabledBorderColor="#5a646e"
+                            badFormatBackgroundColor="#e74c3c"
+                            badFormatBorderColor="#5a646e"
                         />
                     </span>
                     <span class="row-hint">
@@ -515,6 +520,8 @@ Displays contextual hints and supports multi-language labels for all fields. -->
                             <InputField
                                 disabled={(node.config.type !== NodeType.FLOAT && node.config.type !== NodeType.INT) || !node.config.min_alarm}
                                 bind:inputValue={node.config.min_alarm_value}
+                                inputInvalid={!node.validation.minAlarm}
+                                enableInputInvalid={true}
                                 onChange={() => {
                                     onPropertyChanged();
                                 }}
@@ -536,6 +543,8 @@ Displays contextual hints and supports multi-language labels for all fields. -->
                             />
                             <Checkbox
                                 bind:checked={node.config.min_alarm}
+                                inputInvalid={!node.validation.minAlarm}
+                                enableInputInvalid={true}
                                 onChange={() => {
                                     onPropertyChanged();
                                 }}
@@ -548,6 +557,8 @@ Displays contextual hints and supports multi-language labels for all fields. -->
                                 enabledBorderColor="#5a646e"
                                 disabledbgColor="#42505f"
                                 disabledBorderColor="#5a646e"
+                                badFormatBackgroundColor="#e74c3c"
+                                badFormatBorderColor="#5a646e"
                             />
                         </span>
                         <span class="row-hint">
@@ -582,6 +593,8 @@ Displays contextual hints and supports multi-language labels for all fields. -->
                             <InputField
                                 disabled={(node.config.type !== NodeType.FLOAT && node.config.type !== NodeType.INT) || !node.config.max_alarm}
                                 bind:inputValue={node.config.max_alarm_value}
+                                inputInvalid={!node.validation.maxAlarm}
+                                enableInputInvalid={true}
                                 onChange={() => {
                                     onPropertyChanged();
                                 }}
@@ -603,6 +616,8 @@ Displays contextual hints and supports multi-language labels for all fields. -->
                             />
                             <Checkbox
                                 bind:checked={node.config.max_alarm}
+                                inputInvalid={!node.validation.maxAlarm}
+                                enableInputInvalid={true}
                                 onChange={() => {
                                     onPropertyChanged();
                                 }}
@@ -615,6 +630,8 @@ Displays contextual hints and supports multi-language labels for all fields. -->
                                 enabledBorderColor="#5a646e"
                                 disabledbgColor="#42505f"
                                 disabledBorderColor="#5a646e"
+                                badFormatBackgroundColor="#e74c3c"
+                                badFormatBorderColor="#5a646e"
                             />
                         </span>
                         <span class="row-hint">
@@ -744,7 +761,7 @@ Displays contextual hints and supports multi-language labels for all fields. -->
                                 virtualNodeChange(node, nodeEditingState, deviceData.protocol);
                                 onPropertyChanged();
                             }}
-                            inputInvalid={!validateVirtualNode(node.display_name, node.config.custom)}
+                            inputInvalid={!node.validation.calculated}
                             enableInputInvalid={true}
                             inputName="virtual-node"
                             width="38px"
@@ -792,6 +809,8 @@ Displays contextual hints and supports multi-language labels for all fields. -->
                         <span class="row-entry">
                             <Checkbox
                                 bind:checked={node.config.incremental_node}
+                                inputInvalid={!node.validation.incremental}
+                                enableInputInvalid={true}
                                 onChange={() => {
                                     onPropertyChanged();
                                 }}
@@ -842,6 +861,8 @@ Displays contextual hints and supports multi-language labels for all fields. -->
                         <span class="row-entry">
                             <Checkbox
                                 bind:checked={node.config.positive_incremental}
+                                inputInvalid={!node.validation.positive_incremental}
+                                enableInputInvalid={true}
                                 onChange={() => {
                                     onPropertyChanged();
                                 }}
@@ -890,6 +911,8 @@ Displays contextual hints and supports multi-language labels for all fields. -->
                         <span class="row-entry">
                             <Checkbox
                                 bind:checked={node.config.calculate_increment}
+                                inputInvalid={!node.validation.calculate_increment}
+                                enableInputInvalid={true}
                                 onChange={() => {
                                     onPropertyChanged();
                                 }}

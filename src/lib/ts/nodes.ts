@@ -1,11 +1,11 @@
 import { get } from "svelte/store";
 import { MeterType, Protocol, type EditableDeviceMeter, type NewDeviceMeter } from "$lib/stores/devices";
-import { nodeSections, NodeType } from "$lib/stores/nodes";
-import { defaultVariables } from "$lib/stores/nodes";
-import { defaultVariableNames } from "$lib/stores/nodes";
-import { defaultVariableUnits } from "$lib/stores/nodes";
-import { NodePrefix, NodePhase } from "$lib/stores/nodes";
+import { nodeSections, NodeType, NodePrefix, NodePhase, defaultVariables, defaultVariableNames, defaultVariableUnits } from "$lib/stores/nodes";
+import { DECIMAL_PLACES_LIM, LOGGING_PERIOD_LIM } from "$lib/stores/nodes";
+import { getInitialNodeValidation } from "$lib/stores/nodes";
 import type { NodeConfiguration, EditableBaseNodeConfig, NodeModbusRTUConfig, NodeOPCUAConfig, EditableNodeConfiguration, DeviceNode, EditableDeviceNode, NodeEditState, DefaultNodeInfo, EditableNodeOPCUAConfig, EditableNodeModbusRTUConfig } from "$lib/stores/nodes";
+import { protocolTexts } from "$lib/stores/lang";
+import { stringIsValidInteger, stringIsValidFloat } from "./util";
 
 /**
  * Converts a record of DeviceNode objects into an array of EditableDeviceNode objects for UI editing.
@@ -29,8 +29,8 @@ export function convertToEditableNodes(nodes: Record<string, DeviceNode>): Array
 
         if (node.config.type === NodeType.FLOAT || node.config.type === NodeType.INT) {
             decimal_places = node.config.decimal_places.toString();
-            min_alarm_value = node.config.min_alarm_value.toFixed(node.config.min_alarm_value);
-            max_alarm_value = node.config.max_alarm_value.toFixed(node.config.max_alarm_value);
+            min_alarm_value = node.config.min_alarm_value.toFixed(parseInt(decimal_places));
+            max_alarm_value = node.config.max_alarm_value.toFixed(parseInt(decimal_places));
         }
 
         let editableConfig: EditableNodeConfiguration;
@@ -78,6 +78,7 @@ export function convertToEditableNodes(nodes: Record<string, DeviceNode>): Array
             display_name: removePrefix(node.name),
             phase: getNodePhase(node.name),
             communication_id: getCommunicationID(node.protocol, editableConfig),
+            validation: getInitialNodeValidation(),
             config: editableConfig,
         }
 
@@ -203,6 +204,7 @@ function createDefaultEditableDeviceNode(variable: DefaultNodeInfo, phase: NodeP
         display_name: variable.name,
         phase: phase,
         communication_id: getCommunicationID(device_data.protocol, nodeConfiguration, true),
+        validation: getInitialNodeValidation(),
     }
 
     return node;
@@ -317,17 +319,36 @@ export function validateCommunicationID(communicationID: string | undefined, pro
 }
 
 /**
+ * Validates a node's protocol based on whether it's a virtual/calculated node.
+ * For non-virtual nodes, checks if the protocol exists in available protocol translations.
+ * For virtual nodes, ensures the protocol is set to NONE.
+ *
+ * @param protocol The protocol to validate
+ * @param virtual True if the node is virtual/calculated, false otherwise
+ * @returns True if the protocol is valid for the node type
+ */
+export function validateNodeProtocol(protocol: Protocol, virtual: boolean): boolean {
+    if (!virtual) {
+        return Object.keys(get(protocolTexts)).includes(protocol);
+    }
+    else {
+        return protocol === Protocol.NONE;
+    }
+}
+
+/**
  * Validates the type of a node variable based on whether it is custom or default.
- * For custom variables, always returns true. For default variables, checks if the type is allowed for the variable name.
+ * For custom variables, checks if the type is a valid NodeType enum value.
+ * For default variables, checks if the type is allowed for the variable name based on applicableTypes.
  *
  * @param type NodeType to validate
- * @param name Name of the node variable
+ * @param name Name of the node variable (used for default variable validation)
  * @param custom True for custom variable, false for default variable
- * @returns True if the type is valid
+ * @returns True if the type is valid for the given variable
  */
 export function validateNodeType(type: NodeType, name: string, custom: boolean): boolean {
     if (custom) {
-        return true;
+        return Object.values(NodeType).includes(type as NodeType);
     } else {
         // For default variables, check if the type is in the applicable types
         const variables = get(defaultVariables);
@@ -342,23 +363,109 @@ export function validateNodeType(type: NodeType, name: string, custom: boolean):
 }
 
 /**
- * Checks if a node can potentially be virtual based on basic criteria.
- * Custom nodes are never virtual. Default nodes must exist and have canBeVirtual = true.
+ * Validates the decimal places value based on node type.
+ * For FLOAT/INT types, validates range 0-6. For STRING/BOOLEAN types, requires empty value.
+ * @param decimal_places String representation of decimal places to validate
+ * @param type NodeType to determine validation rules
+ * @returns True if decimal places are valid for the given node type
+ */
+export function validateDecimalPlaces(decimal_places: string, type: NodeType): boolean {
+
+    if (type === NodeType.FLOAT || type === NodeType.INT) {
+        if (stringIsValidInteger(decimal_places) && parseInt(decimal_places) >= DECIMAL_PLACES_LIM.MIN && parseInt(decimal_places) <= DECIMAL_PLACES_LIM.MAX) {
+            return true;
+        }
+    }
+    else {
+        return decimal_places === "";
+    }
+    return false;
+}
+
+/**
+ * Validates the logging period value for a node.
+ * @param logging_period String representation of logging period in minutes to validate
+ * @param logging_enabled Whether logging is enabled (if false, always returns true)
+ * @returns True if logging period is valid (1-1440 minutes when logging enabled)
+ */
+export function validateLoggingPeriod(logging_period: string, logging_enabled: boolean): boolean {
+    if (!logging_enabled) {
+        return true;
+    }
+
+    return (stringIsValidInteger(logging_period) && parseInt(logging_period) >= LOGGING_PERIOD_LIM.MIN && parseInt(logging_period) <= LOGGING_PERIOD_LIM.MAX);
+}
+
+/**
+ * Validates an alarm value based on node type and whether the alarm is enabled.
+ * @param alarm_value String representation of the alarm value to validate
+ * @param alarm_enabled Whether the alarm is enabled (if false, always returns true)
+ * @param type NodeType to determine validation method (FLOAT or INT)
+ * @returns True if alarm value is valid for the given type when alarm is enabled
+ */
+export function validateAlarm(alarm_value: string, alarm_enabled: boolean, type: NodeType): boolean {
+    if (!alarm_enabled) {
+        return true;
+    }
+
+    if (type === NodeType.FLOAT) {
+        return stringIsValidFloat(alarm_value);
+    }
+    else if (type === NodeType.INT) {
+        return stringIsValidInteger(alarm_value);
+    }
+
+    return false;
+}
+
+/**
+ * Validates whether a node can be set as virtual/calculated based on its properties.
+ * Custom nodes cannot be virtual. For default nodes, checks if the node exists in defaultVariables
+ * and has canBeVirtual = true. Non-virtual nodes are always valid regardless of type.
  * Does not check dependencies; for full validation use virtualNodeRules.ts.
  *
+ * @param virtual Whether the node is set as virtual/calculated
  * @param name Display name of the node variable (without prefix)
  * @param custom True for custom variable, false for default variable
- * @returns True if the node can potentially be virtual
+ * @returns True if the virtual setting is valid for this node type
  */
-export function validateVirtualNode(name: string, custom: boolean): boolean {
-    if (custom) { // Custom nodes can't be virtual
+export function validateVirtualNode(virtual: boolean, name: string, custom: boolean): boolean {
+    if (custom && virtual) { // Custom nodes can't be virtual
         return false;
+    }
+    if (!virtual) { // all nodes can be fetched from communication
+        return true;
     }
     const variables = get(defaultVariables);
     const variable = Object.values(variables).find(v => v.name === name);
     if (variable) {
         if (variable.canBeVirtual) {
             return true;
+        }
+    }
+    return false;
+}
+
+/**
+ * Validates whether a node can be set as incremental based on its properties.
+ * Custom nodes cannot be incremental. For default nodes, checks if the node exists in defaultVariables
+ * and has isIncrementalNode = true. Non-incremental nodes are always valid regardless of type.
+ *
+ * @param incremental Whether the node is set as incremental
+ * @param name Display name of the node variable (without prefix)
+ * @param custom True for custom variable, false for default variable
+ * @returns True if the incremental setting is valid for this node type
+ */
+export function validateIncrementalNode(incremental: boolean, name: string, custom: boolean): boolean {
+    if (custom) { // all custom nodes can or can not be incremental
+        return true;
+    }
+
+    if (!custom) {
+        const variables = get(defaultVariables);
+        const variable = Object.values(variables).find(v => v.name === name);
+        if (variable) {
+            return incremental === variable.isIncrementalNode;
         }
     }
     return false;
@@ -455,6 +562,66 @@ export function virtualNodeChange(node: EditableDeviceNode, nodeState: NodeEditS
         node.communication_id = nodeState.oldCommunicationID ? nodeState.oldCommunicationID : "";
         node.protocol = selectedProtocol;
     }
+}
+
+/**
+ * Updates the validation state for all nodes in the provided array.
+ * Runs comprehensive validation checks on each node's properties and updates their validation objects.
+ * This function should be called whenever node configurations change to ensure validation state is current.
+ *
+ * @param nodes Array of editable device nodes to validate
+ * @param nodesBySection Record grouping nodes by their phase sections, used for duplicate name validation within each section
+ * 
+ * @description Validates the following properties for each node:
+ * - variableName: Checks name validity, uniqueness within section, and custom/default rules
+ * - variableType: Validates unit based on node type and custom/default status (duplicated as variableUnit)
+ * - variableUnit: Same validation as variableType (validates unit appropriateness)
+ * - communicationID: Validates format and value based on protocol (MODBUS_RTU, OPC_UA, NONE)
+ * - protocol: Ensures protocol is valid for virtual/non-virtual nodes
+ * - type: Validates NodeType based on custom/default variable rules
+ * - decimalPlaces: Validates decimal places range (0-6) for numeric types, empty for others
+ * - loggingPeriod: Validates logging period range (1-1440 minutes) when logging is enabled
+ * - minAlarm/maxAlarm: Validates alarm values based on node type when alarms are enabled
+ * - calculated: Validates virtual node settings based on variable capabilities
+ * - incremental: Validates incremental node settings based on default variable properties
+ * - calculate_increment/positive_incremental: Set to true (hardcoded, may need dynamic validation)
+ * 
+ * Call this function after any changes to node configurations and before checking overall validation with getAllNodesValidation().
+ */
+export function updateNodesValidation(nodes: Array<EditableDeviceNode>, nodesBySection: Record<NodePhase, Array<EditableDeviceNode>>): void {
+    for (let node of nodes) {
+        node.validation.variableName = validateNodeName(node.display_name, node.config.custom, nodesBySection[node.phase]);
+        node.validation.variableType = validateNodeUnit(node.display_name, node.config.type, node.config.unit, node.config.custom);
+        node.validation.variableUnit = validateNodeUnit(node.display_name, node.config.type, node.config.unit, node.config.custom);
+        node.validation.communicationID = validateCommunicationID(node.communication_id, node.protocol);
+        node.validation.protocol = validateNodeProtocol(node.protocol, node.config.calculated);
+        node.validation.type = validateNodeType(node.config.type, node.display_name, node.config.custom);
+        node.validation.decimalPlaces = validateDecimalPlaces(node.config.decimal_places, node.config.type);
+        node.validation.loggingPeriod = validateLoggingPeriod(node.config.logging_period, node.config.logging);
+        node.validation.minAlarm = validateAlarm(node.config.min_alarm_value, node.config.min_alarm, node.config.type);
+        node.validation.maxAlarm = validateAlarm(node.config.max_alarm_value, node.config.max_alarm, node.config.type);
+        node.validation.calculated = validateVirtualNode(node.config.calculated, node.display_name, node.config.custom);
+        node.validation.incremental = validateIncrementalNode(node.config.incremental_node, node.display_name, node.config.custom);
+        node.validation.calculate_increment = true;
+        node.validation.positive_incremental = true;
+    }
+}
+
+/**
+ * Checks if all nodes in the provided array pass validation.
+ * Iterates through each node and calls its validation.isValid() method to determine
+ * if all validation checks pass. Returns false as soon as any node fails validation.
+ *
+ * @param nodes Array of editable device nodes to validate
+ * @returns True if all nodes pass validation, false if any node fails
+ */
+export function getAllNodesValidation(nodes: Array<EditableDeviceNode>): boolean {
+    for (let node of nodes) {
+        if (!(node.validation.isValid())) {
+            return false;
+        }
+    }
+    return true;
 }
 
 /**
@@ -690,6 +857,7 @@ export function addNode(sectionPrefix: NodePrefix, device_data: EditableDeviceMe
         display_name: nodeBaseName,
         phase: getNodePhase(fullNodeName),
         communication_id: getCommunicationID(device_data.protocol, newNodeConfiguration, true),
+        validation: getInitialNodeValidation(),
     };
 
     return newFormattedNode;
