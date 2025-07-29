@@ -6,6 +6,8 @@ import { getInitialNodeValidation } from "$lib/stores/nodes";
 import type { NodeConfiguration, EditableBaseNodeConfig, NodeModbusRTUConfig, NodeOPCUAConfig, EditableNodeConfiguration, DeviceNode, EditableDeviceNode, NodeEditState, DefaultNodeInfo, EditableNodeOPCUAConfig, EditableNodeModbusRTUConfig } from "$lib/stores/nodes";
 import { protocolTexts } from "$lib/stores/lang";
 import { stringIsValidInteger, stringIsValidFloat } from "./util";
+import isEqualPkg from "lodash";
+const { isEqual } = isEqualPkg;
 
 /**
  * Converts a record of DeviceNode objects into an array of EditableDeviceNode objects for UI editing.
@@ -21,45 +23,37 @@ export function convertToEditableNodes(nodes: Record<string, DeviceNode>): Array
 
     for (let node of Object.values(nodes)) {
         let editableNode: EditableDeviceNode;
-        let protocol = node.protocol;
 
-        let decimal_places: string = "";
-        let min_alarm_value: string = "";
-        let max_alarm_value: string = "";
-
-        if (node.config.type === NodeType.FLOAT || node.config.type === NodeType.INT) {
-            decimal_places = node.config.decimal_places.toString();
-            min_alarm_value = node.config.min_alarm_value.toFixed(parseInt(decimal_places));
-            max_alarm_value = node.config.max_alarm_value.toFixed(parseInt(decimal_places));
-        }
+        let decimal_places: string = node.config.decimal_places !== null ? node.config.decimal_places.toString() : "";
+        let number_decimal_places: number = decimal_places ? parseInt(decimal_places) : 0;
 
         let editableConfig: EditableNodeConfiguration;
         let editableBaseConfig: EditableBaseNodeConfig = {
-            calculate_increment: node.config.calculate_increment,
+            calculate_increment: node.config.calculate_increment ? node.config.calculate_increment : false,
             calculated: node.config.calculated,
             custom: node.config.custom,
             decimal_places: decimal_places,
             enabled: node.config.enabled,
-            incremental_node: node.config.incremental_node,
+            incremental_node: node.config.incremental_node ? node.config.incremental_node : false,
             logging: node.config.logging,
             logging_period: node.config.logging_period.toString(),
             max_alarm: node.config.max_alarm,
-            max_alarm_value: max_alarm_value,
+            max_alarm_value: node.config.max_alarm_value !== null ? node.config.max_alarm_value.toFixed(number_decimal_places) : "",
             min_alarm: node.config.min_alarm,
-            min_alarm_value: min_alarm_value,
-            positive_incremental: node.config.positive_incremental,
+            min_alarm_value: node.config.min_alarm_value !== null ? node.config.min_alarm_value.toFixed(number_decimal_places) : "",
+            positive_incremental: node.config.positive_incremental ? node.config.positive_incremental : false,
             publish: node.config.publish,
             type: node.config.type,
-            unit: node.config.unit,
+            unit: node.config.unit !== null ? node.config.unit : "",
         };
 
-        if (protocol === Protocol.OPC_UA) {
+        if (node.protocol === Protocol.OPC_UA) {
             editableConfig = {
                 ...editableBaseConfig,
                 node_id: (node.config as NodeOPCUAConfig).node_id,
             }
         }
-        else if (protocol === Protocol.MODBUS_RTU) {
+        else if (node.protocol === Protocol.MODBUS_RTU) {
             editableConfig = {
                 ...editableBaseConfig,
                 register: (node.config as NodeModbusRTUConfig).register.toString(),
@@ -87,7 +81,107 @@ export function convertToEditableNodes(nodes: Record<string, DeviceNode>): Array
 
     }
 
-    return editableNodes.sort((a, b) => a.display_name.localeCompare(b.display_name));
+    return sortNodesByName(editableNodes) as Array<EditableDeviceNode>;
+}
+
+/**
+ * Converts an array of EditableDeviceNode objects back to an array of DeviceNode objects for API operations.
+ * This function transforms the editable node configurations from form-compatible string-based values
+ * back to the proper data types required by the backend API.
+ *
+ * @param nodes Array of EditableDeviceNode objects to convert
+ * @returns Array of DeviceNode objects ready for API operations
+ * @throws {Error} Throws an error if a node protocol is not supported
+ *
+ * @description This conversion is necessary because:
+ * - API expects numeric values instead of string representations from forms
+ * - String numeric values are parsed back to numbers for API compatibility
+ * - The editable structure is transformed back to the original node structure
+ * - Protocol-specific configuration properties are properly typed
+ * - Form-specific properties (validation, communication_id, display_name, phase) are excluded
+ *
+ * @example
+ * ```typescript
+ * const editableNodes: EditableDeviceNode[] = [
+ *   {
+ *     name: "L1_voltage",
+ *     protocol: Protocol.MODBUS_RTU,
+ *     config: {
+ *       decimal_places: "2",
+ *       logging_period: "15",
+ *       register: "0x0001",
+ *       // ... other editable properties
+ *     }
+ *     // ... other properties
+ *   }
+ * ];
+ * 
+ * const nodes = convertToNodes(editableNodes);
+ * // Now suitable for API operations with proper numeric types
+ * // nodes[0].config.decimal_places will be 2 (number)
+ * // nodes[0].config.logging_period will be 15 (number)
+ * ```
+ */
+export function convertToNodes(nodes: Array<EditableDeviceNode>): Array<DeviceNode> {
+    const deviceNodes: Array<DeviceNode> = [];
+
+    for (const editableNode of nodes) {
+        let nodeConfig: NodeConfiguration;
+        let numericType = editableNode.config.type === NodeType.FLOAT || editableNode.config.type === NodeType.INT;
+
+        // Convert base configuration with proper type conversion
+        const baseConfig = {
+            calculate_increment: numericType ? editableNode.config.calculate_increment : null,
+            calculated: editableNode.config.calculated,
+            custom: editableNode.config.custom,
+            decimal_places: stringIsValidInteger(editableNode.config.decimal_places) ? parseInt(editableNode.config.decimal_places) : null,
+            enabled: editableNode.config.enabled,
+            incremental_node: numericType ? editableNode.config.incremental_node : null,
+            logging: editableNode.config.logging,
+            logging_period: parseInt(editableNode.config.logging_period),
+            max_alarm: editableNode.config.max_alarm,
+            max_alarm_value: stringIsValidFloat(editableNode.config.max_alarm_value) ? parseFloat(editableNode.config.max_alarm_value) : null,
+            min_alarm: editableNode.config.min_alarm,
+            min_alarm_value: stringIsValidFloat(editableNode.config.min_alarm_value) ? parseFloat(editableNode.config.min_alarm_value) : null,
+            positive_incremental: numericType ? editableNode.config.positive_incremental : null,
+            publish: editableNode.config.publish,
+            type: editableNode.config.type,
+            unit: numericType ? editableNode.config.unit : null,
+        };
+
+        // Handle protocol-specific configuration
+        if (editableNode.protocol === Protocol.OPC_UA) {
+            const editableConfig = editableNode.config as EditableNodeOPCUAConfig;
+            nodeConfig = {
+                ...baseConfig,
+                node_id: editableConfig.node_id,
+            };
+        } else if (editableNode.protocol === Protocol.MODBUS_RTU) {
+            const editableConfig = editableNode.config as EditableNodeModbusRTUConfig;
+            nodeConfig = {
+                ...baseConfig,
+                register: parseInt(editableConfig.register.replace('0x', ''), 16),
+            };
+        } else if (editableNode.protocol === Protocol.NONE) {
+            // For virtual/calculated nodes with no communication protocol
+            nodeConfig = {
+                ...baseConfig,
+            };
+        } else {
+            throw new Error(`Unsupported protocol: ${editableNode.protocol}`);
+        }
+
+        const deviceNode: DeviceNode = {
+            name: editableNode.name,
+            device_id: editableNode.device_id,
+            protocol: editableNode.protocol,
+            config: nodeConfig,
+        };
+
+        deviceNodes.push(deviceNode);
+    }
+
+    return sortNodesByName(deviceNodes) as Array<DeviceNode>;
 }
 
 /**
@@ -126,7 +220,17 @@ export function getDefaultNodesList(device_data: EditableDeviceMeter | NewDevice
 
     }
 
-    return nodes.sort((a, b) => a.display_name.localeCompare(b.display_name));
+    return sortNodesByName(nodes) as Array<EditableDeviceNode>;
+}
+
+/**
+ * Sorts an array of nodes alphabetically by their display name (without prefix).
+ * 
+ * @param nodes Array of nodes to sort
+ * @returns Sorted array of nodes
+ */
+export function sortNodesByName(nodes: Array<EditableDeviceNode | DeviceNode>): Array<EditableDeviceNode | DeviceNode> {
+    return nodes.sort((a, b) => removePrefix(a.name).localeCompare(removePrefix(b.name)));
 }
 
 /**
@@ -157,8 +261,11 @@ function createDefaultEditableDeviceNode(variable: DefaultNodeInfo, phase: NodeP
     if (variable.type === NodeType.FLOAT || variable.type === NodeType.INT) {
 
         decimal_places = variable.defaultNumberOfDecimals ? variable.defaultNumberOfDecimals.toString() : "0";
-        min_alarm_value = variable.defaultMinAlarm ? variable.defaultMinAlarm.toFixed(parseInt(decimal_places)) : Number(0).toFixed(parseInt(decimal_places));
-        max_alarm_value = variable.defaultMaxAlarm ? variable.defaultMaxAlarm.toFixed(parseInt(decimal_places)) : Number(0).toFixed(parseInt(decimal_places));
+
+        if (!(variable.isIncrementalNode)) {
+            min_alarm_value = variable.defaultMinAlarm ? variable.defaultMinAlarm.toFixed(parseInt(decimal_places)) : Number(0).toFixed(parseInt(decimal_places));
+            max_alarm_value = variable.defaultMaxAlarm ? variable.defaultMaxAlarm.toFixed(parseInt(decimal_places)) : Number(0).toFixed(parseInt(decimal_places));
+        }
     }
 
     const nodeBaseConfiguration: EditableBaseNodeConfig = {
@@ -872,4 +979,40 @@ export function addNode(sectionPrefix: NodePrefix, device_data: EditableDeviceMe
  */
 export function getNodeIndex(node: EditableDeviceNode, nodesArray: Array<EditableDeviceNode>): number {
     return nodesArray.findIndex((n) => n === node);
+}
+
+/**
+ * Normalizes a DeviceNode by sorting its config properties alphabetically.
+ * Used for consistent comparison between nodes.
+ * 
+ * @param node The DeviceNode to normalize
+ * @returns Normalized node with sorted config properties
+ */
+export function normalizeNode(node: DeviceNode): DeviceNode {
+    return {
+        device_id: node.device_id,
+        name: node.name,
+        protocol: node.protocol,
+        config: Object.fromEntries(
+            Object.entries(node.config).sort(([a], [b]) => a.localeCompare(b))
+        ) as NodeConfiguration
+    };
+}
+
+/**
+ * Compares two arrays of DeviceNode objects for equality.
+ * Normalizes and sorts both arrays by name before comparison to ensure consistent results.
+ * 
+ * @param a First array of DeviceNode objects
+ * @param b Second array of DeviceNode objects
+ * @returns True if arrays contain equivalent nodes, false otherwise
+ */
+export function areNodesEqual(a: DeviceNode[], b: DeviceNode[]): boolean {
+    const sortByName = (arr: DeviceNode[]) =>
+        [...arr].sort((x, y) => x.name.localeCompare(y.name));
+
+    return isEqual(
+        sortByName(a).map(normalizeNode),
+        sortByName(b).map(normalizeNode)
+    );
 }

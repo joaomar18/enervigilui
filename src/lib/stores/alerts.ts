@@ -1,8 +1,9 @@
 import { writable, type Writable } from "svelte/store";
 import type { Language } from "./lang";
 
-// your alert state
+// Alert state
 export const displayAlert = writable(false);
+export const displayAsInfo = writable(false);
 export const alertText = writable<Record<Language, string>>({ EN: "", PT: "" });
 
 export const alertTimeout: Writable<ReturnType<typeof setTimeout> | null> = writable(null);
@@ -22,7 +23,8 @@ export const alertTimeout: Writable<ReturnType<typeof setTimeout> | null> = writ
  */
 export function showAlert(
     textLang: Record<Language, string>,
-    variables?: Record<string, string | number>
+    variables?: Record<string, string | number>,
+    isInfo?: boolean
 ) {
     alertTimeout.update((old) => {
         if (old) clearTimeout(old);
@@ -48,6 +50,7 @@ export function showAlert(
         alertText.set(textLang);
     }
 
+    displayAsInfo.set(isInfo ? true : false);
     displayAlert.set(true);
     const id = setTimeout(() => displayAlert.set(false), 3000);
     alertTimeout.set(id);

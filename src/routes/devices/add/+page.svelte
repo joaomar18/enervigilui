@@ -1,7 +1,7 @@
 <script lang="ts">
     import { onMount } from "svelte";
-    import { validateDeviceName, createNewDevice, updateDeviceValidation, validDeviceOperation } from "$lib/ts/devices";
-    import { getNodeIndex, getDefaultNodesList, changeNodeProtocol, updateNodesValidation } from "$lib/ts/nodes";
+    import { addDevice, validateDeviceName, createNewDevice, updateDeviceValidation, validDeviceOperation, convertToDevice } from "$lib/ts/devices";
+    import { getNodeIndex, getDefaultNodesList, changeNodeProtocol, updateNodesValidation, convertToNodes } from "$lib/ts/nodes";
     import { nodeSections } from "$lib/stores/nodes";
     import Selector from "../../../components/General/Selector.svelte";
     import HintInfo from "../../../components/General/HintInfo.svelte";
@@ -29,10 +29,13 @@
 
     // Stores for authorization
     import { loadedDone } from "$lib/stores/navigation";
+    import { showAlert } from "$lib/stores/alerts";
 
     // Variables
     let showAddWindow: boolean = false; // Show Add Device Window
     let showConfigNodeWindow: boolean = false; // Show Node Full Configuration Window
+
+    let performingAddRequest: boolean = false; // Performing Add Device Request
 
     let deviceData: NewDeviceMeter; // Device Data
     let opcuaConfig: EditableDeviceOPCUAConfig | null; // OPC UA Configuration
@@ -74,7 +77,20 @@
     // Functions
 
     //Function to save device changes
-    async function addDevice(): Promise<void> {
+    async function addDeviceConfirmation(): Promise<void> {
+        if ($loadedDone && nodesInitialized) {
+            let convertedNodes = convertToNodes(nodes);
+
+            performingAddRequest = true;
+            const { status } = await addDevice(deviceData, deviceData.device_image, convertedNodes);
+            performingAddRequest = false;
+            if (status !== 200) {
+                showAlert($texts.addDeviceRequestError);
+                showAddWindow = false;
+                return;
+            }
+            await navigateTo("/devices", $selectedLang, {});
+        }
         showAddWindow = false;
     }
 
@@ -341,7 +357,7 @@ Shows input forms for protocol-specific parameters and organizes device nodes fo
                                     hoverColor="#17673a"
                                     borderColor="#145a36"
                                     fontColor="#f5f5f5"
-                                    onClick={addDevice}
+                                    onClick={addDeviceConfirmation}
                                 />
                             </div>
                         </ModalWindow>

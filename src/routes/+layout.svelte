@@ -19,7 +19,7 @@
     import { selectedLang, texts } from "$lib/stores/lang";
 
     // Stores for alerts
-    import { displayAlert, alertText, alertTimeout } from "$lib/stores/alerts";
+    import { displayAlert, displayAsInfo, alertText, alertTimeout } from "$lib/stores/alerts";
 
     // Authorization stores
     import { splashDone, loadedDone, showSubLoader, leftPanelOpen } from "$lib/stores/navigation";
@@ -249,10 +249,13 @@
             <div class="alerts-div" class:prioritize={$displayAlert} class:sidebar-open={$leftPanelOpen}>
                 {#if $displayAlert}
                     <Alert
+                        isInfo={$displayAsInfo}
                         bottomPos="0px"
                         alertText={$alertText[$selectedLang]}
                         backgroundColor="#a11f2a"
                         borderColor="#b91c1c"
+                        infoBackgroundColor="#1e3a8a"
+                        infoBorderColor="#1d4ed8"
                         textColor="#ffffff"
                         onClick={() => {
                             alertTimeout.update((id) => {

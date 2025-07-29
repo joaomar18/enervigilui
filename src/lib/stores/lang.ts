@@ -650,7 +650,30 @@ const textsObject: TextsObject = {
         PT: "Existem variáveis do dispositivo com configurações inválidas.",
         EN: "There are device variables with invalid configurations.",
     },
-
+    noChangesToDevice: {
+        PT: "Não foram efetuadas alterações às configurações do dispositivo. Não é necessário guardar a edição.",
+        EN: "No changes were made to the device configuration. There is no need to save the edit.",
+    },
+    cancelDeviceEdit: {
+        PT: "Cancelar edição do dispositivo",
+        EN: "Cancel device edit",
+    },
+    cancelDeviceEditInfo: {
+        PT: "Foram efetuadas alterações às configurações do dispositivo que não foram guardadas. Cancelar a edição irá descartar todas as alterações. Tem a certeza que pretende continuar?",
+        EN: "Changes have been made to the device configuration that have not been saved. Canceling the edit will discard all changes. Are you sure you want to continue?",
+    },
+    addDeviceRequestError: {
+        PT: "O servidor não respondeu ao pedido de adição do dispositivo.",
+        EN: "The server did not respond to the device add request.",
+    },
+    editDeviceRequestError: {
+        PT: "O servidor não respondeu ao pedido de alteração às configurações do dispositivo.",
+        EN: "The server did not respond to the device configuration change request.",
+    },
+    deleteDeviceRequestError: {
+        PT: "O servidor não respondeu ao pedido de remoção do dispositivo.",
+        EN: "The server did not respond to the device delete request."
+    }
 };
 
 //////////     D E V I C E     T E X T S     //////////

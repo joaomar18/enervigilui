@@ -245,7 +245,7 @@ Displays contextual hints and supports multi-language labels for all fields. -->
                 </span>
             </span>
         </div>
-        {#if node.config.type === NodeType.FLOAT || node.config.type === NodeType.INT}
+        {#if node.config.type === NodeType.FLOAT}
             <div class="row">
                 <span class="row-variable">
                     <span class="row-identifier">{$texts.decimalPlaces[$selectedLang]}</span>

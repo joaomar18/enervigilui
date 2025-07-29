@@ -1,6 +1,9 @@
 <script lang="ts">
     import { fade } from "svelte/transition";
 
+    // Props
+    export let isInfo: boolean = false;
+
     // Layout / styling props
     export let topPos: string = "";
     export let bottomPos: string = "";
@@ -9,6 +12,8 @@
     export let alertText: string;
     export let backgroundColor: string;
     export let borderColor: string = "transparent";
+    export let infoBackgroundColor: string;
+    export let infoBorderColor: string = "transparent";
     export let textColor: string;
 
     // Variables
@@ -35,39 +40,20 @@
         --top-position: {topPos};
         --bottom-position: {bottomPos};
         --background-color:{backgroundColor};
+        --info-background-color: {infoBackgroundColor};
+        --info-border-color: {infoBorderColor};
         --border-color:{borderColor};
         --transform-y: {transformY};
     "
+    class:info={isInfo}
     out:fade={{ duration: 300 }}
 >
     <div class="content">
         <span class="alert-text" style="--text-color:{textColor};">{alertText}</span>
         <button class="close-button" on:click={handleClick} aria-label="Close Button">
-            <svg
-                xmlns="http://www.w3.org/2000/svg"
-                width="32"
-                height="32"
-                viewBox="0 0 24 24"
-                fill="none"
-            >
-                <line
-                    class="close-button-line"
-                    x1="6"
-                    y1="6"
-                    x2="18"
-                    y2="18"
-                    stroke-width="1"
-                    stroke-linecap="round"
-                />
-                <line
-                    class="close-button-line"
-                    x1="18"
-                    y1="6"
-                    x2="6"
-                    y2="18"
-                    stroke-width="1"
-                    stroke-linecap="round"
-                />
+            <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none">
+                <line class="close-button-line" x1="6" y1="6" x2="18" y2="18" stroke-width="1" stroke-linecap="round" />
+                <line class="close-button-line" x1="18" y1="6" x2="6" y2="18" stroke-width="1" stroke-linecap="round" />
             </svg>
         </button>
     </div>
@@ -92,6 +78,12 @@
         -webkit-tap-highlight-color: transparent;
         -webkit-touch-callout: none;
         user-select: none;
+    }
+
+    /* Styling for information alert */
+    .alert-div.info {
+        background-color: var(--info-background-color);
+        border: 1px solid var(--info-border-color);
     }
 
     /* Flex container for alert text and close button */

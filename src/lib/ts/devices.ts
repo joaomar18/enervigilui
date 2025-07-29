@@ -2,11 +2,13 @@ import { makeAPIRequest } from "./api";
 import { get } from "svelte/store";
 import { getInitialDeviceValidation, Protocol } from "$lib/stores/devices";
 import { defaultOPCUAOptions, defaultModbusRTUOptions } from "$lib/stores/devices";
-import type { DeviceMeter, EditableDeviceMeter, NewDeviceMeter, EditableCommunicationOptions, DeviceModbusRTUConfig, DeviceOPCUAConfig, MeterType, MeterOptions } from "$lib/stores/devices";
+import type { DeviceMeter, EditableDeviceMeter, NewDeviceMeter, EditableCommunicationOptions, DeviceModbusRTUConfig, DeviceOPCUAConfig, MeterType, MeterOptions, EditableDeviceOPCUAConfig, EditableDeviceModbusRTUConfig } from "$lib/stores/devices";
 import { protocolTexts } from "$lib/stores/lang";
-import type { EditableDeviceNode } from "$lib/stores/nodes";
+import type { DeviceNode, EditableDeviceNode } from "$lib/stores/nodes";
 import { getAllNodesValidation } from "./nodes";
 import { showAlert } from "$lib/stores/alerts";
+import isEqualPkg from "lodash";
+const { isEqual } = isEqualPkg;
 
 import { texts } from "$lib/stores/lang";
 
@@ -73,6 +75,76 @@ export async function getDeviceNodesConfig(
     timeout: number = 3000
 ): Promise<{ status: number; data: any }> {
     return makeAPIRequest("/api/get_nodes_config", "GET", { name, id }, timeout);
+}
+
+/**
+ * Sends a new device configuration to the server for creation.
+ *
+ * @param {NewDeviceMeter} deviceData - The device configuration data for the new device
+ * @param {File | undefined} deviceImage - Optional image file to upload for the device
+ * @param {Array<DeviceNode>} deviceNodes - Array of device nodes associated with this device
+ * @param {number} [timeout=3000] - The timeout duration in milliseconds for the API request
+ * @returns {Promise<{ status: number; }>} A promise that resolves to an object containing the HTTP status code
+ *
+ * Example usage:
+ * ```typescript
+ * const response = await addDevice(deviceData, imageFile, deviceNodes);
+ * console.log(response.status);
+ * ```
+ */
+export async function addDevice(
+    deviceData: NewDeviceMeter,
+    deviceImage: File | undefined,
+    deviceNodes: Array<DeviceNode>,
+    timeout: number = 3000
+): Promise<{ status: number; }> {
+    return makeAPIRequest("/api/add_device", "POST", { deviceData, deviceImage, deviceNodes }, timeout);
+}
+
+/**
+ * Sends device configuration changes to the server for updating an existing device.
+ *
+ * @param {DeviceMeter} deviceData - The device configuration data to update on the server
+ * @param {File | undefined} deviceImage - Optional image file to upload for the device
+ * @param {Array<DeviceNode>} deviceNodes - Array of device nodes associated with this device
+ * @param {number} [timeout=3000] - The timeout duration in milliseconds for the API request
+ * @returns {Promise<{ status: number; }>} A promise that resolves to an object containing the HTTP status code
+ *
+ * Example usage:
+ * ```typescript
+ * const response = await editDeviceConfig(deviceData, imageFile, deviceNodes);
+ * console.log(response.status);
+ * ```
+ */
+export async function editDevice(
+    deviceData: DeviceMeter,
+    deviceImage: File | undefined,
+    deviceNodes: Array<DeviceNode>,
+    timeout: number = 3000
+): Promise<{ status: number; }> {
+    return makeAPIRequest("/api/edit_device", "POST", { deviceData, deviceImage, deviceNodes }, timeout);
+}
+
+/**
+ * Sends a device deletion request to the server.
+ *
+ * @param {string} deviceName - The name of the device to delete
+ * @param {number} deviceID - The unique identifier of the device to delete
+ * @param {number} [timeout=3000] - The timeout duration in milliseconds for the API request
+ * @returns {Promise<{ status: number; }>} A promise that resolves to an object containing the HTTP status code
+ *
+ * Example usage:
+ * ```typescript
+ * const response = await deleteDevice("DeviceName", 123);
+ * console.log(response.status);
+ * ```
+ */
+export async function deleteDevice(
+    deviceName: string,
+    deviceID: number,
+    timeout: number = 3000
+): Promise<{ status: number; }> {
+    return makeAPIRequest("/api/delete_device", "DELETE", { deviceName, deviceID }, timeout);
 }
 
 /**
@@ -149,6 +221,81 @@ export function convertToEditableDevice(device: DeviceMeter): EditableDeviceMete
         device_image: undefined,
         current_image_url: `/devices/${device.name}_${device.id}.png`,
         validation: getInitialDeviceValidation(),
+    };
+}
+
+/**
+ * Converts an EditableDeviceMeter object back to a DeviceMeter for API operations.
+ * This function transforms the editable device configuration from form-compatible
+ * string-based values back to the proper data types required by the backend API.
+ * 
+ * @param {EditableDeviceMeter} device - The editable device meter object to convert
+ * @returns {DeviceMeter} - The converted device meter object ready for API operations
+ * @throws {Error} - Throws an error if the device protocol is not supported
+ * 
+ * @description This conversion is necessary because:
+ * - API expects numeric values instead of string representations from forms
+ * - OPC UA username/password fields convert from `string` back to `string | null`
+ * - All string numeric values are parsed back to numbers for API compatibility
+ * - The editable structure is transformed back to the original device structure
+ * - Device image and validation properties are excluded (not part of DeviceMeter)
+ * 
+ * @example
+ * ```typescript
+ * const editableDevice: EditableDeviceMeter = {
+ *   id: 1,
+ *   name: "Test Meter",
+ *   protocol: Protocol.OPC_UA,
+ *   communication_options: {
+ *     read_period: "5",
+ *     timeout: "3",
+ *     // ... other string properties
+ *   }
+ *   // ... other properties
+ * };
+ * 
+ * const device = convertToDevice(editableDevice);
+ * // Now suitable for API operations with proper numeric types
+ * // device.communication_options.read_period will be 5 (number)
+ * ```
+ */
+export function convertToDevice(device: EditableDeviceMeter): DeviceMeter {
+    let communicationOptions: DeviceOPCUAConfig | DeviceModbusRTUConfig;
+
+    if (device.protocol === Protocol.OPC_UA) {
+        const editableConfig = device.communication_options as EditableDeviceOPCUAConfig;
+        communicationOptions = {
+            username: editableConfig.username || null,
+            password: editableConfig.password || null,
+            read_period: parseInt(editableConfig.read_period),
+            timeout: parseInt(editableConfig.timeout),
+            url: editableConfig.url,
+        } as DeviceOPCUAConfig;
+    } else if (device.protocol === Protocol.MODBUS_RTU) {
+        const editableConfig = device.communication_options as EditableDeviceModbusRTUConfig;
+        communicationOptions = {
+            baudrate: parseInt(editableConfig.baudrate),
+            bytesize: parseInt(editableConfig.bytesize),
+            parity: editableConfig.parity,
+            port: editableConfig.port,
+            read_period: parseInt(editableConfig.read_period),
+            retries: parseInt(editableConfig.retries),
+            slave_id: parseInt(editableConfig.slave_id),
+            stopbits: parseInt(editableConfig.stopbits),
+            timeout: parseInt(editableConfig.timeout),
+        } as DeviceModbusRTUConfig;
+    } else {
+        throw new Error("Unsupported Protocol");
+    }
+
+    return {
+        connected: device.connected,
+        id: device.id,
+        name: device.name,
+        protocol: device.protocol,
+        type: device.type,
+        options: device.options,
+        communication_options: communicationOptions,
     };
 }
 
@@ -358,4 +505,40 @@ export function validDeviceOperation(deviceData: EditableDeviceMeter | NewDevice
         showAlert(get(texts).invalidDeviceNodes); // Invalid Device Nodes
     }
     return false;
+}
+
+/**
+ * Normalizes a DeviceMeter by sorting its communication options properties alphabetically.
+ * Used for consistent comparison between devices.
+ * 
+ * @param device The DeviceMeter to normalize
+ * @returns Normalized device with sorted communication options properties
+ */
+export function normalizeDevice(device: DeviceMeter): DeviceMeter {
+    return {
+        connected: device.connected,
+        id: device.id,
+        name: device.name,
+        protocol: device.protocol,
+        type: device.type,
+        options: device.options,
+        communication_options: Object.fromEntries(
+            Object.entries(device.communication_options).sort(([a], [b]) => a.localeCompare(b))
+        ) as DeviceOPCUAConfig | DeviceModbusRTUConfig
+    };
+}
+
+/**
+ * Compares two DeviceMeter objects for equality.
+ * Normalizes both devices before comparison to ensure consistent results.
+ * 
+ * @param a First DeviceMeter object
+ * @param b Second DeviceMeter object  
+ * @returns True if devices are equivalent, false otherwise
+ */
+export function areDevicesEqual(a: DeviceMeter, b: DeviceMeter): boolean {
+    return isEqual(
+        normalizeDevice(a),
+        normalizeDevice(b)
+    );
 }

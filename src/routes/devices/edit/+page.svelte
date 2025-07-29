@@ -1,10 +1,19 @@
 <script lang="ts">
     import { onMount, onDestroy } from "svelte";
-    import { getDeviceState, getDeviceNodesConfig, convertToEditableDevice, updateDeviceValidation, validDeviceOperation } from "$lib/ts/devices";
-    import { getNodeIndex, convertToEditableNodes, changeNodeProtocol, updateNodesValidation } from "$lib/ts/nodes";
+    import {
+        getDeviceState,
+        getDeviceNodesConfig,
+        editDevice,
+        deleteDevice,
+        convertToEditableDevice,
+        convertToDevice,
+        updateDeviceValidation,
+        validDeviceOperation,
+        areDevicesEqual,
+    } from "$lib/ts/devices";
+    import { getNodeIndex, convertToEditableNodes, changeNodeProtocol, updateNodesValidation, convertToNodes, areNodesEqual } from "$lib/ts/nodes";
     import { nodeSections } from "$lib/stores/nodes";
     import Selector from "../../../components/General/Selector.svelte";
-    import SelectorButton from "../../../components/General/SelectorButton.svelte";
     import HintInfo from "../../../components/General/HintInfo.svelte";
     import EditableText from "../../../components/General/EditableText.svelte";
     import UploadImage from "../../../components/General/UploadImage.svelte";
@@ -36,14 +45,21 @@
     import { loadedDone } from "$lib/stores/navigation";
 
     // Variables
+    let showCancelWindow: boolean = false; // Show Cancelation Window (if changes were made)
     let showSaveWindow: boolean = false; // Show Save Configuration Window
     let showDeleteWindow: boolean = false; // Show Delete Device Window
     let showConfigNodeWindow: boolean = false; // Show Node Full Configuration Window
 
     let deleteDeviceName: string; // Variable to confirm device delete (must match device name)
 
+    let performingSaveRequest: boolean = false; // Performing Save Device Request
+    let performingDeleteRequest: boolean = false; // Performing Delete Device Request
+
     let devicePollTimer: ReturnType<typeof setTimeout>; // Timeout for device configuration request
     let nodesPollTimer: ReturnType<typeof setTimeout>; // Timeout for device nodes configuration request
+
+    let initialDeviceData: DeviceMeter; // Initial Device Data (to check if there were changes made)
+    let initialNodes: Array<DeviceNode>; // Initial Nodes (to check if there were changes made)
 
     let deviceData: EditableDeviceMeter; // Device Data
     let opcuaConfig: EditableDeviceOPCUAConfig | null; // OPC UA Configuration
@@ -94,6 +110,7 @@
                     showAlert($texts.errorDeviceConfig);
                 } else {
                     let requestDeviceData: DeviceMeter = data;
+                    initialDeviceData = requestDeviceData;
                     deviceData = convertToEditableDevice(requestDeviceData);
                     sucess = true;
                 }
@@ -118,6 +135,7 @@
                     showAlert($texts.errorDeviceNodesConfig);
                 } else {
                     let requestDeviceNodes: Record<string, DeviceNode> = data;
+                    initialNodes = Object.values(requestDeviceNodes) as Array<DeviceNode>;
                     nodes = convertToEditableNodes(requestDeviceNodes);
                     nodesInitialized = true;
                     sucess = true;
@@ -133,17 +151,49 @@
     }
 
     //Function to save device changes
-    async function saveEdit(): Promise<void> {
+    async function editDeviceConfirmation(): Promise<void> {
+        if (validDeviceOperation(deviceData)) {
+            let convertedDevice = convertToDevice(deviceData);
+            let convertedNodes = convertToNodes(nodes);
+
+            if (areNodesEqual(initialNodes, convertedNodes) && areDevicesEqual(initialDeviceData, convertedDevice)) {
+                showAlert($texts.noChangesToDevice, {}, true);
+                showSaveWindow = false;
+                return;
+            }
+            performingSaveRequest = true;
+            const { status } = await editDevice(convertedDevice, deviceData.device_image, convertedNodes);
+            performingSaveRequest = false;
+            if (status !== 200) {
+                showAlert($texts.editDeviceRequestError);
+                showSaveWindow = false;
+                return;
+            }
+            await navigateTo("/devices", $selectedLang, {});
+        }
         showSaveWindow = false;
     }
 
     // Function to cancel edit device (go to devices page)
     async function cancelEdit(): Promise<void> {
+        showCancelWindow = false;
         await navigateTo("/devices", $selectedLang, {});
     }
 
-    // Function to open popup to confirm device delete
-    async function deleteDevice(): Promise<void> {
+    // Function to delete device
+    async function deleteDeviceConfirmation(): Promise<void> {
+        if ($loadedDone && nodesInitialized) {
+            performingDeleteRequest = true;
+            const { status } = await deleteDevice(deviceData.name, deviceData.id);
+            performingDeleteRequest = false;
+            if (status !== 200) {
+                showAlert($texts.deleteDeviceRequestError);
+                deleteDeviceName = "";
+                showDeleteWindow = false;
+                return;
+            }
+            await navigateTo("/devices", $selectedLang, {});
+        }
         deleteDeviceName = "";
         showDeleteWindow = false;
     }
@@ -339,7 +389,13 @@ Shows input forms for protocol-specific parameters and organizes device nodes fo
                     imageWidth="22px"
                     imageHeight="22px"
                     imageLeftPos="20px"
-                    onClick={cancelEdit}
+                    onClick={() => {
+                        if (areNodesEqual(initialNodes, convertToNodes(nodes)) && areDevicesEqual(initialDeviceData, convertToDevice(deviceData))) {
+                            cancelEdit();
+                            return;
+                        }
+                        showCancelWindow = true;
+                    }}
                 />
                 <Button
                     enabled={$loadedDone && nodesInitialized}
@@ -360,6 +416,10 @@ Shows input forms for protocol-specific parameters and organizes device nodes fo
                     imageLeftPos="20px"
                     onClick={() => {
                         if (validDeviceOperation(deviceData)) {
+                            if (areNodesEqual(initialNodes, convertToNodes(nodes)) && areDevicesEqual(initialDeviceData, convertToDevice(deviceData))) {
+                                showAlert($texts.noChangesToDevice, {}, true);
+                                return;
+                            }
                             showSaveWindow = true;
                         }
                     }}
@@ -461,7 +521,43 @@ Shows input forms for protocol-specific parameters and organizes device nodes fo
                                     disabledHoverColor="#2a1818"
                                     disabledBorderColor="#5a3a3a"
                                     fontColor="#f5f5f5"
-                                    onClick={deleteDevice}
+                                    onClick={deleteDeviceConfirmation}
+                                />
+                            </div>
+                        </ModalWindow>
+                    </div>
+                </div>
+            </div>
+        {/if}
+        {#if showCancelWindow}
+            <div class="overlay-device-div">
+                <div class="overlay-device-div-content">
+                    <div class="window-div">
+                        <ModalWindow
+                            title={`${$texts.cancelDeviceEdit[$selectedLang]}`}
+                            width="80%"
+                            minWidth="300px"
+                            maxWidth="550px"
+                            height="fit-content"
+                            borderRadius="10px"
+                            borderColor="#2a2e3a"
+                            backgroundColor="#14161c"
+                            closeWindow={() => {
+                                showCancelWindow = false;
+                            }}
+                        >
+                            <span class="save-window-text">{$texts.cancelDeviceEditInfo[$selectedLang]}</span>
+                            <div class="button-div save-window-button">
+                                <Button
+                                    buttonText={$texts.confirm[$selectedLang]}
+                                    width="150px"
+                                    height="40px"
+                                    borderRadius="5px"
+                                    backgroundColor="#3a3a3a"
+                                    hoverColor="#4b4b4b"
+                                    borderColor="#5c5c5c"
+                                    fontColor="#f5f5f5"
+                                    onClick={cancelEdit}
                                 />
                             </div>
                         </ModalWindow>
@@ -497,7 +593,7 @@ Shows input forms for protocol-specific parameters and organizes device nodes fo
                                     hoverColor="#1C6DD0"
                                     borderColor="#1456B0"
                                     fontColor="#f5f5f5"
-                                    onClick={saveEdit}
+                                    onClick={editDeviceConfirmation}
                                 />
                             </div>
                         </ModalWindow>
