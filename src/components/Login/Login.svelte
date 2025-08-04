@@ -3,12 +3,7 @@
     import { onMount, onDestroy } from "svelte";
     import { selectedLang, texts } from "$lib/stores/lang";
     import type { Language } from "$lib/stores/lang";
-    import {
-        loginUser,
-        interpretLoginStatus,
-        validateUsername,
-        validatePassword,
-    } from "$lib/ts/login";
+    import { loginUser, interpretLoginStatus, validateUsername, validatePassword } from "$lib/ts/login";
     import { navigateTo } from "$lib/ts/navigation";
 
     import LoginField from "./Inputs/LoginField.svelte";
@@ -63,7 +58,7 @@
             const { status, data }: { status: number; data: any } = await loginUser(
                 username, // Username
                 password, // Password
-                autoLogin // Auto-login flag
+                autoLogin, // Auto-login flag
             );
 
             // Handle success or failure
@@ -184,13 +179,7 @@
         processingBackgroundColor="rgb(127,127,127)"
         onClick={login}
     />
-    <ForgotPassButton
-        paddingTop="20px"
-        paddingBottom="30px"
-        textColor="rgb(216,216,216)"
-        hoverTextColor="rgb(51,151,210)"
-        onClick={forgotPassword}
-    />
+    <ForgotPassButton paddingTop="20px" paddingBottom="30px" textColor="rgb(216,216,216)" hoverTextColor="rgb(51,151,210)" onClick={forgotPassword} />
 </div>
 
 <style>

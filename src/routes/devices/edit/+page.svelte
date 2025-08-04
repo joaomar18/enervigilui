@@ -156,20 +156,28 @@
             let convertedDevice = convertToDevice(deviceData);
             let convertedNodes = convertToNodes(nodes);
 
-            if (areNodesEqual(initialNodes, convertedNodes) && areDevicesEqual(initialDeviceData, convertedDevice)) {
-                showAlert($texts.noChangesToDevice, {}, true);
-                showSaveWindow = false;
-                return;
+            try {
+                if (
+                    areNodesEqual(initialNodes, convertedNodes) &&
+                    areDevicesEqual(initialDeviceData, convertedDevice) &&
+                    deviceData.device_image === undefined
+                ) {
+                    showAlert($texts.noChangesToDevice, {}, true);
+                    showSaveWindow = false;
+                    return;
+                }
+                performingSaveRequest = true;
+                const { status } = await editDevice(convertedDevice, deviceData.device_image, convertedNodes);
+                performingSaveRequest = false;
+                if (status !== 200) {
+                    showAlert($texts.editDeviceRequestError);
+                    showSaveWindow = false;
+                    return;
+                }
+                await navigateTo("/devices", $selectedLang, {});
+            } catch (e) {
+                console.error(e);
             }
-            performingSaveRequest = true;
-            const { status } = await editDevice(convertedDevice, deviceData.device_image, convertedNodes);
-            performingSaveRequest = false;
-            if (status !== 200) {
-                showAlert($texts.editDeviceRequestError);
-                showSaveWindow = false;
-                return;
-            }
-            await navigateTo("/devices", $selectedLang, {});
         }
         showSaveWindow = false;
     }
@@ -183,16 +191,20 @@
     // Function to delete device
     async function deleteDeviceConfirmation(): Promise<void> {
         if ($loadedDone && nodesInitialized) {
-            performingDeleteRequest = true;
-            const { status } = await deleteDevice(deviceData.name, deviceData.id);
-            performingDeleteRequest = false;
-            if (status !== 200) {
-                showAlert($texts.deleteDeviceRequestError);
-                deleteDeviceName = "";
-                showDeleteWindow = false;
-                return;
+            try {
+                performingDeleteRequest = true;
+                const { status } = await deleteDevice(deviceData.name, deviceData.id);
+                performingDeleteRequest = false;
+                if (status !== 200) {
+                    showAlert($texts.deleteDeviceRequestError);
+                    deleteDeviceName = "";
+                    showDeleteWindow = false;
+                    return;
+                }
+                await navigateTo("/devices", $selectedLang, {});
+            } catch (e) {
+                console.error(e);
             }
-            await navigateTo("/devices", $selectedLang, {});
         }
         deleteDeviceName = "";
         showDeleteWindow = false;
@@ -390,7 +402,11 @@ Shows input forms for protocol-specific parameters and organizes device nodes fo
                     imageHeight="22px"
                     imageLeftPos="20px"
                     onClick={() => {
-                        if (areNodesEqual(initialNodes, convertToNodes(nodes)) && areDevicesEqual(initialDeviceData, convertToDevice(deviceData))) {
+                        if (
+                            areNodesEqual(initialNodes, convertToNodes(nodes)) &&
+                            areDevicesEqual(initialDeviceData, convertToDevice(deviceData)) &&
+                            deviceData.device_image === undefined
+                        ) {
                             cancelEdit();
                             return;
                         }
@@ -416,7 +432,11 @@ Shows input forms for protocol-specific parameters and organizes device nodes fo
                     imageLeftPos="20px"
                     onClick={() => {
                         if (validDeviceOperation(deviceData)) {
-                            if (areNodesEqual(initialNodes, convertToNodes(nodes)) && areDevicesEqual(initialDeviceData, convertToDevice(deviceData))) {
+                            if (
+                                areNodesEqual(initialNodes, convertToNodes(nodes)) &&
+                                areDevicesEqual(initialDeviceData, convertToDevice(deviceData)) &&
+                                deviceData.device_image === undefined
+                            ) {
                                 showAlert($texts.noChangesToDevice, {}, true);
                                 return;
                             }

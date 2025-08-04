@@ -72,14 +72,16 @@ export async function makeAPIRequest(
         }
 
         const response = await fetch(url, options);
+        const data = await response.json();
         clearTimeout(timeoutId); // cancel timeout if response arrives in time
 
         return {
             status: response.status,
-            data: await response.json(),
+            data: data,
         };
     } catch (error) {
         clearTimeout(timeoutId);
+        console.error(error);
         return {
             status: -1,
             data: null,

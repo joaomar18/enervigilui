@@ -12,7 +12,7 @@
     export let alertText: string;
     export let backgroundColor: string;
     export let borderColor: string = "transparent";
-    export let infoBackgroundColor: string;
+    export let infoBackgroundColor: string = backgroundColor;
     export let infoBorderColor: string = "transparent";
     export let textColor: string;
 
