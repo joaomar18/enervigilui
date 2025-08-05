@@ -82,7 +82,7 @@
             let convertedNodes = convertToNodes(nodes);
 
             performingAddRequest = true;
-            const { status } = await addDevice(deviceData, deviceData.device_image, convertedNodes);
+            const { status } = await addDevice(convertToDevice(deviceData), deviceData.device_image, convertedNodes);
             performingAddRequest = false;
             if (status !== 200) {
                 showAlert($texts.addDeviceRequestError);

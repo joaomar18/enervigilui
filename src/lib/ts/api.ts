@@ -6,9 +6,14 @@
  *   Only these methods are supported; an error will be thrown for unsupported methods.
  * @param params - An object containing the parameters to include in the request.
  *   - For GET requests, the parameters are appended to the URL as query parameters.
- *   - For non-GET requests, the parameters are included in the request body as JSON.
+ *   - For non-GET requests without files, the parameters are included in the request body as JSON.
+ *   - For non-GET requests with files, the parameters are included in FormData along with the file.
  * @param timeout - The maximum time in milliseconds to wait for a server response
  *   before aborting the request. Defaults to 3000ms (3 seconds).
+ * @param file - Optional file to upload. When provided, the request will be sent as FormData
+ *   instead of JSON, and the file will be included in the form data.
+ * @param fileFieldName - The field name for the file in the FormData. Defaults to "file".
+ *   This allows the server to identify the file with the expected field name.
  * @returns A promise that resolves to an object containing:
  *   - `status`: HTTP status code from the server response, or -1 if the request failed/timed out.
  *   - `data`: The data returned by the server, or null if the request failed.
@@ -24,6 +29,21 @@
  * const { status, data } = await makeAPIRequest("/api/resource", "POST", { name: "John", age: 30 });
  *
  * @example
+ * // Example file upload with additional parameters
+ * const fileInput = document.querySelector('input[type="file"]') as HTMLInputElement;
+ * const file = fileInput.files?.[0];
+ * if (file) {
+ *   const { status, data } = await makeAPIRequest(
+ *     "/api/devices/123/image", 
+ *     "POST", 
+ *     { deviceId: 123, description: "Device photo" }, 
+ *     10000, 
+ *     file, 
+ *     "deviceImage"
+ *   );
+ * }
+ *
+ * @example
  * // Example with a custom timeout
  * const { status, data } = await makeAPIRequest("/api/resource", "GET", {}, 5000); // 5-second timeout
  */
@@ -31,7 +51,9 @@ export async function makeAPIRequest(
     endpoint: string,
     method: string,
     params: Record<string, any> = {},
-    timeout: number = 3000
+    timeout: number = 3000,
+    file?: File,
+    fileFieldName: string = "file"
 ): Promise<{ status: number; data: any }> {
     const controller = new AbortController();
     const signal = controller.signal;
@@ -46,9 +68,6 @@ export async function makeAPIRequest(
         let url = endpoint;
         let options: RequestInit = {
             method: method,
-            headers: {
-                "Content-Type": "application/json",
-            },
             signal,
         };
 
@@ -67,8 +86,26 @@ export async function makeAPIRequest(
             url = queryParams ? `${endpoint}?${queryParams}` : endpoint;
         }
         // For non-GET requests, add params to the body
-        else if (method !== "GET" && Object.keys(params).length > 0) {
-            options.body = JSON.stringify(params);
+        else if (method !== "GET") {
+
+            if (file) {
+                const formData = new FormData();
+                formData.append(fileFieldName, file);
+
+                Object.entries(params).forEach(([key, value]) => {
+                    formData.append(key, JSON.stringify(value));
+                });
+
+                options.body = formData;
+
+            }
+            else if (Object.keys(params).length > 0) {
+                options.headers = {
+                    "Content-Type": "application/json",
+                };
+                options.body = JSON.stringify(params);
+            }
+
         }
 
         const response = await fetch(url, options);

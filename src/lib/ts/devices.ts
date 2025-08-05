@@ -89,12 +89,12 @@ export async function getDeviceNodesConfig(
  * ```
  */
 export async function addDevice(
-    deviceData: NewDeviceMeter,
+    deviceData: DeviceMeter,
     deviceImage: File | undefined,
     deviceNodes: Array<DeviceNode>,
     timeout: number = 3000
 ): Promise<{ status: number; }> {
-    return makeAPIRequest("/api/add_device", "POST", { deviceData, deviceImage, deviceNodes }, timeout);
+    return makeAPIRequest("/api/add_device", "POST", { deviceData, deviceNodes }, timeout, deviceImage, "deviceImage");
 }
 
 /**
@@ -118,7 +118,7 @@ export async function editDevice(
     deviceNodes: Array<DeviceNode>,
     timeout: number = 3000
 ): Promise<{ status: number; }> {
-    return makeAPIRequest("/api/edit_device", "POST", { deviceData, deviceImage, deviceNodes }, timeout);
+    return makeAPIRequest("/api/edit_device", "POST", { deviceData, deviceNodes }, timeout, deviceImage, "deviceImage");
 }
 
 /**
@@ -221,11 +221,11 @@ export function convertToEditableDevice(device: DeviceMeter): EditableDeviceMete
 }
 
 /**
- * Converts an EditableDeviceMeter object back to a DeviceMeter for API operations.
+ * Converts an EditableDeviceMeter or NewDeviceMeter object back to a DeviceMeter for API operations.
  * This function transforms the editable device configuration from form-compatible
  * string-based values back to the proper data types required by the backend API.
  * 
- * @param {EditableDeviceMeter} device - The editable device meter object to convert
+ * @param {EditableDeviceMeter | NewDeviceMeter} device - The editable device meter object to convert
  * @returns {DeviceMeter} - The converted device meter object ready for API operations
  * @throws {Error} - Throws an error if the device protocol is not supported
  * 
@@ -235,6 +235,7 @@ export function convertToEditableDevice(device: DeviceMeter): EditableDeviceMete
  * - All string numeric values are parsed back to numbers for API compatibility
  * - The editable structure is transformed back to the original device structure
  * - Device image and validation properties are excluded (not part of DeviceMeter)
+ * - For NewDeviceMeter objects, the id property is omitted (handled by server)
  * 
  * @example
  * ```typescript
@@ -255,7 +256,7 @@ export function convertToEditableDevice(device: DeviceMeter): EditableDeviceMete
  * // device.communication_options.read_period will be 5 (number)
  * ```
  */
-export function convertToDevice(device: EditableDeviceMeter): DeviceMeter {
+export function convertToDevice(device: EditableDeviceMeter | NewDeviceMeter): DeviceMeter {
     let communicationOptions: DeviceOPCUAConfig | DeviceModbusRTUConfig;
 
     if (device.protocol === Protocol.OPC_UA) {
@@ -284,15 +285,30 @@ export function convertToDevice(device: EditableDeviceMeter): DeviceMeter {
         throw new Error("Unsupported Protocol");
     }
 
-    return {
-        connected: device.connected,
-        id: device.id,
+    const baseDevice = {
         name: device.name,
         protocol: device.protocol,
         type: device.type,
         options: device.options,
         communication_options: communicationOptions,
     };
+
+    // Handle different device types - EditableDeviceMeter has id and connected, NewDeviceMeter doesn't
+    if ('id' in device) {
+        // EditableDeviceMeter case
+        return {
+            ...baseDevice,
+            connected: device.connected,
+            id: device.id,
+        } as DeviceMeter;
+    } else {
+        // NewDeviceMeter case - assume defaults for server-assigned properties
+        return {
+            ...baseDevice,
+            connected: false, // New devices start disconnected
+            id: 0, // Will be assigned by server
+        } as DeviceMeter;
+    }
 }
 
 /**

@@ -410,6 +410,8 @@ Shows input forms for protocol-specific parameters and organizes device nodes fo
                             cancelEdit();
                             return;
                         }
+                        console.log("Initial device data: ", initialDeviceData);
+                        console.log("Converted device data", convertToDevice(deviceData));
                         showCancelWindow = true;
                     }}
                 />
