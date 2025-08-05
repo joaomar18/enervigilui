@@ -210,8 +210,13 @@ export function getDefaultNodesList(device_data: EditableDeviceMeter | NewDevice
 
     else if (device_data.type === MeterType.THREE_PHASE) {
 
-        for (const section of nodeSections) {
+        const threePhaseeSections = nodeSections.filter(section => section.phase !== NodePhase.SINGLEPHASE);
+
+        for (const section of threePhaseeSections) {
             const phaseVars = defaultVars.filter((v) => v.useByDefault && v.applicablePhases.includes(section.phase));
+
+            console.log("Phase: ", section.phase, "Vars: ", phaseVars);
+
             for (const variable of phaseVars) {
                 nodes.push(createDefaultEditableDeviceNode(variable, section.phase, device_data));
             }
