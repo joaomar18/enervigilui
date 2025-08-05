@@ -89,7 +89,7 @@
     $: if (deviceData && nodes) {
         nodesBySection = nodeSections.reduce(
             (acc: Record<NodePhase, Array<EditableDeviceNode>>, section) => {
-                acc[section.key] = nodes.filter(section.filter);
+                acc[section.key] = nodes.filter((node) => section.filter(node, deviceData.type));
                 return acc;
             },
             {} as Record<NodePhase, Array<EditableDeviceNode>>,
@@ -101,11 +101,11 @@
     // Functions
 
     //Function to fetch device configuration
-    function fetchDeviceConfig(name: string, id: number): void {
+    function fetchDeviceConfig(id: number): void {
         const tick = async () => {
             let sucess = false;
             try {
-                const { status, data }: { status: number; data: any } = await getDeviceState(name, id);
+                const { status, data }: { status: number; data: any } = await getDeviceState(id);
                 if (status !== 200) {
                     showAlert($texts.errorDeviceConfig);
                 } else {
@@ -126,17 +126,18 @@
     }
 
     // Function to fetch device nodes (variables)
-    function fetchDeviceNodesConfig(name: string, id: number): void {
+    function fetchDeviceNodesConfig(id: number): void {
         const tick = async () => {
             let sucess = false;
             try {
-                const { status, data }: { status: number; data: any } = await getDeviceNodesConfig(name, id);
+                const { status, data }: { status: number; data: any } = await getDeviceNodesConfig(id);
                 if (status !== 200) {
                     showAlert($texts.errorDeviceNodesConfig);
                 } else {
                     let requestDeviceNodes: Record<string, DeviceNode> = data;
                     initialNodes = Object.values(requestDeviceNodes) as Array<DeviceNode>;
-                    nodes = convertToEditableNodes(requestDeviceNodes);
+                    while (!deviceData);
+                    nodes = convertToEditableNodes(requestDeviceNodes, deviceData.type);
                     nodesInitialized = true;
                     sucess = true;
                 }
@@ -213,11 +214,10 @@
     // Mount function
     onMount(() => {
         const params = new URLSearchParams(window.location.search);
-        let deviceName = params.get("deviceName");
         let deviceId = params.get("deviceId");
-        if (deviceName && deviceId) {
-            fetchDeviceConfig(deviceName, Number(deviceId));
-            fetchDeviceNodesConfig(deviceName, Number(deviceId));
+        if (deviceId) {
+            fetchDeviceConfig(Number(deviceId));
+            fetchDeviceNodesConfig(Number(deviceId));
         } else {
             showAlert($texts.errorEditDeviceParams);
             loadedDone.set(true);

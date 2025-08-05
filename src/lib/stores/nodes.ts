@@ -1,6 +1,6 @@
 import { readable } from "svelte/store";
 import { derived } from "svelte/store";
-import { Protocol } from "$lib/stores/devices";
+import { MeterType, Protocol } from "$lib/stores/devices";
 import { getNodePhase } from "$lib/ts/nodes";
 
 /*****     C O N S T A N T S     *****/
@@ -87,7 +87,7 @@ export interface NodeSection {
     phase: NodePhase;
     prefix: NodePrefix;
     labelKey: string;
-    filter: (node: EditableDeviceNode) => boolean;
+    filter: (node: EditableDeviceNode, meter_type: MeterType) => boolean;
 }
 
 /**
@@ -96,43 +96,50 @@ export interface NodeSection {
  */
 export const nodeSections: Array<NodeSection> = [
     {
+        key: NodePhase.SINGLEPHASE,
+        phase: NodePhase.SINGLEPHASE,
+        prefix: NodePrefix.SINGLEPHASE,
+        labelKey: "singlePhase",
+        filter: (node, meter_type) => getNodePhase(node.name, meter_type) === NodePhase.SINGLEPHASE,
+    },
+    {
         key: NodePhase.L1,
         phase: NodePhase.L1,
         prefix: NodePrefix.L1,
         labelKey: "l1Phase",
-        filter: (node) => getNodePhase(node.name) === NodePhase.L1,
+        filter: (node, meter_type) => getNodePhase(node.name, meter_type) === NodePhase.L1,
     },
     {
         key: NodePhase.L2,
         phase: NodePhase.L2,
         prefix: NodePrefix.L2,
         labelKey: "l2Phase",
-        filter: (node) => getNodePhase(node.name) === NodePhase.L2,
+        filter: (node, meter_type) => getNodePhase(node.name, meter_type) === NodePhase.L2,
     },
     {
         key: NodePhase.L3,
         phase: NodePhase.L3,
         prefix: NodePrefix.L3,
         labelKey: "l3Phase",
-        filter: (node) => getNodePhase(node.name) === NodePhase.L3,
+        filter: (node, meter_type) => getNodePhase(node.name, meter_type) === NodePhase.L3,
     },
     {
         key: NodePhase.TOTAL,
         phase: NodePhase.TOTAL,
         prefix: NodePrefix.TOTAL,
         labelKey: "total",
-        filter: (node) => getNodePhase(node.name) === NodePhase.TOTAL,
+        filter: (node, meter_type) => getNodePhase(node.name, meter_type) === NodePhase.TOTAL,
     },
     {
         key: NodePhase.GENERAL,
         phase: NodePhase.GENERAL,
         prefix: NodePrefix.GENERAL,
         labelKey: "general",
-        filter: (node: any) => {
-            const isL1 = getNodePhase(node.name) === NodePhase.L1;
-            const isL2 = getNodePhase(node.name) === NodePhase.L2;
-            const isL3 = getNodePhase(node.name) === NodePhase.L3;
-            const isTotal = getNodePhase(node.name) === NodePhase.TOTAL;
+        filter: (node, meter_type) => {
+            const isL1 = getNodePhase(node.name, meter_type) === NodePhase.L1;
+            const isL2 = getNodePhase(node.name, meter_type) === NodePhase.L2;
+            const isL3 = getNodePhase(node.name, meter_type) === NodePhase.L3;
+            const isTotal = getNodePhase(node.name, meter_type) === NodePhase.TOTAL;
             return !isL1 && !isL2 && !isL3 && !isTotal;
         },
     },

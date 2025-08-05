@@ -15,9 +15,10 @@ const { isEqual } = isEqualPkg;
  * The resulting array is sorted by display name for consistent UI ordering.
  *
  * @param nodes Record of DeviceNode objects to convert
+ * @param meter_type Type of meter (SINGLE_PHASE or THREE_PHASE) used to determine node phases
  * @returns Array of editable device nodes ready for UI forms
  */
-export function convertToEditableNodes(nodes: Record<string, DeviceNode>): Array<EditableDeviceNode> {
+export function convertToEditableNodes(nodes: Record<string, DeviceNode>, meter_type: MeterType): Array<EditableDeviceNode> {
 
     let editableNodes: Array<EditableDeviceNode> = [];
 
@@ -70,7 +71,7 @@ export function convertToEditableNodes(nodes: Record<string, DeviceNode>): Array
             device_id: node.device_id,
             protocol: node.protocol,
             display_name: removePrefix(node.name),
-            phase: getNodePhase(node.name),
+            phase: getNodePhase(node.name, meter_type),
             communication_id: getCommunicationID(node.protocol, editableConfig),
             validation: getInitialNodeValidation(),
             config: editableConfig,
@@ -151,16 +152,14 @@ export function convertToNodes(nodes: Array<EditableDeviceNode>): Array<DeviceNo
 
         // Handle protocol-specific configuration
         if (editableNode.protocol === Protocol.OPC_UA) {
-            const editableConfig = editableNode.config as EditableNodeOPCUAConfig;
             nodeConfig = {
                 ...baseConfig,
-                node_id: editableConfig.node_id,
+                node_id: editableNode.communication_id,
             };
         } else if (editableNode.protocol === Protocol.MODBUS_RTU) {
-            const editableConfig = editableNode.config as EditableNodeModbusRTUConfig;
             nodeConfig = {
                 ...baseConfig,
-                register: parseInt(editableConfig.register.replace('0x', ''), 16),
+                register: parseInt(editableNode.communication_id.replace('0x', ''), 16),
             };
         } else if (editableNode.protocol === Protocol.NONE) {
             // For virtual/calculated nodes with no communication protocol
@@ -732,36 +731,48 @@ export function getAllNodesValidation(nodes: Array<EditableDeviceNode>): boolean
 }
 
 /**
- * Determines the node phase from its name prefix.
- * Returns the corresponding NodePhase enum value or GENERAL if no match.
+ * Determines the node phase from its name prefix based on meter type.
+ * For single-phase meters, always returns SINGLEPHASE.
+ * For three-phase meters, analyzes the prefix to determine L1, L2, L3, TOTAL, or GENERAL phase.
  *
  * @param name Node variable name to check
- * @returns Detected phase or GENERAL
+ * @param meter_type Type of meter (SINGLE_PHASE or THREE_PHASE) to determine phase logic
+ * @returns Detected phase based on name prefix and meter type
+ * @throws {Error} Throws an error if meter_type is invalid
  */
-export function getNodePhase(name: string): NodePhase {
+export function getNodePhase(name: string, meter_type: MeterType): NodePhase {
 
-    if (name.startsWith(NodePrefix.L1) && !name.startsWith(NodePrefix.L1_L2) && !name.startsWith(NodePrefix.L1_L3)) {
-        return NodePhase.L1;
+    if (meter_type === MeterType.SINGLE_PHASE) {
+        return NodePhase.SINGLEPHASE;
     }
-    else if (name.startsWith(NodePrefix.L2) && !name.startsWith(NodePrefix.L2_L1) && !name.startsWith(NodePrefix.L2_L3)) {
-        return NodePhase.L2;
-    }
-    else if (name.startsWith(NodePrefix.L3) && !name.startsWith(NodePrefix.L3_L1) && !name.startsWith(NodePrefix.L3_L2)) {
-        return NodePhase.L3;
-    }
-    else if (name.startsWith(NodePrefix.TOTAL)) {
-        return NodePhase.TOTAL;
+    else if (meter_type === MeterType.THREE_PHASE) {
+        if (name.startsWith(NodePrefix.L1) && !name.startsWith(NodePrefix.L1_L2) && !name.startsWith(NodePrefix.L1_L3)) {
+            return NodePhase.L1;
+        }
+        else if (name.startsWith(NodePrefix.L2) && !name.startsWith(NodePrefix.L2_L1) && !name.startsWith(NodePrefix.L2_L3)) {
+            return NodePhase.L2;
+        }
+        else if (name.startsWith(NodePrefix.L3) && !name.startsWith(NodePrefix.L3_L1) && !name.startsWith(NodePrefix.L3_L2)) {
+            return NodePhase.L3;
+        }
+        else if (name.startsWith(NodePrefix.TOTAL)) {
+            return NodePhase.TOTAL;
+        }
+        else {
+            return NodePhase.GENERAL;
+        }
     }
     else {
-        return NodePhase.GENERAL;
+        throw new Error(`Invalid meter type ${meter_type}`);
     }
 }
 
 /**
  * Maps NodePhase enum to the corresponding prefix used in node names.
+ * Returns the appropriate prefix string for the given phase.
  *
- * @param phase NodePhase value
- * @returns Corresponding prefix string
+ * @param phase NodePhase value to convert to prefix
+ * @returns Corresponding prefix string, or empty string for invalid phase
  */
 export function getNodePrefix(phase: NodePhase): string {
     switch (phase) {
@@ -962,7 +973,7 @@ export function addNode(sectionPrefix: NodePrefix, device_data: EditableDeviceMe
         protocol: device_data.protocol,
         config: newNodeConfiguration,
         display_name: nodeBaseName,
-        phase: getNodePhase(fullNodeName),
+        phase: getNodePhase(fullNodeName, device_data.type),
         communication_id: getCommunicationID(device_data.protocol, newNodeConfiguration, true),
         validation: getInitialNodeValidation(),
     };

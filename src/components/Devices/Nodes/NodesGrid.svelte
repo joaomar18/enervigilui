@@ -95,6 +95,8 @@
             (window as any)._nodesGridResizeObserver = undefined;
         }
     });
+
+    $: console.log(nodes);
 </script>
 
 <!-- NodesGrid Component: displays a responsive table of device nodes, grouped by section for three-phase meters. 
@@ -181,7 +183,7 @@ Includes multi-language headers and adapts layout to container size. -->
                 <!--     T H R E E     P H A S E     M E T E R S     -->
                 {#if deviceData.type === MeterType.THREE_PHASE && nodesBySection}
                     <!-- Render each node section -->
-                    {#each nodeSections as section (section.key)}
+                    {#each nodeSections.filter((section) => section.key !== NodePhase.SINGLEPHASE) as section (section.key)}
                         <tr class="sub-section">
                             <td colspan="20">{$texts[section.labelKey][$selectedLang]}</td>
                         </tr>
@@ -219,39 +221,41 @@ Includes multi-language headers and adapts layout to container size. -->
                         />
                     {/each}
                     <!--     S I N G L E     P H A S E     M E T E R S     -->
-                {:else if deviceData.type === MeterType.SINGLE_PHASE}
-                    {#each nodes as node, i (i)}
-                        <NodeRow
-                            {node}
-                            currentGridWidth={currentWidth}
-                            {columnVisibility}
-                            backgroundColor="rgba(255, 255, 255, 0.05)"
-                            disabledBackgroundColor="rgba(255, 255, 255, 0.22)"
-                            hoverColor="rgba(255, 255, 255, 0.09)"
-                            disabledHoverColor="rgba(255, 255, 255, 0.28)"
+                {:else if deviceData.type === MeterType.SINGLE_PHASE && nodesBySection}
+                    {#each nodeSections.filter((section) => section.key === NodePhase.SINGLEPHASE) as section (section.key)}
+                        {#each nodesBySection[section.key] as node, i (i)}
+                            <NodeRow
+                                {node}
+                                currentGridWidth={currentWidth}
+                                {columnVisibility}
+                                backgroundColor="rgba(255, 255, 255, 0.05)"
+                                disabledBackgroundColor="rgba(255, 255, 255, 0.22)"
+                                hoverColor="rgba(255, 255, 255, 0.09)"
+                                disabledHoverColor="rgba(255, 255, 255, 0.28)"
+                                {windowWidth}
+                                onDelete={() => {
+                                    let deletedNodeIndex = getNodeIndex(node, nodes);
+                                    if (deletedNodeIndex !== -1) {
+                                        nodes = [...nodes.slice(0, deletedNodeIndex), ...nodes.slice(deletedNodeIndex + 1)];
+                                    }
+                                }}
+                                onConfig={(nodeEditingState: NodeEditState) => {
+                                    onShowConfigPopup(node, nodeEditingState);
+                                }}
+                                {deviceData}
+                                onPropertyChanged={() => {
+                                    onPropertyChanged(node);
+                                }}
+                            />
+                        {/each}
+                        <AddNode
                             {windowWidth}
-                            onDelete={() => {
-                                let deletedNodeIndex = getNodeIndex(node, nodes);
-                                if (deletedNodeIndex !== -1) {
-                                    nodes = [...nodes.slice(0, deletedNodeIndex), ...nodes.slice(deletedNodeIndex + 1)];
-                                }
-                            }}
-                            onConfig={(nodeEditingState: NodeEditState) => {
-                                onShowConfigPopup(node, nodeEditingState);
-                            }}
-                            {deviceData}
-                            onPropertyChanged={() => {
-                                onPropertyChanged(node);
+                            backgroundColor="rgba(255, 255, 255, 0.05)"
+                            onAddNode={() => {
+                                nodes = [...nodes, addNode(section.prefix, deviceData)];
                             }}
                         />
                     {/each}
-                    <AddNode
-                        {windowWidth}
-                        backgroundColor="rgba(255, 255, 255, 0.05)"
-                        onAddNode={() => {
-                            nodes = [...nodes, addNode(NodePrefix.SINGLEPHASE, deviceData)];
-                        }}
-                    />
                 {/if}
             </tbody>
         </table>

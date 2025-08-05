@@ -24,10 +24,17 @@
     export let imageHeight: string;
 
     // Variables
-
     let currentImageUrl: string;
+    let imageLoaded: boolean = false;
+    let showImage: boolean = false;
 
-    $: currentImageUrl = imageURL;
+    $: {
+        (async () => {
+            if (imageURL || defaultImageURL) {
+                await setValidImageUrl();
+            }
+        })();
+    }
 
     // Export Funcions
     export let onEdit: () => void;
@@ -45,9 +52,38 @@
         }
     }
 
-    function handleImageError() {
-        if (defaultImageURL && currentImageUrl !== defaultImageURL) {
+    async function checkImageExists(url: string): Promise<boolean> {
+        try {
+            const response = await fetch(url, {
+                method: "HEAD",
+                cache: "no-cache",
+            });
+            return response.ok;
+        } catch {
+            return false;
+        }
+    }
+
+    async function setValidImageUrl() {
+        // Reset state
+        imageLoaded = false;
+        showImage = false;
+        currentImageUrl = "";
+
+        // Try to load image
+        if (imageURL && (await checkImageExists(imageURL))) {
+            currentImageUrl = imageURL;
+            imageLoaded = true;
+            showImage = true;
+            return;
+        }
+
+        // Try to Load default image
+        if (defaultImageURL && (await checkImageExists(defaultImageURL))) {
             currentImageUrl = defaultImageURL;
+            imageLoaded = true;
+            showImage = true;
+            return;
         }
     }
 </script>
@@ -68,8 +104,7 @@
 >
     <div class="content">
         <h3>{deviceName}</h3>
-        <div style="background-image: url('{currentImageUrl}');" class="device-image-div">
-            <img src={currentImageUrl} alt="Url Checker" style="display:none" on:error={handleImageError} />
+        <div style="background-image: {imageLoaded ? `url('${currentImageUrl}')` : 'none'};" class="device-image-div" class:image-loaded={showImage}>
             <button class="device-image-mask" on:click={handleEnter} aria-label="Enter Device"></button>
         </div>
         <div class="actions-div">
@@ -187,10 +222,22 @@
         background-size: auto 87.5%;
         border-radius: 50%;
         -webkit-tap-highlight-color: transparent;
+        opacity: 0;
+        transition: opacity 0.2s ease-in-out;
+    }
+
+    /* Image loaded state: fully visible */
+    .device-image-div.image-loaded {
+        opacity: 1;
     }
 
     /* Image hover: slightly dim the device image on hover */
     .device-image-div:hover {
+        opacity: 0.8;
+    }
+
+    /* Ensure hover effect works with loaded images */
+    .device-image-div.image-loaded:hover {
         opacity: 0.8;
     }
 

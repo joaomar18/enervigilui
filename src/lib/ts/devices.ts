@@ -34,7 +34,6 @@ export async function getAllDevicesState(
 /**
  * Fetches the state and configuration of a specific device from the server.
  *
- * @param {string} name - The name of the device.
  * @param {number} id - The unique identifier of the device.
  * @param {number} [timeout=3000] - The timeout duration in milliseconds for the API request.
  * @returns {Promise<{ status: number; data: any }>} - A promise that resolves to an object containing
@@ -42,22 +41,20 @@ export async function getAllDevicesState(
  *
  * Example usage:
  * ```typescript
- * const response = await getDeviceState("DeviceName", 123);
+ * const response = await getDeviceState(123);
  * console.log(response.status, response.data);
  * ```
  */
 export async function getDeviceState(
-    name: string,
     id: number,
     timeout: number = 3000
 ): Promise<{ status: number; data: any }> {
-    return makeAPIRequest("/api/get_device_state", "GET", { name, id }, timeout);
+    return makeAPIRequest("/api/get_device_state", "GET", { id }, timeout);
 }
 
 /**
  * Fetches the configuration of nodes associated with a specific device from the server.
  *
- * @param {string} name - The name of the device.
  * @param {number} id - The unique identifier of the device.
  * @param {number} [timeout=3000] - The timeout duration in milliseconds for the API request.
  * @returns {Promise<{ status: number; data: any }>} - A promise that resolves to an object containing
@@ -65,16 +62,15 @@ export async function getDeviceState(
  *
  * Example usage:
  * ```typescript
- * const response = await getDeviceNodesConfig("DeviceName", 123);
+ * const response = await getDeviceNodesConfig(123);
  * console.log(response.status, response.data);
  * ```
  */
 export async function getDeviceNodesConfig(
-    name: string,
     id: number,
     timeout: number = 3000
 ): Promise<{ status: number; data: any }> {
-    return makeAPIRequest("/api/get_nodes_config", "GET", { name, id }, timeout);
+    return makeAPIRequest("/api/get_nodes_config", "GET", { id }, timeout);
 }
 
 /**

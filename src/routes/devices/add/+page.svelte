@@ -65,7 +65,7 @@
     $: if (deviceData && nodes) {
         nodesBySection = nodeSections.reduce(
             (acc: Record<NodePhase, Array<EditableDeviceNode>>, section) => {
-                acc[section.key] = nodes.filter(section.filter);
+                acc[section.key] = nodes.filter((node) => section.filter(node, deviceData.type));
                 return acc;
             },
             {} as Record<NodePhase, Array<EditableDeviceNode>>,
