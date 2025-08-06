@@ -1,6 +1,6 @@
 <script lang="ts">
-    import { onMount } from "svelte";
-    import { addDevice, validateDeviceName, createNewDevice, updateDeviceValidation, validDeviceOperation, convertToDevice } from "$lib/ts/devices";
+    import { onMount, onDestroy } from "svelte";
+    import { getDefaultImage, addDevice, createNewDevice, updateDeviceValidation, validDeviceOperation, convertToDevice } from "$lib/ts/devices";
     import { getNodeIndex, getDefaultNodesList, changeNodeProtocol, updateNodesValidation, convertToNodes } from "$lib/ts/nodes";
     import { nodeSections } from "$lib/stores/nodes";
     import Selector from "../../../components/General/Selector.svelte";
@@ -36,6 +36,8 @@
     let showConfigNodeWindow: boolean = false; // Show Node Full Configuration Window
 
     let performingAddRequest: boolean = false; // Performing Add Device Request
+
+    let defaultImgPollTimer: ReturnType<typeof setTimeout>; // Timeout for default image request
 
     let deviceData: NewDeviceMeter; // Device Data
     let opcuaConfig: EditableDeviceOPCUAConfig | null; // OPC UA Configuration
@@ -76,6 +78,31 @@
 
     // Functions
 
+    // Function to fetch default image for devices
+    function fetchDefaultImage(): void {
+        const tick = async () => {
+            let sucess = false;
+            try {
+                const { status, data }: { status: number; data: any } = await getDefaultImage();
+                if (status !== 200) {
+                    showAlert($texts.errorDeviceConfig);
+                } else {
+                    const deviceImage = data as Record<string, string>;
+                    deviceData.current_image_url = `data:${deviceImage["type"]};base64,${deviceImage["data"]}`;
+                    sucess = true;
+                }
+            } catch (e) {
+                showAlert($texts.errorDeviceConfig);
+                console.error(e);
+            }
+            loadedDone.set(true);
+            if (!sucess) {
+                defaultImgPollTimer = setTimeout(tick, 2500);
+            }
+        };
+        tick();
+    }
+
     //Function to save device changes
     async function addDeviceConfirmation(): Promise<void> {
         if ($loadedDone && nodesInitialized) {
@@ -103,8 +130,14 @@
     onMount(() => {
         deviceData = createNewDevice(defaultDeviceOptions.protocol, defaultDeviceOptions.type, defaultDeviceOptions.options);
         nodes = getDefaultNodesList(deviceData);
+        fetchDefaultImage();
         loadedDone.set(true);
         nodesInitialized = true;
+    });
+
+    // Cleanup function
+    onDestroy(() => {
+        clearTimeout(defaultImgPollTimer);
     });
 </script>
 
@@ -136,7 +169,7 @@ Shows input forms for protocol-specific parameters and organizes device nodes fo
                         width="200px"
                         height="200px"
                         borderRadius="50%"
-                        imageUrl={`/img/default-device.png`}
+                        imageUrl={deviceData.current_image_url ?? ""}
                         imageHeight="87.5%"
                         backgroundColor="rgba(255, 255, 255, 0.1)"
                         hoverColor="rgba(255, 255, 255, 0.13)"

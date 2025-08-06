@@ -10,19 +10,28 @@ import isEqualPkg from "lodash";
 const { isEqual } = isEqualPkg;
 
 /**
- * Converts a record of DeviceNode objects into an array of EditableDeviceNode objects for UI editing.
+ * Converts an array of DeviceNode objects into an array of EditableDeviceNode objects for UI editing.
  * Each node's configuration is transformed into editable string-based fields for form input and validation.
  * The resulting array is sorted by display name for consistent UI ordering.
  *
- * @param nodes Record of DeviceNode objects to convert
+ * @param nodes Array of DeviceNode objects to convert
  * @param meter_type Type of meter (SINGLE_PHASE or THREE_PHASE) used to determine node phases
  * @returns Array of editable device nodes ready for UI forms
+ * 
+ * @description This conversion is necessary because:
+ * - Form inputs require string types for proper binding and validation
+ * - Numeric values (decimal_places, logging_period, register, alarm values) are converted to strings
+ * - Additional UI properties are added: display_name, phase, communication_id, validation
+ * - Protocol-specific configuration is handled (OPC UA node_id vs Modbus RTU register)
+ * - The original node structure is preserved with editable string-based configuration
+ * - Validation state is initialized for all configuration properties
+ * - Communication ID is formatted appropriately for each protocol (hex for Modbus, string for OPC UA)
  */
-export function convertToEditableNodes(nodes: Record<string, DeviceNode>, meter_type: MeterType): Array<EditableDeviceNode> {
+export function convertToEditableNodes(nodes: Array<DeviceNode>, meter_type: MeterType): Array<EditableDeviceNode> {
 
     let editableNodes: Array<EditableDeviceNode> = [];
 
-    for (let node of Object.values(nodes)) {
+    for (let node of nodes) {
         let editableNode: EditableDeviceNode;
 
         let decimal_places: string = node.config.decimal_places !== null ? node.config.decimal_places.toString() : "";
@@ -214,8 +223,6 @@ export function getDefaultNodesList(device_data: EditableDeviceMeter | NewDevice
 
         for (const section of threePhaseeSections) {
             const phaseVars = defaultVars.filter((v) => v.useByDefault && v.applicablePhases.includes(section.phase));
-
-            console.log("Phase: ", section.phase, "Vars: ", phaseVars);
 
             for (const variable of phaseVars) {
                 nodes.push(createDefaultEditableDeviceNode(variable, section.phase, device_data));

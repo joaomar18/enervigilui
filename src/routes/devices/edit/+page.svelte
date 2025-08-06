@@ -62,6 +62,7 @@
     let initialNodes: Array<DeviceNode>; // Initial Nodes (to check if there were changes made)
 
     let deviceData: EditableDeviceMeter; // Device Data
+    let deviceImageURL: string; // Device image URL (from request)
     let opcuaConfig: EditableDeviceOPCUAConfig | null; // OPC UA Configuration
     let modbusRTUConfig: EditableDeviceModbusRTUConfig | null; // Modbus RTU Configuration
 
@@ -109,9 +110,9 @@
                 if (status !== 200) {
                     showAlert($texts.errorDeviceConfig);
                 } else {
-                    let requestDeviceData: DeviceMeter = data;
-                    initialDeviceData = requestDeviceData;
-                    deviceData = convertToEditableDevice(requestDeviceData);
+                    const { image: deviceImage, ...requestDeviceData } = data as DeviceMeter & { image: Record<string, string> };
+                    initialDeviceData = requestDeviceData as DeviceMeter;
+                    deviceData = convertToEditableDevice(initialDeviceData, deviceImage);
                     sucess = true;
                 }
             } catch (e) {
@@ -136,9 +137,6 @@
                 } else {
                     let requestDeviceNodes: Record<string, DeviceNode> = data;
                     initialNodes = Object.values(requestDeviceNodes) as Array<DeviceNode>;
-                    while (!deviceData);
-                    nodes = convertToEditableNodes(requestDeviceNodes, deviceData.type);
-                    nodesInitialized = true;
                     sucess = true;
                 }
             } catch (e) {
@@ -149,6 +147,17 @@
             }
         };
         tick();
+    }
+
+    // When device data is ready as well as nodes, initializes nodes
+    $: if (initialNodes && deviceData && !nodesInitialized) {
+        try {
+            nodes = convertToEditableNodes(initialNodes, deviceData.type);
+            nodesInitialized = true;
+        } catch (e) {
+            showAlert($texts.errorDeviceNodesConfig);
+            setTimeout(() => fetchDeviceNodesConfig(deviceData.id), 2500);
+        }
     }
 
     //Function to save device changes
@@ -258,7 +267,7 @@ Shows input forms for protocol-specific parameters and organizes device nodes fo
                         width="200px"
                         height="200px"
                         borderRadius="50%"
-                        imageUrl={deviceData.current_image_url}
+                        imageUrl={deviceData.current_image_url ?? ""}
                         defaultImageUrl={`/img/default-device.png`}
                         imageHeight="87.5%"
                         backgroundColor="rgba(255, 255, 255, 0.1)"
@@ -410,8 +419,6 @@ Shows input forms for protocol-specific parameters and organizes device nodes fo
                             cancelEdit();
                             return;
                         }
-                        console.log("Initial device data: ", initialDeviceData);
-                        console.log("Converted device data", convertToDevice(deviceData));
                         showCancelWindow = true;
                     }}
                 />

@@ -242,7 +242,7 @@ export interface DeviceMeter {
  * @property {MeterOptions} options - Operational settings controlling measurement capabilities and data acquisition
  * @property {EditableCommunicationOptions} communication_options - Protocol-specific communication parameters and settings (as strings for form input)
  * @property {File | undefined} device_image - Optional image file for the device (for visual identification in UI)
- * @property {string} current_image_url - URL of the device's current image (for displaying existing images in forms)
+ * @property {string | undefined} current_image_url - Optional URL of the device's current image (for displaying existing images in forms)
  * @property {DeviceValidation} validation - Validation state for all device configuration properties
  */
 export interface EditableDeviceMeter {
@@ -254,7 +254,7 @@ export interface EditableDeviceMeter {
     options: MeterOptions,
     communication_options: EditableCommunicationOptions;
     device_image: File | undefined;
-    current_image_url: string;
+    current_image_url: string | undefined;
     validation: DeviceValidation;
 }
 
@@ -269,6 +269,7 @@ export interface EditableDeviceMeter {
  * @property {MeterOptions} options - Operational settings controlling measurement capabilities and data acquisition
  * @property {EditableCommunicationOptions} communication_options - Protocol-specific communication parameters and settings (as strings for form input)
  * @property {File | undefined} device_image - Optional image file for the device (for visual identification in UI)
+ * @property {string | undefined} current_image_url - Optional URL of the device's current image (for displaying existing images in forms)
  * @property {DeviceValidation} validation - Validation state for all device configuration properties
  */
 export interface NewDeviceMeter {
@@ -278,6 +279,7 @@ export interface NewDeviceMeter {
     options: MeterOptions,
     communication_options: EditableCommunicationOptions;
     device_image: File | undefined;
+    current_image_url: string | undefined;
     validation: DeviceValidation;
 }
 

@@ -53,6 +53,25 @@ export async function getDeviceState(
 }
 
 /**
+ * Fetches the default device image from the server.
+ *
+ * @param {number} [timeout=3000] - The timeout duration in milliseconds for the API request.
+ * @returns {Promise<{ status: number; data: any }>} - A promise that resolves to an object containing
+ * the HTTP status code and the default image data.
+ *
+ * Example usage:
+ * ```typescript
+ * const response = await getDefaultImage();
+ * console.log(response.status, response.data);
+ * ```
+ */
+export async function getDefaultImage(
+    timeout: number = 3000
+): Promise<{ status: number; data: any }> {
+    return makeAPIRequest("/api/get_default_image", "GET", {}, timeout);
+}
+
+/**
  * Fetches the configuration of nodes associated with a specific device from the server.
  *
  * @param {number} id - The unique identifier of the device.
@@ -149,6 +168,7 @@ export async function deleteDevice(
  * form input handling where all communication parameters need to be strings.
  * 
  * @param {DeviceMeter} device - The device meter object to convert
+ * @param {Record<string, string>} deviceImage - The device image data containing type and base64 data
  * @returns {EditableDeviceMeter} - The converted editable device meter object
  * @throws {Error} - Throws an error if the device protocol is not supported
  * 
@@ -158,7 +178,7 @@ export async function deleteDevice(
  * - All numeric values are converted to strings for input field compatibility
  * - The original device structure is preserved except for communication options
  * - Device image is initialized as undefined (can be set later in forms)
- * - Current image URL is constructed from device name and ID for displaying existing images
+ * - Current image URL is constructed from device image data as a data URL for displaying existing images
  * - Validation state is initialized with all checks set to false
  * 
  * @example
@@ -170,12 +190,17 @@ export async function deleteDevice(
  *   // ... other properties
  * };
  * 
- * const editableDevice = convertToEditableDevice(device);
+ * const deviceImage = {
+ *   type: "image/png",
+ *   data: "iVBORw0KGgoAAAANSUhEUgAAAMgAAAEKCAYAAABXDxqV..."
+ * };
+ * 
+ * const editableDevice = convertToEditableDevice(device, deviceImage);
  * // Now suitable for form binding with string-based inputs
- * // editableDevice.current_image_url will be "/devices/Test Meter_1.png"
+ * // editableDevice.current_image_url will be "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAMgAAAEKCAYAAABXDxqV..."
  * ```
  */
-export function convertToEditableDevice(device: DeviceMeter): EditableDeviceMeter {
+export function convertToEditableDevice(device: DeviceMeter, deviceImage: Record<string, string>): EditableDeviceMeter {
     let editableCommunicationOptions: EditableCommunicationOptions;
 
     if (device.protocol === Protocol.OPC_UA) {
@@ -215,7 +240,7 @@ export function convertToEditableDevice(device: DeviceMeter): EditableDeviceMete
         options: device.options,
         communication_options: editableCommunicationOptions,
         device_image: undefined,
-        current_image_url: `/devices/${device.name}_${device.id}.png`,
+        current_image_url: `data:${deviceImage["type"]};base64,${deviceImage["data"]}`,
         validation: getInitialDeviceValidation(),
     };
 }
@@ -350,6 +375,7 @@ export function createNewDevice(protocol: Protocol, meter_type: MeterType, meter
         options: meter_options,
         communication_options: communication_options,
         device_image: undefined,
+        current_image_url: undefined,
         validation: getInitialDeviceValidation(),
     }
 

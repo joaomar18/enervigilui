@@ -95,8 +95,6 @@
             (window as any)._nodesGridResizeObserver = undefined;
         }
     });
-
-    $: console.log(nodes);
 </script>
 
 <!-- NodesGrid Component: displays a responsive table of device nodes, grouped by section for three-phase meters. 

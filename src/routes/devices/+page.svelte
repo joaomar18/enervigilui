@@ -21,6 +21,7 @@
     // Variables
     let pollTimer: ReturnType<typeof setTimeout>;
     let devices: Array<DeviceMeter>;
+    let devicesImg: Record<number, string> = {};
 
     // Sorted devices
     $: sortedDevices = Array.isArray(devices) ? [...devices].sort((a, b) => a.id - b.id) : [];
@@ -33,7 +34,12 @@
                 if (status !== 200) {
                     showAlert($texts.errorDevicesState);
                 } else {
-                    devices = data;
+                    devices = data.map((data: DeviceMeter & { image: Record<string, string> }) => {
+                        const { image: deviceImage, ...requestDeviceData } = data as DeviceMeter & { image: Record<string, string> };
+                        let deviceData: DeviceMeter = requestDeviceData as DeviceMeter;
+                        devicesImg[deviceData.id] = `data:${deviceImage["type"]};base64,${deviceImage["data"]}`;
+                        return deviceData;
+                    });
                 }
             } catch (e) {
                 showAlert($texts.errorDevicesState);
@@ -84,7 +90,7 @@
             borderRadius="20px"
             backgroundColor="#14161c"
             borderColor="rgba(255,255,255,0.07)"
-            imageURL={`/devices/${device.name}_${device.id}.png`}
+            imageURL={devicesImg[device.id]}
             defaultImageURL="/img/default-device.png"
             imageBackgroundColor="rgba(255, 255, 255, 0.1)"
             imageWidth="200px"
