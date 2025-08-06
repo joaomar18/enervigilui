@@ -108,7 +108,9 @@
             try {
                 const { status, data }: { status: number; data: any } = await getDeviceState(id);
                 if (status !== 200) {
-                    showAlert($texts.errorDeviceConfig);
+                    showAlert($texts.errorDeviceConfig, {
+                        error: String(data["error"]),
+                    });
                 } else {
                     const { image: deviceImage, ...requestDeviceData } = data as DeviceMeter & { image: Record<string, string> };
                     initialDeviceData = requestDeviceData as DeviceMeter;
@@ -116,7 +118,10 @@
                     sucess = true;
                 }
             } catch (e) {
-                showAlert($texts.errorDeviceConfig);
+                showAlert($texts.errorDeviceConfig, {
+                    error: String(e),
+                });
+                console.error(`Could not obtain the device configuration: ${e}`);
             }
             loadedDone.set(true);
             if (!sucess) {
@@ -133,14 +138,19 @@
             try {
                 const { status, data }: { status: number; data: any } = await getDeviceNodesConfig(id);
                 if (status !== 200) {
-                    showAlert($texts.errorDeviceNodesConfig);
+                    showAlert($texts.errorDeviceNodesConfig, {
+                        error: String(data["error"]),
+                    });
                 } else {
                     let requestDeviceNodes: Record<string, DeviceNode> = data;
                     initialNodes = Object.values(requestDeviceNodes) as Array<DeviceNode>;
                     sucess = true;
                 }
             } catch (e) {
-                showAlert($texts.errorDeviceNodesConfig);
+                showAlert($texts.errorDeviceNodesConfig, {
+                    error: String(e),
+                });
+                console.error(`Could not obtain the nodes configuration: ${e}`);
             }
             if (!sucess) {
                 nodesPollTimer = setTimeout(tick, 2500);
@@ -155,7 +165,7 @@
             nodes = convertToEditableNodes(initialNodes, deviceData.type);
             nodesInitialized = true;
         } catch (e) {
-            showAlert($texts.errorDeviceNodesConfig);
+            console.error(`Could not initialize the nodes configuration from the request: ${e}`);
             setTimeout(() => fetchDeviceNodesConfig(deviceData.id), 2500);
         }
     }
@@ -177,10 +187,12 @@
                     return;
                 }
                 performingSaveRequest = true;
-                const { status } = await editDevice(convertedDevice, deviceData.device_image, convertedNodes);
+                const { status, data } = await editDevice(convertedDevice, deviceData.device_image, convertedNodes);
                 performingSaveRequest = false;
                 if (status !== 200) {
-                    showAlert($texts.editDeviceRequestError);
+                    showAlert($texts.editDeviceRequestError, {
+                        error: String(data["error"]),
+                    });
                     showSaveWindow = false;
                     return;
                 }
@@ -203,10 +215,12 @@
         if ($loadedDone && nodesInitialized) {
             try {
                 performingDeleteRequest = true;
-                const { status } = await deleteDevice(deviceData.name, deviceData.id);
+                const { status, data } = await deleteDevice(deviceData.name, deviceData.id);
                 performingDeleteRequest = false;
                 if (status !== 200) {
-                    showAlert($texts.deleteDeviceRequestError);
+                    showAlert($texts.deleteDeviceRequestError, {
+                        error: String(data["error"]),
+                    });
                     deleteDeviceName = "";
                     showDeleteWindow = false;
                     return;
@@ -538,6 +552,7 @@ Shows input forms for protocol-specific parameters and organizes device nodes fo
                             </div>
                             <div class="button-div">
                                 <Button
+                                    processing={performingDeleteRequest}
                                     enabled={deleteDeviceName === deviceData.name}
                                     buttonText={$texts.confirm[$selectedLang]}
                                     width="150px"
@@ -549,6 +564,8 @@ Shows input forms for protocol-specific parameters and organizes device nodes fo
                                     disabledBackgroundColor="#3a2323"
                                     disabledHoverColor="#2a1818"
                                     disabledBorderColor="#5a3a3a"
+                                    imageWidth="22px"
+                                    imageHeight="22px"
                                     fontColor="#f5f5f5"
                                     onClick={deleteDeviceConfirmation}
                                 />
@@ -614,6 +631,7 @@ Shows input forms for protocol-specific parameters and organizes device nodes fo
                             <span class="save-window-text">{$texts.saveDeviceInfo[$selectedLang]}</span>
                             <div class="button-div save-window-button">
                                 <Button
+                                    processing={performingSaveRequest}
                                     buttonText={$texts.confirm[$selectedLang]}
                                     width="150px"
                                     height="40px"
@@ -621,6 +639,11 @@ Shows input forms for protocol-specific parameters and organizes device nodes fo
                                     backgroundColor="#2F80ED"
                                     hoverColor="#1C6DD0"
                                     borderColor="#1456B0"
+                                    disabledBackgroundColor="#7da5d9"
+                                    disabledHoverColor="#7da5d9"
+                                    disabledBorderColor="#6287b6"
+                                    imageWidth="22px"
+                                    imageHeight="22px"
                                     fontColor="#f5f5f5"
                                     onClick={editDeviceConfirmation}
                                 />

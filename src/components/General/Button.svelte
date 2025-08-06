@@ -1,12 +1,13 @@
 <script lang="ts">
     //Props
     export let enabled: boolean = true;
+    export let processing: boolean = false;
 
     // Layout / styling props
     export let buttonText: string;
     export let width: string;
     export let minWidth: string = "";
-    export let maxWidth: string = ""; 
+    export let maxWidth: string = "";
     export let height: string;
     export let borderRadius: string = "";
     export let backgroundColor: string;
@@ -67,15 +68,21 @@
         --image-right-position: {imageRightPos};
         --image-left-position: {imageLeftPos};
     "
-    class:align-left={imageRightPos != "auto"}
-    class:align-right={imageLeftPos != "auto"}
-    class:disabled={!enabled}
+    class:align-left={imageRightPos != "auto" && !processing}
+    class:align-right={imageLeftPos != "auto" && !processing}
+    class:disabled={!enabled || processing}
     aria-label={buttonText}
     on:click={handleClick}
 >
-    {buttonText}
-    {#if imageURL}
-        <img src={imageURL} alt={imageURL} />
+    {#if !processing}
+        {buttonText}
+        {#if imageURL}
+            <img src={imageURL} alt={imageURL} />
+        {/if}
+    {:else}
+        <svg class="loader" width={imageWidth} height={imageHeight} viewBox="0 0 50 50" xmlns="http://www.w3.org/2000/svg">
+            <circle class="path" cx="25" cy="25" r="20" fill="none" stroke-width="4" />
+        </svg>
     {/if}
 </button>
 
@@ -139,5 +146,26 @@
         left: var(--image-left-position);
         right: var(--image-right-position);
         transform: translateY(-50%);
+    }
+
+    /* Loading spinner: rotating animation */
+    .loader {
+        animation: rotate 1s linear infinite;
+        transform-origin: center;
+    }
+
+    /* Spinner circle path: animated stroke */
+    .path {
+        stroke: white;
+        stroke-linecap: butt;
+        stroke-dasharray: 90, 150;
+        stroke-dashoffset: 0;
+    }
+
+    /* Keyframe animation: full 360 degree rotation */
+    @keyframes rotate {
+        100% {
+            transform: rotate(360deg);
+        }
     }
 </style>

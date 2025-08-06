@@ -99,7 +99,8 @@ export async function getDeviceNodesConfig(
  * @param {File | undefined} deviceImage - Optional image file to upload for the device
  * @param {Array<DeviceNode>} deviceNodes - Array of device nodes associated with this device
  * @param {number} [timeout=3000] - The timeout duration in milliseconds for the API request
- * @returns {Promise<{ status: number; }>} A promise that resolves to an object containing the HTTP status code
+ * @returns {Promise<{ status: number; data: any }>} A promise that resolves to an object containing
+ * the HTTP status code and the response data.
  *
  * Example usage:
  * ```typescript
@@ -112,7 +113,7 @@ export async function addDevice(
     deviceImage: File | undefined,
     deviceNodes: Array<DeviceNode>,
     timeout: number = 3000
-): Promise<{ status: number; }> {
+): Promise<{ status: number; data: any }> {
     return makeAPIRequest("/api/add_device", "POST", { deviceData, deviceNodes }, timeout, deviceImage, "deviceImage");
 }
 
@@ -123,8 +124,9 @@ export async function addDevice(
  * @param {File | undefined} deviceImage - Optional image file to upload for the device
  * @param {Array<DeviceNode>} deviceNodes - Array of device nodes associated with this device
  * @param {number} [timeout=3000] - The timeout duration in milliseconds for the API request
- * @returns {Promise<{ status: number; }>} A promise that resolves to an object containing the HTTP status code
- *
+ * @returns {Promise<{ status: number; data: any }>} A promise that resolves to an object containing
+ * the HTTP status code and the response data.
+ * 
  * Example usage:
  * ```typescript
  * const response = await editDeviceConfig(deviceData, imageFile, deviceNodes);
@@ -136,7 +138,7 @@ export async function editDevice(
     deviceImage: File | undefined,
     deviceNodes: Array<DeviceNode>,
     timeout: number = 3000
-): Promise<{ status: number; }> {
+): Promise<{ status: number; data: any }> {
     return makeAPIRequest("/api/edit_device", "POST", { deviceData, deviceNodes }, timeout, deviceImage, "deviceImage");
 }
 
@@ -146,7 +148,8 @@ export async function editDevice(
  * @param {string} deviceName - The name of the device to delete
  * @param {number} deviceID - The unique identifier of the device to delete
  * @param {number} [timeout=3000] - The timeout duration in milliseconds for the API request
- * @returns {Promise<{ status: number; }>} A promise that resolves to an object containing the HTTP status code
+ * @returns {Promise<{ status: number; data: any }>} A promise that resolves to an object containing
+ * the HTTP status code and the response data.
  *
  * Example usage:
  * ```typescript
@@ -158,7 +161,7 @@ export async function deleteDevice(
     deviceName: string,
     deviceID: number,
     timeout: number = 3000
-): Promise<{ status: number; }> {
+): Promise<{ status: number; data: any }> {
     return makeAPIRequest("/api/delete_device", "DELETE", { deviceName, deviceID }, timeout);
 }
 
@@ -359,10 +362,10 @@ export function createNewDevice(protocol: Protocol, meter_type: MeterType, meter
     let communication_options;
 
     if (protocol === Protocol.MODBUS_RTU) {
-        communication_options = defaultModbusRTUOptions;
+        communication_options = { ...defaultModbusRTUOptions };
     }
     else if (protocol === Protocol.OPC_UA) {
-        communication_options = defaultOPCUAOptions;
+        communication_options = { ...defaultOPCUAOptions };
     }
     else {
         throw new Error("Unsupported Protocol");
@@ -372,7 +375,7 @@ export function createNewDevice(protocol: Protocol, meter_type: MeterType, meter
         name: "",
         protocol: protocol,
         type: meter_type,
-        options: meter_options,
+        options: { ...meter_options },
         communication_options: communication_options,
         device_image: undefined,
         current_image_url: undefined,

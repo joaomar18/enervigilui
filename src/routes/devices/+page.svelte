@@ -32,7 +32,9 @@
             try {
                 const { status, data }: { status: number; data: any } = await getAllDevicesState();
                 if (status !== 200) {
-                    showAlert($texts.errorDevicesState);
+                    showAlert($texts.errorDevicesState, {
+                        error: String(data["error"]),
+                    });
                 } else {
                     devices = data.map((data: DeviceMeter & { image: Record<string, string> }) => {
                         const { image: deviceImage, ...requestDeviceData } = data as DeviceMeter & { image: Record<string, string> };
@@ -42,7 +44,10 @@
                     });
                 }
             } catch (e) {
-                showAlert($texts.errorDevicesState);
+                showAlert($texts.errorDevicesState, {
+                    error: String(e),
+                });
+                console.error(`Could not obtain devices state: ${e}`);
             }
             loadedDone.set(true);
             pollTimer = setTimeout(tick, 2500);

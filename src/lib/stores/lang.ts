@@ -170,20 +170,24 @@ const textsObject: TextsObject = {
         EN: "Add device",
     },
     errorDevicesState: {
-        PT: "Não foi possível obter o estado dos dispositivos do servidor.",
-        EN: "Could not obtain devices status from the server.",
+        PT: "Não foi possível obter o estado dos dispositivos do servidor: {error}",
+        EN: "Could not obtain devices status from the server: {error}",
     },
     errorDeviceConfig: {
-        PT: "Não foi possível obter a configuração para o dispositivo do servidor.",
-        EN: "Could not obtain device configuration from the server.",
+        PT: "Não foi possível obter a configuração para o dispositivo do servidor: {error}",
+        EN: "Could not obtain device configuration from the server: {error}",
     },
     errorDeviceNodesConfig: {
-        PT: "Não foi possível obter a configuração das variáveis para o dispositivo do servidor.",
-        EN: "Could not obtain device variables configuration from the server.",
+        PT: "Não foi possível obter a configuração das variáveis para o dispositivo do servidor: {error}",
+        EN: "Could not obtain device variables configuration from the server: {error}",
     },
     errorEditDeviceParams: {
         PT: "Não foram atribuídos o nome e/ou o id do dispositivo.",
         EN: "The name and/or the id of the device were not assigned.",
+    },
+    errorDefaultImage: {
+        PT: "Não foi possível obter a imagem padrão para o dispositivo: {error}",
+        EN: "Could not obtain the default image for the device: {error}"
     },
     deviceCommunication: {
         PT: "Comunicação do Dispositivo",
@@ -663,16 +667,16 @@ const textsObject: TextsObject = {
         EN: "Changes have been made to the device configuration that have not been saved. Canceling the edit will discard all changes. Are you sure you want to continue?",
     },
     addDeviceRequestError: {
-        PT: "O servidor não respondeu ao pedido de adição do dispositivo.",
-        EN: "The server did not respond to the device add request.",
+        PT: "O servidor não respondeu ao pedido de adição do dispositivo: {error}",
+        EN: "The server did not respond to the device add request: {error}",
     },
     editDeviceRequestError: {
-        PT: "O servidor não respondeu ao pedido de alteração às configurações do dispositivo.",
-        EN: "The server did not respond to the device configuration change request.",
+        PT: "O servidor não respondeu ao pedido de alteração às configurações do dispositivo: {error}",
+        EN: "The server did not respond to the device configuration change request: {error}",
     },
     deleteDeviceRequestError: {
-        PT: "O servidor não respondeu ao pedido de remoção do dispositivo.",
-        EN: "The server did not respond to the device delete request."
+        PT: "O servidor não respondeu ao pedido de remoção do dispositivo: {error}",
+        EN: "The server did not respond to the device delete request: {error}"
     }
 };
 

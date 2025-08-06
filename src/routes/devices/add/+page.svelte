@@ -85,15 +85,19 @@
             try {
                 const { status, data }: { status: number; data: any } = await getDefaultImage();
                 if (status !== 200) {
-                    showAlert($texts.errorDeviceConfig);
+                    showAlert($texts.errorDefaultImage, {
+                        error: String(data["error"]),
+                    });
                 } else {
                     const deviceImage = data as Record<string, string>;
                     deviceData.current_image_url = `data:${deviceImage["type"]};base64,${deviceImage["data"]}`;
                     sucess = true;
                 }
             } catch (e) {
-                showAlert($texts.errorDeviceConfig);
-                console.error(e);
+                showAlert($texts.errorDefaultImage, {
+                    error: String(e),
+                });
+                console.error(`Could not obtain the devices status: ${e}`);
             }
             loadedDone.set(true);
             if (!sucess) {
@@ -109,10 +113,12 @@
             let convertedNodes = convertToNodes(nodes);
 
             performingAddRequest = true;
-            const { status } = await addDevice(convertToDevice(deviceData), deviceData.device_image, convertedNodes);
+            const { status, data } = await addDevice(convertToDevice(deviceData), deviceData.device_image, convertedNodes);
             performingAddRequest = false;
             if (status !== 200) {
-                showAlert($texts.addDeviceRequestError);
+                showAlert($texts.addDeviceRequestError, {
+                    error: String(data["error"]),
+                });
                 showAddWindow = false;
                 return;
             }
@@ -382,6 +388,7 @@ Shows input forms for protocol-specific parameters and organizes device nodes fo
                             <span class="add-window-text">{$texts.addNewDeviceInfo[$selectedLang]}</span>
                             <div class="button-div save-window-button">
                                 <Button
+                                    processing={performingAddRequest}
                                     buttonText={$texts.confirm[$selectedLang]}
                                     width="150px"
                                     height="40px"
@@ -389,6 +396,11 @@ Shows input forms for protocol-specific parameters and organizes device nodes fo
                                     backgroundColor="#1a8d46"
                                     hoverColor="#17673a"
                                     borderColor="#145a36"
+                                    disabledBackgroundColor="#6a8d76"
+                                    disabledHoverColor="#6a8d76"
+                                    disabledBorderColor="#55705d"
+                                    imageWidth="22px"
+                                    imageHeight="22px"
                                     fontColor="#f5f5f5"
                                     onClick={addDeviceConfirmation}
                                 />
