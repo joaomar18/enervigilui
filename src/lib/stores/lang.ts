@@ -677,6 +677,10 @@ const textsObject: TextsObject = {
     deleteDeviceRequestError: {
         PT: "O servidor não respondeu ao pedido de remoção do dispositivo: {error}",
         EN: "The server did not respond to the device delete request: {error}"
+    },
+    configuration: {
+        PT: "Configuração",
+        EN: "Configuration",
     }
 };
 
