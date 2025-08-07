@@ -294,7 +294,7 @@
         width: 100%;
         height: 100vh;
         min-width: 350px;
-        min-height: 760px;
+        min-height: 600px;
         display: flex;
         align-items: center;
         justify-content: center;
@@ -384,7 +384,7 @@
         padding: 0;
         width: 100%;
         min-width: 350px;
-        min-height: 760px;
+        min-height: 600px;
         display: flex;
         flex-direction: column;
         justify-content: start;
@@ -478,7 +478,7 @@
         position: relative;
         padding-left: 0px;
         height: fit-content;
-        min-height: 760px;
+        min-height: 600px;
         width: 100%;
         transition: padding-left 0.2s ease-in-out;
     }
@@ -667,7 +667,7 @@
     }
 
     /* Ensure content fills taller viewports */
-    @media (min-height: 760px) {
+    @media (min-height: 600px) {
         .dashboard-container .content {
             min-height: calc(100vh - 74px);
         }
