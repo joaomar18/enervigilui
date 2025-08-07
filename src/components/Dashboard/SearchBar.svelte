@@ -1,4 +1,11 @@
 <script lang="ts">
+    import { onMount } from "svelte";
+    import { browser } from "$app/environment";
+    import { replaceState } from "$app/navigation";
+
+    // Props
+    export let searchString: string;
+
     // Layout / styling props
     export let width: string;
     export let minWidth: string;
@@ -15,6 +22,52 @@
     export let selectedBorderColor: string = backgroundColor;
     export let imageWidth: string;
     export let imageHeight: string;
+
+    // Variables
+    let inputValue: string;
+    let currentSearchString: string;
+    let inputElement: HTMLInputElement;
+
+    // Sync input value when search string changes externally
+    $: if (currentSearchString !== searchString) {
+        currentSearchString = searchString;
+        inputValue = searchString;
+    }
+
+    // Click Export Function
+    export let onClick: () => void;
+
+    // Functions
+    function changeSearchQuery(searchQuery: string): void {
+        searchString = searchQuery;
+
+        if (!browser) return;
+
+        const params = new URLSearchParams(window.location.search);
+        params.set("searchQuery", searchQuery);
+        const newUrl = `${window.location.pathname}?${params.toString()}`;
+
+        replaceState(newUrl, {});
+    }
+
+    function handleChange() {
+        changeSearchQuery(inputValue);
+        if (onClick) {
+            onClick();
+        }
+    }
+
+    function handleKeydown(event: KeyboardEvent) {
+        if (event.key === "Enter") {
+            handleChange();
+        } else if (event.key === "Escape") {
+            inputElement.blur();
+        }
+    }
+
+    onMount(() => {
+        inputValue = searchString;
+    });
 </script>
 
 <!-- 
@@ -39,7 +92,14 @@
             "
             class="search-bar-div"
         >
-            <input type="text" placeholder={placeholderText} name="Search Bar" />
+            <input
+                type="text"
+                placeholder={placeholderText}
+                name="Search Bar"
+                bind:this={inputElement}
+                bind:value={inputValue}
+                on:keydown={handleKeydown}
+            />
         </div>
         <div
             style="
@@ -54,7 +114,7 @@
             class="search-button-div"
         >
             <img src="/img/search.png" alt="Search Loop" />
-            <button aria-label="Search Button"></button>
+            <button aria-label="Search Button" on:click={handleChange}></button>
         </div>
     </div>
 </div>

@@ -22,9 +22,10 @@
     import { displayAlert, displayAsInfo, alertText, alertTimeout } from "$lib/stores/alerts";
 
     // Authorization stores
-    import { splashDone, loadedDone, showSubLoader, leftPanelOpen } from "$lib/stores/navigation";
+    import { splashDone, loadedDone, showSubLoader, leftPanelOpen, searchQuery } from "$lib/stores/navigation";
+    import { setSearchQuery } from "$lib/ts/navigation";
 
-    //Variables
+    // Variables
     let shouldRedirect: boolean = false;
     let redirectTarget: string | undefined = undefined;
 
@@ -33,7 +34,7 @@
     let leftHeaderEl: Node;
     let headerEl: Node;
 
-    //Check Auto-login Function
+    // Check Auto-login Function
     async function checkAuthentication() {
         const path = window.location.pathname;
 
@@ -63,12 +64,21 @@
         }
     }
 
-    //Function to wait for authentication while showing an initial loader screen with minimum display time
+    // Get Search Query Function
+    async function getSearchQuery() {
+        const path = window.location.pathname;
+        const params = new URLSearchParams(window.location.search);
+        const searchQuery = params.get("searchQuery") ?? "";
+        setSearchQuery(path, searchQuery);
+    }
+
+    // Function to wait for authentication while showing an initial loader screen with minimum display time
     async function waitInitialSplash(minSplashDuration: number): Promise<void> {
         const authPromise = checkAuthentication();
+        const getSearchQueryPromise = getSearchQuery();
         const timerPromise = new Promise((res) => setTimeout(res, minSplashDuration));
 
-        await Promise.all([authPromise, timerPromise]);
+        await Promise.all([authPromise, getSearchQueryPromise, timerPromise]);
 
         if (shouldRedirect && redirectTarget) {
             await navigateTo(redirectTarget, $selectedLang);
@@ -77,14 +87,14 @@
         splashDone.set(true);
     }
 
-    //Function to handle clicks outside header element
+    // Function to handle clicks outside header element
     function handleClickOutsideHeader(event: MouseEvent): void {
         if (leftHeaderEl && headerEl && !leftHeaderEl.contains(event.target as Node) && !headerEl.contains(event.target as Node)) {
             mobileSearchOpen = false;
         }
     }
 
-    //On Mount Function
+    // On Mount Function
     onMount(() => {
         leftPanelOpen.set(window.matchMedia("(min-width: 880px)").matches);
 
@@ -109,7 +119,7 @@
         };
     });
 
-    //Logout Function
+    // Logout Function
     async function logout(): Promise<void> {
         const { status } = await logoutUser();
         await navigateTo("/login", $selectedLang, {}, true);
@@ -180,6 +190,10 @@
             <div class="main-header-div" class:collapse={mobileSearchOpen}>
                 <div class="search-bar-div" class:open={mobileSearchOpen}>
                     <SearchBar
+                        onClick={async () => {
+                            await navigateTo("/devices", $selectedLang, { searchQuery: $searchQuery });
+                        }}
+                        bind:searchString={$searchQuery}
                         width="80%"
                         minWidth="250px"
                         maxWidth="650px"

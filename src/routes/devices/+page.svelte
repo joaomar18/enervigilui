@@ -1,6 +1,6 @@
 <script lang="ts">
     import { navigateTo } from "$lib/ts/navigation";
-    import { getAllDevicesState } from "$lib/ts/devices";
+    import { filterDevices, getAllDevicesState } from "$lib/ts/devices";
 
     // Stores for multi-language support
     import { texts, selectedLang } from "$lib/stores/lang";
@@ -9,7 +9,7 @@
     import { showAlert } from "$lib/stores/alerts";
 
     // Stores for authorization
-    import { loadedDone } from "$lib/stores/navigation";
+    import { loadedDone, searchQuery } from "$lib/stores/navigation";
 
     //Types
     import type { DeviceMeter } from "$lib/stores/devices";
@@ -24,7 +24,7 @@
     let devicesImg: Record<number, string> = {};
 
     // Sorted devices
-    $: sortedDevices = Array.isArray(devices) ? [...devices].sort((a, b) => a.id - b.id) : [];
+    $: sortedDevices = filterDevices(devices, $searchQuery);
 
     // Function to poll devices status
     function startPolling() {

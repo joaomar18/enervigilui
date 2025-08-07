@@ -166,6 +166,41 @@ export async function deleteDevice(
 }
 
 /**
+ * Filters an array of devices based on a search query matching device name or ID.
+ * Handles partial matching for names and supports numeric ID matching with leading zeros.
+ *
+ * @param devices - Array of DeviceMeter objects to filter
+ * @param searchQuery - Search string to match against device names and IDs
+ * @returns Filtered array of devices sorted by ID, or all devices if search query is empty
+ */
+export function filterDevices(devices: Array<DeviceMeter>, searchQuery: string): Array<DeviceMeter> {
+    let filteredDevices: Array<DeviceMeter> = Array.isArray(devices) ? [...devices].sort((a, b) => a.id - b.id) : [];
+
+    if (!searchQuery || searchQuery.trim() === "") {
+        return filteredDevices;
+    }
+
+    const query = searchQuery.trim().toLowerCase();
+
+    // Filter devices that match the search query in name or ID
+    filteredDevices = filteredDevices.filter(device => {
+        const nameMatch = device.name.toLowerCase().includes(query);
+
+        // ID matching: handle both partial string matching and numeric matching with leading zeros
+        const idString = device.id.toString();
+        const partialIdMatch = idString.includes(query);
+
+        // For numeric queries, parse and compare the numeric values to handle leading zeros
+        const numericMatch = !isNaN(parseInt(query)) &&
+            parseInt(query) === device.id;
+
+        return nameMatch || partialIdMatch || numericMatch;
+    });
+
+    return filteredDevices;
+}
+
+/**
  * Converts a DeviceMeter object to an EditableDeviceMeter for form handling.
  * This function transforms the device configuration data structure to support
  * form input handling where all communication parameters need to be strings.
@@ -240,7 +275,7 @@ export function convertToEditableDevice(device: DeviceMeter, deviceImage: Record
         name: device.name,
         protocol: device.protocol,
         type: device.type,
-        options: device.options,
+        options: { ...device.options },
         communication_options: editableCommunicationOptions,
         device_image: undefined,
         current_image_url: `data:${deviceImage["type"]};base64,${deviceImage["data"]}`,
@@ -317,7 +352,7 @@ export function convertToDevice(device: EditableDeviceMeter | NewDeviceMeter): D
         name: device.name,
         protocol: device.protocol,
         type: device.type,
-        options: device.options,
+        options: { ...device.options },
         communication_options: communicationOptions,
     };
 

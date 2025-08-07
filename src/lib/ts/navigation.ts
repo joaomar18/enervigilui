@@ -2,21 +2,22 @@ import { goto } from "$app/navigation";
 import { get } from "svelte/store";
 
 // Splash screen store
-import { splashDone, loadedDone, showSubLoader, leftPanelOpen } from "../stores/navigation";
+import { splashDone, loadedDone, showSubLoader, leftPanelOpen, searchQuery } from "../stores/navigation";
 
 let resetSubLoaderSub: (() => void) | null = null; //Subscription to reset sub loader
 let subLoaderTimer: ReturnType<typeof setTimeout> | null = null; // Timeout to set sub loader in case of delay
 
 /**
- * Builds navigation URLs with query parameters.
+ * Builds navigation URLs with query parameters and returns navigation route information.
  *
  * Appends all extra parameters except 'lang', then appends the language code as the final query parameter.
- * Returns the intended navigation URL and the current URL for comparison.
+ * Returns the complete target URL, target route, current route, and extracted search query for navigation comparison.
  *
  * @param url - The base URL or route to navigate to (without query parameters).
  * @param lang - Language code to append as the final 'lang' query parameter.
  * @param extraParams - Additional key/value pairs to include in the query string (excluding 'lang').
- * @returns [target, current] - Array with the intended navigation URL and the current URL.
+ * @returns [target, targetRoute, currentRoute, searchQuery] 
+ * - Array with the complete target URL with query params, target route path, current route path, and extracted search query string.
  */
 function getNavigationReady(url: string, lang: string, extraParams: Record<string, string> = {}): Array<string> {
     const params = new URLSearchParams();
@@ -26,8 +27,11 @@ function getNavigationReady(url: string, lang: string, extraParams: Record<strin
     params.append("lang", lang);
 
     const target = `${url}?${params.toString()}`;
-    const current = window.location.pathname + window.location.search;
-    return [target, current];
+    const targetRoute = url;
+    const currentRoute = window.location.pathname;
+    const searchQuery = params.get("searchQuery") ?? "";
+
+    return [target, targetRoute, currentRoute, searchQuery];
 }
 
 /**
@@ -78,6 +82,23 @@ function setSubLoaderTrigger(showSubLoaderTime: number) {
 }
 
 /**
+ * Sets the search query state based on the target route.
+ *
+ * Clears the search query for all routes except "/devices" where it preserves the search string.
+ * This ensures search functionality is only active on the devices page.
+ *
+ * @param targetRoute - The route being navigated to.
+ * @param searchString - The search query string to set (only used for "/devices" route).
+ */
+export function setSearchQuery(targetRoute: string, searchString: string) {
+    if (targetRoute !== "/devices") {
+        searchQuery.set("");
+    } else {
+        searchQuery.set(searchString);
+    }
+}
+
+/**
  * Navigates to a new URL, appending extra query parameters and a `lang` parameter,
  * with optional splash screen and sub-loader logic.
  *
@@ -89,14 +110,22 @@ function setSubLoaderTrigger(showSubLoaderTime: number) {
  * @param showSubLoaderTime - Time in ms before showing the sub-loader if loading is not complete. Defaults to `600`.
  * @returns Promise<void> Resolves after navigation and splash screen (if enabled) are complete.
  *
+ * @description This function handles:
+ * - Building the complete URL with query parameters
+ * - Checking if already on the target route (skips navigation if true)
+ * - Setting up sub-loader timing for delayed page loads
+ * - Managing search query state based on the target route
+ * - Optional splash screen with minimum duration
+ * - Closing left panel on mobile devices after navigation
+ *
  * @example
  * // Navigate with only language
  * navigateTo('/devices/edit', 'PT');
  * // → /devices/edit?lang=PT
  *
- * // With extra parameters
- * navigateTo('/devices/edit', 'PT', { foo: 'bar' });
- * // → /devices/edit?foo=bar&lang=PT
+ * // With extra parameters (including search)
+ * navigateTo('/devices', 'PT', { searchQuery: 'meter' });
+ * // → /devices?searchQuery=meter&lang=PT
  *
  * // With splash screen and custom duration
  * navigateTo('/home', 'EN', { ref: '123' }, true, 500)
@@ -113,25 +142,24 @@ export async function navigateTo(
     minSplashDuration: number = 300,
     showSubLoaderTime: number = 600
 ): Promise<void> {
-    let [target, current] = getNavigationReady(url, lang, extraParams);
+    let [target, targetRoute, currentRoute, searchQuery] = getNavigationReady(url, lang, extraParams);
 
     // Already in Intended URL
-    if (target === current) {
+    if (targetRoute === currentRoute) {
         return;
     }
 
     resetSubLoaderTrigger();
+    loadedDone.set(false);
+    setSubLoaderTrigger(showSubLoaderTime);
+    setSearchQuery(targetRoute, searchQuery);
 
     let gotoPromise = goto(target);
     let timerPromise = Promise.resolve();
-
     if (splashScreen) {
         splashDone.set(false);
         timerPromise = new Promise((res) => setTimeout(res, minSplashDuration));
     }
-    loadedDone.set(false);
-
-    setSubLoaderTrigger(showSubLoaderTime);
 
     await Promise.all([gotoPromise, timerPromise]);
 

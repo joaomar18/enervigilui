@@ -64,11 +64,12 @@
 </script>
 
 <!-- 
-  InfoHint: Interactive info component with toggleable hint box.
-  - Displays a message with an icon.
-  - On click, toggles between "info" and "close" icons.
-  - Reveals a hint box with slotted content.
-  - Fully customizable via props for size, colors, and border styles.
+  ExpandableButton: Interactive expandable button component with toggleable modal.
+  - Displays a three-dot icon that toggles to a close (X) icon when clicked.
+  - On click, reveals/hides an expandable modal with slotted content.
+  - Supports validation states with different color schemes.
+  - Fully customizable via props for size, colors, border styles, and positioning.
+  - Includes click-outside-to-close functionality.
 -->
 <div class="button-div">
     <div
@@ -126,6 +127,7 @@
 </div>
 
 <style>
+    /* Container for expandable button and modal - flexbox layout with relative positioning for modal placement */
     .button-div {
         width: fit-content;
         height: fit-content;

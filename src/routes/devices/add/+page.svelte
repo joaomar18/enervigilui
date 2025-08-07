@@ -385,25 +385,27 @@ Shows input forms for protocol-specific parameters and organizes device nodes fo
                                 showAddWindow = false;
                             }}
                         >
-                            <span class="add-window-text">{$texts.addNewDeviceInfo[$selectedLang]}</span>
-                            <div class="button-div save-window-button">
-                                <Button
-                                    processing={performingAddRequest}
-                                    buttonText={$texts.confirm[$selectedLang]}
-                                    width="150px"
-                                    height="40px"
-                                    borderRadius="5px"
-                                    backgroundColor="#1a8d46"
-                                    hoverColor="#17673a"
-                                    borderColor="#145a36"
-                                    disabledBackgroundColor="#6a8d76"
-                                    disabledHoverColor="#6a8d76"
-                                    disabledBorderColor="#55705d"
-                                    imageWidth="22px"
-                                    imageHeight="22px"
-                                    fontColor="#f5f5f5"
-                                    onClick={addDeviceConfirmation}
-                                />
+                            <div class="modal-window-div">
+                                <span class="add-window-text">{$texts.addNewDeviceInfo[$selectedLang]}</span>
+                                <div class="button-div save-window-button">
+                                    <Button
+                                        processing={performingAddRequest}
+                                        buttonText={$texts.confirm[$selectedLang]}
+                                        width="150px"
+                                        height="40px"
+                                        borderRadius="5px"
+                                        backgroundColor="#1a8d46"
+                                        hoverColor="#17673a"
+                                        borderColor="#145a36"
+                                        disabledBackgroundColor="#6a8d76"
+                                        disabledHoverColor="#6a8d76"
+                                        disabledBorderColor="#55705d"
+                                        imageWidth="22px"
+                                        imageHeight="22px"
+                                        fontColor="#f5f5f5"
+                                        onClick={addDeviceConfirmation}
+                                    />
+                                </div>
                             </div>
                         </ModalWindow>
                     </div>
@@ -603,6 +605,20 @@ Shows input forms for protocol-specific parameters and organizes device nodes fo
         display: flex;
         justify-content: center;
         align-items: center;
+    }
+
+    /* Modal window content container styling */
+    .overlay-device-div-content .window-div .modal-window-div {
+        position: relative;
+        margin: 0;
+        padding: 0;
+        width: 100%;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        justify-content: start;
+        align-items: center;
+        gap: 20px;
     }
 
     /* Modal window text styling */

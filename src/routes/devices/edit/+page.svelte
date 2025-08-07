@@ -531,44 +531,46 @@ Shows input forms for protocol-specific parameters and organizes device nodes fo
                                 showDeleteWindow = false;
                             }}
                         >
-                            <span>{$texts.deleteDeviceInfo[$selectedLang]}</span>
-                            <div class="input-field-div">
-                                <InputField
-                                    bind:inputValue={deleteDeviceName}
-                                    infoText={$texts.confirmDeleteDevice[$selectedLang]}
-                                    width="100%"
-                                    height="40px"
-                                    borderRadius="5px"
-                                    backgroundColor="#23272f"
-                                    borderColor="#323a45"
-                                    selectedBackgroundColor="#252b33"
-                                    selectedBorderColor="#e74c3c"
-                                    fontSize="1rem"
-                                    fontColor="#f5f5f5"
-                                    fontWeight="400"
-                                    infoTextColor="rgb(170, 170, 170)"
-                                    infoTextSize="0.95rem"
-                                />
-                            </div>
-                            <div class="button-div">
-                                <Button
-                                    processing={performingDeleteRequest}
-                                    enabled={deleteDeviceName === deviceData.name}
-                                    buttonText={$texts.confirm[$selectedLang]}
-                                    width="150px"
-                                    height="40px"
-                                    borderRadius="5px"
-                                    backgroundColor="#E74C3C"
-                                    hoverColor="#C0392B"
-                                    borderColor="#A93226"
-                                    disabledBackgroundColor="#3a2323"
-                                    disabledHoverColor="#2a1818"
-                                    disabledBorderColor="#5a3a3a"
-                                    imageWidth="22px"
-                                    imageHeight="22px"
-                                    fontColor="#f5f5f5"
-                                    onClick={deleteDeviceConfirmation}
-                                />
+                            <div class="modal-window-div">
+                                <span>{$texts.deleteDeviceInfo[$selectedLang]}</span>
+                                <div class="input-field-div">
+                                    <InputField
+                                        bind:inputValue={deleteDeviceName}
+                                        infoText={$texts.confirmDeleteDevice[$selectedLang]}
+                                        width="100%"
+                                        height="40px"
+                                        borderRadius="5px"
+                                        backgroundColor="#23272f"
+                                        borderColor="#323a45"
+                                        selectedBackgroundColor="#252b33"
+                                        selectedBorderColor="#e74c3c"
+                                        fontSize="1rem"
+                                        fontColor="#f5f5f5"
+                                        fontWeight="400"
+                                        infoTextColor="rgb(170, 170, 170)"
+                                        infoTextSize="0.95rem"
+                                    />
+                                </div>
+                                <div class="button-div">
+                                    <Button
+                                        processing={performingDeleteRequest}
+                                        enabled={deleteDeviceName === deviceData.name}
+                                        buttonText={$texts.confirm[$selectedLang]}
+                                        width="150px"
+                                        height="40px"
+                                        borderRadius="5px"
+                                        backgroundColor="#E74C3C"
+                                        hoverColor="#C0392B"
+                                        borderColor="#A93226"
+                                        disabledBackgroundColor="#3a2323"
+                                        disabledHoverColor="#2a1818"
+                                        disabledBorderColor="#5a3a3a"
+                                        imageWidth="22px"
+                                        imageHeight="22px"
+                                        fontColor="#f5f5f5"
+                                        onClick={deleteDeviceConfirmation}
+                                    />
+                                </div>
                             </div>
                         </ModalWindow>
                     </div>
@@ -592,19 +594,21 @@ Shows input forms for protocol-specific parameters and organizes device nodes fo
                                 showCancelWindow = false;
                             }}
                         >
-                            <span class="save-window-text">{$texts.cancelDeviceEditInfo[$selectedLang]}</span>
-                            <div class="button-div save-window-button">
-                                <Button
-                                    buttonText={$texts.confirm[$selectedLang]}
-                                    width="150px"
-                                    height="40px"
-                                    borderRadius="5px"
-                                    backgroundColor="#3a3a3a"
-                                    hoverColor="#4b4b4b"
-                                    borderColor="#5c5c5c"
-                                    fontColor="#f5f5f5"
-                                    onClick={cancelEdit}
-                                />
+                            <div class="modal-window-div">
+                                <span class="save-window-text">{$texts.cancelDeviceEditInfo[$selectedLang]}</span>
+                                <div class="button-div save-window-button">
+                                    <Button
+                                        buttonText={$texts.confirm[$selectedLang]}
+                                        width="150px"
+                                        height="40px"
+                                        borderRadius="5px"
+                                        backgroundColor="#3a3a3a"
+                                        hoverColor="#4b4b4b"
+                                        borderColor="#5c5c5c"
+                                        fontColor="#f5f5f5"
+                                        onClick={cancelEdit}
+                                    />
+                                </div>
                             </div>
                         </ModalWindow>
                     </div>
@@ -628,25 +632,27 @@ Shows input forms for protocol-specific parameters and organizes device nodes fo
                                 showSaveWindow = false;
                             }}
                         >
-                            <span class="save-window-text">{$texts.saveDeviceInfo[$selectedLang]}</span>
-                            <div class="button-div save-window-button">
-                                <Button
-                                    processing={performingSaveRequest}
-                                    buttonText={$texts.confirm[$selectedLang]}
-                                    width="150px"
-                                    height="40px"
-                                    borderRadius="5px"
-                                    backgroundColor="#2F80ED"
-                                    hoverColor="#1C6DD0"
-                                    borderColor="#1456B0"
-                                    disabledBackgroundColor="#7da5d9"
-                                    disabledHoverColor="#7da5d9"
-                                    disabledBorderColor="#6287b6"
-                                    imageWidth="22px"
-                                    imageHeight="22px"
-                                    fontColor="#f5f5f5"
-                                    onClick={editDeviceConfirmation}
-                                />
+                            <div class="modal-window-div">
+                                <span class="save-window-text">{$texts.saveDeviceInfo[$selectedLang]}</span>
+                                <div class="button-div save-window-button">
+                                    <Button
+                                        processing={performingSaveRequest}
+                                        buttonText={$texts.confirm[$selectedLang]}
+                                        width="150px"
+                                        height="40px"
+                                        borderRadius="5px"
+                                        backgroundColor="#2F80ED"
+                                        hoverColor="#1C6DD0"
+                                        borderColor="#1456B0"
+                                        disabledBackgroundColor="#7da5d9"
+                                        disabledHoverColor="#7da5d9"
+                                        disabledBorderColor="#6287b6"
+                                        imageWidth="22px"
+                                        imageHeight="22px"
+                                        fontColor="#f5f5f5"
+                                        onClick={editDeviceConfirmation}
+                                    />
+                                </div>
                             </div>
                         </ModalWindow>
                     </div>
@@ -856,6 +862,20 @@ Shows input forms for protocol-specific parameters and organizes device nodes fo
         display: flex;
         justify-content: center;
         align-items: center;
+    }
+
+    /* Modal window content container styling */
+    .overlay-device-div-content .window-div .modal-window-div {
+        position: relative;
+        margin: 0;
+        padding: 0;
+        width: 100%;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        justify-content: start;
+        align-items: center;
+        gap: 20px;
     }
 
     /* Modal window text styling */
