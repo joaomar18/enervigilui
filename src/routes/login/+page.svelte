@@ -28,7 +28,7 @@
         width: 100%;
         height: 100vh;
         min-width: 350px;
-        min-height: 760px;
+        min-height: 600px;
         display: grid;
         grid-template-columns: 1fr;
         align-items: center;
