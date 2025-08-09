@@ -28,7 +28,7 @@ import { texts } from "$lib/stores/lang";
 export async function getAllDevicesState(
     timeout: number = 3000
 ): Promise<{ status: number; data: any }> {
-    return makeAPIRequest("/api/get_all_device_state", "GET", {}, timeout);
+    return makeAPIRequest("/api/device/get_all_devices_state", "GET", {}, timeout);
 }
 
 /**
@@ -49,7 +49,7 @@ export async function getDeviceState(
     id: number,
     timeout: number = 3000
 ): Promise<{ status: number; data: any }> {
-    return makeAPIRequest("/api/get_device_state", "GET", { id }, timeout);
+    return makeAPIRequest("/api/device/get_device_state", "GET", { id }, timeout);
 }
 
 /**
@@ -68,7 +68,7 @@ export async function getDeviceState(
 export async function getDefaultImage(
     timeout: number = 3000
 ): Promise<{ status: number; data: any }> {
-    return makeAPIRequest("/api/get_default_image", "GET", {}, timeout);
+    return makeAPIRequest("/api/device/get_default_image", "GET", {}, timeout);
 }
 
 /**
@@ -89,7 +89,7 @@ export async function getDeviceNodesConfig(
     id: number,
     timeout: number = 3000
 ): Promise<{ status: number; data: any }> {
-    return makeAPIRequest("/api/get_nodes_config", "GET", { id }, timeout);
+    return makeAPIRequest("/api/nodes/get_nodes_config", "GET", { id }, timeout);
 }
 
 /**
@@ -114,7 +114,7 @@ export async function addDevice(
     deviceNodes: Array<DeviceNode>,
     timeout: number = 3000
 ): Promise<{ status: number; data: any }> {
-    return makeAPIRequest("/api/add_device", "POST", { deviceData, deviceNodes }, timeout, deviceImage, "deviceImage");
+    return makeAPIRequest("/api/device/add_device", "POST", { deviceData, deviceNodes }, timeout, deviceImage, "deviceImage");
 }
 
 /**
@@ -139,7 +139,7 @@ export async function editDevice(
     deviceNodes: Array<DeviceNode>,
     timeout: number = 3000
 ): Promise<{ status: number; data: any }> {
-    return makeAPIRequest("/api/edit_device", "POST", { deviceData, deviceNodes }, timeout, deviceImage, "deviceImage");
+    return makeAPIRequest("/api/device/edit_device", "POST", { deviceData, deviceNodes }, timeout, deviceImage, "deviceImage");
 }
 
 /**
@@ -162,7 +162,7 @@ export async function deleteDevice(
     deviceID: number,
     timeout: number = 3000
 ): Promise<{ status: number; data: any }> {
-    return makeAPIRequest("/api/delete_device", "DELETE", { deviceName, deviceID }, timeout);
+    return makeAPIRequest("/api/device/delete_device", "DELETE", { deviceName, deviceID }, timeout);
 }
 
 /**

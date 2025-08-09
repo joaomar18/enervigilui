@@ -28,7 +28,7 @@ export async function loginUser(
     timeout: number = 3000
 ): Promise<{ status: number; data: any }> {
     return makeAPIRequest(
-        "/api/login",
+        "/api/auth/login",
         "POST",
         {
             username,
@@ -57,7 +57,7 @@ export async function loginUser(
  * const { status, data } = await autoLogin(5000); // 5 second timeout
  */
 export async function autoLogin(timeout: number = 3000): Promise<{ status: number; data: any }> {
-    return makeAPIRequest("/api/auto_login", "POST", {}, timeout);
+    return makeAPIRequest("/api/auth/auto_login", "POST", {}, timeout);
 }
 
 /**
@@ -77,7 +77,7 @@ export async function autoLogin(timeout: number = 3000): Promise<{ status: numbe
  * const { status, data } = await logoutUser(5000); // 5 second timeout
  */
 export async function logoutUser(timeout: number = 3000): Promise<{ status: number; data: any }> {
-    return makeAPIRequest("/api/logout", "POST", {}, timeout);
+    return makeAPIRequest("/api/auth/logout", "POST", {}, timeout);
 }
 
 /**
