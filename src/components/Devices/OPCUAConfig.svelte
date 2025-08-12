@@ -41,15 +41,6 @@
                 enableInputInvalid={true}
                 width="100%"
                 height="40px"
-                borderRadius="5px"
-                backgroundColor="#252b33"
-                borderColor="#323a45"
-                selectedBackgroundColor="#252b33"
-                selectedBorderColor="#2F80ED"
-                badFormatBorderColor="#e74c3c"
-                fontSize="1rem"
-                fontColor="#f5f5f5"
-                fontWeight="400"
             />
         </div>
         <div class="info-div">
@@ -95,17 +86,6 @@
                 }}
                 width="100%"
                 height="40px"
-                borderRadius="5px"
-                backgroundColor="#252b33"
-                borderColor="#323a45"
-                selectedBackgroundColor="#252b33"
-                selectedBorderColor="#2F80ED"
-                badFormatBorderColor="#e74c3c"
-                fontSize="1rem"
-                fontColor="#f5f5f5"
-                fontWeight="400"
-                textAlign="center"
-                unitTextColor="rgb(170,170,170)"
             />
         </div>
         <div class="info-div">
@@ -151,17 +131,6 @@
                 }}
                 width="100%"
                 height="40px"
-                borderRadius="5px"
-                backgroundColor="#252b33"
-                borderColor="#323a45"
-                selectedBackgroundColor="#252b33"
-                selectedBorderColor="#2F80ED"
-                badFormatBorderColor="#e74c3c"
-                fontSize="1rem"
-                fontColor="#f5f5f5"
-                fontWeight="400"
-                textAlign="center"
-                unitTextColor="rgb(170,170,170)"
             />
         </div>
         <div class="info-div">
@@ -197,14 +166,6 @@
                     bind:inputValue={opcuaConfig.username}
                     width="100%"
                     height="40px"
-                    borderRadius="5px"
-                    backgroundColor="#252b33"
-                    borderColor="#323a45"
-                    selectedBackgroundColor="#252b33"
-                    selectedBorderColor="#2F80ED"
-                    fontSize="1rem"
-                    fontColor="#f5f5f5"
-                    fontWeight="400"
                 />
             </div>
             <div class="info-div">
@@ -239,14 +200,6 @@
                     inputType="PASSWORD"
                     width="100%"
                     height="40px"
-                    borderRadius="5px"
-                    backgroundColor="#252b33"
-                    borderColor="#323a45"
-                    selectedBackgroundColor="#252b33"
-                    selectedBorderColor="#2F80ED"
-                    fontSize="1rem"
-                    fontColor="#f5f5f5"
-                    fontWeight="400"
                 />
             </div>
             <div class="info-div">

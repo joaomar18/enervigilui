@@ -8,6 +8,9 @@
     // Stores for multi-language support
     import { texts, baudrateTexts, parityTexts, bytesizeTexts, stopbitsTexts, selectedLang } from "$lib/stores/lang";
 
+    // Styles
+    import { SelectorStyle, InputFieldStyle, HintInfoStyle } from "$lib/style/components";
+
     // Stores for alerts
     import { showAlert } from "$lib/stores/alerts";
 
@@ -54,41 +57,10 @@
     <span>{$texts.communicationPort[$selectedLang]}</span>
     <div class="input-div">
         <div class="input-content-div">
-            <InputField
-                bind:inputValue={modbusRTUConfig.port}
-                inputInvalid={!validModbusRtuPort}
-                enableInputInvalid={true}
-                width="100%"
-                height="40px"
-                borderRadius="5px"
-                backgroundColor="#252b33"
-                borderColor="#323a45"
-                selectedBackgroundColor="#252b33"
-                selectedBorderColor="#2F80ED"
-                badFormatBorderColor="#e74c3c"
-                fontSize="1rem"
-                fontColor="#f5f5f5"
-                fontWeight="400"
-            />
+            <InputField bind:inputValue={modbusRTUConfig.port} inputInvalid={!validModbusRtuPort} enableInputInvalid={true} style={InputFieldStyle} />
         </div>
         <div class="info-div">
-            <HintInfo
-                labelText=""
-                hintWidth="300px"
-                hintHeight="fit-content"
-                hintBackgroundColor="#1e242b"
-                hintBorderColor="#2c343d"
-                hintBorderRadius="10px"
-                textColor="#f5f5f5"
-                openBackgroundColor="rgba(255, 255, 255, 0.05)"
-                openHoverBackgroundColor="rgba(255, 255, 255, 0.1)"
-                openStrokeColor="#cccccc"
-                openHoverStrokeColor="#eeeeee"
-                closeBackgroundColor="rgba(255, 255, 255, 0.1)"
-                closeHoverBackgroundColor="rgba(255, 255, 255, 0.2)"
-                closeStrokeColor="white"
-                closeHoverStrokeColor="#eeeeee"
-            >
+            <HintInfo style={HintInfoStyle}>
                 <span class="info-text">{$texts.communicationPortInfo[$selectedLang]}</span>
             </HintInfo>
         </div>
@@ -112,38 +84,11 @@
                         maxValue: SLAVE_ID_LIM.MAX,
                     });
                 }}
-                width="100%"
-                height="40px"
-                borderRadius="5px"
-                backgroundColor="#252b33"
-                borderColor="#323a45"
-                selectedBackgroundColor="#252b33"
-                selectedBorderColor="#2F80ED"
-                badFormatBorderColor="#e74c3c"
-                fontSize="1rem"
-                fontColor="#f5f5f5"
-                fontWeight="400"
-                textAlign="center"
+                style={InputFieldStyle}
             />
         </div>
         <div class="info-div">
-            <HintInfo
-                labelText=""
-                hintWidth="300px"
-                hintHeight="fit-content"
-                hintBackgroundColor="#1e242b"
-                hintBorderColor="#2c343d"
-                hintBorderRadius="10px"
-                textColor="#f5f5f5"
-                openBackgroundColor="rgba(255, 255, 255, 0.05)"
-                openHoverBackgroundColor="rgba(255, 255, 255, 0.1)"
-                openStrokeColor="#cccccc"
-                openHoverStrokeColor="#eeeeee"
-                closeBackgroundColor="rgba(255, 255, 255, 0.1)"
-                closeHoverBackgroundColor="rgba(255, 255, 255, 0.2)"
-                closeStrokeColor="white"
-                closeHoverStrokeColor="#eeeeee"
-            >
+            <HintInfo style={HintInfoStyle}>
                 <span class="info-text">{$texts.slaveIDInfo[$selectedLang]}</span>
             </HintInfo>
         </div>
@@ -160,40 +105,10 @@
             inputInvalid={!validBaudrate}
             enableInputInvalid={true}
             scrollable={true}
-            maxOptions={5}
-            width="200px"
-            height="40px"
-            borderRadius="5px"
-            backgroundColor="#252b33"
-            borderColor="#323a45"
-            selectedColor="#14566b"
-            badFormatBorderColor="#e74c3c"
-            optionsBackgroundColor="#1e242b"
-            optionsBorderColor="#323a45"
-            letterSpacing="0.5px"
-            wordSpacing="1px"
-            arrowWidth="16px"
-            arrowHeight="16px"
-            arrowRightPos="10px"
+            style={SelectorStyle}
         />
         <div class="info-div">
-            <HintInfo
-                labelText=""
-                hintWidth="300px"
-                hintHeight="fit-content"
-                hintBackgroundColor="#1e242b"
-                hintBorderColor="#2c343d"
-                hintBorderRadius="10px"
-                textColor="#f5f5f5"
-                openBackgroundColor="rgba(255, 255, 255, 0.05)"
-                openHoverBackgroundColor="rgba(255, 255, 255, 0.1)"
-                openStrokeColor="#cccccc"
-                openHoverStrokeColor="#eeeeee"
-                closeBackgroundColor="rgba(255, 255, 255, 0.1)"
-                closeHoverBackgroundColor="rgba(255, 255, 255, 0.2)"
-                closeStrokeColor="white"
-                closeHoverStrokeColor="#eeeeee"
-            >
+            <HintInfo style={HintInfoStyle}>
                 <span class="info-text">{$texts.baudrateInfo[$selectedLang]}</span>
             </HintInfo>
         </div>
@@ -210,40 +125,10 @@
             inputInvalid={!validParity}
             enableInputInvalid={true}
             scrollable={true}
-            maxOptions={5}
-            width="200px"
-            height="40px"
-            borderRadius="5px"
-            backgroundColor="#252b33"
-            borderColor="#323a45"
-            selectedColor="#14566b"
-            badFormatBorderColor="#e74c3c"
-            optionsBackgroundColor="#1e242b"
-            optionsBorderColor="#323a45"
-            letterSpacing="0.5px"
-            wordSpacing="1px"
-            arrowWidth="16px"
-            arrowHeight="16px"
-            arrowRightPos="10px"
+            style={SelectorStyle}
         />
         <div class="info-div">
-            <HintInfo
-                labelText=""
-                hintWidth="300px"
-                hintHeight="fit-content"
-                hintBackgroundColor="#1e242b"
-                hintBorderColor="#2c343d"
-                hintBorderRadius="10px"
-                textColor="#f5f5f5"
-                openBackgroundColor="rgba(255, 255, 255, 0.05)"
-                openHoverBackgroundColor="rgba(255, 255, 255, 0.1)"
-                openStrokeColor="#cccccc"
-                openHoverStrokeColor="#eeeeee"
-                closeBackgroundColor="rgba(255, 255, 255, 0.1)"
-                closeHoverBackgroundColor="rgba(255, 255, 255, 0.2)"
-                closeStrokeColor="white"
-                closeHoverStrokeColor="#eeeeee"
-            >
+            <HintInfo style={HintInfoStyle}>
                 <span class="info-text">{$texts.parityInfo[$selectedLang]}</span>
             </HintInfo>
         </div>
@@ -260,40 +145,10 @@
             inputInvalid={!validByteSize}
             enableInputInvalid={true}
             scrollable={true}
-            maxOptions={5}
-            width="200px"
-            height="40px"
-            borderRadius="5px"
-            backgroundColor="#252b33"
-            borderColor="#323a45"
-            selectedColor="#14566b"
-            badFormatBorderColor="#e74c3c"
-            optionsBackgroundColor="#1e242b"
-            optionsBorderColor="#323a45"
-            letterSpacing="0.5px"
-            wordSpacing="1px"
-            arrowWidth="16px"
-            arrowHeight="16px"
-            arrowRightPos="10px"
+            style={SelectorStyle}
         />
         <div class="info-div">
-            <HintInfo
-                labelText=""
-                hintWidth="300px"
-                hintHeight="fit-content"
-                hintBackgroundColor="#1e242b"
-                hintBorderColor="#2c343d"
-                hintBorderRadius="10px"
-                textColor="#f5f5f5"
-                openBackgroundColor="rgba(255, 255, 255, 0.05)"
-                openHoverBackgroundColor="rgba(255, 255, 255, 0.1)"
-                openStrokeColor="#cccccc"
-                openHoverStrokeColor="#eeeeee"
-                closeBackgroundColor="rgba(255, 255, 255, 0.1)"
-                closeHoverBackgroundColor="rgba(255, 255, 255, 0.2)"
-                closeStrokeColor="white"
-                closeHoverStrokeColor="#eeeeee"
-            >
+            <HintInfo style={HintInfoStyle}>
                 <span class="info-text">{$texts.bytesizeInfo[$selectedLang]}</span>
             </HintInfo>
         </div>
@@ -310,40 +165,10 @@
             inputInvalid={!validStopBits}
             enableInputInvalid={true}
             scrollable={true}
-            maxOptions={5}
-            width="200px"
-            height="40px"
-            borderRadius="5px"
-            backgroundColor="#252b33"
-            borderColor="#323a45"
-            selectedColor="#14566b"
-            badFormatBorderColor="#e74c3c"
-            optionsBackgroundColor="#1e242b"
-            optionsBorderColor="#323a45"
-            letterSpacing="0.5px"
-            wordSpacing="1px"
-            arrowWidth="16px"
-            arrowHeight="16px"
-            arrowRightPos="10px"
+            style={SelectorStyle}
         />
         <div class="info-div">
-            <HintInfo
-                labelText=""
-                hintWidth="300px"
-                hintHeight="fit-content"
-                hintBackgroundColor="#1e242b"
-                hintBorderColor="#2c343d"
-                hintBorderRadius="10px"
-                textColor="#f5f5f5"
-                openBackgroundColor="rgba(255, 255, 255, 0.05)"
-                openHoverBackgroundColor="rgba(255, 255, 255, 0.1)"
-                openStrokeColor="#cccccc"
-                openHoverStrokeColor="#eeeeee"
-                closeBackgroundColor="rgba(255, 255, 255, 0.1)"
-                closeHoverBackgroundColor="rgba(255, 255, 255, 0.2)"
-                closeStrokeColor="white"
-                closeHoverStrokeColor="#eeeeee"
-            >
+            <HintInfo style={HintInfoStyle}>
                 <span class="info-text">{$texts.stopbitsInfo[$selectedLang]}</span>
             </HintInfo>
         </div>
@@ -368,39 +193,11 @@
                         maxValue: READ_PERIOD_LIM.MAX,
                     });
                 }}
-                width="100%"
-                height="40px"
-                borderRadius="5px"
-                backgroundColor="#252b33"
-                borderColor="#323a45"
-                selectedBackgroundColor="#252b33"
-                selectedBorderColor="#2F80ED"
-                badFormatBorderColor="#e74c3c"
-                fontSize="1rem"
-                fontColor="#f5f5f5"
-                fontWeight="400"
-                textAlign="center"
-                unitTextColor="rgb(170,170,170)"
+                style={InputFieldStyle}
             />
         </div>
         <div class="info-div">
-            <HintInfo
-                labelText=""
-                hintWidth="300px"
-                hintHeight="fit-content"
-                hintBackgroundColor="#1e242b"
-                hintBorderColor="#2c343d"
-                hintBorderRadius="10px"
-                textColor="#f5f5f5"
-                openBackgroundColor="rgba(255, 255, 255, 0.05)"
-                openHoverBackgroundColor="rgba(255, 255, 255, 0.1)"
-                openStrokeColor="#cccccc"
-                openHoverStrokeColor="#eeeeee"
-                closeBackgroundColor="rgba(255, 255, 255, 0.1)"
-                closeHoverBackgroundColor="rgba(255, 255, 255, 0.2)"
-                closeStrokeColor="white"
-                closeHoverStrokeColor="#eeeeee"
-            >
+            <HintInfo style={HintInfoStyle}>
                 <span class="info-text">{$texts.readPeriodInfo[$selectedLang]}</span>
             </HintInfo>
         </div>
@@ -424,39 +221,11 @@
                         maxValue: TIMEOUT_LIM.MAX,
                     });
                 }}
-                width="100%"
-                height="40px"
-                borderRadius="5px"
-                backgroundColor="#252b33"
-                borderColor="#323a45"
-                selectedBackgroundColor="#252b33"
-                selectedBorderColor="#2F80ED"
-                badFormatBorderColor="#e74c3c"
-                fontSize="1rem"
-                fontColor="#f5f5f5"
-                fontWeight="400"
-                textAlign="center"
-                unitTextColor="rgb(170,170,170)"
+                style={InputFieldStyle}
             />
         </div>
         <div class="info-div">
-            <HintInfo
-                labelText=""
-                hintWidth="300px"
-                hintHeight="fit-content"
-                hintBackgroundColor="#1e242b"
-                hintBorderColor="#2c343d"
-                hintBorderRadius="10px"
-                textColor="#f5f5f5"
-                openBackgroundColor="rgba(255, 255, 255, 0.05)"
-                openHoverBackgroundColor="rgba(255, 255, 255, 0.1)"
-                openStrokeColor="#cccccc"
-                openHoverStrokeColor="#eeeeee"
-                closeBackgroundColor="rgba(255, 255, 255, 0.1)"
-                closeHoverBackgroundColor="rgba(255, 255, 255, 0.2)"
-                closeStrokeColor="white"
-                closeHoverStrokeColor="#eeeeee"
-            >
+            <HintInfo style={HintInfoStyle}>
                 <span class="info-text">{$texts.commTimeoutInfo[$selectedLang]}</span>
             </HintInfo>
         </div>
@@ -479,39 +248,11 @@
                         maxValue: RETRIES_NUMBER_LIM.MAX,
                     });
                 }}
-                width="100%"
-                height="40px"
-                borderRadius="5px"
-                backgroundColor="#252b33"
-                borderColor="#323a45"
-                selectedBackgroundColor="#252b33"
-                selectedBorderColor="#2F80ED"
-                badFormatBorderColor="#e74c3c"
-                fontSize="1rem"
-                fontColor="#f5f5f5"
-                fontWeight="400"
-                textAlign="center"
-                unitTextColor="rgb(170,170,170)"
+                style={InputFieldStyle}
             />
         </div>
         <div class="info-div">
-            <HintInfo
-                labelText=""
-                hintWidth="300px"
-                hintHeight="fit-content"
-                hintBackgroundColor="#1e242b"
-                hintBorderColor="#2c343d"
-                hintBorderRadius="10px"
-                textColor="#f5f5f5"
-                openBackgroundColor="rgba(255, 255, 255, 0.05)"
-                openHoverBackgroundColor="rgba(255, 255, 255, 0.1)"
-                openStrokeColor="#cccccc"
-                openHoverStrokeColor="#eeeeee"
-                closeBackgroundColor="rgba(255, 255, 255, 0.1)"
-                closeHoverBackgroundColor="rgba(255, 255, 255, 0.2)"
-                closeStrokeColor="white"
-                closeHoverStrokeColor="#eeeeee"
-            >
+            <HintInfo style={HintInfoStyle}>
                 <span class="info-text">{$texts.retriesInfo[$selectedLang]}</span>
             </HintInfo>
         </div>

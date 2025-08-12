@@ -2,26 +2,31 @@
     import { onMount, onDestroy } from "svelte";
     import { browser } from "$app/environment";
 
+    // Styles
+    import type { ComponentStyles } from "$lib/style/components";
+    import { getStyle } from "$lib/style/components";
+    import { selectedStyle } from "$lib/style/components";
+
     // Props
     export let openInverted: boolean = false;
+    export let labelText: string = "";
 
     // Layout / styling props
-    export let labelText: string = "";
-    export let hintWidth: string;
-    export let hintHeight: string;
-    export let textColor: string;
-    export let hintBackgroundColor: string;
-    export let hintBorderColor: string = "transparent";
-    export let hintBorderRadius: string = "0px";
-    export let openBackgroundColor: string;
-    export let openHoverBackgroundColor: string = openBackgroundColor;
-    export let openStrokeColor: string;
-    export let openHoverStrokeColor: string = openStrokeColor;
-
-    export let closeBackgroundColor: string;
-    export let closeHoverBackgroundColor: string = closeBackgroundColor;
-    export let closeStrokeColor: string;
-    export let closeHoverStrokeColor: string = closeStrokeColor;
+    export let style: ComponentStyles | null = null;
+    export let hintWidth: string = getStyle(style, "hintWidth", $selectedStyle);
+    export let hintHeight: string = getStyle(style, "hintHeight", $selectedStyle);
+    export let textColor: string = getStyle(style, "textColor", $selectedStyle);
+    export let hintBackgroundColor: string = getStyle(style, "hintBackgroundColor", $selectedStyle);
+    export let hintBorderColor: string = getStyle(style, "hintBorderColor", $selectedStyle);
+    export let hintBorderRadius: string = getStyle(style, "hintBorderRadius", $selectedStyle);
+    export let openBackgroundColor = getStyle(style, "openBackgroundColor", $selectedStyle);
+    export let openHoverBackgroundColor: string = getStyle(style, "openHoverBackgroundColor", $selectedStyle);
+    export let openStrokeColor: string = getStyle(style, "openStrokeColor", $selectedStyle);
+    export let openHoverStrokeColor: string = getStyle(style, "openHoverStrokeColor", $selectedStyle);
+    export let closeBackgroundColor: string = getStyle(style, "closeBackgroundColor", $selectedStyle);
+    export let closeHoverBackgroundColor: string = getStyle(style, "closeHoverBackgroundColor", $selectedStyle);
+    export let closeStrokeColor: string = getStyle(style, "closeStrokeColor", $selectedStyle);
+    export let closeHoverStrokeColor: string = getStyle(style, "closeHoverStrokeColor", $selectedStyle);
 
     // Variables
     let hintOpened: boolean;

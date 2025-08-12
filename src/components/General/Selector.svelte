@@ -5,6 +5,11 @@
     // Stores for multi-language support
     import { selectedLang } from "$lib/stores/lang";
 
+    // Styles
+    import type { ComponentStyles } from "$lib/style/components";
+    import { getStyle } from "$lib/style/components";
+    import { selectedStyle } from "$lib/style/components";
+
     //Props
     export let disabled: boolean = false; // Selector is disabled
     export let useLang: boolean = false; //use language texts in options and selected option
@@ -15,29 +20,30 @@
     export let setSelectedOption: ((value: string) => void) | undefined = undefined; //Function to set the selected option, if not provided, the selectedOption will be updated directly
     export let invertOptions: boolean = false; //Invert Options div position
     export let scrollable: boolean = false; //makes the content scrollable
-    export let maxOptions: number = 0; //if the content is scrollable assigns the maximum number of visible options
+    export let maxOptions: number = 5; //if the content is scrollable assigns the maximum number of visible options
 
     // Layout / styling props
-    export let width: string;
-    export let height: string;
-    export let borderRadius: string = "0px";
-    export let backgroundColor: string;
-    export let borderColor: string = backgroundColor;
-    export let disabledBackgroundColor: string = backgroundColor;
-    export let disabledBorderColor: string = disabledBackgroundColor;
-    export let selectedColor: string = backgroundColor;
-    export let badFormatBackgroundColor: string = backgroundColor;
-    export let badFormatBorderColor: string = badFormatBackgroundColor;
-    export let optionsBackgroundColor: string = backgroundColor;
-    export let optionsBorderColor: string = backgroundColor;
-    export let optionsInnerBorderColor: string = "transparent";
-    export let optionHeight: string = height;
-    export let fontSize: string = "1rem";
-    export let letterSpacing: string = "normal";
-    export let wordSpacing: string = "normal";
-    export let arrowWidth: string;
-    export let arrowHeight: string;
-    export let arrowRightPos: string = "0px";
+    export let style: ComponentStyles | null = null;
+    export let width: string = getStyle(style, "width", $selectedStyle);
+    export let height: string = getStyle(style, "height", $selectedStyle);
+    export let borderRadius: string = getStyle(style, "borderRadius", $selectedStyle);
+    export let backgroundColor: string = getStyle(style, "backgroundColor", $selectedStyle);
+    export let borderColor: string = getStyle(style, "borderColor", $selectedStyle);
+    export let disabledBackgroundColor: string = getStyle(style, "disabledBackgroundColor", $selectedStyle);
+    export let disabledBorderColor: string = getStyle(style, "disabledBorderColor", $selectedStyle);
+    export let selectedColor: string = getStyle(style, "selectedColor", $selectedStyle);
+    export let badFormatBackgroundColor: string = getStyle(style, "badFormatBackgroundColor", $selectedStyle);
+    export let badFormatBorderColor: string = getStyle(style, "badFormatBorderColor", $selectedStyle);
+    export let optionsBackgroundColor: string = getStyle(style, "optionsBackgroundColor", $selectedStyle);
+    export let optionsBorderColor: string = getStyle(style, "optionsBorderColor", $selectedStyle);
+    export let optionsInnerBorderColor: string = getStyle(style, "optionsInnerBorderColor", $selectedStyle);
+    export let optionHeight: string = getStyle(style, "optionHeight", $selectedStyle);
+    export let fontSize: string = getStyle(style, "fontSize", $selectedStyle);
+    export let letterSpacing: string = getStyle(style, "letterSpacing", $selectedStyle);
+    export let wordSpacing: string = getStyle(style, "wordSpacing", $selectedStyle);
+    export let arrowWidth: string = getStyle(style, "arrowWidth", $selectedStyle);
+    export let arrowHeight: string = getStyle(style, "arrowHeight", $selectedStyle);
+    export let arrowRightPos: string = getStyle(style, "arrowRightPos", $selectedStyle);
 
     // Variables
     let isOpen: boolean = false;
