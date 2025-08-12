@@ -2,6 +2,7 @@
     import { onMount, onDestroy, tick } from "svelte";
 
     // Styles
+    import { InputFieldStyle } from "$lib/style/components";
     import { getStyle } from "$lib/style/components";
 
     // Props
@@ -15,30 +16,57 @@
     export let maxValue: number = Number.MAX_SAFE_INTEGER;
     export let infoText: string = "";
 
-    // Layout / styling props
+    // Style object (from theme)
     export let style: { [property: string]: string } | null = null;
-    export let width: string = getStyle(style, "width");
+    $: effectiveStyle = style ?? $InputFieldStyle;
+
+    // Layout / styling props
+    export let width: string | undefined = undefined;
     export let minWidth: string | null = null;
     export let maxWidth: string | null = null;
-    export let height: string = getStyle(style, "height");
-    export let borderRadius: string = getStyle(style, "borderRadius");
-    export let backgroundColor: string = getStyle(style, "backgroundColor");
-    export let borderColor: string = getStyle(style, "borderColor");
-    export let disabledBackgroundColor: string = getStyle(style, "disabledBackgroundColor");
-    export let disabledBorderColor: string = getStyle(style, "disabledBorderColor");
-    export let selectedBackgroundColor: string = getStyle(style, "selectedBackgroundColor");
-    export let selectedBorderColor: string = getStyle(style, "selectedBorderColor");
-    export let badFormatBackgroundColor: string = getStyle(style, "badFormatBackgroundColor");
-    export let badFormatBorderColor: string = getStyle(style, "badFormatBorderColor");
-    export let paddingLeft: string = getStyle(style, "paddingLeft");
-    export let fontSize: string = getStyle(style, "fontSize");
-    export let fontColor: string = getStyle(style, "fontColor");
-    export let fontWeight: string = getStyle(style, "fontWeight");
-    export let textAlign: string = getStyle(style, "textAlign");
-    export let infoTextColor: string = getStyle(style, "infoTextColor");
-    export let infoTextSize: string = getStyle(style, "infoTextSize");
-    export let infoTextWeight: string = getStyle(style, "infoTextWeight");
-    export let unitTextColor: string = getStyle(style, "unitTextColor");
+    export let height: string | undefined = undefined;
+    export let borderRadius: string | undefined = undefined;
+    export let backgroundColor: string | undefined = undefined;
+    export let borderColor: string | undefined = undefined;
+    export let disabledBackgroundColor: string | undefined = undefined;
+    export let disabledBorderColor: string | undefined = undefined;
+    export let selectedBackgroundColor: string | undefined = undefined;
+    export let selectedBorderColor: string | undefined = undefined;
+    export let badFormatBackgroundColor: string | undefined = undefined;
+    export let badFormatBorderColor: string | undefined = undefined;
+    export let paddingLeft: string | undefined = undefined;
+    export let fontSize: string | undefined = undefined;
+    export let fontColor: string | undefined = undefined;
+    export let fontWeight: string | undefined = undefined;
+    export let textAlign: string | undefined = undefined;
+    export let infoTextColor: string | undefined = undefined;
+    export let infoTextSize: string | undefined = undefined;
+    export let infoTextWeight: string | undefined = undefined;
+    export let unitTextColor: string | undefined = undefined;
+
+    // Merged style
+    $: mergedStyle = {
+        width: width ?? getStyle(effectiveStyle, "width"),
+        height: height ?? getStyle(effectiveStyle, "height"),
+        borderRadius: borderRadius ?? getStyle(effectiveStyle, "borderRadius"),
+        backgroundColor: backgroundColor ?? getStyle(effectiveStyle, "backgroundColor"),
+        borderColor: borderColor ?? getStyle(effectiveStyle, "borderColor"),
+        disabledBackgroundColor: disabledBackgroundColor ?? getStyle(effectiveStyle, "disabledBackgroundColor"),
+        disabledBorderColor: disabledBorderColor ?? getStyle(effectiveStyle, "disabledBorderColor"),
+        selectedBackgroundColor: selectedBackgroundColor ?? getStyle(effectiveStyle, "selectedBackgroundColor"),
+        selectedBorderColor: selectedBorderColor ?? getStyle(effectiveStyle, "selectedBorderColor"),
+        badFormatBackgroundColor: badFormatBackgroundColor ?? getStyle(effectiveStyle, "badFormatBackgroundColor"),
+        badFormatBorderColor: badFormatBorderColor ?? getStyle(effectiveStyle, "badFormatBorderColor"),
+        paddingLeft: paddingLeft ?? getStyle(effectiveStyle, "paddingLeft"),
+        fontSize: fontSize ?? getStyle(effectiveStyle, "fontSize"),
+        fontColor: fontColor ?? getStyle(effectiveStyle, "fontColor"),
+        fontWeight: fontWeight ?? getStyle(effectiveStyle, "fontWeight"),
+        textAlign: textAlign ?? getStyle(effectiveStyle, "textAlign"),
+        infoTextColor: infoTextColor ?? getStyle(effectiveStyle, "infoTextColor"),
+        infoTextSize: infoTextSize ?? getStyle(effectiveStyle, "infoTextSize"),
+        infoTextWeight: infoTextWeight ?? getStyle(effectiveStyle, "infoTextWeight"),
+        unitTextColor: unitTextColor ?? getStyle(effectiveStyle, "unitTextColor"),
+    };
 
     // Variables
     let selected = false;
@@ -146,29 +174,29 @@ Applies special styling when focused.
 -->
 <div
     style="
-        --width: {width};
+        --width: {mergedStyle.width};
         --min-width: {minWidth};
         --max-width: {maxWidth};
-        --height: {height};
-        --border-radius: {borderRadius};
-        --background-color: {backgroundColor};
-        --border-color: {borderColor};
-        --disabled-background-color: {disabledBackgroundColor};
-        --disabled-border-color: {disabledBorderColor};
-        --selected-background-color: {selectedBackgroundColor};
-        --selected-border-color: {selectedBorderColor};
-        --bad-format-background-color: {badFormatBackgroundColor};
-        --bad-format-border-color: {badFormatBorderColor};
+        --height: {mergedStyle.height};
+        --border-radius: {mergedStyle.borderRadius};
+        --background-color: {mergedStyle.backgroundColor};
+        --border-color: {mergedStyle.borderColor};
+        --disabled-background-color: {mergedStyle.disabledBackgroundColor};
+        --disabled-border-color: {mergedStyle.disabledBorderColor};
+        --selected-background-color: {mergedStyle.selectedBackgroundColor};
+        --selected-border-color: {mergedStyle.selectedBorderColor};
+        --bad-format-background-color: {mergedStyle.badFormatBackgroundColor};
+        --bad-format-border-color: {mergedStyle.badFormatBorderColor};
         --input-padding-right: {unitWidth > 0 ? unitWidth + 10 + 'px' : '10px'};
-        --padding-left: {paddingLeft};
-        --font-size: {fontSize};
-        --font-color: {fontColor};
-        --font-weight: {fontWeight};
-        --text-align: {textAlign};
-        --info-text-color: {infoTextColor};
-        --info-text-size: {infoTextSize};
-        --info-text-weight: {infoTextWeight};    
-        --unit-text-color: {unitTextColor};
+        --padding-left: {mergedStyle.paddingLeft};
+        --font-size: {mergedStyle.fontSize};
+        --font-color: {mergedStyle.fontColor};
+        --font-weight: {mergedStyle.fontWeight};
+        --text-align: {mergedStyle.textAlign};
+        --info-text-color: {mergedStyle.infoTextColor};
+        --info-text-size: {mergedStyle.infoTextSize};
+        --info-text-weight: {mergedStyle.infoTextWeight};    
+        --unit-text-color: {mergedStyle.unitTextColor};
     "
     class="container"
 >

@@ -3,14 +3,18 @@
     import { browser } from "$app/environment";
 
     // Styles
+    import { HintInfoStyle } from "$lib/style/components";
     import { getStyle } from "$lib/style/components";
 
     // Props
     export let openInverted: boolean = false;
     export let labelText: string = "";
 
-    // Layout / styling props
+    // Style object (from theme)
     export let style: { [property: string]: string } | null = null;
+    $: effectiveStyle = style ?? $HintInfoStyle;
+
+    // Layout / styling props
     export let hintWidth: string = getStyle(style, "hintWidth");
     export let hintHeight: string = getStyle(style, "hintHeight");
     export let textColor: string = getStyle(style, "textColor");
@@ -25,6 +29,24 @@
     export let closeHoverBackgroundColor: string = getStyle(style, "closeHoverBackgroundColor");
     export let closeStrokeColor: string = getStyle(style, "closeStrokeColor");
     export let closeHoverStrokeColor: string = getStyle(style, "closeHoverStrokeColor");
+
+    // Merged style
+    $: mergedStyle = {
+        hintWidth: hintWidth ?? getStyle(effectiveStyle, "hintWidth"),
+        hintHeight: hintHeight ?? getStyle(effectiveStyle, "hintHeight"),
+        textColor: textColor ?? getStyle(effectiveStyle, "textColor"),
+        hintBackgroundColor: hintBackgroundColor ?? getStyle(effectiveStyle, "hintBackgroundColor"),
+        hintBorderColor: hintBorderColor ?? getStyle(effectiveStyle, "hintBorderColor"),
+        hintBorderRadius: hintBorderRadius ?? getStyle(effectiveStyle, "hintBorderRadius"),
+        openBackgroundColor: openBackgroundColor ?? getStyle(effectiveStyle, "openBackgroundColor"),
+        openHoverBackgroundColor: openHoverBackgroundColor ?? getStyle(effectiveStyle, "openHoverBackgroundColor"),
+        openStrokeColor: openStrokeColor ?? getStyle(effectiveStyle, "openStrokeColor"),
+        openHoverStrokeColor: openHoverStrokeColor ?? getStyle(effectiveStyle, "openHoverStrokeColor"),
+        closeBackgroundColor: closeBackgroundColor ?? getStyle(effectiveStyle, "closeBackgroundColor"),
+        closeHoverBackgroundColor: closeHoverBackgroundColor ?? getStyle(effectiveStyle, "closeHoverBackgroundColor"),
+        closeStrokeColor: closeStrokeColor ?? getStyle(effectiveStyle, "closeStrokeColor"),
+        closeHoverStrokeColor: closeHoverStrokeColor ?? getStyle(effectiveStyle, "closeHoverStrokeColor"),
+    };
 
     // Variables
     let hintOpened: boolean;
@@ -68,11 +90,11 @@
         bind:this={hintDiv}
         class="hint-div"
         style="
-            --hint-width: {hintWidth};
-            --hint-height: {hintHeight};
-            --hint-background-color: {hintBackgroundColor};
-            --hint-border-color: {hintBorderColor};
-            --hint-border-radius: {hintBorderRadius};
+            --hint-width: {mergedStyle.hintWidth};
+            --hint-height: {mergedStyle.hintHeight};
+            --hint-background-color: {mergedStyle.hintBackgroundColor};
+            --hint-border-color: {mergedStyle.hintBorderColor};
+            --hint-border-radius: {mergedStyle.hintBorderRadius};
         "
         class:open={hintOpened}
         class:inverted={openInverted}
@@ -83,15 +105,15 @@
         <div
             class="hint-button"
             style="
-                --open-background-color:{openBackgroundColor};
-                --open-hover-background-color:{openHoverBackgroundColor};
-                --open-stroke-color:{openStrokeColor};
-                --open-hover-stroke-color: {openHoverStrokeColor};
+                --open-background-color:{mergedStyle.openBackgroundColor};
+                --open-hover-background-color:{mergedStyle.openHoverBackgroundColor};
+                --open-stroke-color:{mergedStyle.openStrokeColor};
+                --open-hover-stroke-color: {mergedStyle.openHoverStrokeColor};
 
-                --close-background-color:{closeBackgroundColor};
-                --close-hover-background-color:{closeHoverBackgroundColor};
-                --close-stroke-color:{closeStrokeColor};
-                --close-hover-stroke-color:{closeHoverStrokeColor};
+                --close-background-color:{mergedStyle.closeBackgroundColor};
+                --close-hover-background-color:{mergedStyle.closeHoverBackgroundColor};
+                --close-stroke-color:{mergedStyle.closeStrokeColor};
+                --close-hover-stroke-color:{mergedStyle.closeHoverStrokeColor};
             "
         >
             <div class="info-button-div" class:hide={hintOpened}>
