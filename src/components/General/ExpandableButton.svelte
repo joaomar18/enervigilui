@@ -13,17 +13,14 @@
     export let modalBackgroundColor: string;
     export let modalBorderColor: string = "transparent";
     export let modalBorderRadius: string = "0px";
-
     export let openBackgroundColor: string;
     export let openHoverBackgroundColor: string = openBackgroundColor;
     export let openStrokeColor: string;
     export let openHoverStrokeColor: string = openStrokeColor;
-
     export let closeBackgroundColor: string;
     export let closeHoverBackgroundColor: string = closeBackgroundColor;
     export let closeStrokeColor: string;
     export let closeHoverStrokeColor: string = closeStrokeColor;
-
     export let badFormatBackgroundColor: string = openBackgroundColor;
     export let badFormatHoverBackgroundColor: string = badFormatBackgroundColor;
     export let badFormatStrokeColor: string = openStrokeColor;

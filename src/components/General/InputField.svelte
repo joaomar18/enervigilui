@@ -2,8 +2,7 @@
     import { onMount, onDestroy, tick } from "svelte";
 
     // Styles
-    import { InputFieldStyle } from "$lib/style/components";
-    import { getStyle } from "$lib/style/components";
+    import { mergeStyle, InputFieldStyle } from "$lib/style/components";
 
     // Props
     export let disabled: boolean = false;
@@ -44,29 +43,31 @@
     export let infoTextWeight: string | undefined = undefined;
     export let unitTextColor: string | undefined = undefined;
 
-    // Merged style
-    $: mergedStyle = {
-        width: width ?? getStyle(effectiveStyle, "width"),
-        height: height ?? getStyle(effectiveStyle, "height"),
-        borderRadius: borderRadius ?? getStyle(effectiveStyle, "borderRadius"),
-        backgroundColor: backgroundColor ?? getStyle(effectiveStyle, "backgroundColor"),
-        borderColor: borderColor ?? getStyle(effectiveStyle, "borderColor"),
-        disabledBackgroundColor: disabledBackgroundColor ?? getStyle(effectiveStyle, "disabledBackgroundColor"),
-        disabledBorderColor: disabledBorderColor ?? getStyle(effectiveStyle, "disabledBorderColor"),
-        selectedBackgroundColor: selectedBackgroundColor ?? getStyle(effectiveStyle, "selectedBackgroundColor"),
-        selectedBorderColor: selectedBorderColor ?? getStyle(effectiveStyle, "selectedBorderColor"),
-        badFormatBackgroundColor: badFormatBackgroundColor ?? getStyle(effectiveStyle, "badFormatBackgroundColor"),
-        badFormatBorderColor: badFormatBorderColor ?? getStyle(effectiveStyle, "badFormatBorderColor"),
-        paddingLeft: paddingLeft ?? getStyle(effectiveStyle, "paddingLeft"),
-        fontSize: fontSize ?? getStyle(effectiveStyle, "fontSize"),
-        fontColor: fontColor ?? getStyle(effectiveStyle, "fontColor"),
-        fontWeight: fontWeight ?? getStyle(effectiveStyle, "fontWeight"),
-        textAlign: textAlign ?? getStyle(effectiveStyle, "textAlign"),
-        infoTextColor: infoTextColor ?? getStyle(effectiveStyle, "infoTextColor"),
-        infoTextSize: infoTextSize ?? getStyle(effectiveStyle, "infoTextSize"),
-        infoTextWeight: infoTextWeight ?? getStyle(effectiveStyle, "infoTextWeight"),
-        unitTextColor: unitTextColor ?? getStyle(effectiveStyle, "unitTextColor"),
+    $: localOverrides = {
+        width,
+        height,
+        borderRadius,
+        backgroundColor,
+        borderColor,
+        disabledBackgroundColor,
+        disabledBorderColor,
+        selectedBackgroundColor,
+        selectedBorderColor,
+        badFormatBackgroundColor,
+        badFormatBorderColor,
+        paddingLeft,
+        fontSize,
+        fontColor,
+        fontWeight,
+        textAlign,
+        infoTextColor,
+        infoTextSize,
+        infoTextWeight,
+        unitTextColor,
     };
+
+    // Merged style
+    $: mergedStyle = mergeStyle(effectiveStyle, localOverrides);
 
     // Variables
     let selected = false;

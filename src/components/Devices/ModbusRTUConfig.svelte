@@ -8,10 +8,6 @@
     // Stores for multi-language support
     import { texts, baudrateTexts, parityTexts, bytesizeTexts, stopbitsTexts, selectedLang } from "$lib/stores/lang";
 
-    // Styles
-    import { SelectorStyle, InputFieldStyle, HintInfoStyle } from "$lib/style/components";
-    import { selectedStyle } from "$lib/style/components";
-
     // Stores for alerts
     import { showAlert } from "$lib/stores/alerts";
 

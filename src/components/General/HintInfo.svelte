@@ -3,8 +3,7 @@
     import { browser } from "$app/environment";
 
     // Styles
-    import { HintInfoStyle } from "$lib/style/components";
-    import { getStyle } from "$lib/style/components";
+    import { mergeStyle, HintInfoStyle } from "$lib/style/components";
 
     // Props
     export let openInverted: boolean = false;
@@ -30,23 +29,25 @@
     export let closeStrokeColor: string | undefined = undefined;
     export let closeHoverStrokeColor: string | undefined = undefined;
 
-    // Merged style
-    $: mergedStyle = {
-        hintWidth: hintWidth ?? getStyle(effectiveStyle, "hintWidth"),
-        hintHeight: hintHeight ?? getStyle(effectiveStyle, "hintHeight"),
-        textColor: textColor ?? getStyle(effectiveStyle, "textColor"),
-        hintBackgroundColor: hintBackgroundColor ?? getStyle(effectiveStyle, "hintBackgroundColor"),
-        hintBorderColor: hintBorderColor ?? getStyle(effectiveStyle, "hintBorderColor"),
-        hintBorderRadius: hintBorderRadius ?? getStyle(effectiveStyle, "hintBorderRadius"),
-        openBackgroundColor: openBackgroundColor ?? getStyle(effectiveStyle, "openBackgroundColor"),
-        openHoverBackgroundColor: openHoverBackgroundColor ?? getStyle(effectiveStyle, "openHoverBackgroundColor"),
-        openStrokeColor: openStrokeColor ?? getStyle(effectiveStyle, "openStrokeColor"),
-        openHoverStrokeColor: openHoverStrokeColor ?? getStyle(effectiveStyle, "openHoverStrokeColor"),
-        closeBackgroundColor: closeBackgroundColor ?? getStyle(effectiveStyle, "closeBackgroundColor"),
-        closeHoverBackgroundColor: closeHoverBackgroundColor ?? getStyle(effectiveStyle, "closeHoverBackgroundColor"),
-        closeStrokeColor: closeStrokeColor ?? getStyle(effectiveStyle, "closeStrokeColor"),
-        closeHoverStrokeColor: closeHoverStrokeColor ?? getStyle(effectiveStyle, "closeHoverStrokeColor"),
+    $: localOverrides = {
+        hintWidth,
+        hintHeight,
+        textColor,
+        hintBackgroundColor,
+        hintBorderColor,
+        hintBorderRadius,
+        openBackgroundColor,
+        openHoverBackgroundColor,
+        openStrokeColor,
+        openHoverStrokeColor,
+        closeBackgroundColor,
+        closeHoverBackgroundColor,
+        closeStrokeColor,
+        closeHoverStrokeColor,
     };
+
+    // Merged style
+    $: mergedStyle = mergeStyle(effectiveStyle, localOverrides);
 
     // Variables
     let hintOpened: boolean;

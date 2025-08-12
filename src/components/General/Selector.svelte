@@ -6,8 +6,7 @@
     import { selectedLang } from "$lib/stores/lang";
 
     // Styles
-    import { SelectorStyle } from "$lib/style/components";
-    import { getStyle } from "$lib/style/components";
+    import { mergeStyle, SelectorStyle } from "$lib/style/components";
 
     //Props
     export let disabled: boolean = false; // Selector is disabled
@@ -47,29 +46,31 @@
     export let arrowHeight: string | undefined = undefined;
     export let arrowRightPos: string | undefined = undefined;
 
-    // Merged style
-    $: mergedStyle = {
-        width: width ?? getStyle(effectiveStyle, "width"),
-        height: height ?? getStyle(effectiveStyle, "height"),
-        borderRadius: borderRadius ?? getStyle(effectiveStyle, "borderRadius"),
-        backgroundColor: backgroundColor ?? getStyle(effectiveStyle, "backgroundColor"),
-        borderColor: borderColor ?? getStyle(effectiveStyle, "borderColor"),
-        disabledBackgroundColor: disabledBackgroundColor ?? getStyle(effectiveStyle, "disabledBackgroundColor"),
-        disabledBorderColor: disabledBorderColor ?? getStyle(effectiveStyle, "disabledBorderColor"),
-        selectedColor: selectedColor ?? getStyle(effectiveStyle, "selectedColor"),
-        badFormatBackgroundColor: badFormatBackgroundColor ?? getStyle(effectiveStyle, "badFormatBackgroundColor"),
-        badFormatBorderColor: badFormatBorderColor ?? getStyle(effectiveStyle, "badFormatBorderColor"),
-        optionsBackgroundColor: optionsBackgroundColor ?? getStyle(effectiveStyle, "optionsBackgroundColor"),
-        optionsBorderColor: optionsBorderColor ?? getStyle(effectiveStyle, "optionsBorderColor"),
-        optionsInnerBorderColor: optionsInnerBorderColor ?? getStyle(effectiveStyle, "optionsInnerBorderColor"),
-        optionHeight: optionHeight ?? getStyle(effectiveStyle, "optionHeight"),
-        fontSize: fontSize ?? getStyle(effectiveStyle, "fontSize"),
-        letterSpacing: letterSpacing ?? getStyle(effectiveStyle, "letterSpacing"),
-        wordSpacing: wordSpacing ?? getStyle(effectiveStyle, "wordSpacing"),
-        arrowWidth: arrowWidth ?? getStyle(effectiveStyle, "arrowWidth"),
-        arrowHeight: arrowHeight ?? getStyle(effectiveStyle, "arrowHeight"),
-        arrowRightPos: arrowRightPos ?? getStyle(effectiveStyle, "arrowRightPos"),
+    $: localOverrides = {
+        width,
+        height,
+        borderRadius,
+        backgroundColor,
+        borderColor,
+        disabledBackgroundColor,
+        disabledBorderColor,
+        selectedColor,
+        badFormatBackgroundColor,
+        badFormatBorderColor,
+        optionsBackgroundColor,
+        optionsBorderColor,
+        optionsInnerBorderColor,
+        optionHeight,
+        fontSize,
+        letterSpacing,
+        wordSpacing,
+        arrowWidth,
+        arrowHeight,
+        arrowRightPos,
     };
+
+    // Merged style
+    $: mergedStyle = mergeStyle(effectiveStyle, localOverrides);
 
     // Variables
     let isOpen: boolean = false;

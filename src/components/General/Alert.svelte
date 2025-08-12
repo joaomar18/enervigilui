@@ -3,13 +3,13 @@
 
     // Props
     export let isInfo: boolean = false;
+    export let pushTop: boolean = false; //push alert to top
+    export let pushBottom: boolean = false; //push alert to bottom
+    export let alertText: string;
 
     // Layout / styling props
     export let topPos: string = "";
     export let bottomPos: string = "";
-    export let pushTop: boolean = false; //push alert to top
-    export let pushBottom: boolean = false; //push alert to bottom
-    export let alertText: string;
     export let backgroundColor: string;
     export let borderColor: string = "transparent";
     export let infoBackgroundColor: string = backgroundColor;

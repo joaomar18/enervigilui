@@ -26,6 +26,25 @@ export function getStyle(style: { [property: string]: string } | null, property:
     return style[property] ?? "";
 }
 
+export function mergeStyle<T extends Record<string, string>>(defaults: T, overrides: Partial<T>): T {
+    const filteredOverrides: Partial<T> = Object.fromEntries(
+        Object.entries(overrides).filter(([, value]) => value !== undefined)
+    ) as Partial<T>;
+
+    return { ...defaults, ...filteredOverrides } as T;
+}
+
+/**
+ * Creates a derived store that exposes style configuration for the current theme.
+ *
+ * @param config - Mapping of style names to style definitions.
+ * @returns A store that always reflects the style for the current {@link selectedStyle} value.
+ */
+export function createStyleStore<T>(config: Record<Style, T>) {
+    return derived(selectedStyle, (s) => config[s]);
+}
+
+
 //////////     I N P U T     F I E L D     //////////
 
 const InputFieldStyleConfig: ComponentStyles = {
@@ -53,10 +72,7 @@ const InputFieldStyleConfig: ComponentStyles = {
     }
 }
 
-export const InputFieldStyle = derived(
-    selectedStyle,
-    ($selectedStyle) => InputFieldStyleConfig[$selectedStyle]
-);
+export const InputFieldStyle = createStyleStore(InputFieldStyleConfig);
 
 //////////     S E L E C T O R     //////////
 
@@ -85,10 +101,7 @@ const SelectorStyleConfig: ComponentStyles = {
     }
 }
 
-export const SelectorStyle = derived(
-    selectedStyle,
-    ($selectedStyle) => SelectorStyleConfig[$selectedStyle]
-);
+export const SelectorStyle = createStyleStore(SelectorStyleConfig);
 
 
 //////////     H I N T     I N F O     //////////
@@ -112,7 +125,4 @@ const HintInfoStyleConfig: ComponentStyles = {
     }
 }
 
-export const HintInfoStyle = derived(
-    selectedStyle,
-    ($selectedStyle) => HintInfoStyleConfig[$selectedStyle]
-);
+export const HintInfoStyle = createStyleStore(HintInfoStyleConfig);
