@@ -38,10 +38,10 @@
     <span>{$texts.networkAddress[$selectedLang]}</span>
     <div class="input-div">
         <div class="input-content-div">
-            <InputField bind:inputValue={opcuaConfig.url} inputInvalid={!validOpcUaUrl} enableInputInvalid={true} style={$InputFieldStyle} />
+            <InputField bind:inputValue={opcuaConfig.url} inputInvalid={!validOpcUaUrl} enableInputInvalid={true} />
         </div>
         <div class="info-div">
-            <HintInfo style={$HintInfoStyle}>
+            <HintInfo>
                 <span class="info-text">{$texts.networkAddressInfo[$selectedLang]}</span>
             </HintInfo>
         </div>
@@ -65,11 +65,10 @@
                         maxValue: READ_PERIOD_LIM.MAX,
                     });
                 }}
-                style={$InputFieldStyle}
             />
         </div>
         <div class="info-div">
-            <HintInfo style={$HintInfoStyle}>
+            <HintInfo>
                 <span class="info-text">{$texts.readPeriodInfo[$selectedLang]}</span>
             </HintInfo>
         </div>
@@ -93,11 +92,10 @@
                         maxValue: TIMEOUT_LIM.MAX,
                     });
                 }}
-                style={$InputFieldStyle}
             />
         </div>
         <div class="info-div">
-            <HintInfo style={$HintInfoStyle}>
+            <HintInfo>
                 <span class="info-text">{$texts.commTimeoutInfo[$selectedLang]}</span>
             </HintInfo>
         </div>
@@ -109,10 +107,10 @@
         <span>{$texts.username[$selectedLang]}</span>
         <div class="input-div">
             <div class="input-content-div">
-                <InputField bind:inputValue={opcuaConfig.username} style={$InputFieldStyle} />
+                <InputField bind:inputValue={opcuaConfig.username} />
             </div>
             <div class="info-div">
-                <HintInfo style={$HintInfoStyle}>
+                <HintInfo>
                     <span class="info-text">{$texts.commUsernameInfo[$selectedLang]}</span>
                 </HintInfo>
             </div>
@@ -122,10 +120,10 @@
         <span>{$texts.password[$selectedLang]}</span>
         <div class="input-div">
             <div class="input-content-div">
-                <InputField bind:inputValue={opcuaConfig.password} inputType="PASSWORD" style={$InputFieldStyle} />
+                <InputField bind:inputValue={opcuaConfig.password} inputType="PASSWORD" />
             </div>
             <div class="info-div">
-                <HintInfo style={$HintInfoStyle}>
+                <HintInfo>
                     <span class="info-text">{$texts.commPasswordInfo[$selectedLang]}</span>
                 </HintInfo>
             </div>

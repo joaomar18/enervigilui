@@ -58,10 +58,10 @@
     <span>{$texts.communicationPort[$selectedLang]}</span>
     <div class="input-div">
         <div class="input-content-div">
-            <InputField bind:inputValue={modbusRTUConfig.port} inputInvalid={!validModbusRtuPort} enableInputInvalid={true} style={$InputFieldStyle} />
+            <InputField bind:inputValue={modbusRTUConfig.port} inputInvalid={!validModbusRtuPort} enableInputInvalid={true} />
         </div>
         <div class="info-div">
-            <HintInfo style={$HintInfoStyle}>
+            <HintInfo>
                 <span class="info-text">{$texts.communicationPortInfo[$selectedLang]}</span>
             </HintInfo>
         </div>
@@ -85,11 +85,10 @@
                         maxValue: SLAVE_ID_LIM.MAX,
                     });
                 }}
-                style={$InputFieldStyle}
             />
         </div>
         <div class="info-div">
-            <HintInfo style={$HintInfoStyle}>
+            <HintInfo>
                 <span class="info-text">{$texts.slaveIDInfo[$selectedLang]}</span>
             </HintInfo>
         </div>
@@ -108,7 +107,7 @@
             scrollable={true}
         />
         <div class="info-div">
-            <HintInfo style={$HintInfoStyle}>
+            <HintInfo>
                 <span class="info-text">{$texts.baudrateInfo[$selectedLang]}</span>
             </HintInfo>
         </div>
@@ -127,7 +126,7 @@
             scrollable={true}
         />
         <div class="info-div">
-            <HintInfo style={$HintInfoStyle}>
+            <HintInfo>
                 <span class="info-text">{$texts.parityInfo[$selectedLang]}</span>
             </HintInfo>
         </div>
@@ -146,7 +145,7 @@
             scrollable={true}
         />
         <div class="info-div">
-            <HintInfo style={$HintInfoStyle}>
+            <HintInfo>
                 <span class="info-text">{$texts.bytesizeInfo[$selectedLang]}</span>
             </HintInfo>
         </div>
@@ -165,7 +164,7 @@
             scrollable={true}
         />
         <div class="info-div">
-            <HintInfo style={$HintInfoStyle}>
+            <HintInfo>
                 <span class="info-text">{$texts.stopbitsInfo[$selectedLang]}</span>
             </HintInfo>
         </div>
@@ -190,11 +189,10 @@
                         maxValue: READ_PERIOD_LIM.MAX,
                     });
                 }}
-                style={$InputFieldStyle}
             />
         </div>
         <div class="info-div">
-            <HintInfo style={$HintInfoStyle}>
+            <HintInfo>
                 <span class="info-text">{$texts.readPeriodInfo[$selectedLang]}</span>
             </HintInfo>
         </div>
@@ -218,11 +216,10 @@
                         maxValue: TIMEOUT_LIM.MAX,
                     });
                 }}
-                style={$InputFieldStyle}
             />
         </div>
         <div class="info-div">
-            <HintInfo style={$HintInfoStyle}>
+            <HintInfo>
                 <span class="info-text">{$texts.commTimeoutInfo[$selectedLang]}</span>
             </HintInfo>
         </div>
@@ -245,11 +242,10 @@
                         maxValue: RETRIES_NUMBER_LIM.MAX,
                     });
                 }}
-                style={$InputFieldStyle}
             />
         </div>
         <div class="info-div">
-            <HintInfo style={$HintInfoStyle}>
+            <HintInfo>
                 <span class="info-text">{$texts.retriesInfo[$selectedLang]}</span>
             </HintInfo>
         </div>

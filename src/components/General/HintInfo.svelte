@@ -15,20 +15,20 @@
     $: effectiveStyle = style ?? $HintInfoStyle;
 
     // Layout / styling props
-    export let hintWidth: string = getStyle(style, "hintWidth");
-    export let hintHeight: string = getStyle(style, "hintHeight");
-    export let textColor: string = getStyle(style, "textColor");
-    export let hintBackgroundColor: string = getStyle(style, "hintBackgroundColor");
-    export let hintBorderColor: string = getStyle(style, "hintBorderColor");
-    export let hintBorderRadius: string = getStyle(style, "hintBorderRadius");
-    export let openBackgroundColor = getStyle(style, "openBackgroundColor");
-    export let openHoverBackgroundColor: string = getStyle(style, "openHoverBackgroundColor");
-    export let openStrokeColor: string = getStyle(style, "openStrokeColor");
-    export let openHoverStrokeColor: string = getStyle(style, "openHoverStrokeColor");
-    export let closeBackgroundColor: string = getStyle(style, "closeBackgroundColor");
-    export let closeHoverBackgroundColor: string = getStyle(style, "closeHoverBackgroundColor");
-    export let closeStrokeColor: string = getStyle(style, "closeStrokeColor");
-    export let closeHoverStrokeColor: string = getStyle(style, "closeHoverStrokeColor");
+    export let hintWidth: string | undefined = undefined;
+    export let hintHeight: string | undefined = undefined;
+    export let textColor: string | undefined = undefined;
+    export let hintBackgroundColor: string | undefined = undefined;
+    export let hintBorderColor: string | undefined = undefined;
+    export let hintBorderRadius: string | undefined = undefined;
+    export let openBackgroundColor: string | undefined = undefined;
+    export let openHoverBackgroundColor: string | undefined = undefined;
+    export let openStrokeColor: string | undefined = undefined;
+    export let openHoverStrokeColor: string | undefined = undefined;
+    export let closeBackgroundColor: string | undefined = undefined;
+    export let closeHoverBackgroundColor: string | undefined = undefined;
+    export let closeStrokeColor: string | undefined = undefined;
+    export let closeHoverStrokeColor: string | undefined = undefined;
 
     // Merged style
     $: mergedStyle = {
