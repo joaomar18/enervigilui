@@ -3,30 +3,28 @@
     import { browser } from "$app/environment";
 
     // Styles
-    import type { ComponentStyles } from "$lib/style/components";
     import { getStyle } from "$lib/style/components";
-    import { selectedStyle } from "$lib/style/components";
 
     // Props
     export let openInverted: boolean = false;
     export let labelText: string = "";
 
     // Layout / styling props
-    export let style: ComponentStyles | null = null;
-    export let hintWidth: string = getStyle(style, "hintWidth", $selectedStyle);
-    export let hintHeight: string = getStyle(style, "hintHeight", $selectedStyle);
-    export let textColor: string = getStyle(style, "textColor", $selectedStyle);
-    export let hintBackgroundColor: string = getStyle(style, "hintBackgroundColor", $selectedStyle);
-    export let hintBorderColor: string = getStyle(style, "hintBorderColor", $selectedStyle);
-    export let hintBorderRadius: string = getStyle(style, "hintBorderRadius", $selectedStyle);
-    export let openBackgroundColor = getStyle(style, "openBackgroundColor", $selectedStyle);
-    export let openHoverBackgroundColor: string = getStyle(style, "openHoverBackgroundColor", $selectedStyle);
-    export let openStrokeColor: string = getStyle(style, "openStrokeColor", $selectedStyle);
-    export let openHoverStrokeColor: string = getStyle(style, "openHoverStrokeColor", $selectedStyle);
-    export let closeBackgroundColor: string = getStyle(style, "closeBackgroundColor", $selectedStyle);
-    export let closeHoverBackgroundColor: string = getStyle(style, "closeHoverBackgroundColor", $selectedStyle);
-    export let closeStrokeColor: string = getStyle(style, "closeStrokeColor", $selectedStyle);
-    export let closeHoverStrokeColor: string = getStyle(style, "closeHoverStrokeColor", $selectedStyle);
+    export let style: { [property: string]: string } | null = null;
+    export let hintWidth: string = getStyle(style, "hintWidth");
+    export let hintHeight: string = getStyle(style, "hintHeight");
+    export let textColor: string = getStyle(style, "textColor");
+    export let hintBackgroundColor: string = getStyle(style, "hintBackgroundColor");
+    export let hintBorderColor: string = getStyle(style, "hintBorderColor");
+    export let hintBorderRadius: string = getStyle(style, "hintBorderRadius");
+    export let openBackgroundColor = getStyle(style, "openBackgroundColor");
+    export let openHoverBackgroundColor: string = getStyle(style, "openHoverBackgroundColor");
+    export let openStrokeColor: string = getStyle(style, "openStrokeColor");
+    export let openHoverStrokeColor: string = getStyle(style, "openHoverStrokeColor");
+    export let closeBackgroundColor: string = getStyle(style, "closeBackgroundColor");
+    export let closeHoverBackgroundColor: string = getStyle(style, "closeHoverBackgroundColor");
+    export let closeStrokeColor: string = getStyle(style, "closeStrokeColor");
+    export let closeHoverStrokeColor: string = getStyle(style, "closeHoverStrokeColor");
 
     // Variables
     let hintOpened: boolean;

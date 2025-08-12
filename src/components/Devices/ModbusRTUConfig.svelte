@@ -10,6 +10,7 @@
 
     // Styles
     import { SelectorStyle, InputFieldStyle, HintInfoStyle } from "$lib/style/components";
+    import { selectedStyle } from "$lib/style/components";
 
     // Stores for alerts
     import { showAlert } from "$lib/stores/alerts";
@@ -57,10 +58,10 @@
     <span>{$texts.communicationPort[$selectedLang]}</span>
     <div class="input-div">
         <div class="input-content-div">
-            <InputField bind:inputValue={modbusRTUConfig.port} inputInvalid={!validModbusRtuPort} enableInputInvalid={true} style={InputFieldStyle} />
+            <InputField bind:inputValue={modbusRTUConfig.port} inputInvalid={!validModbusRtuPort} enableInputInvalid={true} style={$InputFieldStyle} />
         </div>
         <div class="info-div">
-            <HintInfo style={HintInfoStyle}>
+            <HintInfo style={$HintInfoStyle}>
                 <span class="info-text">{$texts.communicationPortInfo[$selectedLang]}</span>
             </HintInfo>
         </div>
@@ -84,11 +85,11 @@
                         maxValue: SLAVE_ID_LIM.MAX,
                     });
                 }}
-                style={InputFieldStyle}
+                style={$InputFieldStyle}
             />
         </div>
         <div class="info-div">
-            <HintInfo style={HintInfoStyle}>
+            <HintInfo style={$HintInfoStyle}>
                 <span class="info-text">{$texts.slaveIDInfo[$selectedLang]}</span>
             </HintInfo>
         </div>
@@ -105,10 +106,9 @@
             inputInvalid={!validBaudrate}
             enableInputInvalid={true}
             scrollable={true}
-            style={SelectorStyle}
         />
         <div class="info-div">
-            <HintInfo style={HintInfoStyle}>
+            <HintInfo style={$HintInfoStyle}>
                 <span class="info-text">{$texts.baudrateInfo[$selectedLang]}</span>
             </HintInfo>
         </div>
@@ -125,10 +125,9 @@
             inputInvalid={!validParity}
             enableInputInvalid={true}
             scrollable={true}
-            style={SelectorStyle}
         />
         <div class="info-div">
-            <HintInfo style={HintInfoStyle}>
+            <HintInfo style={$HintInfoStyle}>
                 <span class="info-text">{$texts.parityInfo[$selectedLang]}</span>
             </HintInfo>
         </div>
@@ -145,10 +144,9 @@
             inputInvalid={!validByteSize}
             enableInputInvalid={true}
             scrollable={true}
-            style={SelectorStyle}
         />
         <div class="info-div">
-            <HintInfo style={HintInfoStyle}>
+            <HintInfo style={$HintInfoStyle}>
                 <span class="info-text">{$texts.bytesizeInfo[$selectedLang]}</span>
             </HintInfo>
         </div>
@@ -165,10 +163,9 @@
             inputInvalid={!validStopBits}
             enableInputInvalid={true}
             scrollable={true}
-            style={SelectorStyle}
         />
         <div class="info-div">
-            <HintInfo style={HintInfoStyle}>
+            <HintInfo style={$HintInfoStyle}>
                 <span class="info-text">{$texts.stopbitsInfo[$selectedLang]}</span>
             </HintInfo>
         </div>
@@ -193,11 +190,11 @@
                         maxValue: READ_PERIOD_LIM.MAX,
                     });
                 }}
-                style={InputFieldStyle}
+                style={$InputFieldStyle}
             />
         </div>
         <div class="info-div">
-            <HintInfo style={HintInfoStyle}>
+            <HintInfo style={$HintInfoStyle}>
                 <span class="info-text">{$texts.readPeriodInfo[$selectedLang]}</span>
             </HintInfo>
         </div>
@@ -221,11 +218,11 @@
                         maxValue: TIMEOUT_LIM.MAX,
                     });
                 }}
-                style={InputFieldStyle}
+                style={$InputFieldStyle}
             />
         </div>
         <div class="info-div">
-            <HintInfo style={HintInfoStyle}>
+            <HintInfo style={$HintInfoStyle}>
                 <span class="info-text">{$texts.commTimeoutInfo[$selectedLang]}</span>
             </HintInfo>
         </div>
@@ -248,11 +245,11 @@
                         maxValue: RETRIES_NUMBER_LIM.MAX,
                     });
                 }}
-                style={InputFieldStyle}
+                style={$InputFieldStyle}
             />
         </div>
         <div class="info-div">
-            <HintInfo style={HintInfoStyle}>
+            <HintInfo style={$HintInfoStyle}>
                 <span class="info-text">{$texts.retriesInfo[$selectedLang]}</span>
             </HintInfo>
         </div>

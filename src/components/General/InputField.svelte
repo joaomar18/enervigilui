@@ -2,9 +2,7 @@
     import { onMount, onDestroy, tick } from "svelte";
 
     // Styles
-    import type { ComponentStyles } from "$lib/style/components";
     import { getStyle } from "$lib/style/components";
-    import { selectedStyle } from "$lib/style/components";
 
     // Props
     export let disabled: boolean = false;
@@ -18,29 +16,29 @@
     export let infoText: string = "";
 
     // Layout / styling props
-    export let style: ComponentStyles | null = null;
-    export let width: string = getStyle(style, "width", $selectedStyle);
+    export let style: { [property: string]: string } | null = null;
+    export let width: string = getStyle(style, "width");
     export let minWidth: string | null = null;
     export let maxWidth: string | null = null;
-    export let height: string = getStyle(style, "height", $selectedStyle);
-    export let borderRadius: string = getStyle(style, "borderRadius", $selectedStyle);
-    export let backgroundColor: string = getStyle(style, "backgroundColor", $selectedStyle);
-    export let borderColor: string = getStyle(style, "borderColor", $selectedStyle);
-    export let disabledBackgroundColor: string = getStyle(style, "disabledBackgroundColor", $selectedStyle);
-    export let disabledBorderColor: string = getStyle(style, "disabledBorderColor", $selectedStyle);
-    export let selectedBackgroundColor: string = getStyle(style, "selectedBackgroundColor", $selectedStyle);
-    export let selectedBorderColor: string = getStyle(style, "selectedBorderColor", $selectedStyle);
-    export let badFormatBackgroundColor: string = getStyle(style, "badFormatBackgroundColor", $selectedStyle);
-    export let badFormatBorderColor: string = getStyle(style, "badFormatBorderColor", $selectedStyle);
-    export let paddingLeft: string = getStyle(style, "paddingLeft", $selectedStyle);
-    export let fontSize: string = getStyle(style, "fontSize", $selectedStyle);
-    export let fontColor: string = getStyle(style, "fontColor", $selectedStyle);
-    export let fontWeight: string = getStyle(style, "fontWeight", $selectedStyle);
-    export let textAlign: string = getStyle(style, "textAlign", $selectedStyle);
-    export let infoTextColor: string = getStyle(style, "infoTextColor", $selectedStyle);
-    export let infoTextSize: string = getStyle(style, "infoTextSize", $selectedStyle);
-    export let infoTextWeight: string = getStyle(style, "infoTextWeight", $selectedStyle);
-    export let unitTextColor: string = getStyle(style, "unitTextColor", $selectedStyle);
+    export let height: string = getStyle(style, "height");
+    export let borderRadius: string = getStyle(style, "borderRadius");
+    export let backgroundColor: string = getStyle(style, "backgroundColor");
+    export let borderColor: string = getStyle(style, "borderColor");
+    export let disabledBackgroundColor: string = getStyle(style, "disabledBackgroundColor");
+    export let disabledBorderColor: string = getStyle(style, "disabledBorderColor");
+    export let selectedBackgroundColor: string = getStyle(style, "selectedBackgroundColor");
+    export let selectedBorderColor: string = getStyle(style, "selectedBorderColor");
+    export let badFormatBackgroundColor: string = getStyle(style, "badFormatBackgroundColor");
+    export let badFormatBorderColor: string = getStyle(style, "badFormatBorderColor");
+    export let paddingLeft: string = getStyle(style, "paddingLeft");
+    export let fontSize: string = getStyle(style, "fontSize");
+    export let fontColor: string = getStyle(style, "fontColor");
+    export let fontWeight: string = getStyle(style, "fontWeight");
+    export let textAlign: string = getStyle(style, "textAlign");
+    export let infoTextColor: string = getStyle(style, "infoTextColor");
+    export let infoTextSize: string = getStyle(style, "infoTextSize");
+    export let infoTextWeight: string = getStyle(style, "infoTextWeight");
+    export let unitTextColor: string = getStyle(style, "unitTextColor");
 
     // Variables
     let selected = false;

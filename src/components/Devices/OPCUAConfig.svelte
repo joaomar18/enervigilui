@@ -7,6 +7,9 @@
     // Stores for multi-language support
     import { texts, selectedLang } from "$lib/stores/lang";
 
+    // Styles
+    import { SelectorStyle, InputFieldStyle, HintInfoStyle } from "$lib/style/components";
+
     // Stores for alerts
     import { showAlert } from "$lib/stores/alerts";
 
@@ -35,32 +38,10 @@
     <span>{$texts.networkAddress[$selectedLang]}</span>
     <div class="input-div">
         <div class="input-content-div">
-            <InputField
-                bind:inputValue={opcuaConfig.url}
-                inputInvalid={!validOpcUaUrl}
-                enableInputInvalid={true}
-                width="100%"
-                height="40px"
-            />
+            <InputField bind:inputValue={opcuaConfig.url} inputInvalid={!validOpcUaUrl} enableInputInvalid={true} style={$InputFieldStyle} />
         </div>
         <div class="info-div">
-            <HintInfo
-                labelText=""
-                hintWidth="300px"
-                hintHeight="fit-content"
-                hintBackgroundColor="#1e242b"
-                hintBorderColor="#2c343d"
-                hintBorderRadius="10px"
-                textColor="#f5f5f5"
-                openBackgroundColor="rgba(255, 255, 255, 0.05)"
-                openHoverBackgroundColor="rgba(255, 255, 255, 0.1)"
-                openStrokeColor="#cccccc"
-                openHoverStrokeColor="#eeeeee"
-                closeBackgroundColor="rgba(255, 255, 255, 0.1)"
-                closeHoverBackgroundColor="rgba(255, 255, 255, 0.2)"
-                closeStrokeColor="white"
-                closeHoverStrokeColor="#eeeeee"
-            >
+            <HintInfo style={$HintInfoStyle}>
                 <span class="info-text">{$texts.networkAddressInfo[$selectedLang]}</span>
             </HintInfo>
         </div>
@@ -84,28 +65,11 @@
                         maxValue: READ_PERIOD_LIM.MAX,
                     });
                 }}
-                width="100%"
-                height="40px"
+                style={$InputFieldStyle}
             />
         </div>
         <div class="info-div">
-            <HintInfo
-                labelText=""
-                hintWidth="300px"
-                hintHeight="fit-content"
-                hintBackgroundColor="#1e242b"
-                hintBorderColor="#2c343d"
-                hintBorderRadius="10px"
-                textColor="#f5f5f5"
-                openBackgroundColor="rgba(255, 255, 255, 0.05)"
-                openHoverBackgroundColor="rgba(255, 255, 255, 0.1)"
-                openStrokeColor="#cccccc"
-                openHoverStrokeColor="#eeeeee"
-                closeBackgroundColor="rgba(255, 255, 255, 0.1)"
-                closeHoverBackgroundColor="rgba(255, 255, 255, 0.2)"
-                closeStrokeColor="white"
-                closeHoverStrokeColor="#eeeeee"
-            >
+            <HintInfo style={$HintInfoStyle}>
                 <span class="info-text">{$texts.readPeriodInfo[$selectedLang]}</span>
             </HintInfo>
         </div>
@@ -129,28 +93,11 @@
                         maxValue: TIMEOUT_LIM.MAX,
                     });
                 }}
-                width="100%"
-                height="40px"
+                style={$InputFieldStyle}
             />
         </div>
         <div class="info-div">
-            <HintInfo
-                labelText=""
-                hintWidth="300px"
-                hintHeight="fit-content"
-                hintBackgroundColor="#1e242b"
-                hintBorderColor="#2c343d"
-                hintBorderRadius="10px"
-                textColor="#f5f5f5"
-                openBackgroundColor="rgba(255, 255, 255, 0.05)"
-                openHoverBackgroundColor="rgba(255, 255, 255, 0.1)"
-                openStrokeColor="#cccccc"
-                openHoverStrokeColor="#eeeeee"
-                closeBackgroundColor="rgba(255, 255, 255, 0.1)"
-                closeHoverBackgroundColor="rgba(255, 255, 255, 0.2)"
-                closeStrokeColor="white"
-                closeHoverStrokeColor="#eeeeee"
-            >
+            <HintInfo style={$HintInfoStyle}>
                 <span class="info-text">{$texts.commTimeoutInfo[$selectedLang]}</span>
             </HintInfo>
         </div>
@@ -162,30 +109,10 @@
         <span>{$texts.username[$selectedLang]}</span>
         <div class="input-div">
             <div class="input-content-div">
-                <InputField
-                    bind:inputValue={opcuaConfig.username}
-                    width="100%"
-                    height="40px"
-                />
+                <InputField bind:inputValue={opcuaConfig.username} style={$InputFieldStyle} />
             </div>
             <div class="info-div">
-                <HintInfo
-                    labelText=""
-                    hintWidth="300px"
-                    hintHeight="fit-content"
-                    hintBackgroundColor="#1e242b"
-                    hintBorderColor="#2c343d"
-                    hintBorderRadius="10px"
-                    textColor="#f5f5f5"
-                    openBackgroundColor="rgba(255, 255, 255, 0.05)"
-                    openHoverBackgroundColor="rgba(255, 255, 255, 0.1)"
-                    openStrokeColor="#cccccc"
-                    openHoverStrokeColor="#eeeeee"
-                    closeBackgroundColor="rgba(255, 255, 255, 0.1)"
-                    closeHoverBackgroundColor="rgba(255, 255, 255, 0.2)"
-                    closeStrokeColor="white"
-                    closeHoverStrokeColor="#eeeeee"
-                >
+                <HintInfo style={$HintInfoStyle}>
                     <span class="info-text">{$texts.commUsernameInfo[$selectedLang]}</span>
                 </HintInfo>
             </div>
@@ -195,31 +122,10 @@
         <span>{$texts.password[$selectedLang]}</span>
         <div class="input-div">
             <div class="input-content-div">
-                <InputField
-                    bind:inputValue={opcuaConfig.password}
-                    inputType="PASSWORD"
-                    width="100%"
-                    height="40px"
-                />
+                <InputField bind:inputValue={opcuaConfig.password} inputType="PASSWORD" style={$InputFieldStyle} />
             </div>
             <div class="info-div">
-                <HintInfo
-                    labelText=""
-                    hintWidth="300px"
-                    hintHeight="fit-content"
-                    hintBackgroundColor="#1e242b"
-                    hintBorderColor="#2c343d"
-                    hintBorderRadius="10px"
-                    textColor="#f5f5f5"
-                    openBackgroundColor="rgba(255, 255, 255, 0.05)"
-                    openHoverBackgroundColor="rgba(255, 255, 255, 0.1)"
-                    openStrokeColor="#cccccc"
-                    openHoverStrokeColor="#eeeeee"
-                    closeBackgroundColor="rgba(255, 255, 255, 0.1)"
-                    closeHoverBackgroundColor="rgba(255, 255, 255, 0.2)"
-                    closeStrokeColor="white"
-                    closeHoverStrokeColor="#eeeeee"
-                >
+                <HintInfo style={$HintInfoStyle}>
                     <span class="info-text">{$texts.commPasswordInfo[$selectedLang]}</span>
                 </HintInfo>
             </div>

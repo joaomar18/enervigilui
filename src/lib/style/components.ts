@@ -1,4 +1,4 @@
-import { writable } from "svelte/store";
+import { writable, derived } from "svelte/store";
 
 // Type of the available styles
 export type Style = 'dark';
@@ -13,23 +13,22 @@ export const selectedStyle = writable<Style>("dark"); //Current selected style: 
 
 
 /**
- * Gets a style property value from a ComponentStyles object for a specific theme.
- * @param style - The ComponentStyles object or null
+ * Gets a style property value from a flattened style object.
+ * @param style - The flattened style object or null
  * @param property - The CSS property name to retrieve
- * @param theme - The theme style to use
  * @returns The property value as a string, or empty string if not found
  */
-export function getStyle(style: ComponentStyles | null, property: string, theme: Style): string {
+export function getStyle(style: { [property: string]: string } | null, property: string): string {
     if (!style) {
         return "";
     }
 
-    return style[theme]?.[property] ?? "";
+    return style[property] ?? "";
 }
 
 //////////     I N P U T     F I E L D     //////////
 
-export const InputFieldStyle: ComponentStyles = {
+const InputFieldStyleConfig: ComponentStyles = {
     dark: {
         width: "100%",
         height: "40px",
@@ -54,9 +53,14 @@ export const InputFieldStyle: ComponentStyles = {
     }
 }
 
+export const InputFieldStyle = derived(
+    selectedStyle,
+    ($selectedStyle) => InputFieldStyleConfig[$selectedStyle]
+);
+
 //////////     S E L E C T O R     //////////
 
-export const SelectorStyle: ComponentStyles = {
+const SelectorStyleConfig: ComponentStyles = {
     dark: {
         width: "200px",
         height: "40px",
@@ -81,10 +85,15 @@ export const SelectorStyle: ComponentStyles = {
     }
 }
 
+export const SelectorStyle = derived(
+    selectedStyle,
+    ($selectedStyle) => SelectorStyleConfig[$selectedStyle]
+);
+
 
 //////////     H I N T     I N F O     //////////
 
-export const HintInfoStyle: ComponentStyles = {
+const HintInfoStyleConfig: ComponentStyles = {
     dark: {
         hintWidth: "300px",
         hintHeight: "fit-content",
@@ -102,3 +111,8 @@ export const HintInfoStyle: ComponentStyles = {
         closeHoverStrokeColor: "#eeeeee",
     }
 }
+
+export const HintInfoStyle = derived(
+    selectedStyle,
+    ($selectedStyle) => HintInfoStyleConfig[$selectedStyle]
+);

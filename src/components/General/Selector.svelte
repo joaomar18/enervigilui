@@ -6,9 +6,8 @@
     import { selectedLang } from "$lib/stores/lang";
 
     // Styles
-    import type { ComponentStyles } from "$lib/style/components";
+    import { SelectorStyle } from "$lib/style/components";
     import { getStyle } from "$lib/style/components";
-    import { selectedStyle } from "$lib/style/components";
 
     //Props
     export let disabled: boolean = false; // Selector is disabled
@@ -22,28 +21,55 @@
     export let scrollable: boolean = false; //makes the content scrollable
     export let maxOptions: number = 5; //if the content is scrollable assigns the maximum number of visible options
 
+    // Style object (from theme)
+    export let style: { [property: string]: string } | null = null;
+    $: effectiveStyle = style ?? $SelectorStyle;
+
     // Layout / styling props
-    export let style: ComponentStyles | null = null;
-    export let width: string = getStyle(style, "width", $selectedStyle);
-    export let height: string = getStyle(style, "height", $selectedStyle);
-    export let borderRadius: string = getStyle(style, "borderRadius", $selectedStyle);
-    export let backgroundColor: string = getStyle(style, "backgroundColor", $selectedStyle);
-    export let borderColor: string = getStyle(style, "borderColor", $selectedStyle);
-    export let disabledBackgroundColor: string = getStyle(style, "disabledBackgroundColor", $selectedStyle);
-    export let disabledBorderColor: string = getStyle(style, "disabledBorderColor", $selectedStyle);
-    export let selectedColor: string = getStyle(style, "selectedColor", $selectedStyle);
-    export let badFormatBackgroundColor: string = getStyle(style, "badFormatBackgroundColor", $selectedStyle);
-    export let badFormatBorderColor: string = getStyle(style, "badFormatBorderColor", $selectedStyle);
-    export let optionsBackgroundColor: string = getStyle(style, "optionsBackgroundColor", $selectedStyle);
-    export let optionsBorderColor: string = getStyle(style, "optionsBorderColor", $selectedStyle);
-    export let optionsInnerBorderColor: string = getStyle(style, "optionsInnerBorderColor", $selectedStyle);
-    export let optionHeight: string = getStyle(style, "optionHeight", $selectedStyle);
-    export let fontSize: string = getStyle(style, "fontSize", $selectedStyle);
-    export let letterSpacing: string = getStyle(style, "letterSpacing", $selectedStyle);
-    export let wordSpacing: string = getStyle(style, "wordSpacing", $selectedStyle);
-    export let arrowWidth: string = getStyle(style, "arrowWidth", $selectedStyle);
-    export let arrowHeight: string = getStyle(style, "arrowHeight", $selectedStyle);
-    export let arrowRightPos: string = getStyle(style, "arrowRightPos", $selectedStyle);
+    export let width: string | undefined = undefined;
+    export let height: string | undefined = undefined;
+    export let borderRadius: string | undefined = undefined;
+    export let backgroundColor: string | undefined = undefined;
+    export let borderColor: string | undefined = undefined;
+    export let disabledBackgroundColor: string | undefined = undefined;
+    export let disabledBorderColor: string | undefined = undefined;
+    export let selectedColor: string | undefined = undefined;
+    export let badFormatBackgroundColor: string | undefined = undefined;
+    export let badFormatBorderColor: string | undefined = undefined;
+    export let optionsBackgroundColor: string | undefined = undefined;
+    export let optionsBorderColor: string | undefined = undefined;
+    export let optionsInnerBorderColor: string | undefined = undefined;
+    export let optionHeight: string | undefined = undefined;
+    export let fontSize: string | undefined = undefined;
+    export let letterSpacing: string | undefined = undefined;
+    export let wordSpacing: string | undefined = undefined;
+    export let arrowWidth: string | undefined = undefined;
+    export let arrowHeight: string | undefined = undefined;
+    export let arrowRightPos: string | undefined = undefined;
+
+    // Merged style
+    $: mergedStyle = {
+        width: width ?? getStyle(effectiveStyle, "width"),
+        height: height ?? getStyle(effectiveStyle, "height"),
+        borderRadius: borderRadius ?? getStyle(effectiveStyle, "borderRadius"),
+        backgroundColor: backgroundColor ?? getStyle(effectiveStyle, "backgroundColor"),
+        borderColor: borderColor ?? getStyle(effectiveStyle, "borderColor"),
+        disabledBackgroundColor: disabledBackgroundColor ?? getStyle(effectiveStyle, "disabledBackgroundColor"),
+        disabledBorderColor: disabledBorderColor ?? getStyle(effectiveStyle, "disabledBorderColor"),
+        selectedColor: selectedColor ?? getStyle(effectiveStyle, "selectedColor"),
+        badFormatBackgroundColor: badFormatBackgroundColor ?? getStyle(effectiveStyle, "badFormatBackgroundColor"),
+        badFormatBorderColor: badFormatBorderColor ?? getStyle(effectiveStyle, "badFormatBorderColor"),
+        optionsBackgroundColor: optionsBackgroundColor ?? getStyle(effectiveStyle, "optionsBackgroundColor"),
+        optionsBorderColor: optionsBorderColor ?? getStyle(effectiveStyle, "optionsBorderColor"),
+        optionsInnerBorderColor: optionsInnerBorderColor ?? getStyle(effectiveStyle, "optionsInnerBorderColor"),
+        optionHeight: optionHeight ?? getStyle(effectiveStyle, "optionHeight"),
+        fontSize: fontSize ?? getStyle(effectiveStyle, "fontSize"),
+        letterSpacing: letterSpacing ?? getStyle(effectiveStyle, "letterSpacing"),
+        wordSpacing: wordSpacing ?? getStyle(effectiveStyle, "wordSpacing"),
+        arrowWidth: arrowWidth ?? getStyle(effectiveStyle, "arrowWidth"),
+        arrowHeight: arrowHeight ?? getStyle(effectiveStyle, "arrowHeight"),
+        arrowRightPos: arrowRightPos ?? getStyle(effectiveStyle, "arrowRightPos"),
+    };
 
     // Variables
     let isOpen: boolean = false;
@@ -62,10 +88,10 @@
     $: selectedKey = useLang
         ? Object.keys(options).find((key) => key === selectedOption)
         : Object.entries(options).find(([_, value]) => value === selectedOption)?.[0];
-    $: shiftTextLeft = String(parseFloat(arrowRightPos) + parseFloat(arrowWidth)) + "px";
+    $: shiftTextLeft = String(parseFloat(mergedStyle.arrowRightPos) + parseFloat(mergedStyle.arrowWidth)) + "px";
     $: {
         if (scrollable && optionsLength > maxOptions) {
-            optionsHeight = String(parseFloat(height) * maxOptions) + "px";
+            optionsHeight = String(parseFloat(mergedStyle.height) * maxOptions) + "px";
         }
     }
     $: {
@@ -135,26 +161,26 @@
     bind:this={selDivEl}
     class="selector-div"
     style="
-        --width: {width};
-        --height: {height};
-        --border-radius: {borderRadius};
-        --background-color: {backgroundColor};
-        --border-color: {borderColor};
-        --disabled-background-color: {disabledBackgroundColor};
-        --disabled-border-color: {disabledBorderColor};
-        --selected-color: {selectedColor};
-        --bad-format-background-color: {badFormatBackgroundColor};
-        --bad-format-border-color: {badFormatBorderColor};
-        --options-background-color: {optionsBackgroundColor};
-        --options-border-color: {optionsBorderColor};
-        --options-inner-border-color: {optionsInnerBorderColor};
-        --option-height: {optionHeight};
-        --font-size: {fontSize};
-        --letter-spacing: {letterSpacing};
-        --word-spacing: {wordSpacing};
-        --arrow-width: {arrowWidth};
-        --arrow-height: {arrowHeight};
-        --arrow-right-position: {arrowRightPos};
+        --width: {mergedStyle.width};
+        --height: {mergedStyle.height};
+        --border-radius: {mergedStyle.borderRadius};
+        --background-color: {mergedStyle.backgroundColor};
+        --border-color: {mergedStyle.borderColor};
+        --disabled-background-color: {mergedStyle.disabledBackgroundColor};
+        --disabled-border-color: {mergedStyle.disabledBorderColor};
+        --selected-color: {mergedStyle.selectedColor};
+        --bad-format-background-color: {mergedStyle.badFormatBackgroundColor};
+        --bad-format-border-color: {mergedStyle.badFormatBorderColor};
+        --options-background-color: {mergedStyle.optionsBackgroundColor};
+        --options-border-color: {mergedStyle.optionsBorderColor};
+        --options-inner-border-color: {mergedStyle.optionsInnerBorderColor};
+        --option-height: {mergedStyle.optionHeight};
+        --font-size: {mergedStyle.fontSize};
+        --letter-spacing: {mergedStyle.letterSpacing};
+        --word-spacing: {mergedStyle.wordSpacing};
+        --arrow-width: {mergedStyle.arrowWidth};
+        --arrow-height: {mergedStyle.arrowHeight};
+        --arrow-right-position: {mergedStyle.arrowRightPos};
         --selected-option-shift-left: {shiftTextLeft};
         --options-height: {optionsHeight};
     "
