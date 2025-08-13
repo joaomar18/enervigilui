@@ -20,6 +20,9 @@
     import type { NewDeviceMeter, EditableDeviceOPCUAConfig, EditableDeviceModbusRTUConfig } from "$lib/stores/devices";
     import type { EditableDeviceNode, NodeEditState, NodePhase } from "$lib/stores/nodes";
 
+    // Styles
+    import { SubSucessButtonStyle, SucessButtonStyle } from "$lib/style/button";
+
     // Navigation
     import { navigateTo } from "$lib/ts/navigation";
 
@@ -304,38 +307,12 @@ Shows input forms for protocol-specific parameters and organizes device nodes fo
                 </div>
             </div>
             <div class="action-buttons-div">
-                <Button
-                    buttonText={$texts.cancel[$selectedLang]}
-                    width="250px"
-                    height="50px"
-                    borderRadius="5px"
-                    backgroundColor="#232528"
-                    borderColor="#8A8C91"
-                    hoverColor="#2C2E34"
-                    fontColor="#f5f5f5"
-                    imageURL="/img/previous.png"
-                    imageWidth="22px"
-                    imageHeight="22px"
-                    imageLeftPos="20px"
-                    onClick={cancelAdd}
-                />
+                <Button buttonText={$texts.cancel[$selectedLang]} imageURL="/img/previous.png" onClick={cancelAdd} />
                 <Button
                     enabled={$loadedDone && nodesInitialized}
                     buttonText={$texts.add[$selectedLang]}
-                    width="250px"
-                    height="50px"
-                    borderRadius="5px"
-                    backgroundColor="#16281a"
-                    borderColor="#1a8d46"
-                    hoverColor="#1c3922"
-                    disabledBackgroundColor="#282828"
-                    disabledBorderColor="#444444"
-                    disabledHoverColor="#282828"
-                    fontColor="#f5f5f5"
+                    style={$SucessButtonStyle}
                     imageURL="/img/plus.png"
-                    imageWidth="22px"
-                    imageHeight="22px"
-                    imageLeftPos="20px"
                     onClick={() => {
                         if (validDeviceOperation(deviceData)) {
                             showAddWindow = true;
@@ -391,18 +368,7 @@ Shows input forms for protocol-specific parameters and organizes device nodes fo
                                     <Button
                                         processing={performingAddRequest}
                                         buttonText={$texts.confirm[$selectedLang]}
-                                        width="150px"
-                                        height="40px"
-                                        borderRadius="5px"
-                                        backgroundColor="#1a8d46"
-                                        hoverColor="#17673a"
-                                        borderColor="#145a36"
-                                        disabledBackgroundColor="#6a8d76"
-                                        disabledHoverColor="#6a8d76"
-                                        disabledBorderColor="#55705d"
-                                        imageWidth="22px"
-                                        imageHeight="22px"
-                                        fontColor="#f5f5f5"
+                                        style={$SubSucessButtonStyle}
                                         onClick={addDeviceConfirmation}
                                     />
                                 </div>

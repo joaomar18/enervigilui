@@ -1,14 +1,38 @@
 <script lang="ts">
-    // Layout / styling props
-    export let width: string;
-    export let height: string;
-    export let borderRadius: string = "";
-    export let backgroundColor: string;
-    export let borderColor: string = backgroundColor;
-    export let hoverColor: string = backgroundColor;
+    // Styles
+    import { mergeStyle } from "$lib/style/components";
+    import { ActionStyle } from "$lib/style/general";
+
+    // Props
     export let imageURL: string = "";
-    export let imageWidth: string = "";
-    export let imageHeight: string = "";
+
+    // Style object (from theme)
+    export let style: { [property: string]: string } | null = null;
+    $: effectiveStyle = style ?? $ActionStyle;
+
+    // Layout / styling props
+    export let width: string | undefined = undefined;
+    export let height: string | undefined = undefined;
+    export let borderRadius: string | undefined = undefined;
+    export let backgroundColor: string | undefined = undefined;
+    export let borderColor: string | undefined = undefined;
+    export let hoverColor: string | undefined = undefined;
+    export let imageWidth: string | undefined = undefined;
+    export let imageHeight: string | undefined = undefined;
+
+    $: localOverrides = {
+        width,
+        height,
+        borderRadius,
+        backgroundColor,
+        borderColor,
+        hoverColor,
+        imageWidth,
+        imageHeight,
+    };
+
+    // Merged style
+    $: mergedStyle = mergeStyle(effectiveStyle, localOverrides);
 
     // Click Export Funcion
     export let onClick: () => void;
@@ -27,20 +51,20 @@
 <div
     class="action-button-div"
     style="
-        --width: {width};
-        --height: {height};
-        --border-radius: {borderRadius};
-        --background-color: {backgroundColor};
-        --border-color: {borderColor};
-        --hover-color: {hoverColor};
+        --width: {mergedStyle.width};
+        --height: {mergedStyle.height};
+        --border-radius: {mergedStyle.borderRadius};
+        --background-color: {mergedStyle.backgroundColor};
+        --border-color: {mergedStyle.borderColor};
+        --hover-color: {mergedStyle.hoverColor};
     "
 >
     <div class="content">
-        {#if imageWidth && imageHeight}
+        {#if mergedStyle.imageWidth && mergedStyle.imageHeight}
             <img
                 style="
-            --image-width: {imageWidth};
-            --image-height: {imageHeight};
+            --image-width: {mergedStyle.imageWidth};
+            --image-height: {mergedStyle.imageHeight};
         "
                 src={imageURL}
                 alt={imageURL}
@@ -61,7 +85,7 @@
         padding: 0;
         background-color: var(--background-color);
         border: 1px solid var(--border-color);
-        border-radius: var(--border-radius, 0px);
+        border-radius: var(--border-radius);
         cursor: pointer;
         -webkit-tap-highlight-color: transparent;
         -webkit-touch-callout: none;

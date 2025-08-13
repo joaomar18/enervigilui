@@ -1,30 +1,61 @@
 <script lang="ts">
+    // Styles
+    import { mergeStyle } from "$lib/style/components";
+    import { DefaultButtonStyle } from "$lib/style/button";
+
     //Props
     export let enabled: boolean = true;
     export let processing: boolean = false;
+    export let buttonText: string;
+    export let imageURL: string = "";
+
+    // Style object (from theme)
+    export let style: { [property: string]: string } | null = null;
+    $: effectiveStyle = style ?? $DefaultButtonStyle;
 
     // Layout / styling props
-    export let buttonText: string;
-    export let width: string;
-    export let minWidth: string = "";
-    export let maxWidth: string = "";
-    export let height: string;
-    export let borderRadius: string = "";
-    export let backgroundColor: string;
-    export let disabledBackgroundColor: string = backgroundColor;
-    export let borderColor: string = "transparent";
-    export let disabledBorderColor: string = borderColor;
-    export let hoverColor: string = backgroundColor;
-    export let disabledHoverColor: string = hoverColor;
-    export let fontColor: string;
-    export let disabledFontColor: string = fontColor;
-    export let fontSize: string = "1rem";
-    export let fontWeight: string = "400";
-    export let imageURL: string = "";
-    export let imageWidth: string = "";
-    export let imageHeight: string = "";
-    export let imageRightPos: string = "auto";
-    export let imageLeftPos: string = "auto";
+    export let width: string | undefined = undefined;
+    export let minWidth: string | undefined = undefined;
+    export let maxWidth: string | undefined = undefined;
+    export let height: string | undefined = undefined;
+    export let borderRadius: string | undefined = undefined;
+    export let backgroundColor: string | undefined = undefined;
+    export let disabledBackgroundColor: string | undefined = undefined;
+    export let borderColor: string | undefined = undefined;
+    export let disabledBorderColor: string | undefined = undefined;
+    export let hoverColor: string | undefined = undefined;
+    export let disabledHoverColor: string | undefined = undefined;
+    export let fontColor: string | undefined = undefined;
+    export let disabledFontColor: string | undefined = undefined;
+    export let fontSize: string | undefined = undefined;
+    export let fontWeight: string | undefined = undefined;
+    export let imageWidth: string | undefined = undefined;
+    export let imageHeight: string | undefined = undefined;
+    export let imageRightPos: string | undefined = undefined;
+    export let imageLeftPos: string | undefined = undefined;
+
+    $: localOverrides = {
+        width,
+        height,
+        borderRadius,
+        backgroundColor,
+        disabledBackgroundColor,
+        borderColor,
+        disabledBorderColor,
+        hoverColor,
+        disabledHoverColor,
+        fontColor,
+        disabledFontColor,
+        fontSize,
+        fontWeight,
+        imageWidth,
+        imageHeight,
+        imageRightPos,
+        imageLeftPos,
+    };
+
+    // Merged style
+    $: mergedStyle = mergeStyle(effectiveStyle, localOverrides);
 
     // Click Export Function
     export let onClick: () => void;
@@ -48,28 +79,28 @@
 -->
 <button
     style="
-        --width: {width};
+        --width: {mergedStyle.width};
         --min-width: {minWidth};
         --max-width: {maxWidth};
-        --height: {height};
-        --border-radius: {borderRadius};
-        --background-color: {backgroundColor};
-        --disabled-background-color: {disabledBackgroundColor};
-        --border-color: {borderColor};
-        --disabled-border-color: {disabledBorderColor};
-        --hover-color: {hoverColor};
-        --disabled-hover-color: {disabledHoverColor};
-        --font-color: {fontColor};
-        --disabled-font-color: {disabledFontColor};
-        --font-size: {fontSize};
-        --font-weight: {fontWeight};
-        --image-width: {imageWidth};
-        --image-height: {imageHeight};
-        --image-right-position: {imageRightPos};
-        --image-left-position: {imageLeftPos};
+        --height: {mergedStyle.height};
+        --border-radius: {mergedStyle.borderRadius};
+        --background-color: {mergedStyle.backgroundColor};
+        --disabled-background-color: {mergedStyle.disabledBackgroundColor};
+        --border-color: {mergedStyle.borderColor};
+        --disabled-border-color: {mergedStyle.disabledBorderColor};
+        --hover-color: {mergedStyle.hoverColor};
+        --disabled-hover-color: {mergedStyle.disabledHoverColor};
+        --font-color: {mergedStyle.fontColor};
+        --disabled-font-color: {mergedStyle.disabledFontColor};
+        --font-size: {mergedStyle.fontSize};
+        --font-weight: {mergedStyle.fontWeight};
+        --image-width: {mergedStyle.imageWidth};
+        --image-height: {mergedStyle.imageHeight};
+        --image-right-position: {mergedStyle.imageRightPos};
+        --image-left-position: {mergedStyle.imageLeftPos};
     "
-    class:align-left={imageRightPos != "auto" && !processing}
-    class:align-right={imageLeftPos != "auto" && !processing}
+    class:align-left={mergedStyle.imageRightPos != "auto" && imageURL && !processing}
+    class:align-right={mergedStyle.imageLeftPos != "auto" && imageURL && !processing}
     class:disabled={!enabled || processing}
     aria-label={buttonText}
     on:click={handleClick}
@@ -80,7 +111,7 @@
             <img src={imageURL} alt={imageURL} />
         {/if}
     {:else}
-        <svg class="loader" width={imageWidth} height={imageHeight} viewBox="0 0 50 50" xmlns="http://www.w3.org/2000/svg">
+        <svg class="loader" width={mergedStyle.imageWidth} height={mergedStyle.imageHeight} viewBox="0 0 50 50" xmlns="http://www.w3.org/2000/svg">
             <circle class="path" cx="25" cy="25" r="20" fill="none" stroke-width="4" />
         </svg>
     {/if}

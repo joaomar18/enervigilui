@@ -1,20 +1,39 @@
 <script lang="ts">
     import { fade } from "svelte/transition";
 
+    // Styles
+    import { mergeStyle } from "$lib/style/components";
+    import { AlertStyle } from "$lib/style/general";
+
     // Props
     export let isInfo: boolean = false;
     export let pushTop: boolean = false; //push alert to top
     export let pushBottom: boolean = false; //push alert to bottom
     export let alertText: string;
-
-    // Layout / styling props
     export let topPos: string = "";
     export let bottomPos: string = "";
-    export let backgroundColor: string;
-    export let borderColor: string = "transparent";
-    export let infoBackgroundColor: string = backgroundColor;
-    export let infoBorderColor: string = "transparent";
-    export let textColor: string;
+
+    // Style object (from theme)
+    export let style: { [property: string]: string } | null = null;
+    $: effectiveStyle = style ?? $AlertStyle;
+
+    // Layout / styling props
+    export let backgroundColor: string | undefined = undefined;
+    export let borderColor: string | undefined = undefined;
+    export let infoBackgroundColor: string | undefined = undefined;
+    export let infoBorderColor: string | undefined = undefined;
+    export let textColor: string | undefined = undefined;
+
+    $: localOverrides = {
+        backgroundColor,
+        borderColor,
+        infoBackgroundColor,
+        infoBorderColor,
+        textColor,
+    };
+
+    // Merged style
+    $: mergedStyle = mergeStyle(effectiveStyle, localOverrides);
 
     // Variables
     $: transformY = pushTop ? "-100%" : pushBottom ? "100%" : "0%";
@@ -39,17 +58,17 @@
     style="
         --top-position: {topPos};
         --bottom-position: {bottomPos};
-        --background-color:{backgroundColor};
-        --info-background-color: {infoBackgroundColor};
-        --info-border-color: {infoBorderColor};
-        --border-color:{borderColor};
+        --background-color:{mergedStyle.backgroundColor};
+        --info-background-color: {mergedStyle.infoBackgroundColor};
+        --info-border-color: {mergedStyle.infoBorderColor};
+        --border-color:{mergedStyle.borderColor};
         --transform-y: {transformY};
     "
     class:info={isInfo}
     out:fade={{ duration: 300 }}
 >
     <div class="content">
-        <span class="alert-text" style="--text-color:{textColor};">{alertText}</span>
+        <span class="alert-text" style="--text-color:{mergedStyle.textColor};">{alertText}</span>
         <button class="close-button" on:click={handleClick} aria-label="Close Button">
             <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none">
                 <line class="close-button-line" x1="6" y1="6" x2="18" y2="18" stroke-width="1" stroke-linecap="round" />

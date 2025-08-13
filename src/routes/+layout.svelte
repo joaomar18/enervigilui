@@ -168,15 +168,7 @@
             </div>
             <div class="close-mobile-search-div" class:open={mobileSearchOpen}>
                 <Action
-                    width="40px"
-                    height="40px"
-                    borderRadius="20px"
-                    backgroundColor="#14161c"
-                    borderColor="#2a2e3a"
-                    hoverColor="#2A2E3A"
                     imageURL="/img/previous.png"
-                    imageWidth="25px"
-                    imageHeight="25px"
                     onClick={() => {
                         mobileSearchOpen = false;
                     }}
@@ -214,15 +206,7 @@
                 <div class="right-header-div" class:close={mobileSearchOpen}>
                     <div class="open-search-bar-div" class:close={mobileSearchOpen}>
                         <Action
-                            width="40px"
-                            height="40px"
-                            borderRadius="20px"
-                            backgroundColor="#14161c"
-                            borderColor="#2a2e3a"
-                            hoverColor="#2A2E3A"
                             imageURL="/img/search.png"
-                            imageWidth="25px"
-                            imageHeight="25px"
                             onClick={() => {
                                 leftPanelOpen.set(false);
                                 mobileSearchOpen = true;
@@ -266,11 +250,6 @@
                         isInfo={$displayAsInfo}
                         bottomPos="0px"
                         alertText={$alertText[$selectedLang]}
-                        backgroundColor="#a11f2a"
-                        borderColor="#b91c1c"
-                        infoBackgroundColor="#1e3a8a"
-                        infoBorderColor="#1d4ed8"
-                        textColor="#ffffff"
                         onClick={() => {
                             alertTimeout.update((id) => {
                                 if (id) clearTimeout(id);

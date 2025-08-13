@@ -6,7 +6,8 @@
     import { selectedLang } from "$lib/stores/lang";
 
     // Styles
-    import { mergeStyle, SelectorStyle } from "$lib/style/components";
+    import { mergeStyle } from "$lib/style/components";
+    import { SelectorStyle } from "$lib/style/general";
 
     //Props
     export let disabled: boolean = false; // Selector is disabled

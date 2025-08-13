@@ -3,7 +3,8 @@
     import { browser } from "$app/environment";
 
     // Styles
-    import { mergeStyle, HintInfoStyle } from "$lib/style/components";
+    import { mergeStyle } from "$lib/style/components";
+    import { HintInfoStyle } from "$lib/style/general";
 
     // Props
     export let openInverted: boolean = false;

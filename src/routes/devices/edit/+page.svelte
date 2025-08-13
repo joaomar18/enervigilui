@@ -31,6 +31,9 @@
     import type { DeviceMeter, EditableDeviceMeter, EditableDeviceOPCUAConfig, EditableDeviceModbusRTUConfig } from "$lib/stores/devices";
     import type { DeviceNode, EditableDeviceNode, NodeEditState, NodePhase } from "$lib/stores/nodes";
 
+    // Styles
+    import { SubDefaultButtonStyle, PrimaryButtonStyle, SubPrimaryButtonStyle, DangerButtonStyle, SubDangerButtonStyle } from "$lib/style/button";
+
     // Navigation
     import { navigateTo } from "$lib/ts/navigation";
 
@@ -413,17 +416,7 @@ Shows input forms for protocol-specific parameters and organizes device nodes fo
             <div class="action-buttons-div">
                 <Button
                     buttonText={$texts.cancel[$selectedLang]}
-                    width="250px"
-                    height="50px"
-                    borderRadius="5px"
-                    backgroundColor="#232528"
-                    borderColor="#8A8C91"
-                    hoverColor="#2C2E34"
-                    fontColor="#f5f5f5"
                     imageURL="/img/previous.png"
-                    imageWidth="22px"
-                    imageHeight="22px"
-                    imageLeftPos="20px"
                     onClick={() => {
                         if (
                             areNodesEqual(initialNodes, convertToNodes(nodes)) &&
@@ -439,20 +432,8 @@ Shows input forms for protocol-specific parameters and organizes device nodes fo
                 <Button
                     enabled={$loadedDone && nodesInitialized}
                     buttonText={$texts.save[$selectedLang]}
-                    width="250px"
-                    height="50px"
-                    borderRadius="5px"
-                    backgroundColor="#1a2233"
-                    borderColor="#2F80ED"
-                    hoverColor="#203046"
-                    disabledBackgroundColor="#282828"
-                    disabledBorderColor="#444444"
-                    disabledHoverColor="#282828"
-                    fontColor="#f5f5f5"
+                    style={$PrimaryButtonStyle}
                     imageURL="/img/save.png"
-                    imageWidth="22px"
-                    imageHeight="22px"
-                    imageLeftPos="20px"
                     onClick={() => {
                         if (validDeviceOperation(deviceData)) {
                             if (
@@ -470,20 +451,8 @@ Shows input forms for protocol-specific parameters and organizes device nodes fo
                 <Button
                     enabled={$loadedDone && nodesInitialized}
                     buttonText={$texts.delete[$selectedLang]}
-                    width="250px"
-                    height="50px"
-                    borderRadius="5px"
-                    backgroundColor="#23171a"
-                    borderColor="#FF3B30"
-                    hoverColor="#3b181a"
-                    disabledBackgroundColor="#282828"
-                    disabledBorderColor="#444444"
-                    disabledHoverColor="#282828"
-                    fontColor="#f5f5f5"
+                    style={$DangerButtonStyle}
                     imageURL="/img/delete.png"
-                    imageWidth="22px"
-                    imageHeight="22px"
-                    imageLeftPos="20px"
                     onClick={() => {
                         showDeleteWindow = true;
                     }}
@@ -556,18 +525,7 @@ Shows input forms for protocol-specific parameters and organizes device nodes fo
                                         processing={performingDeleteRequest}
                                         enabled={deleteDeviceName === deviceData.name}
                                         buttonText={$texts.confirm[$selectedLang]}
-                                        width="150px"
-                                        height="40px"
-                                        borderRadius="5px"
-                                        backgroundColor="#E74C3C"
-                                        hoverColor="#C0392B"
-                                        borderColor="#A93226"
-                                        disabledBackgroundColor="#3a2323"
-                                        disabledHoverColor="#2a1818"
-                                        disabledBorderColor="#5a3a3a"
-                                        imageWidth="22px"
-                                        imageHeight="22px"
-                                        fontColor="#f5f5f5"
+                                        style={$SubDangerButtonStyle}
                                         onClick={deleteDeviceConfirmation}
                                     />
                                 </div>
@@ -597,17 +555,7 @@ Shows input forms for protocol-specific parameters and organizes device nodes fo
                             <div class="modal-window-div">
                                 <span class="save-window-text">{$texts.cancelDeviceEditInfo[$selectedLang]}</span>
                                 <div class="button-div save-window-button">
-                                    <Button
-                                        buttonText={$texts.confirm[$selectedLang]}
-                                        width="150px"
-                                        height="40px"
-                                        borderRadius="5px"
-                                        backgroundColor="#3a3a3a"
-                                        hoverColor="#4b4b4b"
-                                        borderColor="#5c5c5c"
-                                        fontColor="#f5f5f5"
-                                        onClick={cancelEdit}
-                                    />
+                                    <Button buttonText={$texts.confirm[$selectedLang]} style={$SubDefaultButtonStyle} onClick={cancelEdit} />
                                 </div>
                             </div>
                         </ModalWindow>
@@ -638,18 +586,7 @@ Shows input forms for protocol-specific parameters and organizes device nodes fo
                                     <Button
                                         processing={performingSaveRequest}
                                         buttonText={$texts.confirm[$selectedLang]}
-                                        width="150px"
-                                        height="40px"
-                                        borderRadius="5px"
-                                        backgroundColor="#2F80ED"
-                                        hoverColor="#1C6DD0"
-                                        borderColor="#1456B0"
-                                        disabledBackgroundColor="#7da5d9"
-                                        disabledHoverColor="#7da5d9"
-                                        disabledBorderColor="#6287b6"
-                                        imageWidth="22px"
-                                        imageHeight="22px"
-                                        fontColor="#f5f5f5"
+                                        style={$SubPrimaryButtonStyle}
                                         onClick={editDeviceConfirmation}
                                     />
                                 </div>

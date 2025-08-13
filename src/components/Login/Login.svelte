@@ -113,9 +113,6 @@
             topPos={`${alertTopPos}px`}
             pushTop={true}
             alertText={alertText($selectedLang)}
-            backgroundColor="#a11f2a"
-            borderColor="#b91c1c"
-            textColor="#ffffff"
             onClick={() => {
                 clearTimeout(alertTimeout);
                 alertTimeout = undefined;

@@ -2,7 +2,8 @@
     import { onMount, onDestroy, tick } from "svelte";
 
     // Styles
-    import { mergeStyle, InputFieldStyle } from "$lib/style/components";
+    import { mergeStyle } from "$lib/style/components";
+    import { InputFieldStyle } from "$lib/style/general";
 
     // Props
     export let disabled: boolean = false;
@@ -21,8 +22,8 @@
 
     // Layout / styling props
     export let width: string | undefined = undefined;
-    export let minWidth: string | null = null;
-    export let maxWidth: string | null = null;
+    export let minWidth: string | undefined = undefined;
+    export let maxWidth: string | undefined = undefined;
     export let height: string | undefined = undefined;
     export let borderRadius: string | undefined = undefined;
     export let backgroundColor: string | undefined = undefined;
