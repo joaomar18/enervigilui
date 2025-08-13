@@ -2,17 +2,51 @@
     // Stores for multi-language support
     import { selectedLang, texts } from "$lib/stores/lang";
 
+    // Styles
+    import { mergeStyle } from "$lib/style/components";
+    import { AddDeviceStyle } from "$lib/style/device";
+
+    // Style object (from theme)
+    export let style: { [property: string]: string | number } | null = null;
+    $: effectiveStyle = style ?? $AddDeviceStyle;
+
     // Layout / styling props
-    export let width: string;
-    export let height: string;
-    export let borderRadius: string = "";
-    export let backgroundColor: string;
-    export let borderColor: string = backgroundColor;
-    export let imageBackgroundColor: string;
-    export let imageWidth: string;
-    export let imageHeight: string;
-    export let strokeColor: string;
-    export let strokeSelectedColor: string;
+    export let width: string | undefined = undefined;
+    export let height: string | undefined = undefined;
+    export let borderRadius: string | undefined = undefined;
+    export let backgroundColor: string | undefined = undefined;
+    export let borderColor: string | undefined = undefined;
+    export let imageBackgroundColor: string | undefined = undefined;
+    export let imageContainerWidth: string | undefined = undefined;
+    export let imageContainerHeight: string | undefined = undefined;
+    export let imageContainerBorderRadius: string | undefined = undefined;
+    export let imageWidth: string | undefined = undefined;
+    export let imageHeight: string | undefined = undefined;
+    export let strokeColor: string | undefined = undefined;
+    export let strokeSelectedColor: string | undefined = undefined;
+    export let shadowColor: string | undefined = undefined;
+    export let titleColor: string | undefined = undefined;
+
+    $: localOverrides = {
+        width,
+        height,
+        borderRadius,
+        backgroundColor,
+        borderColor,
+        imageBackgroundColor,
+        imageContainerWidth,
+        imageContainerHeight,
+        imageContainerBorderRadius,
+        imageWidth,
+        imageHeight,
+        strokeColor,
+        strokeSelectedColor,
+        shadowColor,
+        titleColor,
+    };
+
+    // Merged style
+    $: mergedStyle = mergeStyle(effectiveStyle, localOverrides);
 
     // Click Export Funcion
     export let onClick: () => void;
@@ -28,23 +62,33 @@
 <!-- Add Device Card: clickable card with a plus icon to add a new device -->
 <div
     style="
-        --width: {width};
-        --height: {height};
-        --border-radius: {borderRadius};
-        --background-color: {backgroundColor};
-        --border-color: {borderColor};
-        --image-background-color: {imageBackgroundColor};
-        --image-width: {imageWidth};
-        --image-height: {imageHeight};
-        --stroke-color: {strokeColor};
-        --stroke-selected-color: {strokeSelectedColor};
+        --width: {mergedStyle.width};
+        --height: {mergedStyle.height};
+        --border-radius: {mergedStyle.borderRadius};
+        --background-color: {mergedStyle.backgroundColor};
+        --border-color: {mergedStyle.borderColor};
+        --image-background-color: {mergedStyle.imageBackgroundColor};
+        --image-container-width: {mergedStyle.imageContainerWidth};
+        --image-container-height: {mergedStyle.imageContainerHeight};
+        --image-container-border-radius: {mergedStyle.imageContainerBorderRadius};
+        --image-width: {mergedStyle.imageWidth};
+        --image-height: {mergedStyle.imageHeight};
+        --stroke-color: {mergedStyle.strokeColor};
+        --stroke-selected-color: {mergedStyle.strokeSelectedColor};
+        --shadow-color: {mergedStyle.shadowColor};
+        --title-color: {mergedStyle.titleColor};
     "
     class="container"
 >
     <div class="content">
         <h3>{$texts.addDevice[$selectedLang]}</h3>
         <div class="add-device-image-div">
-            <svg xmlns="http://www.w3.org/2000/svg" width="200" height="200" viewBox="0 0 200 200">
+            <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width={mergedStyle.imageContainerWidth}
+                height={mergedStyle.imageContainerHeight}
+                viewBox="0 0 200 200"
+            >
                 <circle cx="100" cy="100" r="100" fill="transparent" />
 
                 <!-- Vertical bar of the plus -->
@@ -72,12 +116,16 @@
         -webkit-tap-highlight-color: transparent;
         -webkit-touch-callout: none;
         user-select: none;
+        transform-origin: center;
+        backface-visibility: hidden;
+        transform: scale(1) translateZ(0);
+        -webkit-font-smoothing: antialiased;
     }
 
     /* Hover: scale up and apply subtle shadow */
     .container:hover {
-        transform: scale(1.1);
-        box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+        transform: scale(1.1) translateZ(0);
+        box-shadow: 0 8px 16px var(--shadow-color);
     }
 
     /* Content: vertical flex layout, centered items */
@@ -100,24 +148,24 @@
         padding: 0;
         padding-top: 20px;
         padding-bottom: 20px;
-        color: #f5f5f5;
+        color: var(--title-color);
         width: 100%;
         text-align: center;
         font-weight: 400;
     }
 
-    /* Image div: circular placeholder with background and sizing */
+    /* Image div: placeholder with background and sizing */
     .add-device-image-div {
         padding: 0;
         margin: 0;
         margin-top: 10px;
-        width: var(--image-width);
-        height: var(--image-height);
+        width: var(--image-container-width);
+        height: var(--image-container-height);
         background-color: var(--image-background-color);
         background-repeat: no-repeat;
         background-position: center;
-        background-size: auto 87.5%;
-        border-radius: 50%;
+        background-size: var(--image-width) var(--image-height);
+        border-radius: var(--image-container-border-radius);
     }
 
     /* Plus icon lines: base stroke color with transition */

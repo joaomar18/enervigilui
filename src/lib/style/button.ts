@@ -202,3 +202,25 @@ const SubSucessButtonStyleConfig: ComponentStyles = {
 }
 
 export const SubSucessButtonStyle = createStyleStore(SubSucessButtonStyleConfig);
+
+
+//////////     A D D     N O D E     B U T T O N     //////////
+
+const AddNodeButtonStyleConfig: ComponentStyles = {
+    dark: {
+        width: "100%",
+        borderRadius: "0px",
+        backgroundColor: "#1a2027",
+        disabledBackgroundColor: "#1a2027",
+        borderColor: "#1a2027",
+        disabledBorderColor: "#1a2027",
+        hoverColor: "#1f242b",
+        disabledHoverColor: "#1f242b",
+        fontColor: "#f5f5f5",
+        disabledFontColor: "#f5f5f5",
+        fontSize: "0.9rem",
+        fontWeight: "400",
+    }
+}
+
+export const AddNodeButtonStyle = createStyleStore(AddNodeButtonStyleConfig);

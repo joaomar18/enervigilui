@@ -1,17 +1,43 @@
 <script lang="ts">
+    // Styles
+    import { mergeStyle } from "$lib/style/components";
+    import { NotificationStyle } from "$lib/style/general";
+
     // Props
     export let notificationsOpen: boolean = false;
     export let notificationsNumber: string;
 
+    // Style object (from theme)
+    export let style: { [property: string]: string | number } | null = null;
+    $: effectiveStyle = style ?? $NotificationStyle;
+
     // Layout / styling props
-    export let width: string;
-    export let height: string;
-    export let borderRadius: string = "";
-    export let backgroundColor: string;
-    export let hoverColor: string = backgroundColor;
-    export let borderColor: string = backgroundColor;
-    export let imageWidth: string;
-    export let imageHeight: string;
+    export let width: string | undefined = undefined;
+    export let height: string | undefined = undefined;
+    export let borderRadius: string | undefined = undefined;
+    export let backgroundColor: string | undefined = undefined;
+    export let hoverColor: string | undefined = undefined;
+    export let borderColor: string | undefined = undefined;
+    export let imageWidth: string | undefined = undefined;
+    export let imageHeight: string | undefined = undefined;
+    export let numberBackgroundColor: string | undefined = undefined;
+    export let numberTextColor: string | undefined = undefined;
+
+    $: localOverrides = {
+        width,
+        height,
+        borderRadius,
+        backgroundColor,
+        hoverColor,
+        borderColor,
+        imageWidth,
+        imageHeight,
+        numberBackgroundColor,
+        numberTextColor,
+    };
+
+    // Merged style
+    $: mergedStyle = mergeStyle(effectiveStyle, localOverrides);
 
     // Functions
     function handleClick(): void {
@@ -25,14 +51,16 @@
 <div
     class="notifications-button-div"
     style="
-        --width: {width};
-        --height: {height};
-        --border-radius: {borderRadius};
-        --background-color: {backgroundColor};
-        --hover-color: {hoverColor};
-        --border-color: {borderColor};
-        --image-width: {imageWidth};
-        --image-height: {imageHeight};
+        --width: {mergedStyle.width};
+        --height: {mergedStyle.height};
+        --border-radius: {mergedStyle.borderRadius};
+        --background-color: {mergedStyle.backgroundColor};
+        --hover-color: {mergedStyle.hoverColor};
+        --border-color: {mergedStyle.borderColor};
+        --image-width: {mergedStyle.imageWidth};
+        --image-height: {mergedStyle.imageHeight};
+        --number-background-color: {mergedStyle.numberBackgroundColor};
+        --number-text-color: {mergedStyle.numberTextColor};
     "
 >
     {#if notificationsOpen}
@@ -77,7 +105,7 @@
         width: 26px;
         height: 26px;
         border-radius: 13px;
-        background-color: #e53935;
+        background-color: var(--number-background-color);
         text-align: center;
         left: -12px;
         bottom: -12px;
@@ -89,7 +117,7 @@
     /* Badge text: styled number inside badge */
     .notifications-number-text-div span {
         display: inline-block;
-        color: #eee;
+        color: var(--number-text-color);
         font-weight: 500;
         font-size: 1rem;
         line-height: 24px;

@@ -4,6 +4,9 @@
     // Stores for multi-language support
     import { selectedLang, texts } from "$lib/stores/lang";
 
+    // Styles
+    import { AddNodeButtonStyle } from "$lib/style/button";
+
     // Props
     export let windowWidth: number;
 
@@ -24,19 +27,7 @@
     class="add-node"
 >
     <td colspan="20">
-        <Button
-            buttonText={$texts.addNode[$selectedLang]}
-            width="100%"
-            borderRadius="0px"
-            borderColor="transparent"
-            height={buttonHeight}
-            backgroundColor="#1a2027"
-            hoverColor="#1f242b"
-            fontSize="0.9rem"
-            fontColor="#f5f5f5"
-            fontWeight="400"
-            onClick={onAddNode}
-        />
+        <Button buttonText={$texts.addNode[$selectedLang]} style={$AddNodeButtonStyle} height={buttonHeight} onClick={onAddNode} />
     </td>
 </tr>
 

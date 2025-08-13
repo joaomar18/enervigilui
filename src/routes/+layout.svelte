@@ -10,7 +10,7 @@
     import Logo from "../components/General/Logo.svelte";
     import MenuButton from "../components/General/MenuButton.svelte";
     import Logout from "../components/Dashboard/Buttons/Logout.svelte";
-    import Notification from "../components/Dashboard/Buttons/Notification.svelte";
+    import Notification from "../components/General/Notification.svelte";
     import SearchBar from "../components/Dashboard/SearchBar.svelte";
     import Action from "../components/General/Action.svelte";
     import Alert from "../components/General/Alert.svelte";
@@ -213,17 +213,7 @@
                             }}
                         />
                     </div>
-                    <Notification
-                        width="40px"
-                        height="40px"
-                        borderRadius="20px"
-                        notificationsNumber={"1"}
-                        backgroundColor="#14161c"
-                        hoverColor="#2A2E3A"
-                        borderColor="#2a2e3a"
-                        imageWidth="25px"
-                        imageHeight="25px"
-                    />
+                    <Notification notificationsNumber={"1"} />
                     <Logout
                         width="125px"
                         height="40px"

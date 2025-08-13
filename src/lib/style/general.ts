@@ -204,6 +204,26 @@ const ModalWindowStyleConfig: ComponentStyles = {
 export const ModalWindowStyle = createStyleStore(ModalWindowStyleConfig);
 
 
+//////////     N O T I F I C A T I O N     //////////
+
+const NotificationStyleConfig: ComponentStyles = {
+    dark: {
+        width: "40px",
+        height: "40px",
+        borderRadius: "20px",
+        backgroundColor: "#14161c",
+        hoverColor: "#2A2E3A",
+        borderColor: "#2a2e3a",
+        imageWidth: "25px",
+        imageHeight: "25px",
+        numberBackgroundColor: "#e53935",
+        numberTextColor: "#eee",
+    }
+}
+
+export const NotificationStyle = createStyleStore(NotificationStyleConfig);
+
+
 //////////     S E L E C T O R     //////////
 
 const SelectorStyleConfig: ComponentStyles = {

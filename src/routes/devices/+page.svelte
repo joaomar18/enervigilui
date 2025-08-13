@@ -90,35 +90,14 @@
             deviceName={device.name}
             connected={device.connected}
             notifications={""}
-            width="300px"
-            height="400px"
-            borderRadius="20px"
-            backgroundColor="#14161c"
-            borderColor="rgba(255,255,255,0.07)"
             imageURL={devicesImg[device.id]}
-            defaultImageURL="/img/default-device.png"
-            imageBackgroundColor="rgba(255, 255, 255, 0.1)"
-            imageWidth="200px"
-            imageHeight="200px"
             onEdit={() => editDevice(device.id, device.name)}
             onEnter={() => {
                 /* ... */
             }}
         />
     {/each}
-    <AddDevice
-        width="300px"
-        height="400px"
-        borderRadius="20px"
-        backgroundColor="#14161c"
-        borderColor="rgba(255,255,255,0.07)"
-        imageBackgroundColor="rgba(255, 255, 255, 0.1)"
-        imageWidth="200px"
-        imageHeight="200px"
-        strokeColor="#9E9E9E"
-        strokeSelectedColor="#e0e0e0"
-        onClick={() => addDevice()}
-    />
+    <AddDevice onClick={() => addDevice()} />
 </div>
 
 <style>
