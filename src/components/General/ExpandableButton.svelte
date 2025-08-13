@@ -1,4 +1,8 @@
 <script lang="ts">
+    // Styles
+    import { mergeStyle } from "$lib/style/components";
+    import { ExpandableButtonStyle } from "$lib/style/general";
+
     import { onMount, onDestroy } from "svelte";
     import { browser } from "$app/environment";
 
@@ -7,24 +11,51 @@
     export let openInverted: boolean = false;
     export let notValid: boolean = false;
 
+    // Style object (from theme)
+    export let style: { [property: string]: string | number } | null = null;
+    $: effectiveStyle = style ?? $ExpandableButtonStyle;
+
     // Layout / styling props
-    export let modalWidth: string;
-    export let modalHeight: string;
-    export let modalBackgroundColor: string;
-    export let modalBorderColor: string = "transparent";
-    export let modalBorderRadius: string = "0px";
-    export let openBackgroundColor: string;
-    export let openHoverBackgroundColor: string = openBackgroundColor;
-    export let openStrokeColor: string;
-    export let openHoverStrokeColor: string = openStrokeColor;
-    export let closeBackgroundColor: string;
-    export let closeHoverBackgroundColor: string = closeBackgroundColor;
-    export let closeStrokeColor: string;
-    export let closeHoverStrokeColor: string = closeStrokeColor;
-    export let badFormatBackgroundColor: string = openBackgroundColor;
-    export let badFormatHoverBackgroundColor: string = badFormatBackgroundColor;
-    export let badFormatStrokeColor: string = openStrokeColor;
-    export let badFormatHoverStrokeColor: string = badFormatStrokeColor;
+    export let modalWidth: string | undefined = undefined;
+    export let modalHeight: string | undefined = undefined;
+    export let modalBackgroundColor: string | undefined = undefined;
+    export let modalBorderColor: string | undefined = undefined;
+    export let modalBorderRadius: string | undefined = undefined;
+    export let openBackgroundColor: string | undefined = undefined;
+    export let openHoverBackgroundColor: string | undefined = undefined;
+    export let openStrokeColor: string | undefined = undefined;
+    export let openHoverStrokeColor: string | undefined = undefined;
+    export let closeBackgroundColor: string | undefined = undefined;
+    export let closeHoverBackgroundColor: string | undefined = undefined;
+    export let closeStrokeColor: string | undefined = undefined;
+    export let closeHoverStrokeColor: string | undefined = undefined;
+    export let badFormatBackgroundColor: string | undefined = undefined;
+    export let badFormatHoverBackgroundColor: string | undefined = undefined;
+    export let badFormatStrokeColor: string | undefined = undefined;
+    export let badFormatHoverStrokeColor: string | undefined = undefined;
+
+    $: localOverrides = {
+        modalWidth,
+        modalHeight,
+        modalBackgroundColor,
+        modalBorderColor,
+        modalBorderRadius,
+        openBackgroundColor,
+        openHoverBackgroundColor,
+        openStrokeColor,
+        openHoverStrokeColor,
+        closeBackgroundColor,
+        closeHoverBackgroundColor,
+        closeStrokeColor,
+        closeHoverStrokeColor,
+        badFormatBackgroundColor,
+        badFormatHoverBackgroundColor,
+        badFormatStrokeColor,
+        badFormatHoverStrokeColor,
+    };
+
+    // Merged style
+    $: mergedStyle = mergeStyle(effectiveStyle, localOverrides);
 
     // Variables
     let modalOpened: boolean;
@@ -73,11 +104,11 @@
         bind:this={modalDiv}
         class="modal-div"
         style="
-            --modal-width: {modalWidth};
-            --modal-height: {modalHeight};
-            --modal-background-color: {modalBackgroundColor};
-            --modal-border-color: {modalBorderColor};
-            --modal-border-radius: {modalBorderRadius};
+            --modal-width: {mergedStyle.modalWidth};
+            --modal-height: {mergedStyle.modalHeight};
+            --modal-background-color: {mergedStyle.modalBackgroundColor};
+            --modal-border-color: {mergedStyle.modalBorderColor};
+            --modal-border-radius: {mergedStyle.modalBorderRadius};
         "
         class:open={modalOpened}
         class:inverted={openInverted}
@@ -88,20 +119,20 @@
         <div
             class="hint-button"
             style="
-                --open-background-color:{openBackgroundColor};
-                --open-hover-background-color:{openHoverBackgroundColor};
-                --open-stroke-color:{openStrokeColor};
-                --open-hover-stroke-color: {openHoverStrokeColor};
+                --open-background-color:{mergedStyle.openBackgroundColor};
+                --open-hover-background-color:{mergedStyle.openHoverBackgroundColor};
+                --open-stroke-color:{mergedStyle.openStrokeColor};
+                --open-hover-stroke-color: {mergedStyle.openHoverStrokeColor};
 
-                --close-background-color:{closeBackgroundColor};
-                --close-hover-background-color:{closeHoverBackgroundColor};
-                --close-stroke-color:{closeStrokeColor};
-                --close-hover-stroke-color:{closeHoverStrokeColor};
+                --close-background-color:{mergedStyle.closeBackgroundColor};
+                --close-hover-background-color:{mergedStyle.closeHoverBackgroundColor};
+                --close-stroke-color:{mergedStyle.closeStrokeColor};
+                --close-hover-stroke-color:{mergedStyle.closeHoverStrokeColor};
 
-                --bad-format-background-color:{badFormatBackgroundColor};
-                --bad-format-hover-background-color: {badFormatHoverBackgroundColor};
-                --bad-format-stroke-color: {badFormatStrokeColor};
-                --bad-format-hover-stroke-color: {badFormatHoverStrokeColor};
+                --bad-format-background-color:{mergedStyle.badFormatBackgroundColor};
+                --bad-format-hover-background-color: {mergedStyle.badFormatHoverBackgroundColor};
+                --bad-format-stroke-color: {mergedStyle.badFormatStrokeColor};
+                --bad-format-hover-stroke-color: {mergedStyle.badFormatHoverStrokeColor};
             "
         >
             <div class="open-button-div" class:hide={modalOpened} class:not-valid={notValid}>
@@ -228,7 +259,7 @@
 
     /* X lines for the "close" icon */
     .close-line {
-        stroke: var(--close-stroke-color, #ffffff);
+        stroke: var(--close-stroke-color);
     }
 
     /* X line color on not valid */

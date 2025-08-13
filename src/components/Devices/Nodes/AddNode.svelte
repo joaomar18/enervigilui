@@ -27,6 +27,8 @@
         <Button
             buttonText={$texts.addNode[$selectedLang]}
             width="100%"
+            borderRadius="0px"
+            borderColor="transparent"
             height={buttonHeight}
             backgroundColor="#1a2027"
             hoverColor="#1f242b"

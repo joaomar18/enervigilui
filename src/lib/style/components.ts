@@ -5,7 +5,7 @@ export type Style = 'dark';
 
 export type ComponentStyles = {
     [K in Style]: {
-        [property: string]: string;
+        [property: string]: string | number;
     };
 }
 
@@ -18,7 +18,7 @@ export const selectedStyle = writable<Style>("dark"); //Current selected style: 
  * @param property - The CSS property name to retrieve
  * @returns The property value as a string, or empty string if not found
  */
-export function getStyle(style: { [property: string]: string } | null, property: string): string {
+export function getStyle(style: { [property: string]: string | number } | null, property: string): string | number {
     if (!style) {
         return "";
     }
@@ -26,7 +26,7 @@ export function getStyle(style: { [property: string]: string } | null, property:
     return style[property] ?? "";
 }
 
-export function mergeStyle<T extends Record<string, string>>(defaults: T, overrides: Partial<T>): T {
+export function mergeStyle<T extends Record<string, string | number>>(defaults: T, overrides: Partial<T>): T {
     const filteredOverrides: Partial<T> = Object.fromEntries(
         Object.entries(overrides).filter(([, value]) => value !== undefined)
     ) as Partial<T>;

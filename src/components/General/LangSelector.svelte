@@ -1,4 +1,8 @@
 <script lang="ts">
+    // Styles
+    import { mergeStyle } from "$lib/style/components";
+    import { LangSelectorStyle } from "$lib/style/general";
+
     import { browser } from "$app/environment";
     import { replaceState } from "$app/navigation";
     import { onMount, onDestroy } from "svelte";
@@ -6,14 +10,37 @@
     //Props
     export let invertOptions: boolean = false; //Invert Options div position
 
+    // Style object (from theme)
+    export let style: { [property: string]: string | number } | null = null;
+    $: effectiveStyle = style ?? $LangSelectorStyle;
+
     // Stores for multi-language support
     import type { Language } from "$lib/stores/lang";
-    import { selectedLang, texts } from "$lib/stores/lang";
+    import { selectedLang } from "$lib/stores/lang";
 
     // Layout / styling props
-    export let backgroundColor: string = "#252b33";
-    export let borderColor: string = "#323a45";
-    export let selectedColor: string = "#00796b";
+    export let backgroundColor: string | undefined = undefined;
+    export let borderColor: string | undefined = undefined;
+    export let selectedColor: string | undefined = undefined;
+    export let optionsBackgroundColor: string | undefined = undefined;
+    export let optionsBorderColor: string | undefined = undefined;
+    export let selectedOptionTextColor: string | undefined = undefined;
+    export let optionsTextColor: string | undefined = undefined;
+    export let optionsSelectedTextColor: string | undefined = undefined;
+
+    $: localOverrides = {
+        backgroundColor,
+        borderColor,
+        selectedColor,
+        optionsBackgroundColor,
+        optionsBorderColor,
+        selectedOptionTextColor,
+        optionsTextColor,
+        optionsSelectedTextColor,
+    };
+
+    // Merged style
+    $: mergedStyle = mergeStyle(effectiveStyle, localOverrides);
 
     // Variables
     let isOpen: boolean = false;
@@ -70,9 +97,14 @@
     bind:this={langDivEl}
     class="language-div"
     style="
-        --background-color: {backgroundColor};
-        --border-color: {borderColor};
-        --selected-color: {selectedColor};
+        --background-color: {mergedStyle.backgroundColor};
+        --border-color: {mergedStyle.borderColor};
+        --selected-color: {mergedStyle.selectedColor};
+        --options-background-color: {mergedStyle.optionsBackgroundColor};
+        --options-border-color: {mergedStyle.optionsBorderColor};
+        --selected-option-text-color: {mergedStyle.selectedOptionTextColor};
+        --options-text-color: {mergedStyle.optionsTextColor};
+        --options-selected-text-color: {mergedStyle.optionsSelectedTextColor};
     "
 >
     <div class="content-div">
@@ -80,13 +112,7 @@
         <span class="selected-lang">{$selectedLang}</span>
         <img
             class="arrow"
-            src={invertOptions
-                ? isOpen
-                    ? "/img/down-arrow.png"
-                    : "/img/up-arrow.png"
-                : isOpen
-                  ? "/img/up-arrow.png"
-                  : "/img/down-arrow.png"}
+            src={invertOptions ? (isOpen ? "/img/down-arrow.png" : "/img/up-arrow.png") : isOpen ? "/img/up-arrow.png" : "/img/down-arrow.png"}
             alt={isOpen ? "up-arrow" : "down-arrow"}
         />
         <button class="open-selector" on:click={toggleSelector} aria-label="View options"></button>
@@ -148,7 +174,7 @@
 
     /* Current selected language text */
     .selected-lang {
-        color: #eeeeee;
+        color: var(--selected-option-text-color);
         font-weight: 400;
         position: absolute;
         font-size: 1.5rem;
@@ -173,9 +199,9 @@
         position: absolute;
         width: 100%;
         height: fit-content;
-        background-color: #1e242b;
+        background-color: var(--options-background-color);
         border-radius: 5px;
-        border: 1px solid #323a45;
+        border: 1px solid var(--options-border-color);
         display: flex;
         flex-direction: column;
         justify-content: start;
@@ -215,7 +241,7 @@
         align-items: center;
         justify-content: center;
         text-align: center;
-        color: #b0bec5;
+        color: var(--options-text-color);
         -webkit-tap-highlight-color: transparent;
     }
 
@@ -235,6 +261,6 @@
     /* Styling for the currently selected option */
     .option.selected-option {
         background-color: var(--selected-color);
-        color: #ffffff;
+        color: var(--options-selected-text-color);
     }
 </style>

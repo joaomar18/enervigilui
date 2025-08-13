@@ -153,7 +153,7 @@
             </div>
         </nav>
         <div class="language-selector-div">
-            <LangSelector invertOptions={true} backgroundColor="#1e242b" borderColor="#323a45" />
+            <LangSelector invertOptions={true} />
             <span class="language-text">{$texts.language[$selectedLang]}</span>
         </div>
     </div>

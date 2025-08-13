@@ -17,7 +17,7 @@
     export let infoText: string = "";
 
     // Style object (from theme)
-    export let style: { [property: string]: string } | null = null;
+    export let style: { [property: string]: string | number } | null = null;
     $: effectiveStyle = style ?? $InputFieldStyle;
 
     // Layout / styling props

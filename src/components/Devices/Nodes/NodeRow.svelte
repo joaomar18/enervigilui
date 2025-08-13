@@ -14,6 +14,9 @@
     import type { EditableDeviceNode, NodeEditState } from "$lib/stores/nodes";
     import type { ColumnVisibilityMap } from "$lib/ts/nodes_gid";
 
+    // Styles
+    import { SubPrimaryButtonStyle, SubDangerButtonStyle } from "$lib/style/button";
+
     // Stores for multi-language support
     import { texts, variableNameTextsByPhase, selectedLang } from "$lib/stores/lang";
 
@@ -366,14 +369,8 @@ properties and action buttons for configuration and deletion. -->
                         onPropertyChanged();
                     }}
                     inputName="custom-node"
-                    width="1.5em"
-                    height="1.5em"
-                    checkMarkWidth={24}
-                    checkMarkHeight={24}
-                    enabledbgColor="#2f80ed"
-                    enabledBorderColor="#5a646e"
-                    disabledbgColor="#42505f"
-                    disabledBorderColor="#5a646e"
+                    width={buttonSize}
+                    height={buttonSize}
                 />
             </div>
         </td>
@@ -387,14 +384,8 @@ properties and action buttons for configuration and deletion. -->
                         onPropertyChanged();
                     }}
                     inputName="publish-node"
-                    width="1.5em"
-                    height="1.5em"
-                    checkMarkWidth={24}
-                    checkMarkHeight={24}
-                    enabledbgColor="#2f80ed"
-                    enabledBorderColor="#5a646e"
-                    disabledbgColor="#42505f"
-                    disabledBorderColor="#5a646e"
+                    width={buttonSize}
+                    height={buttonSize}
                 />
             </div>
         </td>
@@ -411,16 +402,8 @@ properties and action buttons for configuration and deletion. -->
                     inputInvalid={!node.validation.calculated}
                     enableInputInvalid={true}
                     inputName="virtual-node"
-                    width="1.5em"
-                    height="1.5em"
-                    checkMarkWidth={24}
-                    checkMarkHeight={24}
-                    enabledbgColor="#2f80ed"
-                    enabledBorderColor="#5a646e"
-                    disabledbgColor="#42505f"
-                    disabledBorderColor="#5a646e"
-                    badFormatBackgroundColor="#e74c3c"
-                    badFormatBorderColor="#5a646e"
+                    width={buttonSize}
+                    height={buttonSize}
                 />
             </div>
         </td>
@@ -435,16 +418,8 @@ properties and action buttons for configuration and deletion. -->
                     }}
                     inputInvalid={!node.validation.loggingPeriod}
                     inputName="log-node"
-                    width="1.5em"
-                    height="1.5em"
-                    checkMarkWidth={24}
-                    checkMarkHeight={24}
-                    enabledbgColor="#2f80ed"
-                    enabledBorderColor="#5a646e"
-                    disabledbgColor="#42505f"
-                    disabledBorderColor="#5a646e"
-                    badFormatBackgroundColor="#e74c3c"
-                    badFormatBorderColor="#5a646e"
+                    width={buttonSize}
+                    height={buttonSize}
                 />
             </div>
         </td>
@@ -461,16 +436,8 @@ properties and action buttons for configuration and deletion. -->
                     inputInvalid={!node.validation.minAlarm}
                     enableInputInvalid={true}
                     inputName="node-min-alarm"
-                    width="1.5em"
-                    height="1.5em"
-                    checkMarkWidth={24}
-                    checkMarkHeight={24}
-                    enabledbgColor="#2f80ed"
-                    enabledBorderColor="#5a646e"
-                    disabledbgColor="#42505f"
-                    disabledBorderColor="#5a646e"
-                    badFormatBackgroundColor="#e74c3c"
-                    badFormatBorderColor="#5a646e"
+                    width={buttonSize}
+                    height={buttonSize}
                 />
             </div>
         </td>
@@ -487,16 +454,8 @@ properties and action buttons for configuration and deletion. -->
                     inputInvalid={!node.validation.maxAlarm}
                     enableInputInvalid={true}
                     inputName="node-max-alarm"
-                    width="1.5em"
-                    height="1.5em"
-                    checkMarkWidth={24}
-                    checkMarkHeight={24}
-                    enabledbgColor="#2f80ed"
-                    enabledBorderColor="#5a646e"
-                    disabledbgColor="#42505f"
-                    disabledBorderColor="#5a646e"
-                    badFormatBackgroundColor="#e74c3c"
-                    badFormatBorderColor="#5a646e"
+                    width={buttonSize}
+                    height={buttonSize}
                 />
             </div>
         </td>
@@ -512,12 +471,6 @@ properties and action buttons for configuration and deletion. -->
                     inputName="enable-node"
                     width={buttonSize}
                     height={buttonSize}
-                    checkMarkWidth={24}
-                    checkMarkHeight={24}
-                    enabledbgColor="#2f80ed"
-                    enabledBorderColor="#5a646e"
-                    disabledbgColor="#42505f"
-                    disabledBorderColor="#5a646e"
                 />
             </div>
         </td>
@@ -541,35 +494,12 @@ properties and action buttons for configuration and deletion. -->
                         >
                     </button>
                 {:else}
-                    <ExpandableButton
-                        bind:closeModal={closeExpandableButton}
-                        notValid={!node.validation.isValid()}
-                        modalWidth="250px"
-                        modalHeight="fit-content"
-                        modalBackgroundColor="#1e242b"
-                        modalBorderColor="#2c343d"
-                        modalBorderRadius="10px"
-                        openBackgroundColor="rgba(255, 255, 255, 0.05)"
-                        openHoverBackgroundColor="rgba(255, 255, 255, 0.1)"
-                        openStrokeColor="#cccccc"
-                        openHoverStrokeColor="#eeeeee"
-                        closeBackgroundColor="rgba(255, 255, 255, 0.1)"
-                        closeHoverBackgroundColor="rgba(255, 255, 255, 0.2)"
-                        closeStrokeColor="white"
-                        closeHoverStrokeColor="#eeeeee"
-                        badFormatStrokeColor="#e74c3c"
-                        badFormatHoverStrokeColor="#c0392b"
-                    >
+                    <ExpandableButton bind:closeModal={closeExpandableButton} notValid={!node.validation.isValid()}>
                         <div class="expandable-button-div">
                             <Button
                                 buttonText={$texts.configuration[$selectedLang]}
+                                style={$SubPrimaryButtonStyle}
                                 width="200px"
-                                height="40px"
-                                borderRadius="5px"
-                                backgroundColor="#2F80ED"
-                                hoverColor="#1C6DD0"
-                                borderColor="#1456B0"
-                                fontColor="#f5f5f5"
                                 imageURL="/img/configuration.png"
                                 imageWidth="20px"
                                 imageHeight="20px"
@@ -581,13 +511,8 @@ properties and action buttons for configuration and deletion. -->
                             />
                             <Button
                                 buttonText={$texts.delete[$selectedLang]}
+                                style={$SubDangerButtonStyle}
                                 width="200px"
-                                height="40px"
-                                borderRadius="5px"
-                                backgroundColor="#E74C3C"
-                                hoverColor="#C0392B"
-                                borderColor="#A93226"
-                                fontColor="#f5f5f5"
                                 imageURL="/img/delete.png"
                                 imageWidth="20px"
                                 imageHeight="20px"

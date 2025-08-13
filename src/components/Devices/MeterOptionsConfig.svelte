@@ -53,18 +53,7 @@
     <span>{$texts.readEnergyFromMeter[$selectedLang]}</span>
     <div class="input-div">
         <div class="input-content-div">
-            <SelectorButton
-                bind:checked={deviceData.options.read_energy_from_meter}
-                width="75px"
-                height="20px"
-                knobWidth="32px"
-                knobHeight="32px"
-                borderRadius="10px"
-                backgroundColor="#3a3a3a"
-                selectedBackgroundColor="#4a4a4a"
-                knobBackgroundColor="#e0e0e0"
-                knobSelectedBackgroundColor="#2f80ed"
-            />
+            <SelectorButton bind:checked={deviceData.options.read_energy_from_meter} />
         </div>
         <div class="info-div">
             <HintInfo>
@@ -77,18 +66,7 @@
     <span>{$texts.readForwardReverseEnergySeparate[$selectedLang]}</span>
     <div class="input-div">
         <div class="input-content-div">
-            <SelectorButton
-                bind:checked={deviceData.options.read_separate_forward_reverse_energy}
-                width="75px"
-                height="20px"
-                knobWidth="32px"
-                knobHeight="32px"
-                borderRadius="10px"
-                backgroundColor="#3a3a3a"
-                selectedBackgroundColor="#4a4a4a"
-                knobBackgroundColor="#e0e0e0"
-                knobSelectedBackgroundColor="#2f80ed"
-            />
+            <SelectorButton bind:checked={deviceData.options.read_separate_forward_reverse_energy} />
         </div>
         <div class="info-div">
             <HintInfo>
@@ -101,18 +79,7 @@
     <span>{$texts.negativeReactivePower[$selectedLang]}</span>
     <div class="input-div">
         <div class="input-content-div">
-            <SelectorButton
-                bind:checked={deviceData.options.negative_reactive_power}
-                width="75px"
-                height="20px"
-                knobWidth="32px"
-                knobHeight="32px"
-                borderRadius="10px"
-                backgroundColor="#3a3a3a"
-                selectedBackgroundColor="#4a4a4a"
-                knobBackgroundColor="#e0e0e0"
-                knobSelectedBackgroundColor="#2f80ed"
-            />
+            <SelectorButton bind:checked={deviceData.options.negative_reactive_power} />
         </div>
         <div class="info-div">
             <HintInfo>
@@ -125,18 +92,7 @@
     <span>{$texts.frequencyReading[$selectedLang]}</span>
     <div class="input-div">
         <div class="input-content-div">
-            <SelectorButton
-                bind:checked={deviceData.options.frequency_reading}
-                width="75px"
-                height="20px"
-                knobWidth="32px"
-                knobHeight="32px"
-                borderRadius="10px"
-                backgroundColor="#3a3a3a"
-                selectedBackgroundColor="#4a4a4a"
-                knobBackgroundColor="#e0e0e0"
-                knobSelectedBackgroundColor="#2f80ed"
-            />
+            <SelectorButton bind:checked={deviceData.options.frequency_reading} />
         </div>
         <div class="info-div">
             <HintInfo>

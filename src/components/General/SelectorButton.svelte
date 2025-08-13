@@ -1,17 +1,40 @@
 <script lang="ts">
+    // Styles
+    import { mergeStyle } from "$lib/style/components";
+    import { SelectorButtonStyle } from "$lib/style/general";
+
     //Props
     export let checked: boolean;
 
+    // Style object (from theme)
+    export let style: { [property: string]: string | number } | null = null;
+    $: effectiveStyle = style ?? $SelectorButtonStyle;
+
     // Layout / styling props
-    export let width: string;
-    export let height: string;
-    export let knobWidth: string;
-    export let knobHeight: string;
-    export let borderRadius: string = "0px";
-    export let backgroundColor: string;
-    export let selectedBackgroundColor: string = backgroundColor;
-    export let knobBackgroundColor: string;
-    export let knobSelectedBackgroundColor: string = knobBackgroundColor;
+    export let width: string | undefined = undefined;
+    export let height: string | undefined = undefined;
+    export let knobWidth: string | undefined = undefined;
+    export let knobHeight: string | undefined = undefined;
+    export let borderRadius: string | undefined = undefined;
+    export let backgroundColor: string | undefined = undefined;
+    export let selectedBackgroundColor: string | undefined = undefined;
+    export let knobBackgroundColor: string | undefined = undefined;
+    export let knobSelectedBackgroundColor: string | undefined = undefined;
+
+    $: localOverrides = {
+        width,
+        height,
+        knobWidth,
+        knobHeight,
+        borderRadius,
+        backgroundColor,
+        selectedBackgroundColor,
+        knobBackgroundColor,
+        knobSelectedBackgroundColor,
+    };
+
+    // Merged style
+    $: mergedStyle = mergeStyle(effectiveStyle, localOverrides);
 
     //Functions
     function getNumber(value: string): number {
@@ -22,10 +45,10 @@
         checked = !checked;
     }
 
-    $: widthNumber = getNumber(width);
-    $: knobWidthNumber = getNumber(knobWidth);
-    $: heightNumber = getNumber(height);
-    $: knobHeightNumber = getNumber(knobHeight);
+    $: widthNumber = getNumber(String(mergedStyle.width));
+    $: knobWidthNumber = getNumber(String(mergedStyle.knobWidth));
+    $: heightNumber = getNumber(String(mergedStyle.height));
+    $: knobHeightNumber = getNumber(String(mergedStyle.knobHeight));
 </script>
 
 <!-- 
@@ -39,17 +62,17 @@
     on:click={toggle}
     aria-label="Selector Button"
     style="
-        --width: {width};
-        --height: {height};
-        --knob-width: {knobWidth};
-        --knob-height: {knobHeight};
+        --width: {mergedStyle.width};
+        --height: {mergedStyle.height};
+        --knob-width: {mergedStyle.knobWidth};
+        --knob-height: {mergedStyle.knobHeight};
         --knob-top-push: {`${(heightNumber - knobHeightNumber) / 2}px`};
         --knob-right-push: {`${widthNumber - knobWidthNumber}px`};
-        --border-radius: {borderRadius};
-        --background-color: {backgroundColor};
-        --selected-background-color: {selectedBackgroundColor};
-        --knob-background-color: {knobBackgroundColor};
-        --knob-selected-background-color: {knobSelectedBackgroundColor};
+        --border-radius: {mergedStyle.borderRadius};
+        --background-color: {mergedStyle.backgroundColor};
+        --selected-background-color: {mergedStyle.selectedBackgroundColor};
+        --knob-background-color: {mergedStyle.knobBackgroundColor};
+        --knob-selected-background-color: {mergedStyle.knobSelectedBackgroundColor};
     "
 >
     <div class="knob {checked ? 'checked' : ''}"></div>

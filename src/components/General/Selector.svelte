@@ -22,7 +22,7 @@
     export let maxOptions: number = 5; //if the content is scrollable assigns the maximum number of visible options
 
     // Style object (from theme)
-    export let style: { [property: string]: string } | null = null;
+    export let style: { [property: string]: string | number } | null = null;
     $: effectiveStyle = style ?? $SelectorStyle;
 
     // Layout / styling props
@@ -90,10 +90,10 @@
     $: selectedKey = useLang
         ? Object.keys(options).find((key) => key === selectedOption)
         : Object.entries(options).find(([_, value]) => value === selectedOption)?.[0];
-    $: shiftTextLeft = String(parseFloat(mergedStyle.arrowRightPos) + parseFloat(mergedStyle.arrowWidth)) + "px";
+    $: shiftTextLeft = String(parseFloat(String(mergedStyle.arrowRightPos)) + parseFloat(String(mergedStyle.arrowWidth))) + "px";
     $: {
         if (scrollable && optionsLength > maxOptions) {
-            optionsHeight = String(parseFloat(mergedStyle.height) * maxOptions) + "px";
+            optionsHeight = String(parseFloat(String(mergedStyle.height)) * maxOptions) + "px";
         }
     }
     $: {

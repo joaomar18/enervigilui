@@ -150,19 +150,7 @@
         hintText={$texts.passwordInfo[$selectedLang]}
     />
     <div class="checkbox-div">
-        <Checkbox
-            bind:checked={autoLogin}
-            inputName="auto-login"
-            width="1.5em"
-            height="1.5em"
-            checkMarkWidth={24}
-            checkMarkHeight={24}
-            enabledbgColor="#4caf7f"
-            enabledBorderColor="#5a646e"
-            disabledbgColor="#42505f"
-            disabledBorderColor="#5a646e"
-            marginRight="10px"
-        />
+        <Checkbox bind:checked={autoLogin} inputName="auto-login" enabledBackgroundColor="#4caf7f" marginRight="10px" />
         <span class="keep-logged-in-text">{$texts.keepSessionLogged[$selectedLang]}</span>
     </div>
     <LoginButton

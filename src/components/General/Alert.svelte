@@ -14,7 +14,7 @@
     export let bottomPos: string = "";
 
     // Style object (from theme)
-    export let style: { [property: string]: string } | null = null;
+    export let style: { [property: string]: string | number } | null = null;
     $: effectiveStyle = style ?? $AlertStyle;
 
     // Layout / styling props

@@ -1,17 +1,38 @@
 <script lang="ts">
+    // Styles
+    import { mergeStyle } from "$lib/style/components";
+    import { UploadImageStyle } from "$lib/style/general";
+
     //Props
     export let imageFile: File | undefined;
+    export let imageUrl: string;
+    export let defaultImageUrl: string | undefined = undefined;
+
+    // Style object (from theme)
+    export let style: { [property: string]: string | number } | null = null;
+    $: effectiveStyle = style ?? $UploadImageStyle;
 
     // Layout / styling props
-    export let width: string;
-    export let height: string;
-    export let borderRadius: string = "0px";
-    export let imageUrl: string;
-    export let defaultImageUrl: string | null = null;
-    export let imageWidth: string = "auto";
-    export let imageHeight: string = "auto";
-    export let backgroundColor: string;
-    export let hoverColor: string = backgroundColor;
+    export let width: string | undefined = undefined;
+    export let height: string | undefined = undefined;
+    export let borderRadius: string | undefined = undefined;
+    export let imageWidth: string | undefined = undefined;
+    export let imageHeight: string | undefined = undefined;
+    export let backgroundColor: string | undefined = undefined;
+    export let hoverColor: string | undefined = undefined;
+
+    $: localOverrides = {
+        width,
+        height,
+        borderRadius,
+        imageWidth,
+        imageHeight,
+        backgroundColor,
+        hoverColor,
+    };
+
+    // Merged style
+    $: mergedStyle = mergeStyle(effectiveStyle, localOverrides);
 
     // Variables
     let fileInput: HTMLInputElement;
@@ -41,13 +62,13 @@
 <!-- Image upload wrapper: shows the current image with a pencil overlay and lets users click to pick a new file -->
 <div
     style="
-        --width: {width};
-        --height: {height};
-        --border-radius: {borderRadius};
-        --image-width: {imageWidth};
-        --image-height: {imageHeight};
-        --background-color: {backgroundColor};
-        --hover-color: {hoverColor};
+        --width: {mergedStyle.width};
+        --height: {mergedStyle.height};
+        --border-radius: {mergedStyle.borderRadius};
+        --image-width: {mergedStyle.imageWidth};
+        --image-height: {mergedStyle.imageHeight};
+        --background-color: {mergedStyle.backgroundColor};
+        --hover-color: {mergedStyle.hoverColor};
     "
     class="container"
 >

@@ -1,4 +1,8 @@
 <script lang="ts">
+    // Styles
+    import { mergeStyle } from "$lib/style/components";
+    import { CheckBoxStyle } from "$lib/style/general";
+
     // Props
     export let disabled: boolean = false;
     export let checked: boolean;
@@ -6,21 +10,45 @@
     export let enableInputInvalid: boolean = false;
     export let inputName: string = ""; //Name of the input
 
+    // Style object (from theme)
+    export let style: { [property: string]: string | number } | null = null;
+    $: effectiveStyle = style ?? $CheckBoxStyle;
+
     // Layout / styling props
-    export let width: string;
-    export let height: string;
-    export let checkMarkWidth: number;
-    export let checkMarkHeight: number;
-    export let checkmarkStroke: number = 2.5;
-    export let marginRight: string = "";
-    export let disabledbgColor: string; // background color when unchecked
-    export let disabledBorderColor: string; // border color when unchecked
-    export let enabledbgColor: string; // background color when checked
-    export let enabledBorderColor: string; // border color when checked
-    export let badFormatBackgroundColor: string = disabledbgColor;
-    export let badFormatBorderColor: string = badFormatBackgroundColor;
-    export let disabledCheckmarkColor: string = "rgb(170,170,170)"; // checkmark color when unchecked
-    export let enabledCheckmarkColor: string = "rgb(255,255,255)"; // checkmark color when checked
+    export let width: string | undefined = undefined;
+    export let height: string | undefined = undefined;
+    export let checkMarkWidth: number | undefined = undefined;
+    export let checkMarkHeight: number | undefined = undefined;
+    export let checkMarkStroke: number | undefined = undefined;
+    export let marginRight: string | undefined = undefined;
+    export let disabledbackgroundColor: string | undefined = undefined;
+    export let disabledBorderColor: string | undefined = undefined;
+    export let enabledBackgroundColor: string | undefined = undefined;
+    export let enabledBorderColor: string | undefined = undefined;
+    export let badFormatBackgroundColor: string | undefined = undefined;
+    export let badFormatBorderColor: string | undefined = undefined;
+    export let disabledCheckMarkColor: string | undefined = undefined;
+    export let enabledCheckMarkColor: string | undefined = undefined;
+
+    $: localOverrides = {
+        width,
+        height,
+        checkMarkWidth,
+        checkMarkHeight,
+        checkMarkStroke,
+        marginRight,
+        disabledbackgroundColor,
+        disabledBorderColor,
+        enabledBackgroundColor,
+        enabledBorderColor,
+        badFormatBackgroundColor,
+        badFormatBorderColor,
+        disabledCheckMarkColor,
+        enabledCheckMarkColor,
+    };
+
+    // Merged style
+    $: mergedStyle = mergeStyle(effectiveStyle, localOverrides);
 
     // Change Export Function
     export let onChange: (() => void) | undefined = undefined;
@@ -39,17 +67,17 @@
 <label
     class="label-checkbox"
     style="
-        --width: {width};
-        --height: {height};
-        --margin-right: {marginRight};
-        --disabled-bg-color: {disabledbgColor};
-        --disabled-border-color: {disabledBorderColor};
-        --enabled-bg-color: {enabledbgColor};
-        --enabled-border-color: {enabledBorderColor};
-        --bad-format-background-color: {badFormatBackgroundColor};
-        --bad-format-border-color: {badFormatBorderColor};
-        --enabled-checkmark-color: {enabledCheckmarkColor};
-        --disabled-checkmark-color: {disabledCheckmarkColor};
+        --width: {mergedStyle.width};
+        --height: {mergedStyle.height};
+        --margin-right: {mergedStyle.marginRight};
+        --disabled-bg-color: {mergedStyle.disabledBackgroundColor};
+        --disabled-border-color: {mergedStyle.disabledBorderColor};
+        --enabled-bg-color: {mergedStyle.enabledBackgroundColor};
+        --enabled-border-color: {mergedStyle.enabledBorderColor};
+        --bad-format-background-color: {mergedStyle.badFormatBackgroundColor};
+        --bad-format-border-color: {mergedStyle.badFormatBorderColor};
+        --enabled-checkmark-color: {mergedStyle.enabledCheckMarkColor};
+        --disabled-checkmark-color: {mergedStyle.disabledCheckMarkColor};
     "
     class:disabled
 >
@@ -66,10 +94,10 @@
         <svg
             xmlns="http://www.w3.org/2000/svg"
             viewBox="0 0 24 24"
-            width={checkMarkWidth}
-            height={checkMarkHeight}
+            width={mergedStyle.checkMarkWidth}
+            height={mergedStyle.checkMarkHeight}
             fill="none"
-            stroke-width={checkmarkStroke}
+            stroke-width={mergedStyle.checkMarkStroke}
             stroke-linecap="round"
             stroke-linejoin="round"
             class:checked
@@ -110,9 +138,9 @@
         height: 1.5em; */
         width: var(--width);
         height: var(--height);
-        border: 1px solid var(--disabled-border-color, #5a646e);
+        border: 1px solid var(--disabled-border-color);
         border-radius: 4px;
-        background-color: var(--disabled-bg-color, #42505f);
+        background-color: var(--disabled-bg-color);
         position: relative;
         display: flex;
         justify-content: center;
@@ -131,8 +159,8 @@
 
     /* Checkbox appearance when checked */
     .label-checkbox input[type="checkbox"]:checked + span {
-        border: 1px solid var(--enabled-border-color, #5a646e);
-        background-color: var(--enabled-bg-color, #4caf7f);
+        border: 1px solid var(--enabled-border-color);
+        background-color: var(--enabled-bg-color);
     }
 
     /* Checkbox appeareance when input is invalid and checked */
@@ -144,6 +172,6 @@
     /* Checkbox appeareance when input is invalid and unchecked */
     .label-checkbox input[type="checkbox"].bad-format-off + span.bad-format-off {
         border: 1px solid var(--bad-format-background-color);
-        background-color: var(--disabled-bg-color, #42505f);
+        background-color: var(--disabled-bg-color);
     }
 </style>

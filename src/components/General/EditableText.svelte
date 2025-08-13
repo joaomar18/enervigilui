@@ -4,6 +4,10 @@
     import { onMount, onDestroy } from "svelte";
     import Action from "./Action.svelte";
 
+    // Styles
+    import { mergeStyle } from "$lib/style/components";
+    import { EditableTextStyle } from "$lib/style/general";
+
     //Props
     export let text: string;
     export let placeHolder: string | null = null;
@@ -11,16 +15,33 @@
     export let textInvalid: boolean = false;
     export let enableTextInvalid: boolean = false;
 
+    // Style object (from theme)
+    export let style: { [property: string]: string | number } | null = null;
+    $: effectiveStyle = style ?? $EditableTextStyle;
+
     // Layout / styling props
-    export let width: string = "auto";
-    export let minWidth: string | null = null;
-    export let maxWidth: string | null = null;
-    export let fontSize: string = "1rem";
-    export let fontColor: string;
-    export let borderColorBottom: string;
-    export let invalidBorderColorBottom: string = borderColorBottom;
-    export let buttonImageWidth: string;
-    export let buttonImageHeight: string;
+    export let width: string | undefined = undefined;
+    export let minWidth: string | undefined = undefined;
+    export let maxWidth: string | undefined = undefined;
+    export let fontSize: string | undefined = undefined;
+    export let fontColor: string | undefined = undefined;
+    export let borderColorBottom: string | undefined = undefined;
+    export let invalidBorderColorBottom: string | undefined = undefined;
+    export let buttonImageWidth: string | undefined = undefined;
+    export let buttonImageHeight: string | undefined = undefined;
+
+    $: localOverrides = {
+        width,
+        fontSize,
+        fontColor,
+        borderColorBottom,
+        invalidBorderColorBottom,
+        buttonImageWidth,
+        buttonImageHeight,
+    };
+
+    // Merged style
+    $: mergedStyle = mergeStyle(effectiveStyle, localOverrides);
 
     //Variables
     let enableInput: boolean = false;
@@ -68,15 +89,15 @@
 <!-- Inline-edit field: click pencil to enter edit mode, press Enter or check to save, Esc or arrow to cancel -->
 <div
     style="
-        --width: {width};
+        --width: {mergedStyle.width};
         --min-width: {minWidth};
         --max-width: {maxWidth};
-        --font-size: {fontSize};
-        --font-color: {fontColor};
-        --border-color-bottom: {borderColorBottom};
-        --invalid-border-color-bottom: {invalidBorderColorBottom};
-        --button-image-width: {buttonImageWidth};
-        --button-image-height: {buttonImageHeight};
+        --font-size: {mergedStyle.fontSize};
+        --font-color: {mergedStyle.fontColor};
+        --border-color-bottom: {mergedStyle.borderColorBottom};
+        --invalid-border-color-bottom: {mergedStyle.invalidBorderColorBottom};
+        --button-image-width: {mergedStyle.buttonImageWidth};
+        --button-image-height: {mergedStyle.buttonImageHeight};
     "
     class="container"
     bind:this={containerEl}
@@ -104,15 +125,11 @@
         {#if !allwaysEnabled}
             <div class="button-div edit-button-div" class:hide={enableInput}>
                 <Action
-                    width="40px"
-                    height="40px"
-                    borderRadius="20px"
                     backgroundColor="transparent"
                     borderColor="transparent"
-                    hoverColor="#2A2E3A"
                     imageURL="/img/edit_pencil.png"
-                    imageWidth={buttonImageWidth}
-                    imageHeight={buttonImageHeight}
+                    imageWidth={String(mergedStyle.buttonImageWidth)}
+                    imageHeight={String(mergedStyle.buttonImageHeight)}
                     onClick={activeInput}
                 />
             </div>
@@ -121,29 +138,21 @@
     {#if !allwaysEnabled}
         <div class="button-div confirm-button-div" class:hide={!enableInput}>
             <Action
-                width="40px"
-                height="40px"
-                borderRadius="20px"
                 backgroundColor="transparent"
                 borderColor="transparent"
-                hoverColor="#2A2E3A"
                 imageURL="/img/accept.png"
-                imageWidth={buttonImageWidth}
-                imageHeight={buttonImageHeight}
+                imageWidth={String(mergedStyle.buttonImageWidth)}
+                imageHeight={String(mergedStyle.buttonImageHeight)}
                 onClick={confirmInput}
             />
         </div>
         <div class="button-div cancel-button-div" class:hide={!enableInput}>
             <Action
-                width="40px"
-                height="40px"
-                borderRadius="20px"
                 backgroundColor="transparent"
                 borderColor="transparent"
-                hoverColor="#2A2E3A"
                 imageURL="/img/previous.png"
-                imageWidth={buttonImageWidth}
-                imageHeight={buttonImageHeight}
+                imageWidth={String(mergedStyle.buttonImageWidth)}
+                imageHeight={String(mergedStyle.buttonImageHeight)}
                 onClick={cancelInput}
             />
         </div>
@@ -164,6 +173,7 @@
         align-items: center;
     }
 
+    /* Container for the input element */
     .container .input-div {
         position: relative;
         width: fit-content;

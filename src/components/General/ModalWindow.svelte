@@ -2,20 +2,44 @@
     import { browser } from "$app/environment";
     import { onMount, onDestroy } from "svelte";
 
-    // Layout / styling props
+    // Styles
+    import { mergeStyle } from "$lib/style/components";
+    import { ModalWindowStyle } from "$lib/style/general";
+
+    // Props
     export let customTitle: boolean = false;
     export let title: string = "";
-    export let width: string;
-    export let minWidth: string | null = null;
-    export let maxWidth: string | null = null;
-    export let height: string;
-    export let maxHeight: string | null = null;
-    export let borderRadius: string = "";
-    export let backgroundColor: string;
-    export let borderColor: string = "transparent";
-    export let titleSize: string = "1rem";
-    export let titleColor: string = "#f5f5f5";
-    export let titleWeight: string = "400";
+
+    // Style object (from theme)
+    export let style: { [property: string]: string | number } | null = null;
+    $: effectiveStyle = style ?? $ModalWindowStyle;
+
+    // Layout / styling props
+    export let width: string | undefined = undefined;
+    export let minWidth: string | undefined = undefined;
+    export let maxWidth: string | undefined = undefined;
+    export let height: string | undefined = undefined;
+    export let maxHeight: string | undefined = undefined;
+    export let borderRadius: string | undefined = undefined;
+    export let backgroundColor: string | undefined = undefined;
+    export let borderColor: string | undefined = undefined;
+    export let titleSize: string | undefined = undefined;
+    export let titleColor: string | undefined = undefined;
+    export let titleWeight: string | undefined = undefined;
+
+    $: localOverrides = {
+        width,
+        height,
+        borderRadius,
+        backgroundColor,
+        borderColor,
+        titleSize,
+        titleColor,
+        titleWeight,
+    };
+
+    // Merged style
+    $: mergedStyle = mergeStyle(effectiveStyle, localOverrides);
 
     // Constants
     const smallScreenHeightTolerance: number = 225;
@@ -82,17 +106,17 @@
 -->
 <div
     style="
-        --width: {width};
+        --width: {mergedStyle.width};
         --min-width: {minWidth};
         --max-width: {maxWidth};
-        --height: {height};
+        --height: {mergedStyle.height};
         --max-height: {procMaxHeight};
-        --border-radius: {borderRadius};
-        --background-color: {backgroundColor};
-        --border-color: {borderColor};
-        --title-size: {titleSize};
-        --title-color: {titleColor};
-        --title-weight: {titleWeight};
+        --border-radius: {mergedStyle.borderRadius};
+        --background-color: {mergedStyle.backgroundColor};
+        --border-color: {mergedStyle.borderColor};
+        --title-size: {mergedStyle.titleSize};
+        --title-color: {mergedStyle.titleColor};
+        --title-weight: {mergedStyle.titleWeight};
     "
     class="container"
     bind:this={containerEl}

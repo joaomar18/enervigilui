@@ -164,7 +164,7 @@
         <LeftPanel bind:leftPanelOpen={$leftPanelOpen} activeSection={page.url.pathname} />
         <div class="left-header-div" bind:this={leftHeaderEl}>
             <div class="menu-button-div" class:close={mobileSearchOpen}>
-                <MenuButton backgroundColor="transparent" hoverColor="#323a45" bind:menuOpen={$leftPanelOpen} />
+                <MenuButton bind:menuOpen={$leftPanelOpen} />
             </div>
             <div class="close-mobile-search-div" class:open={mobileSearchOpen}>
                 <Action

@@ -96,11 +96,7 @@
             <LangSelector />
         </div>
         <div class="menu-button-div">
-            <MenuButton
-                backgroundColor="#252b33"
-                hoverColor="#323a45"
-                bind:menuOpen={dropdownOpen}
-            />
+            <MenuButton backgroundColor="#252b33" bind:menuOpen={dropdownOpen} />
         </div>
     </div>
     <div class="dropdown-menu" class:open={dropdownOpen}>
@@ -154,7 +150,7 @@
         />
         <div class="language-selector-dropdown-div">
             <span class="language-text">{$texts.language[$selectedLang]}</span>
-            <LangSelector backgroundColor="#1e242b" borderColor="#323a45" />
+            <LangSelector />
         </div>
     </div>
 </div>

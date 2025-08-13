@@ -162,27 +162,11 @@ Shows input forms for protocol-specific parameters and organizes device nodes fo
                     allwaysEnabled={true}
                     enableTextInvalid={true}
                     textInvalid={!deviceData.validation.deviceName}
-                    width="75%"
                     minWidth="250px"
                     maxWidth="500px"
-                    fontSize="1.1rem"
-                    fontColor="#f5f5f5"
-                    borderColorBottom="rgba(255, 255, 255, 0.2)"
-                    invalidBorderColorBottom="#e74c3c"
-                    buttonImageWidth="22px"
-                    buttonImageHeight="22px"
                 />
                 <div class="device-image-div">
-                    <UploadImage
-                        bind:imageFile={deviceData.device_image}
-                        width="200px"
-                        height="200px"
-                        borderRadius="50%"
-                        imageUrl={deviceData.current_image_url ?? ""}
-                        imageHeight="87.5%"
-                        backgroundColor="rgba(255, 255, 255, 0.1)"
-                        hoverColor="rgba(255, 255, 255, 0.13)"
-                    />
+                    <UploadImage bind:imageFile={deviceData.device_image} imageUrl={deviceData.current_image_url ?? ""} />
                 </div>
             </div>
             <div class="device-section-div">
@@ -351,13 +335,8 @@ Shows input forms for protocol-specific parameters and organizes device nodes fo
                     <div class="window-div">
                         <ModalWindow
                             title={`${$texts.addNewDevice[$selectedLang]}`}
-                            width="80%"
                             minWidth="300px"
                             maxWidth="550px"
-                            height="fit-content"
-                            borderRadius="10px"
-                            borderColor="#2a2e3a"
-                            backgroundColor="#14161c"
                             closeWindow={() => {
                                 showAddWindow = false;
                             }}

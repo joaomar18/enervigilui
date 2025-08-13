@@ -35,6 +35,72 @@ const AlertStyleConfig: ComponentStyles = {
 export const AlertStyle = createStyleStore(AlertStyleConfig);
 
 
+//////////     C H E C K B O X     //////////
+
+const CheckboxStyleConfig: ComponentStyles = {
+    dark: {
+        width: "1.5em",
+        height: "1.5em",
+        checkMarkWidth: 24,
+        checkMarkHeight: 24,
+        checkMarkStroke: 2.5,
+        disabledBackgroundColor: "#42505f",
+        disabledBorderColor: "#5a646e",
+        enabledBackgroundColor: "#2f80ed",
+        enabledBorderColor: "#5a646e",
+        badFormatBackgroundColor: "#e74c3c",
+        badFormatBorderColor: "#5a646e",
+        disabledCheckMarkColor: "rgb(170,170,170)",
+        enabledCheckMarkColor: "rgb(255,255,255)",
+    }
+}
+
+export const CheckBoxStyle = createStyleStore(CheckboxStyleConfig);
+
+
+//////////     E D I T A B L E     T E X T     //////////
+
+const EditableTextStyleConfig: ComponentStyles = {
+    dark: {
+        width: "75%",
+        fontSize: "1.1rem",
+        fontColor: "#f5f5f5",
+        borderColorBottom: "rgba(255, 255, 255, 0.2)",
+        invalidBorderColorBottom: "#e74c3c",
+        buttonImageWidth: "22px",
+        buttonImageHeight: "22px",
+    }
+}
+
+export const EditableTextStyle = createStyleStore(EditableTextStyleConfig);
+
+//////////     E X P A N D A B L E     B U T T O N     //////////
+
+const ExpandableButtonStyleConfig: ComponentStyles = {
+    dark: {
+        modalWidth: "250px",
+        modalHeight: "fit-content",
+        modalBackgroundColor: "#1e242b",
+        modalBorderColor: "#2c343d",
+        modalBorderRadius: "10px",
+        openBackgroundColor: "rgba(255, 255, 255, 0.05)",
+        openHoverBackgroundColor: "rgba(255, 255, 255, 0.1)",
+        openStrokeColor: "#cccccc",
+        openHoverStrokeColor: "#eeeeee",
+        closeBackgroundColor: "rgba(255, 255, 255, 0.1)",
+        closeHoverBackgroundColor: "rgba(255, 255, 255, 0.2)",
+        closeStrokeColor: "white",
+        closeHoverStrokeColor: "#eeeeee",
+        badFormatBackgroundColor: "rgba(255, 255, 255, 0.05)",
+        badFormatHoverBackgroundColor: "rgba(255, 255, 255, 0.05)",
+        badFormatStrokeColor: "#e74c3c",
+        badFormatHoverStrokeColor: "#c0392b",
+    }
+}
+
+export const ExpandableButtonStyle = createStyleStore(ExpandableButtonStyleConfig);
+
+
 //////////     H I N T     I N F O     //////////
 
 const HintInfoStyleConfig: ComponentStyles = {
@@ -88,6 +154,56 @@ const InputFieldStyleConfig: ComponentStyles = {
 
 export const InputFieldStyle = createStyleStore(InputFieldStyleConfig);
 
+
+//////////     L A N G U A G E     S E L E C T O R     //////////
+
+const LangSelectorStyleConfig: ComponentStyles = {
+    dark: {
+        backgroundColor: "#1e242b",
+        borderColor: "#323a45",
+        selectedColor: "#00796b",
+        optionsBackgroundColor: "#1e242b",
+        optionsBorderColor: "#323a45",
+        selectedOptionTextColor: "#eeeeee",
+        optionsTextColor: "#b0bec5",
+        optionsSelectedTextColor: "#eeeeee",
+    }
+}
+
+export const LangSelectorStyle = createStyleStore(LangSelectorStyleConfig);
+
+
+//////////     M E N U     B U T T O N     //////////
+
+const MenuButtonStyleConfig: ComponentStyles = {
+    dark: {
+        backgroundColor: "transparent",
+        hoverColor: "#323a45",
+        hamburgerLinesColor: "white"
+    }
+}
+
+export const MenuButtonStyle = createStyleStore(MenuButtonStyleConfig);
+
+
+//////////     M O D A L     W I N D O W     //////////
+
+const ModalWindowStyleConfig: ComponentStyles = {
+    dark: {
+        width: "80%",
+        height: "fit-content",
+        borderRadius: "10px",
+        backgroundColor: "#14161c",
+        borderColor: "#2a2e3a",
+        titleSize: "1rem",
+        titleColor: "#f5f5f5",
+        titleWeight: "400",
+    }
+}
+
+export const ModalWindowStyle = createStyleStore(ModalWindowStyleConfig);
+
+
 //////////     S E L E C T O R     //////////
 
 const SelectorStyleConfig: ComponentStyles = {
@@ -116,3 +232,39 @@ const SelectorStyleConfig: ComponentStyles = {
 }
 
 export const SelectorStyle = createStyleStore(SelectorStyleConfig);
+
+
+//////////     S E L E C T O R     B U T T O N     //////////
+
+const SelectorButtonStyleConfig: ComponentStyles = {
+    dark: {
+        width: "75px",
+        height: "20px",
+        knobWidth: "32px",
+        knobHeight: "32px",
+        borderRadius: "10px",
+        backgroundColor: "#3a3a3a",
+        selectedBackgroundColor: "#4a4a4a",
+        knobBackgroundColor: "#e0e0e0",
+        knobSelectedBackgroundColor: "#2f80ed",
+    }
+}
+
+export const SelectorButtonStyle = createStyleStore(SelectorButtonStyleConfig);
+
+
+//////////     U P L O A D     I M A G E     //////////
+
+const UploadImageStyleConfig: ComponentStyles = {
+    dark: {
+        width: "200px",
+        height: "200px",
+        borderRadius: "50%",
+        imageWidth: "auto",
+        imageHeight: "87.5%",
+        backgroundColor: "rgba(255, 255, 255, 0.1)",
+        hoverColor: "rgba(255, 255, 255, 0.13)",
+    }
+}
+
+export const UploadImageStyle = createStyleStore(UploadImageStyleConfig);

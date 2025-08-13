@@ -1,10 +1,28 @@
 <script lang="ts">
+    // Styles
+    import { mergeStyle } from "$lib/style/components";
+    import { MenuButtonStyle } from "$lib/style/general";
+
     // Props
     export let menuOpen: boolean = false;
 
+    // Style object (from theme)
+    export let style: { [property: string]: string | number } | null = null;
+    $: effectiveStyle = style ?? $MenuButtonStyle;
+
     // Layout / styling props
-    export let backgroundColor: string = "#252b33";
-    export let hoverColor: string = "#323a45";
+    export let backgroundColor: string | undefined = undefined;
+    export let hoverColor: string | undefined = undefined;
+    export let hamburgerLinesColor: string | undefined = undefined;
+
+    $: localOverrides = {
+        backgroundColor,
+        hoverColor,
+        hamburgerLinesColor,
+    };
+
+    // Merged style
+    $: mergedStyle = mergeStyle(effectiveStyle, localOverrides);
 
     // Functions
     function handleClick(): void {
@@ -19,8 +37,9 @@
 <div
     class="menu-button-div"
     style="
-        --background-color: {backgroundColor};
-        --hover-color: {hoverColor};
+        --background-color: {mergedStyle.backgroundColor};
+        --hover-color: {mergedStyle.hoverColor};
+        --hamburger-lines-color: {mergedStyle.hamburgerLinesColor};
     "
 >
     <div class="menu-button">
@@ -86,7 +105,7 @@
         margin: 0;
         padding: 0;
         height: 3px;
-        background-color: white;
+        background-color: var(--hamburger-lines-color);
         transition: 0.1s ease;
     }
 
