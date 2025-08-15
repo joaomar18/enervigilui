@@ -1,18 +1,47 @@
 <script lang="ts">
-    // Layout / styling props
-    export let width: string = "";
-    export let height: string = "";
-    export let paddingLeft: string = "0px";
-    export let paddingRight: string = "0px";
+    // Styles
+    import { mergeStyle } from "$lib/style/components";
+    import { LinkStyle } from "$lib/style/login";
+
+    // Style object (from theme)
+    export let style: { [property: string]: string | number } | null = null;
+    $: effectiveStyle = style ?? $LinkStyle;
+
+    // Props
     export let buttonText: string = "";
     export let imageURL: string = "";
-    export let imageWidth: string = "";
-    export let imageHeight: string = "";
-    export let imageRightPosition: string = "20px";
-    export let fontSize: string = "1rem";
-    export let backgroundColor: string = "#252b33";
-    export let hoverColor: string = "#323a45";
-    export let borderBottomColor: string = "transparent";
+
+    // Layout / styling props
+    export let width: string | undefined = undefined;
+    export let height: string | undefined = undefined;
+    export let paddingLeft: string | undefined = undefined;
+    export let paddingRight: string | undefined = undefined;
+    export let imageWidth: string | undefined = undefined;
+    export let imageHeight: string | undefined = undefined;
+    export let imageRightPosition: string | undefined = undefined;
+    export let fontSize: string | undefined = undefined;
+    export let fontColor: string | undefined = undefined;
+    export let backgroundColor: string | undefined = undefined;
+    export let hoverColor: string | undefined = undefined;
+    export let borderBottomColor: string | undefined = undefined;
+
+    $: localOverrides = {
+        width,
+        height,
+        paddingLeft,
+        paddingRight,
+        imageWidth,
+        imageHeight,
+        imageRightPosition,
+        fontSize,
+        fontColor,
+        backgroundColor,
+        hoverColor,
+        borderBottomColor,
+    };
+
+    // Merged style
+    $: mergedStyle = mergeStyle(effectiveStyle, localOverrides);
 
     export let onClick: () => void;
 
@@ -32,30 +61,31 @@
 <div
     class="link-div"
     style="
-        --div-width: {isPercent(width) ? width : 'fit-content'};
-        --div-height: {isPercent(height) ? height : 'fit-content'};
-        --background-color: {backgroundColor};
-        --hover-color: {hoverColor};
+        --div-width: {isPercent(String(mergedStyle.width)) ? mergedStyle.width : 'fit-content'};
+        --div-height: {isPercent(String(mergedStyle.height)) ? mergedStyle.height : 'fit-content'};
+        --background-color: {mergedStyle.backgroundColor};
+        --hover-color: {mergedStyle.hoverColor};
     "
 >
     <div class="content">
         <span
             style="
-            --span-width: {!isPercent(width) ? width : '100%'};
-            --span-height: {!isPercent(height) ? height : '100%'};
-            --padding-left: {paddingLeft};
-            --padding-right: {paddingRight};
-            --border-bottom-color: {borderBottomColor};
-            --font-size: {fontSize};
+            --span-width: {!isPercent(String(mergedStyle.width)) ? mergedStyle.width : '100%'};
+            --span-height: {!isPercent(String(mergedStyle.height)) ? mergedStyle.height : '100%'};
+            --padding-left: {mergedStyle.paddingLeft};
+            --padding-right: {mergedStyle.paddingRight};
+            --border-bottom-color: {mergedStyle.borderBottomColor};
+            --font-size: {mergedStyle.fontSize};
+            --font-color: {mergedStyle.fontColor};
             
         ">{buttonText}</span
         >
-        {#if imageWidth && imageHeight}
+        {#if mergedStyle.imageWidth && mergedStyle.imageHeight}
             <img
                 style="
-                --image-width: {imageWidth};
-                --image-height: {imageHeight};
-                --image-right: {imageRightPosition};
+                --image-width: {mergedStyle.imageWidth};
+                --image-height: {mergedStyle.imageHeight};
+                --image-right: {mergedStyle.imageRightPosition};
             "
                 src={imageURL}
                 alt={imageURL}
@@ -105,8 +135,8 @@
         height: var(--span-height);
         background-color: var(--background-color);
         border-bottom: 1px solid var(--border-bottom-color);
-        color: #eeeeee;
-        font-size: var(--font-size, 1rem);
+        color: var(--font-color);
+        font-size: var(--font-size);
         font-weight: 400;
         outline: none;
         -webkit-font-smoothing: antialiased;

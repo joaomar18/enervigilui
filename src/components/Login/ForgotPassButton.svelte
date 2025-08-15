@@ -2,11 +2,29 @@
     // Stores for multi-language support
     import { selectedLang, texts } from "$lib/stores/lang";
 
+    // Styles
+    import { mergeStyle } from "$lib/style/components";
+    import { ForgotPassButtonStyle } from "$lib/style/login";
+
+    // Style object (from theme)
+    export let style: { [property: string]: string | number } | null = null;
+    $: effectiveStyle = style ?? $ForgotPassButtonStyle;
+
     // Layout / styling props
-    export let paddingTop: string = "0px";
-    export let paddingBottom: string = "0px";
-    export let textColor: string = ""; //normal text color
-    export let hoverTextColor: string = ""; //text color when button is hovered
+    export let paddingTop: string | undefined = undefined;
+    export let paddingBottom: string | undefined = undefined;
+    export let textColor: string | undefined = undefined;
+    export let hoverTextColor: string | undefined = undefined;
+
+    $: localOverrides = {
+        paddingTop,
+        paddingBottom,
+        textColor,
+        hoverTextColor,
+    };
+
+    // Merged style
+    $: mergedStyle = mergeStyle(effectiveStyle, localOverrides);
 
     // Click Export Funcion
     export let onClick: () => void;
@@ -25,15 +43,15 @@
 <div
     class="forgot-password-div"
     style="
-        --padding-top:{paddingTop};
-        --padding-bottom:{paddingBottom};
+        --padding-top:{mergedStyle.paddingTop};
+        --padding-bottom:{mergedStyle.paddingBottom};
     "
 >
     <span
         class="forgot-password-text"
         style="
-        --text-color: {textColor};
-        --hover-text-color: {hoverTextColor};
+        --text-color: {mergedStyle.textColor};
+        --hover-text-color: {mergedStyle.hoverTextColor};
     ">{$texts.forgotPassword[$selectedLang]}</span
     >
     <button on:click={handleClick} aria-label="Button"></button>
@@ -52,13 +70,13 @@
 
     /* Text color on hover */
     .forgot-password-div:hover .forgot-password-text {
-        color: var(--hover-text-color, rgb(52, 151, 210));
+        color: var(--hover-text-color);
     }
 
     /* Text appearance and color (default) */
     .forgot-password-text {
         font-size: 1.1rem;
-        color: var(--text-color, rgb(216, 216, 216));
+        color: var(--text-color);
         text-decoration: underline;
     }
 

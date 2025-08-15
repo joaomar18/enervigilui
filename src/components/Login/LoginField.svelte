@@ -1,21 +1,41 @@
 <script lang="ts">
-    import HintInfo from "../../General/HintInfo.svelte";
+    import HintInfo from "../General/HintInfo.svelte";
+
+    // Styles
+    import { mergeStyle } from "$lib/style/components";
+    import { LoginFieldStyle } from "$lib/style/login";
+
+    // Style object (from theme)
+    export let style: { [property: string]: string | number } | null = null;
+    $: effectiveStyle = style ?? $LoginFieldStyle;
 
     // Props
     export let id;
-
-    // Layout / styling props
-    export let paddingTop: string = "0px";
-    export let paddingBottom: string = "0px";
-    export let imageUrl: string;
-    export let imageWidth: string;
-    export let imageHeight: string;
-    export let fieldText: string; //Visible text of the field
-    export let type: string = "text"; // Input type (default is text)
-    export let value: string = "";
+    export let hintText: string;
     export let incorrect: boolean;
     export let incorrectText: string;
-    export let hintText: string;
+    export let type: string = "text"; // Input type (default is text)
+    export let value: string = "";
+    export let fieldText: string; //Visible text of the field
+    export let imageUrl: string;
+
+    // Layout / styling props
+    export let paddingTop: string | undefined = undefined;
+    export let paddingBottom: string | undefined = undefined;
+    export let imageWidth: string | undefined = undefined;
+    export let imageHeight: string | undefined = undefined;
+    export let labelTextColor: string | undefined = undefined;
+
+    $: localOverrides = {
+        paddingTop,
+        paddingBottom,
+        imageWidth,
+        imageHeight,
+        labelTextColor,
+    };
+
+    // Merged style
+    $: mergedStyle = mergeStyle(effectiveStyle, localOverrides);
 
     // Variables
     let showPassword: boolean = false;
@@ -32,8 +52,9 @@
 <div
     class="field"
     style="
-        --padding-top: {paddingTop};
-        --padding-bottom: {paddingBottom};
+        --padding-top: {mergedStyle.paddingTop};
+        --padding-bottom: {mergedStyle.paddingBottom};
+        --label-text-color: {mergedStyle.labelTextColor};
     "
 >
     <span class="field-name">{fieldText}</span>
@@ -41,20 +62,15 @@
         <img
             class="field-image"
             style="
-                --image-width:{imageWidth}; 
-                --image-height:{imageHeight};
+                --image-width:{mergedStyle.imageWidth}; 
+                --image-height:{mergedStyle.imageHeight};
             "
             src={imageUrl}
             alt={fieldText}
         />
         {#if type === "password"}
             {#if !showPassword}
-                <input
-                    type="password"
-                    {id}
-                    style="padding-right:50px; {incorrect ? 'border: 2px solid #D72638' : ''}"
-                    bind:value
-                />
+                <input type="password" {id} style="padding-right:50px; {incorrect ? 'border: 2px solid #D72638' : ''}" bind:value />
             {:else}
                 <input
                     type="text"
@@ -65,28 +81,18 @@
                 />
             {/if}
         {:else}
-            <input
-                type="text"
-                {id}
-                autocomplete={id}
-                bind:value
-                style={incorrect ? "border: 2px solid #D72638" : ""}
-            />
+            <input type="text" {id} autocomplete={id} bind:value style={incorrect ? "border: 2px solid #D72638" : ""} />
         {/if}
         {#if type === "password"}
-            <div class="show-hide-div" style="width:{imageWidth}; height:{imageHeight};">
+            <div class="show-hide-div" style="width:{mergedStyle.imageWidth}; height:{mergedStyle.imageHeight};">
                 <div class="show-hide-content">
                     <img
                         class="show-hide-img"
                         src={showPassword ? "./img/show.png" : "./img/hide.png"}
                         alt={showPassword ? "show" : "hide"}
-                        style="width:{imageWidth}; heigh:{imageHeight};"
+                        style="width:{mergedStyle.imageWidth}; heigh:{mergedStyle.imageHeight};"
                     />
-                    <button
-                        class="show-hide-btn"
-                        on:click={togglePassword}
-                        aria-label="Show Password"
-                    ></button>
+                    <button class="show-hide-btn" on:click={togglePassword} aria-label="Show Password"></button>
                 </div>
             </div>
         {/if}
@@ -133,7 +139,7 @@
     .field-name {
         font-size: 1.25rem;
         font-weight: 300;
-        color: rgb(255, 255, 255);
+        color: var(--label-text-color);
         width: 100%;
         padding-bottom: 10px;
     }

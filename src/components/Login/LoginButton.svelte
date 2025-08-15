@@ -2,17 +2,46 @@
     // Stores for multi-language support
     import { selectedLang, texts } from "$lib/stores/lang";
 
+    // Styles
+    import { mergeStyle } from "$lib/style/components";
+    import { LoginButtonStyle } from "$lib/style/login";
+
+    // Style object (from theme)
+    export let style: { [property: string]: string | number } | null = null;
+    $: effectiveStyle = style ?? $LoginButtonStyle;
+
     // Props
     export let processing: boolean; //Login is being processed
 
     // Layout / styling props
-    export let width: string;
-    export let height: string;
-    export let paddingTop: string = "0px";
-    export let paddingBottom: string = "0px";
-    export let backgroundColor: string;
-    export let processingBackgroundColor: string = backgroundColor;
-    export let hoverColor: string = backgroundColor;
+    export let width: string | undefined = undefined;
+    export let height: string | undefined = undefined;
+    export let paddingTop: string | undefined = undefined;
+    export let paddingBottom: string | undefined = undefined;
+    export let backgroundColor: string | undefined = undefined;
+    export let processingBackgroundColor: string | undefined = undefined;
+    export let hoverColor: string | undefined = undefined;
+    export let textColor: string | undefined = undefined;
+    export let loaderWidth: string | undefined = undefined;
+    export let loaderHeight: string | undefined = undefined;
+    export let loaderColor: string | undefined = undefined;
+
+    $: localOverrides = {
+        width,
+        height,
+        paddingTop,
+        paddingBottom,
+        backgroundColor,
+        processingBackgroundColor,
+        hoverColor,
+        textColor,
+        loaderWidth,
+        loaderHeight,
+        loaderColor,
+    };
+
+    // Merged style
+    $: mergedStyle = mergeStyle(effectiveStyle, localOverrides);
 
     // Click Export Funcion
     export let onClick: () => void;
@@ -31,17 +60,19 @@
 -->
 <div
     style="
-        --padding-top:{paddingTop};
-        --padding-bottom:{paddingBottom};
+        --padding-top:{mergedStyle.paddingTop};
+        --padding-bottom:{mergedStyle.paddingBottom};
     "
 >
     <button
         style="
-            --width:{width}; 
-            --height:{height};
-            --background-color:{backgroundColor};
-            --processing-background-color:{processingBackgroundColor};
-            --hover-color:{hoverColor};
+            --width:{mergedStyle.width}; 
+            --height:{mergedStyle.height};
+            --background-color:{mergedStyle.backgroundColor};
+            --processing-background-color:{mergedStyle.processingBackgroundColor};
+            --hover-color:{mergedStyle.hoverColor};
+            --text-color:{mergedStyle.textColor};
+            --loader-color:{mergedStyle.loaderColor};
         "
         on:click={handleClick}
         class:processing
@@ -49,13 +80,7 @@
         {#if !processing}
             {$texts.login[$selectedLang]}
         {:else}
-            <svg
-                class="loader"
-                width="24"
-                height="24"
-                viewBox="0 0 50 50"
-                xmlns="http://www.w3.org/2000/svg"
-            >
+            <svg class="loader" width={mergedStyle.loaderWidth} height={mergedStyle.loaderHeight} viewBox="0 0 50 50" xmlns="http://www.w3.org/2000/svg">
                 <circle class="path" cx="25" cy="25" r="20" fill="none" stroke-width="4" />
             </svg>
         {/if}
@@ -65,8 +90,8 @@
 <style>
     /* Wrapper with configurable vertical spacing */
     div {
-        padding-top: var(--padding-top, 0px);
-        padding-bottom: var(--padding-bottom, 0px);
+        padding-top: var(--padding-top);
+        padding-bottom: var(--padding-bottom);
         -webkit-tap-highlight-color: transparent;
         -webkit-touch-callout: none;
         user-select: none;
@@ -75,7 +100,7 @@
     /* Button appearance and color (default) */
     button {
         box-sizing: content-box;
-        color: rgb(255, 255, 255);
+        color: var(--text-color);
         background-color: var(--background-color);
         width: var(--width, "fit-content");
         height: var(--height, "fit-content");
@@ -113,7 +138,7 @@
     }
 
     .path {
-        stroke: white;
+        stroke: var(--loader-color);
         stroke-linecap: butt;
         stroke-dasharray: 90, 150;
         stroke-dashoffset: 0;

@@ -1,13 +1,16 @@
 <script lang="ts">
     import { browser } from "$app/environment";
     import { onMount, onDestroy } from "svelte";
-    import Logo from "../../General/Logo.svelte";
-    import Link from "../Buttons/Link.svelte";
-    import MenuButton from "../../General/MenuButton.svelte";
-    import LangSelector from "../../General/LangSelector.svelte";
+    import Logo from "../General/Logo.svelte";
+    import Link from "./Link.svelte";
+    import MenuButton from "../General/MenuButton.svelte";
+    import LangSelector from "../General/LangSelector.svelte";
 
     // Stores for multi-language support
     import { selectedLang, texts } from "$lib/stores/lang";
+
+    // Styles
+    import { MobileLinkStyle } from "$lib/style/login";
 
     // Variables
     let dropdownOpen: boolean;
@@ -15,9 +18,7 @@
 
     // Functions
     function aboutUs(): void {}
-
     function help(): void {}
-
     function contacts(): void {}
 
     function handleClickOutsideHeader(event: MouseEvent): void {
@@ -58,39 +59,9 @@
             <Logo />
         </div>
         <div class="links-header-div">
-            <Link
-                width="150px"
-                height="40px"
-                paddingLeft="10px"
-                buttonText={$texts.aboutUs[$selectedLang]}
-                imageURL="/img/info.png"
-                imageRightPosition="10px"
-                imageWidth="24px"
-                imageHeight="24px"
-                onClick={aboutUs}
-            />
-            <Link
-                width="150px"
-                height="40px"
-                paddingLeft="10px"
-                buttonText={$texts.help[$selectedLang]}
-                imageURL="/img/help.png"
-                imageRightPosition="10px"
-                imageWidth="24px"
-                imageHeight="24px"
-                onClick={help}
-            />
-            <Link
-                width="150px"
-                height="40px"
-                paddingLeft="10px"
-                buttonText={$texts.contacts[$selectedLang]}
-                imageURL="/img/customer-service.png"
-                imageRightPosition="10px"
-                imageWidth="24px"
-                imageHeight="24px"
-                onClick={contacts}
-            />
+            <Link buttonText={$texts.aboutUs[$selectedLang]} imageURL="/img/info.png" onClick={aboutUs} />
+            <Link buttonText={$texts.help[$selectedLang]} imageURL="/img/help.png" onClick={help} />
+            <Link buttonText={$texts.contacts[$selectedLang]} imageURL="/img/customer-service.png" onClick={contacts} />
         </div>
         <div class="language-selector-header-div">
             <LangSelector />
@@ -100,54 +71,9 @@
         </div>
     </div>
     <div class="dropdown-menu" class:open={dropdownOpen}>
-        <Link
-            width="100%"
-            height="74px"
-            paddingLeft="20px"
-            paddingRight="20px"
-            buttonText={$texts.aboutUs[$selectedLang]}
-            imageURL="/img/info.png"
-            imageWidth="46px"
-            imageHeight="46px"
-            imageRightPosition="20px"
-            fontSize="20px"
-            backgroundColor="#1f262d"
-            hoverColor="#2c343d"
-            borderBottomColor="#2c343d"
-            onClick={aboutUs}
-        />
-        <Link
-            width="100%"
-            height="74px"
-            paddingLeft="20px"
-            paddingRight="20px"
-            buttonText={$texts.help[$selectedLang]}
-            imageURL="/img/help.png"
-            imageWidth="46px"
-            imageHeight="46px"
-            imageRightPosition="20px"
-            fontSize="20px"
-            backgroundColor="#1f262d"
-            hoverColor="#2c343d"
-            borderBottomColor="#2c343d"
-            onClick={help}
-        />
-        <Link
-            width="100%"
-            height="74px"
-            paddingLeft="20px"
-            paddingRight="20px"
-            buttonText={$texts.contacts[$selectedLang]}
-            imageURL="/img/customer-service.png"
-            imageWidth="46px"
-            imageHeight="46px"
-            imageRightPosition="20px"
-            fontSize="20px"
-            backgroundColor="#1f262d"
-            hoverColor="#2c343d"
-            borderBottomColor="#2c343d"
-            onClick={contacts}
-        />
+        <Link style={$MobileLinkStyle} buttonText={$texts.aboutUs[$selectedLang]} imageURL="/img/info.png" onClick={aboutUs} />
+        <Link style={$MobileLinkStyle} buttonText={$texts.help[$selectedLang]} imageURL="/img/help.png" onClick={help} />
+        <Link style={$MobileLinkStyle} buttonText={$texts.contacts[$selectedLang]} imageURL="/img/customer-service.png" onClick={contacts} />
         <div class="language-selector-dropdown-div">
             <span class="language-text">{$texts.language[$selectedLang]}</span>
             <LangSelector />

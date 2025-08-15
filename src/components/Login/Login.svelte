@@ -6,9 +6,9 @@
     import { loginUser, interpretLoginStatus, validateUsername, validatePassword } from "$lib/ts/login";
     import { navigateTo } from "$lib/ts/navigation";
 
-    import LoginField from "./Inputs/LoginField.svelte";
-    import LoginButton from "./Buttons/LoginButton.svelte";
-    import ForgotPassButton from "./Buttons/ForgotPassButton.svelte";
+    import LoginField from "./LoginField.svelte";
+    import LoginButton from "./LoginButton.svelte";
+    import ForgotPassButton from "./ForgotPassButton.svelte";
     import Checkbox from "../General/Checkbox.svelte";
     import Alert from "../General/Alert.svelte";
 
@@ -124,10 +124,7 @@
     <LoginField
         id="username"
         paddingTop="10px"
-        paddingBottom="0px"
         imageUrl="/img/user.png"
-        imageWidth="32px"
-        imageHeight="32px"
         fieldText={$texts.username[$selectedLang]}
         type="text"
         bind:value={username}
@@ -138,10 +135,7 @@
     <LoginField
         id="password"
         paddingTop="30px"
-        paddingBottom="0px"
         imageUrl="/img/password.png"
-        imageWidth="32px"
-        imageHeight="32px"
         fieldText={$texts.password[$selectedLang]}
         type="password"
         bind:value={password}
@@ -153,18 +147,8 @@
         <Checkbox bind:checked={autoLogin} inputName="auto-login" enabledBackgroundColor="#4caf7f" marginRight="10px" />
         <span class="keep-logged-in-text">{$texts.keepSessionLogged[$selectedLang]}</span>
     </div>
-    <LoginButton
-        processing={loginProcessing}
-        paddingTop="30px"
-        paddingBottom="0px"
-        width="200px"
-        height="55px"
-        backgroundColor="rgb(0, 158, 96)"
-        hoverColor="rgb(0, 143, 57)"
-        processingBackgroundColor="rgb(127,127,127)"
-        onClick={login}
-    />
-    <ForgotPassButton paddingTop="20px" paddingBottom="30px" textColor="rgb(216,216,216)" hoverTextColor="rgb(51,151,210)" onClick={forgotPassword} />
+    <LoginButton processing={loginProcessing} paddingTop="30px" onClick={login} />
+    <ForgotPassButton onClick={forgotPassword} />
 </div>
 
 <style>

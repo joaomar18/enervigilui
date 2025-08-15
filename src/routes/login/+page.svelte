@@ -1,6 +1,6 @@
 <script lang="ts">
     import { fade } from "svelte/transition";
-    import Header from "../../components/Login/Header/Header.svelte";
+    import Header from "../../components/Login/Header.svelte";
     import Info from "../../components/Login/Info.svelte";
     import Login from "../../components/Login/Login.svelte";
 </script>
@@ -15,7 +15,7 @@
         <Login />
     </div>
     <div class="column" id="second-col">
-        <Info paddingTop="0px" paddingBottom="0px" appImageUrl="/img/smart-meter.png" />
+        <Info appImageUrl="/img/smart-meter.png" />
     </div>
 </div>
 
