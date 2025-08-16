@@ -1,19 +1,51 @@
 <script lang="ts">
-    // Layout / styling props
-    export let width: string;
-    export let height: string;
-    export let borderRadius: string = "";
-    export let backgroundColor: string;
-    export let hoverColor: string = backgroundColor;
-    export let borderColor: string = backgroundColor;
+    // Styles
+    import { mergeStyle } from "$lib/style/components";
+    import { LogoutStyle } from "$lib/style/dashboard";
+
+    // Style object (from theme)
+    export let style: { [property: string]: string | number } | null = null;
+    $: effectiveStyle = style ?? $LogoutStyle;
+
+    // Props
     export let buttonText: string;
-    export let fontSize: string = "";
-    export let paddingLeft: string = "";
-    export let paddingRight: string = "";
-    export let paddingLeftText: string = "";
     export let imageUrl: string | undefined = undefined;
-    export let imageWidth: string = "";
-    export let imageHeight: string = "";
+
+    // Layout / styling props
+    export let width: string | undefined = undefined;
+    export let height: string | undefined = undefined;
+    export let borderRadius: string | undefined = undefined;
+    export let backgroundColor: string | undefined = undefined;
+    export let hoverColor: string | undefined = undefined;
+    export let borderColor: string | undefined = undefined;
+    export let fontSize: string | undefined = undefined;
+    export let paddingLeft: string | undefined = undefined;
+    export let paddingRight: string | undefined = undefined;
+    export let paddingLeftText: string | undefined = undefined;
+    export let imageWidth: string | undefined = undefined;
+    export let imageHeight: string | undefined = undefined;
+    export let textColor: string | undefined = undefined;
+    export let textWeight: string | undefined = undefined;
+
+    $: localOverrides = {
+        width,
+        height,
+        borderRadius,
+        backgroundColor,
+        hoverColor,
+        borderColor,
+        fontSize,
+        paddingLeft,
+        paddingRight,
+        paddingLeftText,
+        imageWidth,
+        imageHeight,
+        textColor,
+        textWeight,
+    };
+
+    // Merged style
+    $: mergedStyle = mergeStyle(effectiveStyle, localOverrides);
 
     // Click Export Funcion
     export let onClick: () => void;
@@ -31,27 +63,27 @@
 -->
 <div
     style="
-        --width: {width};
-        --height: {height};
-        --border-radius: {borderRadius};
-        --background-color: {backgroundColor};
-        --hover-color: {hoverColor};
-        --border-color: {borderColor};
+        --width: {mergedStyle.width};
+        --height: {mergedStyle.height};
+        --border-radius: {mergedStyle.borderRadius};
+        --background-color: {mergedStyle.backgroundColor};
+        --hover-color: {mergedStyle.hoverColor};
+        --border-color: {mergedStyle.borderColor};
     "
     class="container"
 >
     <div
         style="
-        --padding-left: {paddingLeft}; 
-        --padding-right: {paddingRight};
+        --padding-left: {mergedStyle.paddingLeft}; 
+        --padding-right: {mergedStyle.paddingRight};
     "
         class="content"
     >
         {#if imageUrl}
             <img
                 style="
-            --image-width: {imageWidth};
-            --image-height: {imageHeight};
+            --image-width: {mergedStyle.imageWidth};
+            --image-height: {mergedStyle.imageHeight};
         "
                 src={imageUrl}
                 alt={imageUrl}
@@ -60,8 +92,10 @@
         <div class="text-div">
             <span
                 style="
-                --font-size: {fontSize};
-                --padding-left-text: {paddingLeftText};
+                --font-size: {mergedStyle.fontSize};
+                --padding-left-text: {mergedStyle.paddingLeftText};
+                --text-color: {mergedStyle.textColor};
+                --text-weight: {mergedStyle.textWeight};
             ">{buttonText}</span
             >
         </div>
@@ -126,9 +160,9 @@
         width: max-content;
         margin: 0;
         padding-left: var(--padding-left-text, 0px);
-        color: #eeeeee;
+        color: var(--text-color);
         font-size: var(--font-size, 1rem);
-        font-weight: 400;
+        font-weight: var(--text-weight);
         outline: none;
         -webkit-font-smoothing: antialiased;
         -moz-osx-font-smoothing: grayscale;

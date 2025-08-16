@@ -10,7 +10,28 @@
     import { selectedLang, texts } from "$lib/stores/lang";
 
     // Styles
-    import { MobileLinkStyle } from "$lib/style/login";
+    import { mergeStyle } from "$lib/style/components";
+    import { HeaderStyle, MobileLinkStyle } from "$lib/style/login";
+
+    // Style object (from theme)
+    export let style: { [property: string]: string | number } | null = null;
+    $: effectiveStyle = style ?? $HeaderStyle;
+
+    // Layout / styling props
+    export let backgroundColor: string | undefined = undefined;
+    export let dropdownBackgroundColor: string | undefined = undefined;
+    export let dropdownBorderBottomColor: string | undefined = undefined;
+    export let textColor: string | undefined = undefined;
+
+    $: localOverrides = {
+        backgroundColor,
+        dropdownBackgroundColor,
+        dropdownBorderBottomColor,
+        textColor,
+    };
+
+    // Merged style
+    $: mergedStyle = mergeStyle(effectiveStyle, localOverrides);
 
     // Variables
     let dropdownOpen: boolean;
@@ -53,7 +74,16 @@
   Header: Responsive navigation header with logo, top navigation links, language selector,
   and a collapsible menu for smaller screens.
 -->
-<div class="header-div" bind:this={headerElement}>
+<div
+    class="header-div"
+    bind:this={headerElement}
+    style="
+        --background-color: {mergedStyle.backgroundColor};
+        --dropdown-background-color: {mergedStyle.dropdownBackgroundColor};
+        --dropdown-border-bottom-color: {mergedStyle.dropdownBorderBottomColor};
+        --text-color: {mergedStyle.textColor};
+    "
+>
     <div class="content-div">
         <div class="logo-div">
             <Logo />
@@ -90,7 +120,7 @@
         height: 74px;
         top: 0px;
         left: 0px;
-        background-color: #1a1f26;
+        background-color: var(--background-color);
     }
 
     /* Content wrapper with centered layout */
@@ -130,8 +160,8 @@
         height: fit-content;
         min-width: 320px;
         top: 74px;
-        background-color: #252b33;
-        border-bottom: 1px solid #37404a;
+        background-color: var(--dropdown-background-color);
+        border-bottom: 1px solid var(--dropdown-border-bottom-color);
         width: 100%;
         display: none;
         justify-content: start;
@@ -156,7 +186,7 @@
 
     /* Language label text styling */
     .language-text {
-        color: #eeeeee;
+        color: var(--text-color);
         font-weight: 300;
         font-size: 18px;
         padding-bottom: 10px;

@@ -19,11 +19,44 @@
     // Stores for multi-language support
     import { texts, variableNameTextsByPhase, selectedLang } from "$lib/stores/lang";
 
+    // Styles
+    import { mergeStyle } from "$lib/style/components";
+    import { NodeConfigWindowStyle } from "$lib/style/nodes";
+    import { NodeInputFieldStyle, NodeSelectorStyle } from "$lib/style/nodes";
+
+    // Style object (from theme)
+    export let style: { [property: string]: string | number } | null = null;
+    $: effectiveStyle = style ?? $NodeConfigWindowStyle;
+
     // Props
     export let visible: boolean;
     export let deviceData: EditableDeviceMeter | NewDeviceMeter;
     export let node: EditableDeviceNode;
     export let nodeEditingState: NodeEditState;
+
+    // Layout / styling props
+    export let headerTextColor: string | undefined = undefined;
+    export let headerTextWeight: string | undefined = undefined;
+    export let headerSubTextColor: string | undefined = undefined;
+    export let headerSubFontWeight: string | undefined = undefined;
+    export let textColor: string | undefined = undefined;
+    export let textWeight: string | undefined = undefined;
+    export let hintInfoTextColor: string | undefined = undefined;
+    export let hintInfoTextWeight: string | undefined = undefined;
+
+    $: localOverrides = {
+        headerTextColor,
+        headerTextWeight,
+        headerSubTextColor,
+        headerSubFontWeight,
+        textColor,
+        textWeight,
+        hintInfoTextColor,
+        hintInfoTextWeight,
+    };
+
+    // Merged style
+    $: mergedStyle = mergeStyle(effectiveStyle, localOverrides);
 
     // Export Funcions
     export let onPropertyChanged: () => void;
@@ -38,14 +71,20 @@ Displays contextual hints and supports multi-language labels for all fields. -->
     maxWidth="750px"
     height="fit-content"
     maxHeight="1050px"
-    borderRadius="10px"
-    borderColor="#2a2e3a"
-    backgroundColor="#14161c"
     closeWindow={() => {
         visible = false;
     }}
 >
-    <span slot="header" class="header">
+    <span
+        slot="header"
+        style="
+            --header-text-color: {mergedStyle.headerTextColor};
+            --header-text-weight: {mergedStyle.headerTextWeight};
+            --header-sub-text-color: {mergedStyle.headerSubTextColor};
+            --header-sub-font-weight: {mergedStyle.headerSubFontWeight};
+        "
+        class="header"
+    >
         <span class="header-section">
             <span class="main-text">{`${$texts.variable[$selectedLang]}:`}</span>
             {#if !node.config.custom}
@@ -67,7 +106,15 @@ Displays contextual hints and supports multi-language labels for all fields. -->
             <span class="sub-text">{node.protocol}</span>
         </span>
     </span>
-    <div class="node-config-div">
+    <div
+        style="
+            --text-color: {mergedStyle.textColor};
+            --text-weight: {mergedStyle.textWeight};
+            --hint-info-text-color: {mergedStyle.hintInfoTextColor};
+            --hint-info-text-weight: {mergedStyle.hintInfoTextWeight};
+        "
+        class="node-config-div"
+    >
         <div class="row">
             <span class="row-variable">
                 <span class="row-identifier">{$texts.variable[$selectedLang]}</span>
@@ -75,6 +122,7 @@ Displays contextual hints and supports multi-language labels for all fields. -->
                     <span class="row-entry">
                         {#if !node.config.custom}
                             <Selector
+                                style={$NodeSelectorStyle}
                                 useLang={true}
                                 options={$variableNameTextsByPhase[node.phase]}
                                 bind:selectedOption={node.display_name}
@@ -85,24 +133,11 @@ Displays contextual hints and supports multi-language labels for all fields. -->
                                 inputInvalid={!node.validation.variableName}
                                 enableInputInvalid={true}
                                 scrollable={true}
-                                maxOptions={5}
                                 width="100%"
-                                height="40px"
-                                optionHeight="40px"
-                                borderRadius="5px"
-                                backgroundColor="#1a2027"
-                                selectedColor="#14566b"
-                                badFormatBorderColor="#e74c3c"
-                                optionsBackgroundColor="#1e242b"
-                                optionsBorderColor="#323a45"
-                                optionsInnerBorderColor="#323a45"
-                                fontSize="0.9rem"
-                                arrowWidth="16px"
-                                arrowHeight="16px"
-                                arrowRightPos="5px"
                             />
                         {:else}
                             <InputField
+                                style={$NodeInputFieldStyle}
                                 bind:inputValue={node.display_name}
                                 onChange={() => {
                                     onPropertyChanged();
@@ -111,39 +146,11 @@ Displays contextual hints and supports multi-language labels for all fields. -->
                                 enableInputInvalid={true}
                                 inputType="STRING"
                                 width="100%"
-                                height="40px"
-                                borderRadius="5px"
-                                backgroundColor="#1a2027"
-                                disabledBackgroundColor="#42505f"
-                                selectedBackgroundColor="#1a2027"
-                                selectedBorderColor="#2F80ED"
-                                badFormatBorderColor="#e74c3c"
-                                fontSize="0.9rem"
-                                fontColor="#f5f5f5"
-                                fontWeight="400"
-                                textAlign="center"
-                                unitTextColor="rgb(170,170,170)"
                             />
                         {/if}
                     </span>
                     <span class="row-hint">
-                        <HintInfo
-                            labelText=""
-                            hintWidth="250px"
-                            hintHeight="fit-content"
-                            hintBackgroundColor="#1e242b"
-                            hintBorderColor="#2c343d"
-                            hintBorderRadius="10px"
-                            textColor="#f5f5f5"
-                            openBackgroundColor="rgba(255, 255, 255, 0.05)"
-                            openHoverBackgroundColor="rgba(255, 255, 255, 0.1)"
-                            openStrokeColor="#cccccc"
-                            openHoverStrokeColor="#eeeeee"
-                            closeBackgroundColor="rgba(255, 255, 255, 0.1)"
-                            closeHoverBackgroundColor="rgba(255, 255, 255, 0.2)"
-                            closeStrokeColor="white"
-                            closeHoverStrokeColor="#eeeeee"
-                        >
+                        <HintInfo hintWidth="250px">
                             <span class="info-text">
                                 {#if !node.config.custom}
                                     {$texts.variableInfo[$selectedLang]}
@@ -164,6 +171,7 @@ Displays contextual hints and supports multi-language labels for all fields. -->
                     <span class="row-entry">
                         {#if !node.config.custom}
                             <Selector
+                                style={$NodeSelectorStyle}
                                 options={Object.fromEntries($defaultVariableUnits[node.display_name]?.map((unit) => [unit, unit]) || [])}
                                 bind:selectedOption={node.config.unit}
                                 onChange={() => {
@@ -173,24 +181,11 @@ Displays contextual hints and supports multi-language labels for all fields. -->
                                 inputInvalid={!node.validation.variableUnit}
                                 enableInputInvalid={true}
                                 scrollable={true}
-                                maxOptions={5}
                                 width="100%"
-                                height="40px"
-                                optionHeight="40px"
-                                borderRadius="5px"
-                                backgroundColor="#1a2027"
-                                disabledBackgroundColor="#42505f"
-                                selectedColor="#14566b"
-                                badFormatBorderColor="#e74c3c"
-                                optionsBackgroundColor="#1e242b"
-                                optionsBorderColor="#323a45"
-                                fontSize="0.9rem"
-                                arrowWidth="16px"
-                                arrowHeight="16px"
-                                arrowRightPos="5px"
                             />
                         {:else}
                             <InputField
+                                style={$NodeInputFieldStyle}
                                 bind:inputValue={node.config.unit}
                                 onChange={() => {
                                     onPropertyChanged();
@@ -200,39 +195,11 @@ Displays contextual hints and supports multi-language labels for all fields. -->
                                 enableInputInvalid={true}
                                 inputType="STRING"
                                 width="100%"
-                                height="40px"
-                                borderRadius="5px"
-                                backgroundColor="#1a2027"
-                                disabledBackgroundColor="#42505f"
-                                selectedBackgroundColor="#1a2027"
-                                selectedBorderColor="#2F80ED"
-                                badFormatBorderColor="#e74c3c"
-                                fontSize="0.9rem"
-                                fontColor="#f5f5f5"
-                                fontWeight="400"
-                                textAlign="center"
-                                unitTextColor="rgb(170,170,170)"
                             />
                         {/if}
                     </span>
                     <span class="row-hint">
-                        <HintInfo
-                            labelText=""
-                            hintWidth="250px"
-                            hintHeight="fit-content"
-                            hintBackgroundColor="#1e242b"
-                            hintBorderColor="#2c343d"
-                            hintBorderRadius="10px"
-                            textColor="#f5f5f5"
-                            openBackgroundColor="rgba(255, 255, 255, 0.05)"
-                            openHoverBackgroundColor="rgba(255, 255, 255, 0.1)"
-                            openStrokeColor="#cccccc"
-                            openHoverStrokeColor="#eeeeee"
-                            closeBackgroundColor="rgba(255, 255, 255, 0.1)"
-                            closeHoverBackgroundColor="rgba(255, 255, 255, 0.2)"
-                            closeStrokeColor="white"
-                            closeHoverStrokeColor="#eeeeee"
-                        >
+                        <HintInfo hintWidth="250px">
                             <span class="info-text">
                                 {#if !node.config.custom}
                                     {$texts.unitInfo[$selectedLang]}
@@ -252,6 +219,7 @@ Displays contextual hints and supports multi-language labels for all fields. -->
                     <span class="row-input">
                         <span class="row-entry">
                             <InputField
+                                style={$NodeInputFieldStyle}
                                 bind:inputValue={node.config.decimal_places}
                                 onChange={() => {
                                     onPropertyChanged();
@@ -268,38 +236,10 @@ Displays contextual hints and supports multi-language labels for all fields. -->
                                     });
                                 }}
                                 width="100%"
-                                height="40px"
-                                borderRadius="5px"
-                                backgroundColor="#1a2027"
-                                disabledBackgroundColor="#42505f"
-                                selectedBackgroundColor="#1a2027"
-                                selectedBorderColor="#2F80ED"
-                                badFormatBorderColor="#e74c3c"
-                                fontSize="0.9rem"
-                                fontColor="#f5f5f5"
-                                fontWeight="400"
-                                textAlign="center"
-                                unitTextColor="rgb(170,170,170)"
                             />
                         </span>
                         <span class="row-hint">
-                            <HintInfo
-                                labelText=""
-                                hintWidth="250px"
-                                hintHeight="fit-content"
-                                hintBackgroundColor="#1e242b"
-                                hintBorderColor="#2c343d"
-                                hintBorderRadius="10px"
-                                textColor="#f5f5f5"
-                                openBackgroundColor="rgba(255, 255, 255, 0.05)"
-                                openHoverBackgroundColor="rgba(255, 255, 255, 0.1)"
-                                openStrokeColor="#cccccc"
-                                openHoverStrokeColor="#eeeeee"
-                                closeBackgroundColor="rgba(255, 255, 255, 0.1)"
-                                closeHoverBackgroundColor="rgba(255, 255, 255, 0.2)"
-                                closeStrokeColor="white"
-                                closeHoverStrokeColor="#eeeeee"
-                            >
+                            <HintInfo hintWidth="250px">
                                 <span class="info-text"> {$texts.decimalPlacesInfo[$selectedLang]}</span>
                             </HintInfo>
                         </span>
@@ -319,6 +259,7 @@ Displays contextual hints and supports multi-language labels for all fields. -->
                 <span class="row-input">
                     <span class="row-entry">
                         <InputField
+                            style={$NodeInputFieldStyle}
                             disabled={node.config.calculated}
                             bind:inputValue={node.communication_id}
                             onChange={() => {
@@ -328,38 +269,10 @@ Displays contextual hints and supports multi-language labels for all fields. -->
                             enableInputInvalid={true}
                             inputType="STRING"
                             width="100%"
-                            height="40px"
-                            borderRadius="5px"
-                            backgroundColor="#1a2027"
-                            disabledBackgroundColor="#42505f"
-                            selectedBackgroundColor="#1a2027"
-                            selectedBorderColor="#2F80ED"
-                            badFormatBorderColor="#e74c3c"
-                            fontSize="0.9rem"
-                            fontColor="#f5f5f5"
-                            fontWeight="400"
-                            textAlign="center"
-                            unitTextColor="rgb(170,170,170)"
                         />
                     </span>
                     <span class="row-hint">
-                        <HintInfo
-                            labelText=""
-                            hintWidth="250px"
-                            hintHeight="fit-content"
-                            hintBackgroundColor="#1e242b"
-                            hintBorderColor="#2c343d"
-                            hintBorderRadius="10px"
-                            textColor="#f5f5f5"
-                            openBackgroundColor="rgba(255, 255, 255, 0.05)"
-                            openHoverBackgroundColor="rgba(255, 255, 255, 0.1)"
-                            openStrokeColor="#cccccc"
-                            openHoverStrokeColor="#eeeeee"
-                            closeBackgroundColor="rgba(255, 255, 255, 0.1)"
-                            closeHoverBackgroundColor="rgba(255, 255, 255, 0.2)"
-                            closeStrokeColor="white"
-                            closeHoverStrokeColor="#eeeeee"
-                        >
+                        <HintInfo hintWidth="250px">
                             <span class="info-text">
                                 {#if deviceData.protocol === Protocol.OPC_UA}
                                     {$texts.nodespaceInfo[$selectedLang]}
@@ -380,6 +293,7 @@ Displays contextual hints and supports multi-language labels for all fields. -->
                 <span class="row-input">
                     <span class="row-entry">
                         <Selector
+                            style={$NodeSelectorStyle}
                             options={Object.fromEntries(Object.entries(NodeType).map(([key, value]) => [value, value]))}
                             bind:selectedOption={node.config.type}
                             onChange={() => {
@@ -389,41 +303,11 @@ Displays contextual hints and supports multi-language labels for all fields. -->
                             inputInvalid={!node.validation.variableType}
                             enableInputInvalid={true}
                             scrollable={true}
-                            maxOptions={5}
                             width="100%"
-                            height="40px"
-                            optionHeight="40px"
-                            borderRadius="5px"
-                            backgroundColor="#1a2027"
-                            disabledBackgroundColor="#42505f"
-                            selectedColor="#14566b"
-                            badFormatBorderColor="#e74c3c"
-                            optionsBackgroundColor="#1e242b"
-                            optionsBorderColor="#323a45"
-                            fontSize="0.9rem"
-                            arrowWidth="16px"
-                            arrowHeight="16px"
-                            arrowRightPos="5px"
                         />
                     </span>
                     <span class="row-hint">
-                        <HintInfo
-                            labelText=""
-                            hintWidth="250px"
-                            hintHeight="fit-content"
-                            hintBackgroundColor="#1e242b"
-                            hintBorderColor="#2c343d"
-                            hintBorderRadius="10px"
-                            textColor="#f5f5f5"
-                            openBackgroundColor="rgba(255, 255, 255, 0.05)"
-                            openHoverBackgroundColor="rgba(255, 255, 255, 0.1)"
-                            openStrokeColor="#cccccc"
-                            openHoverStrokeColor="#eeeeee"
-                            closeBackgroundColor="rgba(255, 255, 255, 0.1)"
-                            closeHoverBackgroundColor="rgba(255, 255, 255, 0.2)"
-                            closeStrokeColor="white"
-                            closeHoverStrokeColor="#eeeeee"
-                        >
+                        <HintInfo hintWidth="250px">
                             <span class="info-text">{$texts.typeInfo[$selectedLang]}</span>
                         </HintInfo>
                     </span>
@@ -436,6 +320,7 @@ Displays contextual hints and supports multi-language labels for all fields. -->
                 <span class="row-input">
                     <span class="row-entry">
                         <InputField
+                            style={$NodeInputFieldStyle}
                             disabled={!node.config.logging}
                             bind:inputValue={node.config.logging_period}
                             onChange={() => {
@@ -454,18 +339,6 @@ Displays contextual hints and supports multi-language labels for all fields. -->
                             }}
                             inputUnit="min."
                             width="100%"
-                            height="40px"
-                            borderRadius="5px"
-                            backgroundColor="#1a2027"
-                            disabledBackgroundColor="#42505f"
-                            selectedBackgroundColor="#1a2027"
-                            selectedBorderColor="#2F80ED"
-                            badFormatBorderColor="#e74c3c"
-                            fontSize="0.9rem"
-                            fontColor="#f5f5f5"
-                            fontWeight="400"
-                            textAlign="center"
-                            unitTextColor="rgb(170,170,170)"
                         />
                         <Checkbox
                             bind:checked={node.config.logging}
@@ -477,34 +350,10 @@ Displays contextual hints and supports multi-language labels for all fields. -->
                             inputName="log-node"
                             width="38px"
                             height="38px"
-                            checkMarkWidth={24}
-                            checkMarkHeight={24}
-                            enabledbgColor="#2f80ed"
-                            enabledBorderColor="#5a646e"
-                            disabledbgColor="#42505f"
-                            disabledBorderColor="#5a646e"
-                            badFormatBackgroundColor="#e74c3c"
-                            badFormatBorderColor="#5a646e"
                         />
                     </span>
                     <span class="row-hint">
-                        <HintInfo
-                            labelText=""
-                            hintWidth="250px"
-                            hintHeight="fit-content"
-                            hintBackgroundColor="#1e242b"
-                            hintBorderColor="#2c343d"
-                            hintBorderRadius="10px"
-                            textColor="#f5f5f5"
-                            openBackgroundColor="rgba(255, 255, 255, 0.05)"
-                            openHoverBackgroundColor="rgba(255, 255, 255, 0.1)"
-                            openStrokeColor="#cccccc"
-                            openHoverStrokeColor="#eeeeee"
-                            closeBackgroundColor="rgba(255, 255, 255, 0.1)"
-                            closeHoverBackgroundColor="rgba(255, 255, 255, 0.2)"
-                            closeStrokeColor="white"
-                            closeHoverStrokeColor="#eeeeee"
-                        >
+                        <HintInfo hintWidth="250px">
                             <span class="info-text">{$texts.loggingInfo[$selectedLang]}</span>
                         </HintInfo>
                     </span>
@@ -518,6 +367,7 @@ Displays contextual hints and supports multi-language labels for all fields. -->
                     <span class="row-input">
                         <span class="row-entry">
                             <InputField
+                                style={$NodeInputFieldStyle}
                                 disabled={(node.config.type !== NodeType.FLOAT && node.config.type !== NodeType.INT) || !node.config.min_alarm}
                                 bind:inputValue={node.config.min_alarm_value}
                                 inputInvalid={!node.validation.minAlarm}
@@ -528,18 +378,6 @@ Displays contextual hints and supports multi-language labels for all fields. -->
                                 inputType={node.config.type}
                                 inputUnit={node.config.unit}
                                 width="100%"
-                                height="40px"
-                                borderRadius="5px"
-                                backgroundColor="#1a2027"
-                                disabledBackgroundColor="#42505f"
-                                selectedBackgroundColor="#1a2027"
-                                selectedBorderColor="#2F80ED"
-                                badFormatBorderColor="#e74c3c"
-                                fontSize="0.9rem"
-                                fontColor="#f5f5f5"
-                                fontWeight="400"
-                                textAlign="center"
-                                unitTextColor="rgb(170,170,170)"
                             />
                             <Checkbox
                                 bind:checked={node.config.min_alarm}
@@ -551,34 +389,10 @@ Displays contextual hints and supports multi-language labels for all fields. -->
                                 inputName="node-min-alarm"
                                 width="38px"
                                 height="38px"
-                                checkMarkWidth={24}
-                                checkMarkHeight={24}
-                                enabledbgColor="#2f80ed"
-                                enabledBorderColor="#5a646e"
-                                disabledbgColor="#42505f"
-                                disabledBorderColor="#5a646e"
-                                badFormatBackgroundColor="#e74c3c"
-                                badFormatBorderColor="#5a646e"
                             />
                         </span>
                         <span class="row-hint">
-                            <HintInfo
-                                labelText=""
-                                hintWidth="250px"
-                                hintHeight="fit-content"
-                                hintBackgroundColor="#1e242b"
-                                hintBorderColor="#2c343d"
-                                hintBorderRadius="10px"
-                                textColor="#f5f5f5"
-                                openBackgroundColor="rgba(255, 255, 255, 0.05)"
-                                openHoverBackgroundColor="rgba(255, 255, 255, 0.1)"
-                                openStrokeColor="#cccccc"
-                                openHoverStrokeColor="#eeeeee"
-                                closeBackgroundColor="rgba(255, 255, 255, 0.1)"
-                                closeHoverBackgroundColor="rgba(255, 255, 255, 0.2)"
-                                closeStrokeColor="white"
-                                closeHoverStrokeColor="#eeeeee"
-                            >
+                            <HintInfo hintWidth="250px">
                                 <span class="info-text">{$texts.minValueInfo[$selectedLang]}</span>
                             </HintInfo>
                         </span>
@@ -591,6 +405,7 @@ Displays contextual hints and supports multi-language labels for all fields. -->
                     <span class="row-input">
                         <span class="row-entry">
                             <InputField
+                                style={$NodeInputFieldStyle}
                                 disabled={(node.config.type !== NodeType.FLOAT && node.config.type !== NodeType.INT) || !node.config.max_alarm}
                                 bind:inputValue={node.config.max_alarm_value}
                                 inputInvalid={!node.validation.maxAlarm}
@@ -601,18 +416,6 @@ Displays contextual hints and supports multi-language labels for all fields. -->
                                 inputType={node.config.type}
                                 inputUnit={node.config.unit}
                                 width="100%"
-                                height="40px"
-                                borderRadius="5px"
-                                backgroundColor="#1a2027"
-                                disabledBackgroundColor="#42505f"
-                                selectedBackgroundColor="#1a2027"
-                                selectedBorderColor="#2F80ED"
-                                badFormatBorderColor="#e74c3c"
-                                fontSize="0.9rem"
-                                fontColor="#f5f5f5"
-                                fontWeight="400"
-                                textAlign="center"
-                                unitTextColor="rgb(170,170,170)"
                             />
                             <Checkbox
                                 bind:checked={node.config.max_alarm}
@@ -624,34 +427,10 @@ Displays contextual hints and supports multi-language labels for all fields. -->
                                 inputName="node-max-alarm"
                                 width="38px"
                                 height="38px"
-                                checkMarkWidth={24}
-                                checkMarkHeight={24}
-                                enabledbgColor="#2f80ed"
-                                enabledBorderColor="#5a646e"
-                                disabledbgColor="#42505f"
-                                disabledBorderColor="#5a646e"
-                                badFormatBackgroundColor="#e74c3c"
-                                badFormatBorderColor="#5a646e"
                             />
                         </span>
                         <span class="row-hint">
-                            <HintInfo
-                                labelText=""
-                                hintWidth="250px"
-                                hintHeight="fit-content"
-                                hintBackgroundColor="#1e242b"
-                                hintBorderColor="#2c343d"
-                                hintBorderRadius="10px"
-                                textColor="#f5f5f5"
-                                openBackgroundColor="rgba(255, 255, 255, 0.05)"
-                                openHoverBackgroundColor="rgba(255, 255, 255, 0.1)"
-                                openStrokeColor="#cccccc"
-                                openHoverStrokeColor="#eeeeee"
-                                closeBackgroundColor="rgba(255, 255, 255, 0.1)"
-                                closeHoverBackgroundColor="rgba(255, 255, 255, 0.2)"
-                                closeStrokeColor="white"
-                                closeHoverStrokeColor="#eeeeee"
-                            >
+                            <HintInfo hintWidth="250px">
                                 <span class="info-text">{$texts.maxValueInfo[$selectedLang]}</span>
                             </HintInfo>
                         </span>
@@ -673,32 +452,10 @@ Displays contextual hints and supports multi-language labels for all fields. -->
                             inputName="custom-node"
                             width="38px"
                             height="38px"
-                            checkMarkWidth={24}
-                            checkMarkHeight={24}
-                            enabledbgColor="#2f80ed"
-                            enabledBorderColor="#5a646e"
-                            disabledbgColor="#42505f"
-                            disabledBorderColor="#5a646e"
                         />
                     </span>
                     <span class="row-hint">
-                        <HintInfo
-                            labelText=""
-                            hintWidth="250px"
-                            hintHeight="fit-content"
-                            hintBackgroundColor="#1e242b"
-                            hintBorderColor="#2c343d"
-                            hintBorderRadius="10px"
-                            textColor="#f5f5f5"
-                            openBackgroundColor="rgba(255, 255, 255, 0.05)"
-                            openHoverBackgroundColor="rgba(255, 255, 255, 0.1)"
-                            openStrokeColor="#cccccc"
-                            openHoverStrokeColor="#eeeeee"
-                            closeBackgroundColor="rgba(255, 255, 255, 0.1)"
-                            closeHoverBackgroundColor="rgba(255, 255, 255, 0.2)"
-                            closeStrokeColor="white"
-                            closeHoverStrokeColor="#eeeeee"
-                        >
+                        <HintInfo hintWidth="250px">
                             <span class="info-text">{$texts.customInfo[$selectedLang]}</span>
                         </HintInfo>
                     </span>
@@ -718,32 +475,10 @@ Displays contextual hints and supports multi-language labels for all fields. -->
                             inputName="publish-node"
                             width="38px"
                             height="38px"
-                            checkMarkWidth={24}
-                            checkMarkHeight={24}
-                            enabledbgColor="#2f80ed"
-                            enabledBorderColor="#5a646e"
-                            disabledbgColor="#42505f"
-                            disabledBorderColor="#5a646e"
                         />
                     </span>
                     <span class="row-hint">
-                        <HintInfo
-                            labelText=""
-                            hintWidth="250px"
-                            hintHeight="fit-content"
-                            hintBackgroundColor="#1e242b"
-                            hintBorderColor="#2c343d"
-                            hintBorderRadius="10px"
-                            textColor="#f5f5f5"
-                            openBackgroundColor="rgba(255, 255, 255, 0.05)"
-                            openHoverBackgroundColor="rgba(255, 255, 255, 0.1)"
-                            openStrokeColor="#cccccc"
-                            openHoverStrokeColor="#eeeeee"
-                            closeBackgroundColor="rgba(255, 255, 255, 0.1)"
-                            closeHoverBackgroundColor="rgba(255, 255, 255, 0.2)"
-                            closeStrokeColor="white"
-                            closeHoverStrokeColor="#eeeeee"
-                        >
+                        <HintInfo hintWidth="250px">
                             <span class="info-text">{$texts.publishInfo[$selectedLang]}</span>
                         </HintInfo>
                     </span>
@@ -766,35 +501,10 @@ Displays contextual hints and supports multi-language labels for all fields. -->
                             inputName="virtual-node"
                             width="38px"
                             height="38px"
-                            checkMarkWidth={24}
-                            checkMarkHeight={24}
-                            enabledbgColor="#2f80ed"
-                            enabledBorderColor="#5a646e"
-                            disabledbgColor="#42505f"
-                            disabledBorderColor="#5a646e"
-                            badFormatBackgroundColor="#e74c3c"
-                            badFormatBorderColor="#5a646e"
                         />
                     </span>
                     <span class="row-hint">
-                        <HintInfo
-                            openInverted={true}
-                            labelText=""
-                            hintWidth="250px"
-                            hintHeight="fit-content"
-                            hintBackgroundColor="#1e242b"
-                            hintBorderColor="#2c343d"
-                            hintBorderRadius="10px"
-                            textColor="#f5f5f5"
-                            openBackgroundColor="rgba(255, 255, 255, 0.05)"
-                            openHoverBackgroundColor="rgba(255, 255, 255, 0.1)"
-                            openStrokeColor="#cccccc"
-                            openHoverStrokeColor="#eeeeee"
-                            closeBackgroundColor="rgba(255, 255, 255, 0.1)"
-                            closeHoverBackgroundColor="rgba(255, 255, 255, 0.2)"
-                            closeStrokeColor="white"
-                            closeHoverStrokeColor="#eeeeee"
-                        >
+                        <HintInfo openInverted={true} hintWidth="250px">
                             <span class="info-text">{$texts.virtualInfo[$selectedLang]}</span>
                         </HintInfo>
                     </span>
@@ -817,35 +527,10 @@ Displays contextual hints and supports multi-language labels for all fields. -->
                                 inputName="incremental-node"
                                 width="38px"
                                 height="38px"
-                                checkMarkWidth={24}
-                                checkMarkHeight={24}
-                                enabledbgColor="#2f80ed"
-                                enabledBorderColor="#5a646e"
-                                disabledbgColor="#42505f"
-                                disabledBorderColor="#5a646e"
-                                badFormatBackgroundColor="#e74c3c"
-                                badFormatBorderColor="#5a646e"
                             />
                         </span>
                         <span class="row-hint">
-                            <HintInfo
-                                openInverted={true}
-                                labelText=""
-                                hintWidth="250px"
-                                hintHeight="fit-content"
-                                hintBackgroundColor="#1e242b"
-                                hintBorderColor="#2c343d"
-                                hintBorderRadius="10px"
-                                textColor="#f5f5f5"
-                                openBackgroundColor="rgba(255, 255, 255, 0.05)"
-                                openHoverBackgroundColor="rgba(255, 255, 255, 0.1)"
-                                openStrokeColor="#cccccc"
-                                openHoverStrokeColor="#eeeeee"
-                                closeBackgroundColor="rgba(255, 255, 255, 0.1)"
-                                closeHoverBackgroundColor="rgba(255, 255, 255, 0.2)"
-                                closeStrokeColor="white"
-                                closeHoverStrokeColor="#eeeeee"
-                            >
+                            <HintInfo openInverted={true} hintWidth="250px">
                                 <span class="info-text">{$texts.incrementalNodeInfo[$selectedLang]}</span>
                             </HintInfo>
                         </span>
@@ -869,35 +554,10 @@ Displays contextual hints and supports multi-language labels for all fields. -->
                                 inputName="positive-increment-node"
                                 width="38px"
                                 height="38px"
-                                checkMarkWidth={24}
-                                checkMarkHeight={24}
-                                enabledbgColor="#2f80ed"
-                                enabledBorderColor="#5a646e"
-                                disabledbgColor="#42505f"
-                                disabledBorderColor="#5a646e"
-                                badFormatBackgroundColor="#e74c3c"
-                                badFormatBorderColor="#5a646e"
                             />
                         </span>
                         <span class="row-hint">
-                            <HintInfo
-                                openInverted={true}
-                                labelText=""
-                                hintWidth="250px"
-                                hintHeight="fit-content"
-                                hintBackgroundColor="#1e242b"
-                                hintBorderColor="#2c343d"
-                                hintBorderRadius="10px"
-                                textColor="#f5f5f5"
-                                openBackgroundColor="rgba(255, 255, 255, 0.05)"
-                                openHoverBackgroundColor="rgba(255, 255, 255, 0.1)"
-                                openStrokeColor="#cccccc"
-                                openHoverStrokeColor="#eeeeee"
-                                closeBackgroundColor="rgba(255, 255, 255, 0.1)"
-                                closeHoverBackgroundColor="rgba(255, 255, 255, 0.2)"
-                                closeStrokeColor="white"
-                                closeHoverStrokeColor="#eeeeee"
-                            >
+                            <HintInfo openInverted={true} hintWidth="250px">
                                 <span class="info-text">{$texts.positiveIncrementInfo[$selectedLang]}</span>
                             </HintInfo>
                         </span>
@@ -919,35 +579,10 @@ Displays contextual hints and supports multi-language labels for all fields. -->
                                 inputName="calculate-increment-node"
                                 width="38px"
                                 height="38px"
-                                checkMarkWidth={24}
-                                checkMarkHeight={24}
-                                enabledbgColor="#2f80ed"
-                                enabledBorderColor="#5a646e"
-                                disabledbgColor="#42505f"
-                                disabledBorderColor="#5a646e"
-                                badFormatBackgroundColor="#e74c3c"
-                                badFormatBorderColor="#5a646e"
                             />
                         </span>
                         <span class="row-hint">
-                            <HintInfo
-                                openInverted={true}
-                                labelText=""
-                                hintWidth="250px"
-                                hintHeight="fit-content"
-                                hintBackgroundColor="#1e242b"
-                                hintBorderColor="#2c343d"
-                                hintBorderRadius="10px"
-                                textColor="#f5f5f5"
-                                openBackgroundColor="rgba(255, 255, 255, 0.05)"
-                                openHoverBackgroundColor="rgba(255, 255, 255, 0.1)"
-                                openStrokeColor="#cccccc"
-                                openHoverStrokeColor="#eeeeee"
-                                closeBackgroundColor="rgba(255, 255, 255, 0.1)"
-                                closeHoverBackgroundColor="rgba(255, 255, 255, 0.2)"
-                                closeStrokeColor="white"
-                                closeHoverStrokeColor="#eeeeee"
-                            >
+                            <HintInfo openInverted={true} hintWidth="250px">
                                 <span class="info-text">{$texts.calculateIncrementInfo[$selectedLang]}</span>
                             </HintInfo>
                         </span>
@@ -968,33 +603,10 @@ Displays contextual hints and supports multi-language labels for all fields. -->
                             inputName="enable-node"
                             width="38px"
                             height="38px"
-                            checkMarkWidth={24}
-                            checkMarkHeight={24}
-                            enabledbgColor="#2f80ed"
-                            enabledBorderColor="#5a646e"
-                            disabledbgColor="#42505f"
-                            disabledBorderColor="#5a646e"
                         />
                     </span>
                     <span class="row-hint">
-                        <HintInfo
-                            openInverted={true}
-                            labelText=""
-                            hintWidth="250px"
-                            hintHeight="fit-content"
-                            hintBackgroundColor="#1e242b"
-                            hintBorderColor="#2c343d"
-                            hintBorderRadius="10px"
-                            textColor="#f5f5f5"
-                            openBackgroundColor="rgba(255, 255, 255, 0.05)"
-                            openHoverBackgroundColor="rgba(255, 255, 255, 0.1)"
-                            openStrokeColor="#cccccc"
-                            openHoverStrokeColor="#eeeeee"
-                            closeBackgroundColor="rgba(255, 255, 255, 0.1)"
-                            closeHoverBackgroundColor="rgba(255, 255, 255, 0.2)"
-                            closeStrokeColor="white"
-                            closeHoverStrokeColor="#eeeeee"
-                        >
+                        <HintInfo openInverted={true} hintWidth="250px">
                             <span class="info-text">{$texts.enabledInfo[$selectedLang]}</span>
                         </HintInfo>
                     </span>
@@ -1028,8 +640,8 @@ Displays contextual hints and supports multi-language labels for all fields. -->
     /* Main label text in header */
     .header .header-section .main-text {
         font-size: 1rem;
-        color: #f5f5f5;
-        font-weight: 400;
+        color: var(--header-text-color);
+        font-weight: var(--header-text-weight);
     }
 
     /* Sub-label text in header */
@@ -1037,8 +649,8 @@ Displays contextual hints and supports multi-language labels for all fields. -->
         padding-left: 5px;
         padding-right: 10px;
         font-size: 1rem;
-        color: rgb(147, 147, 147);
-        font-weight: 300;
+        color: var(--header-sub-text-color);
+        font-weight: var(--header-sub-font-weight);
     }
 
     /* Main container for all node config rows */
@@ -1089,8 +701,8 @@ Displays contextual hints and supports multi-language labels for all fields. -->
     /* Identifier label for each config field */
     .row .row-variable .row-identifier {
         font-size: 1rem;
-        color: #f5f5f5;
-        font-weight: 400;
+        color: var(--text-color);
+        font-weight: var(--text-weight);
         white-space: nowrap;
         text-align: center;
         padding: 0;
@@ -1158,8 +770,8 @@ Displays contextual hints and supports multi-language labels for all fields. -->
         padding: 10px;
         padding-right: 40px;
         font-size: 1rem;
-        font-weight: 400;
+        font-weight: var(--hint-info-text-weight);
         line-height: 1.5;
-        color: white;
+        color: var(--hint-info-text-color);
     }
 </style>

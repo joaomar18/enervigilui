@@ -5,13 +5,26 @@
     import { selectedLang, texts } from "$lib/stores/lang";
 
     // Styles
-    import { AddNodeButtonStyle } from "$lib/style/button";
+    import { mergeStyle } from "$lib/style/components";
+    import { AddNodeStyle } from "$lib/style/nodes";
+    import { AddNodeButtonStyle } from "$lib/style/nodes";
+
+    // Style object (from theme)
+    export let style: { [property: string]: string | number } | null = null;
+    $: effectiveStyle = style ?? $AddNodeStyle;
 
     // Props
     export let windowWidth: number;
 
     // Layout / styling props
-    export let backgroundColor: string;
+    export let backgroundColor: string | undefined = undefined;
+
+    $: localOverrides = {
+        backgroundColor,
+    };
+
+    // Merged style
+    $: mergedStyle = mergeStyle(effectiveStyle, localOverrides);
 
     // Export Funcions
     export let onAddNode: () => void;
@@ -22,7 +35,7 @@
 
 <tr
     style="
-        --background-color: {backgroundColor};
+        --background-color: {mergedStyle.backgroundColor};
     "
     class="add-node"
 >

@@ -1,6 +1,33 @@
 import type { ComponentStyles } from "./components";
 import { createStyleStore } from "./components";
 
+//////////     H E A D E R     //////////
+
+const HeaderStyleConfig: ComponentStyles = {
+    dark: {
+        backgroundColor: "#1a1f26",
+        dropdownBackgroundColor: "#252b33",
+        dropdownBorderBottomColor: "#37404a",
+        textColor: "#eeeeee",
+    },
+};
+
+export const HeaderStyle = createStyleStore(HeaderStyleConfig);
+
+//////////     H E A D E R     //////////
+
+const LoginFormStyleConfig: ComponentStyles = {
+    dark: {
+        backgroundColor: "#212830",
+        titleColor: "rgb(255,255,255)",
+        textColor: "#eeeeee",
+        titleWeight: "400",
+        textWeight: "300",
+    },
+};
+
+export const LoginFormStyle = createStyleStore(LoginFormStyleConfig);
+
 //////////     F O R G O T     P A S S W O R D     B U T T O N     //////////
 
 const ForgotPassButtonStyleConfig: ComponentStyles = {
@@ -9,11 +36,10 @@ const ForgotPassButtonStyleConfig: ComponentStyles = {
         paddingBottom: "30px",
         textColor: "rgb(216,216,216)",
         hoverTextColor: "rgb(51,151,210)",
-    }
-}
+    },
+};
 
 export const ForgotPassButtonStyle = createStyleStore(ForgotPassButtonStyleConfig);
-
 
 //////////     I N P U T     F I E L D     //////////
 
@@ -24,11 +50,10 @@ const LoginFieldStyleConfig: ComponentStyles = {
         imageWidth: "32px",
         imageHeight: "32px",
         labelTextColor: "rgb(255,255,255)",
-    }
-}
+    },
+};
 
 export const LoginFieldStyle = createStyleStore(LoginFieldStyleConfig);
-
 
 //////////     I N P U T     F I E L D     //////////
 
@@ -45,11 +70,10 @@ const LoginButtonStyleConfig: ComponentStyles = {
         loaderWidth: "24",
         loaderHeight: "24",
         loaderColor: "rgb(255,255,255)",
-    }
-}
+    },
+};
 
 export const LoginButtonStyle = createStyleStore(LoginButtonStyleConfig);
-
 
 //////////     I N F O     //////////
 
@@ -63,11 +87,10 @@ const InfoStyleConfig: ComponentStyles = {
         subTextColor: "#eeee",
         mainTextWeight: "500",
         subTextWeight: "300",
-    }
-}
+    },
+};
 
 export const InfoStyle = createStyleStore(InfoStyleConfig);
-
 
 //////////     L I N K     //////////
 
@@ -85,11 +108,10 @@ const LinkStyleConfig: ComponentStyles = {
         backgroundColor: "#252b33",
         hoverColor: "#323a45",
         borderBottomColor: "transparent",
-    }
-}
+    },
+};
 
 export const LinkStyle = createStyleStore(LinkStyleConfig);
-
 
 //////////     M O B I L E     L I N K     //////////
 
@@ -107,7 +129,7 @@ const MobileLinkStyleConfig: ComponentStyles = {
         backgroundColor: "#1f262d",
         hoverColor: "#2c343d",
         borderBottomColor: "#2c343d",
-    }
-}
+    },
+};
 
 export const MobileLinkStyle = createStyleStore(MobileLinkStyleConfig);

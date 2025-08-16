@@ -3,25 +3,53 @@
     import { browser } from "$app/environment";
     import { replaceState } from "$app/navigation";
 
+    // Styles
+    import { mergeStyle } from "$lib/style/components";
+    import { SearchBarStyle } from "$lib/style/dashboard";
+
+    // Style object (from theme)
+    export let style: { [property: string]: string | number } | null = null;
+    $: effectiveStyle = style ?? $SearchBarStyle;
+
     // Props
     export let searchString: string;
+    export let placeholderText: string;
 
     // Layout / styling props
-    export let width: string;
-    export let minWidth: string;
-    export let maxWidth: string;
-    export let height: string;
-    export let borderRadius: string = "";
-    export let searchButtonWidth: string;
-    export let placeholderText: string;
-    export let backgroundColor: string;
-    export let buttonBgColor: string;
-    export let buttonHoverColor: string = buttonBgColor;
-    export let borderColor: string = backgroundColor;
-    export let buttonBorderColor: string = buttonBgColor;
-    export let selectedBorderColor: string = backgroundColor;
-    export let imageWidth: string;
-    export let imageHeight: string;
+    export let width: string | undefined = undefined;
+    export let minWidth: string | undefined = undefined;
+    export let maxWidth: string | undefined = undefined;
+    export let height: string | undefined = undefined;
+    export let borderRadius: string | undefined = undefined;
+    export let searchButtonWidth: string | undefined = undefined;
+    export let backgroundColor: string | undefined = undefined;
+    export let buttonBgColor: string | undefined = undefined;
+    export let buttonHoverColor: string | undefined = undefined;
+    export let borderColor: string | undefined = undefined;
+    export let buttonBorderColor: string | undefined = undefined;
+    export let selectedBorderColor: string | undefined = undefined;
+    export let imageWidth: string | undefined = undefined;
+    export let imageHeight: string | undefined = undefined;
+    export let textColor: string | undefined = undefined;
+
+    $: localOverrides = {
+        width,
+        height,
+        borderRadius,
+        searchButtonWidth,
+        backgroundColor,
+        buttonBgColor,
+        buttonHoverColor,
+        borderColor,
+        buttonBorderColor,
+        selectedBorderColor,
+        imageWidth,
+        imageHeight,
+        textColor,
+    };
+
+    // Merged style
+    $: mergedStyle = mergeStyle(effectiveStyle, localOverrides);
 
     // Variables
     let inputValue: string;
@@ -75,20 +103,21 @@
 -->
 <div
     style="
-        --width: {width};
+        --width: {mergedStyle.width};
         --min-width: {minWidth};
         --max-width: {maxWidth};
-        --height: {height};
+        --height: {mergedStyle.height};
     "
     class="container"
 >
     <div class="content">
         <div
             style="
-                --border-radius: {borderRadius};
-                --background-color: {backgroundColor};
-                --border-color: {borderColor};
-                --selected-border-color: {selectedBorderColor};
+                --border-radius: {mergedStyle.borderRadius};
+                --background-color: {mergedStyle.backgroundColor};
+                --border-color: {mergedStyle.borderColor};
+                --selected-border-color: {mergedStyle.selectedBorderColor};
+                --text-color: {mergedStyle.textColor};
             "
             class="search-bar-div"
         >
@@ -103,13 +132,13 @@
         </div>
         <div
             style="
-                --button-width: {searchButtonWidth};
-                --button-border-radius: {borderRadius};
-                --button-background-color: {buttonBgColor};
-                --button-hover-color: {buttonHoverColor};
-                --button-border-color: {buttonBorderColor};
-                --image-width: {imageWidth};
-                --image-height: {imageHeight};
+                --button-width: {mergedStyle.searchButtonWidth};
+                --button-border-radius: {mergedStyle.borderRadius};
+                --button-background-color: {mergedStyle.buttonBgColor};
+                --button-hover-color: {mergedStyle.buttonHoverColor};
+                --button-border-color: {mergedStyle.buttonBorderColor};
+                --image-width: {mergedStyle.imageWidth};
+                --image-height: {mergedStyle.imageHeight};
             "
             class="search-button-div"
         >
@@ -176,7 +205,7 @@
         outline: none;
         box-shadow: none;
         border: none;
-        color: #eee;
+        color: var(--text-color);
     }
 
     /* Search button wrapper: fixed width, no left border */

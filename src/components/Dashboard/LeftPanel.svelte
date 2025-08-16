@@ -1,18 +1,54 @@
 <script lang="ts">
     import { navigateTo } from "$lib/ts/navigation";
 
-    import Link from "./Buttons/Link.svelte";
+    import Link from "./Link.svelte";
     import LangSelector from "../General/LangSelector.svelte";
     import Logo from "../General/Logo.svelte";
 
     // Stores for multi-language support
     import { selectedLang, texts } from "$lib/stores/lang";
 
-    //Props
+    // Styles
+    import { mergeStyle } from "$lib/style/components";
+    import { LeftPanelStyle } from "$lib/style/dashboard";
+
+    // Style object (from theme)
+    export let style: { [property: string]: string | number } | null = null;
+    $: effectiveStyle = style ?? $LeftPanelStyle;
+
+    // Props
     export let leftPanelOpen: boolean;
     export let activeSection: string;
 
-    //Functions
+    // Layout / styling props
+    export let overlayMaskBackgroundColor: string | undefined = undefined;
+    export let backgroundColor: string | undefined = undefined;
+    export let borderRightColor: string | undefined = undefined;
+    export let scrollbarTrackColor: string | undefined = undefined;
+    export let scrollbarThumbColor: string | undefined = undefined;
+    export let sectionTextColor: string | undefined = undefined;
+    export let sectionTextWeight: string | undefined = undefined;
+    export let sectionBorderBottomColor: string | undefined = undefined;
+    export let textColor: string | undefined = undefined;
+    export let textWeight: string | undefined = undefined;
+
+    $: localOverrides = {
+        overlayMaskBackgroundColor,
+        backgroundColor,
+        borderRightColor,
+        scrollbarTrackColor,
+        scrollbarThumbColor,
+        sectionTextColor,
+        sectionTextWeight,
+        sectionBorderBottomColor,
+        textColor,
+        textWeight,
+    };
+
+    // Merged style
+    $: mergedStyle = mergeStyle(effectiveStyle, localOverrides);
+
+    // Functions
     async function browseTo(path: string) {
         await navigateTo(path, $selectedLang);
     }
@@ -25,10 +61,30 @@
 <!-- 
   Left Side Panel: Overlay mask and collapsible left navigation with logo, sections, and language selector.  
 -->
-<div class="mask" class:close={!leftPanelOpen}>
+<div
+    class="mask"
+    style="
+        --overlay-mask-background-color: {mergedStyle.overlayMaskBackgroundColor};
+    "
+    class:close={!leftPanelOpen}
+>
     <button on:click={closePanel} aria-label="Close Panel"></button>
 </div>
-<div class="container" class:open={leftPanelOpen}>
+<div
+    class="container"
+    style="
+        --background-color: {mergedStyle.backgroundColor};
+        --border-right-color: {mergedStyle.borderRightColor};
+        --scrollbar-track-color: {mergedStyle.scrollbarTrackColor};
+        --scrollbar-thumb-color: {mergedStyle.scrollbarThumbColor};
+        --section-text-color: {mergedStyle.sectionTextColor};
+        --section-text-weight: {mergedStyle.sectionTextWeight};
+        --section-border-bottom-color: {mergedStyle.sectionBorderBottomColor};
+        --text-color: {mergedStyle.textColor};
+        --text-weight: {mergedStyle.textWeight};
+    "
+    class:open={leftPanelOpen}
+>
     <!--Only show logo div when logo div of header is disabled-->
     <div class="logo-div">
         <Logo />
@@ -40,34 +96,16 @@
                 <span class="section-label">{$texts.general[$selectedLang]}</span>
                 <Link
                     selected={activeSection.includes("/devices")}
-                    paddingLeft="10px"
-                    paddingRight="10px"
-                    paddingLeftText="10px"
                     buttonText={$texts.devices[$selectedLang]}
                     imageURL="/img/devices.png"
-                    imageWidth="25px"
-                    imageHeight="25px"
-                    fontSize="1rem"
-                    backgroundColor="transparent"
-                    hoverColor="rgba(255, 255, 255, 0.05)"
-                    selectedColor="#2F4138"
                     onClick={() => {
                         browseTo("/devices");
                     }}
                 />
                 <Link
                     selected={activeSection.includes("/mqtt")}
-                    paddingLeft="10px"
-                    paddingRight="10px"
-                    paddingLeftText="10px"
                     buttonText="MQTT"
                     imageURL="/img/mqtt.png"
-                    imageWidth="25px"
-                    imageHeight="25px"
-                    fontSize="1rem"
-                    backgroundColor="transparent"
-                    hoverColor="rgba(255, 255, 255, 0.05)"
-                    selectedColor="#2F4138"
                     onClick={() => {
                         browseTo("/mqtt");
                     }}
@@ -79,34 +117,16 @@
                 <span class="section-label">{$texts.diagnostics[$selectedLang]}</span>
                 <Link
                     selected={activeSection.includes("/health")}
-                    paddingLeft="10px"
-                    paddingRight="10px"
-                    paddingLeftText="10px"
                     buttonText={$texts.health[$selectedLang]}
                     imageURL="/img/health.png"
-                    imageWidth="25px"
-                    imageHeight="25px"
-                    fontSize="1rem"
-                    backgroundColor="transparent"
-                    hoverColor="rgba(255, 255, 255, 0.05)"
-                    selectedColor="#2F4138"
                     onClick={() => {
                         browseTo("/health");
                     }}
                 />
                 <Link
                     selected={activeSection.includes("/logs")}
-                    paddingLeft="10px"
-                    paddingRight="10px"
-                    paddingLeftText="10px"
                     buttonText={$texts.logs[$selectedLang]}
                     imageURL="/img/logs.png"
-                    imageWidth="25px"
-                    imageHeight="25px"
-                    fontSize="1rem"
-                    backgroundColor="transparent"
-                    hoverColor="rgba(255, 255, 255, 0.05)"
-                    selectedColor="#2F4138"
                     onClick={() => {
                         browseTo("/logs");
                     }}
@@ -118,34 +138,16 @@
                 <span class="section-label">{$texts.system[$selectedLang]}</span>
                 <Link
                     selected={activeSection.includes("/settings")}
-                    paddingLeft="10px"
-                    paddingRight="10px"
-                    paddingLeftText="10px"
                     buttonText={$texts.settings[$selectedLang]}
                     imageURL="/img/settings.png"
-                    imageWidth="25px"
-                    imageHeight="25px"
-                    fontSize="1rem"
-                    backgroundColor="transparent"
-                    hoverColor="rgba(255, 255, 255, 0.05)"
-                    selectedColor="#2F4138"
                     onClick={() => {
                         browseTo("/settings");
                     }}
                 />
                 <Link
                     selected={activeSection.includes("/backup")}
-                    paddingLeft="10px"
-                    paddingRight="10px"
-                    paddingLeftText="10px"
                     buttonText={$texts.backup[$selectedLang]}
                     imageURL="/img/backup.png"
-                    imageWidth="25px"
-                    imageHeight="25px"
-                    fontSize="1rem"
-                    backgroundColor="transparent"
-                    hoverColor="rgba(255, 255, 255, 0.05)"
-                    selectedColor="#2F4138"
                     onClick={() => {
                         browseTo("/backup");
                     }}
@@ -162,7 +164,7 @@
 <style>
     /* Overlay mask: full-screen semi-transparent backdrop */
     .mask {
-        background-color: rgba(0, 0, 0, 0.3);
+        background-color: var(--overlay-mask-background-color);
         position: fixed;
         top: 0;
         bottom: 0;
@@ -195,8 +197,8 @@
         width: 250px;
         height: calc(100vh - 74px);
         padding-top: 74px;
-        background: #15191f;
-        border-right: 1px solid rgba(255, 255, 255, 0.02);
+        background: var(--background-color);
+        border-right: 1px solid var(--border-right-color);
         display: flex;
         flex-direction: column;
         transform: translateX(-100%);
@@ -232,7 +234,7 @@
         flex-direction: column;
         justify-content: space-between;
         scrollbar-width: thin;
-        scrollbar-color: #323a45 #1e242b;
+        scrollbar-color: var(--scrollbar-track-color) var(--scrollbar-thumb-color);
     }
 
     /* Navigation section wrapper */
@@ -261,11 +263,11 @@
         padding-bottom: 5px;
         padding-right: 0px;
         font-size: 0.75rem;
-        font-weight: 500;
-        color: rgba(255, 255, 255, 0.4);
+        font-weight: var(--section-text-weight);
+        color: var(--section-text-color);
         text-transform: uppercase;
         letter-spacing: 1px;
-        border-bottom: 2px solid rgba(255, 255, 255, 0.1);
+        border-bottom: 2px solid var(--section-border-bottom-color);
         width: calc(100% - 40px);
     }
 
@@ -281,8 +283,8 @@
 
     /* Language text label */
     .language-text {
-        color: #eeeeee;
-        font-weight: 300;
+        color: var(--text-color);
+        font-weight: var(--text-weight);
         font-size: 18px;
         padding-top: 10px;
     }

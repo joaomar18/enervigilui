@@ -7,7 +7,7 @@
 
     // Stores for variable definitions
     import { MeterType, Protocol } from "$lib/stores/devices";
-    import { NodePrefix, NodePhase } from "$lib/stores/nodes";
+    import { NodePhase } from "$lib/stores/nodes";
 
     // Types
     import type { EditableDeviceMeter, NewDeviceMeter } from "$lib/stores/devices";
@@ -188,13 +188,9 @@ Includes multi-language headers and adapts layout to container size. -->
                         {#each nodesBySection[section.key] as node, i (i)}
                             <NodeRow
                                 {node}
-                                backgroundColor="rgba(255, 255, 255, 0.05)"
-                                disabledBackgroundColor="rgba(255, 255, 255, 0.22)"
-                                hoverColor="rgba(255, 255, 255, 0.09)"
-                                disabledHoverColor="rgba(255, 255, 255, 0.28)"
-                                {windowWidth}
                                 currentGridWidth={currentWidth}
                                 {columnVisibility}
+                                {windowWidth}
                                 onDelete={() => {
                                     let deletedNodeIndex = getNodeIndex(node, nodes);
                                     if (deletedNodeIndex !== -1) {
@@ -212,7 +208,6 @@ Includes multi-language headers and adapts layout to container size. -->
                         {/each}
                         <AddNode
                             {windowWidth}
-                            backgroundColor="rgba(255, 255, 255, 0.05)"
                             onAddNode={() => {
                                 nodes = [...nodes, addNode(section.prefix, deviceData)];
                             }}
@@ -226,10 +221,6 @@ Includes multi-language headers and adapts layout to container size. -->
                                 {node}
                                 currentGridWidth={currentWidth}
                                 {columnVisibility}
-                                backgroundColor="rgba(255, 255, 255, 0.05)"
-                                disabledBackgroundColor="rgba(255, 255, 255, 0.22)"
-                                hoverColor="rgba(255, 255, 255, 0.09)"
-                                disabledHoverColor="rgba(255, 255, 255, 0.28)"
                                 {windowWidth}
                                 onDelete={() => {
                                     let deletedNodeIndex = getNodeIndex(node, nodes);
@@ -248,7 +239,6 @@ Includes multi-language headers and adapts layout to container size. -->
                         {/each}
                         <AddNode
                             {windowWidth}
-                            backgroundColor="rgba(255, 255, 255, 0.05)"
                             onAddNode={() => {
                                 nodes = [...nodes, addNode(section.prefix, deviceData)];
                             }}

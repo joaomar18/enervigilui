@@ -9,7 +9,7 @@
     import LeftPanel from "../components/Dashboard/LeftPanel.svelte";
     import Logo from "../components/General/Logo.svelte";
     import MenuButton from "../components/General/MenuButton.svelte";
-    import Logout from "../components/Dashboard/Buttons/Logout.svelte";
+    import Logout from "../components/Dashboard/Logout.svelte";
     import Notification from "../components/General/Notification.svelte";
     import SearchBar from "../components/Dashboard/SearchBar.svelte";
     import Action from "../components/General/Action.svelte";
@@ -186,21 +186,9 @@
                             await navigateTo("/devices", $selectedLang, { searchQuery: $searchQuery });
                         }}
                         bind:searchString={$searchQuery}
-                        width="80%"
+                        placeholderText={$texts.searchDevice[$selectedLang]}
                         minWidth="250px"
                         maxWidth="650px"
-                        height="40px"
-                        borderRadius="20px"
-                        searchButtonWidth="75px"
-                        placeholderText={$texts.searchDevice[$selectedLang]}
-                        backgroundColor="#14161c"
-                        buttonBgColor="#1C2126"
-                        buttonHoverColor="#232731"
-                        borderColor="#2a2e3a"
-                        buttonBorderColor="#2A2E3A"
-                        selectedBorderColor="#3B7DFF"
-                        imageWidth="25px"
-                        imageHeight="25px"
                     />
                 </div>
                 <div class="right-header-div" class:close={mobileSearchOpen}>
@@ -214,22 +202,7 @@
                         />
                     </div>
                     <Notification notificationsNumber={"1"} />
-                    <Logout
-                        width="125px"
-                        height="40px"
-                        borderRadius="20px"
-                        backgroundColor="#14161c"
-                        hoverColor="#2A2E3A"
-                        borderColor="#2a2e3a"
-                        buttonText={$texts.logout[$selectedLang]}
-                        fontSize="1rem"
-                        paddingLeft="10px"
-                        paddingRight="20px"
-                        imageUrl="/img/logout.png"
-                        imageWidth="32px"
-                        imageHeight="32px"
-                        onClick={logout}
-                    />
+                    <Logout buttonText={$texts.logout[$selectedLang]} imageUrl="/img/logout.png" onClick={logout} />
                 </div>
             </div>
         </div>

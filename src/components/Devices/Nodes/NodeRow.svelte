@@ -14,24 +14,43 @@
     import type { EditableDeviceNode, NodeEditState } from "$lib/stores/nodes";
     import type { ColumnVisibilityMap } from "$lib/ts/nodes_gid";
 
-    // Styles
-    import { SubPrimaryButtonStyle, SubDangerButtonStyle } from "$lib/style/button";
-
     // Stores for multi-language support
     import { texts, variableNameTextsByPhase, selectedLang } from "$lib/stores/lang";
+
+    // Styles
+    import { mergeStyle } from "$lib/style/components";
+    import { NodeRowStyle } from "$lib/style/nodes";
+    import { SubPrimaryButtonStyle, SubDangerButtonStyle } from "$lib/style/button";
+    import { NodeInputFieldStyle, NodeSelectorStyle } from "$lib/style/nodes";
+
+    // Style object (from theme)
+    export let style: { [property: string]: string | number } | null = null;
+    $: effectiveStyle = style ?? $NodeRowStyle;
 
     // Props
     export let deviceData: EditableDeviceMeter | NewDeviceMeter;
     export let node: EditableDeviceNode;
-
-    // Layout / styling props
     export let windowWidth: number;
     export let currentGridWidth: number;
     export let columnVisibility: ColumnVisibilityMap;
-    export let backgroundColor: string;
-    export let hoverColor: string = backgroundColor;
-    export let disabledBackgroundColor: string = backgroundColor;
-    export let disabledHoverColor: string = disabledBackgroundColor;
+
+    // Layout / styling props
+    export let backgroundColor: string | undefined = undefined;
+    export let hoverColor: string | undefined = undefined;
+    export let disabledBackgroundColor: string | undefined = undefined;
+    export let disabledHoverColor: string | undefined = undefined;
+    export let svgButtonsColor: string | undefined = undefined;
+
+    $: localOverrides = {
+        backgroundColor,
+        hoverColor,
+        disabledBackgroundColor,
+        disabledHoverColor,
+        svgButtonsColor,
+    };
+
+    // Merged style
+    $: mergedStyle = mergeStyle(effectiveStyle, localOverrides);
 
     // Variables
     let nodeEditingState: NodeEditState = {
@@ -76,10 +95,11 @@ name, unit, communication ID, type, alarms, and options. Includes checkboxes for
 properties and action buttons for configuration and deletion. -->
 <tr
     style="
-        --background-color: {backgroundColor};
-        --hover-color: {hoverColor};
-        --disabled-background-color: {disabledBackgroundColor};
-        --disabled-hover-color: {disabledHoverColor};
+        --background-color: {mergedStyle.backgroundColor};
+        --hover-color: {mergedStyle.hoverColor};
+        --disabled-background-color: {mergedStyle.disabledBackgroundColor};
+        --disabled-hover-color: {mergedStyle.disabledHoverColor};
+        --svg-buttons-color: {mergedStyle.svgButtonsColor};
     "
     class="edit-node"
     class:disabled={!node.config.enabled}
@@ -89,6 +109,7 @@ properties and action buttons for configuration and deletion. -->
             <div class="cell-content">
                 {#if !node.config.custom}
                     <Selector
+                        style={$NodeSelectorStyle}
                         useLang={true}
                         options={$variableNameTextsByPhase[node.phase]}
                         bind:selectedOption={node.display_name}
@@ -99,24 +120,12 @@ properties and action buttons for configuration and deletion. -->
                         inputInvalid={!node.validation.variableName}
                         enableInputInvalid={true}
                         scrollable={true}
-                        maxOptions={5}
-                        width="90%"
                         height={rowHeight}
                         optionHeight={rowHeight}
-                        borderRadius="5px"
-                        backgroundColor="#1a2027"
-                        selectedColor="#14566b"
-                        badFormatBorderColor="#e74c3c"
-                        optionsBackgroundColor="#1e242b"
-                        optionsBorderColor="#323a45"
-                        optionsInnerBorderColor="#323a45"
-                        fontSize="0.9rem"
-                        arrowWidth="16px"
-                        arrowHeight="16px"
-                        arrowRightPos="5px"
                     />
                 {:else}
                     <InputField
+                        style={$NodeInputFieldStyle}
                         bind:inputValue={node.display_name}
                         onChange={() => {
                             onPropertyChanged();
@@ -124,19 +133,7 @@ properties and action buttons for configuration and deletion. -->
                         inputInvalid={!node.validation.variableName}
                         enableInputInvalid={true}
                         inputType="STRING"
-                        width="90%"
                         height={rowHeight}
-                        borderRadius="5px"
-                        backgroundColor="#1a2027"
-                        disabledBackgroundColor="#42505f"
-                        selectedBackgroundColor="#1a2027"
-                        selectedBorderColor="#2F80ED"
-                        badFormatBorderColor="#e74c3c"
-                        fontSize="0.9rem"
-                        fontColor="#f5f5f5"
-                        fontWeight="400"
-                        textAlign="center"
-                        unitTextColor="rgb(170,170,170)"
                     />
                 {/if}
             </div>
@@ -147,6 +144,7 @@ properties and action buttons for configuration and deletion. -->
             <div class="cell-content">
                 {#if !node.config.custom}
                     <Selector
+                        style={$NodeSelectorStyle}
                         options={Object.fromEntries($defaultVariableUnits[node.display_name]?.map((unit) => [unit, unit]) || [])}
                         bind:selectedOption={node.config.unit}
                         onChange={() => {
@@ -156,24 +154,12 @@ properties and action buttons for configuration and deletion. -->
                         inputInvalid={!node.validation.variableUnit}
                         enableInputInvalid={true}
                         scrollable={true}
-                        maxOptions={5}
-                        width="90%"
                         height={rowHeight}
                         optionHeight={rowHeight}
-                        borderRadius="5px"
-                        backgroundColor="#1a2027"
-                        disabledBackgroundColor="#42505f"
-                        selectedColor="#14566b"
-                        badFormatBorderColor="#e74c3c"
-                        optionsBackgroundColor="#1e242b"
-                        optionsBorderColor="#323a45"
-                        fontSize="0.9rem"
-                        arrowWidth="16px"
-                        arrowHeight="16px"
-                        arrowRightPos="5px"
                     />
                 {:else}
                     <InputField
+                        style={$NodeInputFieldStyle}
                         bind:inputValue={node.config.unit}
                         onChange={() => {
                             onPropertyChanged();
@@ -182,19 +168,7 @@ properties and action buttons for configuration and deletion. -->
                         inputInvalid={!node.validation.variableUnit}
                         enableInputInvalid={true}
                         inputType="STRING"
-                        width="90%"
                         height={rowHeight}
-                        borderRadius="5px"
-                        backgroundColor="#1a2027"
-                        disabledBackgroundColor="#42505f"
-                        selectedBackgroundColor="#1a2027"
-                        selectedBorderColor="#2F80ED"
-                        badFormatBorderColor="#e74c3c"
-                        fontSize="0.9rem"
-                        fontColor="#f5f5f5"
-                        fontWeight="400"
-                        textAlign="center"
-                        unitTextColor="rgb(170,170,170)"
                     />
                 {/if}
             </div>
@@ -204,6 +178,7 @@ properties and action buttons for configuration and deletion. -->
         <td>
             <div class="cell-content">
                 <InputField
+                    style={$NodeInputFieldStyle}
                     disabled={node.config.calculated}
                     bind:inputValue={node.communication_id}
                     onChange={() => {
@@ -212,19 +187,7 @@ properties and action buttons for configuration and deletion. -->
                     inputInvalid={!node.validation.communicationID}
                     enableInputInvalid={true}
                     inputType="STRING"
-                    width="90%"
                     height={rowHeight}
-                    borderRadius="5px"
-                    backgroundColor="#1a2027"
-                    disabledBackgroundColor="#42505f"
-                    selectedBackgroundColor="#1a2027"
-                    selectedBorderColor="#2F80ED"
-                    badFormatBorderColor="#e74c3c"
-                    fontSize="0.9rem"
-                    fontColor="#f5f5f5"
-                    fontWeight="400"
-                    textAlign="center"
-                    unitTextColor="rgb(170,170,170)"
                 />
             </div>
         </td>
@@ -233,6 +196,7 @@ properties and action buttons for configuration and deletion. -->
         <td>
             <div class="cell-content">
                 <Selector
+                    style={$NodeSelectorStyle}
                     options={Object.fromEntries(Object.entries(NodeType).map(([key, value]) => [value, value]))}
                     bind:selectedOption={node.config.type}
                     onChange={() => {
@@ -242,21 +206,8 @@ properties and action buttons for configuration and deletion. -->
                     inputInvalid={!node.validation.variableType}
                     enableInputInvalid={true}
                     scrollable={true}
-                    maxOptions={5}
-                    width="90%"
                     height={rowHeight}
                     optionHeight={rowHeight}
-                    borderRadius="5px"
-                    backgroundColor="#1a2027"
-                    disabledBackgroundColor="#42505f"
-                    selectedColor="#14566b"
-                    badFormatBorderColor="#e74c3c"
-                    optionsBackgroundColor="#1e242b"
-                    optionsBorderColor="#323a45"
-                    fontSize="0.9rem"
-                    arrowWidth="16px"
-                    arrowHeight="16px"
-                    arrowRightPos="5px"
                 />
             </div>
         </td>
@@ -265,6 +216,7 @@ properties and action buttons for configuration and deletion. -->
         <td>
             <div class="cell-content">
                 <InputField
+                    style={$NodeInputFieldStyle}
                     disabled={!node.config.logging}
                     bind:inputValue={node.config.logging_period}
                     inputInvalid={!node.validation.loggingPeriod}
@@ -282,19 +234,6 @@ properties and action buttons for configuration and deletion. -->
                         });
                     }}
                     inputUnit="min."
-                    width="90%"
-                    height={rowHeight}
-                    borderRadius="5px"
-                    backgroundColor="#1a2027"
-                    disabledBackgroundColor="#42505f"
-                    selectedBackgroundColor="#1a2027"
-                    selectedBorderColor="#2F80ED"
-                    badFormatBorderColor="#e74c3c"
-                    fontSize="0.9rem"
-                    fontColor="#f5f5f5"
-                    fontWeight="400"
-                    textAlign="center"
-                    unitTextColor="rgb(170,170,170)"
                 />
             </div>
         </td>
@@ -303,6 +242,7 @@ properties and action buttons for configuration and deletion. -->
         <td>
             <div class="cell-content">
                 <InputField
+                    style={$NodeInputFieldStyle}
                     disabled={(node.config.type !== NodeType.FLOAT && node.config.type !== NodeType.INT) || !node.config.min_alarm}
                     bind:inputValue={node.config.min_alarm_value}
                     inputInvalid={!node.validation.type}
@@ -312,19 +252,7 @@ properties and action buttons for configuration and deletion. -->
                     }}
                     inputType={node.config.type}
                     inputUnit={node.config.unit}
-                    width="90%"
                     height={rowHeight}
-                    borderRadius="5px"
-                    backgroundColor="#1a2027"
-                    disabledBackgroundColor="#42505f"
-                    selectedBackgroundColor="#1a2027"
-                    selectedBorderColor="#2F80ED"
-                    badFormatBorderColor="#e74c3c"
-                    fontSize="0.9rem"
-                    fontColor="#f5f5f5"
-                    fontWeight="400"
-                    textAlign="center"
-                    unitTextColor="rgb(170,170,170)"
                 />
             </div>
         </td>
@@ -333,6 +261,7 @@ properties and action buttons for configuration and deletion. -->
         <td>
             <div class="cell-content">
                 <InputField
+                    style={$NodeInputFieldStyle}
                     disabled={(node.config.type !== NodeType.FLOAT && node.config.type !== NodeType.INT) || !node.config.max_alarm}
                     bind:inputValue={node.config.max_alarm_value}
                     inputInvalid={!node.validation.maxAlarm}
@@ -342,19 +271,7 @@ properties and action buttons for configuration and deletion. -->
                     }}
                     inputType={node.config.type}
                     inputUnit={node.config.unit}
-                    width="90%"
                     height={rowHeight}
-                    borderRadius="5px"
-                    backgroundColor="#1a2027"
-                    disabledBackgroundColor="#42505f"
-                    selectedBackgroundColor="#1a2027"
-                    selectedBorderColor="#2F80ED"
-                    badFormatBorderColor="#e74c3c"
-                    fontSize="0.9rem"
-                    fontColor="#f5f5f5"
-                    fontWeight="400"
-                    textAlign="center"
-                    unitTextColor="rgb(170,170,170)"
                 />
             </div>
         </td>
@@ -497,8 +414,8 @@ properties and action buttons for configuration and deletion. -->
                     <ExpandableButton bind:closeModal={closeExpandableButton} notValid={!node.validation.isValid()}>
                         <div class="expandable-button-div">
                             <Button
-                                buttonText={$texts.configuration[$selectedLang]}
                                 style={$SubPrimaryButtonStyle}
+                                buttonText={$texts.configuration[$selectedLang]}
                                 width="200px"
                                 imageURL="/img/configuration.png"
                                 imageWidth="20px"
@@ -510,8 +427,8 @@ properties and action buttons for configuration and deletion. -->
                                 }}
                             />
                             <Button
-                                buttonText={$texts.delete[$selectedLang]}
                                 style={$SubDangerButtonStyle}
+                                buttonText={$texts.delete[$selectedLang]}
                                 width="200px"
                                 imageURL="/img/delete.png"
                                 imageWidth="20px"
@@ -587,7 +504,7 @@ properties and action buttons for configuration and deletion. -->
 
     /* Delete button icon color */
     .btn-delete svg {
-        fill: rgb(192, 192, 192);
+        fill: var(--svg-buttons-color);
     }
 
     /* Delete button icon color on hover */
@@ -597,7 +514,7 @@ properties and action buttons for configuration and deletion. -->
 
     /* More options button icon color */
     .btn-more-options svg {
-        fill: rgb(192, 192, 192);
+        fill: var(--svg-buttons-color);
     }
 
     /* More options button icon color on hover */

@@ -22,12 +22,10 @@ const DefaultButtonStyleConfig: ComponentStyles = {
         imageHeight: "22px",
         imageRightPos: "auto",
         imageLeftPos: "20px",
-
-    }
-}
+    },
+};
 
 export const DefaultButtonStyle = createStyleStore(DefaultButtonStyleConfig);
-
 
 //////////     S U B     D E F A U L T     B U T T O N     //////////
 
@@ -46,11 +44,10 @@ const SubDefaultButtonStyleConfig: ComponentStyles = {
         disabledFontColor: "#f5f5f5",
         fontSize: "1rem",
         fontWeight: "400",
-    }
-}
+    },
+};
 
 export const SubDefaultButtonStyle = createStyleStore(SubDefaultButtonStyleConfig);
-
 
 //////////     P R I M A R Y     B U T T O N     //////////
 
@@ -73,12 +70,10 @@ const PrimaryButtonStyleConfig: ComponentStyles = {
         imageHeight: "22px",
         imageRightPos: "auto",
         imageLeftPos: "20px",
-
-    }
-}
+    },
+};
 
 export const PrimaryButtonStyle = createStyleStore(PrimaryButtonStyleConfig);
-
 
 //////////     S U B     P R I M A R Y     B U T T O N     //////////
 
@@ -97,11 +92,10 @@ const SubPrimaryButtonStyleConfig: ComponentStyles = {
         disabledFontColor: "#f5f5f5",
         fontSize: "1rem",
         fontWeight: "400",
-    }
-}
+    },
+};
 
 export const SubPrimaryButtonStyle = createStyleStore(SubPrimaryButtonStyleConfig);
-
 
 //////////     D A N G E R     B U T T O N     //////////
 
@@ -124,12 +118,10 @@ const DangerButtonStyleConfig: ComponentStyles = {
         imageHeight: "22px",
         imageRightPos: "auto",
         imageLeftPos: "20px",
-
-    }
-}
+    },
+};
 
 export const DangerButtonStyle = createStyleStore(DangerButtonStyleConfig);
-
 
 //////////     S U B     D A N G E R     B U T T O N     //////////
 
@@ -148,8 +140,8 @@ const SubDangerButtonStyleConfig: ComponentStyles = {
         disabledFontColor: "#f5f5f5",
         fontSize: "1rem",
         fontWeight: "400",
-    }
-}
+    },
+};
 
 export const SubDangerButtonStyle = createStyleStore(SubDangerButtonStyleConfig);
 
@@ -174,12 +166,10 @@ const SucessButtonStyleConfig: ComponentStyles = {
         imageHeight: "22px",
         imageRightPos: "auto",
         imageLeftPos: "20px",
-
-    }
-}
+    },
+};
 
 export const SucessButtonStyle = createStyleStore(SucessButtonStyleConfig);
-
 
 //////////     S U B     D A N G E R     B U T T O N     //////////
 
@@ -198,29 +188,7 @@ const SubSucessButtonStyleConfig: ComponentStyles = {
         disabledFontColor: "#f5f5f5",
         fontSize: "1rem",
         fontWeight: "400",
-    }
-}
+    },
+};
 
 export const SubSucessButtonStyle = createStyleStore(SubSucessButtonStyleConfig);
-
-
-//////////     A D D     N O D E     B U T T O N     //////////
-
-const AddNodeButtonStyleConfig: ComponentStyles = {
-    dark: {
-        width: "100%",
-        borderRadius: "0px",
-        backgroundColor: "#1a2027",
-        disabledBackgroundColor: "#1a2027",
-        borderColor: "#1a2027",
-        disabledBorderColor: "#1a2027",
-        hoverColor: "#1f242b",
-        disabledHoverColor: "#1f242b",
-        fontColor: "#f5f5f5",
-        disabledFontColor: "#f5f5f5",
-        fontSize: "0.9rem",
-        fontWeight: "400",
-    }
-}
-
-export const AddNodeButtonStyle = createStyleStore(AddNodeButtonStyleConfig);

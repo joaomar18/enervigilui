@@ -2,7 +2,7 @@
     import { fade } from "svelte/transition";
     import Header from "../../components/Login/Header.svelte";
     import Info from "../../components/Login/Info.svelte";
-    import Login from "../../components/Login/Login.svelte";
+    import LoginForm from "../../components/Login/LoginForm.svelte";
 </script>
 
 <!-- 
@@ -12,7 +12,7 @@
 <div class="container" in:fade={{ duration: 300 }}>
     <Header />
     <div class="column" id="first-col">
-        <Login />
+        <LoginForm />
     </div>
     <div class="column" id="second-col">
         <Info appImageUrl="/img/smart-meter.png" />

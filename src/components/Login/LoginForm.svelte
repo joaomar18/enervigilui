@@ -12,6 +12,32 @@
     import Checkbox from "../General/Checkbox.svelte";
     import Alert from "../General/Alert.svelte";
 
+    // Styles
+    import { mergeStyle } from "$lib/style/components";
+    import { LoginFormStyle } from "$lib/style/login";
+
+    // Style object (from theme)
+    export let style: { [property: string]: string | number } | null = null;
+    $: effectiveStyle = style ?? $LoginFormStyle;
+
+    // Layout / styling props
+    export let backgroundColor: string | undefined = undefined;
+    export let titleColor: string | undefined = undefined;
+    export let textColor: string | undefined = undefined;
+    export let titleWeight: string | undefined = undefined;
+    export let textWeight: string | undefined = undefined;
+
+    $: localOverrides = {
+        backgroundColor,
+        titleColor,
+        textColor,
+        titleWeight,
+        textWeight,
+    };
+
+    // Merged style
+    $: mergedStyle = mergeStyle(effectiveStyle, localOverrides);
+
     // Form State
     let username: string = "";
     let password: string = "";
@@ -107,7 +133,16 @@
   LoginModal: Main login form component with username and password fields,
   error handling, persistent session checkbox, and action buttons.
 -->
-<div class="login-modal">
+<div
+    class="login-modal"
+    style="
+        --background-color: {mergedStyle.backgroundColor};
+        --title-color: {mergedStyle.titleColor};
+        --text-color: {mergedStyle.textColor};
+        --title-weight: {mergedStyle.titleWeight};
+        --text-weight: {mergedStyle.textWeight};
+    "
+>
     {#if displayAlert}
         <Alert
             topPos={`${alertTopPos}px`}
@@ -160,7 +195,7 @@
         padding: 0;
         width: 100%;
         height: 500px;
-        background-color: #212830;
+        background-color: var(--background-color);
         min-width: 260px;
         display: flex;
         flex-direction: column;
@@ -179,8 +214,8 @@
         padding: 0;
         padding-top: 30px;
         padding-bottom: 30px;
-        color: rgb(255, 255, 255);
-        font-weight: 400;
+        color: var(--title-color);
+        font-weight: var(--title-weight);
         font-size: 1.5rem;
     }
 
@@ -200,8 +235,8 @@
     /* Label text for the checkbox */
     .keep-logged-in-text {
         font-size: 1.25rem;
-        font-weight: 300;
-        color: rgb(255, 255, 255);
+        font-weight: var(--text-weight);
+        color: var(--text-color);
     }
 
     /* Responsive layout for tablets */

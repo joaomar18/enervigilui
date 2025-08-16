@@ -1,20 +1,46 @@
 <script lang="ts">
+    // Styles
+    import { mergeStyle } from "$lib/style/components";
+    import { LinkStyle } from "$lib/style/dashboard";
+
+    // Style object (from theme)
+    export let style: { [property: string]: string | number } | null = null;
+    $: effectiveStyle = style ?? $LinkStyle;
+
     //Props
     export let selected: boolean = false;
-
-    // Layout / styling props
-    export let paddingLeft: string = "0px";
-    export let paddingRight: string = "0px";
-    export let paddingLeftText: string = "0px";
     export let buttonText: string = "";
     export let imageURL: string = "";
-    export let imageWidth: string = "";
-    export let imageHeight: string = "";
-    export let fontSize: string = "1rem";
-    export let backgroundColor: string = "#252b33";
-    export let hoverColor: string = "#323a45";
-    export let selectedColor: string = backgroundColor;
-    export let borderBottomColor: string = "transparent";
+
+    // Layout / styling props
+    export let paddingLeft: string | undefined = undefined;
+    export let paddingRight: string | undefined = undefined;
+    export let paddingLeftText: string | undefined = undefined;
+    export let imageWidth: string | undefined = undefined;
+    export let imageHeight: string | undefined = undefined;
+    export let fontSize: string | undefined = undefined;
+    export let textColor: string | undefined = undefined;
+    export let backgroundColor: string | undefined = undefined;
+    export let hoverColor: string | undefined = undefined;
+    export let selectedColor: string | undefined = undefined;
+    export let borderBottomColor: string | undefined = undefined;
+
+    $: localOverrides = {
+        paddingLeft,
+        paddingRight,
+        paddingLeftText,
+        imageWidth,
+        imageHeight,
+        fontSize,
+        textColor,
+        backgroundColor,
+        hoverColor,
+        selectedColor,
+        borderBottomColor,
+    };
+
+    // Merged style
+    $: mergedStyle = mergeStyle(effectiveStyle, localOverrides);
 
     // Click Export Funcion
     export let onClick: () => void;
@@ -34,19 +60,19 @@
     class="link-div"
     class:selected
     style="
-        --background-color: {backgroundColor};
-        --hover-color: {hoverColor};
-        --selected-color: {selectedColor};
-        --padding-left: {paddingLeft};
-        --padding-right: {paddingRight};
+        --background-color: {mergedStyle.backgroundColor};
+        --hover-color: {mergedStyle.hoverColor};
+        --selected-color: {mergedStyle.selectedColor};
+        --padding-left: {mergedStyle.paddingLeft};
+        --padding-right: {mergedStyle.paddingRight};
     "
 >
     <div class="content">
-        {#if imageWidth && imageHeight}
+        {#if mergedStyle.imageWidth && mergedStyle.imageHeight}
             <img
                 style="
-            --image-width: {imageWidth};
-            --image-height: {imageHeight};
+            --image-width: {mergedStyle.imageWidth};
+            --image-height: {mergedStyle.imageHeight};
         "
                 src={imageURL}
                 alt={imageURL}
@@ -54,10 +80,10 @@
         {/if}
         <span
             style="
-            --padding-left-text: {paddingLeftText};
-            --border-bottom-color: {borderBottomColor};
-            --font-size: {fontSize};
-            
+            --padding-left-text: {mergedStyle.paddingLeftText};
+            --border-bottom-color: {mergedStyle.borderBottomColor};
+            --font-size: {mergedStyle.fontSize};
+            --text-color: {mergedStyle.textColor};
         ">{buttonText}</span
         >
         <button on:click={handleClick} aria-label="Link Button"></button>
@@ -78,8 +104,6 @@
         padding-right: var(--pading-right);
         border: none;
         background: none;
-        color: #ddd;
-        font-size: 16px;
         text-align: left;
         border-radius: 4px;
         cursor: pointer;
@@ -122,8 +146,8 @@
         margin: 0;
         padding-left: var(--padding-left-text);
         border-bottom: 1px solid var(--border-bottom-color);
-        color: #eeeeee;
-        font-size: var(--font-size, 1rem);
+        color: var(--text-color);
+        font-size: var(--font-size);
         font-weight: 400;
         outline: none;
         -webkit-font-smoothing: antialiased;
