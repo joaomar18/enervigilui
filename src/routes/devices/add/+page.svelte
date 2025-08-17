@@ -37,7 +37,7 @@
 
     // Stores for authorization
     import { loadedDone } from "$lib/stores/navigation";
-    import { showAlert } from "$lib/stores/alerts";
+    import { showAlert } from "$lib/ts/view/notification";
 
     // Variables
     let showAddWindow: boolean = false; // Show Add Device Window

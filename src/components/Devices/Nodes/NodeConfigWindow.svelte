@@ -6,7 +6,7 @@
     import { Protocol } from "$lib/stores/devices";
     import ModalWindow from "../../General/ModalWindow.svelte";
     import { nodeNameChange, nodeTypeChange, customNodeChange, virtualNodeChange } from "$lib/ts/handlers/nodes";
-    import { showAlert } from "$lib/stores/alerts";
+    import { showAlert } from "$lib/ts/view/notification";
     import { DECIMAL_PLACES_LIM, LOGGING_PERIOD_LIM, NodeType } from "$lib/stores/nodes";
 
     // Types

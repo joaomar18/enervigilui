@@ -7,7 +7,7 @@
     import { texts, selectedLang } from "$lib/stores/lang";
 
     // Stores for alerts
-    import { showAlert } from "$lib/stores/alerts";
+    import { showAlert } from "$lib/ts/view/notification";
 
     // Stores for authorization
     import { loadedDone, searchQuery } from "$lib/stores/navigation";

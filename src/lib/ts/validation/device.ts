@@ -3,7 +3,7 @@ import type { DeviceMeter, EditableDeviceMeter, NewDeviceMeter } from "$lib/stor
 import type { EditableDeviceNode } from "$lib/stores/nodes";
 import { normalizeDevice } from "$lib/ts/util/device";
 import { getAllNodesValidation } from "$lib/ts/validation/nodes";
-import { showAlert } from "$lib/stores/alerts";
+import { showAlert } from "$lib/ts/view/notification";
 import { texts, protocolTexts } from "$lib/stores/lang";
 import isEqualPkg from "lodash";
 const { isEqual } = isEqualPkg;

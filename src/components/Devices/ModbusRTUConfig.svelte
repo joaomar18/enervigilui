@@ -2,14 +2,14 @@
     import InputField from "../General/InputField.svelte";
     import HintInfo from "../General/HintInfo.svelte";
     import Selector from "../General/Selector.svelte";
-    import { validateModbusRtuPort } from "$lib/ts/devices";
+    import { validateModbusRtuPort } from "$lib/ts/validation/device";
     import { READ_PERIOD_LIM, TIMEOUT_LIM, SLAVE_ID_LIM, RETRIES_NUMBER_LIM } from "$lib/stores/devices";
 
     // Stores for multi-language support
     import { texts, baudrateTexts, parityTexts, bytesizeTexts, stopbitsTexts, selectedLang } from "$lib/stores/lang";
 
     // Stores for alerts
-    import { showAlert } from "$lib/stores/alerts";
+    import { showAlert } from "$lib/ts/view/notification";
 
     // Types
     import type { EditableDeviceModbusRTUConfig } from "$lib/stores/devices";

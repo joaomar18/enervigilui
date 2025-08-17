@@ -38,7 +38,7 @@
     import { protocolTexts } from "$lib/stores/lang";
 
     // Stores for alerts
-    import { showAlert } from "$lib/stores/alerts";
+    import { showAlert } from "$lib/ts/view/notification";
 
     // Stores for authorization
     import { loadedDone } from "$lib/stores/navigation";

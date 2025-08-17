@@ -7,7 +7,7 @@
     import { nodeNameChange, nodeTypeChange, customNodeChange, virtualNodeChange } from "$lib/ts/handlers/nodes";
     import { LOGGING_PERIOD_LIM, NodeType } from "$lib/stores/nodes";
     import { defaultVariableUnits } from "$lib/stores/nodes";
-    import { showAlert } from "$lib/stores/alerts";
+    import { showAlert } from "$lib/ts/view/notification";
 
     // Types
     import type { EditableDeviceMeter, NewDeviceMeter } from "$lib/stores/devices";

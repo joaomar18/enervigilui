@@ -1,14 +1,14 @@
 <script lang="ts">
     import InputField from "../General/InputField.svelte";
     import HintInfo from "../General/HintInfo.svelte";
-    import { validateOpcUaUrl } from "$lib/ts/devices";
+    import { validateOpcUaUrl } from "$lib/ts/validation/device";
     import { READ_PERIOD_LIM, TIMEOUT_LIM } from "$lib/stores/devices";
 
     // Stores for multi-language support
     import { texts, selectedLang } from "$lib/stores/lang";
 
     // Stores for alerts
-    import { showAlert } from "$lib/stores/alerts";
+    import { showAlert } from "$lib/ts/view/notification";
 
     // Types
     import type { EditableDeviceOPCUAConfig } from "$lib/stores/devices";
