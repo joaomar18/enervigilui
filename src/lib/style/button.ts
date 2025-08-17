@@ -92,6 +92,8 @@ const SubPrimaryButtonStyleConfig: ComponentStyles = {
         disabledFontColor: "#f5f5f5",
         fontSize: "1rem",
         fontWeight: "400",
+        imageWidth: "20px",
+        imageHeight: "20px",
     },
 };
 
@@ -140,6 +142,8 @@ const SubDangerButtonStyleConfig: ComponentStyles = {
         disabledFontColor: "#f5f5f5",
         fontSize: "1rem",
         fontWeight: "400",
+        imageWidth: "20px",
+        imageHeight: "20px",
     },
 };
 
@@ -188,6 +192,8 @@ const SubSucessButtonStyleConfig: ComponentStyles = {
         disabledFontColor: "#f5f5f5",
         fontSize: "1rem",
         fontWeight: "400",
+        imageWidth: "20px",
+        imageHeight: "20px",
     },
 };
 
