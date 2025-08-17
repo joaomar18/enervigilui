@@ -298,6 +298,8 @@ export function getAllNodesValidation(nodes: Array<EditableDeviceNode>): boolean
  */
 export function areNodesEqual(a: DeviceNode[], b: DeviceNode[]): boolean {
     const sortByName = (arr: DeviceNode[]) => [...arr].sort((x, y) => x.name.localeCompare(y.name));
-
+    console.log("Debug, Nodes are equal: ", isEqual(sortByName(a).map(normalizeNode), sortByName(b).map(normalizeNode)));
+    console.log("Nodes A: ", (sortByName(a).map(normalizeNode)));
+    console.log("Nodes B: ", (sortByName(b).map(normalizeNode)));
     return isEqual(sortByName(a).map(normalizeNode), sortByName(b).map(normalizeNode));
 }

@@ -122,5 +122,6 @@ export function validDeviceOperation(deviceData: EditableDeviceMeter | NewDevice
  * @returns True if equal.
  */
 export function areDevicesEqual(a: DeviceMeter, b: DeviceMeter): boolean {
+    console.log("Debug, Devices are equal: ", isEqual(normalizeDevice(a), normalizeDevice(b)));
     return isEqual(normalizeDevice(a), normalizeDevice(b));
 }

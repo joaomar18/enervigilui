@@ -61,7 +61,6 @@
     let initialNodes: Array<DeviceNode>; // Initial Nodes (to check if there were changes made)
 
     let deviceData: EditableDeviceMeter; // Device Data
-    let deviceImageURL: string; // Device image URL (from request)
     let opcuaConfig: EditableDeviceOPCUAConfig | null; // OPC UA Configuration
     let modbusRTUConfig: EditableDeviceModbusRTUConfig | null; // Modbus RTU Configuration
 
