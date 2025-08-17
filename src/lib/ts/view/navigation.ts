@@ -2,7 +2,7 @@ import { goto } from "$app/navigation";
 import { get } from "svelte/store";
 
 // Splash screen store
-import { splashDone, loadedDone, showSubLoader, leftPanelOpen, searchQuery } from "../stores/navigation";
+import { splashDone, loadedDone, showSubLoader, leftPanelOpen, searchQuery } from "../../stores/navigation";
 
 let resetSubLoaderSub: (() => void) | null = null; //Subscription to reset sub loader
 let subLoaderTimer: ReturnType<typeof setTimeout> | null = null; // Timeout to set sub loader in case of delay
@@ -16,7 +16,7 @@ let subLoaderTimer: ReturnType<typeof setTimeout> | null = null; // Timeout to s
  * @param url - The base URL or route to navigate to (without query parameters).
  * @param lang - Language code to append as the final 'lang' query parameter.
  * @param extraParams - Additional key/value pairs to include in the query string (excluding 'lang').
- * @returns [target, targetRoute, currentRoute, searchQuery] 
+ * @returns [target, targetRoute, currentRoute, searchQuery]
  * - Array with the complete target URL with query params, target route path, current route path, and extracted search query string.
  */
 function getNavigationReady(url: string, lang: string, extraParams: Record<string, string> = {}): Array<string> {
@@ -170,5 +170,4 @@ export async function navigateTo(
     if (splashScreen) {
         splashDone.set(true);
     }
-
 }

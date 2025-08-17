@@ -4,7 +4,7 @@
     import Checkbox from "../../General/Checkbox.svelte";
     import Button from "../../General/Button.svelte";
     import ExpandableButton from "../../General/ExpandableButton.svelte";
-    import { nodeNameChange, nodeTypeChange, customNodeChange, virtualNodeChange } from "$lib/ts/nodes";
+    import { nodeNameChange, nodeTypeChange, customNodeChange, virtualNodeChange } from "$lib/ts/handlers/nodes";
     import { LOGGING_PERIOD_LIM, NodeType } from "$lib/stores/nodes";
     import { defaultVariableUnits } from "$lib/stores/nodes";
     import { showAlert } from "$lib/stores/alerts";
@@ -12,7 +12,7 @@
     // Types
     import type { EditableDeviceMeter, NewDeviceMeter } from "$lib/stores/devices";
     import type { EditableDeviceNode, NodeEditState } from "$lib/stores/nodes";
-    import type { ColumnVisibilityMap } from "$lib/ts/nodes_gid";
+    import type { ColumnVisibilityMap } from "$lib/ts/view/nodes";
 
     // Stores for multi-language support
     import { texts, variableNameTextsByPhase, selectedLang } from "$lib/stores/lang";

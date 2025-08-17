@@ -1,9 +1,9 @@
 <script lang="ts">
     import { onMount } from "svelte";
-    import { autoLogin } from "$lib/ts/login";
+    import { autoLogin } from "$lib/ts/api/auth";
     import { page } from "$app/state";
-    import { logoutUser } from "$lib/ts/login";
-    import { navigateTo } from "$lib/ts/navigation";
+    import { logoutUser } from "$lib/ts/api/auth";
+    import { navigateTo } from "$lib/ts/view/navigation";
     import { fade } from "svelte/transition";
     import { browser } from "$app/environment";
     import LeftPanel from "../components/Dashboard/LeftPanel.svelte";
@@ -23,7 +23,7 @@
 
     // Authorization stores
     import { splashDone, loadedDone, showSubLoader, leftPanelOpen, searchQuery } from "$lib/stores/navigation";
-    import { setSearchQuery } from "$lib/ts/navigation";
+    import { setSearchQuery } from "$lib/ts/view/navigation";
 
     // Variables
     let shouldRedirect: boolean = false;

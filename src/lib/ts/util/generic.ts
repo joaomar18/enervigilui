@@ -5,7 +5,7 @@
  */
 export function stringIsValidInteger(str: string): boolean {
     const num = Number(str);
-    return Number.isInteger(num) && str.trim() !== '';
+    return Number.isInteger(num) && str.trim() !== "";
 }
 
 /**
@@ -15,5 +15,5 @@ export function stringIsValidInteger(str: string): boolean {
  */
 export function stringIsValidFloat(str: string): boolean {
     const num = Number(str);
-    return !isNaN(num) && str.trim() !== '';
+    return !isNaN(num) && str.trim() !== "";
 }

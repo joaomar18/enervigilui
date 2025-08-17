@@ -3,8 +3,9 @@
     import { onMount, onDestroy } from "svelte";
     import { selectedLang, texts } from "$lib/stores/lang";
     import type { Language } from "$lib/stores/lang";
-    import { loginUser, interpretLoginStatus, validateUsername, validatePassword } from "$lib/ts/login";
-    import { navigateTo } from "$lib/ts/navigation";
+    import { loginUser } from "$lib/ts/api/auth";
+    import { interpretLoginStatus, validateUsername, validatePassword } from "$lib/ts/validation/auth";
+    import { navigateTo } from "$lib/ts/view/navigation";
 
     import LoginField from "./LoginField.svelte";
     import LoginButton from "./LoginButton.svelte";

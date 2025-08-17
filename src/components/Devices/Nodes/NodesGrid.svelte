@@ -2,7 +2,8 @@
     import NodeRow from "./NodeRow.svelte";
     import AddNode from "./AddNode.svelte";
     import { onMount, onDestroy } from "svelte";
-    import { addNode, getNodeIndex } from "$lib/ts/nodes";
+    import { addNode } from "$lib/ts/factory/nodes";
+    import { getNodeIndex } from "$lib/ts/util/nodes";
     import { nodeSections } from "$lib/stores/nodes";
 
     // Stores for variable definitions
@@ -12,7 +13,7 @@
     // Types
     import type { EditableDeviceMeter, NewDeviceMeter } from "$lib/stores/devices";
     import type { EditableDeviceNode, NodeEditState } from "$lib/stores/nodes";
-    import type { ColumnVisibilityMap } from "$lib/ts/nodes_gid";
+    import type { ColumnVisibilityMap } from "$lib/ts/view/nodes";
 
     // Stores for multi-language support
     import { selectedLang, texts } from "$lib/stores/lang";

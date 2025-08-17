@@ -1,7 +1,12 @@
 <script lang="ts">
     import { onMount, onDestroy } from "svelte";
-    import { getDefaultImage, addDevice, createNewDevice, updateDeviceValidation, validDeviceOperation, convertToDevice } from "$lib/ts/devices";
-    import { getNodeIndex, getDefaultNodesList, changeNodeProtocol, updateNodesValidation, convertToNodes } from "$lib/ts/nodes";
+    import { getDefaultImage, addDevice } from "$lib/ts/api/device";
+    import { createNewDevice, convertToDevice } from "$lib/ts/factory/device";
+    import { convertToNodes, getDefaultNodesList } from "$lib/ts/factory/nodes";
+    import { updateDeviceValidation, validDeviceOperation } from "$lib/ts/validation/device";
+    import { updateNodesValidation } from "$lib/ts/validation/nodes";
+    import { getNodeIndex } from "$lib/ts/util/nodes";
+    import { changeNodeProtocol } from "$lib/ts/handlers/nodes";
     import { nodeSections } from "$lib/stores/nodes";
     import Selector from "../../../components/General/Selector.svelte";
     import HintInfo from "../../../components/General/HintInfo.svelte";
@@ -24,7 +29,7 @@
     import { SubSucessButtonStyle, SucessButtonStyle } from "$lib/style/button";
 
     // Navigation
-    import { navigateTo } from "$lib/ts/navigation";
+    import { navigateTo } from "$lib/ts/view/navigation";
 
     // Stores for multi-language support
     import { texts, selectedLang } from "$lib/stores/lang";

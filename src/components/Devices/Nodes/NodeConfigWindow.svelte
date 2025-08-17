@@ -5,7 +5,7 @@
     import Selector from "../../General/Selector.svelte";
     import { Protocol } from "$lib/stores/devices";
     import ModalWindow from "../../General/ModalWindow.svelte";
-    import { nodeNameChange, nodeTypeChange, customNodeChange, virtualNodeChange } from "$lib/ts/nodes";
+    import { nodeNameChange, nodeTypeChange, customNodeChange, virtualNodeChange } from "$lib/ts/handlers/nodes";
     import { showAlert } from "$lib/stores/alerts";
     import { DECIMAL_PLACES_LIM, LOGGING_PERIOD_LIM, NodeType } from "$lib/stores/nodes";
 

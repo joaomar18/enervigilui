@@ -1,6 +1,7 @@
 <script lang="ts">
-    import { navigateTo } from "$lib/ts/navigation";
-    import { filterDevices, getAllDevicesState } from "$lib/ts/devices";
+    import { navigateTo } from "$lib/ts/view/navigation";
+    import { getAllDevicesState } from "$lib/ts/api/device";
+    import { filterDevices } from "$lib/ts/util/device";
 
     // Stores for multi-language support
     import { texts, selectedLang } from "$lib/stores/lang";

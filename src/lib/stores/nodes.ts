@@ -1,7 +1,7 @@
 import { readable } from "svelte/store";
 import { derived } from "svelte/store";
 import { MeterType, Protocol } from "$lib/stores/devices";
-import { getNodePhase } from "$lib/ts/nodes";
+import { getNodePhase } from "$lib/ts/util/nodes";
 
 /*****     C O N S T A N T S     *****/
 export const DECIMAL_PLACES_LIM: Record<string, number> = { MIN: 0, MAX: 6 };

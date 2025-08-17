@@ -1,17 +1,13 @@
 <script lang="ts">
     import { onMount, onDestroy } from "svelte";
-    import {
-        getDeviceState,
-        getDeviceNodesConfig,
-        editDevice,
-        deleteDevice,
-        convertToEditableDevice,
-        convertToDevice,
-        updateDeviceValidation,
-        validDeviceOperation,
-        areDevicesEqual,
-    } from "$lib/ts/devices";
-    import { getNodeIndex, convertToEditableNodes, changeNodeProtocol, updateNodesValidation, convertToNodes, areNodesEqual } from "$lib/ts/nodes";
+    import { getDeviceState, editDevice, deleteDevice } from "$lib/ts/api/device";
+    import { getDeviceNodesConfig } from "$lib/ts/api/nodes";
+    import { convertToEditableDevice, convertToDevice } from "$lib/ts/factory/device";
+    import { updateDeviceValidation, validDeviceOperation, areDevicesEqual } from "$lib/ts/validation/device";
+    import { convertToEditableNodes, convertToNodes } from "$lib/ts/factory/nodes";
+    import { updateNodesValidation, areNodesEqual } from "$lib/ts/validation/nodes";
+    import { changeNodeProtocol } from "$lib/ts/handlers/nodes";
+    import { getNodeIndex } from "$lib/ts/util/nodes";
     import { nodeSections } from "$lib/stores/nodes";
     import Selector from "../../../components/General/Selector.svelte";
     import HintInfo from "../../../components/General/HintInfo.svelte";
@@ -35,7 +31,7 @@
     import { SubDefaultButtonStyle, PrimaryButtonStyle, SubPrimaryButtonStyle, DangerButtonStyle, SubDangerButtonStyle } from "$lib/style/button";
 
     // Navigation
-    import { navigateTo } from "$lib/ts/navigation";
+    import { navigateTo } from "$lib/ts/view/navigation";
 
     // Stores for multi-language support
     import { texts, selectedLang } from "$lib/stores/lang";

@@ -34,11 +34,11 @@
  * const file = fileInput.files?.[0];
  * if (file) {
  *   const { status, data } = await makeAPIRequest(
- *     "/api/devices/123/image", 
- *     "POST", 
- *     { deviceId: 123, description: "Device photo" }, 
- *     10000, 
- *     file, 
+ *     "/api/devices/123/image",
+ *     "POST",
+ *     { deviceId: 123, description: "Device photo" },
+ *     10000,
+ *     file,
  *     "deviceImage"
  *   );
  * }
@@ -87,7 +87,6 @@ export async function makeAPIRequest(
         }
         // For non-GET requests, add params to the body
         else if (method !== "GET") {
-
             if (file) {
                 const formData = new FormData();
                 formData.append(fileFieldName, file);
@@ -97,15 +96,12 @@ export async function makeAPIRequest(
                 });
 
                 options.body = formData;
-
-            }
-            else if (Object.keys(params).length > 0) {
+            } else if (Object.keys(params).length > 0) {
                 options.headers = {
                     "Content-Type": "application/json",
                 };
                 options.body = JSON.stringify(params);
             }
-
         }
 
         const response = await fetch(url, options);
