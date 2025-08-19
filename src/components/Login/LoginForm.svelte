@@ -1,16 +1,13 @@
 <script lang="ts">
-    import { browser } from "$app/environment";
-    import { onMount, onDestroy } from "svelte";
     import { loginUser } from "$lib/ts/api/auth";
     import { interpretLoginStatus, validateUsername, validatePassword } from "$lib/ts/validation/auth";
     import { navigateTo } from "$lib/ts/view/navigation";
-
     import LoginField from "./LoginField.svelte";
     import LoginButton from "./LoginButton.svelte";
     import ForgotPassButton from "./ForgotPassButton.svelte";
     import Checkbox from "../General/Checkbox.svelte";
-    import Toast from "../General/Toast.svelte";
     import { ToastType } from "$lib/stores/view/toast";
+    import { showToast } from "$lib/ts/view/toast";
 
     // Texts
     import { texts } from "$lib/stores/lang/generalTexts";
@@ -58,22 +55,6 @@
     $: usernameErrorText = usernameIncorrect ? $texts.userInvalid : "";
     $: passwordErrorText = passwordIncorrect ? $texts.passwordInvalid : "";
 
-    // Alert State
-    let displayAlert: boolean = false;
-    let alertText: string = "";
-    let alertTopPos: number = -10;
-    let alertTimeout: number | undefined = undefined;
-
-    // Function to create alert / delete old alerts
-    function showAlert(text: string): void {
-        if (alertTimeout) {
-            clearTimeout(alertTimeout);
-        }
-        alertText = text;
-        displayAlert = true;
-        alertTimeout = setTimeout(() => (displayAlert = false), 3000);
-    }
-
     // Login Logic
     async function login(): Promise<void> {
         loginAttempt = true;
@@ -95,10 +76,11 @@
             if (status === 200) {
                 await navigateTo("/devices", $selectedLang, {}, true); // Navigate to the dashboard on success
             } else {
-                showAlert(interpretLoginStatus(status, data, $texts, $selectedLang)); // Handle error
+                interpretLoginStatus(status, data); // Handle error
             }
-        } catch (error) {
-            showAlert($texts.unexpectedError);
+        } catch (e) {
+            showToast("unexpectedError", ToastType.ALERT);
+            console.error(`Error processing login request: ${e}`);
         } finally {
             loginProcessing = false;
         }
@@ -107,30 +89,6 @@
     function forgotPassword(): void {
         // Placeholder for future implementation
     }
-
-    // Responsive Alert Positioning
-    function handleScreenResize(): void {
-        if (browser && window.innerHeight >= 760) {
-            const offset = -10 - 0.3 * (window.innerHeight - 760);
-            alertTopPos = Math.max(offset, -60);
-        } else {
-            alertTopPos = -10;
-        }
-    }
-
-    // Setup / teardown listeners
-    onMount(() => {
-        if (browser) {
-            window.addEventListener("resize", handleScreenResize);
-            handleScreenResize();
-        }
-    });
-
-    onDestroy(() => {
-        if (browser) {
-            window.removeEventListener("resize", handleScreenResize);
-        }
-    });
 </script>
 
 <!-- 
@@ -147,19 +105,6 @@
         --text-weight: {mergedStyle.textWeight};
     "
 >
-    {#if displayAlert}
-        <Toast
-            topPos={`${alertTopPos}px`}
-            pushTop={true}
-            toastText={alertText}
-            toastType={ToastType.ALERT}
-            onClick={() => {
-                clearTimeout(alertTimeout);
-                alertTimeout = undefined;
-                displayAlert = false;
-            }}
-        />
-    {/if}
     <h3>{$texts.title}</h3>
     <LoginField
         id="username"

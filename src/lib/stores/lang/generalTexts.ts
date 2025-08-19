@@ -59,20 +59,16 @@ const textsObject: TextsObject = {
         EN: "The password must contain at least 5 characters without spaces.",
     },
     wrongCredentials: {
-        PT: "O nome de utilizador e/ou a palavra-passe estão incorretos. Tentativas restantes:",
-        EN: "The username and/or password are incorrect. Remaining tries:",
+        PT: "O nome de utilizador e/ou a palavra-passe estão incorretos. Tentativas restantes: {remaining}",
+        EN: "The username and/or password are incorrect. Remaining tries: {remaining}",
     },
     timeout: {
         PT: "O servidor não respondeu ao pedido.",
         EN: "The server did not respond to the request.",
     },
-    tooManyAttempts01: {
-        PT: "O servidor bloqueou este endereço até às",
-        EN: "The server has blocked this address until",
-    },
-    tooManyAttempts02: {
-        PT: "devido a demasiadas tentativas inválidas.",
-        EN: "due to too many invalid attempts.",
+    tooManyAttempts: {
+        PT: "O servidor bloqueou este endereço até às {localTime} devido a demasiadas tentativas inválidas.",
+        EN: "The server has blocked this address until {localTime} due to too many invalid attempts.",
     },
     unknownError: {
         PT: "O servidor encontrou um erro fatal no pedido. Por favor contacte o administrador do sistema.",

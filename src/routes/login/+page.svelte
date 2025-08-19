@@ -3,6 +3,14 @@
     import Header from "../../components/Login/Header.svelte";
     import Info from "../../components/Login/Info.svelte";
     import LoginForm from "../../components/Login/LoginForm.svelte";
+    import Toast from "../../components/General/Toast.svelte";
+
+    // Toast
+    import { displayToast, toastKey, toastType, toastVariables } from "$lib/stores/view/toast";
+    import { closeToast } from "$lib/ts/view/toast";
+
+    // Texts
+    import { texts } from "$lib/stores/lang/generalTexts";
 </script>
 
 <!-- 
@@ -13,6 +21,9 @@
     <Header />
     <div class="column" id="first-col">
         <LoginForm />
+        {#if $displayToast}
+            <Toast topPos="94px" toastText={$texts[$toastKey]} toastType={$toastType} toastVariables={$toastVariables} onClick={closeToast} />
+        {/if}
     </div>
     <div class="column" id="second-col">
         <Info appImageUrl="/img/smart-meter.png" />
@@ -37,9 +48,10 @@
 
     /* Shared styling for both columns */
     .column {
-        width: 100%;
+        position: relative;
         padding: 0;
         margin: 0;
+        width: 100%;
         height: 100%;
         display: flex;
         justify-content: center;

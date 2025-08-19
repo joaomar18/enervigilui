@@ -20,3 +20,14 @@ export function showToast(key: string, type: ToastType, variables?: Record<strin
     const id = setTimeout(() => displayToast.set(false), 3000);
     toastTimeout.set(id);
 }
+
+/**
+ * Closes the toast popup and clears its timeout.
+ */
+export function closeToast() {
+    toastTimeout.update((id) => {
+        if (id) clearTimeout(id);
+        return null;
+    });
+    displayToast.set(false);
+}

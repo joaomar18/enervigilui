@@ -19,8 +19,9 @@
     import { texts } from "$lib/stores/lang/generalTexts";
     import { selectedLang } from "$lib/stores/lang/definition";
 
-    // Notifications
-    import { displayToast, toastType, toastKey, toastVariables, toastTimeout } from "$lib/stores/view/toast";
+    // Toast
+    import { displayToast, toastType, toastKey, toastVariables } from "$lib/stores/view/toast";
+    import { closeToast } from "$lib/ts/view/toast";
 
     // Authorization stores
     import { splashDone, loadedDone, showSubLoader, leftPanelOpen, searchQuery } from "$lib/stores/navigation";
@@ -210,19 +211,7 @@
         <main class="content" class:open={$leftPanelOpen}>
             <div class="alerts-div" class:prioritize={$displayToast} class:sidebar-open={$leftPanelOpen}>
                 {#if $displayToast}
-                    <Toast
-                        bottomPos="0px"
-                        toastText={$texts[$toastKey]}
-                        toastType={$toastType}
-                        toastVariables={$toastVariables}
-                        onClick={() => {
-                            toastTimeout.update((id) => {
-                                if (id) clearTimeout(id);
-                                return null;
-                            });
-                            displayToast.set(false);
-                        }}
-                    />
+                    <Toast bottomPos="0px" toastText={$texts[$toastKey]} toastType={$toastType} toastVariables={$toastVariables} onClick={closeToast} />
                 {/if}
             </div>
             <div class="container-div">

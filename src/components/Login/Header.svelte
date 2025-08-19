@@ -121,6 +121,7 @@
         top: 0px;
         left: 0px;
         background-color: var(--background-color);
+        z-index: 2;
     }
 
     /* Content wrapper with centered layout */

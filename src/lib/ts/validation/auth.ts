@@ -1,33 +1,33 @@
-import type { Language } from "$lib/stores/lang/definition";
+import { get } from "svelte/store";
+import { selectedLang } from "$lib/stores/lang/definition";
+import { ToastType } from "$lib/stores/view/toast";
+import { showToast } from "../view/toast";
 
 /**
- * Returns login status message for given status and language.
+ * Shows alert toast for given status and language.
  * @param status Status code.
  * @param data Optional info.
- * @param texts Message templates.
- * @param lang Language.
- * @returns Status message.
  */
-export function interpretLoginStatus(
-    status: number,
-    data: { remaining?: number; unlocked?: string },
-    texts: Record<string, string>,
-    lang: Language
-): string {
+export function interpretLoginStatus(status: number, data: { remaining?: number; unlocked?: string }): void {
+    console.log("Interpreting login status");
     switch (status) {
         case -1:
-            return `${texts.timeout}`;
+            showToast("timeout", ToastType.ALERT);
+            break;
         case 401:
-            return `${texts.wrongCredentials} ${data.remaining}`;
+            showToast("wrongCredentials", ToastType.ALERT, { remaining: String(data.remaining) });
+            break;
         case 429:
             const date = new Date(data.unlocked ?? "");
-            const localTime = date.toLocaleTimeString(lang === "PT" ? "pt-PT" : "en-US", {
+            const localTime = date.toLocaleTimeString(get(selectedLang) === "PT" ? "pt-PT" : "en-US", {
                 hour: "2-digit",
                 minute: "2-digit",
             });
-            return `${texts.tooManyAttempts01} ${localTime} ${texts.tooManyAttempts02}`;
+            showToast("tooManyAttempts", ToastType.ALERT, { localTime: localTime });
+            break;
         default:
-            return `${texts.unknownError}`;
+            showToast("unknownError", ToastType.ALERT);
+            break;
     }
 }
 
