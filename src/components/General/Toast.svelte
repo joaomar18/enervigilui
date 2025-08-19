@@ -71,13 +71,13 @@
     let backgroundColor: string;
     let borderColor: string;
 
-    $: if (toastText) {
+    $: {
         message = toastText;
-    }
-    $: if (toastVariables) {
-        Object.entries(toastVariables).forEach(([key, value]) => {
-            message = message.replace(`{${key}}`, String(value));
-        });
+        if (toastVariables) {
+            Object.entries(toastVariables).forEach(([key, value]) => {
+                message = message.replace(`{${key}}`, String(value));
+            });
+        }
     }
     $: transformY = pushTop ? "-100%" : pushBottom ? "100%" : "0%";
     $: {

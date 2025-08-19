@@ -9,7 +9,6 @@ import { showToast } from "../view/toast";
  * @param data Optional info.
  */
 export function interpretLoginStatus(status: number, data: { remaining?: number; unlocked?: string }): void {
-    console.log("Interpreting login status");
     switch (status) {
         case -1:
             showToast("timeout", ToastType.ALERT);
