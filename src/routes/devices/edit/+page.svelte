@@ -28,6 +28,7 @@
     import type { DeviceNode, EditableDeviceNode, NodeEditState, NodePhase } from "$lib/stores/nodes";
 
     // Styles
+    import { DangerInputFieldStyle } from "$lib/style/general";
     import { SubDefaultButtonStyle, PrimaryButtonStyle, SubPrimaryButtonStyle, DangerButtonStyle, SubDangerButtonStyle } from "$lib/style/button";
 
     // Navigation
@@ -299,40 +300,9 @@ Shows input forms for protocol-specific parameters and organizes device nodes fo
                                 nodes = [...nodes];
                             }}
                             scrollable={true}
-                            maxOptions={5}
-                            width="200px"
-                            height="40px"
-                            borderRadius="5px"
-                            backgroundColor="#252b33"
-                            borderColor="#323a45"
-                            selectedColor="#14566b"
-                            badFormatBorderColor="#e74c3c"
-                            optionsBackgroundColor="#1e242b"
-                            optionsBorderColor="#323a45"
-                            letterSpacing="0.5px"
-                            wordSpacing="1px"
-                            arrowWidth="16px"
-                            arrowHeight="16px"
-                            arrowRightPos="10px"
                         />
                         <div class="info-div">
-                            <HintInfo
-                                labelText=""
-                                hintWidth="300px"
-                                hintHeight="fit-content"
-                                hintBackgroundColor="#1e242b"
-                                hintBorderColor="#2c343d"
-                                hintBorderRadius="10px"
-                                textColor="#f5f5f5"
-                                openBackgroundColor="rgba(255, 255, 255, 0.05)"
-                                openHoverBackgroundColor="rgba(255, 255, 255, 0.1)"
-                                openStrokeColor="#cccccc"
-                                openHoverStrokeColor="#eeeeee"
-                                closeBackgroundColor="rgba(255, 255, 255, 0.1)"
-                                closeHoverBackgroundColor="rgba(255, 255, 255, 0.2)"
-                                closeStrokeColor="white"
-                                closeHoverStrokeColor="#eeeeee"
-                            >
+                            <HintInfo>
                                 <span class="info-text">{$texts.communicationProtocolInfo[$selectedLang]}</span>
                             </HintInfo>
                         </div>
@@ -378,16 +348,6 @@ Shows input forms for protocol-specific parameters and organizes device nodes fo
                             editingNodeState = nodeEditingState;
                             showConfigNodeWindow = true;
                         }}
-                        width="100%"
-                        height="fit-content"
-                        borderRadius="10px"
-                        backgroundColor="#252b33"
-                        borderColor="#323a45"
-                        headerBackgroundColor="#1A2128"
-                        headerTextColor="#f5f5f5"
-                        subSectionBackgroundColor="#1f2a31"
-                        subSectionTextColor="#cbd5e1"
-                        subSectionBorderColor="transparent"
                     />
                 </div>
             </div>
@@ -479,18 +439,7 @@ Shows input forms for protocol-specific parameters and organizes device nodes fo
                                     <InputField
                                         bind:inputValue={deleteDeviceName}
                                         infoText={$texts.confirmDeleteDevice[$selectedLang]}
-                                        width="100%"
-                                        height="40px"
-                                        borderRadius="5px"
-                                        backgroundColor="#23272f"
-                                        borderColor="#323a45"
-                                        selectedBackgroundColor="#252b33"
-                                        selectedBorderColor="#e74c3c"
-                                        fontSize="1rem"
-                                        fontColor="#f5f5f5"
-                                        fontWeight="400"
-                                        infoTextColor="rgb(170, 170, 170)"
-                                        infoTextSize="0.95rem"
+                                        style={$DangerInputFieldStyle}
                                     />
                                 </div>
                                 <div class="button-div">

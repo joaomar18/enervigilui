@@ -18,6 +18,14 @@
     // Stores for multi-language support
     import { selectedLang, texts } from "$lib/stores/lang";
 
+    // Styles
+    import { mergeStyle } from "$lib/style/components";
+    import { NodesGridStyle } from "$lib/style/nodes";
+
+    // Style object (from theme)
+    export let style: { [property: string]: string | number } | null = null;
+    $: effectiveStyle = style ?? $NodesGridStyle;
+
     // Props
     export let deviceData: EditableDeviceMeter | NewDeviceMeter;
     export let nodesInitialized: boolean; // Nodes are initialized
@@ -25,16 +33,32 @@
     export let nodesBySection: Record<NodePhase, Array<EditableDeviceNode>>; // Nodes Configuration by Section
 
     // Layout / styling props
-    export let width: string;
-    export let height: string;
-    export let borderRadius: string = "";
-    export let backgroundColor: string;
-    export let borderColor: string = backgroundColor;
-    export let headerBackgroundColor: string = backgroundColor;
-    export let headerTextColor: string;
-    export let subSectionBackgroundColor: string = backgroundColor;
-    export let subSectionTextColor: string = headerTextColor;
-    export let subSectionBorderColor: string = borderColor;
+    export let width: string | undefined = undefined;
+    export let height: string | undefined = undefined;
+    export let borderRadius: string | undefined = undefined;
+    export let backgroundColor: string | undefined = undefined;
+    export let borderColor: string | undefined = undefined;
+    export let headerBackgroundColor: string | undefined = undefined;
+    export let headerTextColor: string | undefined = undefined;
+    export let subSectionBackgroundColor: string | undefined = undefined;
+    export let subSectionTextColor: string | undefined = undefined;
+    export let subSectionBorderColor: string | undefined = undefined;
+
+    $: localOverrides = {
+        width,
+        height,
+        borderRadius,
+        backgroundColor,
+        borderColor,
+        headerBackgroundColor,
+        headerTextColor,
+        subSectionBackgroundColor,
+        subSectionTextColor,
+        subSectionBorderColor,
+    };
+
+    // Merged style
+    $: mergedStyle = mergeStyle(effectiveStyle, localOverrides);
 
     // Export Functions
     export let onPropertyChanged: (node: EditableDeviceNode) => void;
@@ -104,16 +128,16 @@ Includes multi-language headers and adapts layout to container size. -->
 <div
     bind:this={containerElement}
     style="
-        --width: {width};
-        --height: {height};
-        --border-radius: {borderRadius};
-        --background-color: {backgroundColor};
-        --border-color: {borderColor};
-        --header-background-color: {headerBackgroundColor};
-        --header-text-color: {headerTextColor};
-        --sub-section-background-color: {subSectionBackgroundColor};
-        --sub-section-text-color: {subSectionTextColor};
-        --sub-section-border-color: {subSectionBorderColor};
+        --width: {mergedStyle.width};
+        --height: {mergedStyle.height};
+        --border-radius: {mergedStyle.borderRadius};
+        --background-color: {mergedStyle.backgroundColor};
+        --border-color: {mergedStyle.borderColor};
+        --header-background-color: {mergedStyle.headerBackgroundColor};
+        --header-text-color: {mergedStyle.headerTextColor};
+        --sub-section-background-color: {mergedStyle.subSectionBackgroundColor};
+        --sub-section-text-color: {mergedStyle.subSectionTextColor};
+        --sub-section-border-color: {mergedStyle.subSectionBorderColor};
     "
     class="container"
 >

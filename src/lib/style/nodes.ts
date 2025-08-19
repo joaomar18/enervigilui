@@ -120,3 +120,22 @@ const NodeSelectorStyleConfig: ComponentStyles = {
 };
 
 export const NodeSelectorStyle = createStyleStore(NodeSelectorStyleConfig);
+
+//////////     N O D E S     G R I D     //////////
+
+const NodesGridStyleConfig: ComponentStyles = {
+    dark: {
+        width: "100%",
+        height: "fit-content",
+        borderRadius: "10px",
+        backgroundColor: "#252b33",
+        borderColor: "#323a45",
+        headerBackgroundColor: "#1A2128",
+        headerTextColor: "#f5f5f5",
+        subSectionBackgroundColor: "#1f2a31",
+        subSectionTextColor: "#cbd5e1",
+        subSectionBorderColor: "transparent",
+    },
+};
+
+export const NodesGridStyle = createStyleStore(NodesGridStyleConfig);
