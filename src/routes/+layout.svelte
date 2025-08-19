@@ -13,13 +13,14 @@
     import Notification from "../components/General/Notification.svelte";
     import SearchBar from "../components/Dashboard/SearchBar.svelte";
     import Action from "../components/General/Action.svelte";
-    import Alert from "../components/General/Alert.svelte";
+    import Toast from "../components/General/Toast.svelte";
 
-    // Stores for multi-language support
-    import { selectedLang, texts } from "$lib/stores/lang";
+    // Texts
+    import { texts } from "$lib/stores/lang/generalTexts";
+    import { selectedLang } from "$lib/stores/lang/definition";
 
-    // Stores for alerts
-    import { displayAlert, displayAsInfo, alertText, alertTimeout } from "$lib/stores/alerts";
+    // Notifications
+    import { displayToast, toastType, toastKey, toastVariables, toastTimeout } from "$lib/stores/view/toast";
 
     // Authorization stores
     import { splashDone, loadedDone, showSubLoader, leftPanelOpen, searchQuery } from "$lib/stores/navigation";
@@ -186,7 +187,7 @@
                             await navigateTo("/devices", $selectedLang, { searchQuery: $searchQuery });
                         }}
                         bind:searchString={$searchQuery}
-                        placeholderText={$texts.searchDevice[$selectedLang]}
+                        placeholderText={$texts.searchDevice}
                         minWidth="250px"
                         maxWidth="650px"
                     />
@@ -202,23 +203,24 @@
                         />
                     </div>
                     <Notification notificationsNumber={"1"} />
-                    <Logout buttonText={$texts.logout[$selectedLang]} imageUrl="/img/logout.png" onClick={logout} />
+                    <Logout buttonText={$texts.logout} imageUrl="/img/logout.png" onClick={logout} />
                 </div>
             </div>
         </div>
         <main class="content" class:open={$leftPanelOpen}>
-            <div class="alerts-div" class:prioritize={$displayAlert} class:sidebar-open={$leftPanelOpen}>
-                {#if $displayAlert}
-                    <Alert
-                        isInfo={$displayAsInfo}
+            <div class="alerts-div" class:prioritize={$displayToast} class:sidebar-open={$leftPanelOpen}>
+                {#if $displayToast}
+                    <Toast
                         bottomPos="0px"
-                        alertText={$alertText[$selectedLang]}
+                        toastText={$texts[$toastKey]}
+                        toastType={$toastType}
+                        toastVariables={$toastVariables}
                         onClick={() => {
-                            alertTimeout.update((id) => {
+                            toastTimeout.update((id) => {
                                 if (id) clearTimeout(id);
                                 return null;
                             });
-                            displayAlert.set(false);
+                            displayToast.set(false);
                         }}
                     />
                 {/if}

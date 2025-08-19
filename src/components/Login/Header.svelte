@@ -6,8 +6,8 @@
     import MenuButton from "../General/MenuButton.svelte";
     import LangSelector from "../General/LangSelector.svelte";
 
-    // Stores for multi-language support
-    import { selectedLang, texts } from "$lib/stores/lang";
+    // Texts
+    import { texts } from "$lib/stores/lang/generalTexts";
 
     // Styles
     import { mergeStyle } from "$lib/style/components";
@@ -89,9 +89,9 @@
             <Logo />
         </div>
         <div class="links-header-div">
-            <Link buttonText={$texts.aboutUs[$selectedLang]} imageURL="/img/info.png" onClick={aboutUs} />
-            <Link buttonText={$texts.help[$selectedLang]} imageURL="/img/help.png" onClick={help} />
-            <Link buttonText={$texts.contacts[$selectedLang]} imageURL="/img/customer-service.png" onClick={contacts} />
+            <Link buttonText={$texts.aboutUs} imageURL="/img/info.png" onClick={aboutUs} />
+            <Link buttonText={$texts.help} imageURL="/img/help.png" onClick={help} />
+            <Link buttonText={$texts.contacts} imageURL="/img/customer-service.png" onClick={contacts} />
         </div>
         <div class="language-selector-header-div">
             <LangSelector />
@@ -101,11 +101,11 @@
         </div>
     </div>
     <div class="dropdown-menu" class:open={dropdownOpen}>
-        <Link style={$MobileLinkStyle} buttonText={$texts.aboutUs[$selectedLang]} imageURL="/img/info.png" onClick={aboutUs} />
-        <Link style={$MobileLinkStyle} buttonText={$texts.help[$selectedLang]} imageURL="/img/help.png" onClick={help} />
-        <Link style={$MobileLinkStyle} buttonText={$texts.contacts[$selectedLang]} imageURL="/img/customer-service.png" onClick={contacts} />
+        <Link style={$MobileLinkStyle} buttonText={$texts.aboutUs} imageURL="/img/info.png" onClick={aboutUs} />
+        <Link style={$MobileLinkStyle} buttonText={$texts.help} imageURL="/img/help.png" onClick={help} />
+        <Link style={$MobileLinkStyle} buttonText={$texts.contacts} imageURL="/img/customer-service.png" onClick={contacts} />
         <div class="language-selector-dropdown-div">
-            <span class="language-text">{$texts.language[$selectedLang]}</span>
+            <span class="language-text">{$texts.language}</span>
             <LangSelector />
         </div>
     </div>

@@ -2,16 +2,12 @@
     import { browser } from "$app/environment";
     import { onMount, onDestroy } from "svelte";
 
-    // Stores for multi-language support
-    import { selectedLang } from "$lib/stores/lang";
-
     // Styles
     import { mergeStyle } from "$lib/style/components";
     import { SelectorStyle } from "$lib/style/general";
 
     //Props
     export let disabled: boolean = false; // Selector is disabled
-    export let useLang: boolean = false; //use language texts in options and selected option
     export let inputInvalid: boolean = false; // Input is invalid
     export let enableInputInvalid: boolean = false; // Enable Input is Invalid property
     export let options: Record<string, any>; //Record with options for the selector
@@ -87,9 +83,7 @@
         }
     }
     $: optionsLength = validOptions.length;
-    $: selectedKey = useLang
-        ? Object.keys(options).find((key) => key === selectedOption)
-        : Object.entries(options).find(([_, value]) => value === selectedOption)?.[0];
+    $: selectedKey = Object.entries(options).find(([key, _]) => key === selectedOption)?.[0];
     $: shiftTextLeft = String(parseFloat(String(mergedStyle.arrowRightPos)) + parseFloat(String(mergedStyle.arrowWidth))) + "px";
     $: {
         if (scrollable && optionsLength > maxOptions) {
@@ -107,11 +101,7 @@
 
     // Functions
     function getDisplayText(key: string): string {
-        if (useLang && options[key] && typeof options[key] === "object") {
-            return options[key][$selectedLang] || key;
-        } else {
-            return key;
-        }
+        return options[key];
     }
 
     function toggleSelector(): void {
@@ -121,9 +111,9 @@
     //Change Option Function
     function changeOption(optionKey: string): void {
         if (setSelectedOption) {
-            setSelectedOption(useLang ? optionKey : options[optionKey]);
+            setSelectedOption(optionKey);
         } else {
-            selectedOption = useLang ? optionKey : options[optionKey];
+            selectedOption = optionKey;
         }
         if (onChange) {
             onChange();
@@ -204,18 +194,11 @@
             class:disabled={optionsLength == 0 || disabled}
         ></button>
         <div class="options {isOpen ? '' : 'disabled'} {invertOptions ? 'inverted' : 'normal'} {scrollable ? 'scrollable' : ''}">
-            {#each Object.entries(options) as [key, value] (key)}
-                {#if useLang}
-                    <div class="option {selectedOption == key ? 'selected-option' : ''}">
-                        <span class="option-name">{getDisplayText(key)}</span>
-                        <button on:click={() => changeOption(key)} aria-label={key}></button>
-                    </div>
-                {:else}
-                    <div class="option {selectedOption == value ? 'selected-option' : ''}">
-                        <span class="option-name">{getDisplayText(key)}</span>
-                        <button on:click={() => changeOption(key)} aria-label={key}></button>
-                    </div>
-                {/if}
+            {#each Object.entries(options) as [key, _] (key)}
+                <div class="option {selectedOption == key ? 'selected-option' : ''}">
+                    <span class="option-name">{getDisplayText(key)}</span>
+                    <button on:click={() => changeOption(key)} aria-label={key}></button>
+                </div>
             {/each}
         </div>
     </div>

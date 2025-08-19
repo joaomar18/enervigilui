@@ -1,20 +1,5 @@
-import { writable, readable, derived } from "svelte/store";
-import { defaultVariables, NodePhase } from "./nodes";
-
-// Type for the available languages
-export type Language = "PT" | "EN";
-
-// Type of the Texts Object
-export interface TextsObject {
-    [key: string]: {
-        PT: string;
-        EN: string;
-    };
-}
-
-export const selectedLang = writable<Language>("PT"); //Current selected language: Starts with PT - Portuguese
-
-//////////     G E N E R A L     T E X T S     //////////
+import { createLangStore } from "$lib/stores/lang/definition";
+import type { TextsObject } from "$lib/stores/lang/definition";
 
 const textsObject: TextsObject = {
     notFound: {
@@ -187,7 +172,7 @@ const textsObject: TextsObject = {
     },
     errorDefaultImage: {
         PT: "Não foi possível obter a imagem padrão para o dispositivo: {error}",
-        EN: "Could not obtain the default image for the device: {error}"
+        EN: "Could not obtain the default image for the device: {error}",
     },
     deviceCommunication: {
         PT: "Comunicação do Dispositivo",
@@ -536,7 +521,7 @@ const textsObject: TextsObject = {
     },
     variableInfo: {
         PT: "Selecione a variável que pretende medir ou monitorizar. Cada variável representa um tipo de dado elétrico, como tensão, corrente, potência, energia, etc.",
-        EN: "Select the variable you want to measure or monitor. Each variable represents a type of electrical data, such as voltage, current, power, energy, etc."
+        EN: "Select the variable you want to measure or monitor. Each variable represents a type of electrical data, such as voltage, current, power, energy, etc.",
     },
     variableCustomInfo: {
         PT: "Defina um nome personalizado para a variável. Use esta opção para variáveis que não se enquadram nas categorias pré-definidas.",
@@ -676,216 +661,12 @@ const textsObject: TextsObject = {
     },
     deleteDeviceRequestError: {
         PT: "O servidor não respondeu ao pedido de remoção do dispositivo: {error}",
-        EN: "The server did not respond to the device delete request: {error}"
+        EN: "The server did not respond to the device delete request: {error}",
     },
     configuration: {
         PT: "Configuração",
         EN: "Configuration",
-    }
-};
-
-//////////     D E V I C E     T E X T S     //////////
-
-const textsObjectsProtocols: TextsObject = {
-    OPC_UA: {
-        PT: "OPC UA",
-        EN: "OPC UA",
-    },
-    MODBUS_RTU: {
-        PT: "MODBUS RTU",
-        EN: "MODBUS RTU",
     },
 };
 
-const textsObjectsConnectionTypes: TextsObject = {
-    SINGLE_PHASE: {
-        PT: "1F",
-        EN: "1F",
-    },
-    THREE_PHASE: {
-        PT: "3F",
-        EN: "3F",
-    },
-};
-
-const textsObjectsBaudrates: TextsObject = {
-    "1200": {
-        PT: "1200",
-        EN: "1200",
-    },
-    "2400": {
-        PT: "2400",
-        EN: "2400",
-    },
-    "4800": {
-        PT: "4800",
-        EN: "4800",
-    },
-    "9600": {
-        PT: "9600",
-        EN: "9600",
-    },
-    "19200": {
-        PT: "19200",
-        EN: "19200",
-    },
-    "38400": {
-        PT: "38400",
-        EN: "38400",
-    },
-    "57600": {
-        PT: "57600",
-        EN: "57600",
-    },
-    "115200": {
-        PT: "115200",
-        EN: "115200",
-    },
-};
-
-const textsObjectsParities: TextsObject = {
-    N: {
-        PT: "Nenhuma",
-        EN: "None",
-    },
-    E: {
-        PT: "Par",
-        EN: "Even",
-    },
-    O: {
-        PT: "Impar",
-        EN: "Odd",
-    },
-};
-
-const textsObjectsBytesizes: TextsObject = {
-    "7": {
-        PT: "7",
-        EN: "7",
-    },
-    "8": {
-        PT: "8",
-        EN: "8",
-    },
-};
-
-const textsObjectsStopbits: TextsObject = {
-    "1": {
-        PT: "1",
-        EN: "1",
-    },
-    "2": {
-        PT: "2",
-        EN: "2",
-    },
-};
-
-//////////     V A R I A B L E S     T E X T S     //////////
-
-const textsObjectsVariables: TextsObject = {
-    voltage: {
-        PT: "Tensão",
-        EN: "Voltage",
-    },
-    l1_l2_voltage: {
-        PT: "Tensão L1-L2",
-        EN: "L1-L2 Voltage",
-    },
-    l2_l3_voltage: {
-        PT: "Tensão L2-L3",
-        EN: "L2-L3 Voltage",
-    },
-    l3_l1_voltage: {
-        PT: "Tensão L3-L1",
-        EN: "L3-L1 Voltage",
-    },
-    current: {
-        PT: "Corrente",
-        EN: "Current",
-    },
-    active_power: {
-        PT: "Potência Ativa",
-        EN: "Active Power",
-    },
-    reactive_power: {
-        PT: "Potência Reativa",
-        EN: "Reactive Power",
-    },
-    apparent_power: {
-        PT: "Potência Aparente",
-        EN: "Apparent Power",
-    },
-    power_factor: {
-        PT: "Fator de Potência",
-        EN: "Power Factor",
-    },
-    power_factor_direction: {
-        PT: "Direção do Fator de Potência",
-        EN: "Power Factor Direction",
-    },
-    frequency: {
-        PT: "Frequência",
-        EN: "Frequency",
-    },
-    active_energy: {
-        PT: "Energia Ativa",
-        EN: "Active Energy",
-    },
-    reactive_energy: {
-        PT: "Energia Reativa",
-        EN: "Reactive Energy",
-    },
-    forward_active_energy: {
-        PT: "Energia Ativa Direta",
-        EN: "Forward Active Energy",
-    },
-    forward_reactive_energy: {
-        PT: "Energia Reativa Direta",
-        EN: "Forward Reactive Energy",
-    },
-    reverse_active_energy: {
-        PT: "Energia Ativa Inversa",
-        EN: "Reverse Active Energy",
-    },
-    reverse_reactive_energy: {
-        PT: "Energia Reativa Inversa",
-        EN: "Reverse Reactive Energy",
-    },
-};
-
-export const texts = readable<TextsObject>(textsObject);
-export const protocolTexts = readable<TextsObject>(textsObjectsProtocols);
-export const meterTypeTexts = readable<TextsObject>(textsObjectsConnectionTypes);
-export const baudrateTexts = readable<TextsObject>(textsObjectsBaudrates);
-export const parityTexts = readable<TextsObject>(textsObjectsParities);
-export const bytesizeTexts = readable<TextsObject>(textsObjectsBytesizes);
-export const stopbitsTexts = readable<TextsObject>(textsObjectsStopbits);
-export const variableNameTexts = readable<TextsObject>(textsObjectsVariables);
-
-/**
- * A derived store that filters variable name texts by their applicable phases.
- * Returns an object where each key is a phase (e.g., "L1", "L2", "L3", "Total", "") 
- * and each value is a TextsObject containing only the variable names that can be applied to that phase.
- * Useful for creating phase-specific variable selectors with proper translations.
- */
-export const variableNameTextsByPhase = derived(
-    [defaultVariables],
-    ([$defaultVariables]) => {
-        const phaseMap: Record<string, TextsObject> = {};
-
-        // Initialize all phases
-        Object.values(NodePhase).forEach(phase => {
-            phaseMap[phase] = {};
-        });
-
-        $defaultVariables.forEach((variable) => {
-            variable.applicablePhases.forEach(phase => {
-                if (textsObjectsVariables[variable.name]) {
-                    phaseMap[phase][variable.name] = textsObjectsVariables[variable.name];
-                }
-            });
-        });
-
-        return phaseMap;
-    }
-);
+export const texts = createLangStore(textsObject);

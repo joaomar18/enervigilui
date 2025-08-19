@@ -1,6 +1,6 @@
 <script lang="ts">
-    // Stores for multi-language support
-    import { selectedLang, texts } from "$lib/stores/lang";
+    // Texts
+    import { texts } from "$lib/stores/lang/generalTexts";
 
     // Styles
     import { mergeStyle } from "$lib/style/components";
@@ -81,7 +81,7 @@
     class="container"
 >
     <div class="content">
-        <h3>{$texts.addDevice[$selectedLang]}</h3>
+        <h3>{$texts.addDevice}</h3>
         <div class="add-device-image-div">
             <svg
                 xmlns="http://www.w3.org/2000/svg"

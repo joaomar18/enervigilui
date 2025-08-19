@@ -15,8 +15,8 @@
     import type { EditableDeviceNode, NodeEditState } from "$lib/stores/nodes";
     import type { ColumnVisibilityMap } from "$lib/ts/view/nodes";
 
-    // Stores for multi-language support
-    import { selectedLang, texts } from "$lib/stores/lang";
+    // Texts
+    import { texts } from "$lib/stores/lang/generalTexts";
 
     // Styles
     import { mergeStyle } from "$lib/style/components";
@@ -149,53 +149,53 @@ Includes multi-language headers and adapts layout to container size. -->
             <thead>
                 <tr class="header">
                     {#if columnVisibility.name.visible}
-                        <th class="max-width">{$texts.variable[$selectedLang]}</th>
+                        <th class="max-width">{$texts.variable}</th>
                     {/if}
                     {#if columnVisibility.unit.visible}
-                        <th class="min-width">{$texts.unit[$selectedLang]}</th>
+                        <th class="min-width">{$texts.unit}</th>
                     {/if}
                     {#if columnVisibility.communicationID.visible}
                         {#if deviceData.protocol === Protocol.OPC_UA}
-                            <th class="mid-width">{$texts.opcuaID[$selectedLang]}</th>
+                            <th class="mid-width">{$texts.opcuaID}</th>
                         {:else if deviceData.protocol === Protocol.MODBUS_RTU}
-                            <th class="mid-width">{$texts.modbusRegister[$selectedLang]}</th>
+                            <th class="mid-width">{$texts.modbusRegister}</th>
                         {/if}
                     {/if}
                     {#if columnVisibility.type.visible}
-                        <th class="mid-width">{$texts.type[$selectedLang]}</th>
+                        <th class="mid-width">{$texts.type}</th>
                     {/if}
                     {#if columnVisibility.logging_period.visible}
-                        <th class="mid-width">{$texts.loggingPeriod[$selectedLang]}</th>
+                        <th class="mid-width">{$texts.loggingPeriod}</th>
                     {/if}
                     {#if columnVisibility.min_alarm.visible}
-                        <th class="mid-width">{$texts.minValue[$selectedLang]} </th>
+                        <th class="mid-width">{$texts.minValue} </th>
                     {/if}
                     {#if columnVisibility.max_alarm.visible}
-                        <th class="mid-width">{$texts.maxValue[$selectedLang]} </th>{/if}
+                        <th class="mid-width">{$texts.maxValue} </th>{/if}
                     {#if columnVisibility.custom.visible}
-                        <th class="min-width">{$texts.custom[$selectedLang]}</th>
+                        <th class="min-width">{$texts.custom}</th>
                     {/if}
                     {#if columnVisibility.publish.visible}
-                        <th class="min-width">{$texts.publish[$selectedLang]}</th>
+                        <th class="min-width">{$texts.publish}</th>
                     {/if}
                     {#if columnVisibility.virtual.visible}
-                        <th class="min-width">{$texts.virtual[$selectedLang]}</th>
+                        <th class="min-width">{$texts.virtual}</th>
                     {/if}
                     {#if columnVisibility.logging.visible}
-                        <th class="min-width">{$texts.logging[$selectedLang]}</th>
+                        <th class="min-width">{$texts.logging}</th>
                     {/if}
                     {#if columnVisibility.enable_min_alarm.visible}
-                        <th class="min-width">{$texts.minAlarm[$selectedLang]}</th>
+                        <th class="min-width">{$texts.minAlarm}</th>
                     {/if}
                     {#if columnVisibility.enable_max_alarm.visible}
-                        <th class="min-width">{$texts.maxAlarm[$selectedLang]}</th>
+                        <th class="min-width">{$texts.maxAlarm}</th>
                     {/if}
                     {#if columnVisibility.enable.visible}
-                        <th class="min-width">{$texts.enabled[$selectedLang]}</th>
+                        <th class="min-width">{$texts.enabled}</th>
                     {/if}
                     {#if columnVisibility.actions.visible}
                         {#if currentWidth > 325}
-                            <th class="min-width">{$texts.actions[$selectedLang]}</th>
+                            <th class="min-width">{$texts.actions}</th>
                         {:else}
                             <th class="super-min-width"><img src="/img/more.png" style="width:20px; height: 20px;" alt="More" /></th>
                         {/if}
@@ -208,7 +208,7 @@ Includes multi-language headers and adapts layout to container size. -->
                     <!-- Render each node section -->
                     {#each nodeSections.filter((section) => section.key !== NodePhase.SINGLEPHASE) as section (section.key)}
                         <tr class="sub-section">
-                            <td colspan="20">{$texts[section.labelKey][$selectedLang]}</td>
+                            <td colspan="20">{$texts[section.labelKey]}</td>
                         </tr>
                         {#each nodesBySection[section.key] as node, i (i)}
                             <NodeRow

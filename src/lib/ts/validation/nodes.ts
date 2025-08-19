@@ -4,7 +4,7 @@ import { NodeType, NodePhase } from "$lib/stores/nodes";
 import { defaultVariables, defaultVariableNames, defaultVariableUnits } from "$lib/stores/nodes";
 import { DECIMAL_PLACES_LIM, LOGGING_PERIOD_LIM } from "$lib/stores/nodes";
 import { normalizeNode } from "$lib/ts/util/nodes";
-import { protocolTexts } from "$lib/stores/lang";
+import { protocolTexts } from "$lib/stores/lang/energyMeterTexts";
 import type { DeviceNode, EditableDeviceNode } from "$lib/stores/nodes";
 import { stringIsValidInteger, stringIsValidFloat } from "$lib/ts/util/generic";
 import isEqualPkg from "lodash";
@@ -298,8 +298,8 @@ export function getAllNodesValidation(nodes: Array<EditableDeviceNode>): boolean
  */
 export function areNodesEqual(a: DeviceNode[], b: DeviceNode[]): boolean {
     const sortByName = (arr: DeviceNode[]) => [...arr].sort((x, y) => x.name.localeCompare(y.name));
-    console.log("Debug, Nodes are equal: ", isEqual(sortByName(a).map(normalizeNode), sortByName(b).map(normalizeNode)));
-    console.log("Nodes A: ", (sortByName(a).map(normalizeNode)));
-    console.log("Nodes B: ", (sortByName(b).map(normalizeNode)));
+    //console.log("Debug, Nodes are equal: ", isEqual(sortByName(a).map(normalizeNode), sortByName(b).map(normalizeNode)));
+    //console.log("Nodes A: ", (sortByName(a).map(normalizeNode)));
+    //console.log("Nodes B: ", (sortByName(b).map(normalizeNode)));
     return isEqual(sortByName(a).map(normalizeNode), sortByName(b).map(normalizeNode));
 }

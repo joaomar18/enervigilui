@@ -20,6 +20,8 @@
     import ModbusRtuConfig from "../../../components/Devices/ModbusRTUConfig.svelte";
     import MeterOptionsConfig from "../../../components/Devices/MeterOptionsConfig.svelte";
     import { Protocol, defaultOPCUAOptions, defaultModbusRTUOptions, defaultDeviceOptions } from "$lib/stores/devices";
+    import { showToast } from "$lib/ts/view/toast";
+    import { ToastType } from "$lib/stores/view/toast";
 
     // Types
     import type { NewDeviceMeter, EditableDeviceOPCUAConfig, EditableDeviceModbusRTUConfig } from "$lib/stores/devices";
@@ -31,13 +33,13 @@
     // Navigation
     import { navigateTo } from "$lib/ts/view/navigation";
 
-    // Stores for multi-language support
-    import { texts, selectedLang } from "$lib/stores/lang";
-    import { protocolTexts } from "$lib/stores/lang";
+    // Texts
+    import { texts } from "$lib/stores/lang/generalTexts";
+    import { selectedLang } from "$lib/stores/lang/definition";
+    import { protocolTexts } from "$lib/stores/lang/energyMeterTexts";
 
     // Stores for authorization
     import { loadedDone } from "$lib/stores/navigation";
-    import { showAlert } from "$lib/ts/view/notification";
 
     // Variables
     let showAddWindow: boolean = false; // Show Add Device Window
@@ -93,7 +95,7 @@
             try {
                 const { status, data }: { status: number; data: any } = await getDefaultImage();
                 if (status !== 200) {
-                    showAlert($texts.errorDefaultImage, {
+                    showToast("errorDefaultImage", ToastType.ALERT, {
                         error: String(data["error"]),
                     });
                 } else {
@@ -102,7 +104,7 @@
                     sucess = true;
                 }
             } catch (e) {
-                showAlert($texts.errorDefaultImage, {
+                showToast("errorDefaultImage", ToastType.ALERT, {
                     error: String(e),
                 });
                 console.error(`Could not obtain the devices status: ${e}`);
@@ -124,7 +126,7 @@
             const { status, data } = await addDevice(convertToDevice(deviceData), deviceData.device_image, convertedNodes);
             performingAddRequest = false;
             if (status !== 200) {
-                showAlert($texts.addDeviceRequestError, {
+                showToast("addDeviceRequestError", ToastType.ALERT, {
                     error: String(data["error"]),
                 });
                 showAddWindow = false;
@@ -163,7 +165,7 @@ Shows input forms for protocol-specific parameters and organizes device nodes fo
             <div class="device-identification-div">
                 <EditableText
                     bind:text={deviceData.name}
-                    placeHolder={$texts.deviceName[$selectedLang]}
+                    placeHolder={$texts.deviceName}
                     allwaysEnabled={true}
                     enableTextInvalid={true}
                     textInvalid={!deviceData.validation.deviceName}
@@ -176,15 +178,14 @@ Shows input forms for protocol-specific parameters and organizes device nodes fo
             </div>
             <div class="device-section-div">
                 <div class="title">
-                    <h3>{$texts.deviceCommunication[$selectedLang]}</h3>
-                    <span>{$texts.deviceCommunicationSub[$selectedLang]}</span>
+                    <h3>{$texts.deviceCommunication}</h3>
+                    <span>{$texts.deviceCommunicationSub}</span>
                 </div>
 
                 <div class="device-input-div">
-                    <span>{$texts.communicationProtocol[$selectedLang]}</span>
+                    <span>{$texts.communicationProtocol}</span>
                     <div class="input-div">
                         <Selector
-                            useLang={true}
                             options={$protocolTexts}
                             bind:selectedOption={deviceData.protocol}
                             inputInvalid={!deviceData.validation.deviceProtocol}
@@ -206,7 +207,7 @@ Shows input forms for protocol-specific parameters and organizes device nodes fo
                         />
                         <div class="info-div">
                             <HintInfo>
-                                <span class="info-text">{$texts.communicationProtocolInfo[$selectedLang]}</span>
+                                <span class="info-text">{$texts.communicationProtocolInfo}</span>
                             </HintInfo>
                         </div>
                     </div>
@@ -220,15 +221,15 @@ Shows input forms for protocol-specific parameters and organizes device nodes fo
             </div>
             <div class="device-section-div">
                 <div class="title">
-                    <h3>{$texts.deviceOptions[$selectedLang]}</h3>
-                    <span>{$texts.deviceOptionsSub[$selectedLang]}</span>
+                    <h3>{$texts.deviceOptions}</h3>
+                    <span>{$texts.deviceOptionsSub}</span>
                 </div>
                 <MeterOptionsConfig bind:deviceData bind:nodes bind:meterOptionsValid={deviceData.validation.meterOptions} />
             </div>
             <div class="device-section-div">
                 <div class="title">
-                    <h3>{$texts.deviceNodes[$selectedLang]}</h3>
-                    <span>{$texts.deviceNodesSub[$selectedLang]}</span>
+                    <h3>{$texts.deviceNodes}</h3>
+                    <span>{$texts.deviceNodesSub}</span>
                 </div>
                 <div class="nodes-grid-div">
                     <NodesGrid
@@ -255,10 +256,10 @@ Shows input forms for protocol-specific parameters and organizes device nodes fo
                 </div>
             </div>
             <div class="action-buttons-div">
-                <Button buttonText={$texts.cancel[$selectedLang]} imageURL="/img/previous.png" onClick={cancelAdd} />
+                <Button buttonText={$texts.cancel} imageURL="/img/previous.png" onClick={cancelAdd} />
                 <Button
                     enabled={$loadedDone && nodesInitialized}
-                    buttonText={$texts.add[$selectedLang]}
+                    buttonText={$texts.add}
                     style={$SucessButtonStyle}
                     imageURL="/img/plus.png"
                     onClick={() => {
@@ -298,7 +299,7 @@ Shows input forms for protocol-specific parameters and organizes device nodes fo
                 <div class="overlay-device-div-content">
                     <div class="window-div">
                         <ModalWindow
-                            title={`${$texts.addNewDevice[$selectedLang]}`}
+                            title={`${$texts.addNewDevice}`}
                             minWidth="300px"
                             maxWidth="550px"
                             closeWindow={() => {
@@ -306,11 +307,11 @@ Shows input forms for protocol-specific parameters and organizes device nodes fo
                             }}
                         >
                             <div class="modal-window-div">
-                                <span class="add-window-text">{$texts.addNewDeviceInfo[$selectedLang]}</span>
+                                <span class="add-window-text">{$texts.addNewDeviceInfo}</span>
                                 <div class="button-div save-window-button">
                                     <Button
                                         processing={performingAddRequest}
-                                        buttonText={$texts.confirm[$selectedLang]}
+                                        buttonText={$texts.confirm}
                                         style={$SubSucessButtonStyle}
                                         onClick={addDeviceConfirmation}
                                     />

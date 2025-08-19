@@ -3,12 +3,11 @@
     import HintInfo from "../General/HintInfo.svelte";
     import { validateOpcUaUrl } from "$lib/ts/validation/device";
     import { READ_PERIOD_LIM, TIMEOUT_LIM } from "$lib/stores/devices";
+    import { showToast } from "$lib/ts/view/toast";
+    import { ToastType } from "$lib/stores/view/toast";
 
-    // Stores for multi-language support
-    import { texts, selectedLang } from "$lib/stores/lang";
-
-    // Stores for alerts
-    import { showAlert } from "$lib/ts/view/notification";
+    // Texts
+    import { texts } from "$lib/stores/lang/generalTexts";
 
     // Types
     import type { EditableDeviceOPCUAConfig } from "$lib/stores/devices";
@@ -32,20 +31,20 @@
   including network address, read period, timeout, and optional authentication fields.
 -->
 <div class="device-input-div">
-    <span>{$texts.networkAddress[$selectedLang]}</span>
+    <span>{$texts.networkAddress}</span>
     <div class="input-div">
         <div class="input-content-div">
             <InputField bind:inputValue={opcuaConfig.url} inputInvalid={!validOpcUaUrl} enableInputInvalid={true} />
         </div>
         <div class="info-div">
             <HintInfo>
-                <span class="info-text">{$texts.networkAddressInfo[$selectedLang]}</span>
+                <span class="info-text">{$texts.networkAddressInfo}</span>
             </HintInfo>
         </div>
     </div>
 </div>
 <div class="device-input-div">
-    <span>{$texts.readPeriod[$selectedLang]}</span>
+    <span>{$texts.readPeriod}</span>
     <div class="input-div">
         <div class="input-content-div">
             <InputField
@@ -53,11 +52,11 @@
                 inputInvalid={!validReadPeriod}
                 enableInputInvalid={true}
                 inputType="POSITIVE_INT"
-                inputUnit={$texts.secondsUnit[$selectedLang]}
+                inputUnit={$texts.secondsUnit}
                 minValue={READ_PERIOD_LIM.MIN}
                 maxValue={READ_PERIOD_LIM.MAX}
                 limitsPassed={() => {
-                    showAlert($texts.readPeriodError, {
+                    showToast("readPeriodError", ToastType.ALERT, {
                         minValue: READ_PERIOD_LIM.MIN,
                         maxValue: READ_PERIOD_LIM.MAX,
                     });
@@ -66,13 +65,13 @@
         </div>
         <div class="info-div">
             <HintInfo>
-                <span class="info-text">{$texts.readPeriodInfo[$selectedLang]}</span>
+                <span class="info-text">{$texts.readPeriodInfo}</span>
             </HintInfo>
         </div>
     </div>
 </div>
 <div class="device-input-div">
-    <span>{$texts.commTimeout[$selectedLang]}</span>
+    <span>{$texts.commTimeout}</span>
     <div class="input-div">
         <div class="input-content-div">
             <InputField
@@ -80,11 +79,11 @@
                 inputInvalid={!validTimeout}
                 enableInputInvalid={true}
                 inputType="POSITIVE_INT"
-                inputUnit={$texts.secondsUnit[$selectedLang]}
+                inputUnit={$texts.secondsUnit}
                 minValue={TIMEOUT_LIM.MIN}
                 maxValue={TIMEOUT_LIM.MAX}
                 limitsPassed={() => {
-                    showAlert($texts.commTimeoutError, {
+                    showToast("commTimeoutError", ToastType.ALERT, {
                         minValue: TIMEOUT_LIM.MIN,
                         maxValue: TIMEOUT_LIM.MAX,
                     });
@@ -93,35 +92,35 @@
         </div>
         <div class="info-div">
             <HintInfo>
-                <span class="info-text">{$texts.commTimeoutInfo[$selectedLang]}</span>
+                <span class="info-text">{$texts.commTimeoutInfo}</span>
             </HintInfo>
         </div>
     </div>
 </div>
 <div class="optional-div">
-    <span class="optional-text">{$texts.authenticationOptional[$selectedLang]}</span>
+    <span class="optional-text">{$texts.authenticationOptional}</span>
     <div class="device-input-div">
-        <span>{$texts.username[$selectedLang]}</span>
+        <span>{$texts.username}</span>
         <div class="input-div">
             <div class="input-content-div">
                 <InputField bind:inputValue={opcuaConfig.username} />
             </div>
             <div class="info-div">
                 <HintInfo>
-                    <span class="info-text">{$texts.commUsernameInfo[$selectedLang]}</span>
+                    <span class="info-text">{$texts.commUsernameInfo}</span>
                 </HintInfo>
             </div>
         </div>
     </div>
     <div class="device-input-div">
-        <span>{$texts.password[$selectedLang]}</span>
+        <span>{$texts.password}</span>
         <div class="input-div">
             <div class="input-content-div">
                 <InputField bind:inputValue={opcuaConfig.password} inputType="PASSWORD" />
             </div>
             <div class="info-div">
                 <HintInfo>
-                    <span class="info-text">{$texts.commPasswordInfo[$selectedLang]}</span>
+                    <span class="info-text">{$texts.commPasswordInfo}</span>
                 </HintInfo>
             </div>
         </div>

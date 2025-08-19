@@ -22,6 +22,8 @@
     import ModbusRtuConfig from "../../../components/Devices/ModbusRTUConfig.svelte";
     import MeterOptionsConfig from "../../../components/Devices/MeterOptionsConfig.svelte";
     import { Protocol, defaultOPCUAOptions, defaultModbusRTUOptions } from "$lib/stores/devices";
+    import { showToast } from "$lib/ts/view/toast";
+    import { ToastType } from "$lib/stores/view/toast";
 
     // Types
     import type { DeviceMeter, EditableDeviceMeter, EditableDeviceOPCUAConfig, EditableDeviceModbusRTUConfig } from "$lib/stores/devices";
@@ -34,15 +36,14 @@
     // Navigation
     import { navigateTo } from "$lib/ts/view/navigation";
 
-    // Stores for multi-language support
-    import { texts, selectedLang } from "$lib/stores/lang";
-    import { protocolTexts } from "$lib/stores/lang";
-
-    // Stores for alerts
-    import { showAlert } from "$lib/ts/view/notification";
+    // Texts
+    import { texts } from "$lib/stores/lang/generalTexts";
+    import { selectedLang } from "$lib/stores/lang/definition";
+    import { protocolTexts } from "$lib/stores/lang/energyMeterTexts";
 
     // Stores for authorization
     import { loadedDone } from "$lib/stores/navigation";
+    import Toast from "../../../components/General/Toast.svelte";
 
     // Variables
     let showCancelWindow: boolean = false; // Show Cancelation Window (if changes were made)
@@ -107,7 +108,7 @@
             try {
                 const { status, data }: { status: number; data: any } = await getDeviceState(id);
                 if (status !== 200) {
-                    showAlert($texts.errorDeviceConfig, {
+                    showToast("errorDeviceConfig", ToastType.ALERT, {
                         error: String(data["error"]),
                     });
                 } else {
@@ -117,7 +118,7 @@
                     sucess = true;
                 }
             } catch (e) {
-                showAlert($texts.errorDeviceConfig, {
+                showToast("errorDeviceConfig", ToastType.ALERT, {
                     error: String(e),
                 });
                 console.error(`Could not obtain the device configuration: ${e}`);
@@ -137,7 +138,7 @@
             try {
                 const { status, data }: { status: number; data: any } = await getDeviceNodesConfig(id);
                 if (status !== 200) {
-                    showAlert($texts.errorDeviceNodesConfig, {
+                    showToast("errorDeviceNodesConfig", ToastType.ALERT, {
                         error: String(data["error"]),
                     });
                 } else {
@@ -146,7 +147,7 @@
                     sucess = true;
                 }
             } catch (e) {
-                showAlert($texts.errorDeviceNodesConfig, {
+                showToast("errorDeviceNodesConfig", ToastType.ALERT, {
                     error: String(e),
                 });
                 console.error(`Could not obtain the nodes configuration: ${e}`);
@@ -181,7 +182,7 @@
                     areDevicesEqual(initialDeviceData, convertedDevice) &&
                     deviceData.device_image === undefined
                 ) {
-                    showAlert($texts.noChangesToDevice, {}, true);
+                    showToast("noChangesToDevice", ToastType.INFO);
                     showSaveWindow = false;
                     return;
                 }
@@ -189,7 +190,7 @@
                 const { status, data } = await editDevice(convertedDevice, deviceData.device_image, convertedNodes);
                 performingSaveRequest = false;
                 if (status !== 200) {
-                    showAlert($texts.editDeviceRequestError, {
+                    showToast("editDeviceRequestError", ToastType.ALERT, {
                         error: String(data["error"]),
                     });
                     showSaveWindow = false;
@@ -217,7 +218,7 @@
                 const { status, data } = await deleteDevice(deviceData.name, deviceData.id);
                 performingDeleteRequest = false;
                 if (status !== 200) {
-                    showAlert($texts.deleteDeviceRequestError, {
+                    showToast("deleteDeviceRequestError", ToastType.ALERT, {
                         error: String(data["error"]),
                     });
                     deleteDeviceName = "";
@@ -241,7 +242,7 @@
             fetchDeviceConfig(Number(deviceId));
             fetchDeviceNodesConfig(Number(deviceId));
         } else {
-            showAlert($texts.errorEditDeviceParams);
+            showToast("errorEditDeviceParams", ToastType.ALERT);
             loadedDone.set(true);
         }
     });
@@ -273,15 +274,14 @@ Shows input forms for protocol-specific parameters and organizes device nodes fo
             </div>
             <div class="device-section-div">
                 <div class="title">
-                    <h3>{$texts.deviceCommunication[$selectedLang]}</h3>
-                    <span>{$texts.deviceCommunicationSub[$selectedLang]}</span>
+                    <h3>{$texts.deviceCommunication}</h3>
+                    <span>{$texts.deviceCommunicationSub}</span>
                 </div>
 
                 <div class="device-input-div">
-                    <span>{$texts.communicationProtocol[$selectedLang]}</span>
+                    <span>{$texts.communicationProtocol}</span>
                     <div class="input-div">
                         <Selector
-                            useLang={true}
                             options={$protocolTexts}
                             bind:selectedOption={deviceData.protocol}
                             inputInvalid={!deviceData.validation.deviceProtocol}
@@ -303,7 +303,7 @@ Shows input forms for protocol-specific parameters and organizes device nodes fo
                         />
                         <div class="info-div">
                             <HintInfo>
-                                <span class="info-text">{$texts.communicationProtocolInfo[$selectedLang]}</span>
+                                <span class="info-text">{$texts.communicationProtocolInfo}</span>
                             </HintInfo>
                         </div>
                     </div>
@@ -317,15 +317,15 @@ Shows input forms for protocol-specific parameters and organizes device nodes fo
             </div>
             <div class="device-section-div">
                 <div class="title">
-                    <h3>{$texts.deviceOptions[$selectedLang]}</h3>
-                    <span>{$texts.deviceOptionsSub[$selectedLang]}</span>
+                    <h3>{$texts.deviceOptions}</h3>
+                    <span>{$texts.deviceOptionsSub}</span>
                 </div>
                 <MeterOptionsConfig bind:deviceData bind:nodes bind:meterOptionsValid={deviceData.validation.meterOptions} />
             </div>
             <div class="device-section-div">
                 <div class="title">
-                    <h3>{$texts.deviceNodes[$selectedLang]}</h3>
-                    <span>{$texts.deviceNodesSub[$selectedLang]}</span>
+                    <h3>{$texts.deviceNodes}</h3>
+                    <span>{$texts.deviceNodesSub}</span>
                 </div>
                 <div class="nodes-grid-div">
                     <NodesGrid
@@ -353,7 +353,7 @@ Shows input forms for protocol-specific parameters and organizes device nodes fo
             </div>
             <div class="action-buttons-div">
                 <Button
-                    buttonText={$texts.cancel[$selectedLang]}
+                    buttonText={$texts.cancel}
                     imageURL="/img/previous.png"
                     onClick={() => {
                         if (
@@ -369,7 +369,7 @@ Shows input forms for protocol-specific parameters and organizes device nodes fo
                 />
                 <Button
                     enabled={$loadedDone && nodesInitialized}
-                    buttonText={$texts.save[$selectedLang]}
+                    buttonText={$texts.save}
                     style={$PrimaryButtonStyle}
                     imageURL="/img/save.png"
                     onClick={() => {
@@ -379,7 +379,7 @@ Shows input forms for protocol-specific parameters and organizes device nodes fo
                                 areDevicesEqual(initialDeviceData, convertToDevice(deviceData)) &&
                                 deviceData.device_image === undefined
                             ) {
-                                showAlert($texts.noChangesToDevice, {}, true);
+                                showToast("noChangesToDevice", ToastType.INFO);
                                 return;
                             }
                             showSaveWindow = true;
@@ -388,7 +388,7 @@ Shows input forms for protocol-specific parameters and organizes device nodes fo
                 />
                 <Button
                     enabled={$loadedDone && nodesInitialized}
-                    buttonText={$texts.delete[$selectedLang]}
+                    buttonText={$texts.delete}
                     style={$DangerButtonStyle}
                     imageURL="/img/delete.png"
                     onClick={() => {
@@ -426,7 +426,7 @@ Shows input forms for protocol-specific parameters and organizes device nodes fo
                 <div class="overlay-device-div-content">
                     <div class="window-div">
                         <ModalWindow
-                            title={`${$texts.deleteDevice[$selectedLang]} ${deviceData.name}`}
+                            title={`${$texts.deleteDevice} ${deviceData.name}`}
                             minWidth="300px"
                             maxWidth="550px"
                             closeWindow={() => {
@@ -434,19 +434,15 @@ Shows input forms for protocol-specific parameters and organizes device nodes fo
                             }}
                         >
                             <div class="modal-window-div">
-                                <span>{$texts.deleteDeviceInfo[$selectedLang]}</span>
+                                <span>{$texts.deleteDeviceInfo}</span>
                                 <div class="input-field-div">
-                                    <InputField
-                                        bind:inputValue={deleteDeviceName}
-                                        infoText={$texts.confirmDeleteDevice[$selectedLang]}
-                                        style={$DangerInputFieldStyle}
-                                    />
+                                    <InputField bind:inputValue={deleteDeviceName} infoText={$texts.confirmDeleteDevice} style={$DangerInputFieldStyle} />
                                 </div>
                                 <div class="button-div">
                                     <Button
                                         processing={performingDeleteRequest}
                                         enabled={deleteDeviceName === deviceData.name}
-                                        buttonText={$texts.confirm[$selectedLang]}
+                                        buttonText={$texts.confirm}
                                         style={$SubDangerButtonStyle}
                                         onClick={deleteDeviceConfirmation}
                                     />
@@ -462,7 +458,7 @@ Shows input forms for protocol-specific parameters and organizes device nodes fo
                 <div class="overlay-device-div-content">
                     <div class="window-div">
                         <ModalWindow
-                            title={`${$texts.cancelDeviceEdit[$selectedLang]}`}
+                            title={`${$texts.cancelDeviceEdit}`}
                             minWidth="300px"
                             maxWidth="550px"
                             closeWindow={() => {
@@ -470,9 +466,9 @@ Shows input forms for protocol-specific parameters and organizes device nodes fo
                             }}
                         >
                             <div class="modal-window-div">
-                                <span class="save-window-text">{$texts.cancelDeviceEditInfo[$selectedLang]}</span>
+                                <span class="save-window-text">{$texts.cancelDeviceEditInfo}</span>
                                 <div class="button-div save-window-button">
-                                    <Button buttonText={$texts.confirm[$selectedLang]} style={$SubDefaultButtonStyle} onClick={cancelEdit} />
+                                    <Button buttonText={$texts.confirm} style={$SubDefaultButtonStyle} onClick={cancelEdit} />
                                 </div>
                             </div>
                         </ModalWindow>
@@ -485,7 +481,7 @@ Shows input forms for protocol-specific parameters and organizes device nodes fo
                 <div class="overlay-device-div-content">
                     <div class="window-div">
                         <ModalWindow
-                            title={`${$texts.saveDevice[$selectedLang]}`}
+                            title={`${$texts.saveDevice}`}
                             minWidth="300px"
                             maxWidth="550px"
                             closeWindow={() => {
@@ -493,11 +489,11 @@ Shows input forms for protocol-specific parameters and organizes device nodes fo
                             }}
                         >
                             <div class="modal-window-div">
-                                <span class="save-window-text">{$texts.saveDeviceInfo[$selectedLang]}</span>
+                                <span class="save-window-text">{$texts.saveDeviceInfo}</span>
                                 <div class="button-div save-window-button">
                                     <Button
                                         processing={performingSaveRequest}
-                                        buttonText={$texts.confirm[$selectedLang]}
+                                        buttonText={$texts.confirm}
                                         style={$SubPrimaryButtonStyle}
                                         onClick={editDeviceConfirmation}
                                     />

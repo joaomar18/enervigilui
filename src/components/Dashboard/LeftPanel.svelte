@@ -5,8 +5,9 @@
     import LangSelector from "../General/LangSelector.svelte";
     import Logo from "../General/Logo.svelte";
 
-    // Stores for multi-language support
-    import { selectedLang, texts } from "$lib/stores/lang";
+    // Texts
+    import { selectedLang } from "$lib/stores/lang/definition";
+    import { texts } from "$lib/stores/lang/generalTexts";
 
     // Styles
     import { mergeStyle } from "$lib/style/components";
@@ -93,10 +94,10 @@
         <nav class="nav-section">
             <!-- Devices Section -->
             <div class="section">
-                <span class="section-label">{$texts.general[$selectedLang]}</span>
+                <span class="section-label">{$texts.general}</span>
                 <Link
                     selected={activeSection.includes("/devices")}
-                    buttonText={$texts.devices[$selectedLang]}
+                    buttonText={$texts.devices}
                     imageURL="/img/devices.png"
                     onClick={() => {
                         browseTo("/devices");
@@ -114,10 +115,10 @@
 
             <!-- Diagnostics Section -->
             <div class="section">
-                <span class="section-label">{$texts.diagnostics[$selectedLang]}</span>
+                <span class="section-label">{$texts.diagnostics}</span>
                 <Link
                     selected={activeSection.includes("/health")}
-                    buttonText={$texts.health[$selectedLang]}
+                    buttonText={$texts.health}
                     imageURL="/img/health.png"
                     onClick={() => {
                         browseTo("/health");
@@ -125,7 +126,7 @@
                 />
                 <Link
                     selected={activeSection.includes("/logs")}
-                    buttonText={$texts.logs[$selectedLang]}
+                    buttonText={$texts.logs}
                     imageURL="/img/logs.png"
                     onClick={() => {
                         browseTo("/logs");
@@ -135,10 +136,10 @@
 
             <!-- System Section -->
             <div class="section">
-                <span class="section-label">{$texts.system[$selectedLang]}</span>
+                <span class="section-label">{$texts.system}</span>
                 <Link
                     selected={activeSection.includes("/settings")}
-                    buttonText={$texts.settings[$selectedLang]}
+                    buttonText={$texts.settings}
                     imageURL="/img/settings.png"
                     onClick={() => {
                         browseTo("/settings");
@@ -146,7 +147,7 @@
                 />
                 <Link
                     selected={activeSection.includes("/backup")}
-                    buttonText={$texts.backup[$selectedLang]}
+                    buttonText={$texts.backup}
                     imageURL="/img/backup.png"
                     onClick={() => {
                         browseTo("/backup");
@@ -156,7 +157,7 @@
         </nav>
         <div class="language-selector-div">
             <LangSelector invertOptions={true} />
-            <span class="language-text">{$texts.language[$selectedLang]}</span>
+            <span class="language-text">{$texts.language}</span>
         </div>
     </div>
 </div>

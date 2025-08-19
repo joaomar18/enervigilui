@@ -8,8 +8,9 @@
     import type { EditableDeviceMeter, NewDeviceMeter } from "$lib/stores/devices";
     import type { EditableDeviceNode } from "$lib/stores/nodes";
 
-    // Stores for multi-language support
-    import { texts, meterTypeTexts, selectedLang } from "$lib/stores/lang";
+    // Texts
+    import { texts } from "$lib/stores/lang/generalTexts";
+    import { meterTypeTexts } from "$lib/stores/lang/energyMeterTexts";
 
     // Props
     export let deviceData: EditableDeviceMeter | NewDeviceMeter;
@@ -28,10 +29,9 @@
   including connection type, energy reading options, and various meter-specific settings.
 -->
 <div class="device-input-div">
-    <span>{$texts.connectionType[$selectedLang]}</span>
+    <span>{$texts.connectionType}</span>
     <div class="input-div">
         <Selector
-            useLang={true}
             options={$meterTypeTexts}
             bind:selectedOption={deviceData.type}
             inputInvalid={!validMeterType}
@@ -43,60 +43,60 @@
         />
         <div class="info-div">
             <HintInfo>
-                <span class="info-text">{$texts.connectionTypeInfo[$selectedLang]}</span>
+                <span class="info-text">{$texts.connectionTypeInfo}</span>
             </HintInfo>
         </div>
     </div>
 </div>
 
 <div class="device-input-div">
-    <span>{$texts.readEnergyFromMeter[$selectedLang]}</span>
+    <span>{$texts.readEnergyFromMeter}</span>
     <div class="input-div">
         <div class="input-content-div">
             <SelectorButton bind:checked={deviceData.options.read_energy_from_meter} />
         </div>
         <div class="info-div">
             <HintInfo>
-                <span class="info-text">{$texts.readEnergyFromMeterInfo[$selectedLang]}</span>
+                <span class="info-text">{$texts.readEnergyFromMeterInfo}</span>
             </HintInfo>
         </div>
     </div>
 </div>
 <div class="device-input-div">
-    <span>{$texts.readForwardReverseEnergySeparate[$selectedLang]}</span>
+    <span>{$texts.readForwardReverseEnergySeparate}</span>
     <div class="input-div">
         <div class="input-content-div">
             <SelectorButton bind:checked={deviceData.options.read_separate_forward_reverse_energy} />
         </div>
         <div class="info-div">
             <HintInfo>
-                <span class="info-text">{$texts.readForwardReverseEnergySeparateInfo[$selectedLang]}</span>
+                <span class="info-text">{$texts.readForwardReverseEnergySeparateInfo}</span>
             </HintInfo>
         </div>
     </div>
 </div>
 <div class="device-input-div">
-    <span>{$texts.negativeReactivePower[$selectedLang]}</span>
+    <span>{$texts.negativeReactivePower}</span>
     <div class="input-div">
         <div class="input-content-div">
             <SelectorButton bind:checked={deviceData.options.negative_reactive_power} />
         </div>
         <div class="info-div">
             <HintInfo>
-                <span class="info-text">{$texts.negativeReactivePowerInfo[$selectedLang]}</span>
+                <span class="info-text">{$texts.negativeReactivePowerInfo}</span>
             </HintInfo>
         </div>
     </div>
 </div>
 <div class="device-input-div">
-    <span>{$texts.frequencyReading[$selectedLang]}</span>
+    <span>{$texts.frequencyReading}</span>
     <div class="input-div">
         <div class="input-content-div">
             <SelectorButton bind:checked={deviceData.options.frequency_reading} />
         </div>
         <div class="info-div">
             <HintInfo>
-                <span class="info-text">{$texts.frequencyReadingInfo[$selectedLang]}</span>
+                <span class="info-text">{$texts.frequencyReadingInfo}</span>
             </HintInfo>
         </div>
     </div>

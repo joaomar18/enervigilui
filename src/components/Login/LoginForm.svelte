@@ -1,8 +1,6 @@
 <script lang="ts">
     import { browser } from "$app/environment";
     import { onMount, onDestroy } from "svelte";
-    import { selectedLang, texts } from "$lib/stores/lang";
-    import type { Language } from "$lib/stores/lang";
     import { loginUser } from "$lib/ts/api/auth";
     import { interpretLoginStatus, validateUsername, validatePassword } from "$lib/ts/validation/auth";
     import { navigateTo } from "$lib/ts/view/navigation";
@@ -11,7 +9,12 @@
     import LoginButton from "./LoginButton.svelte";
     import ForgotPassButton from "./ForgotPassButton.svelte";
     import Checkbox from "../General/Checkbox.svelte";
-    import Alert from "../General/Alert.svelte";
+    import Toast from "../General/Toast.svelte";
+    import { ToastType } from "$lib/stores/view/toast";
+
+    // Texts
+    import { texts } from "$lib/stores/lang/generalTexts";
+    import { selectedLang } from "$lib/stores/lang/definition";
 
     // Styles
     import { mergeStyle } from "$lib/style/components";
@@ -52,21 +55,21 @@
     $: usernameIncorrect = !validateUsername(username) && loginAttempt;
     $: passwordIncorrect = !validatePassword(password) && loginAttempt;
 
-    $: usernameErrorText = usernameIncorrect ? $texts.userInvalid[$selectedLang] : "";
-    $: passwordErrorText = passwordIncorrect ? $texts.passwordInvalid[$selectedLang] : "";
+    $: usernameErrorText = usernameIncorrect ? $texts.userInvalid : "";
+    $: passwordErrorText = passwordIncorrect ? $texts.passwordInvalid : "";
 
     // Alert State
     let displayAlert: boolean = false;
-    let alertText: (lang: Language) => string = () => "";
+    let alertText: string = "";
     let alertTopPos: number = -10;
     let alertTimeout: number | undefined = undefined;
 
     // Function to create alert / delete old alerts
-    function showAlert(generatetextFunction: (lang: Language) => string): void {
+    function showAlert(text: string): void {
         if (alertTimeout) {
             clearTimeout(alertTimeout);
         }
-        alertText = generatetextFunction;
+        alertText = text;
         displayAlert = true;
         alertTimeout = setTimeout(() => (displayAlert = false), 3000);
     }
@@ -92,10 +95,10 @@
             if (status === 200) {
                 await navigateTo("/devices", $selectedLang, {}, true); // Navigate to the dashboard on success
             } else {
-                showAlert(interpretLoginStatus(status, data, $texts)); // Handle error
+                showAlert(interpretLoginStatus(status, data, $texts, $selectedLang)); // Handle error
             }
         } catch (error) {
-            showAlert((lang: Language) => $texts.unexpectedError[lang]);
+            showAlert($texts.unexpectedError);
         } finally {
             loginProcessing = false;
         }
@@ -145,10 +148,11 @@
     "
 >
     {#if displayAlert}
-        <Alert
+        <Toast
             topPos={`${alertTopPos}px`}
             pushTop={true}
-            alertText={alertText($selectedLang)}
+            toastText={alertText}
+            toastType={ToastType.ALERT}
             onClick={() => {
                 clearTimeout(alertTimeout);
                 alertTimeout = undefined;
@@ -156,32 +160,32 @@
             }}
         />
     {/if}
-    <h3>{$texts.title[$selectedLang]}</h3>
+    <h3>{$texts.title}</h3>
     <LoginField
         id="username"
         paddingTop="10px"
         imageUrl="/img/user.png"
-        fieldText={$texts.username[$selectedLang]}
+        fieldText={$texts.username}
         type="text"
         bind:value={username}
         incorrect={usernameIncorrect}
         incorrectText={usernameErrorText}
-        hintText={$texts.userInfo[$selectedLang]}
+        hintText={$texts.userInfo}
     />
     <LoginField
         id="password"
         paddingTop="30px"
         imageUrl="/img/password.png"
-        fieldText={$texts.password[$selectedLang]}
+        fieldText={$texts.password}
         type="password"
         bind:value={password}
         incorrect={passwordIncorrect}
         incorrectText={passwordErrorText}
-        hintText={$texts.passwordInfo[$selectedLang]}
+        hintText={$texts.passwordInfo}
     />
     <div class="checkbox-div">
         <Checkbox bind:checked={autoLogin} inputName="auto-login" enabledBackgroundColor="#4caf7f" marginRight="10px" />
-        <span class="keep-logged-in-text">{$texts.keepSessionLogged[$selectedLang]}</span>
+        <span class="keep-logged-in-text">{$texts.keepSessionLogged}</span>
     </div>
     <LoginButton processing={loginProcessing} paddingTop="30px" onClick={login} />
     <ForgotPassButton onClick={forgotPassword} />

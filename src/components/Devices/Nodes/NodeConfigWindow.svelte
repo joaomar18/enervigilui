@@ -6,7 +6,8 @@
     import { Protocol } from "$lib/stores/devices";
     import ModalWindow from "../../General/ModalWindow.svelte";
     import { nodeNameChange, nodeTypeChange, customNodeChange, virtualNodeChange } from "$lib/ts/handlers/nodes";
-    import { showAlert } from "$lib/ts/view/notification";
+    import { showToast } from "$lib/ts/view/toast";
+    import { ToastType } from "$lib/stores/view/toast";
     import { DECIMAL_PLACES_LIM, LOGGING_PERIOD_LIM, NodeType } from "$lib/stores/nodes";
 
     // Types
@@ -16,8 +17,9 @@
     // Stores for variable definitions
     import { defaultVariableUnits } from "$lib/stores/nodes";
 
-    // Stores for multi-language support
-    import { texts, variableNameTextsByPhase, selectedLang } from "$lib/stores/lang";
+    // Texts
+    import { texts } from "$lib/stores/lang/generalTexts";
+    import { variableNameTextsByPhase } from "$lib/stores/lang/energyMeterTexts";
 
     // Styles
     import { mergeStyle } from "$lib/style/components";
@@ -86,11 +88,11 @@ Displays contextual hints and supports multi-language labels for all fields. -->
         class="header"
     >
         <span class="header-section">
-            <span class="main-text">{`${$texts.variable[$selectedLang]}:`}</span>
+            <span class="main-text">{`${$texts.variable}:`}</span>
             {#if !node.config.custom}
                 <span class="sub-text">
                     {#if node.display_name !== "" && node.display_name !== undefined}
-                        {$variableNameTextsByPhase[node.phase][node.display_name][$selectedLang] || $texts.notFound[$selectedLang]}
+                        {$variableNameTextsByPhase[node.phase][node.display_name] || $texts.notFound}
                     {/if}
                 </span>
             {:else}
@@ -98,11 +100,11 @@ Displays contextual hints and supports multi-language labels for all fields. -->
             {/if}
         </span>
         <span class="header-section">
-            <span class="main-text">{`${$texts.section[$selectedLang]}:`}</span>
-            <span class="sub-text">{$texts[node.phase.toLocaleLowerCase()][$selectedLang]}</span>
+            <span class="main-text">{`${$texts.section}:`}</span>
+            <span class="sub-text">{$texts[node.phase.toLocaleLowerCase()]}</span>
         </span>
         <span class="header-section">
-            <span class="main-text">{`${$texts.protocol[$selectedLang]}:`}</span>
+            <span class="main-text">{`${$texts.protocol}:`}</span>
             <span class="sub-text">{node.protocol}</span>
         </span>
     </span>
@@ -117,13 +119,12 @@ Displays contextual hints and supports multi-language labels for all fields. -->
     >
         <div class="row">
             <span class="row-variable">
-                <span class="row-identifier">{$texts.variable[$selectedLang]}</span>
+                <span class="row-identifier">{$texts.variable}</span>
                 <span class="row-input">
                     <span class="row-entry">
                         {#if !node.config.custom}
                             <Selector
                                 style={$NodeSelectorStyle}
-                                useLang={true}
                                 options={$variableNameTextsByPhase[node.phase]}
                                 bind:selectedOption={node.display_name}
                                 onChange={() => {
@@ -153,9 +154,9 @@ Displays contextual hints and supports multi-language labels for all fields. -->
                         <HintInfo hintWidth="250px">
                             <span class="info-text">
                                 {#if !node.config.custom}
-                                    {$texts.variableInfo[$selectedLang]}
+                                    {$texts.variableInfo}
                                 {:else}
-                                    {$texts.variableCustomInfo[$selectedLang]}
+                                    {$texts.variableCustomInfo}
                                 {/if}
                             </span>
                         </HintInfo>
@@ -166,7 +167,7 @@ Displays contextual hints and supports multi-language labels for all fields. -->
 
         <div class="row">
             <span class="row-variable">
-                <span class="row-identifier">{$texts.unit[$selectedLang]}</span>
+                <span class="row-identifier">{$texts.unit}</span>
                 <span class="row-input">
                     <span class="row-entry">
                         {#if !node.config.custom}
@@ -202,9 +203,9 @@ Displays contextual hints and supports multi-language labels for all fields. -->
                         <HintInfo hintWidth="250px">
                             <span class="info-text">
                                 {#if !node.config.custom}
-                                    {$texts.unitInfo[$selectedLang]}
+                                    {$texts.unitInfo}
                                 {:else}
-                                    {$texts.unitCustomInfo[$selectedLang]}
+                                    {$texts.unitCustomInfo}
                                 {/if}</span
                             >
                         </HintInfo>
@@ -215,7 +216,7 @@ Displays contextual hints and supports multi-language labels for all fields. -->
         {#if node.config.type === NodeType.FLOAT}
             <div class="row">
                 <span class="row-variable">
-                    <span class="row-identifier">{$texts.decimalPlaces[$selectedLang]}</span>
+                    <span class="row-identifier">{$texts.decimalPlaces}</span>
                     <span class="row-input">
                         <span class="row-entry">
                             <InputField
@@ -230,7 +231,7 @@ Displays contextual hints and supports multi-language labels for all fields. -->
                                 minValue={DECIMAL_PLACES_LIM.MIN}
                                 maxValue={DECIMAL_PLACES_LIM.MAX}
                                 limitsPassed={() => {
-                                    showAlert($texts.decimalPlacesError, {
+                                    showToast("decimalPlacesError", ToastType.ALERT, {
                                         minValue: DECIMAL_PLACES_LIM.MIN,
                                         maxValue: DECIMAL_PLACES_LIM.MAX,
                                     });
@@ -240,7 +241,7 @@ Displays contextual hints and supports multi-language labels for all fields. -->
                         </span>
                         <span class="row-hint">
                             <HintInfo hintWidth="250px">
-                                <span class="info-text"> {$texts.decimalPlacesInfo[$selectedLang]}</span>
+                                <span class="info-text"> {$texts.decimalPlacesInfo}</span>
                             </HintInfo>
                         </span>
                     </span>
@@ -251,9 +252,9 @@ Displays contextual hints and supports multi-language labels for all fields. -->
             <span class="row-variable">
                 <span class="row-identifier">
                     {#if deviceData.protocol === Protocol.OPC_UA}
-                        {$texts.opcuaID[$selectedLang]}
+                        {$texts.opcuaID}
                     {:else if deviceData.protocol === Protocol.MODBUS_RTU}
-                        {$texts.modbusRegister[$selectedLang]}
+                        {$texts.modbusRegister}
                     {/if}</span
                 >
                 <span class="row-input">
@@ -275,11 +276,11 @@ Displays contextual hints and supports multi-language labels for all fields. -->
                         <HintInfo hintWidth="250px">
                             <span class="info-text">
                                 {#if deviceData.protocol === Protocol.OPC_UA}
-                                    {$texts.nodespaceInfo[$selectedLang]}
+                                    {$texts.nodespaceInfo}
                                 {:else if deviceData.protocol === Protocol.MODBUS_RTU}
-                                    {$texts.registerInfo[$selectedLang]}
+                                    {$texts.registerInfo}
                                 {:else}
-                                    {$texts.nocommInfo[$selectedLang]}
+                                    {$texts.nocommInfo}
                                 {/if}
                             </span>
                         </HintInfo>
@@ -289,7 +290,7 @@ Displays contextual hints and supports multi-language labels for all fields. -->
         </div>
         <div class="row">
             <span class="row-variable">
-                <span class="row-identifier">{$texts.type[$selectedLang]}</span>
+                <span class="row-identifier">{$texts.type}</span>
                 <span class="row-input">
                     <span class="row-entry">
                         <Selector
@@ -308,7 +309,7 @@ Displays contextual hints and supports multi-language labels for all fields. -->
                     </span>
                     <span class="row-hint">
                         <HintInfo hintWidth="250px">
-                            <span class="info-text">{$texts.typeInfo[$selectedLang]}</span>
+                            <span class="info-text">{$texts.typeInfo}</span>
                         </HintInfo>
                     </span>
                 </span>
@@ -316,7 +317,7 @@ Displays contextual hints and supports multi-language labels for all fields. -->
         </div>
         <div class="row">
             <span class="row-variable">
-                <span class="row-identifier">{$texts.loggingPeriod[$selectedLang]}</span>
+                <span class="row-identifier">{$texts.loggingPeriod}</span>
                 <span class="row-input">
                     <span class="row-entry">
                         <InputField
@@ -332,7 +333,7 @@ Displays contextual hints and supports multi-language labels for all fields. -->
                             minValue={LOGGING_PERIOD_LIM.MIN}
                             maxValue={LOGGING_PERIOD_LIM.MAX}
                             limitsPassed={() => {
-                                showAlert($texts.loggingPeriodError, {
+                                showToast($texts.loggingPeriodError, ToastType.ALERT, {
                                     minValue: LOGGING_PERIOD_LIM.MIN,
                                     maxValue: LOGGING_PERIOD_LIM.MAX,
                                 });
@@ -354,7 +355,7 @@ Displays contextual hints and supports multi-language labels for all fields. -->
                     </span>
                     <span class="row-hint">
                         <HintInfo hintWidth="250px">
-                            <span class="info-text">{$texts.loggingInfo[$selectedLang]}</span>
+                            <span class="info-text">{$texts.loggingInfo}</span>
                         </HintInfo>
                     </span>
                 </span>
@@ -363,7 +364,7 @@ Displays contextual hints and supports multi-language labels for all fields. -->
         {#if node.config.type === NodeType.FLOAT || node.config.type == NodeType.INT}
             <div class="row">
                 <span class="row-variable">
-                    <span class="row-identifier">{$texts.minValue[$selectedLang]}</span>
+                    <span class="row-identifier">{$texts.minValue}</span>
                     <span class="row-input">
                         <span class="row-entry">
                             <InputField
@@ -393,7 +394,7 @@ Displays contextual hints and supports multi-language labels for all fields. -->
                         </span>
                         <span class="row-hint">
                             <HintInfo hintWidth="250px">
-                                <span class="info-text">{$texts.minValueInfo[$selectedLang]}</span>
+                                <span class="info-text">{$texts.minValueInfo}</span>
                             </HintInfo>
                         </span>
                     </span>
@@ -401,7 +402,7 @@ Displays contextual hints and supports multi-language labels for all fields. -->
             </div>
             <div class="row">
                 <span class="row-variable">
-                    <span class="row-identifier">{$texts.maxValue[$selectedLang]}</span>
+                    <span class="row-identifier">{$texts.maxValue}</span>
                     <span class="row-input">
                         <span class="row-entry">
                             <InputField
@@ -431,7 +432,7 @@ Displays contextual hints and supports multi-language labels for all fields. -->
                         </span>
                         <span class="row-hint">
                             <HintInfo hintWidth="250px">
-                                <span class="info-text">{$texts.maxValueInfo[$selectedLang]}</span>
+                                <span class="info-text">{$texts.maxValueInfo}</span>
                             </HintInfo>
                         </span>
                     </span>
@@ -440,7 +441,7 @@ Displays contextual hints and supports multi-language labels for all fields. -->
         {/if}
         <div class="row">
             <span class="row-variable no-wrap">
-                <span class="row-identifier">{$texts.custom[$selectedLang]}</span>
+                <span class="row-identifier">{$texts.custom}</span>
                 <span class="row-input">
                     <span class="row-entry">
                         <Checkbox
@@ -456,7 +457,7 @@ Displays contextual hints and supports multi-language labels for all fields. -->
                     </span>
                     <span class="row-hint">
                         <HintInfo hintWidth="250px">
-                            <span class="info-text">{$texts.customInfo[$selectedLang]}</span>
+                            <span class="info-text">{$texts.customInfo}</span>
                         </HintInfo>
                     </span>
                 </span>
@@ -464,7 +465,7 @@ Displays contextual hints and supports multi-language labels for all fields. -->
         </div>
         <div class="row">
             <span class="row-variable no-wrap">
-                <span class="row-identifier">{$texts.publish[$selectedLang]}</span>
+                <span class="row-identifier">{$texts.publish}</span>
                 <span class="row-input">
                     <span class="row-entry">
                         <Checkbox
@@ -479,7 +480,7 @@ Displays contextual hints and supports multi-language labels for all fields. -->
                     </span>
                     <span class="row-hint">
                         <HintInfo hintWidth="250px">
-                            <span class="info-text">{$texts.publishInfo[$selectedLang]}</span>
+                            <span class="info-text">{$texts.publishInfo}</span>
                         </HintInfo>
                     </span>
                 </span>
@@ -487,7 +488,7 @@ Displays contextual hints and supports multi-language labels for all fields. -->
         </div>
         <div class="row">
             <span class="row-variable no-wrap">
-                <span class="row-identifier">{$texts.virtual[$selectedLang]}</span>
+                <span class="row-identifier">{$texts.virtual}</span>
                 <span class="row-input">
                     <span class="row-entry">
                         <Checkbox
@@ -505,7 +506,7 @@ Displays contextual hints and supports multi-language labels for all fields. -->
                     </span>
                     <span class="row-hint">
                         <HintInfo openInverted={true} hintWidth="250px">
-                            <span class="info-text">{$texts.virtualInfo[$selectedLang]}</span>
+                            <span class="info-text">{$texts.virtualInfo}</span>
                         </HintInfo>
                     </span>
                 </span>
@@ -514,7 +515,7 @@ Displays contextual hints and supports multi-language labels for all fields. -->
         {#if node.config.type === NodeType.FLOAT || node.config.type === NodeType.INT}
             <div class="row">
                 <span class="row-variable no-wrap">
-                    <span class="row-identifier">{$texts.incrementalNode[$selectedLang]}</span>
+                    <span class="row-identifier">{$texts.incrementalNode}</span>
                     <span class="row-input">
                         <span class="row-entry">
                             <Checkbox
@@ -531,7 +532,7 @@ Displays contextual hints and supports multi-language labels for all fields. -->
                         </span>
                         <span class="row-hint">
                             <HintInfo openInverted={true} hintWidth="250px">
-                                <span class="info-text">{$texts.incrementalNodeInfo[$selectedLang]}</span>
+                                <span class="info-text">{$texts.incrementalNodeInfo}</span>
                             </HintInfo>
                         </span>
                     </span>
@@ -541,7 +542,7 @@ Displays contextual hints and supports multi-language labels for all fields. -->
         {#if node.config.incremental_node}
             <div class="row">
                 <span class="row-variable no-wrap">
-                    <span class="row-identifier">{$texts.positiveIncrement[$selectedLang]}</span>
+                    <span class="row-identifier">{$texts.positiveIncrement}</span>
                     <span class="row-input">
                         <span class="row-entry">
                             <Checkbox
@@ -558,7 +559,7 @@ Displays contextual hints and supports multi-language labels for all fields. -->
                         </span>
                         <span class="row-hint">
                             <HintInfo openInverted={true} hintWidth="250px">
-                                <span class="info-text">{$texts.positiveIncrementInfo[$selectedLang]}</span>
+                                <span class="info-text">{$texts.positiveIncrementInfo}</span>
                             </HintInfo>
                         </span>
                     </span>
@@ -566,7 +567,7 @@ Displays contextual hints and supports multi-language labels for all fields. -->
             </div>
             <div class="row">
                 <span class="row-variable no-wrap">
-                    <span class="row-identifier">{$texts.calculateIncrement[$selectedLang]}</span>
+                    <span class="row-identifier">{$texts.calculateIncrement}</span>
                     <span class="row-input">
                         <span class="row-entry">
                             <Checkbox
@@ -583,7 +584,7 @@ Displays contextual hints and supports multi-language labels for all fields. -->
                         </span>
                         <span class="row-hint">
                             <HintInfo openInverted={true} hintWidth="250px">
-                                <span class="info-text">{$texts.calculateIncrementInfo[$selectedLang]}</span>
+                                <span class="info-text">{$texts.calculateIncrementInfo}</span>
                             </HintInfo>
                         </span>
                     </span>
@@ -592,7 +593,7 @@ Displays contextual hints and supports multi-language labels for all fields. -->
         {/if}
         <div class="row">
             <span class="row-variable no-wrap">
-                <span class="row-identifier">{$texts.enabled[$selectedLang]}</span>
+                <span class="row-identifier">{$texts.enabled}</span>
                 <span class="row-input">
                     <span class="row-entry">
                         <Checkbox
@@ -607,7 +608,7 @@ Displays contextual hints and supports multi-language labels for all fields. -->
                     </span>
                     <span class="row-hint">
                         <HintInfo openInverted={true} hintWidth="250px">
-                            <span class="info-text">{$texts.enabledInfo[$selectedLang]}</span>
+                            <span class="info-text">{$texts.enabledInfo}</span>
                         </HintInfo>
                     </span>
                 </span>

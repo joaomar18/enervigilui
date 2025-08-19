@@ -2,12 +2,12 @@
     import { navigateTo } from "$lib/ts/view/navigation";
     import { getAllDevicesState } from "$lib/ts/api/device";
     import { filterDevices } from "$lib/ts/util/device";
+    import { showToast } from "$lib/ts/view/toast";
+    import { ToastType } from "$lib/stores/view/toast";
 
-    // Stores for multi-language support
-    import { texts, selectedLang } from "$lib/stores/lang";
-
-    // Stores for alerts
-    import { showAlert } from "$lib/ts/view/notification";
+    // Texts
+    import { texts } from "$lib/stores/lang/generalTexts";
+    import { selectedLang } from "$lib/stores/lang/definition";
 
     // Stores for authorization
     import { loadedDone, searchQuery } from "$lib/stores/navigation";
@@ -33,7 +33,7 @@
             try {
                 const { status, data }: { status: number; data: any } = await getAllDevicesState();
                 if (status !== 200) {
-                    showAlert($texts.errorDevicesState, {
+                    showToast("errorDevicesState", ToastType.ALERT, {
                         error: String(data["error"]),
                     });
                 } else {
@@ -45,7 +45,7 @@
                     });
                 }
             } catch (e) {
-                showAlert($texts.errorDevicesState, {
+                showToast("errorDevicesState", ToastType.ALERT, {
                     error: String(e),
                 });
                 console.error(`Could not obtain devices state: ${e}`);

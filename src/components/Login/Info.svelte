@@ -1,6 +1,6 @@
 <script lang="ts">
-    //Stores for multi-language support
-    import { selectedLang, texts } from "$lib/stores/lang";
+    // Texts
+    import { texts } from "$lib/stores/lang/generalTexts";
 
     // Styles
     import { mergeStyle } from "$lib/style/components";
@@ -55,10 +55,10 @@
 >
     <div class="content">
         <h1>
-            {$texts.infoMainMessage[$selectedLang]}
+            {$texts.infoMainMessage}
         </h1>
         <h3>
-            {$texts.infoSubMessage[$selectedLang]}
+            {$texts.infoSubMessage}
         </h3>
         <div
             class="app-image"

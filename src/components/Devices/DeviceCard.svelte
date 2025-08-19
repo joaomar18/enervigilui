@@ -2,8 +2,8 @@
     import Action from "../General/Action.svelte";
     import Notification from "../General/Notification.svelte";
 
-    // Stores for multi-language support
-    import { selectedLang, texts } from "$lib/stores/lang";
+    // Texts
+    import { texts } from "$lib/stores/lang/generalTexts";
 
     // Styles
     import { mergeStyle } from "$lib/style/components";
@@ -115,9 +115,9 @@
         <div class="connection-state-div">
             <div class:connected class="connection-status"></div>
             {#if connected}
-                <span class="connection-text">{$texts.connected[$selectedLang]}</span>
+                <span class="connection-text">{$texts.connected}</span>
             {:else}
-                <span class="connection-text">{$texts.disconnected[$selectedLang]}</span>
+                <span class="connection-text">{$texts.disconnected}</span>
             {/if}
         </div>
     </div>

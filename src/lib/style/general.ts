@@ -18,19 +18,23 @@ const ActionStyleConfig: ComponentStyles = {
 
 export const ActionStyle = createStyleStore(ActionStyleConfig);
 
-//////////     A L E R T     //////////
+//////////     T O A S T     //////////
 
-const AlertStyleConfig: ComponentStyles = {
+const ToastStyleConfig: ComponentStyles = {
     dark: {
-        backgroundColor: "#a11f2a",
-        borderColor: "#b91c1c",
+        alertBackgroundColor: "#a11f2a",
+        alertBorderColor: "#b91c1c",
+        warningBackgroundColor: "#f59e42",
+        warningBorderColor: "#e67e22",
         infoBackgroundColor: "#1e3a8a",
         infoBorderColor: "#1d4ed8",
+        neutralBackgroundColor: "#374151",
+        neutralBorderColor: "#6b7280",
         textColor: "#ffffff",
     },
 };
 
-export const AlertStyle = createStyleStore(AlertStyleConfig);
+export const ToastStyle = createStyleStore(ToastStyleConfig);
 
 //////////     C H E C K B O X     //////////
 

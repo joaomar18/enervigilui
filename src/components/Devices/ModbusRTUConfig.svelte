@@ -4,12 +4,12 @@
     import Selector from "../General/Selector.svelte";
     import { validateModbusRtuPort } from "$lib/ts/validation/device";
     import { READ_PERIOD_LIM, TIMEOUT_LIM, SLAVE_ID_LIM, RETRIES_NUMBER_LIM } from "$lib/stores/devices";
+    import { showToast } from "$lib/ts/view/toast";
+    import { ToastType } from "$lib/stores/view/toast";
 
-    // Stores for multi-language support
-    import { texts, baudrateTexts, parityTexts, bytesizeTexts, stopbitsTexts, selectedLang } from "$lib/stores/lang";
-
-    // Stores for alerts
-    import { showAlert } from "$lib/ts/view/notification";
+    // Texts
+    import { texts } from "$lib/stores/lang/generalTexts";
+    import { baudrateTexts, parityTexts, bytesizeTexts, stopbitsTexts } from "$lib/stores/lang/modbusRtuTexts";
 
     // Types
     import type { EditableDeviceModbusRTUConfig } from "$lib/stores/devices";
@@ -51,21 +51,21 @@
 </script>
 
 <div class="device-input-div">
-    <span>{$texts.communicationPort[$selectedLang]}</span>
+    <span>{$texts.communicationPort}</span>
     <div class="input-div">
         <div class="input-content-div">
             <InputField bind:inputValue={modbusRTUConfig.port} inputInvalid={!validModbusRtuPort} enableInputInvalid={true} />
         </div>
         <div class="info-div">
             <HintInfo>
-                <span class="info-text">{$texts.communicationPortInfo[$selectedLang]}</span>
+                <span class="info-text">{$texts.communicationPortInfo}</span>
             </HintInfo>
         </div>
     </div>
 </div>
 
 <div class="device-input-div">
-    <span>{$texts.slaveID[$selectedLang]}</span>
+    <span>{$texts.slaveID}</span>
     <div class="input-div">
         <div class="input-content-div">
             <InputField
@@ -76,7 +76,7 @@
                 minValue={SLAVE_ID_LIM.MIN}
                 maxValue={SLAVE_ID_LIM.MAX}
                 limitsPassed={() => {
-                    showAlert($texts.slaveIDError, {
+                    showToast("slaveIDError", ToastType.ALERT, {
                         minValue: SLAVE_ID_LIM.MIN,
                         maxValue: SLAVE_ID_LIM.MAX,
                     });
@@ -85,17 +85,16 @@
         </div>
         <div class="info-div">
             <HintInfo>
-                <span class="info-text">{$texts.slaveIDInfo[$selectedLang]}</span>
+                <span class="info-text">{$texts.slaveIDInfo}</span>
             </HintInfo>
         </div>
     </div>
 </div>
 
 <div class="device-input-div">
-    <span>{$texts.baudrate[$selectedLang]}</span>
+    <span>{$texts.baudrate}</span>
     <div class="input-div">
         <Selector
-            useLang={true}
             options={$baudrateTexts}
             bind:selectedOption={modbusRTUConfig.baudrate}
             inputInvalid={!validBaudrate}
@@ -104,17 +103,16 @@
         />
         <div class="info-div">
             <HintInfo>
-                <span class="info-text">{$texts.baudrateInfo[$selectedLang]}</span>
+                <span class="info-text">{$texts.baudrateInfo}</span>
             </HintInfo>
         </div>
     </div>
 </div>
 
 <div class="device-input-div">
-    <span>{$texts.parity[$selectedLang]}</span>
+    <span>{$texts.parity}</span>
     <div class="input-div">
         <Selector
-            useLang={true}
             options={$parityTexts}
             bind:selectedOption={modbusRTUConfig.parity}
             inputInvalid={!validParity}
@@ -123,17 +121,16 @@
         />
         <div class="info-div">
             <HintInfo>
-                <span class="info-text">{$texts.parityInfo[$selectedLang]}</span>
+                <span class="info-text">{$texts.parityInfo}</span>
             </HintInfo>
         </div>
     </div>
 </div>
 
 <div class="device-input-div">
-    <span>{$texts.bytesize[$selectedLang]}</span>
+    <span>{$texts.bytesize}</span>
     <div class="input-div">
         <Selector
-            useLang={true}
             options={$bytesizeTexts}
             bind:selectedOption={modbusRTUConfig.bytesize}
             inputInvalid={!validByteSize}
@@ -142,17 +139,16 @@
         />
         <div class="info-div">
             <HintInfo>
-                <span class="info-text">{$texts.bytesizeInfo[$selectedLang]}</span>
+                <span class="info-text">{$texts.bytesizeInfo}</span>
             </HintInfo>
         </div>
     </div>
 </div>
 
 <div class="device-input-div">
-    <span>{$texts.stopbits[$selectedLang]}</span>
+    <span>{$texts.stopbits}</span>
     <div class="input-div">
         <Selector
-            useLang={true}
             options={$stopbitsTexts}
             bind:selectedOption={modbusRTUConfig.stopbits}
             inputInvalid={!validStopBits}
@@ -161,14 +157,14 @@
         />
         <div class="info-div">
             <HintInfo>
-                <span class="info-text">{$texts.stopbitsInfo[$selectedLang]}</span>
+                <span class="info-text">{$texts.stopbitsInfo}</span>
             </HintInfo>
         </div>
     </div>
 </div>
 
 <div class="device-input-div">
-    <span>{$texts.readPeriod[$selectedLang]}</span>
+    <span>{$texts.readPeriod}</span>
     <div class="input-div">
         <div class="input-content-div">
             <InputField
@@ -176,11 +172,11 @@
                 inputInvalid={!validReadPeriod}
                 enableInputInvalid={true}
                 inputType="POSITIVE_INT"
-                inputUnit={$texts.secondsUnit[$selectedLang]}
+                inputUnit={$texts.secondsUnit}
                 minValue={READ_PERIOD_LIM.MIN}
                 maxValue={READ_PERIOD_LIM.MAX}
                 limitsPassed={() => {
-                    showAlert($texts.readPeriodError, {
+                    showToast("readPeriodError", ToastType.ALERT, {
                         minValue: READ_PERIOD_LIM.MIN,
                         maxValue: READ_PERIOD_LIM.MAX,
                     });
@@ -189,13 +185,13 @@
         </div>
         <div class="info-div">
             <HintInfo>
-                <span class="info-text">{$texts.readPeriodInfo[$selectedLang]}</span>
+                <span class="info-text">{$texts.readPeriodInfo}</span>
             </HintInfo>
         </div>
     </div>
 </div>
 <div class="device-input-div">
-    <span>{$texts.commTimeout[$selectedLang]}</span>
+    <span>{$texts.commTimeout}</span>
     <div class="input-div">
         <div class="input-content-div">
             <InputField
@@ -203,11 +199,11 @@
                 inputInvalid={!validTimeout}
                 enableInputInvalid={true}
                 inputType="POSITIVE_INT"
-                inputUnit={$texts.secondsUnit[$selectedLang]}
+                inputUnit={$texts.secondsUnit}
                 minValue={TIMEOUT_LIM.MIN}
                 maxValue={TIMEOUT_LIM.MAX}
                 limitsPassed={() => {
-                    showAlert($texts.commTimeoutError, {
+                    showToast("commTimeoutError", ToastType.ALERT, {
                         minValue: TIMEOUT_LIM.MIN,
                         maxValue: TIMEOUT_LIM.MAX,
                     });
@@ -216,13 +212,13 @@
         </div>
         <div class="info-div">
             <HintInfo>
-                <span class="info-text">{$texts.commTimeoutInfo[$selectedLang]}</span>
+                <span class="info-text">{$texts.commTimeoutInfo}</span>
             </HintInfo>
         </div>
     </div>
 </div>
 <div class="device-input-div">
-    <span>{$texts.retries[$selectedLang]}</span>
+    <span>{$texts.retries}</span>
     <div class="input-div">
         <div class="input-content-div">
             <InputField
@@ -233,7 +229,7 @@
                 minValue={RETRIES_NUMBER_LIM.MIN}
                 maxValue={RETRIES_NUMBER_LIM.MAX}
                 limitsPassed={() => {
-                    showAlert($texts.retriesError, {
+                    showToast("retriesError", ToastType.ALERT, {
                         minValue: RETRIES_NUMBER_LIM.MIN,
                         maxValue: RETRIES_NUMBER_LIM.MAX,
                     });
@@ -242,7 +238,7 @@
         </div>
         <div class="info-div">
             <HintInfo>
-                <span class="info-text">{$texts.retriesInfo[$selectedLang]}</span>
+                <span class="info-text">{$texts.retriesInfo}</span>
             </HintInfo>
         </div>
     </div>

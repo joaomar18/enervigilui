@@ -1,8 +1,8 @@
 <script lang="ts">
     import Button from "../../General/Button.svelte";
 
-    // Stores for multi-language support
-    import { selectedLang, texts } from "$lib/stores/lang";
+    // Texts
+    import { texts } from "$lib/stores/lang/generalTexts";
 
     // Styles
     import { mergeStyle } from "$lib/style/components";
@@ -40,7 +40,7 @@
     class="add-node"
 >
     <td colspan="20">
-        <Button buttonText={$texts.addNode[$selectedLang]} style={$AddNodeButtonStyle} height={buttonHeight} onClick={onAddNode} />
+        <Button buttonText={$texts.addNode} style={$AddNodeButtonStyle} height={buttonHeight} onClick={onAddNode} />
     </td>
 </tr>
 

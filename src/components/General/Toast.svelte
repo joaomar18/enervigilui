@@ -1,42 +1,90 @@
 <script lang="ts">
     import { fade } from "svelte/transition";
+    import { ToastType } from "$lib/stores/view/toast";
 
     // Styles
     import { mergeStyle } from "$lib/style/components";
-    import { AlertStyle } from "$lib/style/general";
+    import { ToastStyle } from "$lib/style/general";
 
     // Props
-    export let isInfo: boolean = false;
     export let pushTop: boolean = false; //push alert to top
     export let pushBottom: boolean = false; //push alert to bottom
-    export let alertText: string;
+    export let toastText: string;
+    export let toastType: ToastType;
+    export let toastVariables: Record<string, string | number> | undefined = undefined;
     export let topPos: string = "";
     export let bottomPos: string = "";
 
     // Style object (from theme)
     export let style: { [property: string]: string | number } | null = null;
-    $: effectiveStyle = style ?? $AlertStyle;
+    $: effectiveStyle = style ?? $ToastStyle;
 
     // Layout / styling props
-    export let backgroundColor: string | undefined = undefined;
-    export let borderColor: string | undefined = undefined;
+    export let alertBackgroundColor: string | undefined = undefined;
+    export let alertBorderColor: string | undefined = undefined;
+    export let warningBackgroundColor: string | undefined = undefined;
+    export let warningBorderColor: string | undefined = undefined;
     export let infoBackgroundColor: string | undefined = undefined;
     export let infoBorderColor: string | undefined = undefined;
+    export let neutralBackgroundColor: string | undefined = undefined;
+    export let neutralBorderColor: string | undefined = undefined;
     export let textColor: string | undefined = undefined;
 
     $: localOverrides = {
-        backgroundColor,
-        borderColor,
+        alertBackgroundColor,
+        alertBorderColor,
+        warningBackgroundColor,
+        warningBorderColor,
         infoBackgroundColor,
         infoBorderColor,
+        neutralBackgroundColor,
+        neutralBorderColor,
         textColor,
     };
 
     // Merged style
     $: mergedStyle = mergeStyle(effectiveStyle, localOverrides);
 
+    // Color Picking
+    const colorMap = {
+        [ToastType.ALERT]: {
+            background: () => String(mergedStyle.alertBackgroundColor),
+            border: () => String(mergedStyle.alertBorderColor),
+        },
+        [ToastType.WARNING]: {
+            background: () => String(mergedStyle.warningBackgroundColor),
+            border: () => String(mergedStyle.warningBorderColor),
+        },
+        [ToastType.INFO]: {
+            background: () => String(mergedStyle.infoBackgroundColor),
+            border: () => String(mergedStyle.infoBorderColor),
+        },
+        [ToastType.NEUTRAL]: {
+            background: () => String(mergedStyle.neutralBackgroundColor),
+            border: () => String(mergedStyle.neutralBorderColor),
+        },
+    };
+
     // Variables
+    let message: string = "";
+    let transformY: string;
+    let backgroundColor: string;
+    let borderColor: string;
+
+    $: if (toastText) {
+        message = toastText;
+    }
+    $: if (toastVariables) {
+        Object.entries(toastVariables).forEach(([key, value]) => {
+            message = message.replace(`{${key}}`, String(value));
+        });
+    }
     $: transformY = pushTop ? "-100%" : pushBottom ? "100%" : "0%";
+    $: {
+        const typeColors = colorMap[toastType] ?? colorMap[ToastType.ALERT];
+        backgroundColor = typeColors.background();
+        borderColor = typeColors.border();
+    }
 
     // Click Export Funcion
     export let onClick: () => void;
@@ -50,25 +98,22 @@
 </script>
 
 <!-- 
-    Alert wrapper with customizable top/bottom positioning, colors and slide direction.
+    Toast wrapper with customizable top/bottom positioning, colors and slide direction.
     Triggered via pushTop / pushBottom or directly with style bindings.
 -->
 <div
-    class="alert-div"
+    class="toast-div"
     style="
         --top-position: {topPos};
         --bottom-position: {bottomPos};
-        --background-color:{mergedStyle.backgroundColor};
-        --info-background-color: {mergedStyle.infoBackgroundColor};
-        --info-border-color: {mergedStyle.infoBorderColor};
-        --border-color:{mergedStyle.borderColor};
+        --background-color: {backgroundColor};
+        --border-color:{borderColor};
         --transform-y: {transformY};
     "
-    class:info={isInfo}
     out:fade={{ duration: 300 }}
 >
     <div class="content">
-        <span class="alert-text" style="--text-color:{mergedStyle.textColor};">{alertText}</span>
+        <span class="toast-text" style="--text-color:{mergedStyle.textColor};">{message}</span>
         <button class="close-button" on:click={handleClick} aria-label="Close Button">
             <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none">
                 <line class="close-button-line" x1="6" y1="6" x2="18" y2="18" stroke-width="1" stroke-linecap="round" />
@@ -79,8 +124,8 @@
 </div>
 
 <style>
-    /* Root alert container */
-    .alert-div {
+    /* Root toast container */
+    .toast-div {
         position: absolute;
         top: var(--top-position, auto);
         left: 50%;
@@ -99,13 +144,7 @@
         user-select: none;
     }
 
-    /* Styling for information alert */
-    .alert-div.info {
-        background-color: var(--info-background-color);
-        border: 1px solid var(--info-border-color);
-    }
-
-    /* Flex container for alert text and close button */
+    /* Flex container for toast text and close button */
     .content {
         width: 100%;
         padding: 0;
@@ -117,8 +156,8 @@
         -webkit-tap-highlight-color: transparent;
     }
 
-    /* Main alert message */
-    .alert-text {
+    /* Main toast message */
+    .toast-text {
         font-size: 1.1rem;
         color: var(--text-color);
         font-weight: 400;

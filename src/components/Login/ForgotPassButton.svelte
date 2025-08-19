@@ -1,6 +1,6 @@
 <script lang="ts">
-    // Stores for multi-language support
-    import { selectedLang, texts } from "$lib/stores/lang";
+    // Texts
+    import { texts } from "$lib/stores/lang/generalTexts";
 
     // Styles
     import { mergeStyle } from "$lib/style/components";
@@ -52,7 +52,7 @@
         style="
         --text-color: {mergedStyle.textColor};
         --hover-text-color: {mergedStyle.hoverTextColor};
-    ">{$texts.forgotPassword[$selectedLang]}</span
+    ">{$texts.forgotPassword}</span
     >
     <button on:click={handleClick} aria-label="Button"></button>
 </div>

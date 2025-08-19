@@ -3,8 +3,9 @@ import type { DeviceMeter, EditableDeviceMeter, NewDeviceMeter } from "$lib/stor
 import type { EditableDeviceNode } from "$lib/stores/nodes";
 import { normalizeDevice } from "$lib/ts/util/device";
 import { getAllNodesValidation } from "$lib/ts/validation/nodes";
-import { showAlert } from "$lib/ts/view/notification";
-import { texts, protocolTexts } from "$lib/stores/lang";
+import { showToast } from "$lib/ts/view/toast";
+import { ToastType } from "$lib/stores/view/toast";
+import { protocolTexts } from "$lib/stores/lang/energyMeterTexts";
 import isEqualPkg from "lodash";
 const { isEqual } = isEqualPkg;
 
@@ -102,15 +103,15 @@ export function validDeviceOperation(deviceData: EditableDeviceMeter | NewDevice
         return true;
     }
     if (!deviceData.validation.deviceName) {
-        showAlert(get(texts).invalidDeviceName); // Invalid device name
+        showToast("invalidDeviceName", ToastType.ALERT); // Invalid device name
     } else if (!deviceData.validation.deviceProtocol) {
-        showAlert(get(texts).invalidProtocol); // Invalid device protocol
+        showToast("invalidProtocol", ToastType.ALERT); // Invalid device protocol
     } else if (!deviceData.validation.communicationOptions) {
-        showAlert(get(texts).invalidCommunicationOptions); // Invalid Communication Options
+        showToast("invalidCommunicationOptions", ToastType.ALERT); // Invalid Communication Options
     } else if (!deviceData.validation.meterOptions) {
-        showAlert(get(texts).invalidMeterOptions); // Invalid Meter Options
+        showToast("invalidMeterOptions", ToastType.ALERT); // Invalid Meter Options
     } else if (!deviceData.validation.nodes) {
-        showAlert(get(texts).invalidDeviceNodes); // Invalid Device Nodes
+        showToast("invalidDeviceNodes", ToastType.ALERT); // Invalid Device Nodes
     }
     return false;
 }
@@ -122,6 +123,6 @@ export function validDeviceOperation(deviceData: EditableDeviceMeter | NewDevice
  * @returns True if equal.
  */
 export function areDevicesEqual(a: DeviceMeter, b: DeviceMeter): boolean {
-    console.log("Debug, Devices are equal: ", isEqual(normalizeDevice(a), normalizeDevice(b)));
+    //console.log("Debug, Devices are equal: ", isEqual(normalizeDevice(a), normalizeDevice(b)));
     return isEqual(normalizeDevice(a), normalizeDevice(b));
 }

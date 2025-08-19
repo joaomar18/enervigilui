@@ -15,8 +15,8 @@
     $: effectiveStyle = style ?? $LangSelectorStyle;
 
     // Stores for multi-language support
-    import type { Language } from "$lib/stores/lang";
-    import { selectedLang } from "$lib/stores/lang";
+    import type { Language } from "$lib/stores/lang/definition";
+    import { selectedLang } from "$lib/stores/lang/definition";
 
     // Layout / styling props
     export let backgroundColor: string | undefined = undefined;

@@ -7,15 +7,17 @@
     import { nodeNameChange, nodeTypeChange, customNodeChange, virtualNodeChange } from "$lib/ts/handlers/nodes";
     import { LOGGING_PERIOD_LIM, NodeType } from "$lib/stores/nodes";
     import { defaultVariableUnits } from "$lib/stores/nodes";
-    import { showAlert } from "$lib/ts/view/notification";
+    import { showToast } from "$lib/ts/view/toast";
+    import { ToastType } from "$lib/stores/view/toast";
 
     // Types
     import type { EditableDeviceMeter, NewDeviceMeter } from "$lib/stores/devices";
     import type { EditableDeviceNode, NodeEditState } from "$lib/stores/nodes";
     import type { ColumnVisibilityMap } from "$lib/ts/view/nodes";
 
-    // Stores for multi-language support
-    import { texts, variableNameTextsByPhase, selectedLang } from "$lib/stores/lang";
+    // Texts
+    import { texts } from "$lib/stores/lang/generalTexts";
+    import { variableNameTextsByPhase } from "$lib/stores/lang/energyMeterTexts";
 
     // Styles
     import { mergeStyle } from "$lib/style/components";
@@ -110,7 +112,6 @@ properties and action buttons for configuration and deletion. -->
                 {#if !node.config.custom}
                     <Selector
                         style={$NodeSelectorStyle}
-                        useLang={true}
                         options={$variableNameTextsByPhase[node.phase]}
                         bind:selectedOption={node.display_name}
                         onChange={() => {
@@ -228,7 +229,7 @@ properties and action buttons for configuration and deletion. -->
                     minValue={LOGGING_PERIOD_LIM.MIN}
                     maxValue={LOGGING_PERIOD_LIM.MAX}
                     limitsPassed={() => {
-                        showAlert($texts.loggingPeriodError, {
+                        showToast("loggingPeriodError", ToastType.ALERT, {
                             minValue: LOGGING_PERIOD_LIM.MIN,
                             maxValue: LOGGING_PERIOD_LIM.MAX,
                         });
@@ -415,7 +416,7 @@ properties and action buttons for configuration and deletion. -->
                         <div class="expandable-button-div">
                             <Button
                                 style={$SubPrimaryButtonStyle}
-                                buttonText={$texts.configuration[$selectedLang]}
+                                buttonText={$texts.configuration}
                                 width="200px"
                                 imageURL="/img/configuration.png"
                                 imageWidth="20px"
@@ -428,7 +429,7 @@ properties and action buttons for configuration and deletion. -->
                             />
                             <Button
                                 style={$SubDangerButtonStyle}
-                                buttonText={$texts.delete[$selectedLang]}
+                                buttonText={$texts.delete}
                                 width="200px"
                                 imageURL="/img/delete.png"
                                 imageWidth="20px"
