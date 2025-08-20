@@ -6,11 +6,10 @@
     import { ToastType } from "$lib/stores/view/toast";
 
     // Texts
-    import { texts } from "$lib/stores/lang/generalTexts";
     import { selectedLang } from "$lib/stores/lang/definition";
 
     // Stores for authorization
-    import { loadedDone, searchQuery } from "$lib/stores/navigation";
+    import { loadedDone, searchQuery } from "$lib/stores/view/navigation";
 
     //Types
     import type { DeviceMeter } from "$lib/stores/devices";

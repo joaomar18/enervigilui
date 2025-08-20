@@ -24,7 +24,7 @@
     import { closeToast } from "$lib/ts/view/toast";
 
     // Authorization stores
-    import { splashDone, loadedDone, showSubLoader, leftPanelOpen, searchQuery } from "$lib/stores/navigation";
+    import { splashDone, loadedDone, showSubLoader, leftPanelOpen, searchQuery } from "$lib/stores/view/navigation";
     import { setSearchQuery } from "$lib/ts/view/navigation";
 
     // Variables

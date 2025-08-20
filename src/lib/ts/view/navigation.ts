@@ -2,7 +2,7 @@ import { goto } from "$app/navigation";
 import { get } from "svelte/store";
 
 // Splash screen store
-import { splashDone, loadedDone, showSubLoader, leftPanelOpen, searchQuery } from "../../stores/navigation";
+import { splashDone, loadedDone, showSubLoader, leftPanelOpen, searchQuery } from "../../stores/view/navigation";
 
 let resetSubLoaderSub: (() => void) | null = null; //Subscription to reset sub loader
 let subLoaderTimer: ReturnType<typeof setTimeout> | null = null; // Timeout to set sub loader in case of delay

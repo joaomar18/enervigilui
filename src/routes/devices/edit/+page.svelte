@@ -42,8 +42,7 @@
     import { protocolTexts } from "$lib/stores/lang/energyMeterTexts";
 
     // Stores for authorization
-    import { loadedDone } from "$lib/stores/navigation";
-    import Toast from "../../../components/General/Toast.svelte";
+    import { loadedDone } from "$lib/stores/view/navigation";
 
     // Variables
     let showCancelWindow: boolean = false; // Show Cancelation Window (if changes were made)

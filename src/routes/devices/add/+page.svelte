@@ -39,7 +39,7 @@
     import { protocolTexts } from "$lib/stores/lang/energyMeterTexts";
 
     // Stores for authorization
-    import { loadedDone } from "$lib/stores/navigation";
+    import { loadedDone } from "$lib/stores/view/navigation";
 
     // Variables
     let showAddWindow: boolean = false; // Show Add Device Window
