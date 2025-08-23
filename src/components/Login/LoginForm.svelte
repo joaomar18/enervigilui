@@ -1,13 +1,13 @@
 <script lang="ts">
-    import { loginUser } from "$lib/ts/api/auth";
-    import { interpretLoginStatus, validateUsername, validatePassword } from "$lib/ts/validation/auth";
-    import { navigateTo } from "$lib/ts/view/navigation";
+    import { loginUser } from "$lib/logic/api/auth";
+    import { interpretLoginStatus, validateUsername, validatePassword } from "$lib/logic/validation/auth";
+    import { navigateTo } from "$lib/logic/view/navigation";
     import LoginField from "./LoginField.svelte";
     import LoginButton from "./LoginButton.svelte";
     import ForgotPassButton from "./ForgotPassButton.svelte";
     import Checkbox from "../General/Checkbox.svelte";
     import { ToastType } from "$lib/stores/view/toast";
-    import { showToast } from "$lib/ts/view/toast";
+    import { showToast } from "$lib/logic/view/toast";
 
     // Texts
     import { texts } from "$lib/stores/lang/generalTexts";

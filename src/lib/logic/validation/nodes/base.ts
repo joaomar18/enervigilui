@@ -1,14 +1,55 @@
 import { get } from "svelte/store";
-import { Protocol } from "$lib/stores/devices";
-import { NodeType, NodePhase } from "$lib/stores/nodes";
-import { defaultVariables, defaultVariableNames, defaultVariableUnits } from "$lib/stores/nodes";
-import { DECIMAL_PLACES_LIM, LOGGING_PERIOD_LIM } from "$lib/stores/nodes";
-import { normalizeNode } from "$lib/ts/util/nodes";
+import { Protocol } from "$lib/types/device/base";
+import { NodeType, NodePhase } from "$lib/types/nodes/base";
+import type { DeviceNode, EditableDeviceNode, NodeValidation } from "$lib/types/nodes/base";
+import { defaultVariables, defaultVariableNames, defaultVariableUnits } from "$lib/stores/device/variables";
+import { normalizeNode } from "$lib/logic/util/nodes";
 import { protocolTexts } from "$lib/stores/lang/energyMeterTexts";
-import type { DeviceNode, EditableDeviceNode } from "$lib/stores/nodes";
-import { stringIsValidInteger, stringIsValidFloat } from "$lib/ts/util/generic";
+import { stringIsValidInteger, stringIsValidFloat } from "$lib/logic/util/generic";
+import { DECIMAL_PLACES_LIM, LOGGING_PERIOD_LIM } from "$lib/types/nodes/base";
 import isEqualPkg from "lodash";
+import { validateModbusRegister } from "./modbusRtu";
+import { validateOpcUaNodeId } from "./opcUa";
 const { isEqual } = isEqualPkg;
+
+/**
+ * Creates and returns a new NodeValidation object with all validation properties set to false.
+ * Used to initialize the validation state for new nodes or reset validation during editing.
+ *
+ * @returns {NodeValidation} A fresh validation object with all checks set to false
+ */
+export function getInitialNodeValidation(): NodeValidation {
+    return {
+        variableName: false,
+        variableType: false,
+        variableUnit: false,
+        communicationID: false,
+        protocol: false,
+        type: false,
+        decimalPlaces: false,
+        loggingPeriod: false,
+        minAlarm: false,
+        maxAlarm: false,
+        calculated: false,
+        incremental: false,
+        calculate_increment: false,
+        positive_incremental: false,
+        isValid() {
+            return (
+                this.variableName &&
+                this.variableType &&
+                this.variableUnit &&
+                this.decimalPlaces &&
+                this.communicationID &&
+                this.loggingPeriod &&
+                this.minAlarm &&
+                this.maxAlarm &&
+                this.calculated &&
+                this.incremental
+            );
+        },
+    };
+}
 
 /**
  * Validates node name.
@@ -90,18 +131,10 @@ export function validateCommunicationID(communicationID: string | undefined, pro
             return trimmedId.length === 0;
 
         case Protocol.MODBUS_RTU:
-            // Check format: must be "0x" followed by 1-4 hex digits
-            const modbusPattern = /^0x[0-9A-Fa-f]{1,4}$/;
-            if (!modbusPattern.test(trimmedId)) {
-                return false;
-            }
-            const value = parseInt(trimmedId.substring(2), 16);
-            return value >= 0 && value <= 0xffff;
+            return validateModbusRegister(trimmedId);
 
         case Protocol.OPC_UA:
-            const opcuaPattern =
-                /^ns=\d+;(i=\d+|s=[^;]+|g=[0-9a-fA-F-]{8}-[0-9a-fA-F-]{4}-[0-9a-fA-F-]{4}-[0-9a-fA-F-]{4}-[0-9a-fA-F-]{12}|b=[A-Za-z0-9+/=]+)$/;
-            return opcuaPattern.test(trimmedId);
+            return validateOpcUaNodeId(trimmedId);
 
         default:
             return false;

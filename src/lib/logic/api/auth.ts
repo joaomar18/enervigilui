@@ -1,4 +1,4 @@
-import { makeAPIRequest } from "$lib/ts/api/api";
+import { makeAPIRequest } from "$lib/logic/api/api";
 
 /**
  * Sends login credentials to the server.

@@ -1,4 +1,4 @@
-import { makeAPIRequest } from "$lib/ts/api/api";
+import { makeAPIRequest } from "$lib/logic/api/api";
 
 /**
  * Gets config of nodes for a device.

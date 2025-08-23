@@ -1,6 +1,6 @@
-import { MeterType, Protocol } from "$lib/stores/devices";
-import { NodePrefix, NodePhase } from "$lib/stores/nodes";
-import type { NodeConfiguration, EditableNodeConfiguration, DeviceNode, EditableDeviceNode } from "$lib/stores/nodes";
+import { MeterType, Protocol } from "$lib/types/device/base";
+import { NodePrefix, NodePhase } from "$lib/types/nodes/base";
+import type { NodeConfiguration, EditableNodeConfiguration, DeviceNode, EditableDeviceNode } from "$lib/types/nodes/base";
 
 /**
  * Sorts nodes alphabetically by display name (without prefix).

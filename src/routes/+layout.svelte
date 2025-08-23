@@ -1,9 +1,9 @@
 <script lang="ts">
     import { onMount } from "svelte";
-    import { autoLogin } from "$lib/ts/api/auth";
+    import { autoLogin } from "$lib/logic/api/auth";
     import { page } from "$app/state";
-    import { logoutUser } from "$lib/ts/api/auth";
-    import { navigateTo } from "$lib/ts/view/navigation";
+    import { logoutUser } from "$lib/logic/api/auth";
+    import { navigateTo } from "$lib/logic/view/navigation";
     import { fade } from "svelte/transition";
     import { browser } from "$app/environment";
     import LeftPanel from "../components/Dashboard/LeftPanel.svelte";
@@ -21,11 +21,11 @@
 
     // Toast
     import { displayToast, toastType, toastKey, toastVariables } from "$lib/stores/view/toast";
-    import { closeToast } from "$lib/ts/view/toast";
+    import { closeToast } from "$lib/logic/view/toast";
 
     // Authorization stores
     import { splashDone, loadedDone, showSubLoader, leftPanelOpen, searchQuery } from "$lib/stores/view/navigation";
-    import { setSearchQuery } from "$lib/ts/view/navigation";
+    import { setSearchQuery } from "$lib/logic/view/navigation";
 
     // Variables
     let shouldRedirect: boolean = false;

@@ -1,21 +1,21 @@
 import { get } from "svelte/store";
-import { MeterType, Protocol } from "$lib/stores/devices";
-import { NodeType, NodePrefix, NodePhase } from "$lib/stores/nodes";
-import { getInitialNodeValidation } from "$lib/stores/nodes";
-import { removePrefix, sortNodesByName, getNodePhase, getNodePrefix, addPrefix, getInitialCommunicationID, getCommunicationID } from "$lib/ts/util/nodes";
-import { defaultVariables, nodeSections } from "$lib/stores/nodes";
-import type { EditableDeviceMeter, NewDeviceMeter } from "$lib/stores/devices";
+import { MeterType, Protocol } from "$lib/types/device/base";
+import { NodeType, NodePhase, NodePrefix, nodeSections } from "$lib/types/nodes/base";
+import type { EditableDeviceMeter, NewDeviceMeter } from "$lib/types/device/base";
 import type {
-    NodeConfiguration,
-    EditableBaseNodeConfig,
-    NodeModbusRTUConfig,
-    NodeOPCUAConfig,
-    EditableNodeConfiguration,
     DeviceNode,
     EditableDeviceNode,
+    EditableNodeConfiguration,
+    EditableBaseNodeConfig,
+    NodeConfiguration,
     DefaultNodeInfo,
-} from "$lib/stores/nodes";
-import { stringIsValidInteger, stringIsValidFloat } from "$lib/ts/util/generic";
+} from "$lib/types/nodes/base";
+import type { NodeOPCUAConfig } from "$lib/types/nodes/opcUa";
+import type { NodeModbusRTUConfig } from "$lib/types/nodes/modbusRtu";
+import { defaultVariables } from "$lib/stores/device/variables";
+import { addPrefix, removePrefix, getNodePhase, getNodePrefix, getCommunicationID, getInitialCommunicationID, sortNodesByName } from "../util/nodes";
+import { getInitialNodeValidation } from "../validation/nodes/base";
+import { stringIsValidInteger, stringIsValidFloat } from "$lib/logic/util/generic";
 
 /**
  * Converts DeviceNode[] to EditableDeviceNode[] for UI forms.

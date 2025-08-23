@@ -1,6 +1,6 @@
-import { makeAPIRequest } from "$lib/ts/api/api";
-import type { DeviceMeter } from "$lib/stores/devices";
-import type { DeviceNode } from "$lib/stores/nodes";
+import { makeAPIRequest } from "$lib/logic/api/api";
+import type { DeviceMeter } from "$lib/types/device/base";
+import type { DeviceNode } from "$lib/types/nodes/base";
 
 /**
  * Gets all devices' state/config from server.

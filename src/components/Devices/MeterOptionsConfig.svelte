@@ -2,11 +2,11 @@
     import Selector from "../General/Selector.svelte";
     import SelectorButton from "../General/SelectorButton.svelte";
     import HintInfo from "../General/HintInfo.svelte";
-    import { getDefaultNodesList } from "$lib/ts/factory/nodes";
+    import { getDefaultNodesList } from "$lib/logic/factory/nodes";
 
     // Types
-    import type { EditableDeviceMeter, NewDeviceMeter } from "$lib/stores/devices";
-    import type { EditableDeviceNode } from "$lib/stores/nodes";
+    import type { EditableDeviceMeter, NewDeviceMeter } from "$lib/types/device/base";
+    import type { EditableDeviceNode } from "$lib/types/nodes/base";
 
     // Texts
     import { texts } from "$lib/stores/lang/generalTexts";

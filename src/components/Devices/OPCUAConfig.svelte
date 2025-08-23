@@ -1,16 +1,16 @@
 <script lang="ts">
     import InputField from "../General/InputField.svelte";
     import HintInfo from "../General/HintInfo.svelte";
-    import { validateOpcUaUrl } from "$lib/ts/validation/device";
-    import { READ_PERIOD_LIM, TIMEOUT_LIM } from "$lib/stores/devices";
-    import { showToast } from "$lib/ts/view/toast";
+    import { validateOpcUaUrl } from "$lib/logic/validation/device/opcUa";
+    import { READ_PERIOD_LIM, TIMEOUT_LIM } from "$lib/types/device/base";
+    import { showToast } from "$lib/logic/view/toast";
     import { ToastType } from "$lib/stores/view/toast";
 
     // Texts
     import { texts } from "$lib/stores/lang/generalTexts";
 
     // Types
-    import type { EditableDeviceOPCUAConfig } from "$lib/stores/devices";
+    import type { EditableDeviceOPCUAConfig } from "$lib/types/device/opcUa";
 
     // Props
     export let opcuaConfig: EditableDeviceOPCUAConfig; // OPC UA Configuration Object

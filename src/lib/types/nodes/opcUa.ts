@@ -1,0 +1,25 @@
+/*****     C O N S T A N T S     *****/
+
+/*****     E N U M S     *****/
+
+/*****     I N T E R F A C E S     *****/
+
+/**
+ * OPC UA node configuration.
+ * @property node_id Node identifier.
+ */
+export interface NodeOPCUAConfig {
+    node_id: string;
+}
+
+/**
+ * Editable OPC UA node config for forms.
+ * @property node_id Node identifier (string).
+ */
+export interface EditableNodeOPCUAConfig {
+    node_id: string;
+}
+
+/*****     T Y P E S     *****/
+
+/*****     O B J E C T S     *****/

@@ -1,4 +1,6 @@
-import type { DeviceMeter, DeviceModbusRTUConfig, DeviceOPCUAConfig } from "$lib/stores/devices";
+import type { DeviceMeter } from "$lib/types/device/base";
+import type { DeviceOPCUAConfig } from "$lib/types/device/opcUa";
+import type { DeviceModbusRTUConfig } from "$lib/types/device/modbusRtu";
 
 /**
  * Filters devices by name or ID.

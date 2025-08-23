@@ -2,9 +2,10 @@
     import InputField from "../General/InputField.svelte";
     import HintInfo from "../General/HintInfo.svelte";
     import Selector from "../General/Selector.svelte";
-    import { validateModbusRtuPort } from "$lib/ts/validation/device";
-    import { READ_PERIOD_LIM, TIMEOUT_LIM, SLAVE_ID_LIM, RETRIES_NUMBER_LIM } from "$lib/stores/devices";
-    import { showToast } from "$lib/ts/view/toast";
+    import { validateModbusRtuPort } from "$lib/logic/validation/device/modbusRtu";
+    import { READ_PERIOD_LIM, TIMEOUT_LIM } from "$lib/types/device/base";
+    import { SLAVE_ID_LIM, RETRIES_NUMBER_LIM } from "$lib/types/device/modbusRtu";
+    import { showToast } from "$lib/logic/view/toast";
     import { ToastType } from "$lib/stores/view/toast";
 
     // Texts
@@ -12,7 +13,7 @@
     import { baudrateTexts, parityTexts, bytesizeTexts, stopbitsTexts } from "$lib/stores/lang/modbusRtuTexts";
 
     // Types
-    import type { EditableDeviceModbusRTUConfig } from "$lib/stores/devices";
+    import type { EditableDeviceModbusRTUConfig } from "$lib/types/device/modbusRtu";
 
     // Props
     export let modbusRTUConfig: EditableDeviceModbusRTUConfig; // Modbus RTU Configuration Object

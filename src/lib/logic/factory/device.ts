@@ -1,18 +1,11 @@
-import { Protocol } from "$lib/stores/devices";
-import { getInitialDeviceValidation } from "$lib/stores/devices";
-import { defaultModbusRTUOptions, defaultOPCUAOptions } from "$lib/stores/devices";
-import type {
-    MeterType,
-    MeterOptions,
-    DeviceMeter,
-    EditableDeviceMeter,
-    NewDeviceMeter,
-    EditableCommunicationOptions,
-    DeviceModbusRTUConfig,
-    DeviceOPCUAConfig,
-    EditableDeviceModbusRTUConfig,
-    EditableDeviceOPCUAConfig,
-} from "$lib/stores/devices";
+import { Protocol } from "$lib/types/device/base";
+import { MeterType } from "$lib/types/device/base";
+import type { DeviceMeter, EditableDeviceMeter, NewDeviceMeter, EditableCommunicationOptions, MeterOptions } from "$lib/types/device/base";
+import type { DeviceModbusRTUConfig, EditableDeviceModbusRTUConfig } from "$lib/types/device/modbusRtu";
+import type { DeviceOPCUAConfig, EditableDeviceOPCUAConfig } from "$lib/types/device/opcUa";
+import { defaultModbusRTUOptions } from "$lib/types/device/modbusRtu";
+import { defaultOPCUAOptions } from "$lib/types/device/opcUa";
+import { getInitialDeviceValidation } from "../validation/device/base";
 
 /**
  * Converts DeviceMeter to EditableDeviceMeter for form handling.

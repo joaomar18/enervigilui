@@ -1,8 +1,8 @@
 <script lang="ts">
-    import { navigateTo } from "$lib/ts/view/navigation";
-    import { getAllDevicesState } from "$lib/ts/api/device";
-    import { filterDevices } from "$lib/ts/util/device";
-    import { showToast } from "$lib/ts/view/toast";
+    import { navigateTo } from "$lib/logic/view/navigation";
+    import { getAllDevicesState } from "$lib/logic/api/device";
+    import { filterDevices } from "$lib/logic/util/device";
+    import { showToast } from "$lib/logic/view/toast";
     import { ToastType } from "$lib/stores/view/toast";
 
     // Texts
@@ -12,7 +12,7 @@
     import { loadedDone, searchQuery } from "$lib/stores/view/navigation";
 
     //Types
-    import type { DeviceMeter } from "$lib/stores/devices";
+    import type { DeviceMeter } from "$lib/types/device/base";
 
     import { onMount, onDestroy } from "svelte";
     import DeviceCard from "../../components/Devices/DeviceCard.svelte";

@@ -1,6 +1,7 @@
 import { derived } from "svelte/store";
 import { createLangStore, selectedLang } from "$lib/stores/lang/definition";
-import { defaultVariables, NodePhase } from "$lib/stores/nodes";
+import { defaultVariables } from "../device/variables";
+import { NodePhase } from "$lib/types/nodes/base";
 import type { TextsObject } from "$lib/stores/lang/definition";
 
 //////////     P R O T O C O L     T E X T S     //////////

@@ -1,14 +1,14 @@
 <script lang="ts">
     import { onMount, onDestroy } from "svelte";
-    import { getDeviceState, editDevice, deleteDevice } from "$lib/ts/api/device";
-    import { getDeviceNodesConfig } from "$lib/ts/api/nodes";
-    import { convertToEditableDevice, convertToDevice } from "$lib/ts/factory/device";
-    import { updateDeviceValidation, validDeviceOperation, areDevicesEqual } from "$lib/ts/validation/device";
-    import { convertToEditableNodes, convertToNodes } from "$lib/ts/factory/nodes";
-    import { updateNodesValidation, areNodesEqual } from "$lib/ts/validation/nodes";
-    import { changeNodeProtocol } from "$lib/ts/handlers/nodes";
-    import { getNodeIndex } from "$lib/ts/util/nodes";
-    import { nodeSections } from "$lib/stores/nodes";
+    import { getDeviceState, editDevice, deleteDevice } from "$lib/logic/api/device";
+    import { getDeviceNodesConfig } from "$lib/logic/api/nodes";
+    import { convertToEditableDevice, convertToDevice } from "$lib/logic/factory/device";
+    import { updateDeviceValidation, validDeviceOperation, areDevicesEqual } from "$lib/logic/validation/device/base";
+    import { convertToEditableNodes, convertToNodes } from "$lib/logic/factory/nodes";
+    import { updateNodesValidation, areNodesEqual } from "$lib/logic/validation/nodes/base";
+    import { changeNodeProtocol } from "$lib/logic/handlers/nodes";
+    import { getNodeIndex } from "$lib/logic/util/nodes";
+    import { nodeSections } from "$lib/types/nodes/base";
     import Selector from "../../../components/General/Selector.svelte";
     import HintInfo from "../../../components/General/HintInfo.svelte";
     import EditableText from "../../../components/General/EditableText.svelte";
@@ -21,20 +21,24 @@
     import OpcuaConfig from "../../../components/Devices/OPCUAConfig.svelte";
     import ModbusRtuConfig from "../../../components/Devices/ModbusRTUConfig.svelte";
     import MeterOptionsConfig from "../../../components/Devices/MeterOptionsConfig.svelte";
-    import { Protocol, defaultOPCUAOptions, defaultModbusRTUOptions } from "$lib/stores/devices";
-    import { showToast } from "$lib/ts/view/toast";
+    import { Protocol } from "$lib/types/device/base";
+    import { defaultOPCUAOptions } from "$lib/types/device/opcUa";
+    import { defaultModbusRTUOptions } from "$lib/types/device/modbusRtu";
+    import { showToast } from "$lib/logic/view/toast";
     import { ToastType } from "$lib/stores/view/toast";
 
     // Types
-    import type { DeviceMeter, EditableDeviceMeter, EditableDeviceOPCUAConfig, EditableDeviceModbusRTUConfig } from "$lib/stores/devices";
-    import type { DeviceNode, EditableDeviceNode, NodeEditState, NodePhase } from "$lib/stores/nodes";
+    import type { DeviceMeter, EditableDeviceMeter } from "$lib/types/device/base";
+    import type { EditableDeviceModbusRTUConfig } from "$lib/types/device/modbusRtu";
+    import type { EditableDeviceOPCUAConfig } from "$lib/types/device/opcUa";
+    import type { DeviceNode, EditableDeviceNode, NodeEditState, NodePhase } from "$lib/types/nodes/base";
 
     // Styles
     import { DangerInputFieldStyle } from "$lib/style/general";
     import { SubDefaultButtonStyle, PrimaryButtonStyle, SubPrimaryButtonStyle, DangerButtonStyle, SubDangerButtonStyle } from "$lib/style/button";
 
     // Navigation
-    import { navigateTo } from "$lib/ts/view/navigation";
+    import { navigateTo } from "$lib/logic/view/navigation";
 
     // Texts
     import { texts } from "$lib/stores/lang/generalTexts";

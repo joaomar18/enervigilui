@@ -3,19 +3,19 @@
     import InputField from "../../General/InputField.svelte";
     import Checkbox from "../../General/Checkbox.svelte";
     import Selector from "../../General/Selector.svelte";
-    import { Protocol } from "$lib/stores/devices";
+    import { Protocol } from "$lib/types/device/base";
     import ModalWindow from "../../General/ModalWindow.svelte";
-    import { nodeNameChange, nodeTypeChange, customNodeChange, virtualNodeChange } from "$lib/ts/handlers/nodes";
-    import { showToast } from "$lib/ts/view/toast";
+    import { nodeNameChange, nodeTypeChange, customNodeChange, virtualNodeChange } from "$lib/logic/handlers/nodes";
+    import { showToast } from "$lib/logic/view/toast";
     import { ToastType } from "$lib/stores/view/toast";
-    import { DECIMAL_PLACES_LIM, LOGGING_PERIOD_LIM, NodeType } from "$lib/stores/nodes";
+    import { NodeType, DECIMAL_PLACES_LIM, LOGGING_PERIOD_LIM } from "$lib/types/nodes/base";
 
     // Types
-    import type { EditableDeviceMeter, NewDeviceMeter } from "$lib/stores/devices";
-    import type { EditableDeviceNode, NodeEditState } from "$lib/stores/nodes";
+    import type { EditableDeviceMeter, NewDeviceMeter } from "$lib/types/device/base";
+    import type { EditableDeviceNode, NodeEditState } from "$lib/types/nodes/base";
 
     // Stores for variable definitions
-    import { defaultVariableUnits } from "$lib/stores/nodes";
+    import { defaultVariableUnits } from "$lib/stores/device/variables";
 
     // Texts
     import { texts } from "$lib/stores/lang/generalTexts";

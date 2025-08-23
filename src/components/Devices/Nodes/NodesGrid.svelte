@@ -2,18 +2,18 @@
     import NodeRow from "./NodeRow.svelte";
     import AddNode from "./AddNode.svelte";
     import { onMount, onDestroy } from "svelte";
-    import { addNode } from "$lib/ts/factory/nodes";
-    import { getNodeIndex } from "$lib/ts/util/nodes";
-    import { nodeSections } from "$lib/stores/nodes";
+    import { addNode } from "$lib/logic/factory/nodes";
+    import { getNodeIndex } from "$lib/logic/util/nodes";
+    import { nodeSections } from "$lib/types/nodes/base";
 
     // Stores for variable definitions
-    import { MeterType, Protocol } from "$lib/stores/devices";
-    import { NodePhase } from "$lib/stores/nodes";
+    import { MeterType, Protocol } from "$lib/types/device/base";
+    import { NodePhase } from "$lib/types/nodes/base";
 
     // Types
-    import type { EditableDeviceMeter, NewDeviceMeter } from "$lib/stores/devices";
-    import type { EditableDeviceNode, NodeEditState } from "$lib/stores/nodes";
-    import type { ColumnVisibilityMap } from "$lib/ts/view/nodes";
+    import type { EditableDeviceMeter, NewDeviceMeter } from "$lib/types/device/base";
+    import type { EditableDeviceNode, NodeEditState } from "$lib/types/nodes/base";
+    import type { ColumnVisibilityMap } from "$lib/logic/view/nodes";
 
     // Texts
     import { texts } from "$lib/stores/lang/generalTexts";

@@ -1,5 +1,5 @@
 <script lang="ts">
-    import { navigateTo } from "$lib/ts/view/navigation";
+    import { navigateTo } from "$lib/logic/view/navigation";
 
     import Link from "./Link.svelte";
     import LangSelector from "../General/LangSelector.svelte";

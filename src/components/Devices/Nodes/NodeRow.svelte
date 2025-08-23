@@ -4,16 +4,16 @@
     import Checkbox from "../../General/Checkbox.svelte";
     import Button from "../../General/Button.svelte";
     import ExpandableButton from "../../General/ExpandableButton.svelte";
-    import { nodeNameChange, nodeTypeChange, customNodeChange, virtualNodeChange } from "$lib/ts/handlers/nodes";
-    import { LOGGING_PERIOD_LIM, NodeType } from "$lib/stores/nodes";
-    import { defaultVariableUnits } from "$lib/stores/nodes";
-    import { showToast } from "$lib/ts/view/toast";
+    import { nodeNameChange, nodeTypeChange, customNodeChange, virtualNodeChange } from "$lib/logic/handlers/nodes";
+    import { NodeType, LOGGING_PERIOD_LIM } from "$lib/types/nodes/base";
+    import { defaultVariableUnits } from "$lib/stores/device/variables";
+    import { showToast } from "$lib/logic/view/toast";
     import { ToastType } from "$lib/stores/view/toast";
 
     // Types
-    import type { EditableDeviceMeter, NewDeviceMeter } from "$lib/stores/devices";
-    import type { EditableDeviceNode, NodeEditState } from "$lib/stores/nodes";
-    import type { ColumnVisibilityMap } from "$lib/ts/view/nodes";
+    import type { EditableDeviceMeter, NewDeviceMeter } from "$lib/types/device/base";
+    import type { EditableDeviceNode, NodeEditState } from "$lib/types/nodes/base";
+    import type { ColumnVisibilityMap } from "$lib/logic/view/nodes";
 
     // Texts
     import { texts } from "$lib/stores/lang/generalTexts";

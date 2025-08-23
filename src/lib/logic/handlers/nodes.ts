@@ -1,9 +1,11 @@
 import { get } from "svelte/store";
-import { Protocol } from "$lib/stores/devices";
-import { NodeType, NodePhase } from "$lib/stores/nodes";
-import { getNodePrefix, getInitialCommunicationID, getCommunicationID } from "$lib/ts/util/nodes";
-import { defaultVariables } from "$lib/stores/nodes";
-import type { NodeEditState, EditableDeviceNode, EditableNodeModbusRTUConfig, EditableNodeOPCUAConfig } from "$lib/stores/nodes";
+import { Protocol } from "$lib/types/device/base";
+import { NodeType, NodePhase } from "$lib/types/nodes/base";
+import { getNodePrefix, getInitialCommunicationID, getCommunicationID } from "../util/nodes";
+import { defaultVariables } from "$lib/stores/device/variables";
+import type { NodeEditState, EditableDeviceNode } from "$lib/types/nodes/base";
+import type { EditableNodeModbusRTUConfig } from "$lib/types/nodes/modbusRtu";
+import type { EditableNodeOPCUAConfig } from "$lib/types/nodes/opcUa";
 
 /**
  * Handles node name changes, updating prefix and unit.

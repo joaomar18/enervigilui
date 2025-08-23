@@ -7,7 +7,7 @@
 
     // Toast
     import { displayToast, toastKey, toastType, toastVariables } from "$lib/stores/view/toast";
-    import { closeToast } from "$lib/ts/view/toast";
+    import { closeToast } from "$lib/logic/view/toast";
 
     // Texts
     import { texts } from "$lib/stores/lang/generalTexts";
