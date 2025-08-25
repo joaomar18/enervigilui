@@ -1,3 +1,5 @@
+import type { ProtocolOptionsBase } from "./base";
+
 /*****     C O N S T A N T S     *****/
 
 // Modbus Limits
@@ -24,7 +26,7 @@ export const RETRIES_NUMBER_LIM: Record<string, number> = { MIN: 0, MAX: 5 };
  * @property {number} stopbits - Number of stop bits used to signal end of character (1 or 2)
  * @property {number} timeout - Maximum time in seconds to wait for device response
  */
-export interface DeviceModbusRTUConfig {
+export interface DeviceModbusRTUConfig extends ProtocolOptionsBase {
     baudrate: number;
     bytesize: number;
     parity: string;
@@ -54,7 +56,7 @@ export interface DeviceModbusRTUConfig {
  * @property {string} timeout - Maximum time in seconds to wait for device response as string
  * @property {boolean} valid - Indicates whether all communication options are valid
  */
-export interface EditableDeviceModbusRTUConfig {
+export interface EditableDeviceModbusRTUConfig extends ProtocolOptionsBase {
     baudrate: string;
     bytesize: string;
     parity: string;

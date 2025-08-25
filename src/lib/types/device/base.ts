@@ -31,6 +31,15 @@ export enum MeterType {
 /*****     I N T E R F A C E S     *****/
 
 /**
+ * Abstract base type for protocol-specific options.
+ * Extend this interface for each protocol to define its configuration shape.
+ */
+export interface ProtocolOptionsBase {
+    // Base Options Interface for Protocols
+}
+
+
+/**
  * Configuration interface for energy meter-specific operational options.
  * Defines boolean flags that control various measurement capabilities and
  * data acquisition behaviors of the energy monitoring device.
