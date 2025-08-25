@@ -1,10 +1,10 @@
+import { get } from "svelte/store";
 import { Protocol } from "$lib/types/device/base";
+import { protocolPlugins } from "$lib/stores/device/protocol";
 import { MeterType } from "$lib/types/device/base";
-import type { DeviceMeter, EditableDeviceMeter, NewDeviceMeter, EditableCommunicationOptions, MeterOptions } from "$lib/types/device/base";
+import type { DeviceMeter, EditableDeviceMeter, NewDeviceMeter, MeterOptions, EditableBaseCommunicationConfig, BaseCommunicationConfig } from "$lib/types/device/base";
 import type { DeviceModbusRTUConfig, EditableDeviceModbusRTUConfig } from "$lib/types/device/modbusRtu";
 import type { DeviceOPCUAConfig, EditableDeviceOPCUAConfig } from "$lib/types/device/opcUa";
-import { defaultModbusRTUOptions } from "$lib/types/device/modbusRtu";
-import { defaultOPCUAOptions } from "$lib/types/device/opcUa";
 import { getInitialDeviceValidation } from "../validation/device/base";
 
 /**
@@ -14,7 +14,7 @@ import { getInitialDeviceValidation } from "../validation/device/base";
  * @returns EditableDeviceMeter.
  */
 export function convertToEditableDevice(device: DeviceMeter, deviceImage: Record<string, string>): EditableDeviceMeter {
-    let editableCommunicationOptions: EditableCommunicationOptions;
+    let editableCommunicationOptions: EditableBaseCommunicationConfig;
 
     if (device.protocol === Protocol.OPC_UA) {
         const opcuaConfig = device.communication_options as DeviceOPCUAConfig;
@@ -25,7 +25,7 @@ export function convertToEditableDevice(device: DeviceMeter, deviceImage: Record
             timeout: opcuaConfig.timeout.toString(),
             url: opcuaConfig.url,
             valid: false,
-        };
+        } as EditableDeviceOPCUAConfig;
     } else if (device.protocol === Protocol.MODBUS_RTU) {
         const modbusConfig = device.communication_options as DeviceModbusRTUConfig;
         editableCommunicationOptions = {
@@ -39,7 +39,7 @@ export function convertToEditableDevice(device: DeviceMeter, deviceImage: Record
             stopbits: modbusConfig.stopbits.toString(),
             timeout: modbusConfig.timeout.toString(),
             valid: false,
-        };
+        } as EditableDeviceModbusRTUConfig;
     } else {
         throw new Error("Unsupported Protocol");
     }
@@ -64,7 +64,7 @@ export function convertToEditableDevice(device: DeviceMeter, deviceImage: Record
  * @returns DeviceMeter.
  */
 export function convertToDevice(device: EditableDeviceMeter | NewDeviceMeter): DeviceMeter {
-    let communicationOptions: DeviceOPCUAConfig | DeviceModbusRTUConfig;
+    let communicationOptions: BaseCommunicationConfig;
 
     if (device.protocol === Protocol.OPC_UA) {
         const editableConfig = device.communication_options as EditableDeviceOPCUAConfig;
@@ -126,12 +126,11 @@ export function convertToDevice(device: EditableDeviceMeter | NewDeviceMeter): D
  * @returns NewDeviceMeter.
  */
 export function createNewDevice(protocol: Protocol, meter_type: MeterType, meter_options: MeterOptions): NewDeviceMeter {
-    let communication_options;
+    let communication_options: EditableBaseCommunicationConfig;
+    let protocolPlugin = get(protocolPlugins)[protocol];
 
-    if (protocol === Protocol.MODBUS_RTU) {
-        communication_options = { ...defaultModbusRTUOptions };
-    } else if (protocol === Protocol.OPC_UA) {
-        communication_options = { ...defaultOPCUAOptions };
+    if (protocolPlugin) {
+        communication_options = { ...(protocolPlugin.defaultOptions) };
     } else {
         throw new Error("Unsupported Protocol");
     }

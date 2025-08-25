@@ -3,7 +3,7 @@
     import InputField from "../../General/InputField.svelte";
     import Checkbox from "../../General/Checkbox.svelte";
     import Selector from "../../General/Selector.svelte";
-    import { Protocol } from "$lib/types/device/base";
+    import { protocolPlugins } from "$lib/stores/device/protocol";
     import ModalWindow from "../../General/ModalWindow.svelte";
     import { nodeNameChange, nodeTypeChange, customNodeChange, virtualNodeChange } from "$lib/logic/handlers/nodes";
     import { showToast } from "$lib/logic/view/toast";
@@ -251,12 +251,8 @@ Displays contextual hints and supports multi-language labels for all fields. -->
         <div class="row">
             <span class="row-variable">
                 <span class="row-identifier">
-                    {#if deviceData.protocol === Protocol.OPC_UA}
-                        {$texts.opcuaID}
-                    {:else if deviceData.protocol === Protocol.MODBUS_RTU}
-                        {$texts.modbusRegister}
-                    {/if}</span
-                >
+                    {$texts[$protocolPlugins[deviceData.protocol].textKey]}
+                </span>
                 <span class="row-input">
                     <span class="row-entry">
                         <InputField
@@ -275,13 +271,7 @@ Displays contextual hints and supports multi-language labels for all fields. -->
                     <span class="row-hint">
                         <HintInfo hintWidth="250px">
                             <span class="info-text">
-                                {#if deviceData.protocol === Protocol.OPC_UA}
-                                    {$texts.nodespaceInfo}
-                                {:else if deviceData.protocol === Protocol.MODBUS_RTU}
-                                    {$texts.registerInfo}
-                                {:else}
-                                    {$texts.nocommInfo}
-                                {/if}
+                                {$texts[$protocolPlugins[deviceData.protocol].infoTextKey]}
                             </span>
                         </HintInfo>
                     </span>

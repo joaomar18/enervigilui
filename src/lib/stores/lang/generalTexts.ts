@@ -663,6 +663,14 @@ const textsObject: TextsObject = {
         PT: "Configuração",
         EN: "Configuration",
     },
+    noProtocol: {
+        PT: "Sem protocolo",
+        EN: "No protocol",
+    },
+    noProtocolInfo: {
+        PT: "Sem protocolo de comunicação selecionado.",
+        EN: "No communication protocol selected.",
+    },
 };
 
 export const texts = createLangStore(textsObject);

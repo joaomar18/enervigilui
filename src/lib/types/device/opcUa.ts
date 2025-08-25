@@ -1,4 +1,4 @@
-import type { ProtocolOptionsBase } from "./base";
+import type { BaseCommunicationConfig, EditableBaseCommunicationConfig } from "./base";
 
 /*****     C O N S T A N T S     *****/
 
@@ -18,7 +18,7 @@ import type { ProtocolOptionsBase } from "./base";
  * @property {number} timeout - Maximum time in seconds to wait for server response before considering request failed
  * @property {string} url - OPC UA server endpoint URL (e.g., "opc.tcp://192.168.1.100:4840")
  */
-export interface DeviceOPCUAConfig extends ProtocolOptionsBase {
+export interface DeviceOPCUAConfig extends BaseCommunicationConfig {
     username: string | null;
     password: string | null;
     read_period: number;
@@ -40,7 +40,7 @@ export interface DeviceOPCUAConfig extends ProtocolOptionsBase {
  * @property {string} url - OPC UA server endpoint URL (e.g., "opc.tcp://192.168.1.100:4840")
  * @property {boolean} valid - Validation flag indicating if configuration is complete and valid
  */
-export interface EditableDeviceOPCUAConfig extends ProtocolOptionsBase {
+export interface EditableDeviceOPCUAConfig extends EditableBaseCommunicationConfig {
     username: string;
     password: string;
     read_period: string;

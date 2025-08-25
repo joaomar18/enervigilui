@@ -22,8 +22,7 @@
     import ModbusRtuConfig from "../../../components/Devices/ModbusRTUConfig.svelte";
     import MeterOptionsConfig from "../../../components/Devices/MeterOptionsConfig.svelte";
     import { Protocol } from "$lib/types/device/base";
-    import { defaultOPCUAOptions } from "$lib/types/device/opcUa";
-    import { defaultModbusRTUOptions } from "$lib/types/device/modbusRtu";
+    import { protocolPlugins } from "$lib/stores/device/protocol";
     import { showToast } from "$lib/logic/view/toast";
     import { ToastType } from "$lib/stores/view/toast";
 
@@ -290,11 +289,8 @@ Shows input forms for protocol-specific parameters and organizes device nodes fo
                             inputInvalid={!deviceData.validation.deviceProtocol}
                             enableInputInvalid={true}
                             onChange={() => {
-                                if (deviceData.protocol === Protocol.OPC_UA) {
-                                    deviceData.communication_options = defaultOPCUAOptions;
-                                } else if (deviceData.protocol === Protocol.MODBUS_RTU) {
-                                    deviceData.communication_options = defaultModbusRTUOptions;
-                                }
+                                let newDefaultOptions = { ...$protocolPlugins[deviceData.protocol].defaultOptions };
+                                deviceData.communication_options = newDefaultOptions;
                                 for (let node of nodes) {
                                     if (deviceData.protocol !== node.protocol && !node.config.calculated) {
                                         changeNodeProtocol(deviceData.protocol, node);

@@ -5,9 +5,10 @@
     import { addNode } from "$lib/logic/factory/nodes";
     import { getNodeIndex } from "$lib/logic/util/nodes";
     import { nodeSections } from "$lib/types/nodes/base";
+    import { protocolPlugins } from "$lib/stores/device/protocol";
 
     // Stores for variable definitions
-    import { MeterType, Protocol } from "$lib/types/device/base";
+    import { MeterType } from "$lib/types/device/base";
     import { NodePhase } from "$lib/types/nodes/base";
 
     // Types
@@ -155,11 +156,9 @@ Includes multi-language headers and adapts layout to container size. -->
                         <th class="min-width">{$texts.unit}</th>
                     {/if}
                     {#if columnVisibility.communicationID.visible}
-                        {#if deviceData.protocol === Protocol.OPC_UA}
-                            <th class="mid-width">{$texts.opcuaID}</th>
-                        {:else if deviceData.protocol === Protocol.MODBUS_RTU}
-                            <th class="mid-width">{$texts.modbusRegister}</th>
-                        {/if}
+                        <th class="mid-width">
+                            {$texts[$protocolPlugins[deviceData.protocol].textKey]}
+                        </th>
                     {/if}
                     {#if columnVisibility.type.visible}
                         <th class="mid-width">{$texts.type}</th>

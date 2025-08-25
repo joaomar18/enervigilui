@@ -1,5 +1,4 @@
-import type { DeviceOPCUAConfig, EditableDeviceOPCUAConfig } from "./opcUa";
-import type { DeviceModbusRTUConfig, EditableDeviceModbusRTUConfig } from "./modbusRtu";
+import type { SvelteComponent } from "svelte";
 
 /*****     C O N S T A N T S     *****/
 
@@ -31,13 +30,18 @@ export enum MeterType {
 /*****     I N T E R F A C E S     *****/
 
 /**
- * Abstract base type for protocol-specific options.
- * Extend this interface for each protocol to define its configuration shape.
+ * Base interface for protocol-specific communication configuration objects.
+ * Extend for each protocol to define its configuration shape.
  */
-export interface ProtocolOptionsBase {
-    // Base Options Interface for Protocols
-}
+export interface BaseCommunicationConfig {}
 
+/**
+ * Base interface for editable protocol configuration objects in forms and UI.
+ * Extend for each protocol to define its editable config shape. The 'valid' property indicates validation status.
+ */
+export interface EditableBaseCommunicationConfig {
+    valid: boolean;
+}
 
 /**
  * Configuration interface for energy meter-specific operational options.
@@ -79,7 +83,7 @@ export interface DeviceMeter {
     protocol: Protocol;
     type: MeterType;
     options: MeterOptions;
-    communication_options: CommunicationOptions;
+    communication_options: BaseCommunicationConfig;
 }
 
 /**
@@ -95,7 +99,7 @@ export interface DeviceMeter {
  * @property {Protocol} protocol - Communication protocol used by this device (MODBUS_RTU, OPC_UA, or NONE)
  * @property {MeterType} type - Electrical connection type (SINGLE_PHASE or THREE_PHASE)
  * @property {MeterOptions} options - Operational settings controlling measurement capabilities and data acquisition
- * @property {EditableCommunicationOptions} communication_options - Protocol-specific communication parameters and settings (as strings for form input)
+ * @property {EditableBaseCommunicationConfig} communication_options - Protocol-specific communication parameters and settings (as strings for form input)
  * @property {File | undefined} device_image - Optional image file for the device (for visual identification in UI)
  * @property {string | undefined} current_image_url - Optional URL of the device's current image (for displaying existing images in forms)
  * @property {DeviceValidation} validation - Validation state for all device configuration properties
@@ -107,7 +111,7 @@ export interface EditableDeviceMeter {
     protocol: Protocol;
     type: MeterType;
     options: MeterOptions;
-    communication_options: EditableCommunicationOptions;
+    communication_options: EditableBaseCommunicationConfig;
     device_image: File | undefined;
     current_image_url: string | undefined;
     validation: DeviceValidation;
@@ -122,7 +126,7 @@ export interface EditableDeviceMeter {
  * @property {Protocol} protocol - Communication protocol used by this device (MODBUS_RTU, OPC_UA, or NONE)
  * @property {MeterType} type - Electrical connection type (SINGLE_PHASE or THREE_PHASE)
  * @property {MeterOptions} options - Operational settings controlling measurement capabilities and data acquisition
- * @property {EditableCommunicationOptions} communication_options - Protocol-specific communication parameters and settings (as strings for form input)
+ * @property {EditableBaseCommunicationConfig} communication_options - Protocol-specific communication parameters and settings (as strings for form input)
  * @property {File | undefined} device_image - Optional image file for the device (for visual identification in UI)
  * @property {string | undefined} current_image_url - Optional URL of the device's current image (for displaying existing images in forms)
  * @property {DeviceValidation} validation - Validation state for all device configuration properties
@@ -132,7 +136,7 @@ export interface NewDeviceMeter {
     protocol: Protocol;
     type: MeterType;
     options: MeterOptions;
-    communication_options: EditableCommunicationOptions;
+    communication_options: EditableBaseCommunicationConfig;
     device_image: File | undefined;
     current_image_url: string | undefined;
     validation: DeviceValidation;
@@ -161,16 +165,6 @@ export interface DeviceValidation {
 }
 
 /*****     T Y P E S     *****/
-
-/**
- * Communication config for either OPC UA or Modbus RTU.
- */
-export type CommunicationOptions = DeviceOPCUAConfig | DeviceModbusRTUConfig;
-
-/**
- * Editable communication config for OPC UA or Modbus RTU (form input).
- */
-export type EditableCommunicationOptions = EditableDeviceOPCUAConfig | EditableDeviceModbusRTUConfig;
 
 /*****     O B J E C T S     *****/
 

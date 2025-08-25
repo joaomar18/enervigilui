@@ -20,8 +20,7 @@
     import ModbusRtuConfig from "../../../components/Devices/ModbusRTUConfig.svelte";
     import MeterOptionsConfig from "../../../components/Devices/MeterOptionsConfig.svelte";
     import { Protocol, defaultDeviceOptions } from "$lib/types/device/base";
-    import { defaultModbusRTUOptions } from "$lib/types/device/modbusRtu";
-    import { defaultOPCUAOptions } from "$lib/types/device/opcUa";
+    import { protocolPlugins } from "$lib/stores/device/protocol";
     import { showToast } from "$lib/logic/view/toast";
     import { ToastType } from "$lib/stores/view/toast";
 
@@ -44,6 +43,7 @@
 
     // Stores for authorization
     import { loadedDone } from "$lib/stores/view/navigation";
+    import { dev } from "$app/environment";
 
     // Variables
     let showAddWindow: boolean = false; // Show Add Device Window
@@ -195,11 +195,8 @@ Shows input forms for protocol-specific parameters and organizes device nodes fo
                             inputInvalid={!deviceData.validation.deviceProtocol}
                             enableInputInvalid={true}
                             onChange={() => {
-                                if (deviceData.protocol === Protocol.OPC_UA) {
-                                    deviceData.communication_options = defaultOPCUAOptions;
-                                } else if (deviceData.protocol === Protocol.MODBUS_RTU) {
-                                    deviceData.communication_options = defaultModbusRTUOptions;
-                                }
+                                let newDefaultOptions = { ...$protocolPlugins[deviceData.protocol].defaultOptions };
+                                deviceData.communication_options = newDefaultOptions;
                                 for (let node of nodes) {
                                     if (deviceData.protocol !== node.protocol && !node.config.calculated) {
                                         changeNodeProtocol(deviceData.protocol, node);
@@ -218,9 +215,9 @@ Shows input forms for protocol-specific parameters and organizes device nodes fo
                 </div>
 
                 {#if opcuaConfig}
-                    <OpcuaConfig bind:opcuaConfig />
+                    <OpcuaConfig bind:opcuaConfig={deviceData.communication_options as EditableDeviceOPCUAConfig} />
                 {:else if modbusRTUConfig}
-                    <ModbusRtuConfig bind:modbusRTUConfig />
+                    <ModbusRtuConfig bind:modbusRTUConfig={deviceData.communication_options as EditableDeviceModbusRTUConfig} />
                 {/if}
             </div>
             <div class="device-section-div">
