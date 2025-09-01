@@ -15,17 +15,17 @@ const AddDeviceStyleConfig: ComponentStyles = {
         imageContainerHeight: "200px",
         imageContainerBorderRadius: "50%",
         imageWidth: "auto",
-        imageHeight: "87.5%",
+        imageHeight: "100%",
         strokeColor: "#9E9E9E",
         strokeSelectedColor: "#e0e0e0",
         shadowColor: "rgba(0, 0, 0, 0.1)",
         titleColor: "#f5f5f5",
-    }
-}
+    },
+};
 
 export const AddDeviceStyle = createStyleStore(AddDeviceStyleConfig);
 
-//////////     A D D     D E V I C E     //////////
+//////////     D E V I C E     C A R D     //////////
 
 const DeviceCardStyleConfig: ComponentStyles = {
     dark: {
@@ -39,16 +39,15 @@ const DeviceCardStyleConfig: ComponentStyles = {
         imageContainerHeight: "200px",
         imageContainerBorderRadius: "50%",
         imageWidth: "auto",
-        imageHeight: "87.5%",
+        imageHeight: "100%",
         textColor: "#e0e0e0",
         imageHoverBackgroundColor: "rgba(50, 50, 50, 0.4)",
         shadowColor: "rgba(0, 0, 0, 0.1)",
         titleColor: "#f5f5f5",
-    }
-}
+    },
+};
 
 export const DeviceCardStyle = createStyleStore(DeviceCardStyleConfig);
-
 
 //////////     D E V I C E     A C T I O N     //////////
 
@@ -62,11 +61,10 @@ const DeviceActionStyleConfig: ComponentStyles = {
         hoverColor: "rgba(255, 255, 255, 0.2)",
         imageWidth: "25px",
         imageHeight: "25px",
-    }
-}
+    },
+};
 
 export const DeviceActionStyle = createStyleStore(DeviceActionStyleConfig);
-
 
 //////////     D E V I C E     N O T I F I C A T I O N     //////////
 
@@ -82,7 +80,7 @@ const DeviceNotificationStyleConfig: ComponentStyles = {
         imageHeight: "25px",
         numberBackgroundColor: "#e53935",
         numberTextColor: "#eee",
-    }
-}
+    },
+};
 
 export const DeviceNotificationStyle = createStyleStore(DeviceNotificationStyleConfig);

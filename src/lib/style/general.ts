@@ -301,7 +301,7 @@ const UploadImageStyleConfig: ComponentStyles = {
         height: "200px",
         borderRadius: "50%",
         imageWidth: "auto",
-        imageHeight: "87.5%",
+        imageHeight: "100%",
         backgroundColor: "rgba(255, 255, 255, 0.1)",
         hoverColor: "rgba(255, 255, 255, 0.13)",
     },
