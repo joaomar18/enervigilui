@@ -110,6 +110,34 @@ export function getEditableBaseNodeConfigFromDefaultVar(variable: DefaultNodeInf
 }
 
 /**
+ * Processes and normalizes a BaseNodeConfig object, ensuring correct types and nulls for non-numeric fields.
+ * Used to sanitize initial node config data before further conversion or use.
+ * @param config - The base node configuration to process.
+ * @returns A normalized BaseNodeConfig object.
+ */
+export function processInitialBaseNodeConfig(config: BaseNodeConfig): BaseNodeConfig {
+    let numericType = config.type === NodeType.FLOAT || config.type === NodeType.INT;
+    return {
+        calculate_increment: numericType ? config.calculate_increment : null,
+        calculated: config.calculated,
+        custom: config.custom,
+        decimal_places: stringIsValidInteger(String(config.decimal_places)) ? config.decimal_places : null,
+        enabled: config.enabled,
+        incremental_node: numericType ? config.incremental_node : null,
+        logging: config.logging,
+        logging_period: config.logging_period,
+        max_alarm: config.max_alarm,
+        max_alarm_value: stringIsValidFloat(String(config.max_alarm_value)) ? config.max_alarm_value : null,
+        min_alarm: config.min_alarm,
+        min_alarm_value: stringIsValidFloat(String(config.min_alarm_value)) ? config.min_alarm_value : null,
+        positive_incremental: numericType ? config.positive_incremental : null,
+        publish: config.publish,
+        type: config.type,
+        unit: numericType ? config.unit : null,
+    } as BaseNodeConfig;
+}
+
+/**
  * Converts DeviceNode[] to EditableDeviceNode[] for UI forms.
  * @param nodes - DeviceNode array.
  * @param meter_type - Meter type.
@@ -156,6 +184,32 @@ export function convertToNodes(nodes: Array<EditableDeviceNode>): Array<DeviceNo
             name: editableNode.name,
             device_id: editableNode.device_id,
             protocol: editableNode.protocol,
+            config: nodeConfig,
+        };
+
+        deviceNodes.push(deviceNode);
+    }
+
+    return sortNodesByName(deviceNodes) as Array<DeviceNode>;
+}
+
+/**
+ * Processes and normalizes an array of DeviceNode objects using protocol-specific logic.
+ * Used to sanitize initial node data before further conversion or use.
+ * @param nodes - Array of DeviceNode objects to process.
+ * @returns Array of normalized DeviceNode objects.
+ */
+export function processInitialNodes(nodes: Array<DeviceNode>): Array<DeviceNode> {
+    const deviceNodes: Array<DeviceNode> = [];
+
+    for (const node of nodes) {
+        let plugin = get(protocolPlugins)[node.protocol];
+        let nodeConfig: BaseNodeConfig = plugin.processInitialNodeConfig(node.config);
+
+        const deviceNode: DeviceNode = {
+            name: node.name,
+            device_id: node.device_id,
+            protocol: node.protocol,
             config: nodeConfig,
         };
 

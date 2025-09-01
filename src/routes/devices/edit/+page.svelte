@@ -2,9 +2,9 @@
     import { onMount, onDestroy } from "svelte";
     import { getDeviceState, editDevice, deleteDevice } from "$lib/logic/api/device";
     import { getDeviceNodesConfig } from "$lib/logic/api/nodes";
-    import { convertToEditableDevice, convertToDevice } from "$lib/logic/factory/device";
+    import { convertToEditableDevice, convertToDevice, processInitialDevice } from "$lib/logic/factory/device";
     import { updateDeviceValidation, validDeviceOperation, areDevicesEqual } from "$lib/logic/validation/device/base";
-    import { convertToEditableNodes, convertToNodes } from "$lib/logic/factory/nodes";
+    import { convertToEditableNodes, convertToNodes, processInitialNodes } from "$lib/logic/factory/nodes";
     import { updateNodesValidation, areNodesEqual } from "$lib/logic/validation/nodes/base";
     import { changeNodeProtocol } from "$lib/logic/handlers/nodes";
     import { getNodeIndex } from "$lib/logic/util/nodes";
@@ -102,7 +102,7 @@
                     });
                 } else {
                     const { image: deviceImage, ...requestDeviceData } = data as DeviceMeter & { image: Record<string, string> };
-                    initialDeviceData = requestDeviceData as DeviceMeter;
+                    initialDeviceData = processInitialDevice(requestDeviceData as DeviceMeter);
                     deviceData = convertToEditableDevice(initialDeviceData, deviceImage);
                     sucess = true;
                 }
@@ -132,7 +132,7 @@
                     });
                 } else {
                     let requestDeviceNodes: Record<string, DeviceNode> = data;
-                    initialNodes = Object.values(requestDeviceNodes) as Array<DeviceNode>;
+                    initialNodes = processInitialNodes(Object.values(requestDeviceNodes) as Array<DeviceNode>);
                     sucess = true;
                 }
             } catch (e) {

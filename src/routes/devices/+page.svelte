@@ -1,5 +1,6 @@
 <script lang="ts">
     import { navigateTo } from "$lib/logic/view/navigation";
+    import { processInitialDevice } from "$lib/logic/factory/device";
     import { getAllDevicesState } from "$lib/logic/api/device";
     import { filterDevices } from "$lib/logic/util/device";
     import { showToast } from "$lib/logic/view/toast";
@@ -38,7 +39,7 @@
                 } else {
                     devices = data.map((data: DeviceMeter & { image: Record<string, string> }) => {
                         const { image: deviceImage, ...requestDeviceData } = data as DeviceMeter & { image: Record<string, string> };
-                        let deviceData: DeviceMeter = requestDeviceData as DeviceMeter;
+                        let deviceData: DeviceMeter = processInitialDevice(requestDeviceData as DeviceMeter);
                         devicesImg[deviceData.id] = `data:${deviceImage["type"]};base64,${deviceImage["data"]}`;
                         return deviceData;
                     });

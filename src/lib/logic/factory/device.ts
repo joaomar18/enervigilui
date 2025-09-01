@@ -70,6 +70,37 @@ export function convertToDevice(device: EditableDeviceMeter | NewDeviceMeter): D
 }
 
 /**
+ * Processes initial data for a device, normalizing it into a DeviceMeter object for backend/API use.
+ * Handles both DeviceMeter and NewDeviceMeter types.
+ * @param device Initial device data object.
+ * @returns Normalized DeviceMeter object.
+ */
+export function processInitialDevice(device: DeviceMeter | NewDeviceMeter): DeviceMeter {
+    const baseDevice = {
+        name: device.name,
+        protocol: device.protocol,
+        type: device.type,
+        options: device.options,
+        communication_options: device.communication_options,
+    };
+
+    // Handle different device types - EditableDeviceMeter has id and connected, NewDeviceMeter doesn't
+    if ("id" in device) {
+        return {
+            ...baseDevice,
+            connected: device.connected,
+            id: device.id,
+        } as DeviceMeter;
+    } else {
+        return {
+            ...baseDevice,
+            connected: false,
+            id: 0,
+        } as DeviceMeter;
+    }
+}
+
+/**
  * Creates a new device meter object with protocol defaults.
  * @param protocol - Device protocol.
  * @param meter_type - Meter type.

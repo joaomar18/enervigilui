@@ -12,7 +12,12 @@ import { defaultBaseNodeConfig } from "$lib/types/nodes/base";
 import ModbusRtuConfig from "../../../components/Devices/ModbusRTUConfig.svelte";
 import OpcuaConfig from "../../../components/Devices/OPCUAConfig.svelte";
 import type { BaseNodeConfig, DefaultNodeInfo, EditableBaseNodeConfig, EditableDeviceNode } from "$lib/types/nodes/base";
-import { convertToBaseNodeConfig, convertToEditableBaseNodeConfig, getEditableBaseNodeConfigFromDefaultVar } from "$lib/logic/factory/nodes";
+import {
+    convertToBaseNodeConfig,
+    convertToEditableBaseNodeConfig,
+    processInitialBaseNodeConfig,
+    getEditableBaseNodeConfigFromDefaultVar,
+} from "$lib/logic/factory/nodes";
 import { validateModbusRegister } from "$lib/logic/validation/nodes/modbusRtu";
 import { validateOpcUaNodeId } from "$lib/logic/validation/nodes/opcUa";
 
@@ -26,6 +31,7 @@ export interface ProtocolPlugin {
     convertCommOptionsToNormal: (editableCommunicationOptions: EditableBaseCommunicationConfig) => BaseCommunicationConfig;
     convertNodeConfigToEditable: (configuration: BaseNodeConfig) => EditableBaseNodeConfig;
     convertNodeConfigToNormal: (editableConfiguration: EditableBaseNodeConfig) => BaseNodeConfig;
+    processInitialNodeConfig: (configuration: BaseNodeConfig) => BaseNodeConfig;
     createNodeConfigFromDefaultVar: (variable: DefaultNodeInfo, options: MeterOptions) => EditableBaseNodeConfig;
     createNewEditableNodeConfig: () => EditableBaseNodeConfig;
     getCommID: (config: BaseNodeConfig | EditableBaseNodeConfig, noFormat: boolean) => string;
@@ -52,6 +58,9 @@ const noProtocolPlugin: ProtocolPlugin = {
     },
     convertNodeConfigToNormal: (editableConfiguration) => {
         return convertToBaseNodeConfig(editableConfiguration);
+    },
+    processInitialNodeConfig: (configuration) => {
+        return processInitialBaseNodeConfig(configuration);
     },
     createNodeConfigFromDefaultVar(variable, options) {
         return getEditableBaseNodeConfigFromDefaultVar(variable, options);
@@ -124,6 +133,13 @@ const modbusRtuPlugin: ProtocolPlugin = {
             register: parseInt((editableConfiguration as EditableNodeModbusRTUConfig).register),
         } as NodeModbusRTUConfig;
     },
+    processInitialNodeConfig: (configuration) => {
+        let baseConfig = processInitialBaseNodeConfig(configuration);
+        return {
+            ...baseConfig,
+            register: (configuration as NodeModbusRTUConfig).register,
+        } as NodeModbusRTUConfig;
+    },
     createNodeConfigFromDefaultVar(variable, options) {
         let editableBaseConfig = getEditableBaseNodeConfigFromDefaultVar(variable, options);
         return {
@@ -194,6 +210,13 @@ const opcUaPlugin: ProtocolPlugin = {
         return {
             ...baseConfig,
             node_id: (editableConfiguration as EditableNodeOPCUAConfig).node_id,
+        } as NodeOPCUAConfig;
+    },
+    processInitialNodeConfig: (configuration) => {
+        let baseConfig = processInitialBaseNodeConfig(configuration);
+        return {
+            ...baseConfig,
+            node_id: (configuration as NodeOPCUAConfig).node_id,
         } as NodeOPCUAConfig;
     },
     createNodeConfigFromDefaultVar(variable, options) {
