@@ -5,7 +5,7 @@
     import Selector from "../../General/Selector.svelte";
     import { protocolPlugins } from "$lib/stores/device/protocol";
     import ModalWindow from "../../General/ModalWindow.svelte";
-    import { nodeNameChange, nodeTypeChange, customNodeChange, virtualNodeChange } from "$lib/logic/handlers/nodes";
+    import { nodeNameChange, communicationIDChange, nodeTypeChange, customNodeChange, virtualNodeChange } from "$lib/logic/handlers/nodes";
     import { showToast } from "$lib/logic/view/toast";
     import { ToastType } from "$lib/stores/view/toast";
     import { NodeType, DECIMAL_PLACES_LIM, LOGGING_PERIOD_LIM } from "$lib/types/nodes/base";
@@ -261,6 +261,7 @@ Displays contextual hints and supports multi-language labels for all fields. -->
                             disabled={node.config.calculated}
                             bind:inputValue={node.communication_id}
                             onChange={() => {
+                                communicationIDChange(node);
                                 onPropertyChanged();
                             }}
                             inputInvalid={!node.validation.communicationID}

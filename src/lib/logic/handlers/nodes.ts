@@ -22,6 +22,18 @@ export function nodeNameChange(node: EditableDeviceNode, phase: NodePhase): void
 }
 
 /**
+ * Updates the communication ID of a node using the protocol plugin's logic.
+ * @param node - The editable device node to update.
+ */
+export function communicationIDChange(node: EditableDeviceNode): void {
+    if (node.protocol === Protocol.NONE) {
+        return;
+    }
+    let plugin = get(protocolPlugins)[node.protocol];
+    plugin.setCommID(node);
+}
+
+/**
  * Updates unit when node type changes.
  * @param node Node to update
  * @param nodeState Previous edit state

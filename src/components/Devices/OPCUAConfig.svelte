@@ -99,32 +99,34 @@
 </div>
 <div class="optional-div">
     <span class="optional-text">{$texts.authenticationOptional}</span>
-    <div class="device-input-div">
-        <span>{$texts.username}</span>
-        <div class="input-div">
-            <div class="input-content-div">
-                <InputField bind:inputValue={configuration.username} />
-            </div>
-            <div class="info-div">
-                <HintInfo>
-                    <span class="info-text">{$texts.commUsernameInfo}</span>
-                </HintInfo>
-            </div>
-        </div>
-    </div>
-    <div class="device-input-div">
-        <span>{$texts.password}</span>
-        <div class="input-div">
-            <div class="input-content-div">
-                <InputField bind:inputValue={configuration.password} inputType="PASSWORD" />
-            </div>
-            <div class="info-div">
-                <HintInfo>
-                    <span class="info-text">{$texts.commPasswordInfo}</span>
-                </HintInfo>
+    <form on:submit|preventDefault>
+        <div class="device-input-div">
+            <span>{$texts.username}</span>
+            <div class="input-div">
+                <div class="input-content-div">
+                    <InputField bind:inputValue={configuration.username} inputType="USERNAME" />
+                </div>
+                <div class="info-div">
+                    <HintInfo>
+                        <span class="info-text">{$texts.commUsernameInfo}</span>
+                    </HintInfo>
+                </div>
             </div>
         </div>
-    </div>
+        <div class="device-input-div">
+            <span>{$texts.password}</span>
+            <div class="input-div">
+                <div class="input-content-div">
+                    <InputField bind:inputValue={configuration.password} inputType="PASSWORD" />
+                </div>
+                <div class="info-div">
+                    <HintInfo>
+                        <span class="info-text">{$texts.commPasswordInfo}</span>
+                    </HintInfo>
+                </div>
+            </div>
+        </div>
+    </form>
 </div>
 
 <style>

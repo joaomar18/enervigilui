@@ -106,28 +106,30 @@
     "
 >
     <h3>{$texts.title}</h3>
-    <LoginField
-        id="username"
-        paddingTop="10px"
-        imageUrl="/img/user.png"
-        fieldText={$texts.username}
-        type="text"
-        bind:value={username}
-        incorrect={usernameIncorrect}
-        incorrectText={usernameErrorText}
-        hintText={$texts.userInfo}
-    />
-    <LoginField
-        id="password"
-        paddingTop="30px"
-        imageUrl="/img/password.png"
-        fieldText={$texts.password}
-        type="password"
-        bind:value={password}
-        incorrect={passwordIncorrect}
-        incorrectText={passwordErrorText}
-        hintText={$texts.passwordInfo}
-    />
+    <form on:submit|preventDefault>
+        <LoginField
+            id="username"
+            paddingTop="10px"
+            imageUrl="/img/user.png"
+            fieldText={$texts.username}
+            type="text"
+            bind:value={username}
+            incorrect={usernameIncorrect}
+            incorrectText={usernameErrorText}
+            hintText={$texts.userInfo}
+        />
+        <LoginField
+            id="password"
+            paddingTop="30px"
+            imageUrl="/img/password.png"
+            fieldText={$texts.password}
+            type="password"
+            bind:value={password}
+            incorrect={passwordIncorrect}
+            incorrectText={passwordErrorText}
+            hintText={$texts.passwordInfo}
+        />
+    </form>
     <div class="checkbox-div">
         <Checkbox bind:checked={autoLogin} inputName="auto-login" enabledBackgroundColor="#4caf7f" marginRight="10px" />
         <span class="keep-logged-in-text">{$texts.keepSessionLogged}</span>
@@ -167,6 +169,14 @@
         color: var(--title-color);
         font-weight: var(--title-weight);
         font-size: 1.5rem;
+    }
+
+    /* Login fields form */
+    form {
+        margin: 0;
+        padding: 0;
+        width: 100%;
+        height: fit-content;
     }
 
     /* Wrapper for the "Keep me logged in" checkbox and label */

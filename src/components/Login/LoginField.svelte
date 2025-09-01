@@ -70,7 +70,13 @@
         />
         {#if type === "password"}
             {#if !showPassword}
-                <input type="password" {id} style="padding-right:50px; {incorrect ? 'border: 2px solid #D72638' : ''}" bind:value />
+                <input
+                    type="password"
+                    {id}
+                    autocomplete="current-password"
+                    style="padding-right:50px; {incorrect ? 'border: 2px solid #D72638' : ''}"
+                    bind:value
+                />
             {:else}
                 <input
                     type="text"
@@ -81,7 +87,7 @@
                 />
             {/if}
         {:else}
-            <input type="text" {id} autocomplete={id} bind:value style={incorrect ? "border: 2px solid #D72638" : ""} />
+            <input type="text" {id} autocomplete="username" bind:value style={incorrect ? "border: 2px solid #D72638" : ""} />
         {/if}
         {#if type === "password"}
             <div class="show-hide-div" style="width:{mergedStyle.imageWidth}; height:{mergedStyle.imageHeight};">

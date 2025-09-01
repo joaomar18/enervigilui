@@ -4,7 +4,7 @@
     import Checkbox from "../../General/Checkbox.svelte";
     import Button from "../../General/Button.svelte";
     import ExpandableButton from "../../General/ExpandableButton.svelte";
-    import { nodeNameChange, nodeTypeChange, customNodeChange, virtualNodeChange } from "$lib/logic/handlers/nodes";
+    import { nodeNameChange, nodeTypeChange, customNodeChange, virtualNodeChange, communicationIDChange } from "$lib/logic/handlers/nodes";
     import { NodeType, LOGGING_PERIOD_LIM } from "$lib/types/nodes/base";
     import { defaultVariableUnits } from "$lib/stores/device/variables";
     import { showToast } from "$lib/logic/view/toast";
@@ -183,6 +183,7 @@ properties and action buttons for configuration and deletion. -->
                     disabled={node.config.calculated}
                     bind:inputValue={node.communication_id}
                     onChange={() => {
+                        communicationIDChange(node);
                         onPropertyChanged();
                     }}
                     inputInvalid={!node.validation.communicationID}

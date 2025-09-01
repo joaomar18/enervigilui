@@ -30,6 +30,7 @@ export interface ProtocolPlugin {
     createNewEditableNodeConfig: () => EditableBaseNodeConfig;
     getCommID: (config: BaseNodeConfig | EditableBaseNodeConfig, noFormat: boolean) => string;
     validateCommID: (communicationID: string) => boolean;
+    setCommID: (node: EditableDeviceNode) => void;
     setCommIDToDefault: (node: EditableDeviceNode) => void;
 }
 
@@ -63,6 +64,9 @@ const noProtocolPlugin: ProtocolPlugin = {
     },
     validateCommID(communicationID) {
         return communicationID.length === 0;
+    },
+    setCommID(node) {
+        throw new Error("Unsupported Protocol");
     },
     setCommIDToDefault(node) {
         throw new Error("Unsupported Protocol");
@@ -117,7 +121,7 @@ const modbusRtuPlugin: ProtocolPlugin = {
         let baseConfig = convertToBaseNodeConfig(editableConfiguration);
         return {
             ...baseConfig,
-            register: parseInt((editableConfiguration as EditableNodeModbusRTUConfig).register.replace("0x", ""), 16),
+            register: parseInt((editableConfiguration as EditableNodeModbusRTUConfig).register),
         } as NodeModbusRTUConfig;
     },
     createNodeConfigFromDefaultVar(variable, options) {
@@ -140,6 +144,9 @@ const modbusRtuPlugin: ProtocolPlugin = {
     },
     validateCommID(communicationID) {
         return validateModbusRegister(communicationID);
+    },
+    setCommID(node) {
+        (node.config as EditableNodeModbusRTUConfig).register = String(parseInt(node.communication_id.replace("0x", ""), 16));
     },
     setCommIDToDefault(node) {
         (node.config as EditableNodeModbusRTUConfig).register = this.defaultCommID ?? "";
@@ -208,6 +215,9 @@ const opcUaPlugin: ProtocolPlugin = {
     },
     validateCommID(communicationID) {
         return validateOpcUaNodeId(communicationID);
+    },
+    setCommID(node) {
+        (node.config as EditableNodeOPCUAConfig).node_id = node.communication_id;
     },
     setCommIDToDefault(node) {
         (node.config as EditableNodeOPCUAConfig).node_id = this.defaultCommID ?? "";

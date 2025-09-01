@@ -213,7 +213,8 @@ Applies special styling when focused.
                 <input
                     class:selected
                     type="password"
-                    name="Input Field"
+                    autocomplete="new-password"
+                    name="Password"
                     on:focus={() => (selected = true)}
                     on:blur={() => {
                         selected = false;
@@ -221,6 +222,26 @@ Applies special styling when focused.
                     }}
                     bind:value={inputValue}
                     on:input={handleInput}
+                    {disabled}
+                    class:disabled
+                    class:bad-format={inputInvalid && enableInputInvalid && !disabled}
+                />
+            {:else if inputType === "USERNAME"}
+                <input
+                    class:selected
+                    type="text"
+                    autocomplete="username"
+                    name="Username"
+                    on:focus={() => (selected = true)}
+                    on:blur={() => {
+                        selected = false;
+                        validateBounds();
+                    }}
+                    bind:value={inputValue}
+                    on:input={handleInput}
+                    {disabled}
+                    class:disabled
+                    class:bad-format={inputInvalid && enableInputInvalid && !disabled}
                 />
             {:else}
                 <input
