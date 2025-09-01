@@ -18,6 +18,7 @@
 
     // Texts
     import { texts } from "$lib/stores/lang/generalTexts";
+    import { pluginTexts } from "$lib/stores/lang/protocolPlugin";
 
     // Styles
     import { mergeStyle } from "$lib/style/components";
@@ -157,7 +158,7 @@ Includes multi-language headers and adapts layout to container size. -->
                     {/if}
                     {#if columnVisibility.communicationID.visible}
                         <th class="mid-width">
-                            {$texts[$protocolPlugins[deviceData.protocol].textKey]}
+                            {$pluginTexts[$protocolPlugins[deviceData.protocol].textKey]}
                         </th>
                     {/if}
                     {#if columnVisibility.type.visible}

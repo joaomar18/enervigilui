@@ -1,8 +1,6 @@
 import { MeterType } from "../device/base";
 import { getNodePhase } from "$lib/logic/util/nodes";
 import { Protocol } from "../device/base";
-import type { NodeModbusRTUConfig, EditableNodeModbusRTUConfig } from "./modbusRtu";
-import type { NodeOPCUAConfig, EditableNodeOPCUAConfig } from "./opcUa";
 
 /*****     C O N S T A N T S     *****/
 
@@ -223,13 +221,13 @@ export interface EditableBaseNodeConfig {
  * @property {number | undefined} device_id - Unique identifier for the device this node belongs to. May be undefined for new nodes before assignment.
  * @property {string} name - Name of the node, typically includes phase prefix
  * @property {Protocol} protocol - Communication protocol used by this node
- * @property {NodeConfiguration} config - Complete configuration including protocol-specific settings
+ * @property {BaseNodeConfig} config - Node configuration with protocol specific options
  */
 export interface DeviceNode {
     device_id?: number;
     name: string;
     protocol: Protocol;
-    config: NodeConfiguration;
+    config: BaseNodeConfig;
 }
 
 /**
@@ -240,7 +238,7 @@ export interface DeviceNode {
  * @property {number | undefined} device_id - Unique identifier for the device this node belongs to. May be undefined for new nodes before assignment.
  * @property {string} name - Full node name, typically includes phase prefix
  * @property {Protocol} protocol - Communication protocol used by this node
- * @property {EditableNodeConfiguration} config - Editable configuration for user input and validation
+ * @property {EditableBaseNodeConfig} config - Editable configuration for user input and validation
  * @property {string} display_name - Display name of the node (without prefix)
  * @property {NodePhase} phase - Electrical phase associated with this node
  * @property {string} communication_id - Protocol-specific communication identifier (e.g., register or node_id)
@@ -249,7 +247,7 @@ export interface EditableDeviceNode {
     device_id?: number;
     name: string;
     protocol: Protocol;
-    config: EditableNodeConfiguration;
+    config: EditableBaseNodeConfig;
     display_name: string;
     phase: NodePhase;
     communication_id: string;
@@ -310,17 +308,29 @@ export interface NodeValidation {
 
 /*****     T Y P E S     *****/
 
-/**
- * Node config: base config plus protocol-specific settings.
- */
-export type NodeConfiguration = BaseNodeConfig & (NodeModbusRTUConfig | NodeOPCUAConfig | NodeNoProtocolConfig);
-
-/**
- * Editable node config for forms: editable base plus protocol-specific settings.
- */
-export type EditableNodeConfiguration = EditableBaseNodeConfig & (EditableNodeModbusRTUConfig | EditableNodeOPCUAConfig | NodeNoProtocolConfig);
-
 /*****     O B J E C T S     *****/
+
+/**
+ * Default editable base node configuration used for initializing new nodes in UI forms.
+ */
+export const defaultBaseNodeConfig: EditableBaseNodeConfig = {
+    calculate_increment: true,
+    calculated: false,
+    custom: true,
+    decimal_places: String(2),
+    enabled: true,
+    incremental_node: false,
+    logging: false,
+    logging_period: String(15),
+    max_alarm: false,
+    max_alarm_value: Number(0).toFixed(2),
+    min_alarm: false,
+    min_alarm_value: Number(0).toFixed(2),
+    positive_incremental: true,
+    type: NodeType.FLOAT,
+    unit: "",
+    publish: true,
+};
 
 /**
  * Array of node section definitions used to group and filter nodes by phase or type.

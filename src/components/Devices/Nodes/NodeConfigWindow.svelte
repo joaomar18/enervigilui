@@ -19,6 +19,7 @@
 
     // Texts
     import { texts } from "$lib/stores/lang/generalTexts";
+    import { pluginTexts } from "$lib/stores/lang/protocolPlugin";
     import { variableNameTextsByPhase } from "$lib/stores/lang/energyMeterTexts";
 
     // Styles
@@ -251,7 +252,7 @@ Displays contextual hints and supports multi-language labels for all fields. -->
         <div class="row">
             <span class="row-variable">
                 <span class="row-identifier">
-                    {$texts[$protocolPlugins[deviceData.protocol].textKey]}
+                    {$pluginTexts[$protocolPlugins[deviceData.protocol].textKey]}
                 </span>
                 <span class="row-input">
                     <span class="row-entry">
@@ -271,7 +272,7 @@ Displays contextual hints and supports multi-language labels for all fields. -->
                     <span class="row-hint">
                         <HintInfo hintWidth="250px">
                             <span class="info-text">
-                                {$texts[$protocolPlugins[deviceData.protocol].infoTextKey]}
+                                {$pluginTexts[$protocolPlugins[deviceData.protocol].infoTextKey]}
                             </span>
                         </HintInfo>
                     </span>

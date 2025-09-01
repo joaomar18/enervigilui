@@ -18,18 +18,13 @@
     import InputField from "../../../components/General/InputField.svelte";
     import NodesGrid from "../../../components/Devices/Nodes/NodesGrid.svelte";
     import NodeConfigWindow from "../../../components/Devices/Nodes/NodeConfigWindow.svelte";
-    import OpcuaConfig from "../../../components/Devices/OPCUAConfig.svelte";
-    import ModbusRtuConfig from "../../../components/Devices/ModbusRTUConfig.svelte";
     import MeterOptionsConfig from "../../../components/Devices/MeterOptionsConfig.svelte";
-    import { Protocol } from "$lib/types/device/base";
     import { protocolPlugins } from "$lib/stores/device/protocol";
     import { showToast } from "$lib/logic/view/toast";
     import { ToastType } from "$lib/stores/view/toast";
 
     // Types
     import type { DeviceMeter, EditableDeviceMeter } from "$lib/types/device/base";
-    import type { EditableDeviceModbusRTUConfig } from "$lib/types/device/modbusRtu";
-    import type { EditableDeviceOPCUAConfig } from "$lib/types/device/opcUa";
     import type { DeviceNode, EditableDeviceNode, NodeEditState, NodePhase } from "$lib/types/nodes/base";
 
     // Styles
@@ -65,8 +60,6 @@
     let initialNodes: Array<DeviceNode>; // Initial Nodes (to check if there were changes made)
 
     let deviceData: EditableDeviceMeter; // Device Data
-    let opcuaConfig: EditableDeviceOPCUAConfig | null; // OPC UA Configuration
-    let modbusRTUConfig: EditableDeviceModbusRTUConfig | null; // Modbus RTU Configuration
 
     let nodesInitialized: boolean = false; // Nodes are initialized (fetched) from server
     let nodes: Array<EditableDeviceNode>;
@@ -77,15 +70,9 @@
 
     // Reactive Statements
 
-    //Synchronize communication configuration with device data
-    $: opcuaConfig = deviceData?.protocol === Protocol.OPC_UA ? (deviceData.communication_options as EditableDeviceOPCUAConfig) : null;
-    $: modbusRTUConfig = deviceData?.protocol === Protocol.MODBUS_RTU ? (deviceData.communication_options as EditableDeviceModbusRTUConfig) : null;
-
-    $: if (opcuaConfig) {
-        deviceData.communication_options = opcuaConfig;
-    }
-    $: if (modbusRTUConfig) {
-        deviceData.communication_options = modbusRTUConfig;
+    // Update initial device validation
+    $: if (deviceData) {
+        updateDeviceValidation(deviceData, undefined);
     }
 
     // Get nodes from the nodes array by section
@@ -307,12 +294,7 @@ Shows input forms for protocol-specific parameters and organizes device nodes fo
                         </div>
                     </div>
                 </div>
-
-                {#if opcuaConfig}
-                    <OpcuaConfig bind:opcuaConfig />
-                {:else if modbusRTUConfig}
-                    <ModbusRtuConfig bind:modbusRTUConfig />
-                {/if}
+                <svelte:component this={$protocolPlugins[deviceData.protocol].ConfigComponent} bind:configuration={deviceData.communication_options} />
             </div>
             <div class="device-section-div">
                 <div class="title">

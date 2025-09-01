@@ -16,7 +16,7 @@
     import type { EditableDeviceModbusRTUConfig } from "$lib/types/device/modbusRtu";
 
     // Props
-    export let modbusRTUConfig: EditableDeviceModbusRTUConfig; // Modbus RTU Configuration Object
+    export let configuration: EditableDeviceModbusRTUConfig; // Modbus RTU Configuration Object
 
     // Variables
     let validModbusRtuPort: boolean; // Modbus RTU Port is valid
@@ -29,17 +29,17 @@
     let validTimeout: boolean; // Timeout is valid
     let validRetriesNumber: boolean; // Number of retries is valid
 
-    $: validModbusRtuPort = validateModbusRtuPort(modbusRTUConfig.port);
-    $: validModbusSlaveID = parseInt(modbusRTUConfig.slave_id) >= SLAVE_ID_LIM.MIN && parseInt(modbusRTUConfig.slave_id) <= SLAVE_ID_LIM.MAX;
-    $: validBaudrate = Object.keys($baudrateTexts).includes(modbusRTUConfig.baudrate);
-    $: validParity = Object.keys($parityTexts).includes(modbusRTUConfig.parity);
-    $: validByteSize = Object.keys($bytesizeTexts).includes(modbusRTUConfig.bytesize);
-    $: validStopBits = Object.keys($stopbitsTexts).includes(modbusRTUConfig.stopbits);
-    $: validReadPeriod = parseInt(modbusRTUConfig.read_period) >= READ_PERIOD_LIM.MIN && parseInt(modbusRTUConfig.read_period) <= READ_PERIOD_LIM.MAX;
-    $: validTimeout = parseInt(modbusRTUConfig.timeout) >= TIMEOUT_LIM.MIN && parseInt(modbusRTUConfig.timeout) <= TIMEOUT_LIM.MAX;
-    $: validRetriesNumber = parseInt(modbusRTUConfig.retries) >= RETRIES_NUMBER_LIM.MIN && parseInt(modbusRTUConfig.retries) <= RETRIES_NUMBER_LIM.MAX;
+    $: validModbusRtuPort = validateModbusRtuPort(configuration.port);
+    $: validModbusSlaveID = parseInt(configuration.slave_id) >= SLAVE_ID_LIM.MIN && parseInt(configuration.slave_id) <= SLAVE_ID_LIM.MAX;
+    $: validBaudrate = Object.keys($baudrateTexts).includes(configuration.baudrate);
+    $: validParity = Object.keys($parityTexts).includes(configuration.parity);
+    $: validByteSize = Object.keys($bytesizeTexts).includes(configuration.bytesize);
+    $: validStopBits = Object.keys($stopbitsTexts).includes(configuration.stopbits);
+    $: validReadPeriod = parseInt(configuration.read_period) >= READ_PERIOD_LIM.MIN && parseInt(configuration.read_period) <= READ_PERIOD_LIM.MAX;
+    $: validTimeout = parseInt(configuration.timeout) >= TIMEOUT_LIM.MIN && parseInt(configuration.timeout) <= TIMEOUT_LIM.MAX;
+    $: validRetriesNumber = parseInt(configuration.retries) >= RETRIES_NUMBER_LIM.MIN && parseInt(configuration.retries) <= RETRIES_NUMBER_LIM.MAX;
 
-    $: modbusRTUConfig.valid =
+    $: configuration.valid =
         validModbusRtuPort &&
         validModbusSlaveID &&
         validBaudrate &&
@@ -55,7 +55,7 @@
     <span>{$texts.communicationPort}</span>
     <div class="input-div">
         <div class="input-content-div">
-            <InputField bind:inputValue={modbusRTUConfig.port} inputInvalid={!validModbusRtuPort} enableInputInvalid={true} />
+            <InputField bind:inputValue={configuration.port} inputInvalid={!validModbusRtuPort} enableInputInvalid={true} />
         </div>
         <div class="info-div">
             <HintInfo>
@@ -70,7 +70,7 @@
     <div class="input-div">
         <div class="input-content-div">
             <InputField
-                bind:inputValue={modbusRTUConfig.slave_id}
+                bind:inputValue={configuration.slave_id}
                 inputInvalid={!validModbusSlaveID}
                 enableInputInvalid={true}
                 inputType="POSITIVE_INT"
@@ -97,7 +97,7 @@
     <div class="input-div">
         <Selector
             options={$baudrateTexts}
-            bind:selectedOption={modbusRTUConfig.baudrate}
+            bind:selectedOption={configuration.baudrate}
             inputInvalid={!validBaudrate}
             enableInputInvalid={true}
             scrollable={true}
@@ -115,7 +115,7 @@
     <div class="input-div">
         <Selector
             options={$parityTexts}
-            bind:selectedOption={modbusRTUConfig.parity}
+            bind:selectedOption={configuration.parity}
             inputInvalid={!validParity}
             enableInputInvalid={true}
             scrollable={true}
@@ -133,7 +133,7 @@
     <div class="input-div">
         <Selector
             options={$bytesizeTexts}
-            bind:selectedOption={modbusRTUConfig.bytesize}
+            bind:selectedOption={configuration.bytesize}
             inputInvalid={!validByteSize}
             enableInputInvalid={true}
             scrollable={true}
@@ -151,7 +151,7 @@
     <div class="input-div">
         <Selector
             options={$stopbitsTexts}
-            bind:selectedOption={modbusRTUConfig.stopbits}
+            bind:selectedOption={configuration.stopbits}
             inputInvalid={!validStopBits}
             enableInputInvalid={true}
             scrollable={true}
@@ -169,7 +169,7 @@
     <div class="input-div">
         <div class="input-content-div">
             <InputField
-                bind:inputValue={modbusRTUConfig.read_period}
+                bind:inputValue={configuration.read_period}
                 inputInvalid={!validReadPeriod}
                 enableInputInvalid={true}
                 inputType="POSITIVE_INT"
@@ -196,7 +196,7 @@
     <div class="input-div">
         <div class="input-content-div">
             <InputField
-                bind:inputValue={modbusRTUConfig.timeout}
+                bind:inputValue={configuration.timeout}
                 inputInvalid={!validTimeout}
                 enableInputInvalid={true}
                 inputType="POSITIVE_INT"
@@ -223,7 +223,7 @@
     <div class="input-div">
         <div class="input-content-div">
             <InputField
-                bind:inputValue={modbusRTUConfig.retries}
+                bind:inputValue={configuration.retries}
                 inputType="POSITIVE_INT"
                 inputInvalid={!validRetriesNumber}
                 enableInputInvalid={true}

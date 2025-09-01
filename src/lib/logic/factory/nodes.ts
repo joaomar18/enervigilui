@@ -1,21 +1,113 @@
 import { get } from "svelte/store";
 import { MeterType, Protocol } from "$lib/types/device/base";
 import { NodeType, NodePhase, NodePrefix, nodeSections } from "$lib/types/nodes/base";
-import type { EditableDeviceMeter, NewDeviceMeter } from "$lib/types/device/base";
-import type {
-    DeviceNode,
-    EditableDeviceNode,
-    EditableNodeConfiguration,
-    EditableBaseNodeConfig,
-    NodeConfiguration,
-    DefaultNodeInfo,
-} from "$lib/types/nodes/base";
-import type { NodeOPCUAConfig } from "$lib/types/nodes/opcUa";
-import type { NodeModbusRTUConfig } from "$lib/types/nodes/modbusRtu";
+import type { EditableDeviceMeter, MeterOptions, NewDeviceMeter } from "$lib/types/device/base";
+import type { DeviceNode, EditableDeviceNode, EditableBaseNodeConfig, DefaultNodeInfo, BaseNodeConfig } from "$lib/types/nodes/base";
 import { defaultVariables } from "$lib/stores/device/variables";
-import { addPrefix, removePrefix, getNodePhase, getNodePrefix, getCommunicationID, getInitialCommunicationID, sortNodesByName } from "../util/nodes";
+import { addPrefix, removePrefix, getNodePhase, getNodePrefix, getCommunicationID, sortNodesByName } from "../util/nodes";
 import { getInitialNodeValidation } from "../validation/nodes/base";
 import { stringIsValidInteger, stringIsValidFloat } from "$lib/logic/util/generic";
+import { protocolPlugins } from "$lib/stores/device/protocol";
+
+/**
+ * Converts a BaseNodeConfig object to an EditableBaseNodeConfig for use in UI forms.
+ * @param config - The base node configuration object.
+ * @returns EditableBaseNodeConfig suitable for editing in the UI.
+ */
+export function convertToEditableBaseNodeConfig(config: BaseNodeConfig): EditableBaseNodeConfig {
+    let decimal_places: string = config.decimal_places !== null ? config.decimal_places.toString() : "";
+    let number_decimal_places: number = decimal_places ? parseInt(decimal_places) : 0;
+    return {
+        calculate_increment: config.calculate_increment ? config.calculate_increment : false,
+        calculated: config.calculated,
+        custom: config.custom,
+        decimal_places: decimal_places,
+        enabled: config.enabled,
+        incremental_node: config.incremental_node ? config.incremental_node : false,
+        logging: config.logging,
+        logging_period: config.logging_period.toString(),
+        max_alarm: config.max_alarm,
+        max_alarm_value: config.max_alarm_value !== null ? config.max_alarm_value.toFixed(number_decimal_places) : "",
+        min_alarm: config.min_alarm,
+        min_alarm_value: config.min_alarm_value !== null ? config.min_alarm_value.toFixed(number_decimal_places) : "",
+        positive_incremental: config.positive_incremental ? config.positive_incremental : false,
+        publish: config.publish,
+        type: config.type,
+        unit: config.unit !== null ? config.unit : "",
+    } as EditableBaseNodeConfig;
+}
+
+/**
+ * Converts an EditableBaseNodeConfig object back to a BaseNodeConfig for API or backend use.
+ * @param config - The editable node configuration object.
+ * @returns BaseNodeConfig suitable for backend/API operations.
+ */
+export function convertToBaseNodeConfig(config: EditableBaseNodeConfig): BaseNodeConfig {
+    let numericType = config.type === NodeType.FLOAT || config.type === NodeType.INT;
+    return {
+        calculate_increment: numericType ? config.calculate_increment : null,
+        calculated: config.calculated,
+        custom: config.custom,
+        decimal_places: stringIsValidInteger(config.decimal_places) ? parseInt(config.decimal_places) : null,
+        enabled: config.enabled,
+        incremental_node: numericType ? config.incremental_node : null,
+        logging: config.logging,
+        logging_period: parseInt(config.logging_period),
+        max_alarm: config.max_alarm,
+        max_alarm_value: stringIsValidFloat(config.max_alarm_value) ? parseFloat(config.max_alarm_value) : null,
+        min_alarm: config.min_alarm,
+        min_alarm_value: stringIsValidFloat(config.min_alarm_value) ? parseFloat(config.min_alarm_value) : null,
+        positive_incremental: numericType ? config.positive_incremental : null,
+        publish: config.publish,
+        type: config.type,
+        unit: numericType ? config.unit : null,
+    } as BaseNodeConfig;
+}
+
+/**
+ * Generates an EditableBaseNodeConfig from a default variable and meter options.
+ * Used to create editable node configs for UI forms based on variable defaults and device options.
+ * @param variable - Default variable information.
+ * @param options - Meter options for the device.
+ * @returns EditableBaseNodeConfig for UI editing.
+ */
+export function getEditableBaseNodeConfigFromDefaultVar(variable: DefaultNodeInfo, options: MeterOptions): EditableBaseNodeConfig {
+    let decimal_places: string = "";
+    let min_alarm_value: string = "";
+    let max_alarm_value: string = "";
+
+    if (variable.type === NodeType.FLOAT || variable.type === NodeType.INT) {
+        decimal_places = variable.defaultNumberOfDecimals ? variable.defaultNumberOfDecimals.toString() : "0";
+
+        if (!variable.isIncrementalNode) {
+            min_alarm_value = variable.defaultMinAlarm
+                ? variable.defaultMinAlarm.toFixed(parseInt(decimal_places))
+                : Number(0).toFixed(parseInt(decimal_places));
+            max_alarm_value = variable.defaultMaxAlarm
+                ? variable.defaultMaxAlarm.toFixed(parseInt(decimal_places))
+                : Number(0).toFixed(parseInt(decimal_places));
+        }
+    }
+
+    return {
+        calculate_increment: variable.isIncrementalNode && !options.read_energy_from_meter,
+        calculated: false,
+        custom: false,
+        decimal_places: decimal_places,
+        enabled: true,
+        incremental_node: variable.isIncrementalNode,
+        logging: variable.defaultLoggingEnabled,
+        logging_period: String(variable.defaultLoggingPeriod),
+        max_alarm: variable.defaultMaxAlarmEnabled ? true : false,
+        max_alarm_value: max_alarm_value,
+        min_alarm: variable.defaultMinAlarmEnabled !== undefined ? true : false,
+        min_alarm_value: min_alarm_value,
+        positive_incremental: variable.isIncrementalNode && !options.read_energy_from_meter,
+        publish: variable.defaultPublished,
+        type: variable.type,
+        unit: variable.defaultUnit,
+    } as EditableBaseNodeConfig;
+}
 
 /**
  * Converts DeviceNode[] to EditableDeviceNode[] for UI forms.
@@ -26,47 +118,10 @@ import { stringIsValidInteger, stringIsValidFloat } from "$lib/logic/util/generi
 export function convertToEditableNodes(nodes: Array<DeviceNode>, meter_type: MeterType): Array<EditableDeviceNode> {
     let editableNodes: Array<EditableDeviceNode> = [];
 
-    for (let node of nodes) {
+    for (const node of nodes) {
         let editableNode: EditableDeviceNode;
-
-        let decimal_places: string = node.config.decimal_places !== null ? node.config.decimal_places.toString() : "";
-        let number_decimal_places: number = decimal_places ? parseInt(decimal_places) : 0;
-
-        let editableConfig: EditableNodeConfiguration;
-        let editableBaseConfig: EditableBaseNodeConfig = {
-            calculate_increment: node.config.calculate_increment ? node.config.calculate_increment : false,
-            calculated: node.config.calculated,
-            custom: node.config.custom,
-            decimal_places: decimal_places,
-            enabled: node.config.enabled,
-            incremental_node: node.config.incremental_node ? node.config.incremental_node : false,
-            logging: node.config.logging,
-            logging_period: node.config.logging_period.toString(),
-            max_alarm: node.config.max_alarm,
-            max_alarm_value: node.config.max_alarm_value !== null ? node.config.max_alarm_value.toFixed(number_decimal_places) : "",
-            min_alarm: node.config.min_alarm,
-            min_alarm_value: node.config.min_alarm_value !== null ? node.config.min_alarm_value.toFixed(number_decimal_places) : "",
-            positive_incremental: node.config.positive_incremental ? node.config.positive_incremental : false,
-            publish: node.config.publish,
-            type: node.config.type,
-            unit: node.config.unit !== null ? node.config.unit : "",
-        };
-
-        if (node.protocol === Protocol.OPC_UA) {
-            editableConfig = {
-                ...editableBaseConfig,
-                node_id: (node.config as NodeOPCUAConfig).node_id,
-            };
-        } else if (node.protocol === Protocol.MODBUS_RTU) {
-            editableConfig = {
-                ...editableBaseConfig,
-                register: (node.config as NodeModbusRTUConfig).register.toString(),
-            };
-        } else {
-            editableConfig = {
-                ...editableBaseConfig,
-            };
-        }
+        let plugin = get(protocolPlugins)[node.protocol];
+        let editableConfig: EditableBaseNodeConfig = plugin.convertNodeConfigToEditable(node.config);
 
         editableNode = {
             name: node.name,
@@ -94,48 +149,8 @@ export function convertToNodes(nodes: Array<EditableDeviceNode>): Array<DeviceNo
     const deviceNodes: Array<DeviceNode> = [];
 
     for (const editableNode of nodes) {
-        let nodeConfig: NodeConfiguration;
-        let numericType = editableNode.config.type === NodeType.FLOAT || editableNode.config.type === NodeType.INT;
-
-        // Convert base configuration with proper type conversion
-        const baseConfig = {
-            calculate_increment: numericType ? editableNode.config.calculate_increment : null,
-            calculated: editableNode.config.calculated,
-            custom: editableNode.config.custom,
-            decimal_places: stringIsValidInteger(editableNode.config.decimal_places) ? parseInt(editableNode.config.decimal_places) : null,
-            enabled: editableNode.config.enabled,
-            incremental_node: numericType ? editableNode.config.incremental_node : null,
-            logging: editableNode.config.logging,
-            logging_period: parseInt(editableNode.config.logging_period),
-            max_alarm: editableNode.config.max_alarm,
-            max_alarm_value: stringIsValidFloat(editableNode.config.max_alarm_value) ? parseFloat(editableNode.config.max_alarm_value) : null,
-            min_alarm: editableNode.config.min_alarm,
-            min_alarm_value: stringIsValidFloat(editableNode.config.min_alarm_value) ? parseFloat(editableNode.config.min_alarm_value) : null,
-            positive_incremental: numericType ? editableNode.config.positive_incremental : null,
-            publish: editableNode.config.publish,
-            type: editableNode.config.type,
-            unit: numericType ? editableNode.config.unit : null,
-        };
-
-        // Handle protocol-specific configuration
-        if (editableNode.protocol === Protocol.OPC_UA) {
-            nodeConfig = {
-                ...baseConfig,
-                node_id: editableNode.communication_id,
-            };
-        } else if (editableNode.protocol === Protocol.MODBUS_RTU) {
-            nodeConfig = {
-                ...baseConfig,
-                register: parseInt(editableNode.communication_id.replace("0x", ""), 16),
-            };
-        } else if (editableNode.protocol === Protocol.NONE) {
-            // For virtual/calculated nodes with no communication protocol
-            nodeConfig = {
-                ...baseConfig,
-            };
-        } else {
-            throw new Error(`Unsupported protocol: ${editableNode.protocol}`);
-        }
+        let plugin = get(protocolPlugins)[editableNode.protocol];
+        let nodeConfig: BaseNodeConfig = plugin.convertNodeConfigToNormal(editableNode.config);
 
         const deviceNode: DeviceNode = {
             name: editableNode.name,
@@ -163,69 +178,17 @@ function createDefaultEditableDeviceNode(
     device_data: EditableDeviceMeter | NewDeviceMeter
 ): EditableDeviceNode {
     const full_name = getNodePrefix(phase) + variable.name;
-
-    let nodeConfiguration: EditableNodeConfiguration;
-
-    let decimal_places: string = "";
-    let min_alarm_value: string = "";
-    let max_alarm_value: string = "";
-
-    if (variable.type === NodeType.FLOAT || variable.type === NodeType.INT) {
-        decimal_places = variable.defaultNumberOfDecimals ? variable.defaultNumberOfDecimals.toString() : "0";
-
-        if (!variable.isIncrementalNode) {
-            min_alarm_value = variable.defaultMinAlarm
-                ? variable.defaultMinAlarm.toFixed(parseInt(decimal_places))
-                : Number(0).toFixed(parseInt(decimal_places));
-            max_alarm_value = variable.defaultMaxAlarm
-                ? variable.defaultMaxAlarm.toFixed(parseInt(decimal_places))
-                : Number(0).toFixed(parseInt(decimal_places));
-        }
-    }
-
-    const nodeBaseConfiguration: EditableBaseNodeConfig = {
-        calculate_increment: variable.isIncrementalNode && !device_data.options.read_energy_from_meter,
-        calculated: false,
-        custom: false,
-        decimal_places: decimal_places,
-        enabled: true,
-        incremental_node: variable.isIncrementalNode,
-        logging: variable.defaultLoggingEnabled,
-        logging_period: String(variable.defaultLoggingPeriod),
-        max_alarm: variable.defaultMaxAlarmEnabled ? true : false,
-        max_alarm_value: max_alarm_value,
-        min_alarm: variable.defaultMinAlarmEnabled !== undefined ? true : false,
-        min_alarm_value: min_alarm_value,
-        positive_incremental: variable.isIncrementalNode && !device_data.options.read_energy_from_meter,
-        publish: variable.defaultPublished,
-        type: variable.type,
-        unit: variable.defaultUnit,
-    };
-
-    if (device_data.protocol === Protocol.MODBUS_RTU) {
-        // Modbus RTU Protocol
-        nodeConfiguration = {
-            ...nodeBaseConfiguration,
-            register: getInitialCommunicationID(Protocol.MODBUS_RTU),
-        };
-    } else if (device_data.protocol === Protocol.OPC_UA) {
-        // OPC UA Protocol
-        nodeConfiguration = {
-            ...nodeBaseConfiguration,
-            node_id: getInitialCommunicationID(Protocol.OPC_UA),
-        };
-    } else {
-        throw new Error("Unsupported protocol");
-    }
+    let plugin = get(protocolPlugins)[device_data.protocol];
+    let editableConfig = plugin.createNodeConfigFromDefaultVar(variable, device_data.options);
 
     let node: EditableDeviceNode = {
         device_id: "id" in device_data ? device_data.id : undefined,
         name: full_name,
         protocol: device_data.protocol,
-        config: nodeConfiguration,
+        config: editableConfig,
         display_name: variable.name,
         phase: phase,
-        communication_id: getCommunicationID(device_data.protocol, nodeConfiguration, true),
+        communication_id: getCommunicationID(device_data.protocol, editableConfig, true),
         validation: getInitialNodeValidation(),
     };
 
@@ -272,51 +235,17 @@ export function addNode(sectionPrefix: NodePrefix, device_data: EditableDeviceMe
     const nodeBaseName = ``;
     const fullNodeName = addPrefix(nodeBaseName, sectionPrefix);
 
-    const newBaseConfiguration: EditableBaseNodeConfig = {
-        calculate_increment: true,
-        calculated: false,
-        custom: true,
-        decimal_places: String(2),
-        enabled: true,
-        incremental_node: false,
-        logging: false,
-        logging_period: String(15),
-        max_alarm: false,
-        max_alarm_value: Number(0).toFixed(2),
-        min_alarm: false,
-        min_alarm_value: Number(0).toFixed(2),
-        positive_incremental: true,
-        type: NodeType.FLOAT,
-        unit: "",
-        publish: true,
-    };
-
-    let newNodeConfiguration: EditableNodeConfiguration;
-
-    if (device_data.protocol === Protocol.MODBUS_RTU) {
-        // Modbus RTU Protocol
-        newNodeConfiguration = {
-            ...newBaseConfiguration,
-            register: getInitialCommunicationID(Protocol.MODBUS_RTU),
-        };
-    } else if (device_data.protocol === Protocol.OPC_UA) {
-        // OPC UA Protocol
-        newNodeConfiguration = {
-            ...newBaseConfiguration,
-            node_id: getInitialCommunicationID(Protocol.OPC_UA),
-        };
-    } else {
-        throw new Error("Unsupported protocol");
-    }
+    let plugin = get(protocolPlugins)[device_data.protocol];
+    let newEditableConfig = plugin.createNewEditableNodeConfig();
 
     const newFormattedNode: EditableDeviceNode = {
         device_id: "id" in device_data ? device_data.id : undefined,
         name: fullNodeName,
         protocol: device_data.protocol,
-        config: newNodeConfiguration,
+        config: newEditableConfig,
         display_name: nodeBaseName,
         phase: getNodePhase(fullNodeName, device_data.type),
-        communication_id: getCommunicationID(device_data.protocol, newNodeConfiguration, true),
+        communication_id: getCommunicationID(device_data.protocol, newEditableConfig, true),
         validation: getInitialNodeValidation(),
     };
 

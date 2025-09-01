@@ -1,3 +1,5 @@
+import type { BaseNodeConfig, EditableBaseNodeConfig } from "./base";
+
 /*****     C O N S T A N T S     *****/
 
 /*****     E N U M S     *****/
@@ -8,7 +10,7 @@
  * OPC UA node configuration.
  * @property node_id Node identifier.
  */
-export interface NodeOPCUAConfig {
+export interface NodeOPCUAConfig extends BaseNodeConfig {
     node_id: string;
 }
 
@@ -16,7 +18,7 @@ export interface NodeOPCUAConfig {
  * Editable OPC UA node config for forms.
  * @property node_id Node identifier (string).
  */
-export interface EditableNodeOPCUAConfig {
+export interface EditableNodeOPCUAConfig extends EditableBaseNodeConfig {
     node_id: string;
 }
 

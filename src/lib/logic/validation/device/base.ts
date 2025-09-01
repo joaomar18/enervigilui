@@ -44,13 +44,15 @@ export function validateDeviceName(name: string): boolean {
 /**
  * Updates device validation state.
  * @param deviceData - Device config.
- * @param nodes - Associated nodes.
+ * @param nodes - Associated nodes (can be undefined if nodes validation is not needed).
  */
-export function updateDeviceValidation(deviceData: EditableDeviceMeter | NewDeviceMeter, nodes: Array<EditableDeviceNode>): void {
+export function updateDeviceValidation(deviceData: EditableDeviceMeter | NewDeviceMeter, nodes: Array<EditableDeviceNode> | undefined): void {
     deviceData.validation.deviceName = validateDeviceName(deviceData.name);
     deviceData.validation.deviceProtocol = Object.keys(get(protocolTexts)).includes(deviceData.protocol);
     deviceData.validation.communicationOptions = deviceData.communication_options.valid;
-    deviceData.validation.nodes = getAllNodesValidation(nodes);
+    if (nodes) {
+        deviceData.validation.nodes = getAllNodesValidation(nodes);
+    }
 }
 
 /**

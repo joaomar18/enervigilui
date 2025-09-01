@@ -1,11 +1,10 @@
 import { get } from "svelte/store";
 import { Protocol } from "$lib/types/device/base";
 import { NodeType, NodePhase } from "$lib/types/nodes/base";
-import { getNodePrefix, getInitialCommunicationID, getCommunicationID } from "../util/nodes";
+import { getNodePrefix, getCommunicationID } from "../util/nodes";
 import { defaultVariables } from "$lib/stores/device/variables";
 import type { NodeEditState, EditableDeviceNode } from "$lib/types/nodes/base";
-import type { EditableNodeModbusRTUConfig } from "$lib/types/nodes/modbusRtu";
-import type { EditableNodeOPCUAConfig } from "$lib/types/nodes/opcUa";
+import { protocolPlugins } from "$lib/stores/device/protocol";
 
 /**
  * Handles node name changes, updating prefix and unit.
@@ -91,14 +90,8 @@ export function virtualNodeChange(node: EditableDeviceNode, nodeState: NodeEditS
  * @param node Node to update
  */
 export function changeNodeProtocol(protocol: Protocol, node: EditableDeviceNode): void {
-    if (protocol === Protocol.MODBUS_RTU) {
-        (node.config as EditableNodeModbusRTUConfig).register = getInitialCommunicationID(Protocol.MODBUS_RTU);
-    } else if (protocol === Protocol.OPC_UA) {
-        (node.config as EditableNodeOPCUAConfig).node_id = getInitialCommunicationID(Protocol.OPC_UA);
-    } else {
-        throw new Error("Unsupported protocol");
-    }
-
+    let plugin = get(protocolPlugins)[protocol];
+    plugin.setCommIDToDefault(node);
     node.protocol = protocol;
     node.communication_id = getCommunicationID(protocol, node.config, true);
 }

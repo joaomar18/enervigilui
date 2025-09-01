@@ -8,10 +8,8 @@ import { protocolTexts } from "$lib/stores/lang/energyMeterTexts";
 import { stringIsValidInteger, stringIsValidFloat } from "$lib/logic/util/generic";
 import { DECIMAL_PLACES_LIM, LOGGING_PERIOD_LIM } from "$lib/types/nodes/base";
 import isEqualPkg from "lodash";
-import { validateModbusRegister } from "./modbusRtu";
-import { validateOpcUaNodeId } from "./opcUa";
+import { protocolPlugins } from "$lib/stores/device/protocol";
 const { isEqual } = isEqualPkg;
-
 /**
  * Creates and returns a new NodeValidation object with all validation properties set to false.
  * Used to initialize the validation state for new nodes or reset validation during editing.
@@ -125,20 +123,9 @@ export function validateCommunicationID(communicationID: string | undefined, pro
     }
 
     const trimmedId = communicationID.trim();
+    let plugin = get(protocolPlugins)[protocol];
 
-    switch (protocol) {
-        case Protocol.NONE:
-            return trimmedId.length === 0;
-
-        case Protocol.MODBUS_RTU:
-            return validateModbusRegister(trimmedId);
-
-        case Protocol.OPC_UA:
-            return validateOpcUaNodeId(trimmedId);
-
-        default:
-            return false;
-    }
+    return plugin.validateCommID(trimmedId);
 }
 
 /**

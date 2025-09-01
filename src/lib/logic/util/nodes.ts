@@ -1,6 +1,8 @@
+import { get } from "svelte/store";
+import { protocolPlugins } from "$lib/stores/device/protocol";
 import { MeterType, Protocol } from "$lib/types/device/base";
 import { NodePrefix, NodePhase } from "$lib/types/nodes/base";
-import type { NodeConfiguration, EditableNodeConfiguration, DeviceNode, EditableDeviceNode } from "$lib/types/nodes/base";
+import type { BaseNodeConfig, EditableBaseNodeConfig, DeviceNode, EditableDeviceNode } from "$lib/types/nodes/base";
 
 /**
  * Sorts nodes alphabetically by display name (without prefix).
@@ -116,39 +118,15 @@ export function addPrefix(name: string, prefix: NodePrefix): string {
 }
 
 /**
- * Gets initial communication ID for protocol.
- * @param protocol Protocol.
- * @returns Initial communication ID.
- */
-export function getInitialCommunicationID(protocol: Protocol): string {
-    if (protocol === Protocol.OPC_UA) {
-        return "ns=;i=";
-    } else if (protocol === Protocol.MODBUS_RTU) {
-        return "0x";
-    } else {
-        throw new Error("Unsupported protocol");
-    }
-}
-
-/**
  * Gets communication ID for node based on protocol and config.
  * @param protocol Protocol.
  * @param config Node config.
  * @param no_format If true, returns plain number for Modbus RTU.
  * @returns Communication ID.
  */
-export function getCommunicationID(protocol: Protocol, config: NodeConfiguration | EditableNodeConfiguration, no_format: boolean = false): string {
-    if (!config) return "";
-
-    if (protocol === Protocol.OPC_UA && "node_id" in config) {
-        const nodeId = config.node_id;
-        return nodeId;
-    } else if (protocol === Protocol.MODBUS_RTU && "register" in config) {
-        const reg = config.register;
-        return no_format ? String(reg) : "0x" + Number(reg).toString(16).toUpperCase().padStart(4, "0");
-    }
-
-    return "";
+export function getCommunicationID(protocol: Protocol, config: BaseNodeConfig | EditableBaseNodeConfig, no_format: boolean = false): string {
+    let plugin = get(protocolPlugins)[protocol];
+    return plugin.getCommID(config, no_format);
 }
 
 /**
@@ -161,6 +139,6 @@ export function normalizeNode(node: DeviceNode): DeviceNode {
         device_id: node.device_id,
         name: node.name,
         protocol: node.protocol,
-        config: Object.fromEntries(Object.entries(node.config).sort(([a], [b]) => a.localeCompare(b))) as NodeConfiguration,
+        config: Object.fromEntries(Object.entries(node.config).sort(([a], [b]) => a.localeCompare(b))) as BaseNodeConfig,
     };
 }

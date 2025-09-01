@@ -13,28 +13,28 @@
     import type { EditableDeviceOPCUAConfig } from "$lib/types/device/opcUa";
 
     // Props
-    export let opcuaConfig: EditableDeviceOPCUAConfig; // OPC UA Configuration Object
+    export let configuration: EditableDeviceOPCUAConfig; // OPC UA Configuration Object
 
     // Variables
     let validOpcUaUrl: boolean; // OPC UA Url is valid
     let validReadPeriod: boolean; // Read Period is valid
     let validTimeout: boolean; // Timeout is valid
 
-    $: validOpcUaUrl = validateOpcUaUrl(opcuaConfig.url);
-    $: validReadPeriod = parseInt(opcuaConfig.read_period) >= READ_PERIOD_LIM.MIN && parseInt(opcuaConfig.read_period) <= READ_PERIOD_LIM.MAX;
-    $: validTimeout = parseInt(opcuaConfig.timeout) >= TIMEOUT_LIM.MIN && parseInt(opcuaConfig.timeout) <= TIMEOUT_LIM.MAX;
-    $: opcuaConfig.valid = validOpcUaUrl && validReadPeriod && validTimeout;
+    $: validOpcUaUrl = validateOpcUaUrl(configuration.url);
+    $: validReadPeriod = parseInt(configuration.read_period) >= READ_PERIOD_LIM.MIN && parseInt(configuration.read_period) <= READ_PERIOD_LIM.MAX;
+    $: validTimeout = parseInt(configuration.timeout) >= TIMEOUT_LIM.MIN && parseInt(configuration.timeout) <= TIMEOUT_LIM.MAX;
+    $: configuration.valid = validOpcUaUrl && validReadPeriod && validTimeout;
 </script>
 
 <!--
-  OPCUAConfig: This component renders the configuration form elements for OPC UA device communication,
+  configuration: This component renders the configuration form elements for OPC UA device communication,
   including network address, read period, timeout, and optional authentication fields.
 -->
 <div class="device-input-div">
     <span>{$texts.networkAddress}</span>
     <div class="input-div">
         <div class="input-content-div">
-            <InputField bind:inputValue={opcuaConfig.url} inputInvalid={!validOpcUaUrl} enableInputInvalid={true} />
+            <InputField bind:inputValue={configuration.url} inputInvalid={!validOpcUaUrl} enableInputInvalid={true} />
         </div>
         <div class="info-div">
             <HintInfo>
@@ -48,7 +48,7 @@
     <div class="input-div">
         <div class="input-content-div">
             <InputField
-                bind:inputValue={opcuaConfig.read_period}
+                bind:inputValue={configuration.read_period}
                 inputInvalid={!validReadPeriod}
                 enableInputInvalid={true}
                 inputType="POSITIVE_INT"
@@ -75,7 +75,7 @@
     <div class="input-div">
         <div class="input-content-div">
             <InputField
-                bind:inputValue={opcuaConfig.timeout}
+                bind:inputValue={configuration.timeout}
                 inputInvalid={!validTimeout}
                 enableInputInvalid={true}
                 inputType="POSITIVE_INT"
@@ -103,7 +103,7 @@
         <span>{$texts.username}</span>
         <div class="input-div">
             <div class="input-content-div">
-                <InputField bind:inputValue={opcuaConfig.username} />
+                <InputField bind:inputValue={configuration.username} />
             </div>
             <div class="info-div">
                 <HintInfo>
@@ -116,7 +116,7 @@
         <span>{$texts.password}</span>
         <div class="input-div">
             <div class="input-content-div">
-                <InputField bind:inputValue={opcuaConfig.password} inputType="PASSWORD" />
+                <InputField bind:inputValue={configuration.password} inputType="PASSWORD" />
             </div>
             <div class="info-div">
                 <HintInfo>

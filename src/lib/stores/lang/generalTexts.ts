@@ -403,14 +403,6 @@ const textsObject: TextsObject = {
         PT: "Unidade",
         EN: "Unit",
     },
-    opcuaID: {
-        PT: "ID OPC UA",
-        EN: "OPC UA ID",
-    },
-    modbusRegister: {
-        PT: "Registo Modbus",
-        EN: "Modbus Register",
-    },
     custom: {
         PT: "Próprio",
         EN: "Custom",
@@ -530,14 +522,6 @@ const textsObject: TextsObject = {
     unitCustomInfo: {
         PT: "Indique a unidade de medida para esta variável personalizada (ex: rpm, %, m³, etc.).",
         EN: "Specify the measurement unit for this custom variable (e.g., rpm, %, m³, etc.).",
-    },
-    nodespaceInfo: {
-        PT: "Indique o ID OPC UA utilizado para aceder à variável no dispositivo.",
-        EN: "Specify the OPC UA ID used to acess the variable on the device.",
-    },
-    registerInfo: {
-        PT: "Indique o registo modbus utilizado para aceder à variável no dispositivo.",
-        EN: "Specify the modbus register used to access the variable on the device.",
     },
     nocommInfo: {
         PT: "Esta variável é virtual e não possui registo de comunicação ou identificador associado.",
@@ -662,14 +646,6 @@ const textsObject: TextsObject = {
     configuration: {
         PT: "Configuração",
         EN: "Configuration",
-    },
-    noProtocol: {
-        PT: "Sem protocolo",
-        EN: "No protocol",
-    },
-    noProtocolInfo: {
-        PT: "Sem protocolo de comunicação selecionado.",
-        EN: "No communication protocol selected.",
     },
 };
 

@@ -1,3 +1,5 @@
+import type { BaseNodeConfig, EditableBaseNodeConfig } from "./base";
+
 /*****     C O N S T A N T S     *****/
 
 /*****     E N U M S     *****/
@@ -8,7 +10,7 @@
  * Modbus RTU node configuration.
  * @property register Register address (number).
  */
-export interface NodeModbusRTUConfig {
+export interface NodeModbusRTUConfig extends BaseNodeConfig {
     register: number;
 }
 
@@ -16,7 +18,7 @@ export interface NodeModbusRTUConfig {
  * Editable Modbus RTU node config for forms.
  * @property register Register address (string).
  */
-export interface EditableNodeModbusRTUConfig {
+export interface EditableNodeModbusRTUConfig extends EditableBaseNodeConfig {
     register: string;
 }
 
