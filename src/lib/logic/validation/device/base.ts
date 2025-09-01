@@ -79,11 +79,11 @@ export function validDeviceOperation(deviceData: EditableDeviceMeter | NewDevice
 }
 
 /**
- * Compares two DeviceMeter objects for equality.
- * @param a - First device.
- * @param b - Second device.
+ * Compares if a new device configuration is equal to an initial device.
+ * @param initialDevice - Initial device configuration.
+ * @param newDevice - New device configuration.
  * @returns True if equal.
  */
-export function areDevicesEqual(a: DeviceMeter, b: DeviceMeter): boolean {
-    return isEqual(normalizeDevice(a), normalizeDevice(b));
+export function areDevicesEqual(initialDevice: DeviceMeter, newDevice: DeviceMeter): boolean {
+    return isEqual(initialDevice, normalizeDevice(newDevice));
 }

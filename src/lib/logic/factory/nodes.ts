@@ -1,5 +1,5 @@
 import { get } from "svelte/store";
-import { MeterType, Protocol } from "$lib/types/device/base";
+import { MeterType } from "$lib/types/device/base";
 import { NodeType, NodePhase, NodePrefix, nodeSections } from "$lib/types/nodes/base";
 import type { EditableDeviceMeter, MeterOptions, NewDeviceMeter } from "$lib/types/device/base";
 import type { DeviceNode, EditableDeviceNode, EditableBaseNodeConfig, DefaultNodeInfo, BaseNodeConfig } from "$lib/types/nodes/base";
@@ -8,6 +8,7 @@ import { addPrefix, removePrefix, getNodePhase, getNodePrefix, getCommunicationI
 import { getInitialNodeValidation } from "../validation/nodes/base";
 import { stringIsValidInteger, stringIsValidFloat } from "$lib/logic/util/generic";
 import { protocolPlugins } from "$lib/stores/device/protocol";
+import { normalizeNode } from "../util/nodes";
 
 /**
  * Converts a BaseNodeConfig object to an EditableBaseNodeConfig for use in UI forms.
@@ -216,7 +217,7 @@ export function processInitialNodes(nodes: Array<DeviceNode>): Array<DeviceNode>
         deviceNodes.push(deviceNode);
     }
 
-    return sortNodesByName(deviceNodes) as Array<DeviceNode>;
+    return (sortNodesByName(deviceNodes) as Array<DeviceNode>).map(normalizeNode);
 }
 
 /**

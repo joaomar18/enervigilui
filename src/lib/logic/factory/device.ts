@@ -11,6 +11,7 @@ import type {
     BaseCommunicationConfig,
 } from "$lib/types/device/base";
 import { getInitialDeviceValidation } from "../validation/device/base";
+import { normalizeDevice } from "../util/device";
 
 /**
  * Converts DeviceMeter to EditableDeviceMeter for form handling.
@@ -84,20 +85,23 @@ export function processInitialDevice(device: DeviceMeter | NewDeviceMeter): Devi
         communication_options: device.communication_options,
     };
 
+    let deviceMeter: DeviceMeter;
     // Handle different device types - EditableDeviceMeter has id and connected, NewDeviceMeter doesn't
     if ("id" in device) {
-        return {
+        deviceMeter = {
             ...baseDevice,
             connected: device.connected,
             id: device.id,
-        } as DeviceMeter;
+        };
     } else {
-        return {
+        deviceMeter = {
             ...baseDevice,
             connected: false,
             id: 0,
-        } as DeviceMeter;
+        };
     }
+
+    return normalizeDevice(deviceMeter);
 }
 
 /**

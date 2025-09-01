@@ -3,7 +3,7 @@ import { Protocol } from "$lib/types/device/base";
 import { NodeType, NodePhase } from "$lib/types/nodes/base";
 import type { DeviceNode, EditableDeviceNode, NodeValidation } from "$lib/types/nodes/base";
 import { defaultVariables, defaultVariableNames, defaultVariableUnits } from "$lib/stores/device/variables";
-import { normalizeNode } from "$lib/logic/util/nodes";
+import { normalizeNode, sortNodesByName } from "$lib/logic/util/nodes";
 import { protocolTexts } from "$lib/stores/lang/energyMeterTexts";
 import { stringIsValidInteger, stringIsValidFloat } from "$lib/logic/util/generic";
 import { DECIMAL_PLACES_LIM, LOGGING_PERIOD_LIM } from "$lib/types/nodes/base";
@@ -311,12 +311,11 @@ export function getAllNodesValidation(nodes: Array<EditableDeviceNode>): boolean
 }
 
 /**
- * Compares two arrays of DeviceNode for equality.
- * @param a First array.
- * @param b Second array.
+ * Compares an initial nodes array configuration with a new array configuration for equality.
+ * @param a Initial configuration array.
+ * @param b New configuration array.
  * @returns True if equal.
  */
-export function areNodesEqual(a: DeviceNode[], b: DeviceNode[]): boolean {
-    const sortByName = (arr: DeviceNode[]) => [...arr].sort((x, y) => x.name.localeCompare(y.name));
-    return isEqual(sortByName(a).map(normalizeNode), sortByName(b).map(normalizeNode));
+export function areNodesEqual(initialNodes: DeviceNode[], newNodes: DeviceNode[]): boolean {
+    return isEqual(initialNodes, (sortNodesByName(newNodes) as DeviceNode[]).map(normalizeNode));
 }
