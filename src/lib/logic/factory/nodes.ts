@@ -15,25 +15,25 @@ import { protocolPlugins } from "$lib/stores/device/protocol";
  * @returns EditableBaseNodeConfig suitable for editing in the UI.
  */
 export function convertToEditableBaseNodeConfig(config: BaseNodeConfig): EditableBaseNodeConfig {
-    let decimal_places: string = config.decimal_places !== null ? config.decimal_places.toString() : "";
-    let number_decimal_places: number = decimal_places ? parseInt(decimal_places) : 0;
+    let decimal_places: string = config.decimal_places?.toString() ?? "";
+    let number_decimal_places: number = parseInt(decimal_places) ?? 0;
     return {
-        calculate_increment: config.calculate_increment ? config.calculate_increment : false,
+        calculate_increment: config.calculate_increment ?? false,
         calculated: config.calculated,
         custom: config.custom,
         decimal_places: decimal_places,
         enabled: config.enabled,
-        incremental_node: config.incremental_node ? config.incremental_node : false,
+        incremental_node: config.incremental_node ?? false,
         logging: config.logging,
         logging_period: config.logging_period.toString(),
         max_alarm: config.max_alarm,
-        max_alarm_value: config.max_alarm_value !== null ? config.max_alarm_value.toFixed(number_decimal_places) : "",
+        max_alarm_value: config.max_alarm_value?.toFixed(number_decimal_places) ?? "",
         min_alarm: config.min_alarm,
-        min_alarm_value: config.min_alarm_value !== null ? config.min_alarm_value.toFixed(number_decimal_places) : "",
-        positive_incremental: config.positive_incremental ? config.positive_incremental : false,
+        min_alarm_value: config.min_alarm_value?.toFixed(number_decimal_places) ?? "",
+        positive_incremental: config.positive_incremental ?? false,
         publish: config.publish,
         type: config.type,
-        unit: config.unit !== null ? config.unit : "",
+        unit: config.unit ?? "",
     } as EditableBaseNodeConfig;
 }
 
