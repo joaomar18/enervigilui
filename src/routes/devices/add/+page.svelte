@@ -214,6 +214,7 @@ Shows input forms for protocol-specific parameters and organizes device nodes fo
                 </div>
                 <div class="nodes-grid-div">
                     <NodesGrid
+                        minHeight="200px"
                         {deviceData}
                         {nodesInitialized}
                         bind:nodes

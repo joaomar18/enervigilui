@@ -37,6 +37,7 @@
     // Layout / styling props
     export let width: string | undefined = undefined;
     export let height: string | undefined = undefined;
+    export let minHeight: string | undefined = undefined;
     export let borderRadius: string | undefined = undefined;
     export let backgroundColor: string | undefined = undefined;
     export let borderColor: string | undefined = undefined;
@@ -132,6 +133,7 @@ Includes multi-language headers and adapts layout to container size. -->
     style="
         --width: {mergedStyle.width};
         --height: {mergedStyle.height};
+        --min-height: {minHeight};
         --border-radius: {mergedStyle.borderRadius};
         --background-color: {mergedStyle.backgroundColor};
         --border-color: {mergedStyle.borderColor};
@@ -287,11 +289,12 @@ Includes multi-language headers and adapts layout to container size. -->
 
     /* Content wrapper for table and sections */
     .content {
+        position: relative;
         width: 100%;
         height: 100%;
+        min-height: var(--min-height, min-content);
         padding: 0;
         margin: 0;
-        position: relative;
         display: flex;
         flex-direction: column;
         align-items: center;
