@@ -1,5 +1,5 @@
 <script lang="ts">
-    import { onMount, onDestroy } from "svelte";
+    import { onMount } from "svelte";
     import { getDefaultImage, addDevice } from "$lib/logic/api/device";
     import { createNewDevice, convertToDevice } from "$lib/logic/factory/device";
     import { convertToNodes, getDefaultNodesList } from "$lib/logic/factory/nodes";
@@ -19,8 +19,7 @@
     import MeterOptionsConfig from "../../../components/Devices/MeterOptionsConfig.svelte";
     import { defaultDeviceOptions } from "$lib/types/device/base";
     import { protocolPlugins } from "$lib/stores/device/protocol";
-    import { showToast } from "$lib/logic/view/toast";
-    import { ToastType } from "$lib/stores/view/toast";
+    import { MethodRetrier } from "$lib/logic/api/retrier";
 
     // Types
     import type { NewDeviceMeter } from "$lib/types/device/base";
@@ -37,7 +36,7 @@
     import { selectedLang } from "$lib/stores/lang/definition";
     import { protocolTexts } from "$lib/stores/lang/energyMeterTexts";
 
-    // Stores for authorization
+    // Stores
     import { loadedDone } from "$lib/stores/view/navigation";
 
     // Variables
@@ -45,13 +44,10 @@
     let showConfigNodeWindow: boolean = false; // Show Node Full Configuration Window
     let performingAddRequest: boolean = false; // Performing Add Device Request
 
-    let defaultImgPollTimer: ReturnType<typeof setTimeout>; // Timeout for default image request
     let deviceData: NewDeviceMeter; // Device Data
-
     let nodesInitialized: boolean = false; // Nodes are initialized (fetched) from server
     let nodes: Array<EditableDeviceNode>;
     let nodesBySection: Record<NodePhase, Array<EditableDeviceNode>>;
-
     let editingNode: EditableDeviceNode; // Current Node being edited in Configuration Window
     let editingNodeState: NodeEditState; // Current state of the Node being edited
 
@@ -77,51 +73,12 @@
 
     // Functions
 
-    // Function to fetch default image for devices
-    function fetchDefaultImage(): void {
-        const tick = async () => {
-            let sucess = false;
-            try {
-                const { status, data }: { status: number; data: any } = await getDefaultImage();
-                if (status !== 200) {
-                    showToast("errorDefaultImage", ToastType.ALERT, {
-                        error: String(data["error"]),
-                    });
-                } else {
-                    const deviceImage = data as Record<string, string>;
-                    deviceData.current_image_url = `data:${deviceImage["type"]};base64,${deviceImage["data"]}`;
-                    sucess = true;
-                }
-            } catch (e) {
-                showToast("errorDefaultImage", ToastType.ALERT, {
-                    error: String(e),
-                });
-                console.error(`Could not obtain the devices status: ${e}`);
-            }
-            loadedDone.set(true);
-            if (!sucess) {
-                defaultImgPollTimer = setTimeout(tick, 2500);
-            }
-        };
-        tick();
-    }
-
     //Function to save device changes
     async function addDeviceConfirmation(): Promise<void> {
         if ($loadedDone && nodesInitialized) {
-            let convertedNodes = convertToNodes(nodes);
-
             performingAddRequest = true;
-            const { status, data } = await addDevice(convertToDevice(deviceData), deviceData.device_image, convertedNodes);
+            await addDevice(convertToDevice(deviceData), deviceData.device_image, convertToNodes(nodes));
             performingAddRequest = false;
-            if (status !== 200) {
-                showToast("addDeviceRequestError", ToastType.ALERT, {
-                    error: String(data["error"]),
-                });
-                showAddWindow = false;
-                return;
-            }
-            await navigateTo("/devices", $selectedLang, {});
         }
         showAddWindow = false;
     }
@@ -135,14 +92,17 @@
     onMount(() => {
         deviceData = createNewDevice(defaultDeviceOptions.protocol, defaultDeviceOptions.type, defaultDeviceOptions.options);
         nodes = getDefaultNodesList(deviceData);
-        fetchDefaultImage();
-        loadedDone.set(true);
         nodesInitialized = true;
-    });
 
-    // Cleanup function
-    onDestroy(() => {
-        clearTimeout(defaultImgPollTimer);
+        let defaultImageRetrier: MethodRetrier | null = new MethodRetrier(async (signal) => {
+            deviceData.current_image_url = await getDefaultImage();
+        }, 3000);
+
+        //Clean-up logic
+        return () => {
+            defaultImageRetrier?.stop();
+            defaultImageRetrier = null;
+        };
     });
 </script>
 

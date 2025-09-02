@@ -44,26 +44,9 @@
         const base = segments.length > 0 ? `/${segments[0]}` : "/";
         const isSubpage = segments.length > 1;
 
-        const { status } = await autoLogin();
-
-        if (status === 200) {
-            // Authenticated
-            if (base === "/" || base === "/login") {
-                shouldRedirect = true;
-                redirectTarget = "/devices";
-            }
-            // User is in a subpage, redirect to main page
-            else if (isSubpage) {
-                shouldRedirect = true;
-                redirectTarget = base;
-            }
-        } else {
-            // Unauthenticated or failed
-            if (base !== "/login") {
-                shouldRedirect = true;
-                redirectTarget = "/login";
-            }
-        }
+        const { redirect, target } = await autoLogin(base, isSubpage);
+        shouldRedirect = redirect;
+        redirectTarget = target;
     }
 
     // Get Search Query Function
@@ -114,7 +97,7 @@
         mql.onchange = handleMqChange;
         window.addEventListener("click", handleClickOutsideHeader);
 
-        //Return: Clean-up logic goes here
+        //Clean-up logic
         return () => {
             mql.onchange = null;
             window.removeEventListener("click", handleClickOutsideHeader);
@@ -123,8 +106,7 @@
 
     // Logout Function
     async function logout(): Promise<void> {
-        const { status } = await logoutUser();
-        await navigateTo("/login", $selectedLang, {}, true);
+        await logoutUser();
     }
 
     // Enable scrolling after splash screen and content loading

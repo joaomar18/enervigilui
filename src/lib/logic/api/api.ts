@@ -1,3 +1,22 @@
+import { get } from "svelte/store";
+import { showToast } from "../view/toast";
+import { ToastType } from "$lib/stores/view/toast";
+import { navigateTo } from "../view/navigation";
+import { selectedLang } from "$lib/stores/lang/definition";
+import { loadedDone } from "$lib/stores/view/navigation";
+import { MethodPoller } from "./poller";
+
+export type CallAPIOptions = {
+    endpoint: string;
+    method: "GET" | "POST" | "PUT" | "DELETE";
+    params?: Record<string, any>;
+    timeout?: number;
+    loginPage?: boolean;
+    file?: File;
+    fileFieldName?: string;
+    setLoaded?: boolean;
+};
+
 /**
  * Makes an HTTP request to the specified API endpoint with the given parameters.
  *
@@ -120,4 +139,86 @@ export async function makeAPIRequest(
             data: null,
         };
     }
+}
+
+export async function callAPI({
+    endpoint,
+    method,
+    params = {},
+    timeout = 3000,
+    loginPage = false,
+    file = undefined,
+    fileFieldName = "file",
+    setLoaded = false,
+}: CallAPIOptions): Promise<{ sucess: boolean; data: any }> {
+    try {
+        const { status, data }: { status: number; data: any } = await makeAPIRequest(endpoint, method, params, timeout, file, fileFieldName);
+        if (status !== 200) {
+            switch (status) {
+                case -1:
+                    showToast("timeout", ToastType.ALERT);
+                    break;
+                case 401:
+                    if (loginPage) {
+                        showToast("wrongCredentials", ToastType.ALERT, { remaining: String(data.remaining) });
+                    } else {
+                        await navigateTo("/login", get(selectedLang), {}, true);
+                    }
+                    break;
+                case 429:
+                    const date = new Date(data.unlocked ?? "");
+                    const localTime = date.toLocaleTimeString(get(selectedLang) === "PT" ? "pt-PT" : "en-US", {
+                        hour: "2-digit",
+                        minute: "2-digit",
+                    });
+                    showToast("tooManyAttempts", ToastType.ALERT, { localTime: localTime });
+                    break;
+                default:
+                    showToast("unknownError", ToastType.ALERT);
+                    break;
+            }
+            return { sucess: false, data: null };
+        }
+        if (setLoaded && !get(loadedDone)) {
+            loadedDone.set(true);
+        }
+        return { sucess: true, data: data };
+    } catch (e) {
+        showToast("unexpectedError", ToastType.ALERT);
+        console.error(`Error processing request: ${e}`);
+        return { sucess: false, data: null };
+    }
+}
+
+export async function callAPIWithRetry({
+    endpoint,
+    method,
+    params = {},
+    timeout = 3000,
+    loginPage = false,
+    file = undefined,
+    fileFieldName = "file",
+    setLoaded = false,
+}: CallAPIOptions): Promise<{ sucess: boolean; data: any }> {
+    let sucess: boolean = false;
+    let data: any;
+
+    let apiCaller: MethodPoller | null = new MethodPoller(async (signal) => {
+        ({ sucess, data } = await callAPI({
+            endpoint,
+            method,
+            params,
+            timeout,
+            loginPage,
+            file,
+            fileFieldName,
+            setLoaded,
+        }));
+        if (sucess) {
+            if (apiCaller) apiCaller.stop();
+            apiCaller = null;
+        }
+    }, timeout);
+
+    return { sucess: sucess, data: data };
 }

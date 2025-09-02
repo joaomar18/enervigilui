@@ -1,8 +1,8 @@
 <script lang="ts">
-    import { onMount, onDestroy } from "svelte";
+    import { onMount } from "svelte";
     import { getDeviceState, editDevice, deleteDevice } from "$lib/logic/api/device";
     import { getDeviceNodesConfig } from "$lib/logic/api/nodes";
-    import { convertToEditableDevice, convertToDevice, processInitialDevice } from "$lib/logic/factory/device";
+    import { convertToDevice } from "$lib/logic/factory/device";
     import { updateDeviceValidation, validDeviceOperation, areDevicesEqual } from "$lib/logic/validation/device/base";
     import { convertToEditableNodes, convertToNodes, processInitialNodes } from "$lib/logic/factory/nodes";
     import { updateNodesValidation, areNodesEqual } from "$lib/logic/validation/nodes/base";
@@ -22,6 +22,7 @@
     import { protocolPlugins } from "$lib/stores/device/protocol";
     import { showToast } from "$lib/logic/view/toast";
     import { ToastType } from "$lib/stores/view/toast";
+    import { MethodRetrier } from "$lib/logic/api/retrier";
 
     // Types
     import type { DeviceMeter, EditableDeviceMeter } from "$lib/types/device/base";
@@ -47,24 +48,16 @@
     let showSaveWindow: boolean = false; // Show Save Configuration Window
     let showDeleteWindow: boolean = false; // Show Delete Device Window
     let showConfigNodeWindow: boolean = false; // Show Node Full Configuration Window
-
     let deleteDeviceName: string; // Variable to confirm device delete (must match device name)
-
     let performingSaveRequest: boolean = false; // Performing Save Device Request
     let performingDeleteRequest: boolean = false; // Performing Delete Device Request
 
-    let devicePollTimer: ReturnType<typeof setTimeout>; // Timeout for device configuration request
-    let nodesPollTimer: ReturnType<typeof setTimeout>; // Timeout for device nodes configuration request
-
     let initialDeviceData: DeviceMeter; // Initial Device Data (to check if there were changes made)
     let initialNodes: Array<DeviceNode>; // Initial Nodes (to check if there were changes made)
-
     let deviceData: EditableDeviceMeter; // Device Data
-
     let nodesInitialized: boolean = false; // Nodes are initialized (fetched) from server
     let nodes: Array<EditableDeviceNode>;
     let nodesBySection: Record<NodePhase, Array<EditableDeviceNode>>;
-
     let editingNode: EditableDeviceNode; // Current Node being edited in Configuration Window
     let editingNodeState: NodeEditState; // Current state of the Node being edited
 
@@ -90,64 +83,6 @@
 
     // Functions
 
-    //Function to fetch device configuration
-    function fetchDeviceConfig(id: number): void {
-        const tick = async () => {
-            let sucess = false;
-            try {
-                const { status, data }: { status: number; data: any } = await getDeviceState(id);
-                if (status !== 200) {
-                    showToast("errorDeviceConfig", ToastType.ALERT, {
-                        error: String(data["error"]),
-                    });
-                } else {
-                    const { image: deviceImage, ...requestDeviceData } = data as DeviceMeter & { image: Record<string, string> };
-                    initialDeviceData = processInitialDevice(requestDeviceData as DeviceMeter);
-                    deviceData = convertToEditableDevice(initialDeviceData, deviceImage);
-                    sucess = true;
-                }
-            } catch (e) {
-                showToast("errorDeviceConfig", ToastType.ALERT, {
-                    error: String(e),
-                });
-                console.error(`Could not obtain the device configuration: ${e}`);
-            }
-            loadedDone.set(true);
-            if (!sucess) {
-                devicePollTimer = setTimeout(tick, 2500);
-            }
-        };
-        tick();
-    }
-
-    // Function to fetch device nodes (variables)
-    function fetchDeviceNodesConfig(id: number): void {
-        const tick = async () => {
-            let sucess = false;
-            try {
-                const { status, data }: { status: number; data: any } = await getDeviceNodesConfig(id);
-                if (status !== 200) {
-                    showToast("errorDeviceNodesConfig", ToastType.ALERT, {
-                        error: String(data["error"]),
-                    });
-                } else {
-                    let requestDeviceNodes: Record<string, DeviceNode> = data;
-                    initialNodes = processInitialNodes(Object.values(requestDeviceNodes) as Array<DeviceNode>);
-                    sucess = true;
-                }
-            } catch (e) {
-                showToast("errorDeviceNodesConfig", ToastType.ALERT, {
-                    error: String(e),
-                });
-                console.error(`Could not obtain the nodes configuration: ${e}`);
-            }
-            if (!sucess) {
-                nodesPollTimer = setTimeout(tick, 2500);
-            }
-        };
-        tick();
-    }
-
     // When device data is ready as well as nodes, initializes nodes
     $: if (initialNodes && deviceData && !nodesInitialized) {
         try {
@@ -155,7 +90,6 @@
             nodesInitialized = true;
         } catch (e) {
             console.error(`Could not initialize the nodes configuration from the request: ${e}`);
-            setTimeout(() => fetchDeviceNodesConfig(deviceData.id), 2500);
         }
     }
 
@@ -164,31 +98,18 @@
         if (validDeviceOperation(deviceData)) {
             let convertedDevice = convertToDevice(deviceData);
             let convertedNodes = convertToNodes(nodes);
-
-            try {
-                if (
-                    areNodesEqual(initialNodes, convertedNodes) &&
-                    areDevicesEqual(initialDeviceData, convertedDevice) &&
-                    deviceData.device_image === undefined
-                ) {
-                    showToast("noChangesToDevice", ToastType.INFO);
-                    showSaveWindow = false;
-                    return;
-                }
-                performingSaveRequest = true;
-                const { status, data } = await editDevice(convertedDevice, deviceData.device_image, convertedNodes);
-                performingSaveRequest = false;
-                if (status !== 200) {
-                    showToast("editDeviceRequestError", ToastType.ALERT, {
-                        error: String(data["error"]),
-                    });
-                    showSaveWindow = false;
-                    return;
-                }
-                await navigateTo("/devices", $selectedLang, {});
-            } catch (e) {
-                console.error(e);
+            if (
+                areNodesEqual(initialNodes, convertedNodes) &&
+                areDevicesEqual(initialDeviceData, convertedDevice) &&
+                deviceData.device_image === undefined
+            ) {
+                showToast("noChangesToDevice", ToastType.INFO);
+                showSaveWindow = false;
+                return;
             }
+            performingSaveRequest = true;
+            await editDevice(convertedDevice, deviceData.device_image, convertedNodes);
+            performingSaveRequest = false;
         }
         showSaveWindow = false;
     }
@@ -202,22 +123,9 @@
     // Function to delete device
     async function deleteDeviceConfirmation(): Promise<void> {
         if ($loadedDone && nodesInitialized) {
-            try {
-                performingDeleteRequest = true;
-                const { status, data } = await deleteDevice(deviceData.name, deviceData.id);
-                performingDeleteRequest = false;
-                if (status !== 200) {
-                    showToast("deleteDeviceRequestError", ToastType.ALERT, {
-                        error: String(data["error"]),
-                    });
-                    deleteDeviceName = "";
-                    showDeleteWindow = false;
-                    return;
-                }
-                await navigateTo("/devices", $selectedLang, {});
-            } catch (e) {
-                console.error(e);
-            }
+            performingDeleteRequest = true;
+            await deleteDevice(deviceData.name, deviceData.id);
+            performingDeleteRequest = false;
         }
         deleteDeviceName = "";
         showDeleteWindow = false;
@@ -227,19 +135,28 @@
     onMount(() => {
         const params = new URLSearchParams(window.location.search);
         let deviceId = params.get("deviceId");
+        let deviceDataRetrier: MethodRetrier | null;
+        let nodesConfigRetrier: MethodRetrier | null;
+
         if (deviceId) {
-            fetchDeviceConfig(Number(deviceId));
-            fetchDeviceNodesConfig(Number(deviceId));
+            deviceDataRetrier = new MethodRetrier(async (signal) => {
+                ({ initialDeviceData, deviceData } = await getDeviceState(Number(deviceId)));
+            }, 3000);
+            nodesConfigRetrier = new MethodRetrier(async (signal) => {
+                ({ initialNodes } = await getDeviceNodesConfig(Number(deviceId)));
+            }, 3000);
         } else {
             showToast("errorEditDeviceParams", ToastType.ALERT);
             loadedDone.set(true);
         }
-    });
 
-    // Cleanup function
-    onDestroy(() => {
-        clearTimeout(devicePollTimer);
-        clearTimeout(nodesPollTimer);
+        //Clean-up logic
+        return () => {
+            deviceDataRetrier?.stop();
+            nodesConfigRetrier?.stop();
+            deviceDataRetrier = null;
+            nodesConfigRetrier = null;
+        };
     });
 </script>
 

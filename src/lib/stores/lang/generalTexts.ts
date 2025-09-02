@@ -67,8 +67,8 @@ const textsObject: TextsObject = {
         EN: "The server did not respond to the request.",
     },
     tooManyAttempts: {
-        PT: "O servidor bloqueou este endereço até às {localTime} devido a demasiadas tentativas inválidas.",
-        EN: "The server has blocked this address until {localTime} due to too many invalid attempts.",
+        PT: "O servidor bloqueou este cliente até às {localTime} devido a demasiadas tentativas inválidas.",
+        EN: "The server has blocked this client until {localTime} due to too many invalid attempts.",
     },
     unknownError: {
         PT: "O servidor encontrou um erro fatal no pedido. Por favor contacte o administrador do sistema.",

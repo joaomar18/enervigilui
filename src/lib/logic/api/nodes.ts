@@ -1,11 +1,21 @@
-import { makeAPIRequest } from "$lib/logic/api/api";
+import { callAPI } from "$lib/logic/api/api";
+import { processInitialNodes } from "../factory/nodes";
+import type { DeviceNode } from "$lib/types/nodes/base";
 
-/**
- * Gets config of nodes for a device.
- * @param id - Device ID.
- * @param timeout - Request timeout (ms).
- * @returns Promise with status and data.
- */
-export async function getDeviceNodesConfig(id: number, timeout: number = 3000): Promise<{ status: number; data: any }> {
-    return makeAPIRequest("/api/nodes/get_nodes_config", "GET", { id }, timeout);
+export async function getDeviceNodesConfig(id: number): Promise<{ initialNodes: Array<DeviceNode> }> {
+    let initialNodes: Array<DeviceNode>;
+    const { sucess, data } = await callAPI({
+        endpoint: "/api/nodes/get_nodes_config",
+        method: "GET",
+        params: { id },
+    });
+
+    if (sucess) {
+        let requestDeviceNodes: Record<string, DeviceNode> = data;
+        initialNodes = processInitialNodes(Object.values(requestDeviceNodes) as Array<DeviceNode>);
+    } else {
+        throw new Error("Get device nodes config error");
+    }
+
+    return { initialNodes };
 }

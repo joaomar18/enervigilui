@@ -1,76 +1,104 @@
-import { makeAPIRequest } from "$lib/logic/api/api";
-import type { DeviceMeter } from "$lib/types/device/base";
+import { get } from "svelte/store";
+import { callAPI } from "$lib/logic/api/api";
+import type { DeviceMeter, EditableDeviceMeter } from "$lib/types/device/base";
 import type { DeviceNode } from "$lib/types/nodes/base";
+import { processInitialDevice, convertToEditableDevice } from "../factory/device";
+import { selectedLang } from "$lib/stores/lang/definition";
+import { navigateTo } from "../view/navigation";
 
-/**
- * Gets all devices' state/config from server.
- * @param timeout - Request timeout (ms).
- * @returns Promise with status and data.
- */
-export async function getAllDevicesState(timeout: number = 3000): Promise<{ status: number; data: any }> {
-    return makeAPIRequest("/api/device/get_all_devices_state", "GET", {}, timeout);
+export async function getAllDevicesState(): Promise<{ devices: Array<DeviceMeter>; devicesImages: Record<number, string> }> {
+    let devices: Array<DeviceMeter>;
+    let devicesImages: Record<number, string> = {};
+
+    const { sucess, data } = await callAPI({
+        endpoint: "/api/device/get_all_devices_state",
+        method: "GET",
+        setLoaded: true,
+    });
+    if (sucess) {
+        devices = data.map((data: DeviceMeter & { image: Record<string, string> }) => {
+            const { image: deviceImage, ...requestDeviceData } = data as DeviceMeter & { image: Record<string, string> };
+            let deviceData: DeviceMeter = processInitialDevice(requestDeviceData as DeviceMeter);
+            devicesImages[deviceData.id] = `data:${deviceImage["type"]};base64,${deviceImage["data"]}`;
+            return deviceData;
+        }) as Array<DeviceMeter>;
+    } else {
+        throw new Error("Get all devices state error");
+    }
+
+    return { devices, devicesImages };
 }
 
-/**
- * Gets a device's state/config from server.
- * @param id - Device ID.
- * @param timeout - Request timeout (ms).
- * @returns Promise with status and data.
- */
-export async function getDeviceState(id: number, timeout: number = 3000): Promise<{ status: number; data: any }> {
-    return makeAPIRequest("/api/device/get_device_state", "GET", { id }, timeout);
+export async function getDeviceState(id: number): Promise<{ initialDeviceData: DeviceMeter; deviceData: EditableDeviceMeter }> {
+    let initialDeviceData: DeviceMeter;
+    let deviceData: EditableDeviceMeter;
+    const { sucess, data } = await callAPI({
+        endpoint: "/api/device/get_device_state",
+        method: "GET",
+        params: { id },
+        setLoaded: true,
+    });
+    if (sucess) {
+        const { image: deviceImage, ...requestDeviceData } = data as DeviceMeter & { image: Record<string, string> };
+        initialDeviceData = processInitialDevice(requestDeviceData as DeviceMeter);
+        deviceData = convertToEditableDevice(initialDeviceData, deviceImage);
+    } else {
+        throw new Error("Get device state error");
+    }
+
+    return { initialDeviceData, deviceData };
 }
 
-/**
- * Gets default device image from server.
- * @param timeout - Request timeout (ms).
- * @returns Promise with status and data.
- */
-export async function getDefaultImage(timeout: number = 3000): Promise<{ status: number; data: any }> {
-    return makeAPIRequest("/api/device/get_default_image", "GET", {}, timeout);
+export async function getDefaultImage(): Promise<string> {
+    let imageData: Record<string, string>;
+    const { sucess, data } = await callAPI({
+        endpoint: "/api/device/get_default_image",
+        method: "GET",
+        setLoaded: true,
+    });
+    if (sucess) {
+        imageData = data as Record<string, string>;
+    } else {
+        throw new Error("Get default image error");
+    }
+    return `data:${imageData["type"]};base64,${imageData["data"]}`;
 }
 
-/**
- * Adds a new device to the server.
- * @param deviceData - Device config.
- * @param deviceImage - Optional image file.
- * @param deviceNodes - Associated nodes.
- * @param timeout - Request timeout (ms).
- * @returns Promise with status and data.
- */
-export async function addDevice(
-    deviceData: DeviceMeter,
-    deviceImage: File | undefined,
-    deviceNodes: Array<DeviceNode>,
-    timeout: number = 3000
-): Promise<{ status: number; data: any }> {
-    return makeAPIRequest("/api/device/add_device", "POST", { deviceData, deviceNodes }, timeout, deviceImage, "deviceImage");
+export async function addDevice(deviceData: DeviceMeter, deviceImage: File | undefined, deviceNodes: Array<DeviceNode>) {
+    const { sucess, data } = await callAPI({
+        endpoint: "/api/device/add_device",
+        method: "POST",
+        params: { deviceData, deviceNodes },
+        file: deviceImage,
+        fileFieldName: "deviceImage",
+    });
+    if (sucess) {
+        await navigateTo("/devices", get(selectedLang), {});
+    }
 }
 
-/**
- * Updates an existing device on the server.
- * @param deviceData - Device config.
- * @param deviceImage - Optional image file.
- * @param deviceNodes - Associated nodes.
- * @param timeout - Request timeout (ms).
- * @returns Promise with status and data.
- */
-export async function editDevice(
-    deviceData: DeviceMeter,
-    deviceImage: File | undefined,
-    deviceNodes: Array<DeviceNode>,
-    timeout: number = 3000
-): Promise<{ status: number; data: any }> {
-    return makeAPIRequest("/api/device/edit_device", "POST", { deviceData, deviceNodes }, timeout, deviceImage, "deviceImage");
+export async function editDevice(deviceData: DeviceMeter, deviceImage: File | undefined, deviceNodes: Array<DeviceNode>) {
+    const { sucess, data } = await callAPI({
+        endpoint: "/api/device/edit_device",
+        method: "POST",
+        params: { deviceData, deviceNodes },
+        file: deviceImage,
+        fileFieldName: "deviceImage",
+    });
+    if (sucess) {
+        await navigateTo("/devices", get(selectedLang), {});
+    }
+    return data;
 }
 
-/**
- * Deletes a device from the server.
- * @param deviceName - Device name.
- * @param deviceID - Device ID.
- * @param timeout - Request timeout (ms).
- * @returns Promise with status and data.
- */
-export async function deleteDevice(deviceName: string, deviceID: number, timeout: number = 3000): Promise<{ status: number; data: any }> {
-    return makeAPIRequest("/api/device/delete_device", "DELETE", { deviceName, deviceID }, timeout);
+export async function deleteDevice(deviceName: string, deviceID: number) {
+    const { sucess, data } = await callAPI({
+        endpoint: "/api/device/delete_device",
+        method: "DELETE",
+        params: { deviceName, deviceID },
+    });
+    if (sucess) {
+        await navigateTo("/devices", get(selectedLang), {});
+    }
+    return data;
 }

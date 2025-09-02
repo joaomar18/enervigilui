@@ -1,17 +1,13 @@
 <script lang="ts">
     import { loginUser } from "$lib/logic/api/auth";
-    import { interpretLoginStatus, validateUsername, validatePassword } from "$lib/logic/validation/auth";
-    import { navigateTo } from "$lib/logic/view/navigation";
+    import { validateUsername, validatePassword } from "$lib/logic/validation/auth";
     import LoginField from "./LoginField.svelte";
     import LoginButton from "./LoginButton.svelte";
     import ForgotPassButton from "./ForgotPassButton.svelte";
     import Checkbox from "../General/Checkbox.svelte";
-    import { ToastType } from "$lib/stores/view/toast";
-    import { showToast } from "$lib/logic/view/toast";
 
     // Texts
     import { texts } from "$lib/stores/lang/generalTexts";
-    import { selectedLang } from "$lib/stores/lang/definition";
 
     // Styles
     import { mergeStyle } from "$lib/style/components";
@@ -58,32 +54,9 @@
     // Login Logic
     async function login(): Promise<void> {
         loginAttempt = true;
-
-        const validInputs: boolean = validateUsername(username) && validatePassword(password);
-        if (!validInputs) return;
-
         loginProcessing = true;
-
-        try {
-            // Send login request
-            const { status, data }: { status: number; data: any } = await loginUser(
-                username, // Username
-                password, // Password
-                autoLogin, // Auto-login flag
-            );
-
-            // Handle success or failure
-            if (status === 200) {
-                await navigateTo("/devices", $selectedLang, {}, true); // Navigate to the dashboard on success
-            } else {
-                interpretLoginStatus(status, data); // Handle error
-            }
-        } catch (e) {
-            showToast("unexpectedError", ToastType.ALERT);
-            console.error(`Error processing login request: ${e}`);
-        } finally {
-            loginProcessing = false;
-        }
+        await loginUser(username, password, autoLogin);
+        loginProcessing = false;
     }
 
     function forgotPassword(): void {
@@ -178,6 +151,10 @@
         margin: 0;
         padding: 0;
         width: 100%;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
         height: fit-content;
     }
 
