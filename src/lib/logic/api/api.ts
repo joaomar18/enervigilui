@@ -189,36 +189,3 @@ export async function callAPI({
         return { sucess: false, data: null };
     }
 }
-
-export async function callAPIWithRetry({
-    endpoint,
-    method,
-    params = {},
-    timeout = 3000,
-    loginPage = false,
-    file = undefined,
-    fileFieldName = "file",
-    setLoaded = false,
-}: CallAPIOptions): Promise<{ sucess: boolean; data: any }> {
-    let sucess: boolean = false;
-    let data: any;
-
-    let apiCaller: MethodPoller | null = new MethodPoller(async (signal) => {
-        ({ sucess, data } = await callAPI({
-            endpoint,
-            method,
-            params,
-            timeout,
-            loginPage,
-            file,
-            fileFieldName,
-            setLoaded,
-        }));
-        if (sucess) {
-            if (apiCaller) apiCaller.stop();
-            apiCaller = null;
-        }
-    }, timeout);
-
-    return { sucess: sucess, data: data };
-}
