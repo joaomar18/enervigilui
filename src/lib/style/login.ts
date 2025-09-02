@@ -41,7 +41,7 @@ const ForgotPassButtonStyleConfig: ComponentStyles = {
 
 export const ForgotPassButtonStyle = createStyleStore(ForgotPassButtonStyleConfig);
 
-//////////     I N P U T     F I E L D     //////////
+//////////     L O G I N     F I E L D     //////////
 
 const LoginFieldStyleConfig: ComponentStyles = {
     dark: {
@@ -55,7 +55,30 @@ const LoginFieldStyleConfig: ComponentStyles = {
 
 export const LoginFieldStyle = createStyleStore(LoginFieldStyleConfig);
 
-//////////     I N P U T     F I E L D     //////////
+//////////     L O G I N     H I N T     I N F O     //////////
+
+const LoginHintInfoStyleConfig: ComponentStyles = {
+    dark: {
+        hintWidth: "300px",
+        hintHeight: "fit-content",
+        textColor: "#d72638",
+        hintBackgroundColor: "#1e242b",
+        hintBorderColor: "#2c343d",
+        hintBorderRadius: "10px",
+        openBackgroundColor: "rgba(215, 38, 56, 0.2)",
+        openHoverBackgroundColor: "rgba(255, 255, 255, 0.1)",
+        openStrokeColor: "#d72638",
+        openHoverStrokeColor: "#ff3e50",
+        closeBackgroundColor: "rgba(255, 255, 255, 0.1)",
+        closeHoverBackgroundColor: "rgba(255, 255, 255, 0.2)",
+        closeStrokeColor: "white",
+        closeHoverStrokeColor: "#eeeeee",
+    },
+};
+
+export const LoginHintInfoStyle = createStyleStore(LoginHintInfoStyleConfig);
+
+//////////     L O G I N     B U T T O N     //////////
 
 const LoginButtonStyleConfig: ComponentStyles = {
     dark: {

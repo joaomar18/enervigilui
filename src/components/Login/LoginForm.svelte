@@ -117,6 +117,7 @@
             incorrect={usernameIncorrect}
             incorrectText={usernameErrorText}
             hintText={$texts.userInfo}
+            onSubmit={login}
         />
         <LoginField
             id="password"
@@ -128,6 +129,7 @@
             incorrect={passwordIncorrect}
             incorrectText={passwordErrorText}
             hintText={$texts.passwordInfo}
+            onSubmit={login}
         />
     </form>
     <div class="checkbox-div">

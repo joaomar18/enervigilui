@@ -4,6 +4,7 @@
     // Styles
     import { mergeStyle } from "$lib/style/components";
     import { LoginFieldStyle } from "$lib/style/login";
+    import { LoginHintInfoStyle } from "$lib/style/login";
 
     // Style object (from theme)
     export let style: { [property: string]: string | number } | null = null;
@@ -38,11 +39,26 @@
     $: mergedStyle = mergeStyle(effectiveStyle, localOverrides);
 
     // Variables
+    let inputElement: HTMLInputElement;
     let showPassword: boolean = false;
+
+    // Click Export Function
+    export let onSubmit: () => void;
 
     // Functions
     function togglePassword(): void {
         showPassword = !showPassword;
+    }
+
+    function handleKeydown(event: KeyboardEvent) {
+        if (event.key === "Enter") {
+            event.preventDefault();
+            if (onSubmit) {
+                onSubmit();
+            }
+        } else if (event.key === "Escape") {
+            inputElement.blur();
+        }
     }
 </script>
 
@@ -71,23 +87,35 @@
         {#if type === "password"}
             {#if !showPassword}
                 <input
+                    bind:this={inputElement}
                     type="password"
                     {id}
                     autocomplete="current-password"
                     style="padding-right:50px; {incorrect ? 'border: 2px solid #D72638' : ''}"
                     bind:value
+                    on:keydown={handleKeydown}
                 />
             {:else}
                 <input
+                    bind:this={inputElement}
                     type="text"
                     {id}
                     autocomplete="current-password"
                     style="padding-right:50px; {incorrect ? 'border: 2px solid #D72638' : ''}"
                     bind:value
+                    on:keydown={handleKeydown}
                 />
             {/if}
         {:else}
-            <input type="text" {id} autocomplete="username" bind:value style={incorrect ? "border: 2px solid #D72638" : ""} />
+            <input
+                bind:this={inputElement}
+                type="text"
+                {id}
+                autocomplete="username"
+                bind:value
+                style={incorrect ? "border: 2px solid #D72638" : ""}
+                on:keydown={handleKeydown}
+            />
         {/if}
         {#if type === "password"}
             <div class="show-hide-div" style="width:{mergedStyle.imageWidth}; height:{mergedStyle.imageHeight};">
@@ -104,23 +132,7 @@
         {/if}
         {#if incorrect}
             <div class="warning-div">
-                <HintInfo
-                    labelText={incorrectText}
-                    hintWidth="300px"
-                    hintHeight="fit-content"
-                    hintBackgroundColor="#1e242b"
-                    hintBorderColor="#2c343d"
-                    hintBorderRadius="10px"
-                    textColor="#d72638"
-                    openBackgroundColor="rgba(215, 38, 56, 0.1)"
-                    openHoverBackgroundColor="rgba(215, 38, 56, 0.2)"
-                    openStrokeColor="#d72638"
-                    openHoverStrokeColor="#ff3e50"
-                    closeBackgroundColor="rgba(255, 255, 255, 0.1)"
-                    closeHoverBackgroundColor="rgba(255, 255, 255, 0.2)"
-                    closeStrokeColor="white"
-                    closeHoverStrokeColor="#eeeeee"
-                >
+                <HintInfo labelText={incorrectText} style={$LoginHintInfoStyle}>
                     <span class="warning-text">{hintText}</span>
                 </HintInfo>
             </div>

@@ -87,7 +87,7 @@
   - Fully customizable via props for size, colors, and border styles.
 -->
 <div class="info-div">
-    <span style="--info-text-color:{textColor}" class="info-text">{labelText}</span>
+    <span style="--info-text-color:{mergedStyle.textColor}" class="info-text">{labelText}</span>
     <div
         bind:this={hintDiv}
         class="hint-div"
