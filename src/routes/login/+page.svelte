@@ -10,7 +10,7 @@
     import { closeToast } from "$lib/logic/view/toast";
 
     // Texts
-    import { texts } from "$lib/stores/lang/generalTexts";
+    import { toastTexts } from "$lib/stores/lang/toastTexts";
 </script>
 
 <!-- 
@@ -22,7 +22,7 @@
     <div class="column" id="first-col">
         <LoginForm />
         {#if $displayToast}
-            <Toast topPos="94px" toastText={$texts[$toastKey]} toastType={$toastType} toastVariables={$toastVariables} onClick={closeToast} />
+            <Toast topPos="94px" toastText={$toastTexts[$toastKey]} toastType={$toastType} toastVariables={$toastVariables} onClick={closeToast} />
         {/if}
     </div>
     <div class="column" id="second-col">

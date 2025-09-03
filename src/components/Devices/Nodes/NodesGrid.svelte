@@ -3,7 +3,7 @@
     import AddNode from "./AddNode.svelte";
     import { onMount, onDestroy } from "svelte";
     import { addNode } from "$lib/logic/factory/nodes";
-    import { getNodeIndex } from "$lib/logic/util/nodes";
+    import { deleteNodeFromArray } from "$lib/logic/handlers/nodes";
     import { nodeSections } from "$lib/types/nodes/base";
     import { protocolPlugins } from "$lib/stores/device/protocol";
 
@@ -30,9 +30,9 @@
 
     // Props
     export let deviceData: EditableDeviceMeter | NewDeviceMeter;
-    export let nodesInitialized: boolean; // Nodes are initialized
     export let nodes: Array<EditableDeviceNode> = []; // Nodes Configuration (Formatted)
     export let nodesBySection: Record<NodePhase, Array<EditableDeviceNode>>; // Nodes Configuration by Section
+    export let nodesInit: boolean; // Nodes are initialized
 
     // Layout / styling props
     export let width: string | undefined = undefined;
@@ -146,7 +146,7 @@ Includes multi-language headers and adapts layout to container size. -->
     class="container"
 >
     <div class="content">
-        <div class="loader-overlay" class:close={nodesInitialized}>
+        <div class="loader-overlay" class:close={nodesInit}>
             <div class="spinner"></div>
         </div>
         <table>
@@ -219,10 +219,7 @@ Includes multi-language headers and adapts layout to container size. -->
                                 {columnVisibility}
                                 {windowWidth}
                                 onDelete={() => {
-                                    let deletedNodeIndex = getNodeIndex(node, nodes);
-                                    if (deletedNodeIndex !== -1) {
-                                        nodes = [...nodes.slice(0, deletedNodeIndex), ...nodes.slice(deletedNodeIndex + 1)];
-                                    }
+                                    nodes = deleteNodeFromArray(node, nodes);
                                 }}
                                 onConfig={(nodeEditingState: NodeEditState) => {
                                     onShowConfigPopup(node, nodeEditingState);
@@ -250,10 +247,7 @@ Includes multi-language headers and adapts layout to container size. -->
                                 {columnVisibility}
                                 {windowWidth}
                                 onDelete={() => {
-                                    let deletedNodeIndex = getNodeIndex(node, nodes);
-                                    if (deletedNodeIndex !== -1) {
-                                        nodes = [...nodes.slice(0, deletedNodeIndex), ...nodes.slice(deletedNodeIndex + 1)];
-                                    }
+                                    nodes = deleteNodeFromArray(node, nodes);
                                 }}
                                 onConfig={(nodeEditingState: NodeEditState) => {
                                     onShowConfigPopup(node, nodeEditingState);

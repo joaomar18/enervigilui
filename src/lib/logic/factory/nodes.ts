@@ -9,6 +9,8 @@ import { getInitialNodeValidation } from "../validation/nodes/base";
 import { stringIsValidInteger, stringIsValidFloat } from "$lib/logic/util/generic";
 import { protocolPlugins } from "$lib/stores/device/protocol";
 import { normalizeNode } from "../util/nodes";
+import { showToast } from "../view/toast";
+import { ToastType } from "$lib/stores/view/toast";
 
 /**
  * Converts a BaseNodeConfig object to an EditableBaseNodeConfig for use in UI forms.
@@ -218,6 +220,19 @@ export function processInitialNodes(nodes: Array<DeviceNode>): Array<DeviceNode>
     }
 
     return (sortNodesByName(deviceNodes) as Array<DeviceNode>).map(normalizeNode);
+}
+
+export function initNodes(meterType: MeterType, initialNodes: Array<DeviceNode>): { sucess: boolean; editableNodes: Array<EditableDeviceNode> } {
+    let editableNodes: Array<EditableDeviceNode> = [];
+    let sucess = false;
+    try {
+        editableNodes = convertToEditableNodes(initialNodes, meterType);
+        sucess = true;
+    } catch (e) {
+        console.error(`Could not initialize the nodes configuration: ${e}`);
+        showToast("initNodesError", ToastType.ALERT, { error: String(e) });
+    }
+    return { sucess, editableNodes };
 }
 
 /**

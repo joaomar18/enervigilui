@@ -58,22 +58,6 @@ const textsObject: TextsObject = {
         PT: "A palavra-passe deve conter pelo menos 5 caracteres sem espaços.",
         EN: "The password must contain at least 5 characters without spaces.",
     },
-    wrongCredentials: {
-        PT: "O nome de utilizador e/ou a palavra-passe estão incorretos. Tentativas restantes: {remaining}",
-        EN: "The username and/or password are incorrect. Remaining tries: {remaining}",
-    },
-    timeout: {
-        PT: "O servidor não respondeu ao pedido.",
-        EN: "The server did not respond to the request.",
-    },
-    tooManyAttempts: {
-        PT: "O servidor bloqueou este cliente até às {localTime} devido a demasiadas tentativas inválidas.",
-        EN: "The server has blocked this client until {localTime} due to too many invalid attempts.",
-    },
-    unknownError: {
-        PT: "O servidor encontrou um erro fatal no pedido. Por favor contacte o administrador do sistema.",
-        EN: "The server encountered a fatal error in the request. Please contact your system administrator.",
-    },
     keepSessionLogged: {
         PT: "Manter sessão iniciada",
         EN: "Stay logged in",
@@ -93,10 +77,6 @@ const textsObject: TextsObject = {
     contacts: {
         PT: "Contactos",
         EN: "Contacts",
-    },
-    unexpectedError: {
-        PT: "Ocorreu um erro inesperado. Por favor tente mais tarde.",
-        EN: "An unexpected error occurred. Please try again.",
     },
     devices: {
         PT: "Dispositivos",
@@ -161,10 +141,6 @@ const textsObject: TextsObject = {
     errorDeviceNodesConfig: {
         PT: "Não foi possível obter a configuração das variáveis para o dispositivo do servidor: {error}",
         EN: "Could not obtain device variables configuration from the server: {error}",
-    },
-    errorEditDeviceParams: {
-        PT: "Não foram atribuídos o nome e/ou o id do dispositivo.",
-        EN: "The name and/or the id of the device were not assigned.",
     },
     errorDefaultImage: {
         PT: "Não foi possível obter a imagem padrão para o dispositivo: {error}",
@@ -319,14 +295,6 @@ const textsObject: TextsObject = {
         PT: "seg.",
         EN: "sec.",
     },
-    readPeriodError: {
-        PT: "O período de leitura deve estar compreendido entre {minValue} e {maxValue} segundos.",
-        EN: "The read period must be between {minValue} and {maxValue} seconds.",
-    },
-    commTimeoutError: {
-        PT: "O tempo limite de comunicação deve estar compreendido entre {minValue} e {maxValue} segundos.",
-        EN: "The communication timeout must be between {minValue} and {maxValue} seconds.",
-    },
     communicationPort: {
         PT: "Porta de Comunicação",
         EN: "Communication Port",
@@ -342,10 +310,6 @@ const textsObject: TextsObject = {
     slaveIDInfo: {
         PT: "Identificador único do dispositivo na rede Modbus. Deve ser um número entre 1 e 247.",
         EN: "Unique identifier of the device on the Modbus network. Must be a number between 1 and 247.",
-    },
-    slaveIDError: {
-        PT: "O ID do dispositivo deve estar compreendido entre {minValue} e {maxValue}.",
-        EN: "The device ID must be between {minValue} and {maxValue}.",
     },
     baudrate: {
         PT: "Baudrate",
@@ -386,10 +350,6 @@ const textsObject: TextsObject = {
     retriesInfo: {
         PT: "O número de tentativas de reenvio em caso de falha na comunicação com o dispositivo.",
         EN: "The number of retries in case of communication failure with the device.",
-    },
-    retriesError: {
-        PT: "O número de tentativas de reenvio deve estar compreendido entre {minValue} e {maxValue}.",
-        EN: "The number of retries must be between {minValue} and {maxValue}.",
     },
     variable: {
         PT: "Variável",
@@ -458,10 +418,6 @@ const textsObject: TextsObject = {
     actions: {
         PT: "Ações",
         EN: "Actions",
-    },
-    loggingPeriodError: {
-        PT: "O período de registo deve estar compreendido entre {minValue} e {maxValue}.",
-        EN: "The logging period must be between {minValue} and {maxValue}.",
     },
     minValue: {
         PT: "Valor Mínimo",
@@ -579,10 +535,6 @@ const textsObject: TextsObject = {
         PT: "Defina o número de casas decimais para apresentar os valores desta variável. Use para ajustar a precisão da visualização.",
         EN: "Set the number of decimal places to display for this variable's values. Use to adjust the precision of visualization",
     },
-    decimalPlacesError: {
-        PT: "O número de casas decimais deve estar compreendido entre {minValue} e {maxValue}.",
-        EN: "The number of decimal places must be between {minValue} and {maxValue}.",
-    },
     deviceName: {
         PT: "Nome do dispositivo",
         EN: "Device name",
@@ -598,30 +550,6 @@ const textsObject: TextsObject = {
     addNewDeviceInfo: {
         PT: "Confirmar a adição irá criar um novo dispositivo. Tem a certeza que pretende continuar?",
         EN: "Confirming will create a new device. Are you sure you want to continue?",
-    },
-    invalidDeviceName: {
-        PT: "O nome do dispositivo é inválido.",
-        EN: "The device name is invalid.",
-    },
-    invalidProtocol: {
-        PT: "O protocolo de comunicação selecionado é inválido ou não suportado.",
-        EN: "The selected communication protocol is invalid or not supported.",
-    },
-    invalidCommunicationOptions: {
-        PT: "As opções relacionadas com a comunicação do dispositivo são inválidas.",
-        EN: "The options related to device communication are invalid.",
-    },
-    invalidMeterOptions: {
-        PT: "As opções relacionadas com o tipo e gestão do dispositivo são inválidas.",
-        EN: "The options related to device type and management are invalid.",
-    },
-    invalidDeviceNodes: {
-        PT: "Existem variáveis do dispositivo com configurações inválidas.",
-        EN: "There are device variables with invalid configurations.",
-    },
-    noChangesToDevice: {
-        PT: "Não foram efetuadas alterações às configurações do dispositivo. Não é necessário guardar a edição.",
-        EN: "No changes were made to the device configuration. There is no need to save the edit.",
     },
     cancelDeviceEdit: {
         PT: "Cancelar edição do dispositivo",

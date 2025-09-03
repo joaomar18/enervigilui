@@ -1,6 +1,11 @@
-import type { DeviceMeter } from "$lib/types/device/base";
+import type { DeviceMeter, EditableDeviceMeter, NewDeviceMeter } from "$lib/types/device/base";
+import type { DeviceNode, EditableDeviceNode } from "$lib/types/nodes/base";
 import type { DeviceOPCUAConfig } from "$lib/types/device/opcUa";
 import type { DeviceModbusRTUConfig } from "$lib/types/device/modbusRtu";
+import { areDevicesEqual } from "../validation/device/base";
+import { areNodesEqual } from "../validation/nodes/base";
+import { convertToDevice } from "../factory/device";
+import { convertToNodes } from "../factory/nodes";
 
 /**
  * Filters devices by name or ID.
@@ -51,4 +56,28 @@ export function normalizeDevice(device: DeviceMeter): DeviceMeter {
             | DeviceOPCUAConfig
             | DeviceModbusRTUConfig,
     };
+}
+
+/**
+ * Checks if there are no changes between initial and current device/nodes data.
+ * @param initialDeviceData Original device data
+ * @param deviceData Current editable device data
+ * @param initialNodes Original nodes array
+ * @param nodes Current editable nodes array
+ * @returns True if no changes detected, false otherwise
+ */
+export function noChangesToDevice(
+    initialDeviceData: DeviceMeter,
+    deviceData: EditableDeviceMeter | NewDeviceMeter,
+    initialNodes: Array<DeviceNode>,
+    nodes: Array<EditableDeviceNode>
+): boolean {
+    if (
+        areNodesEqual(initialNodes, convertToNodes(nodes)) &&
+        areDevicesEqual(initialDeviceData, convertToDevice(deviceData)) &&
+        deviceData.device_image === undefined
+    ) {
+        return true;
+    }
+    return false;
 }

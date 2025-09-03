@@ -5,28 +5,27 @@
     import { convertToNodes, getDefaultNodesList } from "$lib/logic/factory/nodes";
     import { updateDeviceValidation, validDeviceOperation } from "$lib/logic/validation/device/base";
     import { updateNodesValidation } from "$lib/logic/validation/nodes/base";
-    import { getNodeIndex } from "$lib/logic/util/nodes";
-    import { changeNodeProtocol } from "$lib/logic/handlers/nodes";
-    import { nodeSections } from "$lib/types/nodes/base";
     import Selector from "../../../components/General/Selector.svelte";
     import HintInfo from "../../../components/General/HintInfo.svelte";
     import EditableText from "../../../components/General/EditableText.svelte";
     import UploadImage from "../../../components/General/UploadImage.svelte";
     import Button from "../../../components/General/Button.svelte";
-    import ModalWindow from "../../../components/General/ModalWindow.svelte";
     import NodesGrid from "../../../components/Devices/Nodes/NodesGrid.svelte";
-    import NodeConfigWindow from "../../../components/Devices/Nodes/NodeConfigWindow.svelte";
+    import PopupNodeConfig from "../../../components/Devices/Nodes/PopupNodeConfig.svelte";
+    import PopupAddDevice from "../../../components/Devices/PopupAddDevice.svelte";
     import MeterOptionsConfig from "../../../components/Devices/MeterOptionsConfig.svelte";
     import { defaultDeviceOptions } from "$lib/types/device/base";
     import { protocolPlugins } from "$lib/stores/device/protocol";
     import { MethodRetrier } from "$lib/logic/api/retrier";
+    import { deviceProtocolChange } from "$lib/logic/handlers/device";
+    import { updateNodes, updateEditingNode, updateNodesBySection } from "$lib/logic/handlers/nodes";
 
     // Types
     import type { NewDeviceMeter } from "$lib/types/device/base";
     import type { EditableDeviceNode, NodeEditState, NodePhase } from "$lib/types/nodes/base";
 
     // Styles
-    import { SubSucessButtonStyle, SucessButtonStyle } from "$lib/style/button";
+    import { SucessButtonStyle } from "$lib/style/button";
 
     // Navigation
     import { navigateTo } from "$lib/logic/view/navigation";
@@ -43,15 +42,18 @@
     let showAddWindow: boolean = false; // Show Add Device Window
     let showConfigNodeWindow: boolean = false; // Show Node Full Configuration Window
     let performingAddRequest: boolean = false; // Performing Add Device Request
-
     let deviceData: NewDeviceMeter; // Device Data
-    let nodesInitialized: boolean = false; // Nodes are initialized (fetched) from server
     let nodes: Array<EditableDeviceNode>;
     let nodesBySection: Record<NodePhase, Array<EditableDeviceNode>>;
     let editingNode: EditableDeviceNode; // Current Node being edited in Configuration Window
     let editingNodeState: NodeEditState; // Current state of the Node being edited
+    let nodesInit: boolean = false; // Nodes are initialized
+    let contentInit: boolean = false; // Content is initialized
 
     // Reactive Statements
+
+    // Content is initialized when both loaded is done and nodes are initialized
+    $: contentInit = $loadedDone && nodesInit;
 
     // Update initial device validation
     $: if (deviceData) {
@@ -59,40 +61,17 @@
     }
 
     // Get nodes from the nodes array by section
-    $: if (deviceData && nodes) {
-        nodesBySection = nodeSections.reduce(
-            (acc: Record<NodePhase, Array<EditableDeviceNode>>, section) => {
-                acc[section.key] = nodes.filter((node) => section.filter(node, deviceData.type));
-                return acc;
-            },
-            {} as Record<NodePhase, Array<EditableDeviceNode>>,
-        );
+    $: if (contentInit) {
+        nodesBySection = updateNodesBySection(deviceData.type, nodes);
         updateNodesValidation(nodes, nodesBySection);
         updateDeviceValidation(deviceData, nodes);
-    }
-
-    // Functions
-
-    //Function to save device changes
-    async function addDeviceConfirmation(): Promise<void> {
-        if ($loadedDone && nodesInitialized) {
-            performingAddRequest = true;
-            await addDevice(convertToDevice(deviceData), deviceData.device_image, convertToNodes(nodes));
-            performingAddRequest = false;
-        }
-        showAddWindow = false;
-    }
-
-    // Function to cancel add device (go to devices page)
-    async function cancelAdd(): Promise<void> {
-        await navigateTo("/devices", $selectedLang, {});
     }
 
     // Mount function
     onMount(() => {
         deviceData = createNewDevice(defaultDeviceOptions.protocol, defaultDeviceOptions.type, defaultDeviceOptions.options);
         nodes = getDefaultNodesList(deviceData);
-        nodesInitialized = true;
+        nodesInit = true;
 
         let defaultImageRetrier: MethodRetrier | null = new MethodRetrier(async (signal) => {
             deviceData.current_image_url = await getDefaultImage();
@@ -140,14 +119,7 @@ Shows input forms for protocol-specific parameters and organizes device nodes fo
                             inputInvalid={!deviceData.validation.deviceProtocol}
                             enableInputInvalid={true}
                             onChange={() => {
-                                let newDefaultOptions = { ...$protocolPlugins[deviceData.protocol].defaultOptions };
-                                deviceData.communication_options = newDefaultOptions;
-                                for (let node of nodes) {
-                                    if (deviceData.protocol !== node.protocol && !node.config.calculated) {
-                                        changeNodeProtocol(deviceData.protocol, node);
-                                    }
-                                }
-                                nodes = [...nodes];
+                                deviceProtocolChange(deviceData, nodes);
                             }}
                             scrollable={true}
                         />
@@ -176,18 +148,12 @@ Shows input forms for protocol-specific parameters and organizes device nodes fo
                     <NodesGrid
                         minHeight="200px"
                         {deviceData}
-                        {nodesInitialized}
+                        {nodesInit}
                         bind:nodes
                         bind:nodesBySection
                         onPropertyChanged={(node: EditableDeviceNode) => {
-                            const editNodesIndex = getNodeIndex(node, nodes);
-                            if (editNodesIndex !== -1) {
-                                nodes[editNodesIndex] = node;
-                                nodes = [...nodes];
-                            }
-                            if (nodes[editNodesIndex] === editingNode) {
-                                editingNode = nodes[editNodesIndex];
-                            }
+                            nodes = updateNodes(node, nodes);
+                            editingNode = updateEditingNode(node, editingNode, nodes);
                         }}
                         onShowConfigPopup={(node: EditableDeviceNode, nodeEditingState: NodeEditState) => {
                             editingNode = node;
@@ -197,10 +163,17 @@ Shows input forms for protocol-specific parameters and organizes device nodes fo
                     />
                 </div>
             </div>
+            <!----------     A C T I O N     B U T T O N S     ---------->
             <div class="action-buttons-div">
-                <Button buttonText={$texts.cancel} imageURL="/img/previous.png" onClick={cancelAdd} />
                 <Button
-                    enabled={$loadedDone && nodesInitialized}
+                    buttonText={$texts.cancel}
+                    imageURL="/img/previous.png"
+                    onClick={async () => {
+                        await navigateTo("/devices", $selectedLang, {});
+                    }}
+                />
+                <Button
+                    enabled={contentInit}
                     buttonText={$texts.add}
                     style={$SucessButtonStyle}
                     imageURL="/img/plus.png"
@@ -212,58 +185,26 @@ Shows input forms for protocol-specific parameters and organizes device nodes fo
                 />
             </div>
         </div>
-        {#if showConfigNodeWindow}
-            <div class="overlay-device-div">
-                <div class="overlay-device-div-content">
-                    <div class="window-div">
-                        <NodeConfigWindow
-                            bind:visible={showConfigNodeWindow}
-                            onPropertyChanged={() => {
-                                const editNodesIndex = getNodeIndex(editingNode, nodes);
-                                if (editNodesIndex !== -1) {
-                                    nodes[editNodesIndex] = editingNode;
-                                    nodes = [...nodes];
-                                }
-                                if (nodes[editNodesIndex] === editingNode) {
-                                    editingNode = nodes[editNodesIndex];
-                                }
-                            }}
-                            {deviceData}
-                            node={editingNode}
-                            bind:nodeEditingState={editingNodeState}
-                        />
-                    </div>
-                </div>
-            </div>
-        {/if}
-        {#if showAddWindow}
-            <div class="overlay-device-div">
-                <div class="overlay-device-div-content">
-                    <div class="window-div">
-                        <ModalWindow
-                            title={`${$texts.addNewDevice}`}
-                            minWidth="300px"
-                            maxWidth="550px"
-                            closeWindow={() => {
-                                showAddWindow = false;
-                            }}
-                        >
-                            <div class="modal-window-div">
-                                <span class="add-window-text">{$texts.addNewDeviceInfo}</span>
-                                <div class="button-div save-window-button">
-                                    <Button
-                                        processing={performingAddRequest}
-                                        buttonText={$texts.confirm}
-                                        style={$SubSucessButtonStyle}
-                                        onClick={addDeviceConfirmation}
-                                    />
-                                </div>
-                            </div>
-                        </ModalWindow>
-                    </div>
-                </div>
-            </div>
-        {/if}
+        <PopupNodeConfig
+            bind:windowOpened={showConfigNodeWindow}
+            onPropertyChanged={() => {
+                nodes = updateNodes(editingNode, nodes);
+            }}
+            {deviceData}
+            node={editingNode}
+            bind:nodeEditingState={editingNodeState}
+        />
+        <PopupAddDevice
+            bind:windowOpened={showAddWindow}
+            processingRequest={performingAddRequest}
+            onAdd={async () => {
+                if (contentInit) {
+                    performingAddRequest = true;
+                    await addDevice(convertToDevice(deviceData), deviceData.device_image, convertToNodes(nodes));
+                    performingAddRequest = false;
+                }
+            }}
+        />
     {/if}
 </div>
 
@@ -421,93 +362,6 @@ Shows input forms for protocol-specific parameters and organizes device nodes fo
         gap: 30px;
         justify-content: center;
         justify-items: center;
-    }
-
-    /* Overlay for modal windows (node config, delete, save) */
-    .overlay-device-div {
-        position: absolute;
-        inset: 0;
-    }
-
-    /* Overlay content container for modals */
-    .overlay-device-div-content {
-        margin: 0;
-        padding: 0;
-        position: relative;
-        width: 100%;
-        height: 100%;
-        display: flex;
-        flex-direction: row;
-        justify-content: center;
-        background: rgba(24, 29, 35, 0.25);
-        backdrop-filter: blur(8px);
-        -webkit-backdrop-filter: blur(8px);
-        z-index: 2;
-    }
-
-    /* Modal window container styling */
-    .overlay-device-div-content .window-div {
-        width: 100%;
-        height: fit-content;
-        margin: 0;
-        padding: 0;
-        position: sticky;
-        top: 50%;
-        transform: translateY(calc(-50% + 37px));
-        display: flex;
-        justify-content: center;
-        align-items: center;
-    }
-
-    /* Modal window content container styling */
-    .overlay-device-div-content .window-div .modal-window-div {
-        position: relative;
-        margin: 0;
-        padding: 0;
-        width: 100%;
-        height: 100%;
-        display: flex;
-        flex-direction: column;
-        justify-content: start;
-        align-items: center;
-        gap: 20px;
-    }
-
-    /* Modal window text styling */
-    .overlay-device-div-content .window-div span {
-        font-size: 1rem;
-        font-weight: 400;
-        color: #e74c3c;
-        line-height: 1.5;
-        text-align: left;
-        word-break: break-word;
-    }
-
-    /* Add window text color override */
-    .overlay-device-div-content .window-div span.add-window-text {
-        color: rgb(170, 170, 170);
-    }
-
-    /* Button container inside modal windows */
-    .overlay-device-div-content .window-div .button-div {
-        margin: 0;
-        width: 100%;
-        height: fit-content;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        flex-direction: column;
-        padding: 10px;
-        padding-left: 0px;
-        padding-right: 0px;
-    }
-
-    /* Button container for save window modal */
-    .overlay-device-div-content .window-div .button-div.save-window-button {
-        padding: 10px;
-        padding-top: 20px;
-        padding-left: 0px;
-        padding-right: 0px;
     }
 
     /* Responsive: stack action buttons vertically on small screens */

@@ -17,6 +17,7 @@
 
     // Texts
     import { texts } from "$lib/stores/lang/generalTexts";
+    import { toastTexts } from "$lib/stores/lang/toastTexts";
     import { selectedLang } from "$lib/stores/lang/definition";
 
     // Toast
@@ -193,7 +194,13 @@
         <main class="content" class:open={$leftPanelOpen}>
             <div class="alerts-div" class:prioritize={$displayToast} class:sidebar-open={$leftPanelOpen}>
                 {#if $displayToast}
-                    <Toast bottomPos="0px" toastText={$texts[$toastKey]} toastType={$toastType} toastVariables={$toastVariables} onClick={closeToast} />
+                    <Toast
+                        bottomPos="0px"
+                        toastText={$toastTexts[$toastKey]}
+                        toastType={$toastType}
+                        toastVariables={$toastVariables}
+                        onClick={closeToast}
+                    />
                 {/if}
             </div>
             <div class="container-div">

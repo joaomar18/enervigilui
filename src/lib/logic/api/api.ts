@@ -4,7 +4,6 @@ import { ToastType } from "$lib/stores/view/toast";
 import { navigateTo } from "../view/navigation";
 import { selectedLang } from "$lib/stores/lang/definition";
 import { loadedDone } from "$lib/stores/view/navigation";
-import { MethodPoller } from "./poller";
 
 export type CallAPIOptions = {
     endpoint: string;

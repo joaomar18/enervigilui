@@ -1,10 +1,11 @@
 import { get } from "svelte/store";
-import { Protocol } from "$lib/types/device/base";
+import { MeterType, Protocol } from "$lib/types/device/base";
 import { NodeType, NodePhase } from "$lib/types/nodes/base";
-import { getNodePrefix, getCommunicationID } from "../util/nodes";
+import { getNodePrefix, getNodeIndex, getCommunicationID } from "../util/nodes";
 import { defaultVariables } from "$lib/stores/device/variables";
-import type { NodeEditState, EditableDeviceNode } from "$lib/types/nodes/base";
 import { protocolPlugins } from "$lib/stores/device/protocol";
+import { nodeSections } from "$lib/types/nodes/base";
+import type { NodeEditState, EditableDeviceNode } from "$lib/types/nodes/base";
 
 /**
  * Handles node name changes, updating prefix and unit.
@@ -106,4 +107,63 @@ export function changeNodeProtocol(protocol: Protocol, node: EditableDeviceNode)
     plugin.setCommIDToDefault(node);
     node.protocol = protocol;
     node.communication_id = getCommunicationID(protocol, node.config, true);
+}
+
+/**
+ * Updates a node in the nodes array and returns a new array with the changes.
+ * @param node Node with updated data
+ * @param nodes Array of nodes to update
+ * @returns New array with the updated node
+ */
+export function updateNodes(node: EditableDeviceNode, nodes: Array<EditableDeviceNode>): Array<EditableDeviceNode> {
+    const editNodesIndex = getNodeIndex(node, nodes);
+    let newNodes = [...nodes];
+    if (editNodesIndex !== -1) {
+        newNodes[editNodesIndex] = node;
+    }
+    return newNodes;
+}
+
+/**
+ * Groups nodes by their respective sections based on meter type.
+ * @param meterType Type of meter to filter nodes for
+ * @param nodes Array of nodes to group
+ * @returns Record with nodes grouped by phase sections
+ */
+export function updateNodesBySection(meterType: MeterType, nodes: Array<EditableDeviceNode>): Record<NodePhase, Array<EditableDeviceNode>> {
+    return nodeSections.reduce((acc: Record<NodePhase, Array<EditableDeviceNode>>, section) => {
+        acc[section.key] = nodes.filter((node) => section.filter(node, meterType));
+        return acc;
+    }, {} as Record<NodePhase, Array<EditableDeviceNode>>);
+}
+
+/**
+ * Updates the editing node reference if it matches the updated node.
+ * @param node Node that was updated
+ * @param editingNode Currently editing node
+ * @param nodes Array of all nodes
+ * @returns Updated editing node reference
+ */
+export function updateEditingNode(node: EditableDeviceNode, editingNode: EditableDeviceNode, nodes: Array<EditableDeviceNode>): EditableDeviceNode {
+    const editNodesIndex = getNodeIndex(node, nodes);
+    let newEditingNode = editingNode;
+    if (nodes[editNodesIndex] === editingNode) {
+        newEditingNode = nodes[editNodesIndex];
+    }
+    return newEditingNode;
+}
+
+/**
+ * Removes a node from the nodes array and returns a new array.
+ * @param node Node to delete
+ * @param nodes Array of nodes to delete from
+ * @returns New array with the node removed
+ */
+export function deleteNodeFromArray(node: EditableDeviceNode, nodes: Array<EditableDeviceNode>): Array<EditableDeviceNode> {
+    let deletedNodeIndex = getNodeIndex(node, nodes);
+    let newNodes: Array<EditableDeviceNode> = [...nodes];
+    if (deletedNodeIndex !== -1) {
+        newNodes = [...newNodes.slice(0, deletedNodeIndex), ...newNodes.slice(deletedNodeIndex + 1)];
+    }
+    return newNodes;
 }
