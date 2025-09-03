@@ -117,11 +117,11 @@ export function changeNodeProtocol(protocol: Protocol, node: EditableDeviceNode)
  */
 export function updateNodes(node: EditableDeviceNode, nodes: Array<EditableDeviceNode>): Array<EditableDeviceNode> {
     const editNodesIndex = getNodeIndex(node, nodes);
-    let newNodes = [...nodes];
+    let newNodes = nodes;
     if (editNodesIndex !== -1) {
         newNodes[editNodesIndex] = node;
     }
-    return newNodes;
+    return [...newNodes];
 }
 
 /**
@@ -147,7 +147,7 @@ export function updateNodesBySection(meterType: MeterType, nodes: Array<Editable
 export function updateEditingNode(node: EditableDeviceNode, editingNode: EditableDeviceNode, nodes: Array<EditableDeviceNode>): EditableDeviceNode {
     const editNodesIndex = getNodeIndex(node, nodes);
     let newEditingNode = editingNode;
-    if (nodes[editNodesIndex] === editingNode) {
+    if (editNodesIndex !== -1 && getNodeIndex(editingNode, nodes) === editNodesIndex) {
         newEditingNode = nodes[editNodesIndex];
     }
     return newEditingNode;

@@ -240,6 +240,7 @@ Shows input forms for protocol-specific parameters and organizes device nodes fo
             bind:windowOpened={showConfigNodeWindow}
             onPropertyChanged={() => {
                 nodes = updateNodes(editingNode, nodes);
+                editingNode = updateEditingNode(editingNode, editingNode, nodes);
             }}
             {deviceData}
             node={editingNode}
