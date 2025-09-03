@@ -1,9 +1,13 @@
 <script lang="ts">
+    import { onMount } from "svelte";
     import { fade } from "svelte/transition";
     import Header from "../../components/Login/Header.svelte";
     import Info from "../../components/Login/Info.svelte";
     import LoginForm from "../../components/Login/LoginForm.svelte";
     import Toast from "../../components/General/Toast.svelte";
+
+    // Stores
+    import { loadedDone } from "$lib/stores/view/navigation";
 
     // Toast
     import { displayToast, toastKey, toastType, toastVariables } from "$lib/stores/view/toast";
@@ -11,6 +15,11 @@
 
     // Texts
     import { toastTexts } from "$lib/stores/lang/toastTexts";
+
+    // Mount function
+    onMount(() => {
+        loadedDone.set(true);
+    });
 </script>
 
 <!-- 

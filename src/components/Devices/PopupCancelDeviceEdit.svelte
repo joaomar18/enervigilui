@@ -23,6 +23,14 @@
     }
 </script>
 
+<!-- 
+  Popup Cancel Device Edit:
+    • Modal confirmation dialog for canceling device edit operations.
+    • Features a backdrop overlay with blur effect and centered modal window.
+    • Displays warning message about losing unsaved changes and confirm button.
+    • Accepts callback function for handling edit cancellation logic.
+    • Auto-closes modal after confirmation to prevent data loss.
+-->
 {#if windowOpened}
     <div class="overlay-device-div">
         <div class="overlay-device-div-content">

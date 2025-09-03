@@ -64,7 +64,7 @@
     export let onPropertyChanged: () => void;
 </script>
 
-<!-- NodeConfigWindow Component: renders a modal window for editing a device node's configuration, including 
+<!-- PopupNodeConfig Component: renders a modal window for editing a device node's configuration, including 
 variable name, unit, communication ID, type, logging, alarms, and advanced options. 
 Displays contextual hints and supports multi-language labels for all fields. -->
 {#if windowOpened}

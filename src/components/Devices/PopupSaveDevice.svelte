@@ -24,6 +24,14 @@
     }
 </script>
 
+<!-- 
+  Popup Save Device:
+    • Modal confirmation dialog for saving device configuration changes.
+    • Features a backdrop overlay with blur effect and centered modal window.
+    • Displays confirmation message and save button with processing state.
+    • Uses primary styling to emphasize positive action (save changes).
+    • Auto-closes modal after successful save operation.
+-->
 {#if windowOpened}
     <div class="overlay-device-div">
         <div class="overlay-device-div-content">

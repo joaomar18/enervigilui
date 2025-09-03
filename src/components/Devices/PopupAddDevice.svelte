@@ -24,6 +24,14 @@
     }
 </script>
 
+<!-- 
+  Popup Add Device:
+    • Modal confirmation dialog for adding new devices to the system.
+    • Features a backdrop overlay with blur effect and centered modal window.
+    • Displays confirmation message and confirm button with processing state.
+    • Accepts callback function for handling device addition logic.
+    • Auto-closes modal after successful device addition.
+-->
 {#if windowOpened}
     <div class="overlay-device-div">
         <div class="overlay-device-div-content">

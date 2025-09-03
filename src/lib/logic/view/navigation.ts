@@ -1,5 +1,8 @@
 import { goto } from "$app/navigation";
 import { get } from "svelte/store";
+import { browser } from "$app/environment";
+import { checkAutoLogin } from "../validation/auth";
+import { selectedLang } from "$lib/stores/lang/definition";
 
 // Splash screen store
 import { splashDone, loadedDone, showSubLoader, leftPanelOpen, searchQuery } from "../../stores/view/navigation";
@@ -82,23 +85,6 @@ function setSubLoaderTrigger(showSubLoaderTime: number) {
 }
 
 /**
- * Sets the search query state based on the target route.
- *
- * Clears the search query for all routes except "/devices" where it preserves the search string.
- * This ensures search functionality is only active on the devices page.
- *
- * @param targetRoute - The route being navigated to.
- * @param searchString - The search query string to set (only used for "/devices" route).
- */
-export function setSearchQuery(targetRoute: string, searchString: string) {
-    if (targetRoute !== "/devices") {
-        searchQuery.set("");
-    } else {
-        searchQuery.set(searchString);
-    }
-}
-
-/**
  * Navigates to a new URL, appending extra query parameters and a `lang` parameter,
  * with optional splash screen and sub-loader logic.
  *
@@ -170,4 +156,88 @@ export async function navigateTo(
     if (splashScreen) {
         splashDone.set(true);
     }
+}
+
+/**
+ * Checks if the current page is an authentication page.
+ * @returns True if the current pathname starts with "/login".
+ */
+export function isAuthenticationPage(): boolean {
+    return window.location.pathname.startsWith("/login");
+}
+
+/**
+ * Checks if the current page is a dashboard page.
+ * @returns True if the current page is not an authentication page.
+ */
+export function isDashboardPage(): boolean {
+    return !isAuthenticationPage();
+}
+
+/**
+ * Updates document body scroll behavior based on content loading state.
+ * @param contentLoaded - True to enable scrolling, false to disable.
+ */
+export function updateScrollingState(contentLoaded: boolean): void {
+    if (browser) {
+        if (contentLoaded) {
+            document.body.style.overflow = "auto";
+        } else {
+            document.body.style.overflow = "hidden";
+        }
+    }
+}
+
+/**
+ * Sets initial left panel state based on screen width.
+ * Opens panel on desktop (≥880px), closes on mobile.
+ */
+export function setInitialLeftPanelState() {
+    leftPanelOpen.set(window.matchMedia("(min-width: 880px)").matches);
+}
+
+/**
+ * Sets the search query state based on the target route.
+ *
+ * Clears the search query for all routes except "/devices" where it preserves the search string.
+ * This ensures search functionality is only active on the devices page.
+ *
+ * @param targetRoute - The route being navigated to.
+ * @param searchString - The search query string to set (only used for "/devices" route).
+ */
+export function setSearchQuery(targetRoute: string, searchString: string) {
+    if (targetRoute !== "/devices") {
+        searchQuery.set("");
+    } else {
+        searchQuery.set(searchString);
+    }
+}
+
+/**
+ * Extracts search query from current URL and updates the search state.
+ * Reads 'searchQuery' parameter from URL and applies it via setSearchQuery.
+ */
+export async function getSearchQuery() {
+    const path = window.location.pathname;
+    const params = new URLSearchParams(window.location.search);
+    const searchQuery = params.get("searchQuery") ?? "";
+    setSearchQuery(path, searchQuery);
+}
+
+/**
+ * Initializes layout by checking authentication, loading search state, and handling redirects.
+ * Waits for minimum splash duration before completing initialization.
+ */
+export async function initLayout() {
+    const checkAutoLoginPromise = checkAutoLogin();
+    const getSearchQueryPromise = getSearchQuery();
+    const minTimePromise = new Promise((res) => setTimeout(res, 300));
+
+    const [authResult] = await Promise.all([checkAutoLoginPromise, getSearchQueryPromise, minTimePromise]);
+
+    if (authResult.shouldRedirect && authResult.redirectTarget) {
+        await navigateTo(authResult.redirectTarget, get(selectedLang));
+    }
+
+    splashDone.set(true);
 }

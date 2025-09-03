@@ -51,6 +51,14 @@
         validRetriesNumber;
 </script>
 
+<!-- 
+  Modbus RTU Configuration:
+    • Form component for configuring Modbus RTU protocol settings.
+    • Input fields: Communication port, slave ID, baudrate, parity, byte size, stop bits.
+    • Timing settings: Read period, timeout, and retry attempts configuration.
+    • Real-time validation with visual feedback and error handling.
+    • Includes hint tooltips for each configuration parameter.
+-->
 <div class="device-input-div">
     <span>{$texts.communicationPort}</span>
     <div class="input-div">

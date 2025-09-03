@@ -48,12 +48,12 @@
     $: mergedStyle = mergeStyle(effectiveStyle, localOverrides);
 
     // Click Export Funcion
-    export let onClick: () => void;
+    export let onClick: () => void | Promise<void>;
 
     // Functions
-    function handleClick(): void {
+    async function handleClick(): Promise<void> {
         if (onClick) {
-            onClick();
+            await onClick();
         }
     }
 </script>

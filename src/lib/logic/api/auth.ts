@@ -22,32 +22,32 @@ export async function loginUser(username: string, password: string, autoLogin: b
     }
 }
 
-export async function autoLogin(basePage: string, isSubpage: boolean): Promise<{ redirect: boolean; target: string }> {
+export async function autoLogin(basePage: string, isSubpage: boolean): Promise<{ shouldRedirect: boolean; redirectTarget: string }> {
     const { sucess, data } = await callAPI({
         endpoint: "/api/auth/auto_login",
         method: "POST",
     });
-    let redirect = false;
-    let target = "";
+    let shouldRedirect = false;
+    let redirectTarget = "";
     if (sucess) {
         // Authenticated
         if (basePage === "/" || basePage === "/login") {
-            redirect = true;
-            target = "/devices";
+            shouldRedirect = true;
+            redirectTarget = "/devices";
         }
         // User is in a subpage, redirect to main page
         else if (isSubpage) {
-            redirect = true;
-            target = basePage;
+            shouldRedirect = true;
+            redirectTarget = basePage;
         }
     } else {
         // Unauthenticated or failed
         if (basePage !== "/login") {
-            redirect = true;
-            target = "/login";
+            shouldRedirect = true;
+            redirectTarget = "/login";
         }
     }
-    return { redirect, target };
+    return { shouldRedirect, redirectTarget };
 }
 
 export async function logoutUser() {

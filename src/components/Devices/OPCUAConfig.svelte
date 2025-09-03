@@ -26,9 +26,13 @@
     $: configuration.valid = validOpcUaUrl && validReadPeriod && validTimeout;
 </script>
 
-<!--
-  configuration: This component renders the configuration form elements for OPC UA device communication,
-  including network address, read period, timeout, and optional authentication fields.
+<!-- 
+  OPC UA Configuration:
+    • Form component for configuring OPC UA protocol settings.
+    • Network settings: OPC UA server URL/endpoint configuration.
+    • Timing settings: Read period and communication timeout parameters.
+    • Real-time validation with visual feedback and error handling.
+    • Includes hint tooltips for each configuration parameter.
 -->
 <div class="device-input-div">
     <span>{$texts.networkAddress}</span>

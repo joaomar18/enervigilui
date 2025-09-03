@@ -35,6 +35,14 @@
     }
 </script>
 
+<!-- 
+  Popup Delete Device:
+    • Modal confirmation dialog for permanently deleting devices from the system.
+    • Features a backdrop overlay with blur effect and centered modal window.
+    • Requires user to type device name exactly to confirm deletion (safety measure).
+    • Uses danger styling (red) to emphasize destructive action.
+    • Button remains disabled until device name is correctly entered.
+-->
 {#if windowOpened}
     <div class="overlay-device-div">
         <div class="overlay-device-div-content">
