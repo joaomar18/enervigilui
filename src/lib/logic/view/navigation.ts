@@ -210,15 +210,29 @@ export async function getSearchQuery() {
 }
 
 /**
- * Initializes layout by checking authentication, loading search state, and handling redirects.
- * Waits for minimum splash duration before completing initialization.
+ * Initializes the application layout by handling authentication, loading state, and navigation setup.
+ *
+ * Performs essential startup tasks including:
+ * - Checking for automatic login and handling authentication state
+ * - Loading and applying search query from URL parameters
+ * - Managing splash screen with minimum duration guarantee
+ * - Handling authentication-based redirects
+ * - Setting up sub-loader triggers for subsequent navigation
+ *
+ * Runs multiple initialization tasks concurrently while ensuring the splash screen
+ * remains visible for at least the minimum duration for smooth user experience.
+ *
+ * @param minSplashDuration - Minimum time (ms) to show splash screen during initialization (default: 300)
+ * @param showSubLoaderTime - Time (ms) before showing sub-loader for subsequent navigation (default: 600)
  */
-export async function initLayout() {
+export async function initLayout(minSplashDuration: number = 300, showSubLoaderTime: number = 600) {
     const checkAutoLoginPromise = checkAutoLogin();
     const getSearchQueryPromise = getSearchQuery();
-    const minTimePromise = new Promise((res) => setTimeout(res, 300));
+    const minTimePromise = new Promise((res) => setTimeout(res, minSplashDuration));
 
+    resetSubLoaderTrigger();
     const [authResult] = await Promise.all([checkAutoLoginPromise, getSearchQueryPromise, minTimePromise]);
+    setSubLoaderTrigger(showSubLoaderTime);
 
     if (authResult.shouldRedirect && authResult.redirectTarget) {
         await navigateTo(authResult.redirectTarget);
