@@ -142,7 +142,7 @@
             "
             class="search-button-div"
         >
-            <img src="/img/search.png" alt="Search Loop" />
+            <img src="/img/search.svg" alt="Search Loop" />
             <button aria-label="Search Button" on:click={handleChange}></button>
         </div>
     </div>

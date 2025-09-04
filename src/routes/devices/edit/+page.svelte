@@ -199,7 +199,7 @@ Shows input forms for protocol-specific parameters and organizes device nodes fo
             <div class="action-buttons-div">
                 <Button
                     buttonText={$texts.cancel}
-                    imageURL="/img/previous.png"
+                    imageURL="/img/previous.svg"
                     onClick={async () => {
                         if (noChangesToDevice(initialDeviceData, deviceData, initialNodes, nodes)) {
                             await navigateTo("/devices");
@@ -212,7 +212,7 @@ Shows input forms for protocol-specific parameters and organizes device nodes fo
                     enabled={contentInit}
                     buttonText={$texts.save}
                     style={$PrimaryButtonStyle}
-                    imageURL="/img/save.png"
+                    imageURL="/img/save.svg"
                     onClick={async () => {
                         if (validDeviceOperation(deviceData)) {
                             if (noChangesToDevice(initialDeviceData, deviceData, initialNodes, nodes)) {
@@ -227,7 +227,7 @@ Shows input forms for protocol-specific parameters and organizes device nodes fo
                     enabled={contentInit}
                     buttonText={$texts.delete}
                     style={$DangerButtonStyle}
-                    imageURL="/img/delete.png"
+                    imageURL="/img/delete.svg"
                     onClick={async () => {
                         showDeleteWindow = true;
                     }}

@@ -108,8 +108,8 @@
         </div>
         <div class="actions-div">
             <Notification notificationsOpen={false} notificationsNumber={notifications} style={$DeviceNotificationStyle} />
-            <Action style={$DeviceActionStyle} imageURL="/img/edit.png" onClick={handleEdit} />
-            <Action style={$DeviceActionStyle} imageURL="/img/enter.png" imageWidth="32px" imageHeight="32px" onClick={handleEnter} />
+            <Action style={$DeviceActionStyle} imageURL="/img/edit.svg" onClick={handleEdit} />
+            <Action style={$DeviceActionStyle} imageURL="/img/enter.png" onClick={handleEnter} />
         </div>
         <span class="id-text">ID: {String(deviceID).padStart(3, "0")}</span>
         <div class="connection-state-div">
@@ -147,7 +147,7 @@
 
     /* Hover state: lift and shadow for emphasis */
     .container:hover {
-        transform: scale(1.125) translate3d(0, 0, 0);
+        transform: scale(1.0625) translate3d(0, 0, 0);
         box-shadow: 0 8px 16px var(--shadow-color);
     }
 

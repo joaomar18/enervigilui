@@ -199,7 +199,7 @@ Includes multi-language headers and adapts layout to container size. -->
                         {#if currentWidth > 325}
                             <th class="min-width">{$texts.actions}</th>
                         {:else}
-                            <th class="super-min-width"><img src="/img/more.png" style="width:20px; height: 20px;" alt="More" /></th>
+                            <th class="super-min-width"><img src="/img/more.svg" style="width:24px; height: 24px;" alt="More" /></th>
                         {/if}
                     {/if}
                 </tr>
@@ -402,6 +402,8 @@ Includes multi-language headers and adapts layout to container size. -->
     }
 
     table th.super-min-width {
+        padding: 0;
+        margin: 0;
         width: 50px;
         min-width: 50px;
         max-width: 50px;

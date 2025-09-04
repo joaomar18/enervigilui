@@ -59,8 +59,8 @@ const DeviceActionStyleConfig: ComponentStyles = {
         backgroundColor: "rgba(255, 255, 255, 0.1)",
         borderColor: "transparent",
         hoverColor: "rgba(255, 255, 255, 0.2)",
-        imageWidth: "25px",
-        imageHeight: "25px",
+        imageWidth: "32px",
+        imageHeight: "32px",
     },
 };
 
@@ -76,8 +76,8 @@ const DeviceNotificationStyleConfig: ComponentStyles = {
         backgroundColor: "rgba(255, 255, 255, 0.1)",
         hoverColor: "rgba(255, 255, 255, 0.2)",
         borderColor: "transparent",
-        imageWidth: "25px",
-        imageHeight: "25px",
+        imageWidth: "32px",
+        imageHeight: "32px",
         numberBackgroundColor: "#e53935",
         numberTextColor: "#eee",
     },

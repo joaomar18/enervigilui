@@ -11,8 +11,8 @@ const ActionStyleConfig: ComponentStyles = {
         backgroundColor: "#14161c",
         borderColor: "#2a2e3a",
         hoverColor: "#2a2e3a",
-        imageWidth: "25px",
-        imageHeight: "25px",
+        imageWidth: "32px",
+        imageHeight: "32px",
     },
 };
 
@@ -67,8 +67,8 @@ const EditableTextStyleConfig: ComponentStyles = {
         fontColor: "#f5f5f5",
         borderColorBottom: "rgba(255, 255, 255, 0.2)",
         invalidBorderColorBottom: "#e74c3c",
-        buttonImageWidth: "22px",
-        buttonImageHeight: "22px",
+        buttonImageWidth: "32px",
+        buttonImageHeight: "32px",
     },
 };
 
@@ -237,8 +237,8 @@ const NotificationStyleConfig: ComponentStyles = {
         backgroundColor: "#14161c",
         hoverColor: "#2A2E3A",
         borderColor: "#2a2e3a",
-        imageWidth: "25px",
-        imageHeight: "25px",
+        imageWidth: "32px",
+        imageHeight: "32px",
         numberBackgroundColor: "#e53935",
         numberTextColor: "#eee",
     },
@@ -267,8 +267,8 @@ const SelectorStyleConfig: ComponentStyles = {
         fontSize: "1rem",
         letterSpacing: "0.5px",
         wordSpacing: "1px",
-        arrowWidth: "16px",
-        arrowHeight: "16px",
+        arrowWidth: "24px",
+        arrowHeight: "24px",
         arrowRightPos: "10px",
     },
 };

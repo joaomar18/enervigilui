@@ -135,7 +135,7 @@
             {#if showExpandArrow}
                 <div class="arrow-div" class:selected>
                     <div class="line"></div>
-                    <img class="arrow" src={isOpen ? "/img/up-arrow.png" : "/img/down-arrow.png"} alt={isOpen ? "up-arrow" : "down-arrow"} />
+                    <img class="arrow" src={isOpen ? "/img/up-arrow.svg" : "/img/down-arrow.svg"} alt={isOpen ? "up-arrow" : "down-arrow"} />
                     <button on:click={toogleIsOpen} aria-label="Toogle sub content button"></button>
                 </div>
             {/if}

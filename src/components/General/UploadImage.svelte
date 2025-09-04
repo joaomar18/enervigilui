@@ -74,7 +74,7 @@
 >
     <div class="content" style="background-image: url('{currentImageUrl}')">
         <img src={currentImageUrl} alt="Url Checker" style="display:none" on:error={handleImageError} />
-        <img class="edit-pencil-img" src="/img/edit_pencil.png" alt="Edit Pencil" />
+        <img class="edit-pencil-img" src="/img/edit_pencil.svg" alt="Edit Pencil" />
 
         <input type="file" accept="image/*" bind:this={fileInput} on:change={onFileChange} style="display:none" />
 
@@ -124,8 +124,8 @@
 
     /* Pencil overlay: centered, semi-transparent, transitions on hover */
     .content .edit-pencil-img {
-        width: 50%;
-        height: 50%;
+        width: 75%;
+        height: 75%;
         position: absolute;
         top: 50%;
         left: 50%;

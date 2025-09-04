@@ -108,11 +108,11 @@
     "
 >
     <div class="content-div">
-        <img class="globe" src="/img/globe.png" alt="globe" />
+        <img class="globe" src="/img/globe.svg" alt="globe" />
         <span class="selected-lang">{$selectedLang}</span>
         <img
             class="arrow"
-            src={invertOptions ? (isOpen ? "/img/down-arrow.png" : "/img/up-arrow.png") : isOpen ? "/img/up-arrow.png" : "/img/down-arrow.png"}
+            src={invertOptions ? (isOpen ? "/img/down-arrow.svg" : "/img/up-arrow.svg") : isOpen ? "/img/up-arrow.svg" : "/img/down-arrow.svg"}
             alt={isOpen ? "up-arrow" : "down-arrow"}
         />
         <button class="open-selector" on:click={toggleSelector} aria-label="View options"></button>
@@ -164,8 +164,8 @@
 
     /* Arrow icon (down or up) */
     .arrow {
-        height: 16px;
-        width: 16px;
+        height: 24px;
+        width: 24px;
         position: absolute;
         top: 50%;
         right: 10px;

@@ -107,7 +107,7 @@
                         showExpandArrow={devicesSubSection}
                         triggerExpand={devicesSubSection}
                         buttonText={$texts.devices}
-                        imageURL="/img/devices.png"
+                        imageURL="/img/devices.svg"
                         onClick={() => {
                             browseTo("/devices");
                         }}
@@ -125,7 +125,7 @@
                             style={$SubLinkStyle}
                             selected={activeSection.includes("/edit")}
                             buttonText={$texts.editConfig}
-                            imageURL="/img/edit.png"
+                            imageURL="/img/edit_pencil.svg"
                             onClick={() => {
                                 browseTo("/devices/edit");
                             }}
@@ -151,7 +151,7 @@
                     <Link
                         selected={activeSection.includes("/mqtt")}
                         buttonText="MQTT"
-                        imageURL="/img/mqtt.png"
+                        imageURL="/img/mqtt.svg"
                         onClick={() => {
                             browseTo("/mqtt");
                         }}
@@ -166,7 +166,7 @@
                     <Link
                         selected={activeSection.includes("/health")}
                         buttonText={$texts.health}
-                        imageURL="/img/health.png"
+                        imageURL="/img/health.svg"
                         onClick={() => {
                             browseTo("/health");
                         }}
@@ -174,7 +174,7 @@
                     <Link
                         selected={activeSection.includes("/logs")}
                         buttonText={$texts.logs}
-                        imageURL="/img/logs.png"
+                        imageURL="/img/logs.svg"
                         onClick={() => {
                             browseTo("/logs");
                         }}
@@ -189,7 +189,7 @@
                     <Link
                         selected={activeSection.includes("/settings")}
                         buttonText={$texts.settings}
-                        imageURL="/img/settings.png"
+                        imageURL="/img/settings.svg"
                         onClick={() => {
                             browseTo("/settings");
                         }}
@@ -197,7 +197,7 @@
                     <Link
                         selected={activeSection.includes("/backup")}
                         buttonText={$texts.backup}
-                        imageURL="/img/backup.png"
+                        imageURL="/img/backup.svg"
                         onClick={() => {
                             browseTo("/backup");
                         }}

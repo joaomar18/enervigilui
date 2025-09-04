@@ -1,7 +1,4 @@
 <script lang="ts">
-    import { browser } from "$app/environment";
-    import { onMount, onDestroy } from "svelte";
-
     // Styles
     import { mergeStyle } from "$lib/style/components";
     import { SelectorStyle } from "$lib/style/general";
@@ -106,6 +103,11 @@
 
     function toggleSelector(): void {
         isOpen = !isOpen;
+        if (isOpen) {
+            window.addEventListener("click", handleClickOutside);
+        } else {
+            window.removeEventListener("click", handleClickOutside);
+        }
     }
 
     //Change Option Function
@@ -125,22 +127,9 @@
     function handleClickOutside(event: MouseEvent): void {
         if (selDivEl && !selDivEl.contains(event.target as Node)) {
             isOpen = false;
-        }
-    }
-
-    //On Mount Function
-    onMount(() => {
-        if (browser) {
-            window.addEventListener("click", handleClickOutside);
-        }
-    });
-
-    //Cleanup Function
-    onDestroy(() => {
-        if (browser) {
             window.removeEventListener("click", handleClickOutside);
         }
-    });
+    }
 </script>
 
 <!-- 
@@ -183,7 +172,7 @@
         <span class="selected-option">{getDisplayText(selectedKey || "")}</span>
         <img
             class="arrow"
-            src={invertOptions ? (isOpen ? "/img/down-arrow.png" : "/img/up-arrow.png") : isOpen ? "/img/up-arrow.png" : "/img/down-arrow.png"}
+            src={invertOptions ? (isOpen ? "/img/down-arrow.svg" : "/img/up-arrow.svg") : isOpen ? "/img/up-arrow.svg" : "/img/down-arrow.svg"}
             alt={isOpen ? "up-arrow" : "down-arrow"}
         />
         <button

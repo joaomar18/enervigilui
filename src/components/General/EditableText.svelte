@@ -127,7 +127,7 @@
                 <Action
                     backgroundColor="transparent"
                     borderColor="transparent"
-                    imageURL="/img/edit_pencil.png"
+                    imageURL="/img/edit_pencil.svg"
                     imageWidth={String(mergedStyle.buttonImageWidth)}
                     imageHeight={String(mergedStyle.buttonImageHeight)}
                     onClick={activeInput}
@@ -140,7 +140,7 @@
             <Action
                 backgroundColor="transparent"
                 borderColor="transparent"
-                imageURL="/img/accept.png"
+                imageURL="/img/acept.svg"
                 imageWidth={String(mergedStyle.buttonImageWidth)}
                 imageHeight={String(mergedStyle.buttonImageHeight)}
                 onClick={confirmInput}
@@ -150,7 +150,7 @@
             <Action
                 backgroundColor="transparent"
                 borderColor="transparent"
-                imageURL="/img/previous.png"
+                imageURL="/img/previous.svg"
                 imageWidth={String(mergedStyle.buttonImageWidth)}
                 imageHeight={String(mergedStyle.buttonImageHeight)}
                 onClick={cancelInput}

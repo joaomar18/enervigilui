@@ -113,13 +113,42 @@ const NodeSelectorStyleConfig: ComponentStyles = {
         fontSize: "0.9rem",
         letterSpacing: "normal",
         wordSpacing: "normal",
-        arrowWidth: "16px",
-        arrowHeight: "16px",
-        arrowRightPos: "5px",
+        arrowWidth: "20x",
+        arrowHeight: "20px",
+        arrowRightPos: "4px",
     },
 };
 
 export const NodeSelectorStyle = createStyleStore(NodeSelectorStyleConfig);
+
+//////////     N O D E     C O N F I G U R A T I O N     P O P U P     S E L E C T O R     //////////
+
+const NodeConfigPopupSelectorStyleConfig: ComponentStyles = {
+    dark: {
+        width: "90%",
+        height: "40px",
+        borderRadius: "5px",
+        backgroundColor: "#1a2027",
+        borderColor: "#1a2027",
+        disabledBackgroundColor: "#42505f",
+        disabledBorderColor: "#42505f",
+        selectedColor: "#14566b",
+        badFormatBackgroundColor: "#1a2027",
+        badFormatBorderColor: "#e74c3c",
+        optionsBackgroundColor: "#1e242b",
+        optionsBorderColor: "#323a45",
+        optionsInnerBorderColor: "#323a45",
+        optionHeight: "40px",
+        fontSize: "0.9rem",
+        letterSpacing: "normal",
+        wordSpacing: "normal",
+        arrowWidth: "24x",
+        arrowHeight: "24px",
+        arrowRightPos: "10px",
+    },
+};
+
+export const NodeConfigPopupSelectorStyle = createStyleStore(NodeConfigPopupSelectorStyleConfig);
 
 //////////     N O D E S     G R I D     //////////
 

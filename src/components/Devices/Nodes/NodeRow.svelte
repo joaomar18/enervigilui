@@ -420,9 +420,9 @@ properties and action buttons for configuration and deletion. -->
                                 style={$SubPrimaryButtonStyle}
                                 buttonText={$texts.configuration}
                                 width="200px"
-                                imageURL="/img/configuration.png"
-                                imageWidth="20px"
-                                imageHeight="20px"
+                                imageURL="/img/settings.svg"
+                                imageWidth="25px"
+                                imageHeight="25px"
                                 imageLeftPos="20px"
                                 onClick={() => {
                                     handleOnConfig();
@@ -433,9 +433,9 @@ properties and action buttons for configuration and deletion. -->
                                 style={$SubDangerButtonStyle}
                                 buttonText={$texts.delete}
                                 width="200px"
-                                imageURL="/img/delete.png"
-                                imageWidth="20px"
-                                imageHeight="20px"
+                                imageURL="/img/delete.svg"
+                                imageWidth="25px"
+                                imageHeight="25px"
                                 imageLeftPos="20px"
                                 onClick={() => {
                                     handleOnDelete();

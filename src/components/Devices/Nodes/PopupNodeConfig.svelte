@@ -25,7 +25,7 @@
     // Styles
     import { mergeStyle } from "$lib/style/components";
     import { NodeConfigWindowStyle } from "$lib/style/nodes";
-    import { NodeInputFieldStyle, NodeSelectorStyle } from "$lib/style/nodes";
+    import { NodeInputFieldStyle, NodeConfigPopupSelectorStyle } from "$lib/style/nodes";
 
     // Style object (from theme)
     export let style: { [property: string]: string | number } | null = null;
@@ -128,7 +128,7 @@ Displays contextual hints and supports multi-language labels for all fields. -->
                                     <span class="row-entry">
                                         {#if !node.config.custom}
                                             <Selector
-                                                style={$NodeSelectorStyle}
+                                                style={$NodeConfigPopupSelectorStyle}
                                                 options={$variableNameTextsByPhase[node.phase]}
                                                 bind:selectedOption={node.display_name}
                                                 onChange={() => {
@@ -176,7 +176,7 @@ Displays contextual hints and supports multi-language labels for all fields. -->
                                     <span class="row-entry">
                                         {#if !node.config.custom}
                                             <Selector
-                                                style={$NodeSelectorStyle}
+                                                style={$NodeConfigPopupSelectorStyle}
                                                 options={Object.fromEntries($defaultVariableUnits[node.display_name]?.map((unit) => [unit, unit]) || [])}
                                                 bind:selectedOption={node.config.unit}
                                                 onChange={() => {
@@ -289,7 +289,7 @@ Displays contextual hints and supports multi-language labels for all fields. -->
                                 <span class="row-input">
                                     <span class="row-entry">
                                         <Selector
-                                            style={$NodeSelectorStyle}
+                                            style={$NodeConfigPopupSelectorStyle}
                                             options={Object.fromEntries(Object.entries(NodeType).map(([key, value]) => [value, value]))}
                                             bind:selectedOption={node.config.type}
                                             onChange={() => {

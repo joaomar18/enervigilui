@@ -60,7 +60,7 @@
     </div>
     <div class="close-mobile-search-div" class:open={mobileSearchOpen}>
         <Action
-            imageURL="/img/previous.png"
+            imageURL="/img/previous.svg"
             onClick={() => {
                 mobileSearchOpen = false;
             }}
@@ -86,7 +86,7 @@
         <div class="right-header-div" class:close={mobileSearchOpen}>
             <div class="open-search-bar-div" class:close={mobileSearchOpen}>
                 <Action
-                    imageURL="/img/search.png"
+                    imageURL="/img/search.svg"
                     onClick={() => {
                         leftPanelOpen.set(false);
                         mobileSearchOpen = true;
@@ -96,7 +96,7 @@
             <Notification notificationsNumber={"1"} />
             <Logout
                 buttonText={$texts.logout}
-                imageUrl="/img/logout.png"
+                imageUrl="/img/logout.svg"
                 onClick={async () => {
                     await logoutUser();
                 }}

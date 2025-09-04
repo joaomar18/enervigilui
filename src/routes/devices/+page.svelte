@@ -76,7 +76,7 @@
         height: 100%;
         display: grid;
         grid-template-columns: repeat(auto-fill, 300px);
-        gap: 30px;
+        gap: 20px;
         justify-content: center;
     }
 </style>

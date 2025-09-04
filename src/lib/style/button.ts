@@ -18,8 +18,8 @@ const DefaultButtonStyleConfig: ComponentStyles = {
         disabledFontColor: "#f5f5f5",
         fontSize: "1rem",
         fontWeight: "400",
-        imageWidth: "22px",
-        imageHeight: "22px",
+        imageWidth: "32px",
+        imageHeight: "32px",
         imageRightPos: "auto",
         imageLeftPos: "20px",
     },
@@ -66,8 +66,8 @@ const PrimaryButtonStyleConfig: ComponentStyles = {
         disabledFontColor: "#f5f5f5",
         fontSize: "1rem",
         fontWeight: "400",
-        imageWidth: "22px",
-        imageHeight: "22px",
+        imageWidth: "32px",
+        imageHeight: "32px",
         imageRightPos: "auto",
         imageLeftPos: "20px",
     },
@@ -116,8 +116,8 @@ const DangerButtonStyleConfig: ComponentStyles = {
         disabledFontColor: "#f5f5f5",
         fontSize: "1rem",
         fontWeight: "400",
-        imageWidth: "22px",
-        imageHeight: "22px",
+        imageWidth: "32px",
+        imageHeight: "32px",
         imageRightPos: "auto",
         imageLeftPos: "20px",
     },
@@ -166,8 +166,8 @@ const SucessButtonStyleConfig: ComponentStyles = {
         disabledFontColor: "#f5f5f5",
         fontSize: "1rem",
         fontWeight: "400",
-        imageWidth: "22px",
-        imageHeight: "22px",
+        imageWidth: "32px",
+        imageHeight: "32px",
         imageRightPos: "auto",
         imageLeftPos: "20px",
     },
@@ -175,7 +175,7 @@ const SucessButtonStyleConfig: ComponentStyles = {
 
 export const SucessButtonStyle = createStyleStore(SucessButtonStyleConfig);
 
-//////////     S U B     D A N G E R     B U T T O N     //////////
+//////////     S U B     S U C E S S     B U T T O N     //////////
 
 const SubSucessButtonStyleConfig: ComponentStyles = {
     dark: {

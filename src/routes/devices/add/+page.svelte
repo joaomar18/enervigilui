@@ -166,7 +166,7 @@ Shows input forms for protocol-specific parameters and organizes device nodes fo
             <div class="action-buttons-div">
                 <Button
                     buttonText={$texts.cancel}
-                    imageURL="/img/previous.png"
+                    imageURL="/img/previous.svg"
                     onClick={async () => {
                         await navigateTo("/devices");
                     }}
@@ -175,7 +175,7 @@ Shows input forms for protocol-specific parameters and organizes device nodes fo
                     enabled={contentInit}
                     buttonText={$texts.add}
                     style={$SucessButtonStyle}
-                    imageURL="/img/plus.png"
+                    imageURL="/img/plus.svg"
                     onClick={() => {
                         if (validDeviceOperation(deviceData)) {
                             showAddWindow = true;
