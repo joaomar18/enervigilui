@@ -24,21 +24,61 @@ export const LeftPanelStyle = createStyleStore(LeftPanelStyleConfig);
 
 const LinkStyleConfig: ComponentStyles = {
     dark: {
+        height: "48px",
         paddingLeft: "10px",
         paddingRight: "10px",
         paddingLeftText: "10px",
         imageWidth: "25px",
         imageHeight: "25px",
+        arrowImageWidth: "16px",
+        arrowImageHeight: "16px",
         fontSize: "1rem",
         textColor: "#eeeeee",
         backgroundColor: "transparent",
         hoverColor: "rgba(255, 255, 255, 0.05)",
         selectedColor: "#2F4138",
+        selectedHoverColor: "rgba(47, 65, 56, 0.8)",
+        arrowBackgroundColor: "transparent",
+        arrowHoverColor: "rgba(255, 255, 255, 0.05)",
+        arrowSelectedColor: "#2F4138",
+        arrowSelectedHoverColor: "rgba(47, 65, 56, 0.8)",
+        arrowLeftBorderColor: "rgba(255, 255, 255, 0.2)",
         borderBottomColor: "transparent",
+        subContentBorderColor: "rgba(255, 255, 255, 0.2)",
     },
 };
 
 export const LinkStyle = createStyleStore(LinkStyleConfig);
+
+//////////     S U B     L I N K     //////////
+
+const SubLinkStyleConfig: ComponentStyles = {
+    dark: {
+        height: "36px",
+        paddingLeft: "20px",
+        paddingRight: "8px",
+        paddingLeftText: "8px",
+        imageWidth: "18px",
+        imageHeight: "18px",
+        arrowImageWidth: "12px",
+        arrowImageHeight: "12px",
+        fontSize: "0.875rem",
+        textColor: "rgba(255, 255, 255, 0.7)",
+        backgroundColor: "transparent",
+        hoverColor: "rgba(255, 255, 255, 0.03)",
+        selectedColor: "rgba(255, 255, 255, 0.08)",
+        selectedHoverColor: "rgba(255, 255, 255, 0.12)",
+        arrowBackgroundColor: "transparent",
+        arrowHoverColor: "rgba(255, 255, 255, 0.04)",
+        arrowSelectedColor: "rgba(255, 255, 255, 0.06)",
+        arrowSelectedHoverColor: "rgba(255, 255, 255, 0.1)",
+        arrowLeftBorderColor: "rgba(255, 255, 255, 0.1)",
+        borderBottomColor: "transparent",
+        subContentBorderColor: "rgba(255, 255, 255, 0.08)",
+    },
+};
+
+export const SubLinkStyle = createStyleStore(SubLinkStyleConfig);
 
 //////////     L O G O U T     //////////
 

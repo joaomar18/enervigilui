@@ -11,6 +11,7 @@
     // Styles
     import { mergeStyle } from "$lib/style/components";
     import { LeftPanelStyle } from "$lib/style/dashboard";
+    import { SubLinkStyle } from "$lib/style/dashboard";
 
     // Style object (from theme)
     export let style: { [property: string]: string | number } | null = null;
@@ -47,6 +48,12 @@
 
     // Merged style
     $: mergedStyle = mergeStyle(effectiveStyle, localOverrides);
+
+    // Variables
+    let devicesSubSection: boolean = false;
+
+    // Reactive Statements
+    $: devicesSubSection = activeSection.includes("/devices/add") || activeSection.includes("/devices/edit");
 
     // Functions
     async function browseTo(path: string) {
@@ -94,64 +101,108 @@
             <!-- Devices Section -->
             <div class="section">
                 <span class="section-label">{$texts.general}</span>
-                <Link
-                    selected={activeSection.includes("/devices")}
-                    buttonText={$texts.devices}
-                    imageURL="/img/devices.png"
-                    onClick={() => {
-                        browseTo("/devices");
-                    }}
-                />
-                <Link
-                    selected={activeSection.includes("/mqtt")}
-                    buttonText="MQTT"
-                    imageURL="/img/mqtt.png"
-                    onClick={() => {
-                        browseTo("/mqtt");
-                    }}
-                />
+                <div class="section-links-div">
+                    <Link
+                        selected={activeSection.includes("/devices")}
+                        showExpandArrow={devicesSubSection}
+                        triggerExpand={devicesSubSection}
+                        buttonText={$texts.devices}
+                        imageURL="/img/devices.png"
+                        onClick={() => {
+                            browseTo("/devices");
+                        }}
+                    >
+                        <Link
+                            style={$SubLinkStyle}
+                            selected={activeSection.includes("/add")}
+                            buttonText={$texts.addNew}
+                            imageURL="/img/plus.png"
+                            onClick={() => {
+                                browseTo("/devices/add");
+                            }}
+                        />
+                        <Link
+                            style={$SubLinkStyle}
+                            selected={activeSection.includes("/edit")}
+                            buttonText={$texts.editConfig}
+                            imageURL="/img/edit.png"
+                            onClick={() => {
+                                browseTo("/devices/edit");
+                            }}
+                        />
+                        <Link
+                            style={$SubLinkStyle}
+                            selected={activeSection.includes("/realtime")}
+                            buttonText={$texts.realTimeData}
+                            onClick={() => {
+                                browseTo("/devices/realtime");
+                            }}
+                        />
+                        <Link
+                            style={$SubLinkStyle}
+                            selected={activeSection.includes("/logs")}
+                            buttonText={$texts.dataAnalytics}
+                            onClick={() => {
+                                browseTo("/devices/logs");
+                            }}
+                        />
+                    </Link>
+
+                    <Link
+                        selected={activeSection.includes("/mqtt")}
+                        buttonText="MQTT"
+                        imageURL="/img/mqtt.png"
+                        onClick={() => {
+                            browseTo("/mqtt");
+                        }}
+                    ></Link>
+                </div>
             </div>
 
             <!-- Diagnostics Section -->
             <div class="section">
                 <span class="section-label">{$texts.diagnostics}</span>
-                <Link
-                    selected={activeSection.includes("/health")}
-                    buttonText={$texts.health}
-                    imageURL="/img/health.png"
-                    onClick={() => {
-                        browseTo("/health");
-                    }}
-                />
-                <Link
-                    selected={activeSection.includes("/logs")}
-                    buttonText={$texts.logs}
-                    imageURL="/img/logs.png"
-                    onClick={() => {
-                        browseTo("/logs");
-                    }}
-                />
+                <div class="section-links-div">
+                    <Link
+                        selected={activeSection.includes("/health")}
+                        buttonText={$texts.health}
+                        imageURL="/img/health.png"
+                        onClick={() => {
+                            browseTo("/health");
+                        }}
+                    ></Link>
+                    <Link
+                        selected={activeSection.includes("/logs")}
+                        buttonText={$texts.logs}
+                        imageURL="/img/logs.png"
+                        onClick={() => {
+                            browseTo("/logs");
+                        }}
+                    ></Link>
+                </div>
             </div>
 
             <!-- System Section -->
             <div class="section">
                 <span class="section-label">{$texts.system}</span>
-                <Link
-                    selected={activeSection.includes("/settings")}
-                    buttonText={$texts.settings}
-                    imageURL="/img/settings.png"
-                    onClick={() => {
-                        browseTo("/settings");
-                    }}
-                />
-                <Link
-                    selected={activeSection.includes("/backup")}
-                    buttonText={$texts.backup}
-                    imageURL="/img/backup.png"
-                    onClick={() => {
-                        browseTo("/backup");
-                    }}
-                />
+                <div class="section-links-div">
+                    <Link
+                        selected={activeSection.includes("/settings")}
+                        buttonText={$texts.settings}
+                        imageURL="/img/settings.png"
+                        onClick={() => {
+                            browseTo("/settings");
+                        }}
+                    ></Link>
+                    <Link
+                        selected={activeSection.includes("/backup")}
+                        buttonText={$texts.backup}
+                        imageURL="/img/backup.png"
+                        onClick={() => {
+                            browseTo("/backup");
+                        }}
+                    ></Link>
+                </div>
             </div>
         </nav>
         <div class="language-selector-div">
@@ -246,7 +297,7 @@
 
     /* Individual menu section block */
     .section {
-        margin-bottom: 24px;
+        margin-bottom: 20px;
         display: flex;
         flex-direction: column;
         align-items: center;
@@ -269,6 +320,18 @@
         letter-spacing: 1px;
         border-bottom: 2px solid var(--section-border-bottom-color);
         width: calc(100% - 40px);
+    }
+
+    .section .section-links-div {
+        margin: 0;
+        padding: 0;
+        width: calc(100% - 30px);
+        height: fit-content;
+        display: flex;
+        flex-direction: column;
+        justify-content: start;
+        align-items: center;
+        gap: 5px;
     }
 
     /* Language selector area */

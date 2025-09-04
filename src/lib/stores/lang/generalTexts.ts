@@ -575,6 +575,26 @@ const textsObject: TextsObject = {
         PT: "Configuração",
         EN: "Configuration",
     },
+    editDeviceConfig: {
+        PT: "Editar configuração do dispositivo",
+        EN: "Edit device configuration",
+    },
+    addNew: {
+        PT: "Adicionar novo",
+        EN: "Add new",
+    },
+    editConfig: {
+        PT: "Editar configuração",
+        EN: "Edit configuration",
+    },
+    realTimeData: {
+        PT: "Dados em tempo real",
+        EN: "Real time data",
+    },
+    dataAnalytics: {
+        PT: "Análise de dados",
+        EN: "Data analytics",
+    },
 };
 
 export const texts = createLangStore(textsObject);
