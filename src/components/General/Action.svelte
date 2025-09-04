@@ -87,9 +87,9 @@
         border: 1px solid var(--border-color);
         border-radius: var(--border-radius);
         cursor: pointer;
+        user-select: none;
         -webkit-tap-highlight-color: transparent;
         -webkit-touch-callout: none;
-        user-select: none;
         transform-origin: center;
         -webkit-font-smoothing: antialiased;
     }
