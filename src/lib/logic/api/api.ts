@@ -140,6 +140,22 @@ export async function makeAPIRequest(
     }
 }
 
+/**
+ * High-level API wrapper that handles HTTP requests with automatic error handling and user feedback.
+ *
+ * Provides centralized error handling, toast notifications, authentication redirects, and loading state management.
+ *
+ * @param options - Configuration object for the API call
+ * @param options.endpoint - API endpoint path (e.g., "/api/devices")
+ * @param options.method - HTTP method ("GET", "POST", "PUT", "DELETE")
+ * @param options.params - Request parameters (query params for GET, body for others)
+ * @param options.timeout - Request timeout in milliseconds (default: 3000)
+ * @param options.loginPage - Whether this is a login page request (affects error handling)
+ * @param options.file - Optional file for upload requests
+ * @param options.fileFieldName - Form field name for file uploads (default: "file")
+ * @param options.setLoaded - Whether to set loadedDone state to true on success
+ * @returns Promise with success status and response data
+ */
 export async function callAPI({
     endpoint,
     method,

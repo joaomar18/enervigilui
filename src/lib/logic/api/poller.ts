@@ -1,3 +1,13 @@
+/**
+ * A polling utility that repeatedly executes a method at specified intervals.
+ *
+ * Features:
+ * - Prevents overlapping executions with in-flight tracking
+ * - Supports abort signals for cancelling long-running operations
+ * - Handles errors gracefully with console logging
+ * - Allows dynamic interval adjustment
+ * - Proper resource cleanup and destruction
+ */
 export class MethodPoller {
     #fn: (signal?: AbortSignal) => Promise<void> | void;
     #interval: number;
@@ -16,6 +26,10 @@ export class MethodPoller {
         this.start();
     }
 
+    /**
+     * Starts or restarts the polling operation.
+     * @param immediate - Whether to run the method immediately or wait for the first interval.
+     */
     start(immediate: boolean = true) {
         if (this.#destroyed) {
             throw new Error("Method Poller is destroyed");
@@ -24,6 +38,10 @@ export class MethodPoller {
         immediate ? this.#run() : this.#schedule();
     }
 
+    /**
+     * Stops the polling operation and optionally destroys the poller.
+     * @param destroy - Whether to permanently destroy the poller instance.
+     */
     stop(destroy: boolean = true) {
         if (this.#timer) {
             clearTimeout(this.#timer);
@@ -38,6 +56,10 @@ export class MethodPoller {
         }
     }
 
+    /**
+     * Executes the polling method with error handling and abort support.
+     * Prevents overlapping executions and reschedules the next run.
+     */
     async #run() {
         if (this.#destroyed) {
             return;
@@ -63,6 +85,9 @@ export class MethodPoller {
         }
     }
 
+    /**
+     * Schedules the next execution of the polling method after the specified interval.
+     */
     #schedule() {
         if (this.#destroyed) {
             return;
@@ -70,6 +95,10 @@ export class MethodPoller {
         this.#timer = setTimeout(() => this.#run(), this.#interval);
     }
 
+    /**
+     * Updates the polling interval and reschedules if currently running.
+     * @param ms - New interval time in milliseconds.
+     */
     setInterval(ms: number) {
         if (this.#destroyed) {
             throw new Error("Method Poller is destroyed");

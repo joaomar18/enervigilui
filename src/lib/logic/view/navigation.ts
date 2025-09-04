@@ -5,10 +5,15 @@ import { checkAutoLogin } from "../validation/auth";
 import { selectedLang } from "$lib/stores/lang/definition";
 
 // Splash screen store
-import { splashDone, loadedDone, showSubLoader, leftPanelOpen, searchQuery } from "../../stores/view/navigation";
-
-let resetSubLoaderSub: (() => void) | null = null; //Subscription to reset sub loader
-let subLoaderTimer: ReturnType<typeof setTimeout> | null = null; // Timeout to set sub loader in case of delay
+import {
+    splashDone,
+    loadedDone,
+    showSubLoader,
+    leftPanelOpen,
+    searchQuery,
+    subLoaderTimer,
+    resetSubLoaderSubscription,
+} from "../../stores/view/navigation";
 
 /**
  * Builds navigation URLs with query parameters and returns navigation route information.
@@ -45,15 +50,17 @@ function getNavigationReady(url: string, lang: string, extraParams: Record<strin
  */
 function resetSubLoaderTrigger() {
     // Reset Sub Loader Timer
-    if (subLoaderTimer) {
-        clearTimeout(subLoaderTimer);
-        subLoaderTimer = null;
+    const timer = get(subLoaderTimer);
+    if (timer) {
+        clearTimeout(timer);
+        subLoaderTimer.set(null);
     }
 
     // Reset Sub Loader Subscription
-    if (resetSubLoaderSub) {
-        resetSubLoaderSub();
-        resetSubLoaderSub = null;
+    const subscription = get(resetSubLoaderSubscription);
+    if (subscription) {
+        subscription();
+        resetSubLoaderSubscription.set(null);
     }
 }
 
@@ -66,22 +73,27 @@ function resetSubLoaderTrigger() {
  * @param showSubLoaderTime - Time in milliseconds to wait before showing the sub-loader if not loaded.
  */
 function setSubLoaderTrigger(showSubLoaderTime: number) {
-    resetSubLoaderSub = loadedDone.subscribe((val) => {
+    const subscription = loadedDone.subscribe((val) => {
         if (val) {
             showSubLoader.set(false);
-            if (resetSubLoaderSub) {
-                resetSubLoaderSub();
-                resetSubLoaderSub = null;
+            const currentSub = get(resetSubLoaderSubscription);
+            if (currentSub) {
+                currentSub();
+                resetSubLoaderSubscription.set(null);
             }
         }
     });
 
-    subLoaderTimer = setTimeout(() => {
+    resetSubLoaderSubscription.set(subscription);
+
+    const timer = setTimeout(() => {
         const loadedDoneState = get(loadedDone);
         if (!loadedDoneState) {
             showSubLoader.set(true);
         }
     }, showSubLoaderTime);
+
+    subLoaderTimer.set(timer);
 }
 
 /**

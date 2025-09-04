@@ -1,3 +1,14 @@
+/**
+ * A retry utility that executes a method with exponential backoff until success or maximum interval reached.
+ *
+ * Key features:
+ * - Exponential backoff with configurable factor and maximum interval
+ * - Prevents overlapping executions using in-flight protection
+ * - AbortSignal support for graceful cancellation
+ * - Automatic retry on failure with increasing delays
+ * - Resource cleanup and lifecycle management
+ * - Dynamic interval adjustment during runtime
+ */
 export class MethodRetrier {
     #fn: (signal?: AbortSignal) => Promise<void> | void;
     #interval: number;
@@ -27,6 +38,12 @@ export class MethodRetrier {
         this.start();
     }
 
+    /**
+     * Starts or restarts the retry loop.
+     *
+     * @param immediate - Whether to execute immediately or wait for the next interval (default: true)
+     * @throws {Error} When the retrier has been destroyed
+     */
     start(immediate: boolean = true) {
         if (this.#destroyed) {
             throw new Error("Method Retrier is destroyed");
@@ -35,6 +52,11 @@ export class MethodRetrier {
         immediate ? this.#run() : this.#schedule();
     }
 
+    /**
+     * Stops the retry loop and optionally destroys the retrier.
+     *
+     * @param destroy - Whether to permanently destroy the retrier (default: true)
+     */
     stop(destroy: boolean = true) {
         if (this.#timer) {
             clearTimeout(this.#timer);
@@ -49,6 +71,9 @@ export class MethodRetrier {
         }
     }
 
+    /**
+     * Executes the method with abort signal support and handles success/failure logic.
+     */
     async #run() {
         let sucess = false;
 
@@ -77,6 +102,9 @@ export class MethodRetrier {
         }
     }
 
+    /**
+     * Schedules the next retry attempt with exponential backoff.
+     */
     #schedule() {
         if (this.#destroyed) {
             return;
@@ -96,6 +124,12 @@ export class MethodRetrier {
         this.#timer = setTimeout(() => this.#run(), this.#currentInterval);
     }
 
+    /**
+     * Updates the retry interval and resets the backoff progression.
+     *
+     * @param ms - New interval in milliseconds
+     * @throws {Error} When the retrier has been destroyed
+     */
     setInterval(ms: number) {
         if (this.#destroyed) {
             throw new Error("Method Retrier is destroyed");

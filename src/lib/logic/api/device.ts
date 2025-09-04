@@ -4,6 +4,13 @@ import type { DeviceNode } from "$lib/types/nodes/base";
 import { processInitialDevice, convertToEditableDevice } from "../factory/device";
 import { navigateTo } from "../view/navigation";
 
+/**
+ * Retrieves all devices and their current state from the server.
+ * Processes device data and converts base64 images to data URLs.
+ *
+ * @returns Object containing processed devices array and device images mapped by ID.
+ * @throws Error if the API request fails.
+ */
 export async function getAllDevicesState(): Promise<{ devices: Array<DeviceMeter>; devicesImages: Record<number, string> }> {
     let devices: Array<DeviceMeter>;
     let devicesImages: Record<number, string> = {};
@@ -27,6 +34,14 @@ export async function getAllDevicesState(): Promise<{ devices: Array<DeviceMeter
     return { devices, devicesImages };
 }
 
+/**
+ * Retrieves a specific device's state and configuration data.
+ * Returns both the initial device data and an editable version for modifications.
+ *
+ * @param id - The unique identifier of the device to retrieve.
+ * @returns Object containing initial device data and editable device configuration.
+ * @throws Error if the API request fails.
+ */
 export async function getDeviceState(id: number): Promise<{ initialDeviceData: DeviceMeter; deviceData: EditableDeviceMeter }> {
     let initialDeviceData: DeviceMeter;
     let deviceData: EditableDeviceMeter;
@@ -47,6 +62,13 @@ export async function getDeviceState(id: number): Promise<{ initialDeviceData: D
     return { initialDeviceData, deviceData };
 }
 
+/**
+ * Retrieves the default device image from the server.
+ * Converts base64 image data to a data URL for display.
+ *
+ * @returns Data URL string of the default device image.
+ * @throws Error if the API request fails.
+ */
 export async function getDefaultImage(): Promise<string> {
     let imageData: Record<string, string>;
     const { sucess, data } = await callAPI({
@@ -62,6 +84,14 @@ export async function getDefaultImage(): Promise<string> {
     return `data:${imageData["type"]};base64,${imageData["data"]}`;
 }
 
+/**
+ * Creates a new device with configuration data, optional image, and associated nodes.
+ * Navigates to devices page on successful creation.
+ *
+ * @param deviceData - Complete device configuration and settings.
+ * @param deviceImage - Optional image file to associate with the device.
+ * @param deviceNodes - Array of nodes/variables associated with the device.
+ */
 export async function addDevice(deviceData: DeviceMeter, deviceImage: File | undefined, deviceNodes: Array<DeviceNode>) {
     const { sucess, data } = await callAPI({
         endpoint: "/api/device/add_device",
@@ -75,6 +105,14 @@ export async function addDevice(deviceData: DeviceMeter, deviceImage: File | und
     }
 }
 
+/**
+ * Updates an existing device with modified configuration data, image, and nodes.
+ * Navigates to devices page on successful update.
+ *
+ * @param deviceData - Updated device configuration and settings.
+ * @param deviceImage - Optional new image file for the device.
+ * @param deviceNodes - Updated array of nodes/variables for the device.
+ */
 export async function editDevice(deviceData: DeviceMeter, deviceImage: File | undefined, deviceNodes: Array<DeviceNode>) {
     const { sucess, data } = await callAPI({
         endpoint: "/api/device/edit_device",
@@ -86,9 +124,15 @@ export async function editDevice(deviceData: DeviceMeter, deviceImage: File | un
     if (sucess) {
         await navigateTo("/devices", {});
     }
-    return data;
 }
 
+/**
+ * Permanently deletes a device from the system.
+ * Navigates to devices page on successful deletion.
+ *
+ * @param deviceName - Name of the device to delete (for confirmation).
+ * @param deviceID - Unique identifier of the device to delete.
+ */
 export async function deleteDevice(deviceName: string, deviceID: number) {
     const { sucess, data } = await callAPI({
         endpoint: "/api/device/delete_device",
@@ -98,5 +142,4 @@ export async function deleteDevice(deviceName: string, deviceID: number) {
     if (sucess) {
         await navigateTo("/devices", {});
     }
-    return data;
 }
