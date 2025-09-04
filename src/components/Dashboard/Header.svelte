@@ -10,7 +10,6 @@
     import { logoutUser } from "$lib/logic/api/auth";
 
     // Texts
-    import { selectedLang } from "$lib/stores/lang/definition";
     import { texts } from "$lib/stores/lang/generalTexts";
 
     // Stores
@@ -76,7 +75,7 @@
         <div class="search-bar-div" class:open={mobileSearchOpen}>
             <SearchBar
                 onClick={async () => {
-                    await navigateTo("/devices", $selectedLang, { searchQuery: $searchQuery });
+                    await navigateTo("/devices", { searchQuery: $searchQuery });
                 }}
                 bind:searchString={$searchQuery}
                 placeholderText={$texts.searchDevice}

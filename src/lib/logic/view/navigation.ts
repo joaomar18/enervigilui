@@ -85,50 +85,23 @@ function setSubLoaderTrigger(showSubLoaderTime: number) {
 }
 
 /**
- * Navigates to a new URL, appending extra query parameters and a `lang` parameter,
- * with optional splash screen and sub-loader logic.
+ * Navigates to a new URL with optional query parameters, splash screen, and loading states.
  *
- * @param url - The base URL or route to navigate to (without query parameters).
- * @param lang - Language code to append as the final `lang` query parameter.
- * @param extraParams - Additional key/value pairs to include in the query string (excluding `lang`).
- * @param splashScreen - If true, shows a splash screen during navigation. Defaults to `false`.
- * @param minSplashDuration - Minimum splash screen duration in ms if enabled. Defaults to `300`.
- * @param showSubLoaderTime - Time in ms before showing the sub-loader if loading is not complete. Defaults to `600`.
- * @returns Promise<void> Resolves after navigation and splash screen (if enabled) are complete.
- *
- * @description This function handles:
- * - Building the complete URL with query parameters
- * - Checking if already on the target route (skips navigation if true)
- * - Setting up sub-loader timing for delayed page loads
- * - Managing search query state based on the target route
- * - Optional splash screen with minimum duration
- * - Closing left panel on mobile devices after navigation
- *
- * @example
- * // Navigate with only language
- * navigateTo('/devices/edit', 'PT');
- * // → /devices/edit?lang=PT
- *
- * // With extra parameters (including search)
- * navigateTo('/devices', 'PT', { searchQuery: 'meter' });
- * // → /devices?searchQuery=meter&lang=PT
- *
- * // With splash screen and custom duration
- * navigateTo('/home', 'EN', { ref: '123' }, true, 500)
- *   .then(() => console.log('Navigation complete and splash hidden'));
- *
- * // With sub-loader shown after 800ms if not loaded
- * navigateTo('/devices', 'PT', {}, false, 300, 800);
+ * @param url - The target URL or route to navigate to.
+ * @param extraParams - Additional query parameters to append to the URL.
+ * @param splashScreen - Whether to show splash screen during navigation.
+ * @param minSplashDuration - Minimum duration (ms) to display splash screen.
+ * @param showSubLoaderTime - Time (ms) before showing sub-loader if navigation takes too long.
+ * @returns Promise that resolves when navigation and splash screen (if enabled) complete.
  */
 export async function navigateTo(
     url: string,
-    lang: string,
     extraParams: Record<string, string> = {},
     splashScreen: boolean = false,
     minSplashDuration: number = 300,
     showSubLoaderTime: number = 600
 ): Promise<void> {
-    let [target, targetRoute, currentRoute, searchQuery] = getNavigationReady(url, lang, extraParams);
+    let [target, targetRoute, currentRoute, searchQuery] = getNavigationReady(url, get(selectedLang), extraParams);
 
     // Already in Intended URL
     if (targetRoute === currentRoute) {
@@ -236,7 +209,7 @@ export async function initLayout() {
     const [authResult] = await Promise.all([checkAutoLoginPromise, getSearchQueryPromise, minTimePromise]);
 
     if (authResult.shouldRedirect && authResult.redirectTarget) {
-        await navigateTo(authResult.redirectTarget, get(selectedLang));
+        await navigateTo(authResult.redirectTarget);
     }
 
     splashDone.set(true);

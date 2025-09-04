@@ -92,6 +92,7 @@
         -webkit-touch-callout: none;
         transform-origin: center;
         -webkit-font-smoothing: antialiased;
+        shape-rendering: geometricPrecision;
     }
 
     /* Hover state: visual feedback on pointer-over */

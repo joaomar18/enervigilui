@@ -161,7 +161,7 @@ export async function callAPI({
                     if (loginPage) {
                         showToast("wrongCredentials", ToastType.ALERT, { remaining: String(data.remaining) });
                     } else {
-                        await navigateTo("/login", get(selectedLang), {}, true);
+                        await navigateTo("/login", {}, true);
                     }
                     break;
                 case 429:

@@ -37,7 +37,6 @@
 
     // Texts
     import { texts } from "$lib/stores/lang/generalTexts";
-    import { selectedLang } from "$lib/stores/lang/definition";
     import { protocolTexts } from "$lib/stores/lang/energyMeterTexts";
 
     // Stores
@@ -73,7 +72,7 @@
             nodesInit = true;
         } else {
             (async () => {
-                await navigateTo("/devices", $selectedLang, {});
+                await navigateTo("/devices");
             })();
         }
     }
@@ -203,7 +202,7 @@ Shows input forms for protocol-specific parameters and organizes device nodes fo
                     imageURL="/img/previous.png"
                     onClick={async () => {
                         if (noChangesToDevice(initialDeviceData, deviceData, initialNodes, nodes)) {
-                            await navigateTo("/devices", $selectedLang, {});
+                            await navigateTo("/devices");
                             return;
                         }
                         showCancelWindow = true;
@@ -276,7 +275,7 @@ Shows input forms for protocol-specific parameters and organizes device nodes fo
         <PopupCancelDeviceEdit
             bind:windowOpened={showCancelWindow}
             onCancelEdit={async () => {
-                await navigateTo("/devices", $selectedLang, {});
+                await navigateTo("/devices");
             }}
         />
     {/if}

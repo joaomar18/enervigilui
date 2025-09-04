@@ -1,9 +1,7 @@
-import { get } from "svelte/store";
 import { callAPI } from "$lib/logic/api/api";
 import type { DeviceMeter, EditableDeviceMeter } from "$lib/types/device/base";
 import type { DeviceNode } from "$lib/types/nodes/base";
 import { processInitialDevice, convertToEditableDevice } from "../factory/device";
-import { selectedLang } from "$lib/stores/lang/definition";
 import { navigateTo } from "../view/navigation";
 
 export async function getAllDevicesState(): Promise<{ devices: Array<DeviceMeter>; devicesImages: Record<number, string> }> {
@@ -73,7 +71,7 @@ export async function addDevice(deviceData: DeviceMeter, deviceImage: File | und
         fileFieldName: "deviceImage",
     });
     if (sucess) {
-        await navigateTo("/devices", get(selectedLang), {});
+        await navigateTo("/devices", {});
     }
 }
 
@@ -86,7 +84,7 @@ export async function editDevice(deviceData: DeviceMeter, deviceImage: File | un
         fileFieldName: "deviceImage",
     });
     if (sucess) {
-        await navigateTo("/devices", get(selectedLang), {});
+        await navigateTo("/devices", {});
     }
     return data;
 }
@@ -98,7 +96,7 @@ export async function deleteDevice(deviceName: string, deviceID: number) {
         params: { deviceName, deviceID },
     });
     if (sucess) {
-        await navigateTo("/devices", get(selectedLang), {});
+        await navigateTo("/devices", {});
     }
     return data;
 }

@@ -6,7 +6,6 @@
     import Logo from "../General/Logo.svelte";
 
     // Texts
-    import { selectedLang } from "$lib/stores/lang/definition";
     import { texts } from "$lib/stores/lang/generalTexts";
 
     // Styles
@@ -51,7 +50,7 @@
 
     // Functions
     async function browseTo(path: string) {
-        await navigateTo(path, $selectedLang);
+        await navigateTo(path);
     }
 
     function closePanel(): void {

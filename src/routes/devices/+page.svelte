@@ -7,9 +7,6 @@
     import { filterDevices } from "$lib/logic/util/device";
     import { MethodPoller } from "$lib/logic/api/poller";
 
-    // Texts
-    import { selectedLang } from "$lib/stores/lang/definition";
-
     // Stores
     import { searchQuery } from "$lib/stores/view/navigation";
 
@@ -25,7 +22,7 @@
 
     // Go to edit device page
     async function editDevice(deviceId: number, deviceName: string): Promise<void> {
-        await navigateTo("devices/edit", $selectedLang, {
+        await navigateTo("devices/edit", {
             deviceId: String(deviceId),
             deviceName: deviceName,
         });
@@ -33,7 +30,7 @@
 
     // Go to add device page
     async function addDevice(): Promise<void> {
-        await navigateTo("devices/add", $selectedLang);
+        await navigateTo("devices/add");
     }
 
     // Mount function to poll devices status

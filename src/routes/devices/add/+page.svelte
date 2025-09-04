@@ -32,7 +32,6 @@
 
     // Texts
     import { texts } from "$lib/stores/lang/generalTexts";
-    import { selectedLang } from "$lib/stores/lang/definition";
     import { protocolTexts } from "$lib/stores/lang/energyMeterTexts";
 
     // Stores
@@ -169,7 +168,7 @@ Shows input forms for protocol-specific parameters and organizes device nodes fo
                     buttonText={$texts.cancel}
                     imageURL="/img/previous.png"
                     onClick={async () => {
-                        await navigateTo("/devices", $selectedLang, {});
+                        await navigateTo("/devices");
                     }}
                 />
                 <Button

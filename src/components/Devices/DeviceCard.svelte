@@ -142,6 +142,7 @@
         object-fit: cover;
         overflow: hidden;
         contain: paint;
+        shape-rendering: geometricPrecision;
     }
 
     /* Hover state: lift and shadow for emphasis */

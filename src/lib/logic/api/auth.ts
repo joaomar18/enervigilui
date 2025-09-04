@@ -1,7 +1,5 @@
-import { get } from "svelte/store";
 import { callAPI } from "$lib/logic/api/api";
 import { navigateTo } from "../view/navigation";
-import { selectedLang } from "$lib/stores/lang/definition";
 import { validateUsername, validatePassword } from "../validation/auth";
 
 export async function loginUser(username: string, password: string, autoLogin: boolean) {
@@ -18,7 +16,7 @@ export async function loginUser(username: string, password: string, autoLogin: b
         loginPage: true,
     });
     if (sucess) {
-        await navigateTo("/devices", get(selectedLang), {}, true); // Navigate to the dashboard on success
+        await navigateTo("/devices", {}, true); // Navigate to the dashboard on success
     }
 }
 
@@ -56,6 +54,6 @@ export async function logoutUser() {
         method: "POST",
     });
     if (sucess) {
-        await navigateTo("/login", get(selectedLang), {}, true);
+        await navigateTo("/login", {}, true);
     }
 }
