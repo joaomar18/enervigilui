@@ -32,7 +32,7 @@
     export let imageContainerBorderRadius: string | undefined = undefined;
     export let imageWidth: string | undefined = undefined;
     export let imageHeight: string | undefined = undefined;
-    export let textColor: string | undefined = "#e0e0e0";
+    export let textColor: string | undefined = undefined;
     export let imageHoverBackgroundColor: string | undefined = undefined;
     export let shadowColor: string | undefined = undefined;
     export let titleColor: string | undefined = undefined;
@@ -138,14 +138,15 @@
         -webkit-touch-callout: none;
         user-select: none;
         transform-origin: center;
-        backface-visibility: hidden;
-        transform: scale(1) translateZ(0);
         -webkit-font-smoothing: antialiased;
+        object-fit: cover;
+        overflow: hidden;
+        contain: paint;
     }
 
     /* Hover state: lift and shadow for emphasis */
     .container:hover {
-        transform: scale(1.1) translateZ(0);
+        transform: scale(1.125) translate3d(0, 0, 0);
         box-shadow: 0 8px 16px var(--shadow-color);
     }
 
@@ -194,6 +195,9 @@
         -webkit-tap-highlight-color: transparent;
         opacity: 0;
         transition: opacity 0.2s ease-in-out;
+        transform-origin: center;
+        -webkit-font-smoothing: antialiased;
+        object-fit: cover;
     }
 
     /* Image loaded state: fully visible */

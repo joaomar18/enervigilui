@@ -90,6 +90,8 @@
         -webkit-tap-highlight-color: transparent;
         -webkit-touch-callout: none;
         user-select: none;
+        transform-origin: center;
+        -webkit-font-smoothing: antialiased;
     }
 
     /* Hover state: visual feedback on pointer-over */

@@ -236,6 +236,7 @@ properties and action buttons for configuration and deletion. -->
                         });
                     }}
                     inputUnit="min."
+                    height={rowHeight}
                 />
             </div>
         </td>
