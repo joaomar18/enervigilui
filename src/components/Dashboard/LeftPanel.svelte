@@ -116,7 +116,7 @@
                             style={$SubLinkStyle}
                             selected={activeSection.includes("/add")}
                             buttonText={$texts.addNew}
-                            imageURL="/img/plus.png"
+                            imageURL="/img/plus-simple.svg"
                             onClick={() => {
                                 browseTo("/devices/add");
                             }}
@@ -134,6 +134,7 @@
                             style={$SubLinkStyle}
                             selected={activeSection.includes("/realtime")}
                             buttonText={$texts.realTimeData}
+                            imageURL="/img/real-time.svg"
                             onClick={() => {
                                 browseTo("/devices/realtime");
                             }}
@@ -142,6 +143,7 @@
                             style={$SubLinkStyle}
                             selected={activeSection.includes("/logs")}
                             buttonText={$texts.dataAnalytics}
+                            imageURL="/img/analytics.svg"
                             onClick={() => {
                                 browseTo("/devices/logs");
                             }}

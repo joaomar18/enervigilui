@@ -83,7 +83,7 @@
         <LoginField
             id="username"
             paddingTop="10px"
-            imageUrl="/img/user.png"
+            imageUrl="/img/user.svg"
             fieldText={$texts.username}
             type="text"
             bind:value={username}
@@ -95,7 +95,7 @@
         <LoginField
             id="password"
             paddingTop="30px"
-            imageUrl="/img/password.png"
+            imageUrl="/img/password.svg"
             fieldText={$texts.password}
             type="password"
             bind:value={password}

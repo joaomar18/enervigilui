@@ -1,4 +1,6 @@
 <script lang="ts">
+    import { onDestroy } from "svelte";
+
     // Styles
     import { mergeStyle } from "$lib/style/components";
     import { SelectorStyle } from "$lib/style/general";
@@ -71,6 +73,7 @@
     let validOptions: [string, any][];
     let optionsHeight: string = "fit-content";
     let selDivEl: Node;
+    let clickEventListenerDefined: boolean = false;
 
     $: {
         if (disabled) {
@@ -92,6 +95,10 @@
             isOpen = false;
         }
     }
+    $: if (!isOpen && clickEventListenerDefined) {
+        window.removeEventListener("click", handleClickOutside);
+        clickEventListenerDefined = false;
+    }
 
     // Change Export Function
     export let onChange: (() => void) | undefined = undefined;
@@ -105,8 +112,7 @@
         isOpen = !isOpen;
         if (isOpen) {
             window.addEventListener("click", handleClickOutside);
-        } else {
-            window.removeEventListener("click", handleClickOutside);
+            clickEventListenerDefined = true;
         }
     }
 
@@ -127,9 +133,14 @@
     function handleClickOutside(event: MouseEvent): void {
         if (selDivEl && !selDivEl.contains(event.target as Node)) {
             isOpen = false;
-            window.removeEventListener("click", handleClickOutside);
         }
     }
+
+    onDestroy(() => {
+        if (clickEventListenerDefined) {
+            window.removeEventListener("click", handleClickOutside);
+        }
+    });
 </script>
 
 <!-- 

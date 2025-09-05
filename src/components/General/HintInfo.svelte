@@ -54,6 +54,13 @@
     let hintOpened: boolean;
     let hintDiv: Node;
     let buttonEl: Node;
+    let clickEventListenerDefined: boolean = false;
+
+    // Reactive Statements
+    $: if (!hintOpened && clickEventListenerDefined) {
+        window.removeEventListener("click", handleClickOutside);
+        clickEventListenerDefined = false;
+    }
 
     // Functions
     function handleClickOutside(event: MouseEvent): void {
@@ -64,16 +71,14 @@
 
     function toogleHint(): void {
         hintOpened = !hintOpened;
+        if (hintOpened) {
+            window.addEventListener("click", handleClickOutside);
+            clickEventListenerDefined = true;
+        }
     }
 
-    onMount(() => {
-        if (browser) {
-            window.addEventListener("click", handleClickOutside);
-        }
-    });
-
     onDestroy(() => {
-        if (browser) {
+        if (clickEventListenerDefined) {
             window.removeEventListener("click", handleClickOutside);
         }
     });

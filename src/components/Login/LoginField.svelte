@@ -122,7 +122,7 @@
                 <div class="show-hide-content">
                     <img
                         class="show-hide-img"
-                        src={showPassword ? "./img/show.png" : "./img/hide.png"}
+                        src={showPassword ? "./img/show.svg" : "./img/hide.svg"}
                         alt={showPassword ? "show" : "hide"}
                         style="width:{mergedStyle.imageWidth}; heigh:{mergedStyle.imageHeight};"
                     />

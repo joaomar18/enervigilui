@@ -14,7 +14,7 @@ const HeaderStyleConfig: ComponentStyles = {
 
 export const HeaderStyle = createStyleStore(HeaderStyleConfig);
 
-//////////     H E A D E R     //////////
+//////////     L O G I N     F O R M     //////////
 
 const LoginFormStyleConfig: ComponentStyles = {
     dark: {
@@ -47,8 +47,8 @@ const LoginFieldStyleConfig: ComponentStyles = {
     dark: {
         paddingTop: "0px",
         paddingBottom: "0px",
-        imageWidth: "32px",
-        imageHeight: "32px",
+        imageWidth: "28px",
+        imageHeight: "28px",
         labelTextColor: "rgb(255,255,255)",
     },
 };
@@ -123,8 +123,8 @@ const LinkStyleConfig: ComponentStyles = {
         height: "40px",
         paddingLeft: "10px",
         paddingRight: "0px",
-        imageWidth: "24px",
-        imageHeight: "24px",
+        imageWidth: "32px",
+        imageHeight: "32px",
         imageRightPosition: "10px",
         fontSize: "1rem",
         fontColor: "#eeeeee",

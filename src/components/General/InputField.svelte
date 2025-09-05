@@ -1,5 +1,5 @@
 <script lang="ts">
-    import { onMount, onDestroy, tick } from "svelte";
+    import { tick } from "svelte";
 
     // Styles
     import { mergeStyle } from "$lib/style/components";
@@ -75,6 +75,12 @@
     let unitElement: HTMLElement | null = null;
     let unitWidth = 0;
 
+    // Reactive Statements
+    $: {
+        updateUnitWidth();
+        inputUnit; // Dependency tracker
+    }
+
     // Detected Limits Violation Export Funcion
     export let limitsPassed: (() => void) | null = null;
 
@@ -108,6 +114,10 @@
         }
 
         inputValue = input;
+
+        if (onChange) {
+            onChange();
+        }
     }
 
     function validateBounds(): void {
@@ -118,6 +128,9 @@
                 if (limitsPassed) {
                     limitsPassed();
                 }
+                if (onChange) {
+                    onChange();
+                }
             } else {
                 const numericValue = parseFloat(inputValue.toString());
                 if (numericValue < minValue) {
@@ -125,10 +138,16 @@
                     if (limitsPassed) {
                         limitsPassed();
                     }
+                    if (onChange) {
+                        onChange();
+                    }
                 } else if (numericValue > maxValue) {
                     inputValue = maxValue.toString();
                     if (limitsPassed) {
                         limitsPassed();
+                    }
+                    if (onChange) {
+                        onChange();
                     }
                 }
             }
@@ -141,29 +160,6 @@
             unitWidth = unitElement.offsetWidth;
         } else {
             unitWidth = 0;
-        }
-    }
-
-    onMount(() => {
-        updateUnitWidth();
-        window.addEventListener("resize", updateUnitWidth);
-    });
-
-    onDestroy(() => {
-        window.removeEventListener("resize", updateUnitWidth);
-    });
-
-    // Reactive statement to update unit width when inputUnit changes
-    $: {
-        if (inputUnit !== null) {
-            updateUnitWidth();
-        }
-    }
-
-    // Reactive statement to handle changes
-    $: if (!disabled && (inputValue !== undefined || inputUnit !== null)) {
-        if (onChange) {
-            onChange();
         }
     }
 </script>
@@ -298,6 +294,7 @@ Applies special styling when focused.
         width: 100%;
         display: flex;
         align-items: center;
+        position: relative;
     }
 
     /* Input element styles */
@@ -356,5 +353,6 @@ Applies special styling when focused.
         font-size: var(--font-size);
         white-space: nowrap;
         font-weight: var(--font-weight);
+        pointer-events: none;
     }
 </style>

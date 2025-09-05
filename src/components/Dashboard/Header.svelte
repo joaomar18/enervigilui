@@ -20,6 +20,18 @@
     let headerEl: HTMLDivElement;
     let leftHeaderEl: HTMLDivElement;
     let mobileSearchOpen: boolean = false;
+    let clickEventListenerDefined: boolean = false;
+
+    // Reactive Statements
+    $: if (mobileSearchOpen && !clickEventListenerDefined) {
+        window.addEventListener("click", handleClickOutside);
+        clickEventListenerDefined = true;
+    }
+
+    $: if (!mobileSearchOpen && clickEventListenerDefined) {
+        window.removeEventListener("click", handleClickOutside);
+        clickEventListenerDefined = false;
+    }
 
     // Functions
     function handleClickOutside(event: MouseEvent): void {
@@ -36,12 +48,13 @@
             }
         };
         desktopMatch.onchange = closeMobileSearchOnDesktop;
-        window.addEventListener("click", handleClickOutside);
 
         //Clean-up logic
         return () => {
             desktopMatch.onchange = null;
-            window.removeEventListener("click", handleClickOutside);
+            if (clickEventListenerDefined) {
+                window.removeEventListener("click", handleClickOutside);
+            }
         };
     });
 </script>

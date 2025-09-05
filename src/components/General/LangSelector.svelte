@@ -45,10 +45,21 @@
     // Variables
     let isOpen: boolean = false;
     let langDivEl: Node;
+    let clickEventListenerDefined: boolean = false;
+
+    // Reactive Statements
+    $: if (!isOpen && clickEventListenerDefined) {
+        window.removeEventListener("click", handleClickOutside);
+        clickEventListenerDefined = false;
+    }
 
     // Functions
     function toggleSelector(): void {
         isOpen = !isOpen;
+        if (isOpen) {
+            window.addEventListener("click", handleClickOutside);
+            clickEventListenerDefined = true;
+        }
     }
 
     function changeLanguage(language: Language): void {
@@ -78,13 +89,11 @@
                 lang = "PT";
             }
             changeLanguage(lang);
-
-            window.addEventListener("click", handleClickOutside);
         }
     });
 
     onDestroy(() => {
-        if (browser) {
+        if (clickEventListenerDefined) {
             window.removeEventListener("click", handleClickOutside);
         }
     });

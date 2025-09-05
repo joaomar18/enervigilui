@@ -1,7 +1,5 @@
 <script lang="ts">
-    import { tick } from "svelte";
-    import { browser } from "$app/environment";
-    import { onMount, onDestroy } from "svelte";
+    import { tick, onDestroy } from "svelte";
     import Action from "./Action.svelte";
 
     // Styles
@@ -43,19 +41,28 @@
     // Merged style
     $: mergedStyle = mergeStyle(effectiveStyle, localOverrides);
 
-    //Variables
+    // Variables
     let enableInput: boolean = false;
     let previousText: string;
     let containerEl: HTMLDivElement;
     let inputEl: HTMLInputElement;
+    let clickEventListenerDefined: boolean = false;
 
-    //Functions
+    // Reactive Statements
+    $: if (!enableInput && clickEventListenerDefined) {
+        window.removeEventListener("click", handleClickOutside);
+        clickEventListenerDefined = false;
+    }
+
+    // Functions
     function activeInput(): void {
         enableInput = true;
         previousText = text;
         tick().then(() => {
             inputEl.focus();
         });
+        window.addEventListener("click", handleClickOutside);
+        clickEventListenerDefined = true;
     }
 
     function cancelInput(): void {
@@ -73,14 +80,8 @@
         }
     }
 
-    onMount(() => {
-        if (browser) {
-            window.addEventListener("click", handleClickOutside);
-        }
-    });
-
     onDestroy(() => {
-        if (browser) {
+        if (clickEventListenerDefined) {
             window.removeEventListener("click", handleClickOutside);
         }
     });

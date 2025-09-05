@@ -109,7 +109,7 @@
         <div class="actions-div">
             <Notification notificationsOpen={false} notificationsNumber={notifications} style={$DeviceNotificationStyle} />
             <Action style={$DeviceActionStyle} imageURL="/img/edit.svg" onClick={handleEdit} />
-            <Action style={$DeviceActionStyle} imageURL="/img/enter.png" onClick={handleEnter} />
+            <Action style={$DeviceActionStyle} imageURL="/img/enter.svg" onClick={handleEnter} />
         </div>
         <span class="id-text">ID: {String(deviceID).padStart(3, "0")}</span>
         <div class="connection-state-div">
@@ -239,7 +239,7 @@
 
     /* Overlay hover: show enter icon and translucent gray overlay */
     .device-image-mask:hover {
-        background-image: url("/img/enter.png");
+        background-image: url("/img/enter.svg");
         background-color: var(--image-hover-background-color);
     }
 
