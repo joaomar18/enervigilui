@@ -3,7 +3,7 @@
     import DeviceCard from "../../components/Devices/DeviceCard.svelte";
     import AddDevice from "../../components/Devices/AddDevice.svelte";
     import { navigateTo } from "$lib/logic/view/navigation";
-    import { getAllDevicesState } from "$lib/logic/api/device";
+    import { getAllDevicesState, getAllDevicesStateWithImage } from "$lib/logic/api/device";
     import { filterDevices } from "$lib/logic/util/device";
     import { MethodPoller } from "$lib/logic/api/poller";
 
@@ -35,14 +35,28 @@
 
     // Mount function to poll devices status
     onMount(() => {
-        let devicesPoller: MethodPoller | null = new MethodPoller(async (signal) => {
-            ({ devices, devicesImages } = await getAllDevicesState());
+        let devicesPoller: MethodPoller | null = null;
+        let devicesWithImagesPoller: MethodPoller | null = new MethodPoller(async (signal) => {
+            ({ devices, devicesImages } = await getAllDevicesStateWithImage());
+
+            // Stop images polling and start devices polling
+            devicesWithImagesPoller?.stop();
+            devicesWithImagesPoller = null;
+            devicesPoller = new MethodPoller(
+                async (signal) => {
+                    ({ devices } = await getAllDevicesState());
+                },
+                3000,
+                false,
+            );
         }, 3000);
 
         //Clean-up logic
         return () => {
             devicesPoller?.stop();
+            devicesWithImagesPoller?.stop();
             devicesPoller = null;
+            devicesWithImagesPoller = null;
         };
     });
 </script>
@@ -57,9 +71,11 @@
             deviceID={device.id}
             deviceName={device.name}
             connected={device.connected}
-            notifications={""}
             imageURL={devicesImages[device.id]}
             onEdit={() => editDevice(device.id, device.name)}
+            onInfo={() => {
+                /* ... */
+            }}
             onEnter={() => {
                 /* ... */
             }}

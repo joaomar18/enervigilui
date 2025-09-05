@@ -1,13 +1,12 @@
 <script lang="ts">
     import Action from "../General/Action.svelte";
-    import Notification from "../General/Notification.svelte";
 
     // Texts
     import { texts } from "$lib/stores/lang/generalTexts";
 
     // Styles
     import { mergeStyle } from "$lib/style/components";
-    import { DeviceCardStyle, DeviceActionStyle, DeviceNotificationStyle } from "$lib/style/device";
+    import { DeviceCardStyle, DeviceActionStyle } from "$lib/style/device";
 
     // Style object (from theme)
     export let style: { [property: string]: string | number } | null = null;
@@ -17,7 +16,6 @@
     export let deviceID: number;
     export let deviceName: string;
     export let connected: boolean;
-    export let notifications: string;
     export let imageURL: string;
 
     // Layout / styling props
@@ -64,6 +62,7 @@
 
     // Export Funcions
     export let onEdit: () => void;
+    export let onInfo: () => void;
     export let onEnter: () => void;
 
     // Functions
@@ -72,6 +71,13 @@
             onEdit();
         }
     }
+
+    function handleInfo(): void {
+        if (onInfo) {
+            onInfo();
+        }
+    }
+
     function handleEnter(): void {
         if (onEnter) {
             onEnter();
@@ -107,7 +113,7 @@
             <button class="device-image-mask" on:click={handleEnter} aria-label="Enter Device"></button>
         </div>
         <div class="actions-div">
-            <Notification notificationsOpen={false} notificationsNumber={notifications} style={$DeviceNotificationStyle} />
+            <Action style={$DeviceActionStyle} imageURL="/img/info.svg" onClick={handleInfo}></Action>
             <Action style={$DeviceActionStyle} imageURL="/img/edit.svg" onClick={handleEdit} />
             <Action style={$DeviceActionStyle} imageURL="/img/enter.svg" onClick={handleEnter} />
         </div>

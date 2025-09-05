@@ -1,6 +1,6 @@
 <script lang="ts">
     import { onMount } from "svelte";
-    import { getDeviceState, editDevice, deleteDevice } from "$lib/logic/api/device";
+    import { getDeviceStateWithImage, editDevice, deleteDevice } from "$lib/logic/api/device";
     import { getDeviceNodesConfig } from "$lib/logic/api/nodes";
     import { convertToDevice } from "$lib/logic/factory/device";
     import { updateDeviceValidation, validDeviceOperation } from "$lib/logic/validation/device/base";
@@ -98,7 +98,7 @@
 
         if (deviceId) {
             deviceDataRetrier = new MethodRetrier(async (signal) => {
-                ({ initialDeviceData, deviceData } = await getDeviceState(Number(deviceId)));
+                ({ initialDeviceData, deviceData } = await getDeviceStateWithImage(Number(deviceId)));
             }, 3000);
             nodesConfigRetrier = new MethodRetrier(async (signal) => {
                 ({ initialNodes } = await getDeviceNodesConfig(Number(deviceId)));

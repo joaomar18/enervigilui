@@ -16,14 +16,14 @@ export class MethodPoller {
     #timer: ReturnType<typeof setTimeout> | null;
     #abort: AbortController | null = null;
 
-    constructor(method_call: (signal?: AbortSignal) => Promise<void> | void, interval: number) {
+    constructor(method_call: (signal?: AbortSignal) => Promise<void> | void, interval: number, immediate: boolean = true) {
         this.#fn = method_call;
         this.#interval = interval;
         this.#inFlight = false;
         this.#destroyed = false;
         this.#timer = null;
         this.#abort = null;
-        this.start();
+        this.start(immediate);
     }
 
     /**

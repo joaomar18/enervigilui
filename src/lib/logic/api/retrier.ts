@@ -24,7 +24,8 @@ export class MethodRetrier {
         method_call: (signal?: AbortSignal) => Promise<void> | void,
         interval: number,
         backoffFactor: number = 1.3,
-        maxIntervalMs: number = 30000
+        maxIntervalMs: number = 30000,
+        immediate: boolean = true
     ) {
         this.#fn = method_call;
         this.#interval = interval;
@@ -35,7 +36,7 @@ export class MethodRetrier {
         this.#destroyed = false;
         this.#timer = null;
         this.#abort = null;
-        this.start();
+        this.start(immediate);
     }
 
     /**
