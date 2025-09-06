@@ -89,6 +89,20 @@ export async function getDeviceState(id: number): Promise<{ initialDeviceData: D
     return { initialDeviceData };
 }
 
+export async function getDeviceInfo(id: number): Promise<any> {
+    const { sucess, data } = await callAPI({
+        endpoint: "/api/device/get_device_info",
+        method: "GET",
+        params: { id },
+    });
+    if (sucess) {
+        return data;
+    }
+    else {
+        throw new Error("Get device info error");
+    }
+}
+
 /**
  * Retrieves a specific device's state and configuration data.
  * Returns both the initial device data and an editable version for modifications.

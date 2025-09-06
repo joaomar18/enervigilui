@@ -1,13 +1,15 @@
 <script lang="ts">
     import { onMount } from "svelte";
+    import { MethodRetrier } from "$lib/logic/api/retrier";
+    import { navigateTo } from "$lib/logic/view/navigation";
+    import { logoutUser } from "$lib/logic/api/auth";
+    import { getDeviceInfo } from "$lib/logic/api/device";
     import MenuButton from "../General/MenuButton.svelte";
     import Action from "../General/Action.svelte";
     import Logo from "../General/Logo.svelte";
     import SearchBar from "./SearchBar.svelte";
     import Notification from "../General/Notification.svelte";
     import Logout from "./Logout.svelte";
-    import { navigateTo } from "$lib/logic/view/navigation";
-    import { logoutUser } from "$lib/logic/api/auth";
 
     // Texts
     import { texts } from "$lib/stores/lang/generalTexts";
@@ -49,12 +51,19 @@
         };
         desktopMatch.onchange = closeMobileSearchOnDesktop;
 
+        let deviceInfoRetrier: MethodRetrier | null = new MethodRetrier(async (signal) => {
+            const data = await getDeviceInfo(1);
+            console.log(data);
+        }, 3000);
+
         //Clean-up logic
         return () => {
             desktopMatch.onchange = null;
             if (clickEventListenerDefined) {
                 window.removeEventListener("click", handleClickOutside);
             }
+            deviceInfoRetrier?.stop();
+            deviceInfoRetrier = null;
         };
     });
 </script>
