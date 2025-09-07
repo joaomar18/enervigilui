@@ -6,7 +6,7 @@
     import SplashLoader from "../components/Dashboard/SplashLoader.svelte";
 
     // Authorization stores
-    import { splashDone, loadedDone } from "$lib/stores/view/navigation";
+    import { currentPage, splashDone, loadedDone } from "$lib/stores/view/navigation";
     import DashboardContainer from "../components/Dashboard/DashboardContainer.svelte";
 
     // Reactive Statements
@@ -27,10 +27,10 @@
 -->
 {#if !$splashDone}
     <SplashLoader />
-{:else if isDashboardPage()}
+{:else if isDashboardPage($currentPage)}
     <DashboardContainer>
         <slot />
     </DashboardContainer>
-{:else if isAuthenticationPage()}
+{:else if isAuthenticationPage($currentPage)}
     <slot />
 {/if}

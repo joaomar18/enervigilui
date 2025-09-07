@@ -6,6 +6,7 @@ import { selectedLang } from "$lib/stores/lang/definition";
 
 // Splash screen store
 import {
+    currentPage,
     splashDone,
     loadedDone,
     showSubLoader,
@@ -133,6 +134,7 @@ export async function navigateTo(
     }
 
     await Promise.all([gotoPromise, timerPromise]);
+    currentPage.set(window.location.pathname);
 
     if (!window.matchMedia("(min-width: 880px)").matches) {
         leftPanelOpen.set(false);
@@ -145,18 +147,29 @@ export async function navigateTo(
 
 /**
  * Checks if the current page is an authentication page.
+ * @param currentPage - The current page path to check.
  * @returns True if the current pathname starts with "/login".
  */
-export function isAuthenticationPage(): boolean {
-    return window.location.pathname.startsWith("/login");
+export function isAuthenticationPage(currentPage: string): boolean {
+    return currentPage.startsWith("/login");
 }
 
 /**
  * Checks if the current page is a dashboard page.
+ * @param currentPage - The current page path to check.
  * @returns True if the current page is not an authentication page.
  */
-export function isDashboardPage(): boolean {
-    return !isAuthenticationPage();
+export function isDashboardPage(currentPage: string): boolean {
+    return !isAuthenticationPage(currentPage);
+}
+
+/**
+ * Checks if the current page is a devices sub-page.
+ * @param currentPage - The current page path to check.
+ * @returns True if the current pathname starts with "/devices/".
+ */
+export function isDevicesSubPage(currentPage: string): boolean {
+    return currentPage.startsWith("/devices/");
 }
 
 /**
@@ -236,6 +249,9 @@ export async function initLayout(minSplashDuration: number = 300, showSubLoaderT
 
     if (authResult.shouldRedirect && authResult.redirectTarget) {
         await navigateTo(authResult.redirectTarget);
+    }
+    else {
+        currentPage.set(window.location.pathname);
     }
 
     splashDone.set(true);

@@ -1,13 +1,14 @@
 <script lang="ts">
-    import { page } from "$app/state";
     import { fade } from "svelte/transition";
     import { closeToast } from "$lib/logic/view/toast";
+    import { isDevicesSubPage } from "$lib/logic/view/navigation";
     import LeftPanel from "./LeftPanel.svelte";
     import Header from "./Header.svelte";
+    import DevicesHeader from "./DevicesHeader.svelte";
     import Toast from "../General/Toast.svelte";
 
     // Stores
-    import { leftPanelOpen, loadedDone, showSubLoader } from "$lib/stores/view/navigation";
+    import { currentPage, leftPanelOpen, loadedDone, showSubLoader } from "$lib/stores/view/navigation";
     import { displayToast, toastKey, toastType, toastVariables } from "$lib/stores/view/toast";
 
     // Texts
@@ -22,8 +23,12 @@
     • Handles loading states with spinner overlay until content is ready.
 -->
 <div class="dashboard-container" in:fade={{ duration: 300 }}>
-    <LeftPanel bind:leftPanelOpen={$leftPanelOpen} activeSection={page.url.pathname} />
-    <Header />
+    <LeftPanel bind:leftPanelOpen={$leftPanelOpen} activeSection={$currentPage} />
+    {#if isDevicesSubPage($currentPage)}
+        <DevicesHeader />
+    {:else}
+        <Header />
+    {/if}
     <main class="content" class:open={$leftPanelOpen}>
         <div class="alerts-div" class:prioritize={$displayToast} class:sidebar-open={$leftPanelOpen}>
             {#if $displayToast}
