@@ -8,10 +8,10 @@ export default defineConfig({
         port: 8080,
         proxy: {
             "/api": {
-                target: "http://192.168.0.20:8000", // your FastAPI backend
+                target: "http://192.168.10.20:8000",
                 changeOrigin: true,
                 secure: false, // if not using HTTPS
-                rewrite: (path) => path.replace(/^\/api/, ""), // <- this line is critical!
+                rewrite: (path) => path.replace(/^\/api/, ""),
             },
         },
     },

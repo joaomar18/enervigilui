@@ -1,8 +1,9 @@
 import { get } from "svelte/store";
-import type { EditableDeviceMeter, NewDeviceMeter } from "$lib/types/device/base";
+import type { EditableDeviceMeter, NewDeviceMeter, DeviceHistory } from "$lib/types/device/base";
 import type { EditableDeviceNode } from "$lib/types/nodes/base";
 import { changeNodeProtocol } from "./nodes";
 import { protocolPlugins } from "$lib/stores/device/protocol";
+import { convertDateToLocalDate } from "../util/generic";
 
 /**
  * Updates device communication options and synchronizes protocol for all nodes when device protocol changes.
@@ -20,4 +21,15 @@ export function deviceProtocolChange(deviceData: EditableDeviceMeter | NewDevice
     }
 
     nodes = [...nodes];
+}
+
+
+export function processDeviceHistory(initialDeviceHistory: DeviceHistory): DeviceHistory {
+    let newDeviceHistory: DeviceHistory = {
+        connection_on_datetime: convertDateToLocalDate(initialDeviceHistory.connection_on_datetime ?? ""),
+        connection_off_datetime: convertDateToLocalDate(initialDeviceHistory.connection_off_datetime ?? ""),
+        created_at: convertDateToLocalDate(initialDeviceHistory.created_at ?? ""),
+        updated_at: convertDateToLocalDate(initialDeviceHistory.updated_at ?? ""),
+    }
+    return newDeviceHistory;
 }

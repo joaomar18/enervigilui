@@ -1,28 +1,39 @@
 <script lang="ts">
+    import { fade } from "svelte/transition";
+    import { onMount } from "svelte";
     import { logoutUser } from "$lib/logic/api/auth";
-    import MenuButton from "../General/MenuButton.svelte";
-    import Logo from "../General/Logo.svelte";
+    import { getDeviceInfo } from "$lib/logic/api/device";
+    import { MethodRetrier } from "$lib/logic/api/retrier";
+    import type { DeviceInfo } from "$lib/types/device/base";
     import Notification from "../General/Notification.svelte";
     import Logout from "./Logout.svelte";
+    import DeviceInfoCard from "../Devices/DeviceInfoCard.svelte";
 
     // Texts
     import { texts } from "$lib/stores/lang/generalTexts";
 
-    // Stores
-    import { leftPanelOpen } from "$lib/stores/view/navigation";
+    // Variables
+    let deviceInfo: DeviceInfo;
+
+    onMount(() => {
+        let deviceDataRetrier: MethodRetrier | null = new MethodRetrier(async (signal) => {
+            ({ deviceInfo } = await getDeviceInfo(1));
+        }, 3000);
+
+        //Clean-up logic
+        return () => {
+            deviceDataRetrier?.stop();
+            deviceDataRetrier = null;
+        };
+    });
 </script>
 
-<div class="left-header-div">
-    <div class="menu-button-div">
-        <MenuButton bind:menuOpen={$leftPanelOpen} />
-    </div>
-    <div class="logo-div">
-        <Logo />
-    </div>
-</div>
-<div class="header-div">
+<div class="header-div" in:fade={{ duration: 300 }}>
     <div class="main-header-div">
-        <div class="right-header-div">
+        <div class="left-div">
+            <DeviceInfoCard {deviceInfo} />
+        </div>
+        <div class="right-div">
             <Notification notificationsNumber={"1"} />
             <Logout
                 buttonText={$texts.logout}
@@ -50,37 +61,6 @@
         z-index: 100;
     }
 
-    /* Left side header (menu/logo/actions) */
-    .left-header-div {
-        position: fixed;
-        left: 0px;
-        top: 0px;
-        width: fit-content;
-        height: 74px;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        z-index: 103;
-    }
-
-    /* Hidden logo slot until enabled */
-    .left-header-div .logo-div {
-        box-sizing: border-box;
-        position: absolute;
-        left: 56px;
-        width: calc(250px - 56px);
-        display: none;
-        justify-content: start;
-        align-items: center;
-        padding-left: 25px;
-    }
-
-    /* Menu button position */
-    .left-header-div .menu-button-div {
-        position: absolute;
-        left: 10px;
-    }
-
     /* Main header area for search & actions */
     .header-div .main-header-div {
         margin: 0;
@@ -94,8 +74,17 @@
         z-index: 99;
     }
 
+    .left-div {
+        padding-left: 20px;
+        width: fit-content;
+        height: fit-content;
+        display: flex;
+        flex-direction: row;
+        justify-content: space-evenly;
+    }
+
     /* Right header action icons */
-    .right-header-div {
+    .right-div {
         padding-right: 20px;
         width: fit-content;
         height: fit-content;
@@ -112,11 +101,8 @@
         }
     }
 
-    /* Show logo slot and fixed header margin on wider screens */
+    /* Show fixed header margin on wider screens */
     @media (min-width: 470px) {
-        .left-header-div .logo-div {
-            display: flex;
-        }
         .header-div .main-header-div {
             margin-left: 250px;
         }

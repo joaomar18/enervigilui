@@ -1,6 +1,6 @@
 <script lang="ts">
-    import { onMount } from "svelte";
     import { fade } from "svelte/transition";
+    import { onMount } from "svelte";
     import Header from "../../components/Login/Header.svelte";
     import Info from "../../components/Login/Info.svelte";
     import LoginForm from "../../components/Login/LoginForm.svelte";

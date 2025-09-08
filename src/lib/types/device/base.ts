@@ -33,7 +33,7 @@ export enum MeterType {
  * Base interface for protocol-specific communication configuration objects.
  * Extend for each protocol to define its configuration shape.
  */
-export interface BaseCommunicationConfig {}
+export interface BaseCommunicationConfig { }
 
 /**
  * Base interface for editable protocol configuration objects in forms and UI.
@@ -162,6 +162,42 @@ export interface DeviceValidation {
     meterOptions: boolean;
     nodes: boolean;
     isValid(): boolean;
+}
+
+/**
+ * Represents the connection and update history of a device.
+ * Tracks when the device was connected or disconnected, and when it was created or last updated.
+ *
+ * @interface DeviceHistory
+ * @property {string | null} connection_on_datetime - Timestamp when the device was last connected (ISO string or null)
+ * @property {string | null} connection_off_datetime - Timestamp when the device was last disconnected (ISO string or null)
+ * @property {string | null} created_at - Timestamp when the device was created (ISO string or null)
+ * @property {string | null} updated_at - Timestamp when the device was last updated (ISO string or null)
+ */
+export interface DeviceHistory {
+    connection_on_datetime: string | null;
+    connection_off_datetime: string | null;
+    created_at: string | null;
+    updated_at: string | null;
+}
+
+/**
+ * Basic information about a device for display or summary purposes.
+ * Includes identification, protocol, connection status, image, and history.
+ *
+ * @interface DeviceInfo
+ * @property {number} id - Unique numeric identifier for the device
+ * @property {string} name - Human-readable name/label for the device
+ * @property {Protocol} protocol - Communication protocol used by this device
+ * @property {boolean} connected - Current connection status of the device
+ * @property {DeviceHistory | null} history - Connection and update history for the device
+ */
+export interface DeviceInfo {
+    id: number;
+    name: string;
+    protocol: Protocol;
+    connected: boolean;
+    history: DeviceHistory | null;
 }
 
 /*****     T Y P E S     *****/

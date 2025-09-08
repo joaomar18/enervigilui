@@ -133,6 +133,7 @@ export async function navigateTo(
         timerPromise = new Promise((res) => setTimeout(res, minSplashDuration));
     }
 
+
     await Promise.all([gotoPromise, timerPromise]);
     currentPage.set(window.location.pathname);
 
@@ -164,12 +165,12 @@ export function isDashboardPage(currentPage: string): boolean {
 }
 
 /**
- * Checks if the current page is a devices sub-page.
+ * Checks if the current page is a device sub-page (but not the "add device" page).
  * @param currentPage - The current page path to check.
- * @returns True if the current pathname starts with "/devices/".
+ * @returns True if the path starts with "/devices/" and is not "/devices/add".
  */
-export function isDevicesSubPage(currentPage: string): boolean {
-    return currentPage.startsWith("/devices/");
+export function isDeviceSubPage(currentPage: string): boolean {
+    return currentPage.startsWith("/devices/") && !currentPage.startsWith("/devices/add");
 }
 
 /**

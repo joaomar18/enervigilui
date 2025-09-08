@@ -1,4 +1,5 @@
 <script lang="ts">
+    import { fade } from "svelte/transition";
     import { onMount } from "svelte";
     import { getDefaultImage, addDevice } from "$lib/logic/api/device";
     import { createNewDevice, convertToDevice } from "$lib/logic/factory/device";
@@ -68,13 +69,15 @@
 
     // Mount function
     onMount(() => {
-        deviceData = createNewDevice(defaultDeviceOptions.protocol, defaultDeviceOptions.type, defaultDeviceOptions.options);
-        nodes = getDefaultNodesList(deviceData);
-        nodesInit = true;
-
         let defaultImageRetrier: MethodRetrier | null = new MethodRetrier(async (signal) => {
+            if (!deviceData) {
+                deviceData = createNewDevice(defaultDeviceOptions.protocol, defaultDeviceOptions.type, defaultDeviceOptions.options);
+            }
             deviceData.current_image_url = await getDefaultImage();
         }, 3000);
+
+        nodes = getDefaultNodesList(deviceData);
+        nodesInit = true;
 
         //Clean-up logic
         return () => {
@@ -86,7 +89,7 @@
 
 <!-- Add Device Page: allows the user to create a new device by entering its details and configuration options, including editable fields for device name, image, communication settings, and meter options.
 Shows input forms for protocol-specific parameters and organizes device nodes for initial setup. Includes action buttons for saving or canceling the new device. -->
-<div class="content">
+<div class="content" in:fade={{ duration: 300 }}>
     {#if deviceData}
         <div class="add-device-div">
             <div class="device-identification-div">

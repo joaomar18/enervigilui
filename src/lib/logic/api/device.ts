@@ -1,7 +1,8 @@
 import { callAPI } from "$lib/logic/api/api";
-import type { DeviceMeter, EditableDeviceMeter } from "$lib/types/device/base";
+import type { DeviceMeter, EditableDeviceMeter, DeviceHistory, DeviceInfo } from "$lib/types/device/base";
 import type { DeviceNode } from "$lib/types/nodes/base";
 import { processInitialDevice, convertToEditableDevice } from "../factory/device";
+import { processDeviceHistory } from "../handlers/device";
 import { navigateTo } from "../view/navigation";
 
 /**
@@ -89,18 +90,25 @@ export async function getDeviceState(id: number): Promise<{ initialDeviceData: D
     return { initialDeviceData };
 }
 
-export async function getDeviceInfo(id: number): Promise<any> {
+export async function getDeviceInfo(id: number): Promise<{ deviceInfo: DeviceInfo }> {
+    let deviceInfo: DeviceInfo;
+    let deviceHistory: DeviceHistory;
+
     const { sucess, data } = await callAPI({
         endpoint: "/api/device/get_device_info",
         method: "GET",
         params: { id },
     });
     if (sucess) {
-        return data;
+        const { ...requestDeviceInfo } = data;
+        deviceHistory = requestDeviceInfo.history as DeviceHistory;
+        deviceInfo = requestDeviceInfo as DeviceInfo;
+        deviceInfo.history = processDeviceHistory(deviceHistory);
     }
     else {
         throw new Error("Get device info error");
     }
+    return { deviceInfo }
 }
 
 /**
@@ -129,6 +137,29 @@ export async function getDeviceStateWithImage(id: number): Promise<{ initialDevi
     }
 
     return { initialDeviceData, deviceData };
+}
+
+export async function getDeviceInfoWithImage(id: number): Promise<{ deviceInfo: DeviceInfo, deviceImageUrl: string }> {
+    let deviceInfo: DeviceInfo;
+    let deviceHistory: DeviceHistory;
+    let deviceImageUrl: string;
+
+    const { sucess, data } = await callAPI({
+        endpoint: "/api/device/get_device_info_with_image",
+        method: "GET",
+        params: { id },
+    });
+    if (sucess) {
+        const { image: requestDeviceImage, ...requestDeviceInfo } = data as DeviceInfo & { image: Record<string, string> };
+        deviceHistory = requestDeviceInfo.history as DeviceHistory;
+        deviceInfo = requestDeviceInfo as DeviceInfo;
+        deviceInfo.history = processDeviceHistory(deviceHistory);
+        deviceImageUrl = `data:${requestDeviceImage["type"]};base64,${requestDeviceImage["data"]}`;
+    }
+    else {
+        throw new Error("Get device info with image error");
+    }
+    return { deviceInfo, deviceImageUrl };
 }
 
 /**

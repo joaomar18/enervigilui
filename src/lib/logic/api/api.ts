@@ -4,6 +4,7 @@ import { ToastType } from "$lib/stores/view/toast";
 import { navigateTo } from "../view/navigation";
 import { selectedLang } from "$lib/stores/lang/definition";
 import { loadedDone } from "$lib/stores/view/navigation";
+import { convertDateToLocalTime } from "../util/generic";
 
 export type CallAPIOptions = {
     endpoint: string;
@@ -181,12 +182,13 @@ export async function callAPI({
                     }
                     break;
                 case 429:
-                    const date = new Date(data.unlocked ?? "");
-                    const localTime = date.toLocaleTimeString(get(selectedLang) === "PT" ? "pt-PT" : "en-US", {
-                        hour: "2-digit",
-                        minute: "2-digit",
-                    });
-                    showToast("tooManyAttempts", ToastType.ALERT, { localTime: localTime });
+                    const localTime = convertDateToLocalTime(data.unlocked);
+                    if (localTime !== null) {
+                        showToast("tooManyAttempts", ToastType.ALERT, { localTime: localTime });
+                    }
+                    else {
+                        showToast("unknownError", ToastType.ALERT);
+                    }
                     break;
                 default:
                     showToast("unknownError", ToastType.ALERT);

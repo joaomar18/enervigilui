@@ -1,4 +1,5 @@
 <script lang="ts">
+    import { fade } from "svelte/transition";
     import { onMount } from "svelte";
     import DeviceCard from "../../components/Devices/DeviceCard.svelte";
     import AddDevice from "../../components/Devices/AddDevice.svelte";
@@ -22,7 +23,7 @@
 
     // Go to edit device page
     async function editDevice(deviceId: number, deviceName: string): Promise<void> {
-        await navigateTo("devices/edit", {
+        await navigateTo("/devices/edit", {
             deviceId: String(deviceId),
             deviceName: deviceName,
         });
@@ -30,7 +31,7 @@
 
     // Go to add device page
     async function addDevice(): Promise<void> {
-        await navigateTo("devices/add");
+        await navigateTo("/devices/add");
     }
 
     // Mount function to poll devices status
@@ -65,7 +66,7 @@
   Devices Page: renders a loading spinner until `loaded` is true,
   then displays a grid of DeviceCard components followed by the AddDevice button.
 -->
-<div class="content">
+<div class="content" in:fade={{ duration: 300 }}>
     {#each sortedDevices as device (device.id)}
         <DeviceCard
             deviceID={device.id}

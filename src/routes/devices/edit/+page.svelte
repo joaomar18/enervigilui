@@ -1,4 +1,5 @@
 <script lang="ts">
+    import { fade } from "svelte/transition";
     import { onMount } from "svelte";
     import { getDeviceStateWithImage, editDevice, deleteDevice } from "$lib/logic/api/device";
     import { getDeviceNodesConfig } from "$lib/logic/api/nodes";
@@ -120,7 +121,7 @@
 
 <!-- Edit Device Page: displays the selected device's details and configuration options, including editable fields for device name, image, communication settings, and meter options. 
 Shows input forms for protocol-specific parameters and organizes device nodes for editing. Includes action buttons for saving, canceling, and deleting the device. -->
-<div class="content">
+<div class="content" in:fade={{ duration: 300 }}>
     {#if deviceData}
         <div class="edit-device-div">
             <div class="device-identification-div">
