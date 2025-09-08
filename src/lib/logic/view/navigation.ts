@@ -16,17 +16,25 @@ import {
     resetSubLoaderSubscription,
 } from "../../stores/view/navigation";
 
+// Current device store
+import { currentDeviceID } from "$lib/stores/device/current";
+
 /**
- * Builds navigation URLs with query parameters and returns navigation route information.
+ * Prepares navigation URLs and extracts navigation-related parameters.
  *
- * Appends all extra parameters except 'lang', then appends the language code as the final query parameter.
- * Returns the complete target URL, target route, current route, and extracted search query for navigation comparison.
+ * Constructs the full target URL with query parameters, appending all extra parameters except 'lang',
+ * and then appends the language code as the final 'lang' query parameter.
+ * Also extracts the target route, current route, search query, and device ID from the parameters.
  *
  * @param url - The base URL or route to navigate to (without query parameters).
  * @param lang - Language code to append as the final 'lang' query parameter.
  * @param extraParams - Additional key/value pairs to include in the query string (excluding 'lang').
- * @returns [target, targetRoute, currentRoute, searchQuery]
- * - Array with the complete target URL with query params, target route path, current route path, and extracted search query string.
+ * @returns [target, targetRoute, currentRoute, searchQuery, deviceID]
+ *   - target: Complete target URL with query params.
+ *   - targetRoute: Target route path.
+ *   - currentRoute: Current route path.
+ *   - searchQuery: Extracted search query string.
+ *   - deviceID: Extracted device ID string (if present).
  */
 function getNavigationReady(url: string, lang: string, extraParams: Record<string, string> = {}): Array<string> {
     const params = new URLSearchParams();
@@ -39,8 +47,9 @@ function getNavigationReady(url: string, lang: string, extraParams: Record<strin
     const targetRoute = url;
     const currentRoute = window.location.pathname;
     const searchQuery = params.get("searchQuery") ?? "";
+    const deviceID = params.get("deviceId") ?? "";
 
-    return [target, targetRoute, currentRoute, searchQuery];
+    return [target, targetRoute, currentRoute, searchQuery, deviceID];
 }
 
 /**
@@ -114,7 +123,7 @@ export async function navigateTo(
     minSplashDuration: number = 300,
     showSubLoaderTime: number = 600
 ): Promise<void> {
-    let [target, targetRoute, currentRoute, searchQuery] = getNavigationReady(url, get(selectedLang), extraParams);
+    let [target, targetRoute, currentRoute, searchQuery, deviceID] = getNavigationReady(url, get(selectedLang), extraParams);
 
     // Already in Intended URL
     if (targetRoute === currentRoute) {
@@ -125,6 +134,7 @@ export async function navigateTo(
     loadedDone.set(false);
     setSubLoaderTrigger(showSubLoaderTime);
     setSearchQuery(targetRoute, searchQuery);
+    currentDeviceID.set(Number(deviceID) || undefined);
 
     let gotoPromise = goto(target);
     let timerPromise = Promise.resolve();

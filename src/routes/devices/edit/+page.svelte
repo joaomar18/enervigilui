@@ -42,6 +42,7 @@
 
     // Stores
     import { loadedDone } from "$lib/stores/view/navigation";
+    import { currentDeviceID } from "$lib/stores/device/current";
 
     // Variables
     let showCancelWindow: boolean = false; // Show Cancelation Window (if changes were made)
@@ -95,16 +96,15 @@
     // Mount function
     onMount(() => {
         const params = new URLSearchParams(window.location.search);
-        let deviceId = params.get("deviceId");
         let deviceDataRetrier: MethodRetrier | null;
         let nodesConfigRetrier: MethodRetrier | null;
 
-        if (deviceId) {
+        if ($currentDeviceID) {
             deviceDataRetrier = new MethodRetrier(async (signal) => {
-                ({ initialDeviceData, deviceData } = await getDeviceStateWithImage(Number(deviceId)));
+                ({ initialDeviceData, deviceData } = await getDeviceStateWithImage(Number($currentDeviceID)));
             }, 3000);
             nodesConfigRetrier = new MethodRetrier(async (signal) => {
-                ({ initialNodes } = await getDeviceNodesConfig(Number(deviceId)));
+                ({ initialNodes } = await getDeviceNodesConfig(Number($currentDeviceID)));
             }, 3000);
         } else {
             showToast("errorEditDeviceParams", ToastType.ALERT);

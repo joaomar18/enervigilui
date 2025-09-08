@@ -2,7 +2,7 @@
     import { fade } from "svelte/transition";
     import { onMount } from "svelte";
     import { logoutUser } from "$lib/logic/api/auth";
-    import { getDeviceInfo } from "$lib/logic/api/device";
+    import { getDeviceInfo, getDeviceInfoWithImage } from "$lib/logic/api/device";
     import { MethodRetrier } from "$lib/logic/api/retrier";
     import type { DeviceInfo } from "$lib/types/device/base";
     import Notification from "../General/Notification.svelte";
@@ -12,13 +12,20 @@
     // Texts
     import { texts } from "$lib/stores/lang/generalTexts";
 
+    //  Stores
+    import { currentDeviceID } from "$lib/stores/device/current";
+
     // Variables
     let deviceInfo: DeviceInfo;
+    let deviceImageUrl: string;
 
     onMount(() => {
-        let deviceDataRetrier: MethodRetrier | null = new MethodRetrier(async (signal) => {
-            ({ deviceInfo } = await getDeviceInfo(1));
-        }, 3000);
+        let deviceDataRetrier: MethodRetrier | null = null;
+        if ($currentDeviceID) {
+            deviceDataRetrier = new MethodRetrier(async (signal) => {
+                ({ deviceInfo, deviceImageUrl } = await getDeviceInfoWithImage($currentDeviceID));
+            }, 3000);
+        }
 
         //Clean-up logic
         return () => {
@@ -31,7 +38,7 @@
 <div class="header-div" in:fade={{ duration: 300 }}>
     <div class="main-header-div">
         <div class="left-div">
-            <DeviceInfoCard {deviceInfo} />
+            <DeviceInfoCard {deviceInfo} {deviceImageUrl} />
         </div>
         <div class="right-div">
             <Notification notificationsNumber={"1"} />

@@ -595,6 +595,14 @@ const textsObject: TextsObject = {
         PT: "Análise de dados",
         EN: "Data analytics",
     },
+    since: {
+        PT: "Desde",
+        EN: "Since",
+    },
+    lastUpdate: {
+        PT: "Última atualização",
+        EN: "Last update",
+    }
 };
 
 export const texts = createLangStore(textsObject);

@@ -6,6 +6,7 @@ import { areDevicesEqual } from "../validation/device/base";
 import { areNodesEqual } from "../validation/nodes/base";
 import { convertToDevice } from "../factory/device";
 import { convertToNodes } from "../factory/nodes";
+//import { currentDeviceID } from "$lib/stores/device/current";
 
 /**
  * Filters devices by name or ID.
