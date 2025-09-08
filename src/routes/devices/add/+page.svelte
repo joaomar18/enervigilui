@@ -6,6 +6,11 @@
     import { convertToNodes, getDefaultNodesList } from "$lib/logic/factory/nodes";
     import { updateDeviceValidation, validDeviceOperation } from "$lib/logic/validation/device/base";
     import { updateNodesValidation } from "$lib/logic/validation/nodes/base";
+    import { defaultDeviceOptions } from "$lib/types/device/base";
+    import { protocolPlugins } from "$lib/stores/device/protocol";
+    import { MethodRetrier } from "$lib/logic/api/retrier";
+    import { deviceProtocolChange } from "$lib/logic/handlers/device";
+    import { updateNodes, updateEditingNode, updateNodesBySection } from "$lib/logic/handlers/nodes";
     import Selector from "../../../components/General/Selector.svelte";
     import HintInfo from "../../../components/General/HintInfo.svelte";
     import EditableText from "../../../components/General/EditableText.svelte";
@@ -15,11 +20,6 @@
     import PopupNodeConfig from "../../../components/Devices/Nodes/PopupNodeConfig.svelte";
     import PopupAddDevice from "../../../components/Devices/PopupAddDevice.svelte";
     import MeterOptionsConfig from "../../../components/Devices/MeterOptionsConfig.svelte";
-    import { defaultDeviceOptions } from "$lib/types/device/base";
-    import { protocolPlugins } from "$lib/stores/device/protocol";
-    import { MethodRetrier } from "$lib/logic/api/retrier";
-    import { deviceProtocolChange } from "$lib/logic/handlers/device";
-    import { updateNodes, updateEditingNode, updateNodesBySection } from "$lib/logic/handlers/nodes";
 
     // Types
     import type { NewDeviceMeter } from "$lib/types/device/base";

@@ -8,10 +8,11 @@
 <div class="wrapper-div">
     {#if deviceInfo}
         <div class="info-div">
-            <div class="text-div">
+            <div class="device-identification">
                 <span class="device-name">{deviceInfo.name}</span>
                 <span class="device-id">ID: {String(deviceInfo.id).padStart(3, "0")}</span>
             </div>
+            <div class="separator" style="padding-left:20px;"></div>
         </div>
     {/if}
 </div>
@@ -31,10 +32,15 @@
         flex-direction: row;
         justify-content: start;
         align-items: center;
-        gap: 10px;
     }
 
-    .text-div {
+    .separator {
+        height: 50px;
+        width: 1px;
+        border-right: 1px solid rgba(255, 255, 255, 0.2);
+    }
+
+    .device-identification {
         gap: 10px;
         display: flex;
         flex-direction: column;
@@ -42,12 +48,12 @@
         justify-content: center;
     }
 
-    .text-div .device-name {
+    .device-identification .device-name {
         color: white;
         font-size: 1.1rem;
     }
 
-    .text-div .device-id {
+    .device-identification .device-id {
         color: rgb(170, 170, 170);
     }
 </style>
