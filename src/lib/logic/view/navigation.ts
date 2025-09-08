@@ -177,7 +177,7 @@ export function isDashboardPage(currentPage: string): boolean {
 /**
  * Checks if the current page is a device sub-page (but not the "add device" page).
  * @param currentPage - The current page path to check.
- * @returns True if the path starts with "/devices/" and is not "/devices/add".
+ * @returns True if the path starts with "/devices/" and is not the add device page.
  */
 export function isDeviceSubPage(currentPage: string): boolean {
     return currentPage.startsWith("/devices/") && !currentPage.startsWith("/devices/add");

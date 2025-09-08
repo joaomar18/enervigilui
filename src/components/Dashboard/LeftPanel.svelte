@@ -141,11 +141,11 @@
                         />
                         <Link
                             style={$SubLinkStyle}
-                            selected={activeSection.includes("/logs")}
+                            selected={activeSection.includes("/analytics")}
                             buttonText={$texts.dataAnalytics}
                             imageURL="/img/analytics.svg"
                             onClick={() => {
-                                browseTo("/devices/logs");
+                                browseTo("/devices/analytics");
                             }}
                         />
                     </Link>

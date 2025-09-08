@@ -1,5 +1,6 @@
 <script lang="ts">
     import type { DeviceInfo } from "$lib/types/device/base";
+    import Action from "../General/Action.svelte";
 
     // Texts
     import { texts } from "$lib/stores/lang/generalTexts";
@@ -9,57 +10,22 @@
     export let deviceImageUrl: string;
 </script>
 
-<div class="wrapper-div">
-    {#if deviceInfo}
-        <div class="info-div">
-            <div class="section">
-                <div style="background-image: {`url('${deviceImageUrl}')`};" class="device-image-div" class:image-loaded={true}></div>
-                <div class="inner-section device-identification" style="padding-left: 20px;">
-                    <span class="device-name">{deviceInfo.name}</span>
-                    <span class="device-id sub-text">ID: {String(deviceInfo.id).padStart(3, "0")}</span>
-                    
-                </div>
+{#if deviceInfo}
+    <div class="info-div">
+        <div class="section">
+            <div style="background-image: {`url('${deviceImageUrl}')`};" class="device-image-div" class:image-loaded={true}></div>
+            <div class="inner-section device-identification" style="padding-left: 10px;">
+                <span class="device-name">{deviceInfo.name}</span>
+                <span class="sub-text">ID: {String(deviceInfo.id).padStart(3, "0")}</span>
             </div>
-            <div class="separator" style="padding-left:20px;"></div>
-            <div class="section">
-                <div class="inner-section connection-state-div" style="padding-left: 20px;">
-                    <div class="status-div">
-                        <div class:connected={deviceInfo.connected} class="connection-status"></div>
-                        {#if deviceInfo.connected}
-                            <span class="connection-text">{$texts.connected}</span>
-                        {:else}
-                            <span class="connection-text">{$texts.disconnected}</span>
-                        {/if}
-                    </div>
-                    {#if deviceInfo.connected}
-                        <span class="sub-text">{deviceInfo.history?.connection_on_datetime}</span>
-                    {:else}
-                        <span class="sub-text">{deviceInfo.history?.updated_at}</span>
-                    {/if}
-                </div>
-                <img alt="Last update" src="/img/network.svg" />
-            </div>
-            <div class="separator" style="padding-left:20px;"></div>
-            <div class="section">
-                <div class="inner-section last-update-div" style="padding-left: 20px;">
-                    <span class="last-update">{$texts.lastUpdate}</span>
-                    <span class="sub-text">{deviceInfo.history?.updated_at}</span>
-                </div>
-                <img alt="Last update" src="/img/last-update.svg" />
-            </div>
-            <div class="separator" style="padding-left:20px;"></div>
         </div>
-    {/if}
-</div>
+        <div class="expand-more-div">
+            <Action imageURL="/img/expand-down.svg" onClick={() => {}} />
+        </div>
+    </div>
+{/if}
 
 <style>
-    .wrapper-div {
-        margin: 0;
-        padding: 0;
-        width: fit-content;
-        height: fit-content;
-    }
-
     .info-div {
         margin: 0;
         padding: 0;
@@ -70,7 +36,7 @@
     }
 
     .section {
-        width: 325px;
+        width: 375px;
         display: flex;
         flex-direction: row;
         justify-content: space-between;
@@ -81,24 +47,26 @@
         flex: 1;
         gap: 10px;
         display: flex;
-        flex-direction: column;
-        align-items: start;
-        justify-content: start;
-    }
-
-    .separator {
-        height: 50px;
-        width: 1px;
-        border-right: 1px solid rgba(255, 255, 255, 0.2);
+        flex-direction: row;
+        align-items: center;
+        justify-content: space-between;
+        padding-top: 3px;
     }
 
     .device-identification .device-name {
-        color: white;
-        font-size: 1.1rem;
+        color: #c9c9c9;
+        font-size: 1.05rem;
+        font-weight: 300;
+    }
+
+    .expand-more-div {
+        padding-left: 10px;
     }
 
     .sub-text {
-        color: rgb(170, 170, 170);
+        color: #9a9a9a;
+        font-weight: 300;
+        font-size: 0.85rem;
     }
 
     /* Image div: placeholder with bg image */
@@ -106,8 +74,8 @@
         position: relative;
         padding: 0;
         margin: 0;
-        width: 50px;
-        height: 50px;
+        width: 40px;
+        height: 40px;
         background-color: rgba(255, 255, 255, 0.1);
         background-repeat: no-repeat;
         background-position: center;
@@ -124,39 +92,5 @@
     /* Image loaded state: fully visible */
     .device-image-div.image-loaded {
         opacity: 1;
-    }
-
-    .connection-state-div .status-div {
-        display: flex;
-        flex-direction: row;
-        align-items: center;
-        justify-content: start;
-        gap: 10px;
-    }
-
-    /* Status dot: default disconnected color */
-    .connection-state-div .connection-status {
-        width: 16px;
-        height: 16px;
-        border-radius: 8px;
-        background-color: #f44336;
-    }
-
-    /* Status dot when connected */
-    .connection-state-div .connection-status.connected {
-        background-color: #4caf50;
-    }
-
-    /* Connection text: subtle label next to dot */
-    .connection-state-div .connection-text {
-        color: rgb(242, 242, 242);
-        font-size: 0.9rem;
-        font-weight: 300;
-    }
-
-    .last-update-div .last-update {
-        color: rgb(242, 242, 242);
-        font-size: 0.9rem;
-        font-weight: 300;
     }
 </style>
