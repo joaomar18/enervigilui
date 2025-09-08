@@ -70,7 +70,9 @@
         const { sucess, editableNodes } = initNodes(deviceData.type, initialNodes);
         if (sucess) {
             nodes = editableNodes;
-            nodesInit = true;
+            setTimeout(() => {
+                nodesInit = true;
+            }, 100); // Small timeout to give a bit of time for the page to load before the nodes
         } else {
             (async () => {
                 await navigateTo("/devices");
