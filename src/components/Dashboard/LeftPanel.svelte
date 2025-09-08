@@ -1,5 +1,6 @@
 <script lang="ts">
     import { navigateTo } from "$lib/logic/view/navigation";
+    import { isDeviceSubPage } from "$lib/logic/view/navigation";
 
     import Link from "./Link.svelte";
     import LangSelector from "../General/LangSelector.svelte";
@@ -7,11 +8,15 @@
 
     // Texts
     import { texts } from "$lib/stores/lang/generalTexts";
+    import { currentDeviceID } from "$lib/stores/device/current";
 
     // Styles
     import { mergeStyle } from "$lib/style/components";
     import { LeftPanelStyle } from "$lib/style/dashboard";
     import { SubLinkStyle } from "$lib/style/dashboard";
+
+    // Stores
+    import { currentPage } from "$lib/stores/view/navigation";
 
     // Style object (from theme)
     export let style: { [property: string]: string | number } | null = null;
@@ -53,11 +58,11 @@
     let devicesSubSection: boolean = false;
 
     // Reactive Statements
-    $: devicesSubSection = activeSection.includes("/devices/add") || activeSection.includes("/devices/edit");
+    $: devicesSubSection = isDeviceSubPage($currentPage);
 
     // Functions
-    async function browseTo(path: string) {
-        await navigateTo(path);
+    async function browseTo(path: string, params: Record<string, string> = {}) {
+        await navigateTo(path, params);
     }
 
     function closePanel(): void {
@@ -127,7 +132,7 @@
                             buttonText={$texts.editConfig}
                             imageURL="/img/edit_pencil.svg"
                             onClick={() => {
-                                browseTo("/devices/edit");
+                                browseTo("/devices/edit", { deviceId: String($currentDeviceID) });
                             }}
                         />
                         <Link
@@ -136,7 +141,7 @@
                             buttonText={$texts.realTimeData}
                             imageURL="/img/real-time.svg"
                             onClick={() => {
-                                browseTo("/devices/realtime");
+                                browseTo("/devices/realtime", { deviceId: String($currentDeviceID) });
                             }}
                         />
                         <Link
@@ -145,7 +150,7 @@
                             buttonText={$texts.dataAnalytics}
                             imageURL="/img/analytics.svg"
                             onClick={() => {
-                                browseTo("/devices/analytics");
+                                browseTo("/devices/analytics", { deviceId: String($currentDeviceID) });
                             }}
                         />
                     </Link>

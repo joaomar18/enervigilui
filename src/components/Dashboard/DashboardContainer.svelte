@@ -2,7 +2,7 @@
     import { fade } from "svelte/transition";
     import { onMount } from "svelte";
     import { closeToast } from "$lib/logic/view/toast";
-    import { isDeviceSubPage } from "$lib/logic/view/navigation";
+    import { isDeviceViewPage } from "$lib/logic/view/navigation";
     import LeftPanel from "./LeftPanel.svelte";
     import Header from "./Header.svelte";
     import DevicesHeader from "./DevicesHeader.svelte";
@@ -59,6 +59,8 @@
             }
         };
     });
+
+    $: console.log($currentPage);
 </script>
 
 <!-- 
@@ -86,7 +88,7 @@
             <Logo />
         </div>
     </div>
-    {#if isDeviceSubPage($currentPage)}
+    {#if isDeviceViewPage($currentPage)}
         <DevicesHeader />
     {:else}
         <Header bind:headerEl bind:mobileSearchOpen />

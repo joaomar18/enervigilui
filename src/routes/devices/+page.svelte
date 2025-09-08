@@ -22,10 +22,9 @@
     $: sortedDevices = filterDevices(devices, $searchQuery);
 
     // Go to edit device page
-    async function editDevice(deviceId: number, deviceName: string): Promise<void> {
+    async function editDevice(deviceId: number): Promise<void> {
         await navigateTo("/devices/edit", {
             deviceId: String(deviceId),
-            deviceName: deviceName,
         });
     }
 
@@ -73,7 +72,7 @@
             deviceName={device.name}
             connected={device.connected}
             imageURL={devicesImages[device.id]}
-            onEdit={() => editDevice(device.id, device.name)}
+            onEdit={() => editDevice(device.id)}
             onInfo={() => {
                 /* ... */
             }}

@@ -174,13 +174,27 @@ export function isDashboardPage(currentPage: string): boolean {
     return !isAuthenticationPage(currentPage);
 }
 
+
 /**
- * Checks if the current page is a device sub-page (but not the "add device" page).
+ * Checks if the current page is a device sub-page (any route under /devices/).
+ *
  * @param currentPage - The current page path to check.
- * @returns True if the path starts with "/devices/" and is not the add device page.
+ * @returns True if the path starts with "/devices/".
  */
 export function isDeviceSubPage(currentPage: string): boolean {
-    return currentPage.startsWith("/devices/") && !currentPage.startsWith("/devices/add");
+    return currentPage.startsWith("/devices/");
+
+}
+
+/**
+ * Checks if the current page is a device view page (a specific device, not add or edit).
+ *
+ * @param currentPage - The current page path to check.
+ * @returns True if the path starts with "/devices/" and is not "/devices/add" or "/devices/edit".
+ */
+export function isDeviceViewPage(currentPage: string): boolean {
+    return currentPage.startsWith("/devices/") && !currentPage.startsWith("/devices/add") && !currentPage.startsWith("/devices/edit");
+
 }
 
 /**
