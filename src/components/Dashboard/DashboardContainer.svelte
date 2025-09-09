@@ -59,8 +59,6 @@
             }
         };
     });
-
-    $: console.log($currentPage);
 </script>
 
 <!-- 

@@ -81,7 +81,7 @@
     .header-div .main-header-div {
         margin: 0;
         padding: 0;
-        margin-left: calc(250px - (250px - 56px));
+        margin-left: 46px;
         width: 100%;
         position: relative;
         display: flex;
@@ -103,7 +103,7 @@
     }
 
     .center-div.open {
-        padding-left: 56px;
+        padding-left: 48px;
         padding-right: 10px;
         display: flex;
     }

@@ -17,6 +17,8 @@
     export let nameMaxWidthSmallScreen: string = "auto";
 
     // Layout / styling props
+    export let width: string | undefined = undefined;
+    export let maxWidth: string | undefined = undefined;
     export let mainTextWidth: string | undefined = undefined;
     export let mainTextColor: string | undefined = undefined;
     export let mainTextWeight: string | undefined = undefined;
@@ -28,6 +30,8 @@
     export let imageBorderRadius: string | undefined = undefined;
 
     $: localOverrides = {
+        width,
+        maxWidth,
         mainTextWidth,
         mainTextColor,
         mainTextWeight,
@@ -48,6 +52,8 @@
     <div
         class="info-div"
         style="
+            --width: {mergedStyle.width};
+            --max-width: {mergedStyle.maxWidth};
             --name-min-width-small-screen: {nameMinWidthSmallScreen};
             --name-max-width-small-screen: {nameMaxWidthSmallScreen};
             --main-text-width: {mergedStyle.mainTextWidth};
@@ -79,7 +85,9 @@
     .info-div {
         margin: 0;
         padding: 0;
-        width: fit-content;
+        width: var(--width);
+        min-width: 0;
+        max-width: var(--max-width, auto);
         height: fit-content;
         display: flex;
         flex-direction: row;
@@ -95,6 +103,7 @@
         align-items: center;
         flex-grow: 1;
         height: fit-content;
+        min-width: 0;
     }
 
     /* Inner Section: device name and ID, spaced */
@@ -108,20 +117,20 @@
         align-items: center;
         flex-grow: 1;
         justify-content: space-between;
+        min-width: 0;
     }
 
     /* Device Name: main text styling */
     .device-identification .device-name {
         font-size: 16px;
+        min-width: 0;
         color: var(--main-text-color);
         font-weight: var(--main-text-weight);
+        flex-grow: 1;
         white-space: nowrap;
-        width: var(--main-text-width);
-        min-width: var(--name-min-width-small-screen);
-        max-width: var(--name-max-width-small-screen);
         overflow: hidden;
         text-overflow: ellipsis;
-        padding-bottom: 2px;
+        transform: translateY(-1px);
     }
 
     /* Expand Button: right-side action */
@@ -138,6 +147,8 @@
         font-size: 14px;
         color: var(--sub-text-color);
         font-weight: var(--sub-text-weight);
+        white-space: nowrap;
+        flex-shrink: 0;
     }
 
     /* Device Image: device photo or icon */
@@ -147,6 +158,7 @@
         padding: 0;
         margin: 0;
         width: var(--image-width);
+        min-width: var(--image-width);
         height: var(--image-height);
         background-color: var(--image-background-color);
         background-repeat: no-repeat;
@@ -167,10 +179,6 @@
     }
 
     @media (min-width: 720px) {
-        .device-identification .device-name {
-            min-width: var(--main-text-width);
-            max-width: var(--main-text-width);
-        }
         .device-image-div {
             display: block;
         }

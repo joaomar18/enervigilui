@@ -39,9 +39,9 @@
 <div class="header-div" in:fade={{ duration: 300 }}>
     <div class="main-header-div">
         <div class="center-div">
-            <DeviceInfoCard {deviceInfo} {deviceImageUrl} />
-        </div>
-        <div class="right-div">
+            <div class="desktop-device-info-div">
+                <DeviceInfoCard {deviceInfo} {deviceImageUrl} />
+            </div>
             <div class="mobile-device-info-div">
                 <ActionWithText
                     width="100%"
@@ -54,6 +54,8 @@
                     onClick={() => {}}
                 />
             </div>
+        </div>
+        <div class="right-div">
             <Notification notificationsNumber={"1"} />
             <Logout
                 buttonText={$texts.logout}
@@ -81,12 +83,12 @@
         z-index: 100;
     }
 
-    /* Main header area for search & actions */
     .header-div .main-header-div {
         margin: 0;
         padding: 0;
-        margin-left: calc(250px - (250px - 56px));
+        margin-left: 46px;
         width: 100%;
+        min-width: 0;
         position: relative;
         display: flex;
         align-items: center;
@@ -96,15 +98,13 @@
 
     .center-div {
         flex: 1;
-        display: none;
-        justify-content: center;
-        align-items: center;
-        padding: 0px;
+        min-width: 0;
+        margin: 0;
+        padding: 0;
         padding-left: 20px;
         padding-right: 20px;
     }
 
-    /* Right header action icons */
     .right-div {
         padding-right: 20px;
         width: fit-content;
@@ -115,19 +115,38 @@
         gap: 20px;
     }
 
-    .mobile-device-info-div {
-        width: 140px;
+    .desktop-device-info-div {
+        display: none;
+        justify-content: center;
+        align-items: center;
+        position: relative;
+        margin: 0;
+        padding: 0;
+        width: 100%;
+        min-width: 0;
+        height: 100%;
     }
 
-    /* Desktop layout: show search bar and slide panel margin */
+    .mobile-device-info-div {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        position: relative;
+        margin: 0;
+        padding: 0;
+        width: 100%;
+        min-width: 0;
+        height: 100%;
+    }
+
     @media (min-width: 880px) {
         .header-div .main-header-div {
             justify-content: space-between;
         }
     }
 
-    @media (min-width: 400px) {
-        .center-div {
+    @media (min-width: 520px) {
+        .desktop-device-info-div {
             display: flex;
         }
         .mobile-device-info-div {
@@ -135,7 +154,6 @@
         }
     }
 
-    /* Show fixed header margin when logo is showing */
     @media (min-width: 880px) {
         .header-div .main-header-div {
             margin-left: 250px;

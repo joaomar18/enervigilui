@@ -1,4 +1,9 @@
 <script lang="ts">
+    import { isDeviceViewPage } from "$lib/logic/view/navigation";
+
+    // Stores
+    import { currentPage } from "$lib/stores/view/navigation";
+
     // Styles
     import { mergeStyle } from "$lib/style/components";
     import { LogoutStyle } from "$lib/style/dashboard";
@@ -47,6 +52,14 @@
     // Merged style
     $: mergedStyle = mergeStyle(effectiveStyle, localOverrides);
 
+    // Variables
+    let deviceViewPage: boolean = false;
+    let managementPage: boolean = false;
+
+    // Reactive Statements
+    $: deviceViewPage = isDeviceViewPage($currentPage);
+    $: managementPage = !deviceViewPage;
+
     // Click Export Funcion
     export let onClick: () => void | Promise<void>;
 
@@ -71,6 +84,8 @@
         --border-color: {mergedStyle.borderColor};
     "
     class="container"
+    class:management-page={managementPage}
+    class:device-view-page={deviceViewPage}
 >
     <div
         style="
@@ -78,6 +93,8 @@
         --padding-right: {mergedStyle.paddingRight};
     "
         class="content"
+        class:management-page={managementPage}
+        class:device-view-page={deviceViewPage}
     >
         {#if imageUrl}
             <img
@@ -89,7 +106,7 @@
                 alt={imageUrl}
             />
         {/if}
-        <div class="text-div">
+        <div class="text-div" class:management-page={managementPage} class:device-view-page={deviceViewPage}>
             <span
                 style="
                 --font-size: {mergedStyle.fontSize};
@@ -192,16 +209,31 @@
 
     /* Tablet breakpoint: collapse text, same width and height container */
     @media (max-width: 559px) {
-        .container {
+        .container.management-page {
             width: var(--height);
         }
 
-        .content {
+        .content.management-page {
             justify-content: center;
             padding: 0;
         }
 
-        .text-div {
+        .text-div.management-page {
+            display: none;
+        }
+    }
+
+    @media (max-width: 624px) {
+        .container.device-view-page {
+            width: var(--height);
+        }
+
+        .content.device-view-page {
+            justify-content: center;
+            padding: 0;
+        }
+
+        .text-div.device-view-page {
             display: none;
         }
     }

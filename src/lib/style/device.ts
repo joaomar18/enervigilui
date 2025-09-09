@@ -53,6 +53,8 @@ export const DeviceCardStyle = createStyleStore(DeviceCardStyleConfig);
 
 const DeviceInfoCardStyleConfig: ComponentStyles = {
     dark: {
+        width: "100%",
+        maxWidth: "375px",
         mainTextWidth: "200px",
         mainTextColor: "#c9c9c9",
         mainTextWeight: "300",
