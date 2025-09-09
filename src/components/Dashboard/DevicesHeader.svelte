@@ -37,7 +37,7 @@
 
 <div class="header-div" in:fade={{ duration: 300 }}>
     <div class="main-header-div">
-        <div class="left-div">
+        <div class="center-div">
             <DeviceInfoCard {deviceInfo} {deviceImageUrl} />
         </div>
         <div class="right-div">
@@ -81,13 +81,11 @@
         z-index: 99;
     }
 
-    .left-div {
-        padding-left: 20px;
-        width: fit-content;
-        height: fit-content;
-        display: flex;
-        flex-direction: row;
-        justify-content: space-evenly;
+    .center-div {
+        flex: 1;
+        display: none;
+        justify-content: center;
+        align-items: center;
     }
 
     /* Right header action icons */
@@ -105,6 +103,9 @@
     @media (min-width: 880px) {
         .header-div .main-header-div {
             justify-content: space-between;
+        }
+        .center-div {
+            display: flex;
         }
     }
 

@@ -49,6 +49,25 @@ const DeviceCardStyleConfig: ComponentStyles = {
 
 export const DeviceCardStyle = createStyleStore(DeviceCardStyleConfig);
 
+//////////     D E V I C E     I N F O     C A R D     //////////
+
+const DeviceInfoCardStyleConfig: ComponentStyles = {
+    dark: {
+        width: "375px",
+        deviceNameMaxWidth: "200px",
+        mainTextColor: "#c9c9c9",
+        mainTextWeight: "300",
+        subTextColor: "#9a9a9a",
+        subTextWeight: "300",
+        imageWidth: "40px",
+        imageHeight: "40px",
+        imageBackgroundColor: "rgba(255, 255, 255, 0.1)",
+        imageBorderRadius: "50%",
+    },
+};
+
+export const DeviceInfoCardStyle = createStyleStore(DeviceInfoCardStyleConfig);
+
 //////////     D E V I C E     A C T I O N     //////////
 
 const DeviceActionStyleConfig: ComponentStyles = {
