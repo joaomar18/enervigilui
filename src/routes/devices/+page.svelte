@@ -28,6 +28,13 @@
         });
     }
 
+    // Go to device main configured page (right now enters real time)
+    async function enterDevice(deviceId: number): Promise<void> {
+        await navigateTo("devices/realtime", {
+            deviceId: String(deviceId),
+        });
+    }
+
     // Go to add device page
     async function addDevice(): Promise<void> {
         await navigateTo("/devices/add");
@@ -76,9 +83,7 @@
             onInfo={() => {
                 /* ... */
             }}
-            onEnter={() => {
-                /* ... */
-            }}
+            onEnter={() => enterDevice(device.id)}
         />
     {/each}
     <AddDevice onClick={() => addDevice()} />

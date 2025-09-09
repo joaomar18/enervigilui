@@ -18,6 +18,28 @@ const ActionStyleConfig: ComponentStyles = {
 
 export const ActionStyle = createStyleStore(ActionStyleConfig);
 
+//////////     A C T I O N     W I T H     T E X T     //////////
+
+const ActionWithTextStyleConfig: ComponentStyles = {
+    dark: {
+        width: "fit-content",
+        height: "40px",
+        borderRadius: "20px",
+        backgroundColor: "#14161c",
+        borderColor: "#2a2e3a",
+        hoverColor: "#2a2e3a",
+        textColor: "#eeeeee",
+        textWeight: "400",
+        textSize: "1rem",
+        imageWidth: "32px",
+        imageHeight: "32px",
+        textPaddingLeft: "10px",
+        imagePaddingRight: "10px",
+    },
+};
+
+export const ActionWithTextStyle = createStyleStore(ActionWithTextStyleConfig);
+
 //////////     T O A S T     //////////
 
 const ToastStyleConfig: ComponentStyles = {

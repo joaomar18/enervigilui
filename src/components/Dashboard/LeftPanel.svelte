@@ -1,5 +1,5 @@
 <script lang="ts">
-    import { navigateTo } from "$lib/logic/view/navigation";
+    import { isDeviceViewPage, navigateTo } from "$lib/logic/view/navigation";
     import { isDeviceSubPage } from "$lib/logic/view/navigation";
 
     import Link from "./Link.svelte";
@@ -56,9 +56,11 @@
 
     // Variables
     let devicesSubSection: boolean = false;
+    let devicesViewPage: boolean = false;
 
     // Reactive Statements
     $: devicesSubSection = isDeviceSubPage($currentPage);
+    $: devicesViewPage = isDeviceViewPage($currentPage);
 
     // Functions
     async function browseTo(path: string, params: Record<string, string> = {}) {
@@ -98,7 +100,7 @@
     class:open={leftPanelOpen}
 >
     <!--Only show logo div when logo div of header is disabled-->
-    <div class="logo-div">
+    <div class="logo-div" class:management-page={!devicesViewPage} class:device-view-page={devicesViewPage}>
         <Logo />
     </div>
     <div class="content">
@@ -359,16 +361,19 @@
         padding-top: 10px;
     }
 
-    /* Hide logo slot on larger screens */
+    /* Hide logo slot on larger screens when on management page */
     @media (min-width: 470px) {
-        .container .logo-div {
+        .container .logo-div.management-page {
             display: none;
         }
     }
 
-    /* Disable mask above certain width */
+    /* Disable mask above certain width or logo on device view page */
     @media (min-width: 880px) {
         .mask {
+            display: none;
+        }
+        .container .logo-div.device-view-page {
             display: none;
         }
     }

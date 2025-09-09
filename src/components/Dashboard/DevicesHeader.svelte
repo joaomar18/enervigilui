@@ -6,6 +6,7 @@
     import { MethodRetrier } from "$lib/logic/api/retrier";
     import type { DeviceInfo } from "$lib/types/device/base";
     import Notification from "../General/Notification.svelte";
+    import ActionWithText from "../General/ActionWithText.svelte";
     import Logout from "./Logout.svelte";
     import DeviceInfoCard from "../Devices/DeviceInfoCard.svelte";
 
@@ -41,6 +42,18 @@
             <DeviceInfoCard {deviceInfo} {deviceImageUrl} />
         </div>
         <div class="right-div">
+            <div class="mobile-device-info-div">
+                <ActionWithText
+                    width="100%"
+                    textPaddingLeft="15px"
+                    imagePaddingRight="5px"
+                    textColor="#c9c9c9"
+                    textWeight="300"
+                    text={`${$texts.device}`}
+                    imageURL={"/img/expand-down.svg"}
+                    onClick={() => {}}
+                />
+            </div>
             <Notification notificationsNumber={"1"} />
             <Logout
                 buttonText={$texts.logout}
@@ -86,6 +99,9 @@
         display: none;
         justify-content: center;
         align-items: center;
+        padding: 0px;
+        padding-left: 20px;
+        padding-right: 20px;
     }
 
     /* Right header action icons */
@@ -99,18 +115,28 @@
         gap: 20px;
     }
 
+    .mobile-device-info-div {
+        width: 140px;
+    }
+
     /* Desktop layout: show search bar and slide panel margin */
     @media (min-width: 880px) {
         .header-div .main-header-div {
             justify-content: space-between;
         }
+    }
+
+    @media (min-width: 400px) {
         .center-div {
             display: flex;
         }
+        .mobile-device-info-div {
+            display: none;
+        }
     }
 
-    /* Show fixed header margin on wider screens */
-    @media (min-width: 470px) {
+    /* Show fixed header margin when logo is showing */
+    @media (min-width: 880px) {
         .header-div .main-header-div {
             margin-left: 250px;
         }

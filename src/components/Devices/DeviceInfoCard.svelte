@@ -13,10 +13,11 @@
     // Props
     export let deviceInfo: DeviceInfo;
     export let deviceImageUrl: string;
+    export let nameMinWidthSmallScreen: string = "auto";
+    export let nameMaxWidthSmallScreen: string = "auto";
 
     // Layout / styling props
-    export let width: string | undefined = undefined;
-    export let deviceNameMaxWidth: string | undefined = undefined;
+    export let mainTextWidth: string | undefined = undefined;
     export let mainTextColor: string | undefined = undefined;
     export let mainTextWeight: string | undefined = undefined;
     export let subTextColor: string | undefined = undefined;
@@ -27,8 +28,7 @@
     export let imageBorderRadius: string | undefined = undefined;
 
     $: localOverrides = {
-        width,
-        deviceNameMaxWidth,
+        mainTextWidth,
         mainTextColor,
         mainTextWeight,
         subTextColor,
@@ -48,8 +48,9 @@
     <div
         class="info-div"
         style="
-            --width: {mergedStyle.width};
-            --device-name-max-width: {mergedStyle.deviceNameMaxWidth};
+            --name-min-width-small-screen: {nameMinWidthSmallScreen};
+            --name-max-width-small-screen: {nameMaxWidthSmallScreen};
+            --main-text-width: {mergedStyle.mainTextWidth};
             --main-text-color: {mergedStyle.mainTextColor};
             --main-text-weight: {mergedStyle.mainTextWeight};
             --sub-text-color: {mergedStyle.subTextColor};
@@ -78,7 +79,7 @@
     .info-div {
         margin: 0;
         padding: 0;
-        width: var(--width);
+        width: fit-content;
         height: fit-content;
         display: flex;
         flex-direction: row;
@@ -115,7 +116,9 @@
         color: var(--main-text-color);
         font-weight: var(--main-text-weight);
         white-space: nowrap;
-        max-width: var(--device-name-max-width);
+        width: var(--main-text-width);
+        min-width: var(--name-min-width-small-screen);
+        max-width: var(--name-max-width-small-screen);
         overflow: hidden;
         text-overflow: ellipsis;
         padding-bottom: 2px;
@@ -139,6 +142,7 @@
 
     /* Device Image: device photo or icon */
     .device-image-div {
+        display: none;
         position: relative;
         padding: 0;
         margin: 0;
@@ -160,5 +164,15 @@
     /* Image Loaded: fade in when loaded */
     .device-image-div.image-loaded {
         opacity: 1;
+    }
+
+    @media (min-width: 720px) {
+        .device-identification .device-name {
+            min-width: var(--main-text-width);
+            max-width: var(--main-text-width);
+        }
+        .device-image-div {
+            display: block;
+        }
     }
 </style>

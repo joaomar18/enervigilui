@@ -84,7 +84,12 @@
                 }}
             />
         </div>
-        <div class="logo-div" class:close={mobileSearchOpen}>
+        <div
+            class="logo-div"
+            class:close={mobileSearchOpen}
+            class:device-view-page={isDeviceViewPage($currentPage)}
+            class:management-page={!isDeviceViewPage($currentPage)}
+        >
             <Logo />
         </div>
     </div>
@@ -292,6 +297,12 @@
             margin-left: 250px;
             width: calc(100% - 250px);
         }
+        .left-header-div .logo-div.device-view-page {
+            display: flex;
+        }
+        .left-header-div .logo-div.device-view-page.close {
+            display: none;
+        }
     }
 
     /* Ensure content fills taller viewports */
@@ -303,8 +314,11 @@
 
     /* Show logo slot and fixed header margin on wider screens */
     @media (min-width: 470px) {
-        .left-header-div .logo-div {
+        .left-header-div .logo-div.management-page {
             display: flex;
+        }
+        .left-header-div .logo-div.management-page.close {
+            display: none;
         }
     }
 </style>

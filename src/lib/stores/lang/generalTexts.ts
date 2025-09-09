@@ -82,6 +82,10 @@ const textsObject: TextsObject = {
         PT: "Dispositivos",
         EN: "Devices",
     },
+    device: {
+        PT: "Dispositivo",
+        EN: "Device",
+    },
     general: {
         PT: "Geral",
         EN: "General",
@@ -603,6 +607,7 @@ const textsObject: TextsObject = {
         PT: "Última atualização",
         EN: "Last update",
     }
+
 };
 
 export const texts = createLangStore(textsObject);
