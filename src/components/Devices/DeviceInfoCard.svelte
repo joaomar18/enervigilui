@@ -130,7 +130,6 @@
         white-space: nowrap;
         overflow: hidden;
         text-overflow: ellipsis;
-        transform: translateY(-1px);
     }
 
     /* Expand Button: right-side action */
@@ -145,6 +144,7 @@
     /* Sub Text: device ID styling */
     .sub-text {
         font-size: 14px;
+        transform: translateY(1px);
         color: var(--sub-text-color);
         font-weight: var(--sub-text-weight);
         white-space: nowrap;

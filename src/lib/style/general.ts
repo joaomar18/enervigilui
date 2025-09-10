@@ -18,9 +18,9 @@ const ActionStyleConfig: ComponentStyles = {
 
 export const ActionStyle = createStyleStore(ActionStyleConfig);
 
-//////////     A C T I O N     W I T H     T E X T     //////////
+//////////     S L O T T E D     A C T I O N     //////////
 
-const ActionWithTextStyleConfig: ComponentStyles = {
+const SlottedActionStyleConfig: ComponentStyles = {
     dark: {
         width: "fit-content",
         height: "40px",
@@ -28,17 +28,10 @@ const ActionWithTextStyleConfig: ComponentStyles = {
         backgroundColor: "#14161c",
         borderColor: "#2a2e3a",
         hoverColor: "#2a2e3a",
-        textColor: "#eeeeee",
-        textWeight: "400",
-        textSize: "1rem",
-        imageWidth: "32px",
-        imageHeight: "32px",
-        textPaddingLeft: "10px",
-        imagePaddingRight: "10px",
     },
 };
 
-export const ActionWithTextStyle = createStyleStore(ActionWithTextStyleConfig);
+export const SlottedActionStyle = createStyleStore(SlottedActionStyleConfig);
 
 //////////     T O A S T     //////////
 

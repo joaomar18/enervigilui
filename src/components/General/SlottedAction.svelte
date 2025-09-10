@@ -1,31 +1,19 @@
 <script lang="ts">
     // Styles
     import { mergeStyle } from "$lib/style/components";
-    import { ActionWithTextStyle } from "$lib/style/general";
-
-    // Props
-    export let text: string = "";
-    export let imageURL: string = "";
+    import { SlottedActionStyle } from "$lib/style/general";
 
     // Style object (from theme)
     export let style: { [property: string]: string | number } | null = null;
-    $: effectiveStyle = style ?? $ActionWithTextStyle;
+    $: effectiveStyle = style ?? $SlottedActionStyle;
 
     // Layout / styling props
-
     export let width: string | undefined = undefined;
     export let height: string | undefined = undefined;
     export let borderRadius: string | undefined = undefined;
     export let backgroundColor: string | undefined = undefined;
     export let borderColor: string | undefined = undefined;
     export let hoverColor: string | undefined = undefined;
-    export let textColor: string | undefined = undefined;
-    export let textWeight: string | undefined = undefined;
-    export let textSize: string | undefined = undefined;
-    export let imageWidth: string | undefined = undefined;
-    export let imageHeight: string | undefined = undefined;
-    export let textPaddingLeft: string | undefined = undefined;
-    export let imagePaddingRight: string | undefined = undefined;
 
     $: localOverrides = {
         width,
@@ -34,13 +22,6 @@
         backgroundColor,
         borderColor,
         hoverColor,
-        textColor,
-        textWeight,
-        textSize,
-        imageWidth,
-        imageHeight,
-        textPaddingLeft,
-        imagePaddingRight,
     };
 
     // Merged style
@@ -69,20 +50,12 @@
         --background-color: {mergedStyle.backgroundColor};
         --border-color: {mergedStyle.borderColor};
         --hover-color: {mergedStyle.hoverColor};
-        --text-color: {mergedStyle.textColor};
-        --text-weight: {mergedStyle.textWeight};
-        --text-size: {mergedStyle.textSize};
-        --image-width: {mergedStyle.imageWidth};
-        --image-height: {mergedStyle.imageHeight};
-        --text-padding-left: {mergedStyle.textPaddingLeft};
-        --image-padding-right: {mergedStyle.imagePaddingRight};
     "
 >
     <div class="content">
-        <span>{text}</span>
-        {#if mergedStyle.imageWidth && mergedStyle.imageHeight}
-            <img src={imageURL} alt={imageURL} />
-        {/if}
+        <div class="slot-div">
+            <slot />
+        </div>
         <button on:click={handleClick} aria-label="Action Button"></button>
     </div>
 </div>
@@ -91,7 +64,6 @@
     /* Wrapper: size, shape, and base look */
     .action-button-div {
         box-sizing: border-box;
-        position: relative;
         width: var(--width);
         height: var(--height);
         margin: 0;
@@ -115,6 +87,7 @@
 
     /* Content container: centers icon or label */
     .content {
+        position: relative;
         margin: 0;
         padding: 0;
         width: 100%;
@@ -124,6 +97,17 @@
         justify-content: space-between;
         align-items: center;
         -webkit-tap-highlight-color: transparent;
+    }
+
+    /* Slotted content container */
+    .content .slot-div{
+        margin: 0;
+        padding: 0;
+        width: 100%;
+        height: 100%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
     }
 
     /* Invisible overlay button: captures clicks */
@@ -139,22 +123,5 @@
         cursor: pointer;
         outline: none;
         -webkit-tap-highlight-color: transparent;
-    }
-
-    /* Text styling */
-    span {
-        margin: 0;
-        padding: 0;
-        padding-left: var(--text-padding-left);
-        color: var(--text-color);
-        font-weight: var(--text-weight);
-        font-size: var(--text-size);
-    }
-
-    /* Icon sizing: driven by CSS variables */
-    img {
-        width: var(--image-width, 0px);
-        height: var(--image-height, 0px);
-        padding-right: var(--image-padding-right);
     }
 </style>
