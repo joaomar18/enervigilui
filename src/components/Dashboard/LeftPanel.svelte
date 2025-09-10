@@ -72,8 +72,11 @@
     }
 </script>
 
-<!-- 
-  Left Side Panel: Overlay mask and collapsible left navigation with logo, sections, and language selector.  
+<!--
+    LeftPanel: main navigation sidebar for the dashboard.
+    Contains navigation links for devices, diagnostics, system, and language selector.
+    Responsive: overlays as a drawer on small screens, fixed on desktop.
+    Uses Link, Logo, and LangSelector components for modularity and theme support.
 -->
 <div
     class="mask"
@@ -222,7 +225,7 @@
 </div>
 
 <style>
-    /* Overlay mask: full-screen semi-transparent backdrop */
+    /* Overlay mask for panel on small screens */
     .mask {
         background-color: var(--overlay-mask-background-color);
         position: fixed;
@@ -234,12 +237,12 @@
         display: block;
     }
 
-    /* Hide mask when panel closed */
+    /* Hide mask when panel is closed */
     .mask.close {
         display: none;
     }
 
-    /* Mask click area */
+    /* Full-area button for closing panel */
     .mask button {
         width: 100%;
         height: 100%;
@@ -249,7 +252,7 @@
         border: none;
     }
 
-    /* Side panel container: off-canvas slide-in panel */
+    /* Main sidebar container */
     .container {
         position: fixed;
         top: 0;
@@ -266,12 +269,12 @@
         z-index: 103;
     }
 
-    /* Slide panel into view when open */
+    /* Slide in when open */
     .container.open {
         transform: translateX(0);
     }
 
-    /* Logo area: fixed header slot inside panel */
+    /* Logo area at top of sidebar */
     .container .logo-div {
         box-sizing: border-box;
         position: absolute;
@@ -285,7 +288,7 @@
         padding-left: 25px;
     }
 
-    /* Main content: scrollable vertical flex container */
+    /* Main content area with nav and language selector */
     .content {
         display: flex;
         flex: 1 1 auto;
@@ -297,14 +300,14 @@
         scrollbar-color: var(--scrollbar-track-color) var(--scrollbar-thumb-color);
     }
 
-    /* Navigation section wrapper */
+    /* Navigation section */
     .nav-section {
         padding: 16px 0;
         display: flex;
         flex-direction: column;
     }
 
-    /* Individual menu section block */
+    /* Section group (devices, diagnostics, system) */
     .section {
         margin-bottom: 20px;
         display: flex;
@@ -313,7 +316,7 @@
         justify-content: start;
     }
 
-    /* Section header label styling */
+    /* Section label styling */
     .section-label {
         box-sizing: content-box;
         display: block;
@@ -331,6 +334,7 @@
         width: calc(100% - 40px);
     }
 
+    /* Links container for each section */
     .section .section-links-div {
         margin: 0;
         padding: 0;
@@ -343,7 +347,7 @@
         gap: 5px;
     }
 
-    /* Language selector area */
+    /* Language selector at bottom */
     .language-selector-div {
         box-sizing: border-box;
         width: 100%;
@@ -353,7 +357,7 @@
         padding: 30px;
     }
 
-    /* Language text label */
+    /* Language label styling */
     .language-text {
         color: var(--text-color);
         font-weight: var(--text-weight);
@@ -361,14 +365,14 @@
         padding-top: 10px;
     }
 
-    /* Hide logo slot on larger screens when on management page */
+    /* Hide logo on management page (desktop) */
     @media (min-width: 470px) {
         .container .logo-div.management-page {
             display: none;
         }
     }
 
-    /* Disable mask above certain width or logo on device view page */
+    /* Hide mask and logo on device view (desktop) */
     @media (min-width: 880px) {
         .mask {
             display: none;

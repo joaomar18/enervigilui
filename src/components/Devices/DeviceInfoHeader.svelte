@@ -4,17 +4,15 @@
 
     // Styles
     import { mergeStyle } from "$lib/style/components";
-    import { DeviceInfoCardStyle } from "$lib/style/device";
+    import { DeviceInfoHeaderStyle } from "$lib/style/device";
 
     // Style object (from theme)
     export let style: { [property: string]: string | number } | null = null;
-    $: effectiveStyle = style ?? $DeviceInfoCardStyle;
+    $: effectiveStyle = style ?? $DeviceInfoHeaderStyle;
 
     // Props
     export let deviceInfo: DeviceInfo;
     export let deviceImageUrl: string;
-    export let nameMinWidthSmallScreen: string = "auto";
-    export let nameMaxWidthSmallScreen: string = "auto";
 
     // Layout / styling props
     export let width: string | undefined = undefined;
@@ -47,15 +45,16 @@
     $: mergedStyle = mergeStyle(effectiveStyle, localOverrides);
 </script>
 
-<!-- Device Info Card: displays a device’s name, image, action buttons, ID, and connection status -->
+<!--
+    Device info header: displays the main device information at the top of the device view page.
+    Includes the device image, device name, and device ID, all styled in a horizontal row.
+-->
 {#if deviceInfo}
     <div
         class="info-div"
         style="
             --width: {mergedStyle.width};
             --max-width: {mergedStyle.maxWidth};
-            --name-min-width-small-screen: {nameMinWidthSmallScreen};
-            --name-max-width-small-screen: {nameMaxWidthSmallScreen};
             --main-text-width: {mergedStyle.mainTextWidth};
             --main-text-color: {mergedStyle.mainTextColor};
             --main-text-weight: {mergedStyle.mainTextWeight};
@@ -81,7 +80,7 @@
 {/if}
 
 <style>
-    /* Container: card wrapper for device info */
+    /* Main container for device info header */
     .info-div {
         margin: 0;
         padding: 0;
@@ -95,7 +94,7 @@
         align-items: center;
     }
 
-    /* Section: horizontal flex for image and identification */
+    /* Section with image and device identification */
     .section {
         display: flex;
         flex-direction: row;
@@ -106,7 +105,7 @@
         min-width: 0;
     }
 
-    /* Inner Section: device name and ID, spaced */
+    /* Device name and ID */
     .section .inner-section {
         margin: 0;
         padding: 0;
@@ -120,7 +119,7 @@
         min-width: 0;
     }
 
-    /* Device Name: main text styling */
+    /* Device name styling */
     .device-identification .device-name {
         font-size: 16px;
         min-width: 0;
@@ -132,7 +131,7 @@
         text-overflow: ellipsis;
     }
 
-    /* Expand Button: right-side action */
+    /* Expand more button container */
     .expand-more-div {
         margin: 0;
         padding: 0;
@@ -141,7 +140,7 @@
         height: fit-content;
     }
 
-    /* Sub Text: device ID styling */
+    /* Subtext for device ID */
     .sub-text {
         font-size: 14px;
         transform: translateY(1px);
@@ -151,7 +150,7 @@
         flex-shrink: 0;
     }
 
-    /* Device Image: device photo or icon */
+    /* Device image styling */
     .device-image-div {
         display: none;
         position: relative;
@@ -173,11 +172,12 @@
         object-fit: cover;
     }
 
-    /* Image Loaded: fade in when loaded */
+    /* Show image when loaded */
     .device-image-div.image-loaded {
         opacity: 1;
     }
 
+    /* Show image on larger screens */
     @media (min-width: 720px) {
         .device-image-div {
             display: block;

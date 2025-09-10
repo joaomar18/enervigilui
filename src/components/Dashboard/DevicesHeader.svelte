@@ -2,13 +2,13 @@
     import { fade } from "svelte/transition";
     import { onMount } from "svelte";
     import { logoutUser } from "$lib/logic/api/auth";
-    import { getDeviceInfo, getDeviceInfoWithImage } from "$lib/logic/api/device";
+    import { getDeviceInfoWithImage } from "$lib/logic/api/device";
     import { MethodRetrier } from "$lib/logic/api/retrier";
     import type { DeviceInfo } from "$lib/types/device/base";
     import Notification from "../General/Notification.svelte";
-    import SlottedAction from "../General/SlottedAction.svelte";
     import Logout from "./Logout.svelte";
-    import DeviceInfoCard from "../Devices/DeviceInfoCard.svelte";
+    import DeviceInfoHeader from "../Devices/DeviceInfoHeader.svelte";
+    import MobileDeviceInfoHeader from "../Devices/MobileDeviceInfoHeader.svelte";
 
     // Texts
     import { texts } from "$lib/stores/lang/generalTexts";
@@ -36,23 +36,20 @@
     });
 </script>
 
+<!--
+    Devices header: sticky top bar for the dashboard device view.
+    Shows device info (desktop and mobile layouts), notifications, and logout button.
+    Uses DeviceInfoHeader and MobileDeviceInfoHeader for responsive device display.
+    Notification and logout actions are always visible on the right.
+-->
 <div class="header-div" in:fade={{ duration: 300 }}>
     <div class="main-header-div">
         <div class="center-div">
             <div class="desktop-device-info-div">
-                <DeviceInfoCard {deviceInfo} {deviceImageUrl} />
+                <DeviceInfoHeader {deviceInfo} {deviceImageUrl} />
             </div>
             <div class="mobile-device-info-div">
-                <SlottedAction width="100%" onClick={() => {}}>
-                    <div class="device-context-div">
-                        <div class="device-label">
-                            <img src="/img/current-device.svg" alt="Current device" />
-                            <span>{$texts.device}</span>
-                        </div>
-                        <span class="sub-text">ID: {String(deviceInfo?.id).padStart(3, "0")}</span>
-                    </div>
-                    <img class="arrow" src="/img/down-arrow.svg" alt="down-arrow" />
-                </SlottedAction>
+                <MobileDeviceInfoHeader {deviceInfo} />
             </div>
         </div>
         <div class="right-div">
@@ -69,7 +66,7 @@
 </div>
 
 <style>
-    /* Top fixed header */
+    /* Sticky header bar for devices dashboard */
     .header-div {
         position: sticky;
         top: 0;
@@ -83,6 +80,7 @@
         z-index: 100;
     }
 
+    /* Main header content container */
     .header-div .main-header-div {
         margin: 0;
         padding: 0;
@@ -96,6 +94,7 @@
         z-index: 99;
     }
 
+    /* Centered device info section */
     .center-div {
         flex: 1;
         min-width: 0;
@@ -105,6 +104,7 @@
         padding-right: 20px;
     }
 
+    /* Right section: notifications and logout */
     .right-div {
         padding-right: 20px;
         width: fit-content;
@@ -115,6 +115,7 @@
         gap: 20px;
     }
 
+    /* Device info for desktop layout */
     .desktop-device-info-div {
         display: none;
         justify-content: center;
@@ -127,6 +128,7 @@
         height: 100%;
     }
 
+    /* Device info for mobile layout */
     .mobile-device-info-div {
         display: flex;
         justify-content: center;
@@ -139,69 +141,10 @@
         height: 100%;
     }
 
-    .mobile-device-info-div .device-context-div {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        flex: 1;
-        min-width: 0;
-        height: 100%;
-        padding-left: 15px;
-        padding-right: 5px;
-    }
-
-    .mobile-device-info-div .device-context-div .device-label {
-        min-width: 0;
-        flex: 1;
-        display: flex;
-        flex-direction: row;
-        justify-content: start;
-        align-items: center;
-    }
-
-    .mobile-device-info-div .device-context-div .device-label img {
-        width: 32px;
-        height: 32px;
-    }
-
-    .mobile-device-info-div .device-context-div .device-label span {
-        display: none;
-        padding-left: 5px;
-        padding-right: 10px;
-        font-size: 16px;
-        min-width: 0;
-        color: #c9c9c9;
-        font-weight: 300;
-        flex: 1;
-        white-space: nowrap;
-        overflow: hidden;
-        text-overflow: ellipsis;
-    }
-
-    .mobile-device-info-div .sub-text {
-        font-size: 14px;
-        color: #9a9a9a;
-        font-weight: 300;
-        white-space: nowrap;
-        flex-shrink: 0;
-        transform: translateY(1px);
-    }
-
-    .mobile-device-info-div .arrow {
-        padding-right: 10px;
-        width: 24px;
-        height: 24px;
-    }
-
+    /* Responsive layout adjustments */
     @media (min-width: 880px) {
         .header-div .main-header-div {
             justify-content: space-between;
-        }
-    }
-
-    @media (min-width: 420px) {
-        .mobile-device-info-div .device-context-div .device-label span {
-            display: block
         }
     }
 

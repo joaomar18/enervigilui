@@ -49,9 +49,9 @@ const DeviceCardStyleConfig: ComponentStyles = {
 
 export const DeviceCardStyle = createStyleStore(DeviceCardStyleConfig);
 
-//////////     D E V I C E     I N F O     C A R D     //////////
+//////////     D E V I C E     I N F O     H E A D E R     //////////
 
-const DeviceInfoCardStyleConfig: ComponentStyles = {
+const DeviceInfoHeaderStyleConfig: ComponentStyles = {
     dark: {
         width: "100%",
         maxWidth: "375px",
@@ -67,7 +67,24 @@ const DeviceInfoCardStyleConfig: ComponentStyles = {
     },
 };
 
-export const DeviceInfoCardStyle = createStyleStore(DeviceInfoCardStyleConfig);
+export const DeviceInfoHeaderStyle = createStyleStore(DeviceInfoHeaderStyleConfig);
+
+//////////     M O B I L E     D E V I C E     I N F O     H E A D E R     //////////
+
+const MobileDeviceInfoHeaderStyleConfig: ComponentStyles = {
+    dark: {
+        mainTextColor: "#c9c9c9",
+        mainTextWeight: "300",
+        subTextColor: "#9a9a9a",
+        subTextWeight: "300",
+        imageWidth: "32px",
+        imageHeight: "32px",
+        arrowWidth: "24px",
+        arrowHeight: "24px",
+    },
+};
+
+export const MobileDeviceInfoHeaderStyle = createStyleStore(MobileDeviceInfoHeaderStyleConfig);
 
 //////////     D E V I C E     A C T I O N     //////////
 

@@ -38,8 +38,9 @@
     }
 </script>
 
-<!-- 
-  Action Button: Reusable clickable component with text and optional image.  
+<!--
+    SlottedAction: a flexible, stylable button-like container for custom content.
+    Renders a slot for any child content and overlays an invisible button for click handling.
 -->
 <div
     class="action-button-div"
@@ -61,7 +62,7 @@
 </div>
 
 <style>
-    /* Wrapper: size, shape, and base look */
+    /* Main container for the slotted action button */
     .action-button-div {
         box-sizing: border-box;
         width: var(--width);
@@ -80,12 +81,12 @@
         shape-rendering: geometricPrecision;
     }
 
-    /* Hover state: visual feedback on pointer-over */
+    /* Hover effect for background color */
     .action-button-div:hover {
         background-color: var(--hover-color);
     }
 
-    /* Content container: centers icon or label */
+    /* Content wrapper for slot and button */
     .content {
         position: relative;
         margin: 0;
@@ -94,13 +95,13 @@
         height: 100%;
         display: flex;
         flex-direction: row;
-        justify-content: space-between;
+        justify-content: center;
         align-items: center;
         -webkit-tap-highlight-color: transparent;
     }
 
-    /* Slotted content container */
-    .content .slot-div{
+    /* Slot container for custom content */
+    .content .slot-div {
         margin: 0;
         padding: 0;
         width: 100%;
@@ -110,7 +111,7 @@
         align-items: center;
     }
 
-    /* Invisible overlay button: captures clicks */
+    /* Invisible button overlay for click handling */
     button {
         position: absolute;
         width: 100%;

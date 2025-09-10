@@ -71,8 +71,10 @@
     }
 </script>
 
-<!-- 
-  Logout Button: Pill-shaped button with optional icon and label.  
+<!--
+    Logout button: stylable button for logging out, with optional icon and text.
+    Adapts layout for management and device view pages, hiding text on small screens.
+    Handles click via invisible button overlay for accessibility and custom styling.
 -->
 <div
     style="
@@ -121,7 +123,7 @@
 </div>
 
 <style>
-    /* Container: size, shape, colors, and click cursor */
+    /* Main container for logout button */
     .container {
         background-color: var(--background-color);
         border: 1px solid var(--border-color);
@@ -135,12 +137,12 @@
         user-select: none;
     }
 
-    /* Hover state: visual feedback on pointer-over */
+    /* Hover effect for background color */
     .container:hover {
         background-color: var(--hover-color);
     }
 
-    /* Content wrapper: horizontal layout and padding */
+    /* Content wrapper for icon and text */
     .content {
         box-sizing: border-box;
         width: 100%;
@@ -157,7 +159,7 @@
         -webkit-tap-highlight-color: transparent;
     }
 
-    /* Text container: centers the label */
+    /* Text container for logout label */
     .text-div {
         height: 100%;
         flex: 1;
@@ -166,7 +168,7 @@
         justify-content: center;
     }
 
-    /* Label: font sizing and padding */
+    /* Logout text styling */
     span {
         box-sizing: border-box;
         display: inline-block;
@@ -185,13 +187,13 @@
         -moz-osx-font-smoothing: grayscale;
     }
 
-    /* Icon sizing: controlled by CSS variables */
+    /* Logout icon styling */
     img {
         width: var(--image-width);
         height: var(--image-height);
     }
 
-    /* Invisible overlay button: captures clicks over entire area */
+    /* Invisible button overlay for click handling */
     button {
         position: absolute;
         width: 100%;
@@ -207,7 +209,7 @@
         -webkit-tap-highlight-color: transparent;
     }
 
-    /* Tablet breakpoint: collapse text, same width and height container */
+    /* Responsive: hide text on small screens for management page */
     @media (max-width: 559px) {
         .container.management-page {
             width: var(--height);
@@ -223,6 +225,7 @@
         }
     }
 
+    /* Responsive: hide text on small screens for device view page */
     @media (max-width: 624px) {
         .container.device-view-page {
             width: var(--height);
