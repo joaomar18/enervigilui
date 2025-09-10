@@ -25,15 +25,16 @@ export const LeftPanelStyle = createStyleStore(LeftPanelStyleConfig);
 const LinkStyleConfig: ComponentStyles = {
     dark: {
         height: "48px",
-        paddingLeft: "10px",
-        paddingRight: "10px",
         paddingLeftText: "10px",
+        imageContainerWidth: "50px",
         imageWidth: "40px",
         imageHeight: "40px",
+        imagePaddingRight: "0px",
         arrowImageWidth: "24px",
         arrowImageHeight: "24px",
         fontSize: "1rem",
         textColor: "#eeeeee",
+        disabledTextColor: "#5c5e66",
         backgroundColor: "transparent",
         hoverColor: "rgba(255, 255, 255, 0.05)",
         selectedColor: "#2F4138",
@@ -44,7 +45,7 @@ const LinkStyleConfig: ComponentStyles = {
         arrowSelectedHoverColor: "rgba(47, 65, 56, 0.8)",
         arrowLeftBorderColor: "rgba(255, 255, 255, 0.2)",
         borderBottomColor: "transparent",
-        subContentBorderColor: "rgba(255, 255, 255, 0.2)",
+        subContentBorderColor: "rgba(255, 255, 255, 0.1)",
     },
 };
 
@@ -54,16 +55,17 @@ export const LinkStyle = createStyleStore(LinkStyleConfig);
 
 const SubLinkStyleConfig: ComponentStyles = {
     dark: {
-        height: "36px",
-        paddingLeft: "20px",
-        paddingRight: "8px",
-        paddingLeftText: "8px",
+        height: "40px",
+        paddingLeftText: "10px",
+        imageContainerWidth: "50px",
         imageWidth: "24px",
         imageHeight: "24px",
-        arrowImageWidth: "12px",
-        arrowImageHeight: "12px",
-        fontSize: "0.875rem",
+        imagePaddingRight: "8px",
+        arrowImageWidth: "0px",
+        arrowImageHeight: "0px",
+        fontSize: "14px",
         textColor: "rgba(255, 255, 255, 0.7)",
+        disabledTextColor: "#5c5e66",
         backgroundColor: "transparent",
         hoverColor: "rgba(255, 255, 255, 0.03)",
         selectedColor: "rgba(255, 255, 255, 0.08)",

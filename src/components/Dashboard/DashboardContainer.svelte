@@ -10,6 +10,7 @@
     import MenuButton from "../General/MenuButton.svelte";
     import Logo from "../General/Logo.svelte";
     import Action from "../General/Action.svelte";
+    import Loader from "../General/Loader.svelte";
 
     // Stores
     import { currentPage, leftPanelOpen, loadedDone, showSubLoader } from "$lib/stores/view/navigation";
@@ -104,11 +105,7 @@
         </div>
         <div class="container-div">
             <div class="content-div">
-                <div class="loader-div">
-                    <div class="loader-div-wrapper" class:close={$loadedDone}>
-                        <div class="spinner" class:show={$showSubLoader}></div>
-                    </div>
-                </div>
+                <Loader closeWrapper={$loadedDone} showLoader={$showSubLoader} />
                 <div class="section-content-div" class:hide={!$loadedDone}>
                     <slot class="section-content-div" />
                 </div>
@@ -225,65 +222,9 @@
         position: relative;
     }
 
-    /* Loader overlay: full-screen dark backdrop with centered spinner */
-    .dashboard-container .container-div .content-div .loader-div {
-        position: absolute;
-        inset: 0;
-        margin: 0;
-        padding: 0;
-        padding-bottom: 60px;
-        box-sizing: border-box;
-        width: 100%;
-        height: calc(100vh - 74px - 60px);
-    }
-
-    /* Loader wrapper for spinner */
-    .dashboard-container .container-div .content-div .loader-div .loader-div-wrapper {
-        margin: 0;
-        padding: 0;
-        position: relative;
-        width: 100%;
-        height: 100%;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        background-color: #181d23;
-        z-index: 1;
-    }
-
-    /* Loader hidden state: fade out and drop behind content */
-    .dashboard-container .container-div .content-div .loader-div .loader-div-wrapper.close {
-        opacity: 0;
-        z-index: 0;
-        pointer-events: none;
-    }
-
-    /* Spinner: circular border animation */
-    .dashboard-container .container-div .content-div .loader-div .loader-div-wrapper .spinner {
-        width: 128px;
-        height: 128px;
-        border: 4px solid rgba(255, 255, 255, 0.2);
-        border-top-color: #fff;
-        border-radius: 50%;
-        animation: content-spin 1s linear infinite;
-        opacity: 0;
-    }
-
-    /* Spinner: show loader when page takes too long to load */
-    .dashboard-container .container-div .content-div .loader-div .loader-div-wrapper .spinner.show {
-        opacity: 1;
-    }
-
     /* Hide Section Content div */
     .dashboard-container .container-div .content-div .section-content-div.hide {
         display: none;
-    }
-
-    /* Spin animation: full rotation */
-    @keyframes content-spin {
-        to {
-            transform: rotate(360deg);
-        }
     }
 
     /* Desktop layout: sidebar padding and alert positioning when sidebar is open */

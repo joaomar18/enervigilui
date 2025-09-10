@@ -323,3 +323,17 @@ const UploadImageStyleConfig: ComponentStyles = {
 };
 
 export const UploadImageStyle = createStyleStore(UploadImageStyleConfig);
+
+//////////     L O A D E R     //////////
+
+const LoaderStyleConfig: ComponentStyles = {
+    dark: {
+        width: "128px",
+        height: "128px",
+        wrapperTopPos: "-104px",
+        border: "4px solid rgba(255, 255, 255, 0.2)",
+        loaderColor: "#fff",
+    },
+};
+
+export const LoaderStyle = createStyleStore(LoaderStyleConfig);

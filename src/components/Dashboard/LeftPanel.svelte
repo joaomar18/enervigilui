@@ -77,6 +77,7 @@
     Contains navigation links for devices, diagnostics, system, and language selector.
     Responsive: overlays as a drawer on small screens, fixed on desktop.
     Uses Link, Logo, and LangSelector components for modularity and theme support.
+    Handles open/close state and disables device-specific links when no device is selected.
 -->
 <div
     class="mask"
@@ -133,27 +134,33 @@
                         />
                         <Link
                             style={$SubLinkStyle}
+                            disabled={!$currentDeviceID}
                             selected={activeSection.includes("/edit")}
                             buttonText={$texts.editConfig}
                             imageURL="/img/edit_pencil.svg"
+                            disabledImageURL="/img/edit_pencil_muted.svg"
                             onClick={() => {
                                 browseTo("/devices/edit", { deviceId: String($currentDeviceID) });
                             }}
                         />
                         <Link
                             style={$SubLinkStyle}
+                            disabled={!$currentDeviceID}
                             selected={activeSection.includes("/realtime")}
                             buttonText={$texts.realTimeData}
-                            imageURL="/img/real-time.svg"
+                            imageURL="/img/realtime.svg"
+                            disabledImageURL="/img/realtime_muted.svg"
                             onClick={() => {
                                 browseTo("/devices/realtime", { deviceId: String($currentDeviceID) });
                             }}
                         />
                         <Link
                             style={$SubLinkStyle}
+                            disabled={!$currentDeviceID}
                             selected={activeSection.includes("/analytics")}
                             buttonText={$texts.dataAnalytics}
                             imageURL="/img/analytics.svg"
+                            disabledImageURL="/img/analytics_muted.svg"
                             onClick={() => {
                                 browseTo("/devices/analytics", { deviceId: String($currentDeviceID) });
                             }}

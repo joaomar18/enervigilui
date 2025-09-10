@@ -8,23 +8,26 @@
     $: effectiveStyle = style ?? $LinkStyle;
 
     //Props
+    export let disabled: boolean = false;
     export let selected: boolean = false;
     export let showExpandArrow: boolean = false;
     export let triggerExpand: boolean = false;
     export let buttonText: string = "";
     export let imageURL: string = "";
+    export let disabledImageURL: string = "";
 
     // Layout / styling props
     export let height: string | undefined = undefined;
-    export let paddingLeft: string | undefined = undefined;
-    export let paddingRight: string | undefined = undefined;
     export let paddingLeftText: string | undefined = undefined;
+    export let imageContainerWidth: string | undefined = undefined;
     export let imageWidth: string | undefined = undefined;
     export let imageHeight: string | undefined = undefined;
+    export let imagePaddingRight: string | undefined = undefined;
     export let arrowImageWidth: string | undefined = undefined;
     export let arrowImageHeight: string | undefined = undefined;
     export let fontSize: string | undefined = undefined;
     export let textColor: string | undefined = undefined;
+    export let disabledTextColor: string | undefined = undefined;
     export let backgroundColor: string | undefined = undefined;
     export let hoverColor: string | undefined = undefined;
     export let selectedColor: string | undefined = undefined;
@@ -39,15 +42,16 @@
 
     $: localOverrides = {
         height,
-        paddingLeft,
-        paddingRight,
         paddingLeftText,
+        imageContainerWidth,
         imageWidth,
         imageHeight,
+        imagePaddingRight,
         arrowImageWidth,
         arrowImageHeight,
         fontSize,
         textColor,
+        disabledTextColor,
         backgroundColor,
         hoverColor,
         selectedColor,
@@ -69,7 +73,6 @@
     let triggerExpandSet: boolean = false;
 
     // Reactive Statements
-
     $: if (!showExpandArrow) isOpen = false;
 
     $: if (triggerExpand && !triggerExpandSet) {
@@ -84,7 +87,7 @@
 
     // Functions
     function handleClick(): void {
-        if (onClick) {
+        if (onClick && !disabled) {
             onClick();
         }
     }
@@ -94,8 +97,10 @@
     }
 </script>
 
-<!-- 
-  Link: Reusable button with optional image. Used for Dashboard Left Panel
+<!--
+    Link: stylable navigation link for the dashboard sidebar and submenus.
+    Supports icons, text, disabled state, selection, and expandable sub-content.
+    Handles click and expand actions with invisible button overlays for accessibility.
 -->
 <div
     class="link-div"
@@ -105,10 +110,10 @@
         --hover-color: {mergedStyle.hoverColor};
         --selected-color: {mergedStyle.selectedColor};
         --selected-hover-color: {mergedStyle.selectedHoverColor};
-        --padding-left: {mergedStyle.paddingLeft};
-        --padding-right: {mergedStyle.paddingRight};
+        --image-container-width: {mergedStyle.imageContainerWidth};
         --image-width: {mergedStyle.imageWidth};
         --image-height: {mergedStyle.imageHeight};
+        --image-padding-right: {mergedStyle.imagePaddingRight};
         --arrow-image-width: {mergedStyle.arrowImageWidth};
         --arrow-image-height: {mergedStyle.arrowImageHeight};
         --padding-left-text: {mergedStyle.paddingLeftText};
@@ -121,15 +126,20 @@
         --sub-content-border-color: {mergedStyle.subContentBorderColor};
         --font-size: {mergedStyle.fontSize};
         --text-color: {mergedStyle.textColor};
+        --disabled-text-color: {mergedStyle.disabledTextColor};
     "
 >
     <div class="content">
         <div class="main-content">
-            <div class="main-link-div" class:selected class:no-right-side-border={showExpandArrow}>
+            <div class="main-link-div" class:enabled={!disabled} class:selected class:no-right-side-border={showExpandArrow}>
                 {#if imageURL}
-                    <img src={imageURL} alt={imageURL} />
+                    <div class="image-div">
+                        <img src={!disabled ? imageURL : disabledImageURL} alt={!disabled ? imageURL : disabledImageURL} />
+                    </div>
                 {/if}
-                <span>{buttonText}</span>
+                <div class="text-div">
+                    <span class:disabled>{buttonText}</span>
+                </div>
                 <button on:click={handleClick} aria-label="Link button"></button>
             </div>
             {#if showExpandArrow}
@@ -147,7 +157,7 @@
 </div>
 
 <style>
-    /* Outer wrapper with configurable width and height */
+    /* Main container for the link component */
     .link-div {
         margin: 0;
         padding: 0;
@@ -161,7 +171,7 @@
         user-select: none;
     }
 
-    /* Internal content container */
+    /* Content wrapper for main and sub content */
     .content {
         margin: 0;
         padding: 0;
@@ -173,7 +183,7 @@
         align-items: center;
     }
 
-    /* Main content for main link */
+    /* Main row: icon, text, arrow */
     .main-content {
         margin: 0;
         padding: 0;
@@ -185,14 +195,12 @@
         align-items: center;
     }
 
-    /* Main link container (Link, Image and Main Button) */
+    /* Main clickable link area */
     .main-link-div {
         position: relative;
         margin: 0;
         padding: 0;
         border-radius: 4px;
-        padding-left: var(--padding-left);
-        padding-right: var(--pading-right);
         display: flex;
         flex-direction: row;
         justify-content: start;
@@ -202,33 +210,53 @@
         border: none;
         background: none;
         text-align: left;
-        cursor: pointer;
         background-color: var(--background-color);
         transition: background 0.2s;
     }
 
-    /* Main link container has arrow on the right (remove right side border) */
+    /* Pointer cursor for enabled links */
+    .main-link-div.enabled {
+        cursor: pointer;
+    }
+
+    /* Remove right border radius if arrow present */
     .main-link-div.no-right-side-border {
         border-top-right-radius: 0px;
         border-bottom-right-radius: 0px;
     }
 
-    /* Hover effect for the main link div */
-    .main-link-div:hover {
+    /* Hover and selected states */
+    .main-link-div.enabled:hover {
         background-color: var(--hover-color);
     }
-
-    /* Main link div color when link is selected */
-    .main-link-div.selected {
+    .main-link-div.enabled.selected {
         background-color: var(--selected-color);
     }
-
-    /* Main link div color when link is selected and hovered */
-    .main-link-div.selected:hover {
+    .main-link-div.enabled.selected:hover {
         background-color: var(--selected-hover-color);
     }
 
-    /* Div for arrow button to acess sub-sections of the Link */
+    /* Icon container */
+    .main-link-div .image-div {
+        margin: 0;
+        padding: 0;
+        width: var(--image-container-width);
+        display: flex;
+        justify-content: end;
+        align-items: center;
+    }
+
+    /* Text container */
+    .main-link-div .text-div {
+        margin: 0;
+        padding: 0;
+        flex: 1;
+        display: flex;
+        justify-content: start;
+        align-items: center;
+    }
+
+    /* Arrow container for expandable links */
     .arrow-div {
         position: relative;
         margin: 0;
@@ -243,23 +271,17 @@
         background-color: var(--arrow-background-color);
         transition: background 0.2s;
     }
-
-    /* Arrow div background color on hover */
     .arrow-div:hover {
         background-color: var(--arrow-hover-color);
     }
-
-    /* Arrow div background color when link is selected */
     .arrow-div.selected {
         background-color: var(--arrow-selected-color);
     }
-
-    /* Arrow div background color on hover when link is selected */
     .arrow-div.selected:hover {
         background-color: var(--arrow-selected-hover-color);
     }
 
-    /* Line to separate main link from arrow */
+    /* Vertical line between link and arrow */
     .arrow-div .line {
         position: absolute;
         left: 0;
@@ -267,7 +289,7 @@
         height: 36px;
     }
 
-    /* Sub content for sub-section links */
+    /* Sub-content slot for expandable links */
     .sub-content {
         position: relative;
         padding: 0;
@@ -280,13 +302,11 @@
         border-bottom-left-radius: 4px;
         border-bottom-right-radius: 4px;
     }
-
-    /* Close sub-content */
     .sub-content.closed {
         display: none;
     }
 
-    /* Styled span acting as the main button body */
+    /* Link text styling */
     span {
         box-sizing: border-box;
         display: flex;
@@ -304,8 +324,11 @@
         -webkit-font-smoothing: antialiased;
         -moz-osx-font-smoothing: grayscale;
     }
+    span.disabled {
+        color: var(--disabled-text-color);
+    }
 
-    /* Transparent overlay button for capturing clicks */
+    /* Invisible button overlay for click handling */
     button {
         position: absolute;
         width: 100%;
@@ -320,15 +343,16 @@
         -webkit-tap-highlight-color: transparent;
     }
 
-    /*  Optional positioned icon on the right side of the component */
+    /* Icon and arrow image styling */
     img {
         width: var(--image-width, 0px);
         height: var(--image-height, 0px);
+        padding: 0;
+        padding-right: var(--image-padding-right);
     }
-
-    /* Optional arrow if link has sub-sections */
     img.arrow {
         width: var(--arrow-image-width, 0px);
         height: var(--arrow-image-height, 0px);
+        padding: 0;
     }
 </style>
