@@ -146,7 +146,7 @@
                 <div class="arrow-div" class:selected>
                     <div class="line"></div>
                     <img class="arrow" src={isOpen ? "/img/up-arrow.svg" : "/img/down-arrow.svg"} alt={isOpen ? "up-arrow" : "down-arrow"} />
-                    <button on:click={toogleIsOpen} aria-label="Toogle sub content button"></button>
+                    <button on:click={toogleIsOpen} aria-label="Toogle sub content button" class:enabled={!disabled}></button>
                 </div>
             {/if}
         </div>
