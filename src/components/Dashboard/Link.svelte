@@ -140,7 +140,7 @@
                 <div class="text-div">
                     <span class:disabled>{buttonText}</span>
                 </div>
-                <button on:click={handleClick} aria-label="Link button"></button>
+                <button on:click={handleClick} aria-label="Link button" class:enabled={!disabled}></button>
             </div>
             {#if showExpandArrow}
                 <div class="arrow-div" class:selected>
@@ -212,11 +212,6 @@
         text-align: left;
         background-color: var(--background-color);
         transition: background 0.2s;
-    }
-
-    /* Pointer cursor for enabled links */
-    .main-link-div.enabled {
-        cursor: pointer;
     }
 
     /* Remove right border radius if arrow present */
@@ -338,9 +333,13 @@
         padding: 0;
         margin: 0;
         opacity: 0;
-        cursor: pointer;
         outline: none;
         -webkit-tap-highlight-color: transparent;
+    }
+
+    /* Show pointer cursor for enabled button overlay */
+    button.enabled {
+        cursor: pointer;
     }
 
     /* Icon and arrow image styling */
