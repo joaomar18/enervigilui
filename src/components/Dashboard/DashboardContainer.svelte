@@ -172,7 +172,7 @@
         padding: 0;
         width: 100%;
         min-width: 350px;
-        min-height: 600px;
+        min-height: calc(100vh - 74px);
         display: flex;
         flex-direction: column;
         justify-content: start;
@@ -184,9 +184,9 @@
         box-sizing: border-box;
         position: relative;
         padding-left: 0px;
-        height: fit-content;
-        min-height: 600px;
         width: 100%;
+        height: 100%;
+        min-height: calc(100vh - 74px);
         transition: padding-left 0.2s ease-in-out;
     }
 
@@ -206,17 +206,30 @@
     }
 
     /* Container: outer wrapper with padding and full height */
-    .dashboard-container .container-div {
+    .dashboard-container .content .container-div {
         box-sizing: border-box;
         margin: 0;
         padding: 30px;
         height: 100%;
+        min-height: calc(100vh - 74px);
+        width: 100%;
     }
 
     /* Content div */
-    .dashboard-container .container-div .content-div {
+    .dashboard-container .content .container-div .content-div {
         width: 100%;
         height: 100%;
+        min-height: calc(100vh - 74 - 60px);
+        margin: 0;
+        padding: 0;
+        position: relative;
+    }
+
+    /* Section Content div to nest the content of specific pages */
+    .dashboard-container .container-div .content-div .section-content-div {
+        width: 100%;
+        height: 100%;
+        min-height: calc(100vh - 74 - 60px);
         margin: 0;
         padding: 0;
         position: relative;
@@ -241,13 +254,6 @@
         }
         .left-header-div .logo-div.device-view-page.close {
             display: none;
-        }
-    }
-
-    /* Ensure content fills taller viewports */
-    @media (min-height: 600px) {
-        .dashboard-container .content {
-            min-height: calc(100vh - 74px);
         }
     }
 

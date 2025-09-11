@@ -415,6 +415,14 @@ const textsObject: TextsObject = {
         PT: "Total",
         EN: "Total",
     },
+    metrics: {
+        PT: "Indicadores",
+        EN: "Metrics",
+    },
+    energyConsumption: {
+        PT: "Consumo de Energia",
+        EN: "Energy Consumption",
+    },
     addNode: {
         PT: "Adicionar Variável",
         EN: "Add Variable",
