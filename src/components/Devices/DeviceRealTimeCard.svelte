@@ -13,9 +13,7 @@
     // Layout / styling props
     export let width: string | undefined = undefined;
     export let height: string | undefined = undefined;
-    export let minWidth: string | undefined = undefined;
     export let minHeight: string | undefined = undefined;
-    export let maxWidth: string | undefined = undefined;
     export let maxHeight: string | undefined = undefined;
     export let backgroundColor: string | undefined = undefined;
     export let borderColor: string | undefined = undefined;
@@ -34,9 +32,7 @@
     $: localOverrides = {
         width,
         height,
-        minWidth,
         minHeight,
-        maxWidth,
         maxHeight,
         backgroundColor,
         borderColor,
@@ -61,9 +57,7 @@
     style="
         --width: {mergedStyle.width};
         --height: {mergedStyle.height};
-        --min-width: {mergedStyle.minWidth};
         --min-height: {mergedStyle.minHeight};
-        --max-width: {mergedStyle.maxWidth};
         --max-height: {mergedStyle.maxHeight};
         --background-color: {mergedStyle.backgroundColor};
         --border-color: {mergedStyle.borderColor};
@@ -95,9 +89,7 @@
         padding: 0;
         width: var(--width);
         height: var(--height);
-        min-width: var(--min-width);
         min-height: var(--min-height);
-        max-width: var(--max-width);
         max-height: var(--max-height);
         background-color: var(--background-color);
         border: 1px solid var(--border-color);

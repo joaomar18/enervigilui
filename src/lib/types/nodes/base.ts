@@ -311,6 +311,19 @@ export interface NodeValidation {
 /*****     O B J E C T S     *****/
 
 /**
+ * Defines the logical order of electrical phases for sorting and grouping nodes.
+ * Used to consistently organize nodes by phase in UI lists and processing logic.
+ */
+export const phaseOrder = [
+    NodePhase.SINGLEPHASE,
+    NodePhase.L1,
+    NodePhase.L2,
+    NodePhase.L3,
+    NodePhase.TOTAL,
+    NodePhase.GENERAL
+];
+
+/**
  * Default editable base node configuration used for initializing new nodes in UI forms.
  */
 export const defaultBaseNodeConfig: EditableBaseNodeConfig = {

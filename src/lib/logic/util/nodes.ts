@@ -1,8 +1,75 @@
 import { get } from "svelte/store";
 import { protocolPlugins } from "$lib/stores/device/protocol";
 import { MeterType, Protocol } from "$lib/types/device/base";
-import { NodePrefix, NodePhase } from "$lib/types/nodes/base";
+import { NodePrefix, NodePhase, NodeType, phaseOrder } from "$lib/types/nodes/base";
 import type { BaseNodeConfig, EditableBaseNodeConfig, DeviceNode, EditableDeviceNode } from "$lib/types/nodes/base";
+
+/**
+ * Determines if a node is incremental (e.g., energy counters).
+ * @param node The node to check.
+ * @returns True if the node is incremental, false otherwise.
+ */
+export function isIncremental(node: EditableDeviceNode | DeviceNode): boolean {
+    return Boolean(node.config.incremental_node);
+}
+
+/**
+ * Determines if a node's value is numeric (float or integer).
+ * @param node The node to check.
+ * @returns True if the node is numeric, false otherwise.
+ */
+export function isNumeric(node: EditableDeviceNode | DeviceNode): boolean {
+    return node.config.type === NodeType.FLOAT || node.config.type === NodeType.INT;
+}
+
+/**
+ * Determines if a node is custom (user-defined).
+ * @param node The node to check.
+ * @returns True if the node is custom, false otherwise.
+ */
+export function isCustom(node: EditableDeviceNode | DeviceNode): boolean {
+    return node.config.custom;
+}
+
+/**
+ * Determines if a node is a default (not custom) node.
+ * @param node The node to check.
+ * @returns True if the node is default, false otherwise.
+ */
+export function isDefault(node: EditableDeviceNode | DeviceNode): boolean {
+    return !isCustom(node);
+}
+
+/**
+ * Returns the priority group for a node name, used for sorting.
+ * Lower numbers have higher priority.
+ * @param nodeName The node name.
+ * @returns The priority number.
+ */
+export function getNodePriority(nodeName: string): number {
+    const name = nodeName.toLowerCase();
+    if (name.includes("power_factor")) return 4;
+    else if (name.includes("power")) return 0;
+    else if (name.includes("energy")) return 3;
+    else if (name.includes("voltage")) return 1;
+    else if (name.includes("current")) return 2;
+    else if (name.includes("frequency")) return 5;
+    return 99;
+}
+
+/**
+ * Returns the sub-priority group for a node name, used for sorting within a group.
+ * Lower numbers have higher priority.
+ * @param nodeName The node name.
+ * @returns The sub-priority number.
+ */
+export function getNodeSubPriority(nodeName: string): number {
+    const name = nodeName.toLowerCase();
+    if (name.includes("active")) return 0;
+    else if (name.includes("reactive")) return 1;
+    else if (name.includes("apparent")) return 2;
+    return 99;
+}
 
 /**
  * Sorts nodes alphabetically by display name (without prefix).

@@ -1,9 +1,10 @@
 import { get } from "svelte/store";
-import type { EditableDeviceMeter, NewDeviceMeter, DeviceHistory } from "$lib/types/device/base";
-import type { EditableDeviceNode } from "$lib/types/nodes/base";
+import type { EditableDeviceMeter, NewDeviceMeter, MeterType, DeviceHistory } from "$lib/types/device/base";
+import type { EditableDeviceNode, DeviceNode } from "$lib/types/nodes/base";
 import { changeNodeProtocol } from "./nodes";
 import { protocolPlugins } from "$lib/stores/device/protocol";
 import { convertDateToLocalDate } from "../util/generic";
+
 
 /**
  * Updates device communication options and synchronizes protocol for all nodes when device protocol changes.
@@ -23,7 +24,13 @@ export function deviceProtocolChange(deviceData: EditableDeviceMeter | NewDevice
     nodes = [...nodes];
 }
 
-
+/**
+ * Converts all date fields in a DeviceHistory object to local date strings.
+ * Ensures consistent date formatting for device history records.
+ *
+ * @param initialDeviceHistory The original DeviceHistory object.
+ * @returns A new DeviceHistory object with formatted date fields.
+ */
 export function processDeviceHistory(initialDeviceHistory: DeviceHistory): DeviceHistory {
     let newDeviceHistory: DeviceHistory = {
         connection_on_datetime: convertDateToLocalDate(initialDeviceHistory.connection_on_datetime ?? ""),

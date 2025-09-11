@@ -1,11 +1,67 @@
 import { get } from "svelte/store";
 import { MeterType, Protocol } from "$lib/types/device/base";
 import { NodeType, NodePhase } from "$lib/types/nodes/base";
-import { getNodePrefix, getNodeIndex, getCommunicationID } from "../util/nodes";
+import { getNodePhase, getNodePriority, getNodeSubPriority, isDefault, isCustom, isIncremental, isNumeric, removePrefix, getNodePrefix, getNodeIndex, getCommunicationID } from "../util/nodes";
 import { defaultVariables } from "$lib/stores/device/variables";
 import { protocolPlugins } from "$lib/stores/device/protocol";
-import { nodeSections } from "$lib/types/nodes/base";
-import type { NodeEditState, EditableDeviceNode } from "$lib/types/nodes/base";
+import { nodeSections, phaseOrder } from "$lib/types/nodes/base";
+import type { NodeEditState, EditableDeviceNode, DeviceNode } from "$lib/types/nodes/base";
+
+/**
+ * Sorts device nodes in a logical order for display and processing.
+ * Nodes are ordered by phase, default/custom status, type (incremental/non-incremental),
+ * group (priority), and subgroup (sub-priority), ensuring a consistent and meaningful layout.
+ *
+ * @param nodes Array of device nodes to sort.
+ * @param meter_type The meter type for phase determination.
+ * @returns Sorted array of nodes.
+ */
+export function sortNodesLogically(nodes: Array<EditableDeviceNode | DeviceNode>, meter_type: MeterType): Array<EditableDeviceNode | DeviceNode> {
+
+    return nodes.slice().sort((a, b) => {
+        // Priority is organized from top to bottom
+
+        // Phase order (higher priority)
+        const phaseA = phaseOrder.indexOf(getNodePhase(a.name, meter_type));
+        const phaseB = phaseOrder.indexOf(getNodePhase(b.name, meter_type));
+        if (phaseA !== phaseB) return phaseA - phaseB;
+
+        // Non-incremental numeric types (default nodes first)
+        if (isDefault(a) && !isDefault(b)) return -1;
+        if (!isDefault(a) && isDefault(b)) return 1;
+
+        // Custom nodes after default nodes
+        if (isCustom(a) && !isCustom(b)) return 1;
+        if (!isCustom(a) && isCustom(b)) return -1;
+
+        // Non-incremental numeric before non-incremental non-numeric
+        if (!isIncremental(a) && isNumeric(a) && (!isIncremental(b) && !isNumeric(b))) return -1;
+        if ((!isIncremental(a) && !isNumeric(a)) && !isIncremental(b) && isNumeric(b)) return 1;
+
+        // Incremental nodes after non-incremental
+        if (isIncremental(a) && !isIncremental(b)) return 1;
+        if (!isIncremental(a) && isIncremental(b)) return -1;
+
+        // Grouping (power, energy, power factor)
+        const groupA = getNodePriority(a.name);
+        const groupB = getNodePriority(b.name);
+        if (groupA !== groupB) return groupA - groupB;
+
+        // Subgroup (active, reactive, apparent)
+        const subA = getNodeSubPriority(a.name);
+        const subB = getNodeSubPriority(b.name);
+        if (subA !== subB) return subA - subB;
+
+        // Within incremental, apply same grouping
+        if (isIncremental(a) && isIncremental(b)) {
+            if (groupA !== groupB) return groupA - groupB;
+            if (subA !== subB) return subA - subB;
+        }
+
+        // Fallback: alphabetical by name (without prefix)
+        return removePrefix(a.name).localeCompare(removePrefix(b.name));
+    });
+}
 
 /**
  * Handles node name changes, updating prefix and unit.

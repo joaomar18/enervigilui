@@ -3,6 +3,7 @@ import { derived } from "svelte/store";
 import { NodeType, NodePhase } from "$lib/types/nodes/base";
 import type { DefaultNodeInfo } from "$lib/types/nodes/base";
 
+
 /**
  * A readable store containing predefined variable types for energy monitoring systems.
  * Includes electrical measurements like voltage, current, power, and energy variables

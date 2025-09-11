@@ -53,13 +53,10 @@ export const DeviceCardStyle = createStyleStore(DeviceCardStyleConfig);
 
 const DeviceRealTimeCardStyleConfig: ComponentStyles = {
     dark: {
-
         width: "100%",
-        height: "calc(50vh - 60px - 20px)",
-        minWidth: "300px",
+        height: "clamp(400px, 40vh, 680px)",
         minHeight: "400px",
-        maxWidth: "auto",
-        maxHeight: "800px",
+        maxHeight: "680px",
         backgroundColor: "#14161c",
         borderColor: "rgba(255,255,255,0.07)",
         shadow: "0 8px 16px rgba(0, 0, 0, 0.1)",

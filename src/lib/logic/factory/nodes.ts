@@ -5,6 +5,7 @@ import type { EditableDeviceMeter, MeterOptions, NewDeviceMeter } from "$lib/typ
 import type { DeviceNode, EditableDeviceNode, EditableBaseNodeConfig, DefaultNodeInfo, BaseNodeConfig } from "$lib/types/nodes/base";
 import { defaultVariables } from "$lib/stores/device/variables";
 import { addPrefix, removePrefix, getNodePhase, getNodePrefix, getCommunicationID, sortNodesByName } from "../util/nodes";
+import { sortNodesLogically } from "../handlers/nodes";
 import { getInitialNodeValidation } from "../validation/nodes/base";
 import { stringIsValidInteger, stringIsValidFloat } from "$lib/logic/util/generic";
 import { protocolPlugins } from "$lib/stores/device/protocol";
@@ -168,7 +169,7 @@ export function convertToEditableNodes(nodes: Array<DeviceNode>, meter_type: Met
         editableNodes.push(editableNode);
     }
 
-    return sortNodesByName(editableNodes) as Array<EditableDeviceNode>;
+    return sortNodesLogically(editableNodes, meter_type) as Array<EditableDeviceNode>;
 }
 
 /**
