@@ -2,7 +2,7 @@ import { get } from "svelte/store";
 import { protocolPlugins } from "$lib/stores/device/protocol";
 import { Protocol } from "$lib/types/device/base";
 import { NodePrefix, NodePhase, NodeType, phaseOrder } from "$lib/types/nodes/base";
-import type { BaseNodeConfig, EditableBaseNodeConfig, NodeRecord, EditableNodeRecord } from "$lib/types/nodes/base";
+import type { BaseNodeConfig, EditableBaseNodeConfig, NodeRecord, EditableNodeRecord, NodeState } from "$lib/types/nodes/base";
 
 /**
  * Determines if a node is incremental (e.g., energy counters).
@@ -193,4 +193,12 @@ export function normalizeNode(node: NodeRecord): NodeRecord {
         config: Object.fromEntries(Object.entries(node.config).sort(([a], [b]) => a.localeCompare(b))) as BaseNodeConfig,
         attributes: node.attributes,
     };
+}
+
+export function getAvailablePhasesFromNodes(nodes: Array<EditableNodeRecord> | Array<NodeRecord>): Array<NodePhase> {
+    return Array.from(new Set(Object.values(nodes).map(node => node.attributes.phase).filter(phase => phase !== null && phase !== undefined))) as NodePhase[];
+}
+
+export function getAvailablePhasesFromNodesState(nodesState: Record<string, NodeState>): Array<NodePhase> {
+    return Array.from(new Set(Object.values(nodesState).map(nodeState => nodeState.phase).filter(phase => phase !== null && phase !== undefined))) as NodePhase[];
 }

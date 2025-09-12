@@ -2,6 +2,7 @@ import { callAPI } from "$lib/logic/api/api";
 import { processInitialNodes, initNodes } from "../factory/nodes";
 import { NodePhase } from "$lib/types/nodes/base";
 import type { NodeRecord, EditableNodeRecord, NodeState } from "$lib/types/nodes/base";
+import { getAvailablePhasesFromNodesState } from "../util/nodes";
 import { nodeSections } from "$lib/types/nodes/base";
 import { navigateTo } from "../view/navigation";
 
@@ -51,7 +52,7 @@ export async function getDeviceNodesState(id: number): Promise<{ nodesStateBySec
 
     if (sucess) {
         let nodesState = data as Record<string, NodeState>;
-        availablePhases = Array.from(new Set(Object.values(nodesState).map(nodeState => nodeState.phase).filter(phase => phase !== null && phase !== undefined))) as NodePhase[];
+        availablePhases = getAvailablePhasesFromNodesState(nodesState);
         nodesStateBySection = nodeSections.reduce((acc: Record<NodePhase, Record<string, NodeState>>, section) => {
             acc[section.key] = Object.fromEntries(
                 Object.entries(nodesState)

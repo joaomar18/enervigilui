@@ -4,6 +4,7 @@
     import { onMount, onDestroy } from "svelte";
     import { addNode } from "$lib/logic/factory/nodes";
     import { deleteNodeFromArray } from "$lib/logic/handlers/nodes";
+    import { getAvailablePhasesFromNodes } from "$lib/logic/util/nodes";
     import { nodeSections } from "$lib/types/nodes/base";
     import { protocolPlugins } from "$lib/stores/device/protocol";
 
@@ -63,18 +64,6 @@
     // Merged style
     $: mergedStyle = mergeStyle(effectiveStyle, localOverrides);
 
-    // Export Functions
-    export let onPropertyChanged: (node: EditableNodeRecord) => void;
-    export let onShowConfigPopup: (node: EditableNodeRecord, nodeEditingState: NodeRecordEditingState) => void;
-
-    // Functions
-    function handleResize() {
-        if (containerElement) {
-            currentWidth = containerElement.clientWidth;
-        }
-        windowWidth = window.innerWidth;
-    }
-
     // Variables
     let containerElement: HTMLDivElement;
     let currentWidth: number;
@@ -98,10 +87,23 @@
         actions: { hideWidth: undefined, visible: true },
     };
 
+    // Reactive Statements
     $: if (currentWidth) {
         for (let key of Object.keys(columnVisibility) as (keyof ColumnVisibilityMap)[]) {
             columnVisibility[key].visible = columnVisibility[key].hideWidth === undefined || currentWidth >= columnVisibility[key].hideWidth;
         }
+    }
+
+    // Export Functions
+    export let onPropertyChanged: (node: EditableNodeRecord) => void;
+    export let onShowConfigPopup: (node: EditableNodeRecord, nodeEditingState: NodeRecordEditingState) => void;
+
+    // Functions
+    function handleResize() {
+        if (containerElement) {
+            currentWidth = containerElement.clientWidth;
+        }
+        windowWidth = window.innerWidth;
     }
 
     onMount(() => {
@@ -205,41 +207,18 @@ Includes multi-language headers and adapts layout to container size. -->
                 </tr>
             </thead>
             <tbody>
-                <!--     T H R E E     P H A S E     M E T E R S     -->
-                {#if deviceData.type === MeterType.THREE_PHASE && nodesBySection}
+                {#if nodesBySection}
                     <!-- Render each node section -->
-                    {#each nodeSections.filter((section) => section.key !== NodePhase.SINGLEPHASE) as section (section.key)}
-                        <tr class="sub-section">
-                            <td colspan="20">{$texts[section.labelKey]}</td>
-                        </tr>
-                        {#each nodesBySection[section.key] as node, i (i)}
-                            <NodeRow
-                                {node}
-                                currentGridWidth={currentWidth}
-                                {columnVisibility}
-                                {windowWidth}
-                                onDelete={() => {
-                                    nodes = deleteNodeFromArray(node, nodes);
-                                }}
-                                onConfig={(nodeEditingState: NodeRecordEditingState) => {
-                                    onShowConfigPopup(node, nodeEditingState);
-                                }}
-                                {deviceData}
-                                onPropertyChanged={() => {
-                                    onPropertyChanged(node);
-                                }}
-                            />
-                        {/each}
-                        <AddNode
-                            {windowWidth}
-                            onAddNode={() => {
-                                nodes = [...nodes, addNode(section.phase, section.prefix, deviceData)];
-                            }}
-                        />
-                    {/each}
-                    <!--     S I N G L E     P H A S E     M E T E R S     -->
-                {:else if deviceData.type === MeterType.SINGLE_PHASE && nodesBySection}
-                    {#each nodeSections.filter((section) => section.key === NodePhase.SINGLEPHASE) as section (section.key)}
+                    {#each nodeSections.filter((section) => {
+                        if (deviceData.type === MeterType.SINGLE_PHASE) return section.phase === NodePhase.SINGLEPHASE;
+                        if (deviceData.type === MeterType.THREE_PHASE) return section.phase !== NodePhase.SINGLEPHASE;
+                        return false;
+                    }) as section (section.key)}
+                        {#if section.phase !== NodePhase.SINGLEPHASE}
+                            <tr class="sub-section">
+                                <td colspan="20">{$texts[section.labelKey]}</td>
+                            </tr>
+                        {/if}
                         {#each nodesBySection[section.key] as node, i (i)}
                             <NodeRow
                                 {node}
