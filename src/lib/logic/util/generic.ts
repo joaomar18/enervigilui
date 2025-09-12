@@ -1,6 +1,5 @@
 import { get } from "svelte/store";
 import { selectedLang } from "$lib/stores/lang/definition";
-import { texts } from "$lib/stores/lang/generalTexts";
 
 /**
  * Validates if a string represents a valid integer.

@@ -67,7 +67,7 @@ export interface MeterOptions {
  * parameters, operational settings, and communication details. This is the main
  * interface that combines all other configuration interfaces into a single device entity.
  *
- * @interface DeviceMeter
+ * @interface Device
  * @property {boolean} connected - Current connection status of the device (true if actively connected)
  * @property {number} id - Unique numeric identifier for the device within the system
  * @property {string} name - Human-readable name/label for the device (e.g., "Main Building Meter")
@@ -76,7 +76,7 @@ export interface MeterOptions {
  * @property {MeterOptions} options - Operational settings controlling measurement capabilities and data acquisition
  * @property {CommunicationOptions} communication_options - Protocol-specific communication parameters and settings
  */
-export interface DeviceMeter {
+export interface Device {
     connected: boolean;
     id: number;
     name: string;
@@ -92,7 +92,7 @@ export interface DeviceMeter {
  * form input handling where communication parameters are entered as strings. Used primarily
  * in device configuration forms and editing components where user input validation is required.
  *
- * @interface EditableDeviceMeter
+ * @interface EditableDevice
  * @property {boolean} connected - Current connection status of the device (true if actively connected)
  * @property {number} id - Unique numeric identifier for the device within the system
  * @property {string} name - Human-readable name/label for the device (e.g., "Main Building Meter")
@@ -104,7 +104,7 @@ export interface DeviceMeter {
  * @property {string | undefined} current_image_url - Optional URL of the device's current image (for displaying existing images in forms)
  * @property {DeviceValidation} validation - Validation state for all device configuration properties
  */
-export interface EditableDeviceMeter {
+export interface EditableDevice {
     connected: boolean;
     id: number;
     name: string;
@@ -121,7 +121,7 @@ export interface EditableDeviceMeter {
  * Interface for creating a new device meter (device creation payload).
  * Used when adding a new device to the backend, omitting properties managed by the backend (id, connected).
  *
- * @interface NewDeviceMeter
+ * @interface NewDevice
  * @property {string} name - Human-readable name/label for the device (e.g., "Main Building Meter")
  * @property {Protocol} protocol - Communication protocol used by this device (MODBUS_RTU, OPC_UA, or NONE)
  * @property {MeterType} type - Electrical connection type (SINGLE_PHASE or THREE_PHASE)
@@ -131,7 +131,7 @@ export interface EditableDeviceMeter {
  * @property {string | undefined} current_image_url - Optional URL of the device's current image (for displaying existing images in forms)
  * @property {DeviceValidation} validation - Validation state for all device configuration properties
  */
-export interface NewDeviceMeter {
+export interface NewDevice {
     name: string;
     protocol: Protocol;
     type: MeterType;
@@ -147,7 +147,7 @@ export interface NewDeviceMeter {
  * Each boolean property indicates whether the corresponding device configuration section passes validation.
  * Used to provide real-time feedback in the UI and prevent invalid device configurations from being saved.
  *
- * @interface
+ * @interface DeviceValidation
  * @property {boolean} deviceName - True if the device name is valid (non-empty, follows naming rules, etc.)
  * @property {boolean} deviceProtocol - True if the selected communication protocol is valid
  * @property {boolean} communicationOptions - True if all protocol-specific communication settings are valid
@@ -182,7 +182,7 @@ export interface DeviceHistory {
 }
 
 /**
- * Basic information about a device for display or summary purposes.
+ * Basic information about a meter for display or summary purposes.
  * Includes identification, protocol, connection status, image, and history.
  *
  * @interface DeviceInfo

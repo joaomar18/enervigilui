@@ -11,8 +11,8 @@
     import { ToastType } from "$lib/stores/view/toast";
 
     // Types
-    import type { EditableDeviceMeter, NewDeviceMeter } from "$lib/types/device/base";
-    import type { EditableDeviceNode, NodeEditState } from "$lib/types/nodes/base";
+    import type { EditableDevice, NewDevice } from "$lib/types/device/base";
+    import type { EditableNodeRecord, NodeRecordEditingState } from "$lib/types/nodes/base";
     import type { ColumnVisibilityMap } from "$lib/logic/view/nodes";
 
     // Texts
@@ -30,8 +30,8 @@
     $: effectiveStyle = style ?? $NodeRowStyle;
 
     // Props
-    export let deviceData: EditableDeviceMeter | NewDeviceMeter;
-    export let node: EditableDeviceNode;
+    export let deviceData: EditableDevice | NewDevice;
+    export let node: EditableNodeRecord;
     export let windowWidth: number;
     export let currentGridWidth: number;
     export let columnVisibility: ColumnVisibilityMap;
@@ -55,7 +55,7 @@
     $: mergedStyle = mergeStyle(effectiveStyle, localOverrides);
 
     // Variables
-    let nodeEditingState: NodeEditState = {
+    let nodeEditingState: NodeRecordEditingState = {
         oldVariableName: node.display_name,
         oldVariableType: node.config.type,
         oldVariableUnit: node.config.unit,
@@ -70,7 +70,7 @@
     // Export Funcions
     export let onPropertyChanged: () => void;
     export let onDelete: () => void;
-    export let onConfig: (nodeEditingState: NodeEditState) => void;
+    export let onConfig: (nodeEditingState: NodeRecordEditingState) => void;
 
     // Functions
     function handleOnDelete(): void {

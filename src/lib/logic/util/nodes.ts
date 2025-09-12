@@ -2,14 +2,14 @@ import { get } from "svelte/store";
 import { protocolPlugins } from "$lib/stores/device/protocol";
 import { Protocol } from "$lib/types/device/base";
 import { NodePrefix, NodePhase, NodeType, phaseOrder } from "$lib/types/nodes/base";
-import type { BaseNodeConfig, EditableBaseNodeConfig, DeviceNode, EditableDeviceNode } from "$lib/types/nodes/base";
+import type { BaseNodeConfig, EditableBaseNodeConfig, NodeRecord, EditableNodeRecord } from "$lib/types/nodes/base";
 
 /**
  * Determines if a node is incremental (e.g., energy counters).
  * @param node The node to check.
  * @returns True if the node is incremental, false otherwise.
  */
-export function isIncremental(node: EditableDeviceNode | DeviceNode): boolean {
+export function isIncremental(node: EditableNodeRecord | NodeRecord): boolean {
     return Boolean(node.config.incremental_node);
 }
 
@@ -18,7 +18,7 @@ export function isIncremental(node: EditableDeviceNode | DeviceNode): boolean {
  * @param node The node to check.
  * @returns True if the node is numeric, false otherwise.
  */
-export function isNumeric(node: EditableDeviceNode | DeviceNode): boolean {
+export function isNumeric(node: EditableNodeRecord | NodeRecord): boolean {
     return node.config.type === NodeType.FLOAT || node.config.type === NodeType.INT;
 }
 
@@ -27,7 +27,7 @@ export function isNumeric(node: EditableDeviceNode | DeviceNode): boolean {
  * @param node The node to check.
  * @returns True if the node is custom, false otherwise.
  */
-export function isCustom(node: EditableDeviceNode | DeviceNode): boolean {
+export function isCustom(node: EditableNodeRecord | NodeRecord): boolean {
     return node.config.custom;
 }
 
@@ -36,7 +36,7 @@ export function isCustom(node: EditableDeviceNode | DeviceNode): boolean {
  * @param node The node to check.
  * @returns True if the node is default, false otherwise.
  */
-export function isDefault(node: EditableDeviceNode | DeviceNode): boolean {
+export function isDefault(node: EditableNodeRecord | NodeRecord): boolean {
     return !isCustom(node);
 }
 
@@ -86,7 +86,7 @@ export function getNodeSubPriority(nodeName: string): number {
  * @param nodes Array of nodes.
  * @returns Sorted array.
  */
-export function sortNodesByName(nodes: Array<EditableDeviceNode | DeviceNode>): Array<EditableDeviceNode | DeviceNode> {
+export function sortNodesByName(nodes: Array<EditableNodeRecord | NodeRecord>): Array<EditableNodeRecord | NodeRecord> {
     return nodes.sort((a, b) => removePrefix(a.name).localeCompare(removePrefix(b.name)));
 }
 
@@ -96,7 +96,7 @@ export function sortNodesByName(nodes: Array<EditableDeviceNode | DeviceNode>): 
  * @param nodesArray Array of nodes.
  * @returns Index or -1.
  */
-export function getNodeIndex(node: EditableDeviceNode, nodesArray: Array<EditableDeviceNode>): number {
+export function getNodeIndex(node: EditableNodeRecord, nodesArray: Array<EditableNodeRecord>): number {
     return nodesArray.findIndex((n) => n === node);
 }
 
@@ -185,7 +185,7 @@ export function getCommunicationID(protocol: Protocol, config: BaseNodeConfig | 
  * @param node DeviceNode.
  * @returns Normalized node.
  */
-export function normalizeNode(node: DeviceNode): DeviceNode {
+export function normalizeNode(node: NodeRecord): NodeRecord {
     return {
         device_id: node.device_id,
         name: node.name,

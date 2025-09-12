@@ -12,8 +12,8 @@
     import { NodePhase } from "$lib/types/nodes/base";
 
     // Types
-    import type { EditableDeviceMeter, NewDeviceMeter } from "$lib/types/device/base";
-    import type { EditableDeviceNode, NodeEditState } from "$lib/types/nodes/base";
+    import type { EditableDevice, NewDevice } from "$lib/types/device/base";
+    import type { EditableNodeRecord, NodeRecordEditingState } from "$lib/types/nodes/base";
     import type { ColumnVisibilityMap } from "$lib/logic/view/nodes";
 
     // Texts
@@ -29,9 +29,9 @@
     $: effectiveStyle = style ?? $NodesGridStyle;
 
     // Props
-    export let deviceData: EditableDeviceMeter | NewDeviceMeter;
-    export let nodes: Array<EditableDeviceNode> = []; // Nodes Configuration (Formatted)
-    export let nodesBySection: Record<NodePhase, Array<EditableDeviceNode>>; // Nodes Configuration by Section
+    export let deviceData: EditableDevice | NewDevice;
+    export let nodes: Array<EditableNodeRecord> = []; // Nodes Configuration (Formatted)
+    export let nodesBySection: Record<NodePhase, Array<EditableNodeRecord>>; // Nodes Configuration by Section
     export let nodesInit: boolean; // Nodes are initialized
 
     // Layout / styling props
@@ -64,8 +64,8 @@
     $: mergedStyle = mergeStyle(effectiveStyle, localOverrides);
 
     // Export Functions
-    export let onPropertyChanged: (node: EditableDeviceNode) => void;
-    export let onShowConfigPopup: (node: EditableDeviceNode, nodeEditingState: NodeEditState) => void;
+    export let onPropertyChanged: (node: EditableNodeRecord) => void;
+    export let onShowConfigPopup: (node: EditableNodeRecord, nodeEditingState: NodeRecordEditingState) => void;
 
     // Functions
     function handleResize() {
@@ -221,7 +221,7 @@ Includes multi-language headers and adapts layout to container size. -->
                                 onDelete={() => {
                                     nodes = deleteNodeFromArray(node, nodes);
                                 }}
-                                onConfig={(nodeEditingState: NodeEditState) => {
+                                onConfig={(nodeEditingState: NodeRecordEditingState) => {
                                     onShowConfigPopup(node, nodeEditingState);
                                 }}
                                 {deviceData}
@@ -249,7 +249,7 @@ Includes multi-language headers and adapts layout to container size. -->
                                 onDelete={() => {
                                     nodes = deleteNodeFromArray(node, nodes);
                                 }}
-                                onConfig={(nodeEditingState: NodeEditState) => {
+                                onConfig={(nodeEditingState: NodeRecordEditingState) => {
                                     onShowConfigPopup(node, nodeEditingState);
                                 }}
                                 {deviceData}

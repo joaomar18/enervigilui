@@ -1,6 +1,6 @@
 import { callAPI } from "$lib/logic/api/api";
-import type { DeviceMeter, EditableDeviceMeter, DeviceHistory, DeviceInfo } from "$lib/types/device/base";
-import type { DeviceNode } from "$lib/types/nodes/base";
+import type { Device, EditableDevice, DeviceHistory, DeviceInfo } from "$lib/types/device/base";
+import type { NodeRecord } from "$lib/types/nodes/base";
 import { processInitialDevice, convertToEditableDevice } from "../factory/device";
 import { processDeviceHistory } from "../handlers/device";
 import { navigateTo } from "../view/navigation";
@@ -12,8 +12,8 @@ import { navigateTo } from "../view/navigation";
  * @returns Object containing array of processed device data.
  * @throws Error if the API request fails.
  */
-export async function getAllDevicesState(): Promise<{ devices: Array<DeviceMeter> }> {
-    let devices: Array<DeviceMeter>;
+export async function getAllDevicesState(): Promise<{ devices: Array<Device> }> {
+    let devices: Array<Device>;
 
     const { sucess, data } = await callAPI({
         endpoint: "/api/device/get_all_devices_state",
@@ -21,11 +21,11 @@ export async function getAllDevicesState(): Promise<{ devices: Array<DeviceMeter
         setLoaded: true,
     });
     if (sucess) {
-        devices = data.map((data: DeviceMeter & { image: Record<string, string> }) => {
-            const { ...requestDeviceData } = data as DeviceMeter;
-            let deviceData: DeviceMeter = processInitialDevice(requestDeviceData as DeviceMeter);
+        devices = data.map((data: Device & { image: Record<string, string> }) => {
+            const { ...requestDeviceData } = data as Device;
+            let deviceData: Device = processInitialDevice(requestDeviceData as Device);
             return deviceData;
-        }) as Array<DeviceMeter>;
+        }) as Array<Device>;
     } else {
         throw new Error("Get all devices state error");
     }
@@ -40,8 +40,8 @@ export async function getAllDevicesState(): Promise<{ devices: Array<DeviceMeter
  * @returns Object containing processed devices array and device images mapped by ID.
  * @throws Error if the API request fails.
  */
-export async function getAllDevicesStateWithImage(): Promise<{ devices: Array<DeviceMeter>; devicesImages: Record<number, string> }> {
-    let devices: Array<DeviceMeter>;
+export async function getAllDevicesStateWithImage(): Promise<{ devices: Array<Device>; devicesImages: Record<number, string> }> {
+    let devices: Array<Device>;
     let devicesImages: Record<number, string> = {};
 
     const { sucess, data } = await callAPI({
@@ -50,12 +50,12 @@ export async function getAllDevicesStateWithImage(): Promise<{ devices: Array<De
         setLoaded: true,
     });
     if (sucess) {
-        devices = data.map((data: DeviceMeter & { image: Record<string, string> }) => {
-            const { image: deviceImage, ...requestDeviceData } = data as DeviceMeter & { image: Record<string, string> };
-            let deviceData: DeviceMeter = processInitialDevice(requestDeviceData as DeviceMeter);
+        devices = data.map((data: Device & { image: Record<string, string> }) => {
+            const { image: deviceImage, ...requestDeviceData } = data as Device & { image: Record<string, string> };
+            let deviceData: Device = processInitialDevice(requestDeviceData as Device);
             devicesImages[deviceData.id] = `data:${deviceImage["type"]};base64,${deviceImage["data"]}`;
             return deviceData;
-        }) as Array<DeviceMeter>;
+        }) as Array<Device>;
     } else {
         throw new Error("Get all devices state with images error");
     }
@@ -71,9 +71,9 @@ export async function getAllDevicesStateWithImage(): Promise<{ devices: Array<De
  * @returns Object containing the initial device data.
  * @throws Error if the API request fails.
  */
-export async function getDeviceState(id: number): Promise<{ initialDeviceData: DeviceMeter }> {
-    let initialDeviceData: DeviceMeter;
-    let deviceData: EditableDeviceMeter;
+export async function getDeviceState(id: number): Promise<{ initialDeviceData: Device }> {
+    let initialDeviceData: Device;
+    let deviceData: EditableDevice;
     const { sucess, data } = await callAPI({
         endpoint: "/api/device/get_device_state",
         method: "GET",
@@ -81,8 +81,8 @@ export async function getDeviceState(id: number): Promise<{ initialDeviceData: D
         setLoaded: true,
     });
     if (sucess) {
-        const { ...requestDeviceData } = data as DeviceMeter;
-        initialDeviceData = processInitialDevice(requestDeviceData as DeviceMeter);
+        const { ...requestDeviceData } = data as Device;
+        initialDeviceData = processInitialDevice(requestDeviceData as Device);
     } else {
         throw new Error("Get device state error");
     }
@@ -119,9 +119,9 @@ export async function getDeviceInfo(id: number): Promise<{ deviceInfo: DeviceInf
  * @returns Object containing initial device data and editable device configuration.
  * @throws Error if the API request fails.
  */
-export async function getDeviceStateWithImage(id: number): Promise<{ initialDeviceData: DeviceMeter; deviceData: EditableDeviceMeter }> {
-    let initialDeviceData: DeviceMeter;
-    let deviceData: EditableDeviceMeter;
+export async function getDeviceStateWithImage(id: number): Promise<{ initialDeviceData: Device; deviceData: EditableDevice }> {
+    let initialDeviceData: Device;
+    let deviceData: EditableDevice;
     const { sucess, data } = await callAPI({
         endpoint: "/api/device/get_device_state_with_image",
         method: "GET",
@@ -129,8 +129,8 @@ export async function getDeviceStateWithImage(id: number): Promise<{ initialDevi
         setLoaded: true,
     });
     if (sucess) {
-        const { image: deviceImage, ...requestDeviceData } = data as DeviceMeter & { image: Record<string, string> };
-        initialDeviceData = processInitialDevice(requestDeviceData as DeviceMeter);
+        const { image: deviceImage, ...requestDeviceData } = data as Device & { image: Record<string, string> };
+        initialDeviceData = processInitialDevice(requestDeviceData as Device);
         deviceData = convertToEditableDevice(initialDeviceData, deviceImage);
     } else {
         throw new Error("Get device state with image error");
@@ -192,7 +192,7 @@ export async function getDefaultImage(): Promise<string> {
  * @param deviceImage - Optional image file to associate with the device.
  * @param deviceNodes - Array of nodes/variables associated with the device.
  */
-export async function addDevice(deviceData: DeviceMeter, deviceImage: File | undefined, deviceNodes: Array<DeviceNode>) {
+export async function addDevice(deviceData: Device, deviceImage: File | undefined, deviceNodes: Array<NodeRecord>) {
     const { sucess, data } = await callAPI({
         endpoint: "/api/device/add_device",
         method: "POST",
@@ -213,7 +213,7 @@ export async function addDevice(deviceData: DeviceMeter, deviceImage: File | und
  * @param deviceImage - Optional new image file for the device.
  * @param deviceNodes - Updated array of nodes/variables for the device.
  */
-export async function editDevice(deviceData: DeviceMeter, deviceImage: File | undefined, deviceNodes: Array<DeviceNode>) {
+export async function editDevice(deviceData: Device, deviceImage: File | undefined, deviceNodes: Array<NodeRecord>) {
     const { sucess, data } = await callAPI({
         endpoint: "/api/device/edit_device",
         method: "POST",

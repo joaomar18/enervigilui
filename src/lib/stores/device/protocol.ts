@@ -11,7 +11,7 @@ import { defaultOPCUAOptions } from "$lib/types/device/opcUa";
 import { defaultBaseNodeConfig } from "$lib/types/nodes/base";
 import ModbusRtuConfig from "../../../components/Devices/ModbusRTUConfig.svelte";
 import OpcuaConfig from "../../../components/Devices/OPCUAConfig.svelte";
-import type { BaseNodeConfig, DefaultNodeInfo, EditableBaseNodeConfig, EditableDeviceNode } from "$lib/types/nodes/base";
+import type { BaseNodeConfig, DefaultNodeInfo, EditableBaseNodeConfig, EditableNodeRecord } from "$lib/types/nodes/base";
 import {
     convertToBaseNodeConfig,
     convertToEditableBaseNodeConfig,
@@ -36,8 +36,8 @@ export interface ProtocolPlugin {
     createNewEditableNodeConfig: () => EditableBaseNodeConfig;
     getCommID: (config: BaseNodeConfig | EditableBaseNodeConfig, noFormat: boolean) => string;
     validateCommID: (communicationID: string) => boolean;
-    setCommID: (node: EditableDeviceNode) => void;
-    setCommIDToDefault: (node: EditableDeviceNode) => void;
+    setCommID: (node: EditableNodeRecord) => void;
+    setCommIDToDefault: (node: EditableNodeRecord) => void;
 }
 
 /*     N O     P R O T O C O L     P L U G I N     */

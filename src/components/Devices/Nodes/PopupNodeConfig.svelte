@@ -11,8 +11,8 @@
     import { NodeType, DECIMAL_PLACES_LIM, LOGGING_PERIOD_LIM } from "$lib/types/nodes/base";
 
     // Types
-    import type { EditableDeviceMeter, NewDeviceMeter } from "$lib/types/device/base";
-    import type { EditableDeviceNode, NodeEditState } from "$lib/types/nodes/base";
+    import type { EditableDevice, NewDevice } from "$lib/types/device/base";
+    import type { EditableNodeRecord, NodeRecordEditingState } from "$lib/types/nodes/base";
 
     // Stores for variable definitions
     import { defaultVariableUnits } from "$lib/stores/device/variables";
@@ -33,9 +33,9 @@
 
     // Props
     export let windowOpened: boolean;
-    export let deviceData: EditableDeviceMeter | NewDeviceMeter;
-    export let node: EditableDeviceNode;
-    export let nodeEditingState: NodeEditState;
+    export let deviceData: EditableDevice | NewDevice;
+    export let node: EditableNodeRecord;
+    export let nodeEditingState: NodeRecordEditingState;
 
     // Layout / styling props
     export let headerTextColor: string | undefined = undefined;

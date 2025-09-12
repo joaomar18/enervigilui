@@ -5,17 +5,10 @@ import { getNodePhasePriority, getNodePriority, getNodeSubPriority, isDefault, i
 import { defaultVariables } from "$lib/stores/device/variables";
 import { protocolPlugins } from "$lib/stores/device/protocol";
 import { nodeSections } from "$lib/types/nodes/base";
-import type { NodeEditState, EditableDeviceNode, DeviceNode } from "$lib/types/nodes/base";
+import type { NodeRecordEditingState, EditableNodeRecord, NodeRecord } from "$lib/types/nodes/base";
 
-/**
- * Sorts device nodes in a logical order for display and processing.
- * Nodes are ordered by phase, default/custom status, type (incremental/non-incremental),
- * group (priority), and subgroup (sub-priority), ensuring a consistent and meaningful layout.
- *
- * @param nodes Array of device nodes to sort.
- * @returns Sorted array of nodes.
- */
-export function sortNodesLogically(nodes: Array<EditableDeviceNode | DeviceNode>): Array<EditableDeviceNode | DeviceNode> {
+
+export function sortNodesLogically(nodes: Array<EditableNodeRecord | NodeRecord>): Array<EditableNodeRecord | NodeRecord> {
 
     return nodes.slice().sort((a, b) => {
         // Priority is organized from top to bottom
@@ -67,7 +60,7 @@ export function sortNodesLogically(nodes: Array<EditableDeviceNode | DeviceNode>
  * @param node Node to update
  * @param phase Phase for prefix
  */
-export function nodeNameChange(node: EditableDeviceNode, phase: NodePhase): void {
+export function nodeNameChange(node: EditableNodeRecord, phase: NodePhase): void {
     const newName = getNodePrefix(phase) + node.display_name;
     const currentDefaultVariables = get(defaultVariables);
     node.name = newName;
@@ -81,7 +74,7 @@ export function nodeNameChange(node: EditableDeviceNode, phase: NodePhase): void
  * Updates the communication ID of a node using the protocol plugin's logic.
  * @param node - The editable device node to update.
  */
-export function communicationIDChange(node: EditableDeviceNode): void {
+export function communicationIDChange(node: EditableNodeRecord): void {
     if (node.protocol === Protocol.NONE) {
         return;
     }
@@ -94,7 +87,7 @@ export function communicationIDChange(node: EditableDeviceNode): void {
  * @param node Node to update
  * @param nodeState Previous edit state
  */
-export function nodeTypeChange(node: EditableDeviceNode, nodeState: NodeEditState): void {
+export function nodeTypeChange(node: EditableNodeRecord, nodeState: NodeRecordEditingState): void {
     if (!node.config.custom) {
         if (node.config.type === NodeType.FLOAT || node.config.type === NodeType.INT) {
             if (nodeState.oldVariableUnit) {
@@ -122,7 +115,7 @@ export function nodeTypeChange(node: EditableDeviceNode, nodeState: NodeEditStat
  * @param nodeState Previous edit state
  * @param phase Phase for prefix
  */
-export function customNodeChange(node: EditableDeviceNode, nodeState: NodeEditState, phase: NodePhase): void {
+export function customNodeChange(node: EditableNodeRecord, nodeState: NodeRecordEditingState, phase: NodePhase): void {
     if (node.config.custom) {
         nodeState.oldVariableName = node.display_name;
         nodeState.oldVariableUnit = node.config.unit;
@@ -141,7 +134,7 @@ export function customNodeChange(node: EditableDeviceNode, nodeState: NodeEditSt
  * @param nodeState Previous edit state
  * @param selectedProtocol Protocol to set
  */
-export function virtualNodeChange(node: EditableDeviceNode, nodeState: NodeEditState, selectedProtocol: Protocol): void {
+export function virtualNodeChange(node: EditableNodeRecord, nodeState: NodeRecordEditingState, selectedProtocol: Protocol): void {
     if (node.config.calculated && node.communication_id !== undefined) {
         nodeState.oldCommunicationID = node.communication_id;
         node.communication_id = "";
@@ -157,7 +150,7 @@ export function virtualNodeChange(node: EditableDeviceNode, nodeState: NodeEditS
  * @param protocol New protocol
  * @param node Node to update
  */
-export function changeNodeProtocol(protocol: Protocol, node: EditableDeviceNode): void {
+export function changeNodeProtocol(protocol: Protocol, node: EditableNodeRecord): void {
     let plugin = get(protocolPlugins)[protocol];
     plugin.setCommIDToDefault(node);
     node.protocol = protocol;
@@ -170,7 +163,7 @@ export function changeNodeProtocol(protocol: Protocol, node: EditableDeviceNode)
  * @param nodes Array of nodes to update
  * @returns New array with the updated node
  */
-export function updateNodes(node: EditableDeviceNode, nodes: Array<EditableDeviceNode>): Array<EditableDeviceNode> {
+export function updateNodes(node: EditableNodeRecord, nodes: Array<EditableNodeRecord>): Array<EditableNodeRecord> {
     const editNodesIndex = getNodeIndex(node, nodes);
     let newNodes = nodes;
     if (editNodesIndex !== -1) {
@@ -185,11 +178,11 @@ export function updateNodes(node: EditableDeviceNode, nodes: Array<EditableDevic
  * @param nodes Array of nodes to group
  * @returns Record with nodes grouped by phase sections
  */
-export function updateNodesBySection(meterType: MeterType, nodes: Array<EditableDeviceNode>): Record<NodePhase, Array<EditableDeviceNode>> {
-    return nodeSections.reduce((acc: Record<NodePhase, Array<EditableDeviceNode>>, section) => {
+export function updateNodesBySection(meterType: MeterType, nodes: Array<EditableNodeRecord>): Record<NodePhase, Array<EditableNodeRecord>> {
+    return nodeSections.reduce((acc: Record<NodePhase, Array<EditableNodeRecord>>, section) => {
         acc[section.key] = nodes.filter((node) => section.filter(node.attributes.phase));
         return acc;
-    }, {} as Record<NodePhase, Array<EditableDeviceNode>>);
+    }, {} as Record<NodePhase, Array<EditableNodeRecord>>);
 }
 
 /**
@@ -199,7 +192,7 @@ export function updateNodesBySection(meterType: MeterType, nodes: Array<Editable
  * @param nodes Array of all nodes
  * @returns Updated editing node reference
  */
-export function updateEditingNode(node: EditableDeviceNode, editingNode: EditableDeviceNode, nodes: Array<EditableDeviceNode>): EditableDeviceNode {
+export function updateEditingNode(node: EditableNodeRecord, editingNode: EditableNodeRecord, nodes: Array<EditableNodeRecord>): EditableNodeRecord {
     const editNodesIndex = getNodeIndex(node, nodes);
     let newEditingNode = editingNode;
     if (editNodesIndex !== -1 && getNodeIndex(editingNode, nodes) === editNodesIndex) {
@@ -214,9 +207,9 @@ export function updateEditingNode(node: EditableDeviceNode, editingNode: Editabl
  * @param nodes Array of nodes to delete from
  * @returns New array with the node removed
  */
-export function deleteNodeFromArray(node: EditableDeviceNode, nodes: Array<EditableDeviceNode>): Array<EditableDeviceNode> {
+export function deleteNodeFromArray(node: EditableNodeRecord, nodes: Array<EditableNodeRecord>): Array<EditableNodeRecord> {
     let deletedNodeIndex = getNodeIndex(node, nodes);
-    let newNodes: Array<EditableDeviceNode> = [...nodes];
+    let newNodes: Array<EditableNodeRecord> = [...nodes];
     if (deletedNodeIndex !== -1) {
         newNodes = [...newNodes.slice(0, deletedNodeIndex), ...newNodes.slice(deletedNodeIndex + 1)];
     }

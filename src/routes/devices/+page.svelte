@@ -12,10 +12,10 @@
     import { searchQuery } from "$lib/stores/view/navigation";
 
     //Types
-    import type { DeviceMeter } from "$lib/types/device/base";
+    import type { Device } from "$lib/types/device/base";
 
     // Variables
-    let devices: Array<DeviceMeter>;
+    let devices: Array<Device>;
     let devicesImages: Record<number, string> = {};
 
     // Sorted devices

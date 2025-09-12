@@ -1,6 +1,6 @@
 import { get } from "svelte/store";
-import type { DeviceValidation, DeviceMeter, EditableDeviceMeter, NewDeviceMeter } from "$lib/types/device/base";
-import type { EditableDeviceNode } from "$lib/types/nodes/base";
+import type { DeviceValidation, Device, EditableDevice, NewDevice } from "$lib/types/device/base";
+import type { EditableNodeRecord } from "$lib/types/nodes/base";
 import { normalizeDevice } from "$lib/logic/util/device";
 import { getAllNodesValidation } from "../nodes/base";
 import { showToast } from "$lib/logic/view/toast";
@@ -46,7 +46,7 @@ export function validateDeviceName(name: string): boolean {
  * @param deviceData - Device config.
  * @param nodes - Associated nodes (can be undefined if nodes validation is not needed).
  */
-export function updateDeviceValidation(deviceData: EditableDeviceMeter | NewDeviceMeter, nodes: Array<EditableDeviceNode> | undefined): void {
+export function updateDeviceValidation(deviceData: EditableDevice | NewDevice, nodes: Array<EditableNodeRecord> | undefined): void {
     deviceData.validation.deviceName = validateDeviceName(deviceData.name);
     deviceData.validation.deviceProtocol = Object.keys(get(protocolTexts)).includes(deviceData.protocol);
     deviceData.validation.communicationOptions = deviceData.communication_options.valid;
@@ -60,7 +60,7 @@ export function updateDeviceValidation(deviceData: EditableDeviceMeter | NewDevi
  * @param deviceData - Device config.
  * @returns True if valid, else false.
  */
-export function validDeviceOperation(deviceData: EditableDeviceMeter | NewDeviceMeter): boolean {
+export function validDeviceOperation(deviceData: EditableDevice | NewDevice): boolean {
     if (deviceData.validation.isValid()) {
         return true;
     }
@@ -84,6 +84,6 @@ export function validDeviceOperation(deviceData: EditableDeviceMeter | NewDevice
  * @param newDevice - New device configuration.
  * @returns True if equal.
  */
-export function areDevicesEqual(initialDevice: DeviceMeter, newDevice: DeviceMeter): boolean {
+export function areDevicesEqual(initialDevice: Device, newDevice: Device): boolean {
     return isEqual(initialDevice, normalizeDevice(newDevice));
 }

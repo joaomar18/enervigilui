@@ -218,7 +218,7 @@ export interface EditableBaseNodeConfig {
  *
  * @property {NodePhase | null} phase - The electrical phase associated with the node
  */
-export interface DeviceNodeAttributes {
+export interface NodeAttributes {
     phase: NodePhase;
 }
 
@@ -234,12 +234,12 @@ export interface DeviceNodeAttributes {
  * @property {BaseNodeConfig} config - Node configuration with protocol-specific options.
  * @property {DeviceNodeAttributes} attributes - Additional metadata for the node, such as phase.
  */
-export interface DeviceNode {
+export interface NodeRecord {
     device_id?: number;
     name: string;
     protocol: Protocol;
     config: BaseNodeConfig;
-    attributes: DeviceNodeAttributes;
+    attributes: NodeAttributes;
 }
 
 /**
@@ -257,12 +257,12 @@ export interface DeviceNode {
  * @property {string} communication_id - Protocol-specific communication identifier (e.g., register or node_id).
  * @property {NodeValidation} validation - Validation state for all editable properties of the node.
  */
-export interface EditableDeviceNode {
+export interface EditableNodeRecord {
     device_id?: number;
     name: string;
     protocol: Protocol;
     config: EditableBaseNodeConfig;
-    attributes: DeviceNodeAttributes;
+    attributes: NodeAttributes;
     display_name: string;
     communication_id: string;
     validation: NodeValidation;
@@ -277,11 +277,31 @@ export interface EditableDeviceNode {
  * @property {string} oldVariableUnit - The previous unit value before
  * @property {string | undefined} oldCommunicationID - The previous communication ID before the edit
  */
-export interface NodeEditState {
+export interface NodeRecordEditingState {
     oldVariableName: string;
     oldVariableType: NodeType;
     oldVariableUnit: string;
     oldCommunicationID: string | undefined;
+}
+
+/**
+ * Represents the real-time state and metadata of a device node for display or monitoring.
+ * Includes the node's value, type, unit, phase, and optional alarm states.
+ *
+ * @property {number | string | boolean | null} value - The current value of the node.
+ * @property {NodeType} type - The data type of the node's value.
+ * @property {string} unit - The measurement unit for the value.
+ * @property {NodePhase} phase - The electrical phase associated with the node.
+ * @property {boolean} [min_alarm_state] - Optional: Indicates if the minimum alarm is active.
+ * @property {boolean} [max_alarm_state] - Optional: Indicates if the maximum alarm is active.
+ */
+export interface NodeState {
+    value: number | string | boolean | null;
+    type: NodeType;
+    unit: string;
+    phase: NodePhase;
+    min_alarm_state?: boolean;
+    max_alarm_state?: boolean;
 }
 
 /**

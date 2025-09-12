@@ -1,10 +1,10 @@
 import { get } from "svelte/store";
 import { MeterType } from "$lib/types/device/base";
 import { NodeType, NodePhase, NodePrefix, nodeSections } from "$lib/types/nodes/base";
-import type { EditableDeviceMeter, MeterOptions, NewDeviceMeter } from "$lib/types/device/base";
-import type { DeviceNode, EditableDeviceNode, EditableBaseNodeConfig, DeviceNodeAttributes, DefaultNodeInfo, BaseNodeConfig } from "$lib/types/nodes/base";
+import type { EditableDevice, MeterOptions, NewDevice } from "$lib/types/device/base";
+import type { NodeRecord, EditableNodeRecord, EditableBaseNodeConfig, NodeAttributes, DefaultNodeInfo, BaseNodeConfig } from "$lib/types/nodes/base";
 import { defaultVariables } from "$lib/stores/device/variables";
-import { addPrefix, removePrefix, getNodePrefix, getCommunicationID, sortNodesByName } from "../util/nodes";
+import { addPrefix, removePrefix, getNodePrefix, getCommunicationID } from "../util/nodes";
 import { sortNodesLogically } from "../handlers/nodes";
 import { getInitialNodeValidation } from "../validation/nodes/base";
 import { stringIsValidInteger, stringIsValidFloat } from "$lib/logic/util/generic";
@@ -141,16 +141,12 @@ export function processInitialBaseNodeConfig(config: BaseNodeConfig): BaseNodeCo
     } as BaseNodeConfig;
 }
 
-/**
- * Converts DeviceNode[] to EditableDeviceNode[] for UI forms.
- * @param nodes - DeviceNode array.
- * @returns EditableDeviceNode array.
- */
-export function convertToEditableNodes(nodes: Array<DeviceNode>): Array<EditableDeviceNode> {
-    let editableNodes: Array<EditableDeviceNode> = [];
+
+export function convertToEditableNodes(nodes: Array<NodeRecord>): Array<EditableNodeRecord> {
+    let editableNodes: Array<EditableNodeRecord> = [];
 
     for (const node of nodes) {
-        let editableNode: EditableDeviceNode;
+        let editableNode: EditableNodeRecord;
         let plugin = get(protocolPlugins)[node.protocol];
         let editableConfig: EditableBaseNodeConfig = plugin.convertNodeConfigToEditable(node.config);
 
@@ -168,22 +164,18 @@ export function convertToEditableNodes(nodes: Array<DeviceNode>): Array<Editable
         editableNodes.push(editableNode);
     }
 
-    return sortNodesLogically(editableNodes) as Array<EditableDeviceNode>;
+    return sortNodesLogically(editableNodes) as Array<EditableNodeRecord>;
 }
 
-/**
- * Converts EditableDeviceNode[] to DeviceNode[] for API.
- * @param nodes - EditableDeviceNode array.
- * @returns DeviceNode array.
- */
-export function convertToNodes(nodes: Array<EditableDeviceNode>): Array<DeviceNode> {
-    const deviceNodes: Array<DeviceNode> = [];
+
+export function convertToNodes(nodes: Array<EditableNodeRecord>): Array<NodeRecord> {
+    const deviceNodes: Array<NodeRecord> = [];
 
     for (const editableNode of nodes) {
         let plugin = get(protocolPlugins)[editableNode.protocol];
         let nodeConfig: BaseNodeConfig = plugin.convertNodeConfigToNormal(editableNode.config);
 
-        const deviceNode: DeviceNode = {
+        const deviceNode: NodeRecord = {
             name: editableNode.name,
             device_id: editableNode.device_id,
             protocol: editableNode.protocol,
@@ -194,23 +186,18 @@ export function convertToNodes(nodes: Array<EditableDeviceNode>): Array<DeviceNo
         deviceNodes.push(deviceNode);
     }
 
-    return sortNodesByName(deviceNodes) as Array<DeviceNode>;
+    return sortNodesLogically(deviceNodes) as Array<NodeRecord>;
 }
 
-/**
- * Processes and normalizes an array of DeviceNode objects using protocol-specific logic.
- * Used to sanitize initial node data before further conversion or use.
- * @param nodes - Array of DeviceNode objects to process.
- * @returns Array of normalized DeviceNode objects.
- */
-export function processInitialNodes(nodes: Array<DeviceNode>): Array<DeviceNode> {
-    const deviceNodes: Array<DeviceNode> = [];
+
+export function processInitialNodes(nodes: Array<NodeRecord>): Array<NodeRecord> {
+    const deviceNodes: Array<NodeRecord> = [];
 
     for (const node of nodes) {
         let plugin = get(protocolPlugins)[node.protocol];
         let nodeConfig: BaseNodeConfig = plugin.processInitialNodeConfig(node.config);
 
-        const deviceNode: DeviceNode = {
+        const deviceNode: NodeRecord = {
             name: node.name,
             device_id: node.device_id,
             protocol: node.protocol,
@@ -221,19 +208,12 @@ export function processInitialNodes(nodes: Array<DeviceNode>): Array<DeviceNode>
         deviceNodes.push(deviceNode);
     }
 
-    return (sortNodesByName(deviceNodes) as Array<DeviceNode>).map(normalizeNode);
+    return (sortNodesLogically(deviceNodes) as Array<NodeRecord>).map(normalizeNode);
 }
 
-/**
- * Initializes editable device nodes from an array of DeviceNode objects.
- * Converts DeviceNode data to EditableDeviceNode format for UI use,
- * handles errors, and displays a toast notification if initialization fails.
- *
- * @param initialNodes Array of DeviceNode objects to initialize.
- * @returns An object containing a success flag and the array of EditableDeviceNode objects.
- */
-export function initNodes(initialNodes: Array<DeviceNode>): { sucess: boolean; editableNodes: Array<EditableDeviceNode> } {
-    let editableNodes: Array<EditableDeviceNode> = [];
+
+export function initNodes(initialNodes: Array<NodeRecord>): { sucess: boolean; editableNodes: Array<EditableNodeRecord> } {
+    let editableNodes: Array<EditableNodeRecord> = [];
     let sucess = false;
     try {
         editableNodes = convertToEditableNodes(initialNodes);
@@ -245,26 +225,20 @@ export function initNodes(initialNodes: Array<DeviceNode>): { sucess: boolean; e
     return { sucess, editableNodes };
 }
 
-/**
- * Creates a default editable node for a variable and phase.
- * @param variable - Default variable info.
- * @param phase - Node phase.
- * @param device_data - Device config.
- * @returns EditableDeviceNode.
- */
+
 function createDefaultEditableDeviceNode(
     variable: DefaultNodeInfo,
     phase: NodePhase,
-    device_data: EditableDeviceMeter | NewDeviceMeter
-): EditableDeviceNode {
+    device_data: EditableDevice | NewDevice
+): EditableNodeRecord {
     const full_name = getNodePrefix(phase) + variable.name;
     let plugin = get(protocolPlugins)[device_data.protocol];
     let editableConfig = plugin.createNodeConfigFromDefaultVar(variable, device_data.options);
     let attributes = {
         phase: phase,
-    } as DeviceNodeAttributes;
+    } as NodeAttributes;
 
-    let node: EditableDeviceNode = {
+    let node: EditableNodeRecord = {
         device_id: "id" in device_data ? device_data.id : undefined,
         name: full_name,
         protocol: device_data.protocol,
@@ -278,13 +252,9 @@ function createDefaultEditableDeviceNode(
     return node;
 }
 
-/**
- * Returns default editable nodes for a device config.
- * @param device_data EditableDeviceMeter or NewDeviceMeter.
- * @returns Sorted array of editable device nodes.
- */
-export function getDefaultNodesList(device_data: EditableDeviceMeter | NewDeviceMeter): Array<EditableDeviceNode> {
-    const nodes: Array<EditableDeviceNode> = [];
+
+export function getDefaultNodesList(device_data: EditableDevice | NewDevice): Array<EditableNodeRecord> {
+    const nodes: Array<EditableNodeRecord> = [];
     const defaultVars = get(defaultVariables);
 
     if (device_data.type === MeterType.SINGLE_PHASE) {
@@ -305,11 +275,11 @@ export function getDefaultNodesList(device_data: EditableDeviceMeter | NewDevice
         }
     }
 
-    return sortNodesByName(nodes) as Array<EditableDeviceNode>;
+    return sortNodesLogically(nodes) as Array<EditableNodeRecord>;
 }
 
 
-export function addNode(sectionPhase: NodePhase, sectionPrefix: NodePrefix, device_data: EditableDeviceMeter | NewDeviceMeter): EditableDeviceNode {
+export function addNode(sectionPhase: NodePhase, sectionPrefix: NodePrefix, device_data: EditableDevice | NewDevice): EditableNodeRecord {
     const nodeBaseName = ``;
     const fullNodeName = addPrefix(nodeBaseName, sectionPrefix);
 
@@ -317,9 +287,9 @@ export function addNode(sectionPhase: NodePhase, sectionPrefix: NodePrefix, devi
     let newEditableConfig = plugin.createNewEditableNodeConfig();
     let newAttributes = {
         phase: sectionPhase,
-    } as DeviceNodeAttributes;
+    } as NodeAttributes;
 
-    const newFormattedNode: EditableDeviceNode = {
+    const newFormattedNode: EditableNodeRecord = {
         device_id: "id" in device_data ? device_data.id : undefined,
         name: fullNodeName,
         protocol: device_data.protocol,

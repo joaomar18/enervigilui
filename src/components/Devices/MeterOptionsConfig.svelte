@@ -5,16 +5,16 @@
     import { getDefaultNodesList } from "$lib/logic/factory/nodes";
 
     // Types
-    import type { EditableDeviceMeter, NewDeviceMeter } from "$lib/types/device/base";
-    import type { EditableDeviceNode } from "$lib/types/nodes/base";
+    import type { EditableDevice, NewDevice } from "$lib/types/device/base";
+    import type { EditableNodeRecord } from "$lib/types/nodes/base";
 
     // Texts
     import { texts } from "$lib/stores/lang/generalTexts";
     import { meterTypeTexts } from "$lib/stores/lang/energyMeterTexts";
 
     // Props
-    export let deviceData: EditableDeviceMeter | NewDeviceMeter;
-    export let nodes: Array<EditableDeviceNode>;
+    export let deviceData: EditableDevice | NewDevice;
+    export let nodes: Array<EditableNodeRecord>;
     export let meterOptionsValid: boolean;
 
     // Variables

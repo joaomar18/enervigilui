@@ -1,7 +1,7 @@
 import { get } from "svelte/store";
 import { Protocol } from "$lib/types/device/base";
 import { NodeType, NodePhase } from "$lib/types/nodes/base";
-import type { DeviceNode, EditableDeviceNode, NodeValidation } from "$lib/types/nodes/base";
+import type { NodeRecord, EditableNodeRecord, NodeValidation } from "$lib/types/nodes/base";
 import { defaultVariables, defaultVariableNames, defaultVariableUnits } from "$lib/stores/device/variables";
 import { normalizeNode, sortNodesByName } from "$lib/logic/util/nodes";
 import { protocolTexts } from "$lib/stores/lang/energyMeterTexts";
@@ -10,6 +10,7 @@ import { DECIMAL_PLACES_LIM, LOGGING_PERIOD_LIM } from "$lib/types/nodes/base";
 import isEqualPkg from "lodash";
 import { protocolPlugins } from "$lib/stores/device/protocol";
 const { isEqual } = isEqualPkg;
+
 /**
  * Creates and returns a new NodeValidation object with all validation properties set to false.
  * Used to initialize the validation state for new nodes or reset validation during editing.
@@ -50,12 +51,12 @@ export function getInitialNodeValidation(): NodeValidation {
 }
 
 
-export function validateNodeName(nodeName: string, customVariable: boolean, currentNodes: Array<EditableDeviceNode>): boolean {
+export function validateNodeName(nodeName: string, customVariable: boolean, currentNodes: Array<EditableNodeRecord>): boolean {
     const names: Array<string> = get(defaultVariableNames);
 
     // Check for duplicates in current nodes
     if (currentNodes) {
-        const nodeCount = Object.values(currentNodes).filter((node: EditableDeviceNode) => node.display_name === nodeName).length;
+        const nodeCount = Object.values(currentNodes).filter((node: EditableNodeRecord) => node.display_name === nodeName).length;
         if (nodeCount >= 2) {
             return false;
         }
@@ -272,7 +273,7 @@ export function validateIncrementalNode(incremental: boolean, name: string, cust
  * @param nodes Array of editable nodes.
  * @param nodesBySection Nodes grouped by phase.
  */
-export function updateNodesValidation(nodes: Array<EditableDeviceNode>, nodesBySection: Record<NodePhase, Array<EditableDeviceNode>>): void {
+export function updateNodesValidation(nodes: Array<EditableNodeRecord>, nodesBySection: Record<NodePhase, Array<EditableNodeRecord>>): void {
     for (let node of nodes) {
         node.validation.variableName = validateNodeName(node.display_name, node.config.custom, nodesBySection[node.attributes.phase]);
         node.validation.variableType = validateNodeUnit(node.display_name, node.config.type, node.config.unit, node.config.custom);
@@ -296,7 +297,7 @@ export function updateNodesValidation(nodes: Array<EditableDeviceNode>, nodesByS
  * @param nodes Array of editable nodes.
  * @returns True if all valid.
  */
-export function getAllNodesValidation(nodes: Array<EditableDeviceNode>): boolean {
+export function getAllNodesValidation(nodes: Array<EditableNodeRecord>): boolean {
     for (let node of nodes) {
         if (!node.validation.isValid()) {
             return false;
@@ -311,6 +312,6 @@ export function getAllNodesValidation(nodes: Array<EditableDeviceNode>): boolean
  * @param b New configuration array.
  * @returns True if equal.
  */
-export function areNodesEqual(initialNodes: DeviceNode[], newNodes: DeviceNode[]): boolean {
-    return isEqual(initialNodes, (sortNodesByName(newNodes) as DeviceNode[]).map(normalizeNode));
+export function areNodesEqual(initialNodes: NodeRecord[], newNodes: NodeRecord[]): boolean {
+    return isEqual(initialNodes, (sortNodesByName(newNodes) as NodeRecord[]).map(normalizeNode));
 }

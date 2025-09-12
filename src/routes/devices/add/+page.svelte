@@ -22,8 +22,8 @@
     import MeterOptionsConfig from "../../../components/Devices/MeterOptionsConfig.svelte";
 
     // Types
-    import type { NewDeviceMeter } from "$lib/types/device/base";
-    import type { EditableDeviceNode, NodeEditState, NodePhase } from "$lib/types/nodes/base";
+    import type { NewDevice } from "$lib/types/device/base";
+    import type { EditableNodeRecord, NodeRecordEditingState, NodePhase } from "$lib/types/nodes/base";
 
     // Styles
     import { SucessButtonStyle } from "$lib/style/button";
@@ -42,11 +42,11 @@
     let showAddWindow: boolean = false; // Show Add Device Window
     let showConfigNodeWindow: boolean = false; // Show Node Full Configuration Window
     let performingAddRequest: boolean = false; // Performing Add Device Request
-    let deviceData: NewDeviceMeter; // Device Data
-    let nodes: Array<EditableDeviceNode>;
-    let nodesBySection: Record<NodePhase, Array<EditableDeviceNode>>;
-    let editingNode: EditableDeviceNode; // Current Node being edited in Configuration Window
-    let editingNodeState: NodeEditState; // Current state of the Node being edited
+    let deviceData: NewDevice; // Device Data
+    let nodes: Array<EditableNodeRecord>;
+    let nodesBySection: Record<NodePhase, Array<EditableNodeRecord>>;
+    let editingNode: EditableNodeRecord; // Current Node being edited in Configuration Window
+    let editingNodeState: NodeRecordEditingState; // Current state of the Node being edited
     let nodesInit: boolean = false; // Nodes are initialized
     let contentInit: boolean = false; // Content is initialized
 
@@ -155,11 +155,11 @@ Shows input forms for protocol-specific parameters and organizes device nodes fo
                         {nodesInit}
                         bind:nodes
                         bind:nodesBySection
-                        onPropertyChanged={(node: EditableDeviceNode) => {
+                        onPropertyChanged={(node: EditableNodeRecord) => {
                             nodes = updateNodes(node, nodes);
                             editingNode = updateEditingNode(node, editingNode, nodes);
                         }}
-                        onShowConfigPopup={(node: EditableDeviceNode, nodeEditingState: NodeEditState) => {
+                        onShowConfigPopup={(node: EditableNodeRecord, nodeEditingState: NodeRecordEditingState) => {
                             editingNode = node;
                             editingNodeState = nodeEditingState;
                             showConfigNodeWindow = true;

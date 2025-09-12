@@ -1,16 +1,40 @@
 <script lang="ts">
     import { fade } from "svelte/transition";
     import { onMount } from "svelte";
+    import { MethodPoller } from "$lib/logic/api/poller";
+    import { NodePhase } from "$lib/types/nodes/base";
+    import { getDeviceNodesState } from "$lib/logic/api/nodes";
     import DeviceRealTimeCard from "../../../components/Devices/DeviceRealTimeCard.svelte";
+    import { showToast } from "$lib/logic/view/toast";
+    import { ToastType } from "$lib/stores/view/toast";
+    import type { NodeState } from "$lib/types/nodes/base";
 
     // Texts
     import { texts } from "$lib/stores/lang/generalTexts";
 
     // Stores
     import { loadedDone } from "$lib/stores/view/navigation";
+    import { currentDeviceID } from "$lib/stores/device/current";
+
+    // Variables
+    let nodesStateBySection: Record<NodePhase, Record<string, NodeState>>;
 
     onMount(() => {
-        loadedDone.set(true);
+        let nodesStatePoller: MethodPoller | null;
+        if ($currentDeviceID) {
+            nodesStatePoller = new MethodPoller(async (signal) => {
+                ({ nodesStateBySection } = await getDeviceNodesState($currentDeviceID));
+            }, 5000);
+        } else {
+            showToast("errorEditDeviceParams", ToastType.ALERT);
+            loadedDone.set(true);
+        }
+
+        //Clean-up logic
+        return () => {
+            nodesStatePoller?.stop();
+            nodesStatePoller = null;
+        };
     });
 </script>
 

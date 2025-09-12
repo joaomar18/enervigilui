@@ -3,9 +3,9 @@ import { Protocol } from "$lib/types/device/base";
 import { protocolPlugins } from "$lib/stores/device/protocol";
 import { MeterType } from "$lib/types/device/base";
 import type {
-    DeviceMeter,
-    EditableDeviceMeter,
-    NewDeviceMeter,
+    Device,
+    EditableDevice,
+    NewDevice,
     MeterOptions,
     EditableBaseCommunicationConfig,
     BaseCommunicationConfig,
@@ -13,13 +13,8 @@ import type {
 import { getInitialDeviceValidation } from "../validation/device/base";
 import { normalizeDevice } from "../util/device";
 
-/**
- * Converts DeviceMeter to EditableDeviceMeter for form handling.
- * @param device - DeviceMeter object.
- * @param deviceImage - Image data.
- * @returns EditableDeviceMeter.
- */
-export function convertToEditableDevice(device: DeviceMeter, deviceImage: Record<string, string>): EditableDeviceMeter {
+
+export function convertToEditableDevice(device: Device, deviceImage: Record<string, string>): EditableDevice {
     let plugin = get(protocolPlugins)[device.protocol];
     let editableCommunicationOptions: EditableBaseCommunicationConfig = plugin.convertCommOptionsToEditable(device.communication_options);
 
@@ -37,12 +32,8 @@ export function convertToEditableDevice(device: DeviceMeter, deviceImage: Record
     };
 }
 
-/**
- * Converts EditableDeviceMeter/NewDeviceMeter to DeviceMeter for API.
- * @param device - EditableDeviceMeter or NewDeviceMeter.
- * @returns DeviceMeter.
- */
-export function convertToDevice(device: EditableDeviceMeter | NewDeviceMeter): DeviceMeter {
+
+export function convertToDevice(device: EditableDevice | NewDevice): Device {
     let plugin = get(protocolPlugins)[device.protocol];
     let communicationOptions: BaseCommunicationConfig = plugin.convertCommOptionsToNormal(device.communication_options);
 
@@ -60,23 +51,18 @@ export function convertToDevice(device: EditableDeviceMeter | NewDeviceMeter): D
             ...baseDevice,
             connected: device.connected,
             id: device.id,
-        } as DeviceMeter;
+        } as Device;
     } else {
         return {
             ...baseDevice,
             connected: false,
             id: 0,
-        } as DeviceMeter;
+        } as Device;
     }
 }
 
-/**
- * Processes initial data for a device, normalizing it into a DeviceMeter object for backend/API use.
- * Handles both DeviceMeter and NewDeviceMeter types.
- * @param device Initial device data object.
- * @returns Normalized DeviceMeter object.
- */
-export function processInitialDevice(device: DeviceMeter | NewDeviceMeter): DeviceMeter {
+
+export function processInitialDevice(device: Device | NewDevice): Device {
     const baseDevice = {
         name: device.name,
         protocol: device.protocol,
@@ -85,7 +71,7 @@ export function processInitialDevice(device: DeviceMeter | NewDeviceMeter): Devi
         communication_options: device.communication_options,
     };
 
-    let deviceMeter: DeviceMeter;
+    let deviceMeter: Device;
     // Handle different device types - EditableDeviceMeter has id and connected, NewDeviceMeter doesn't
     if ("id" in device) {
         deviceMeter = {
@@ -104,18 +90,12 @@ export function processInitialDevice(device: DeviceMeter | NewDeviceMeter): Devi
     return normalizeDevice(deviceMeter);
 }
 
-/**
- * Creates a new device meter object with protocol defaults.
- * @param protocol - Device protocol.
- * @param meter_type - Meter type.
- * @param meter_options - Meter options.
- * @returns NewDeviceMeter.
- */
-export function createNewDevice(protocol: Protocol, meter_type: MeterType, meter_options: MeterOptions): NewDeviceMeter {
+
+export function createNewDevice(protocol: Protocol, meter_type: MeterType, meter_options: MeterOptions): NewDevice {
     let protocolPlugin = get(protocolPlugins)[protocol];
     let communication_options: EditableBaseCommunicationConfig = { ...protocolPlugin.defaultOptions };
 
-    let new_device: NewDeviceMeter = {
+    let new_device: NewDevice = {
         name: "",
         protocol: protocol,
         type: meter_type,

@@ -5,7 +5,7 @@
     import { getDeviceNodesConfig } from "$lib/logic/api/nodes";
     import { convertToDevice } from "$lib/logic/factory/device";
     import { updateDeviceValidation, validDeviceOperation } from "$lib/logic/validation/device/base";
-    import { convertToNodes, initNodes } from "$lib/logic/factory/nodes";
+    import { convertToNodes } from "$lib/logic/factory/nodes";
     import { updateNodesValidation } from "$lib/logic/validation/nodes/base";
     import { updateNodes, updateEditingNode, updateNodesBySection } from "$lib/logic/handlers/nodes";
     import { protocolPlugins } from "$lib/stores/device/protocol";
@@ -27,8 +27,8 @@
     import PopupCancelDeviceEdit from "../../../components/Devices/PopupCancelDeviceEdit.svelte";
 
     // Types
-    import type { DeviceMeter, EditableDeviceMeter } from "$lib/types/device/base";
-    import type { DeviceNode, EditableDeviceNode, NodeEditState, NodePhase } from "$lib/types/nodes/base";
+    import type { Device, EditableDevice } from "$lib/types/device/base";
+    import type { NodeRecord, EditableNodeRecord, NodeRecordEditingState, NodePhase } from "$lib/types/nodes/base";
 
     // Styles
     import { PrimaryButtonStyle, DangerButtonStyle } from "$lib/style/button";
@@ -51,13 +51,13 @@
     let showConfigNodeWindow: boolean = false; // Show Node Full Configuration Window
     let performingSaveRequest: boolean = false; // Performing Save Device Request
     let performingDeleteRequest: boolean = false; // Performing Delete Device Request
-    let initialDeviceData: DeviceMeter; // Initial Device Data (to check if there were changes made)
-    let initialNodes: Array<DeviceNode>; // Initial Nodes (to check if there were changes made)
-    let deviceData: EditableDeviceMeter; // Device Data
-    let nodes: Array<EditableDeviceNode>; // Editable Nodes Array
-    let nodesBySection: Record<NodePhase, Array<EditableDeviceNode>>; // Editable Nodes Array divided by Phase
-    let editingNode: EditableDeviceNode; // Current Node being edited in Configuration Window
-    let editingNodeState: NodeEditState; // Current state of the Node being edited
+    let initialDeviceData: Device; // Initial Device Data (to check if there were changes made)
+    let initialNodes: Array<NodeRecord>; // Initial Nodes (to check if there were changes made)
+    let deviceData: EditableDevice; // Device Data
+    let nodes: Array<EditableNodeRecord>; // Editable Nodes Array
+    let nodesBySection: Record<NodePhase, Array<EditableNodeRecord>>; // Editable Nodes Array divided by Phase
+    let editingNode: EditableNodeRecord; // Current Node being edited in Configuration Window
+    let editingNodeState: NodeRecordEditingState; // Current state of the Node being edited
     let nodesInit: boolean = false; // Nodes are initialized
     let contentInit: boolean = false; // Content is initialized
 
@@ -174,11 +174,11 @@ Shows input forms for protocol-specific parameters and organizes device nodes fo
                         {nodesInit}
                         bind:nodes
                         bind:nodesBySection
-                        onPropertyChanged={(node: EditableDeviceNode) => {
+                        onPropertyChanged={(node: EditableNodeRecord) => {
                             nodes = updateNodes(node, nodes);
                             editingNode = updateEditingNode(node, editingNode, nodes);
                         }}
-                        onShowConfigPopup={(node: EditableDeviceNode, nodeEditingState: NodeEditState) => {
+                        onShowConfigPopup={(node: EditableNodeRecord, nodeEditingState: NodeRecordEditingState) => {
                             editingNode = node;
                             editingNodeState = nodeEditingState;
                             showConfigNodeWindow = true;
