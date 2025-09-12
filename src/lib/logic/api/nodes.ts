@@ -39,8 +39,9 @@ export async function getDeviceNodesConfig(id: number): Promise<{ initialNodes: 
     return { initialNodes, nodes };
 }
 
-export async function getDeviceNodesState(id: number): Promise<{ nodesStateBySection: Record<NodePhase, Record<string, NodeState>> }> {
+export async function getDeviceNodesState(id: number): Promise<{ nodesStateBySection: Record<NodePhase, Record<string, NodeState>>, availablePhases: Array<NodePhase> }> {
     let nodesStateBySection: Record<NodePhase, Record<string, NodeState>>;
+    let availablePhases: Array<NodePhase> = [];
     const { sucess, data } = await callAPI({
         endpoint: "/api/nodes/get_nodes_state",
         method: "GET",
@@ -50,7 +51,7 @@ export async function getDeviceNodesState(id: number): Promise<{ nodesStateBySec
 
     if (sucess) {
         let nodesState = data as Record<string, NodeState>;
-
+        availablePhases = Array.from(new Set(Object.values(nodesState).map(nodeState => nodeState.phase).filter(phase => phase !== null && phase !== undefined))) as NodePhase[];
         nodesStateBySection = nodeSections.reduce((acc: Record<NodePhase, Record<string, NodeState>>, section) => {
             acc[section.key] = Object.fromEntries(
                 Object.entries(nodesState)
@@ -62,5 +63,5 @@ export async function getDeviceNodesState(id: number): Promise<{ nodesStateBySec
         throw new Error("Get device nodes state error");
     }
 
-    return { nodesStateBySection };
+    return { nodesStateBySection, availablePhases };
 }

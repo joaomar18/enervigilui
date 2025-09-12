@@ -7,6 +7,7 @@
     import DeviceRealTimeCard from "../../../components/Devices/DeviceRealTimeCard.svelte";
     import { showToast } from "$lib/logic/view/toast";
     import { ToastType } from "$lib/stores/view/toast";
+    import { nodeSections } from "$lib/types/nodes/base";
     import type { NodeState } from "$lib/types/nodes/base";
 
     // Texts
@@ -18,12 +19,13 @@
 
     // Variables
     let nodesStateBySection: Record<NodePhase, Record<string, NodeState>>;
+    let availablePhases: Array<NodePhase>;
 
     onMount(() => {
         let nodesStatePoller: MethodPoller | null;
         if ($currentDeviceID) {
             nodesStatePoller = new MethodPoller(async (signal) => {
-                ({ nodesStateBySection } = await getDeviceNodesState($currentDeviceID));
+                ({ nodesStateBySection, availablePhases } = await getDeviceNodesState($currentDeviceID));
             }, 5000);
         } else {
             showToast("errorEditDeviceParams", ToastType.ALERT);
@@ -39,29 +41,22 @@
 </script>
 
 <div class="content" in:fade={{ duration: 300 }}>
-    <div class="grid">
-        <div class="grid-col">
-            <DeviceRealTimeCard titleText={$texts.l1Phase}></DeviceRealTimeCard>
+    {#if nodesStateBySection}
+        <div class="grid">
+            {#each nodeSections.filter((section) => availablePhases.includes(section.phase)) as section (section.key)}
+                <div class="grid-col">
+                    <DeviceRealTimeCard titleText={section.phase !== NodePhase.SINGLEPHASE ? $texts[section.labelKey] : $texts.variables}
+                    ></DeviceRealTimeCard>
+                </div>
+            {/each}
+            <div class="grid-col">
+                <DeviceRealTimeCard titleText={$texts.metrics}></DeviceRealTimeCard>
+            </div>
+            <div class="grid-col span-2">
+                <DeviceRealTimeCard titleText={$texts.energyConsumption}></DeviceRealTimeCard>
+            </div>
         </div>
-        <div class="grid-col">
-            <DeviceRealTimeCard titleText={$texts.l2Phase}></DeviceRealTimeCard>
-        </div>
-        <div class="grid-col">
-            <DeviceRealTimeCard titleText={$texts.l3Phase}></DeviceRealTimeCard>
-        </div>
-        <div class="grid-col">
-            <DeviceRealTimeCard titleText={$texts.total}></DeviceRealTimeCard>
-        </div>
-        <div class="grid-col">
-            <DeviceRealTimeCard titleText={$texts.general}></DeviceRealTimeCard>
-        </div>
-        <div class="grid-col">
-            <DeviceRealTimeCard titleText={$texts.metrics}></DeviceRealTimeCard>
-        </div>
-        <div class="grid-col span-2">
-            <DeviceRealTimeCard titleText={$texts.energyConsumption}></DeviceRealTimeCard>
-        </div>
-    </div>
+    {/if}
 </div>
 
 <style>

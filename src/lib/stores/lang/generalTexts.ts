@@ -614,7 +614,11 @@ const textsObject: TextsObject = {
     lastUpdate: {
         PT: "Última atualização",
         EN: "Last update",
-    }
+    },
+    variables: {
+        PT: "Variáveis",
+        EN: "Variables",
+    },
 
 };
 
