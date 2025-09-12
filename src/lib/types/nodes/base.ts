@@ -1,5 +1,3 @@
-import { MeterType } from "../device/base";
-import { getNodePhase } from "$lib/logic/util/nodes";
 import { Protocol } from "../device/base";
 
 /*****     C O N S T A N T S     *****/
@@ -77,21 +75,21 @@ export enum NodeType {
 /*****     I N T E R F A C E S     *****/
 
 /**
- * Represents a section of nodes grouped by phase or type in the energy monitoring system.
- * Used to organize, filter, and label nodes for display and configuration.
+ * Represents a section of nodes grouped by electrical phase or type in the energy monitoring system.
+ * Used to organize, filter, and label nodes for display, configuration, and UI grouping.
  *
- * @property {NodePhase} key - Unique key identifying the section (phase)
- * @property {NodePhase} phase - The phase associated with this section
- * @property {NodePrefix} prefix - The prefix used for node names in this section
- * @property {string} labelKey - The translation key for the section label
- * @property {(node: FormattedNode) => boolean} filter - Function to filter nodes belonging to this section
+ * @property {NodePhase} key - Unique key identifying the section (typically the phase).
+ * @property {NodePhase} phase - The electrical phase associated with this section.
+ * @property {NodePrefix} prefix - The prefix used for node names in this section.
+ * @property {string} labelKey - The translation key for the section label in the UI.
+ * @property {(phase: NodePhase) => boolean} filter - Function to determine if a node phase belongs in this section.
  */
 export interface NodeSection {
     key: NodePhase;
     phase: NodePhase;
     prefix: NodePrefix;
     labelKey: string;
-    filter: (node: EditableDeviceNode, meter_type: MeterType) => boolean;
+    filter: (phase: NodePhase) => boolean;
 }
 
 /**
@@ -214,42 +212,58 @@ export interface EditableBaseNodeConfig {
 }
 
 /**
- * Represents a complete node in a device's configuration (as stored or sent to the backend).
- * Contains all information needed to identify, configure, and communicate with a node.
+ * Additional metadata for a device node, such as its associated electrical phase.
+ * Used to extend node information with properties not included in the main node interface,
+ * enabling more precise grouping, filtering, and processing of nodes.
+ *
+ * @property {NodePhase | null} phase - The electrical phase associated with the node
+ */
+export interface DeviceNodeAttributes {
+    phase: NodePhase;
+}
+
+/**
+ * Represents a complete node in a device's configuration as stored or sent to the backend.
+ * Contains all information needed to identify, configure, and communicate with a node,
+ * including protocol, configuration, and additional attributes such as phase.
  *
  * @interface
  * @property {number | undefined} device_id - Unique identifier for the device this node belongs to. May be undefined for new nodes before assignment.
- * @property {string} name - Name of the node, typically includes phase prefix
- * @property {Protocol} protocol - Communication protocol used by this node
- * @property {BaseNodeConfig} config - Node configuration with protocol specific options
+ * @property {string} name - Name of the node, typically includes phase prefix.
+ * @property {Protocol} protocol - Communication protocol used by this node.
+ * @property {BaseNodeConfig} config - Node configuration with protocol-specific options.
+ * @property {DeviceNodeAttributes} attributes - Additional metadata for the node, such as phase.
  */
 export interface DeviceNode {
     device_id?: number;
     name: string;
     protocol: Protocol;
     config: BaseNodeConfig;
+    attributes: DeviceNodeAttributes;
 }
 
 /**
  * Editable version of the device node for UI forms and user input.
- * Used to represent device node data with editable fields for user input and validation in the UI.
+ * Used to represent device node data with editable fields for user input and validation in the UI,
+ * including display name, communication ID, and validation state.
  *
  * @interface
  * @property {number | undefined} device_id - Unique identifier for the device this node belongs to. May be undefined for new nodes before assignment.
- * @property {string} name - Full node name, typically includes phase prefix
- * @property {Protocol} protocol - Communication protocol used by this node
- * @property {EditableBaseNodeConfig} config - Editable configuration for user input and validation
- * @property {string} display_name - Display name of the node (without prefix)
- * @property {NodePhase} phase - Electrical phase associated with this node
- * @property {string} communication_id - Protocol-specific communication identifier (e.g., register or node_id)
+ * @property {string} name - Full node name, typically includes phase prefix.
+ * @property {Protocol} protocol - Communication protocol used by this node.
+ * @property {EditableBaseNodeConfig} config - Editable configuration for user input and validation.
+ * @property {DeviceNodeAttributes} attributes - Additional metadata for the node, such as phase.
+ * @property {string} display_name - Display name of the node (without prefix).
+ * @property {string} communication_id - Protocol-specific communication identifier (e.g., register or node_id).
+ * @property {NodeValidation} validation - Validation state for all editable properties of the node.
  */
 export interface EditableDeviceNode {
     device_id?: number;
     name: string;
     protocol: Protocol;
     config: EditableBaseNodeConfig;
+    attributes: DeviceNodeAttributes;
     display_name: string;
-    phase: NodePhase;
     communication_id: string;
     validation: NodeValidation;
 }
@@ -355,46 +369,46 @@ export const nodeSections: Array<NodeSection> = [
         phase: NodePhase.SINGLEPHASE,
         prefix: NodePrefix.SINGLEPHASE,
         labelKey: "singlePhase",
-        filter: (node, meter_type) => getNodePhase(node.name, meter_type) === NodePhase.SINGLEPHASE,
+        filter: (phase) => phase === NodePhase.SINGLEPHASE,
     },
     {
         key: NodePhase.L1,
         phase: NodePhase.L1,
         prefix: NodePrefix.L1,
         labelKey: "l1Phase",
-        filter: (node, meter_type) => getNodePhase(node.name, meter_type) === NodePhase.L1,
+        filter: (phase) => phase === NodePhase.L1,
     },
     {
         key: NodePhase.L2,
         phase: NodePhase.L2,
         prefix: NodePrefix.L2,
         labelKey: "l2Phase",
-        filter: (node, meter_type) => getNodePhase(node.name, meter_type) === NodePhase.L2,
+        filter: (phase) => phase === NodePhase.L2,
     },
     {
         key: NodePhase.L3,
         phase: NodePhase.L3,
         prefix: NodePrefix.L3,
         labelKey: "l3Phase",
-        filter: (node, meter_type) => getNodePhase(node.name, meter_type) === NodePhase.L3,
+        filter: (phase) => phase === NodePhase.L3,
     },
     {
         key: NodePhase.TOTAL,
         phase: NodePhase.TOTAL,
         prefix: NodePrefix.TOTAL,
         labelKey: "total",
-        filter: (node, meter_type) => getNodePhase(node.name, meter_type) === NodePhase.TOTAL,
+        filter: (phase) => phase === NodePhase.TOTAL,
     },
     {
         key: NodePhase.GENERAL,
         phase: NodePhase.GENERAL,
         prefix: NodePrefix.GENERAL,
         labelKey: "general",
-        filter: (node, meter_type) => {
-            const isL1 = getNodePhase(node.name, meter_type) === NodePhase.L1;
-            const isL2 = getNodePhase(node.name, meter_type) === NodePhase.L2;
-            const isL3 = getNodePhase(node.name, meter_type) === NodePhase.L3;
-            const isTotal = getNodePhase(node.name, meter_type) === NodePhase.TOTAL;
+        filter: (phase) => {
+            const isL1 = phase === NodePhase.L1;
+            const isL2 = phase === NodePhase.L2;
+            const isL3 = phase === NodePhase.L3;
+            const isTotal = phase === NodePhase.TOTAL;
             return !isL1 && !isL2 && !isL3 && !isTotal;
         },
     },

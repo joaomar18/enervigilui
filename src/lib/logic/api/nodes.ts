@@ -1,17 +1,20 @@
 import { callAPI } from "$lib/logic/api/api";
-import { processInitialNodes } from "../factory/nodes";
-import type { DeviceNode } from "$lib/types/nodes/base";
+import { processInitialNodes, initNodes } from "../factory/nodes";
+import type { DeviceNode, EditableDeviceNode } from "$lib/types/nodes/base";
+import { navigateTo } from "../view/navigation";
 
 /**
- * Retrieves device node configuration from the server.
- * Fetches all nodes/variables associated with a specific device and processes them for use.
+ * Fetches and processes the configuration for all nodes of a device by its ID.
+ * Calls the backend API, converts the response to DeviceNode and EditableDeviceNode arrays,
+ * and navigates away if initialization fails.
  *
- * @param id - The unique identifier of the device whose nodes to retrieve.
- * @returns Object containing processed array of device nodes/variables.
- * @throws Error if the API request fails.
+ * @param id The unique identifier of the device.
+ * @returns A promise resolving to an object containing the initial DeviceNode array and the processed EditableDeviceNode array.
+ * @throws Error if the API call fails.
  */
-export async function getDeviceNodesConfig(id: number): Promise<{ initialNodes: Array<DeviceNode> }> {
-    let initialNodes: Array<DeviceNode>;
+export async function getDeviceNodesConfig(id: number): Promise<{ initialNodes: Array<DeviceNode>, nodes: Array<EditableDeviceNode> }> {
+    let initialNodes: Array<DeviceNode> = [];
+    let nodes: Array<EditableDeviceNode> = [];
     const { sucess, data } = await callAPI({
         endpoint: "/api/nodes/get_nodes_config",
         method: "GET",
@@ -21,9 +24,15 @@ export async function getDeviceNodesConfig(id: number): Promise<{ initialNodes: 
     if (sucess) {
         let requestDeviceNodes: Record<string, DeviceNode> = data;
         initialNodes = processInitialNodes(Object.values(requestDeviceNodes) as Array<DeviceNode>);
+        const { sucess, editableNodes } = initNodes(initialNodes);
+        if (sucess) {
+            nodes = editableNodes;
+        } else {
+            await navigateTo("/devices");
+        }
     } else {
         throw new Error("Get device nodes config error");
     }
 
-    return { initialNodes };
+    return { initialNodes, nodes };
 }

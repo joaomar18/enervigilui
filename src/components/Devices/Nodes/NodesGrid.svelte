@@ -233,7 +233,7 @@ Includes multi-language headers and adapts layout to container size. -->
                         <AddNode
                             {windowWidth}
                             onAddNode={() => {
-                                nodes = [...nodes, addNode(section.prefix, deviceData)];
+                                nodes = [...nodes, addNode(section.phase, section.prefix, deviceData)];
                             }}
                         />
                     {/each}
@@ -261,7 +261,7 @@ Includes multi-language headers and adapts layout to container size. -->
                         <AddNode
                             {windowWidth}
                             onAddNode={() => {
-                                nodes = [...nodes, addNode(section.prefix, deviceData)];
+                                nodes = [...nodes, addNode(section.phase, section.prefix, deviceData)];
                             }}
                         />
                     {/each}

@@ -96,7 +96,7 @@ Displays contextual hints and supports multi-language labels for all fields. -->
                             {#if !node.config.custom}
                                 <span class="sub-text">
                                     {#if node.display_name !== "" && node.display_name !== undefined}
-                                        {$variableNameTextsByPhase[node.phase][node.display_name] || $texts.notFound}
+                                        {$variableNameTextsByPhase[node.attributes.phase][node.display_name] || $texts.notFound}
                                     {/if}
                                 </span>
                             {:else}
@@ -105,7 +105,7 @@ Displays contextual hints and supports multi-language labels for all fields. -->
                         </span>
                         <span class="header-section">
                             <span class="main-text">{`${$texts.section}:`}</span>
-                            <span class="sub-text">{$texts[node.phase.toLocaleLowerCase()]}</span>
+                            <span class="sub-text">{$texts[node.attributes.phase.toLocaleLowerCase()]}</span>
                         </span>
                         <span class="header-section">
                             <span class="main-text">{`${$texts.protocol}:`}</span>
@@ -129,10 +129,10 @@ Displays contextual hints and supports multi-language labels for all fields. -->
                                         {#if !node.config.custom}
                                             <Selector
                                                 style={$NodeConfigPopupSelectorStyle}
-                                                options={$variableNameTextsByPhase[node.phase]}
+                                                options={$variableNameTextsByPhase[node.attributes.phase]}
                                                 bind:selectedOption={node.display_name}
                                                 onChange={() => {
-                                                    nodeNameChange(node, node.phase);
+                                                    nodeNameChange(node, node.attributes.phase);
                                                     onPropertyChanged();
                                                 }}
                                                 inputInvalid={!node.validation.variableName}
@@ -444,7 +444,7 @@ Displays contextual hints and supports multi-language labels for all fields. -->
                                         <Checkbox
                                             bind:checked={node.config.custom}
                                             onChange={() => {
-                                                customNodeChange(node, nodeEditingState, node.phase);
+                                                customNodeChange(node, nodeEditingState, node.attributes.phase);
                                                 onPropertyChanged();
                                             }}
                                             inputName="custom-node"

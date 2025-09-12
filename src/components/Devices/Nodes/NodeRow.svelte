@@ -112,10 +112,10 @@ properties and action buttons for configuration and deletion. -->
                 {#if !node.config.custom}
                     <Selector
                         style={$NodeSelectorStyle}
-                        options={$variableNameTextsByPhase[node.phase]}
+                        options={$variableNameTextsByPhase[node.attributes.phase]}
                         bind:selectedOption={node.display_name}
                         onChange={() => {
-                            nodeNameChange(node, node.phase);
+                            nodeNameChange(node, node.attributes.phase);
                             onPropertyChanged();
                         }}
                         inputInvalid={!node.validation.variableName}
@@ -285,7 +285,7 @@ properties and action buttons for configuration and deletion. -->
                 <Checkbox
                     bind:checked={node.config.custom}
                     onChange={() => {
-                        customNodeChange(node, nodeEditingState, node.phase);
+                        customNodeChange(node, nodeEditingState, node.attributes.phase);
                         onPropertyChanged();
                     }}
                     inputName="custom-node"

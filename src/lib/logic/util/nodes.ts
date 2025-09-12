@@ -1,6 +1,6 @@
 import { get } from "svelte/store";
 import { protocolPlugins } from "$lib/stores/device/protocol";
-import { MeterType, Protocol } from "$lib/types/device/base";
+import { Protocol } from "$lib/types/device/base";
 import { NodePrefix, NodePhase, NodeType, phaseOrder } from "$lib/types/nodes/base";
 import type { BaseNodeConfig, EditableBaseNodeConfig, DeviceNode, EditableDeviceNode } from "$lib/types/nodes/base";
 
@@ -38,6 +38,16 @@ export function isCustom(node: EditableDeviceNode | DeviceNode): boolean {
  */
 export function isDefault(node: EditableDeviceNode | DeviceNode): boolean {
     return !isCustom(node);
+}
+
+/**
+ * Returns the index of the given phase in the phaseOrder array for sorting purposes.
+ *
+ * @param phase The node phase to evaluate.
+ * @returns The sorting priority index.
+ */
+export function getNodePhasePriority(phase: NodePhase): number {
+    return phaseOrder.indexOf(phase);
 }
 
 /**
@@ -88,32 +98,6 @@ export function sortNodesByName(nodes: Array<EditableDeviceNode | DeviceNode>): 
  */
 export function getNodeIndex(node: EditableDeviceNode, nodesArray: Array<EditableDeviceNode>): number {
     return nodesArray.findIndex((n) => n === node);
-}
-
-/**
- * Gets node phase from name and meter type.
- * @param name Node name.
- * @param meter_type Meter type.
- * @returns Node phase.
- */
-export function getNodePhase(name: string, meter_type: MeterType): NodePhase {
-    if (meter_type === MeterType.SINGLE_PHASE) {
-        return NodePhase.SINGLEPHASE;
-    } else if (meter_type === MeterType.THREE_PHASE) {
-        if (name.startsWith(NodePrefix.L1) && !name.startsWith(NodePrefix.L1_L2) && !name.startsWith(NodePrefix.L1_L3)) {
-            return NodePhase.L1;
-        } else if (name.startsWith(NodePrefix.L2) && !name.startsWith(NodePrefix.L2_L1) && !name.startsWith(NodePrefix.L2_L3)) {
-            return NodePhase.L2;
-        } else if (name.startsWith(NodePrefix.L3) && !name.startsWith(NodePrefix.L3_L1) && !name.startsWith(NodePrefix.L3_L2)) {
-            return NodePhase.L3;
-        } else if (name.startsWith(NodePrefix.TOTAL)) {
-            return NodePhase.TOTAL;
-        } else {
-            return NodePhase.GENERAL;
-        }
-    } else {
-        throw new Error(`Invalid meter type ${meter_type}`);
-    }
 }
 
 /**
@@ -207,5 +191,6 @@ export function normalizeNode(node: DeviceNode): DeviceNode {
         name: node.name,
         protocol: node.protocol,
         config: Object.fromEntries(Object.entries(node.config).sort(([a], [b]) => a.localeCompare(b))) as BaseNodeConfig,
+        attributes: node.attributes,
     };
 }

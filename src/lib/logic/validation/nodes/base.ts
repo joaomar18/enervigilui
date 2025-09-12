@@ -49,14 +49,8 @@ export function getInitialNodeValidation(): NodeValidation {
     };
 }
 
-/**
- * Validates node name.
- * @param nodeName Display name (no prefix).
- * @param customVariable True for custom variable.
- * @param currentNodes Optional nodes for duplicate check.
- * @returns True if valid.
- */
-export function validateNodeName(nodeName: string, customVariable: boolean, currentNodes?: Array<EditableDeviceNode>): boolean {
+
+export function validateNodeName(nodeName: string, customVariable: boolean, currentNodes: Array<EditableDeviceNode>): boolean {
     const names: Array<string> = get(defaultVariableNames);
 
     // Check for duplicates in current nodes
@@ -66,6 +60,7 @@ export function validateNodeName(nodeName: string, customVariable: boolean, curr
             return false;
         }
     }
+
 
     if (customVariable) {
         // For custom variables, check if name exists in default names (custom nodes can't use default names)
@@ -279,7 +274,7 @@ export function validateIncrementalNode(incremental: boolean, name: string, cust
  */
 export function updateNodesValidation(nodes: Array<EditableDeviceNode>, nodesBySection: Record<NodePhase, Array<EditableDeviceNode>>): void {
     for (let node of nodes) {
-        node.validation.variableName = validateNodeName(node.display_name, node.config.custom, nodesBySection[node.phase]);
+        node.validation.variableName = validateNodeName(node.display_name, node.config.custom, nodesBySection[node.attributes.phase]);
         node.validation.variableType = validateNodeUnit(node.display_name, node.config.type, node.config.unit, node.config.custom);
         node.validation.variableUnit = validateNodeUnit(node.display_name, node.config.type, node.config.unit, node.config.custom);
         node.validation.communicationID = validateCommunicationID(node.communication_id, node.protocol);

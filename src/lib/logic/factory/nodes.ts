@@ -2,9 +2,9 @@ import { get } from "svelte/store";
 import { MeterType } from "$lib/types/device/base";
 import { NodeType, NodePhase, NodePrefix, nodeSections } from "$lib/types/nodes/base";
 import type { EditableDeviceMeter, MeterOptions, NewDeviceMeter } from "$lib/types/device/base";
-import type { DeviceNode, EditableDeviceNode, EditableBaseNodeConfig, DefaultNodeInfo, BaseNodeConfig } from "$lib/types/nodes/base";
+import type { DeviceNode, EditableDeviceNode, EditableBaseNodeConfig, DeviceNodeAttributes, DefaultNodeInfo, BaseNodeConfig } from "$lib/types/nodes/base";
 import { defaultVariables } from "$lib/stores/device/variables";
-import { addPrefix, removePrefix, getNodePhase, getNodePrefix, getCommunicationID, sortNodesByName } from "../util/nodes";
+import { addPrefix, removePrefix, getNodePrefix, getCommunicationID, sortNodesByName } from "../util/nodes";
 import { sortNodesLogically } from "../handlers/nodes";
 import { getInitialNodeValidation } from "../validation/nodes/base";
 import { stringIsValidInteger, stringIsValidFloat } from "$lib/logic/util/generic";
@@ -144,10 +144,9 @@ export function processInitialBaseNodeConfig(config: BaseNodeConfig): BaseNodeCo
 /**
  * Converts DeviceNode[] to EditableDeviceNode[] for UI forms.
  * @param nodes - DeviceNode array.
- * @param meter_type - Meter type.
  * @returns EditableDeviceNode array.
  */
-export function convertToEditableNodes(nodes: Array<DeviceNode>, meter_type: MeterType): Array<EditableDeviceNode> {
+export function convertToEditableNodes(nodes: Array<DeviceNode>): Array<EditableDeviceNode> {
     let editableNodes: Array<EditableDeviceNode> = [];
 
     for (const node of nodes) {
@@ -160,16 +159,16 @@ export function convertToEditableNodes(nodes: Array<DeviceNode>, meter_type: Met
             device_id: node.device_id,
             protocol: node.protocol,
             display_name: removePrefix(node.name),
-            phase: getNodePhase(node.name, meter_type),
             communication_id: getCommunicationID(node.protocol, editableConfig),
             validation: getInitialNodeValidation(),
             config: editableConfig,
+            attributes: node.attributes,
         };
 
         editableNodes.push(editableNode);
     }
 
-    return sortNodesLogically(editableNodes, meter_type) as Array<EditableDeviceNode>;
+    return sortNodesLogically(editableNodes) as Array<EditableDeviceNode>;
 }
 
 /**
@@ -189,6 +188,7 @@ export function convertToNodes(nodes: Array<EditableDeviceNode>): Array<DeviceNo
             device_id: editableNode.device_id,
             protocol: editableNode.protocol,
             config: nodeConfig,
+            attributes: editableNode.attributes,
         };
 
         deviceNodes.push(deviceNode);
@@ -215,6 +215,7 @@ export function processInitialNodes(nodes: Array<DeviceNode>): Array<DeviceNode>
             device_id: node.device_id,
             protocol: node.protocol,
             config: nodeConfig,
+            attributes: node.attributes,
         };
 
         deviceNodes.push(deviceNode);
@@ -223,11 +224,19 @@ export function processInitialNodes(nodes: Array<DeviceNode>): Array<DeviceNode>
     return (sortNodesByName(deviceNodes) as Array<DeviceNode>).map(normalizeNode);
 }
 
-export function initNodes(meterType: MeterType, initialNodes: Array<DeviceNode>): { sucess: boolean; editableNodes: Array<EditableDeviceNode> } {
+/**
+ * Initializes editable device nodes from an array of DeviceNode objects.
+ * Converts DeviceNode data to EditableDeviceNode format for UI use,
+ * handles errors, and displays a toast notification if initialization fails.
+ *
+ * @param initialNodes Array of DeviceNode objects to initialize.
+ * @returns An object containing a success flag and the array of EditableDeviceNode objects.
+ */
+export function initNodes(initialNodes: Array<DeviceNode>): { sucess: boolean; editableNodes: Array<EditableDeviceNode> } {
     let editableNodes: Array<EditableDeviceNode> = [];
     let sucess = false;
     try {
-        editableNodes = convertToEditableNodes(initialNodes, meterType);
+        editableNodes = convertToEditableNodes(initialNodes);
         sucess = true;
     } catch (e) {
         console.error(`Could not initialize the nodes configuration: ${e}`);
@@ -251,14 +260,17 @@ function createDefaultEditableDeviceNode(
     const full_name = getNodePrefix(phase) + variable.name;
     let plugin = get(protocolPlugins)[device_data.protocol];
     let editableConfig = plugin.createNodeConfigFromDefaultVar(variable, device_data.options);
+    let attributes = {
+        phase: phase,
+    } as DeviceNodeAttributes;
 
     let node: EditableDeviceNode = {
         device_id: "id" in device_data ? device_data.id : undefined,
         name: full_name,
         protocol: device_data.protocol,
         config: editableConfig,
+        attributes: attributes,
         display_name: variable.name,
-        phase: phase,
         communication_id: getCommunicationID(device_data.protocol, editableConfig, true),
         validation: getInitialNodeValidation(),
     };
@@ -296,26 +308,24 @@ export function getDefaultNodesList(device_data: EditableDeviceMeter | NewDevice
     return sortNodesByName(nodes) as Array<EditableDeviceNode>;
 }
 
-/**
- * Creates a new node for a section and device.
- * @param sectionPrefix - Node name prefix.
- * @param device_data - Device config.
- * @returns EditableDeviceNode.
- */
-export function addNode(sectionPrefix: NodePrefix, device_data: EditableDeviceMeter | NewDeviceMeter): EditableDeviceNode {
+
+export function addNode(sectionPhase: NodePhase, sectionPrefix: NodePrefix, device_data: EditableDeviceMeter | NewDeviceMeter): EditableDeviceNode {
     const nodeBaseName = ``;
     const fullNodeName = addPrefix(nodeBaseName, sectionPrefix);
 
     let plugin = get(protocolPlugins)[device_data.protocol];
     let newEditableConfig = plugin.createNewEditableNodeConfig();
+    let newAttributes = {
+        phase: sectionPhase,
+    } as DeviceNodeAttributes;
 
     const newFormattedNode: EditableDeviceNode = {
         device_id: "id" in device_data ? device_data.id : undefined,
         name: fullNodeName,
         protocol: device_data.protocol,
         config: newEditableConfig,
+        attributes: newAttributes,
         display_name: nodeBaseName,
-        phase: getNodePhase(fullNodeName, device_data.type),
         communication_id: getCommunicationID(device_data.protocol, newEditableConfig, true),
         validation: getInitialNodeValidation(),
     };

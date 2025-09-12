@@ -1,10 +1,10 @@
 import { get } from "svelte/store";
 import { MeterType, Protocol } from "$lib/types/device/base";
 import { NodeType, NodePhase } from "$lib/types/nodes/base";
-import { getNodePhase, getNodePriority, getNodeSubPriority, isDefault, isCustom, isIncremental, isNumeric, removePrefix, getNodePrefix, getNodeIndex, getCommunicationID } from "../util/nodes";
+import { getNodePhasePriority, getNodePriority, getNodeSubPriority, isDefault, isCustom, isIncremental, isNumeric, removePrefix, getNodePrefix, getNodeIndex, getCommunicationID } from "../util/nodes";
 import { defaultVariables } from "$lib/stores/device/variables";
 import { protocolPlugins } from "$lib/stores/device/protocol";
-import { nodeSections, phaseOrder } from "$lib/types/nodes/base";
+import { nodeSections } from "$lib/types/nodes/base";
 import type { NodeEditState, EditableDeviceNode, DeviceNode } from "$lib/types/nodes/base";
 
 /**
@@ -13,17 +13,16 @@ import type { NodeEditState, EditableDeviceNode, DeviceNode } from "$lib/types/n
  * group (priority), and subgroup (sub-priority), ensuring a consistent and meaningful layout.
  *
  * @param nodes Array of device nodes to sort.
- * @param meter_type The meter type for phase determination.
  * @returns Sorted array of nodes.
  */
-export function sortNodesLogically(nodes: Array<EditableDeviceNode | DeviceNode>, meter_type: MeterType): Array<EditableDeviceNode | DeviceNode> {
+export function sortNodesLogically(nodes: Array<EditableDeviceNode | DeviceNode>): Array<EditableDeviceNode | DeviceNode> {
 
     return nodes.slice().sort((a, b) => {
         // Priority is organized from top to bottom
 
         // Phase order (higher priority)
-        const phaseA = phaseOrder.indexOf(getNodePhase(a.name, meter_type));
-        const phaseB = phaseOrder.indexOf(getNodePhase(b.name, meter_type));
+        const phaseA = getNodePhasePriority(a.attributes.phase);
+        const phaseB = getNodePhasePriority(b.attributes.phase);
         if (phaseA !== phaseB) return phaseA - phaseB;
 
         // Non-incremental numeric types (default nodes first)
@@ -188,7 +187,7 @@ export function updateNodes(node: EditableDeviceNode, nodes: Array<EditableDevic
  */
 export function updateNodesBySection(meterType: MeterType, nodes: Array<EditableDeviceNode>): Record<NodePhase, Array<EditableDeviceNode>> {
     return nodeSections.reduce((acc: Record<NodePhase, Array<EditableDeviceNode>>, section) => {
-        acc[section.key] = nodes.filter((node) => section.filter(node, meterType));
+        acc[section.key] = nodes.filter((node) => section.filter(node.attributes.phase));
         return acc;
     }, {} as Record<NodePhase, Array<EditableDeviceNode>>);
 }

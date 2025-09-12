@@ -66,21 +66,6 @@
     // Content is initialized when both loaded is done and nodes are initialized
     $: contentInit = $loadedDone && nodesInit;
 
-    // When device data is ready as well as nodes, initializes nodes
-    $: if (initialNodes && deviceData && !nodesInit) {
-        const { sucess, editableNodes } = initNodes(deviceData.type, initialNodes);
-        if (sucess) {
-            nodes = editableNodes;
-            setTimeout(() => {
-                nodesInit = true;
-            }, 100); // Small timeout to give a bit of time for the page to load before the nodes
-        } else {
-            (async () => {
-                await navigateTo("/devices");
-            })();
-        }
-    }
-
     // Update initial device validation
     $: if (deviceData) {
         updateDeviceValidation(deviceData, undefined);
@@ -104,7 +89,10 @@
                 ({ initialDeviceData, deviceData } = await getDeviceStateWithImage(Number($currentDeviceID)));
             }, 3000);
             nodesConfigRetrier = new MethodRetrier(async (signal) => {
-                ({ initialNodes } = await getDeviceNodesConfig(Number($currentDeviceID)));
+                ({ initialNodes, nodes } = await getDeviceNodesConfig(Number($currentDeviceID)));
+                setTimeout(() => {
+                    nodesInit = true;
+                }, 100); // Small timeout to give a bit of time for the page to load before the nodes
             }, 3000);
         } else {
             showToast("errorEditDeviceParams", ToastType.ALERT);
