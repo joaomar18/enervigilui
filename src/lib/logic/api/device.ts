@@ -6,17 +6,17 @@ import { processDeviceHistory } from "../handlers/device";
 import { navigateTo } from "../view/navigation";
 
 /**
- * Retrieves all devices and their current state from the server.
+ * Retrieves all devices objects from the server with their state and configuration.
  * Processes device data without including images for faster loading.
  *
  * @returns Object containing array of processed device data.
  * @throws Error if the API request fails.
  */
-export async function getAllDevicesState(): Promise<{ devices: Array<Device> }> {
+export async function getAllDevices(): Promise<{ devices: Array<Device> }> {
     let devices: Array<Device>;
 
     const { sucess, data } = await callAPI({
-        endpoint: "/api/device/get_all_devices_state",
+        endpoint: "/api/device/get_all_devices",
         method: "GET",
         setLoaded: true,
     });
@@ -27,25 +27,25 @@ export async function getAllDevicesState(): Promise<{ devices: Array<Device> }> 
             return deviceData;
         }) as Array<Device>;
     } else {
-        throw new Error("Get all devices state error");
+        throw new Error("Get all devices error");
     }
 
     return { devices };
 }
 
 /**
- * Retrieves all devices and their current state from the server.
+ * Retrieves all devices objects from the server.
  * Processes device data and converts base64 images to data URLs.
  *
  * @returns Object containing processed devices array and device images mapped by ID.
  * @throws Error if the API request fails.
  */
-export async function getAllDevicesStateWithImage(): Promise<{ devices: Array<Device>; devicesImages: Record<number, string> }> {
+export async function getAllDevicesWithImage(): Promise<{ devices: Array<Device>; devicesImages: Record<number, string> }> {
     let devices: Array<Device>;
     let devicesImages: Record<number, string> = {};
 
     const { sucess, data } = await callAPI({
-        endpoint: "/api/device/get_all_devices_state_with_image",
+        endpoint: "/api/device/get_all_devices_with_image",
         method: "GET",
         setLoaded: true,
     });
@@ -57,25 +57,25 @@ export async function getAllDevicesStateWithImage(): Promise<{ devices: Array<De
             return deviceData;
         }) as Array<Device>;
     } else {
-        throw new Error("Get all devices state with images error");
+        throw new Error("Get all devices state images error");
     }
 
     return { devices, devicesImages };
 }
 
 /**
- * Retrieves a specific device's state and configuration data.
+ * Retrieves a specific device object with state and configuration data.
  * Returns only the initial device data without image information.
  *
  * @param id - The unique identifier of the device to retrieve.
  * @returns Object containing the initial device data.
  * @throws Error if the API request fails.
  */
-export async function getDeviceState(id: number): Promise<{ initialDeviceData: Device }> {
+export async function getDevice(id: number): Promise<{ initialDeviceData: Device }> {
     let initialDeviceData: Device;
     let deviceData: EditableDevice;
     const { sucess, data } = await callAPI({
-        endpoint: "/api/device/get_device_state",
+        endpoint: "/api/device/get_device",
         method: "GET",
         params: { id },
         setLoaded: true,
@@ -84,7 +84,7 @@ export async function getDeviceState(id: number): Promise<{ initialDeviceData: D
         const { ...requestDeviceData } = data as Device;
         initialDeviceData = processInitialDevice(requestDeviceData as Device);
     } else {
-        throw new Error("Get device state error");
+        throw new Error("Get device error");
     }
 
     return { initialDeviceData };
@@ -112,18 +112,18 @@ export async function getDeviceInfo(id: number): Promise<{ deviceInfo: DeviceInf
 }
 
 /**
- * Retrieves a specific device's state and configuration data.
+ * Retrieves a specific device object with state and configuration data.
  * Returns both the initial device data and an editable version for modifications.
  *
  * @param id - The unique identifier of the device to retrieve.
  * @returns Object containing initial device data and editable device configuration.
  * @throws Error if the API request fails.
  */
-export async function getDeviceStateWithImage(id: number): Promise<{ initialDeviceData: Device; deviceData: EditableDevice }> {
+export async function getDeviceWithImage(id: number): Promise<{ initialDeviceData: Device; deviceData: EditableDevice }> {
     let initialDeviceData: Device;
     let deviceData: EditableDevice;
     const { sucess, data } = await callAPI({
-        endpoint: "/api/device/get_device_state_with_image",
+        endpoint: "/api/device/get_device_with_image",
         method: "GET",
         params: { id },
         setLoaded: true,
@@ -133,7 +133,7 @@ export async function getDeviceStateWithImage(id: number): Promise<{ initialDevi
         initialDeviceData = processInitialDevice(requestDeviceData as Device);
         deviceData = convertToEditableDevice(initialDeviceData, deviceImage);
     } else {
-        throw new Error("Get device state with image error");
+        throw new Error("Get device with image error");
     }
 
     return { initialDeviceData, deviceData };
@@ -230,14 +230,13 @@ export async function editDevice(deviceData: Device, deviceImage: File | undefin
  * Permanently deletes a device from the system.
  * Navigates to devices page on successful deletion.
  *
- * @param deviceName - Name of the device to delete (for confirmation).
  * @param deviceID - Unique identifier of the device to delete.
  */
-export async function deleteDevice(deviceName: string, deviceID: number) {
+export async function deleteDevice(deviceID: number) {
     const { sucess, data } = await callAPI({
         endpoint: "/api/device/delete_device",
         method: "DELETE",
-        params: { deviceName, deviceID },
+        params: { deviceID },
     });
     if (sucess) {
         await navigateTo("/devices", {});

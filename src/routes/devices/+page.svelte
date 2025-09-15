@@ -4,7 +4,7 @@
     import DeviceCard from "../../components/Devices/DeviceCard.svelte";
     import AddDevice from "../../components/Devices/AddDevice.svelte";
     import { navigateTo } from "$lib/logic/view/navigation";
-    import { getAllDevicesState, getAllDevicesStateWithImage } from "$lib/logic/api/device";
+    import { getAllDevices, getAllDevicesWithImage } from "$lib/logic/api/device";
     import { filterDevices } from "$lib/logic/util/device";
     import { MethodPoller } from "$lib/logic/api/poller";
 
@@ -44,14 +44,14 @@
     onMount(() => {
         let devicesPoller: MethodPoller | null = null;
         let devicesWithImagesPoller: MethodPoller | null = new MethodPoller(async (signal) => {
-            ({ devices, devicesImages } = await getAllDevicesStateWithImage());
+            ({ devices, devicesImages } = await getAllDevicesWithImage());
 
             // Stop images polling and start devices polling
             devicesWithImagesPoller?.stop();
             devicesWithImagesPoller = null;
             devicesPoller = new MethodPoller(
                 async (signal) => {
-                    ({ devices } = await getAllDevicesState());
+                    ({ devices } = await getAllDevices());
                 },
                 3000,
                 false,

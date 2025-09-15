@@ -1,7 +1,7 @@
 <script lang="ts">
     import { fade } from "svelte/transition";
     import { onMount } from "svelte";
-    import { getDeviceStateWithImage, editDevice, deleteDevice } from "$lib/logic/api/device";
+    import { getDeviceWithImage, editDevice, deleteDevice } from "$lib/logic/api/device";
     import { getDeviceNodesConfig } from "$lib/logic/api/nodes";
     import { convertToDevice } from "$lib/logic/factory/device";
     import { updateDeviceValidation, validDeviceOperation } from "$lib/logic/validation/device/base";
@@ -86,7 +86,7 @@
 
         if ($currentDeviceID) {
             deviceDataRetrier = new MethodRetrier(async (signal) => {
-                ({ initialDeviceData, deviceData } = await getDeviceStateWithImage(Number($currentDeviceID)));
+                ({ initialDeviceData, deviceData } = await getDeviceWithImage(Number($currentDeviceID)));
             }, 3000);
             nodesConfigRetrier = new MethodRetrier(async (signal) => {
                 ({ initialNodes, nodes } = await getDeviceNodesConfig(Number($currentDeviceID)));
@@ -258,7 +258,7 @@ Shows input forms for protocol-specific parameters and organizes device nodes fo
             onDelete={async () => {
                 if (contentInit) {
                     performingDeleteRequest = true;
-                    await deleteDevice(deviceData.name, deviceData.id);
+                    await deleteDevice(deviceData.id);
                     performingDeleteRequest = false;
                 }
             }}
