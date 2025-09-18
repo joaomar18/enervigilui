@@ -4,11 +4,13 @@
     import { MethodPoller } from "$lib/logic/api/poller";
     import { NodePhase } from "$lib/types/nodes/base";
     import { getDeviceNodesState } from "$lib/logic/api/nodes";
-    import DeviceRealTimeCard from "../../../components/Devices/DeviceRealTimeCard.svelte";
     import { showToast } from "$lib/logic/view/toast";
     import { ToastType } from "$lib/stores/view/toast";
     import { nodeSections } from "$lib/types/nodes/base";
     import type { NodeState } from "$lib/types/nodes/base";
+    import DeviceRealTimeCard from "../../../components/Devices/DeviceRealTimeCard.svelte";
+    import ExpandableSection from "../../../components/General/ExpandableSection.svelte";
+    import Action from "../../../components/General/Action.svelte";
 
     // Texts
     import { texts } from "$lib/stores/lang/generalTexts";
@@ -17,9 +19,13 @@
     import { loadedDone } from "$lib/stores/view/navigation";
     import { currentDeviceID } from "$lib/stores/device/current";
 
+    // Styles
+    import { RealTimeCardActionStyle } from "$lib/style/device";
+
     // Variables
     let nodesStateBySection: Record<NodePhase, Record<string, NodeState>>;
     let availablePhases: Array<NodePhase>;
+    
 
     onMount(() => {
         let nodesStatePoller: MethodPoller | null;
@@ -45,15 +51,44 @@
         <div class="grid">
             {#each nodeSections.filter((section) => availablePhases.includes(section.phase)) as section (section.key)}
                 <div class="grid-col">
-                    <DeviceRealTimeCard titleText={section.phase !== NodePhase.SINGLEPHASE ? $texts[section.labelKey] : $texts.variables}
-                    ></DeviceRealTimeCard>
+                    <DeviceRealTimeCard titleText={section.phase !== NodePhase.SINGLEPHASE ? $texts[section.labelKey] : $texts.variables}>
+                        <div class="slot-div" slot="header">
+                            <div class="phase-actions-div">
+                                <Action style={$RealTimeCardActionStyle} imageURL="/img/collapse-all.svg" onClick={() => {}} />
+                                <Action style={$RealTimeCardActionStyle} imageURL="/img/expand-all.svg" onClick={() => {}} />
+                            </div>
+                        </div>
+                        <div class="slot-div" slot="content">
+                            <ExpandableSection titleText="Medições" >
+                                <div style="width:100%; height: 700px; background-color: white;"></div>
+                            </ExpandableSection>
+                            <ExpandableSection titleText="Contadores">
+                                <div style="width:100%; height: 700px; background-color: white;"></div>
+                            </ExpandableSection>
+                            <ExpandableSection titleText="Estados">
+                                <div style="width:100%; height: 700px; background-color: white;"></div>
+                            </ExpandableSection>
+                            <ExpandableSection titleText="Textos">
+                                <div style="width:100%; height: 700px; background-color: white;"></div>
+                            </ExpandableSection>
+                            <ExpandableSection titleText="Outros">
+                                <div style="width:100%; height: 700px; background-color: white;"></div>
+                            </ExpandableSection>
+                        </div>
+                    </DeviceRealTimeCard>
                 </div>
             {/each}
             <div class="grid-col">
-                <DeviceRealTimeCard titleText={$texts.metrics}></DeviceRealTimeCard>
+                <DeviceRealTimeCard titleText={$texts.metrics}>
+                    <div class="slot-div" slot="header"></div>
+                    <div class="slot-div" slot="content"></div>
+                </DeviceRealTimeCard>
             </div>
             <div class="grid-col span-2">
-                <DeviceRealTimeCard titleText={$texts.energyConsumption}></DeviceRealTimeCard>
+                <DeviceRealTimeCard titleText={$texts.energyConsumption}>
+                    <div class="slot-div" slot="header"></div>
+                    <div class="slot-div" slot="content"></div>
+                </DeviceRealTimeCard>
             </div>
         </div>
     {/if}
@@ -81,6 +116,21 @@
 
     .grid .grid-col.span-2 {
         grid-column: span 2;
+    }
+
+    .slot-div {
+        position: relative;
+        width: 100%;
+        height: 100%;
+        margin: 0;
+        padding: 0;
+    }
+
+    .slot-div .phase-actions-div {
+        display: flex;
+        justify-content: end;
+        align-items: center;
+        gap: 10px;
     }
 
     @media (max-width: 1569px) {

@@ -68,8 +68,11 @@ const DeviceRealTimeCardStyleConfig: ComponentStyles = {
         headerBorder: "1px solid rgba(255,255,255,0.1)",
         headerPaddingTop: "20px",
         headerPaddingBottom: "10px",
-        contentVerticalPadding: "20px",
-        contentHorizontalPadding: "10px",
+        contentPaddingTop: "20px",
+        contentPaddingBottom: "30px",
+        contentPaddingHorizontal: "20px",
+        scrollbarTrackColor: "#1a1c22",
+        scrollbarThumbColor: "#4a5059",
     },
 };
 
@@ -147,3 +150,20 @@ const DeviceNotificationStyleConfig: ComponentStyles = {
 };
 
 export const DeviceNotificationStyle = createStyleStore(DeviceNotificationStyleConfig);
+
+//////////     D E V I C E     R E A L     T I M E     C A R D     A C T I O N     //////////
+
+const RealTimeCardActionStyleConfig: ComponentStyles = {
+    dark: {
+        width: "32px",
+        height: "32px",
+        borderRadius: "16px",
+        backgroundColor: "#1b1e26",
+        borderColor: "#3b4250",
+        hoverColor: "#3b4250",
+        imageWidth: "20px",
+        imageHeight: "20px",
+    },
+};
+
+export const RealTimeCardActionStyle = createStyleStore(RealTimeCardActionStyleConfig);

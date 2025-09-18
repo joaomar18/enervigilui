@@ -26,8 +26,11 @@
     export let headerBorder: string | undefined = undefined;
     export let headerPaddingTop: string | undefined = undefined;
     export let headerPaddingBottom: string | undefined = undefined;
-    export let contentVerticalPadding: string | undefined = undefined;
-    export let contentHorizontalPadding: string | undefined = undefined;
+    export let contentPaddingTop: string | undefined = undefined;
+    export let contentPaddingBottom: string | undefined = undefined;
+    export let contentPaddingHorizontal: string | undefined = undefined;
+    export let scrollbarTrackColor: string | undefined = undefined;
+    export let scrollbarThumbColor: string | undefined = undefined;
 
     $: localOverrides = {
         width,
@@ -45,8 +48,11 @@
         headerBorder,
         headerPaddingTop,
         headerPaddingBottom,
-        contentVerticalPadding,
-        contentHorizontalPadding,
+        contentPaddingTop,
+        contentPaddingBottom,
+        contentPaddingHorizontal,
+        scrollbarTrackColor,
+        scrollbarThumbColor,
     };
 
     // Merged style
@@ -70,16 +76,24 @@
         --header-border: {mergedStyle.headerBorder};
         --header-padding-top: {mergedStyle.headerPaddingTop};
         --header-padding-bottom: {mergedStyle.headerPaddingBottom};
-        --content-vertical-padding: {mergedStyle.contentVerticalPadding};
-        --content-horizontal-padding: {mergedStyle.contentHorizontalPadding};
+        --content-padding-top: {mergedStyle.contentPaddingTop};
+        --content-padding-bottom: {mergedStyle.contentPaddingBottom};
+        --content-padding-horizontal: {mergedStyle.contentPaddingHorizontal};
+        --scrollbar-track-color: {mergedStyle.scrollbarTrackColor};
+        --scrollbar-thumb-color: {mergedStyle.scrollbarThumbColor};
     "
     class="container"
 >
     <div class="header">
         <h3>{titleText}</h3>
+        <div class="slot-content">
+            <slot name="header" />
+        </div>
     </div>
     <div class="content">
-        <slot />
+        <div class="wrapper">
+            <slot name="content" />
+        </div>
     </div>
 </div>
 
@@ -108,10 +122,13 @@
         padding-top: var(--header-padding-top);
         padding-bottom: var(--header-padding-bottom);
         border-bottom: var(--header-border);
+        display: flex;
+        flex-direction: row;
+        justify-content: space-between;
+        align-items: center;
     }
 
     .header h3 {
-        width: 100%;
         margin: 0;
         padding: 0;
         padding-left: var(--title-padding-left);
@@ -120,16 +137,39 @@
         font-weight: var(--title-weight);
     }
 
+    .header .slot-content {
+        flex: 1;
+        height: 100%;
+    }
+
     .content {
+        box-sizing: border-box;
         margin: 0;
-        padding-top: var(--content-vertical-padding);
-        padding-bottom: var(--content-vertical-padding);
-        padding-left: var(--content-horizontal-padding);
-        padding-right: var(--content-horizontal-padding);
+        padding: 0;
+        padding-top: var(--content-padding-top);
+        padding-bottom: var(--content-padding-bottom);
         width: 100%;
         min-height: 0;
         flex: 1;
-        overflow: hidden;
+    }
+
+    .wrapper {
+        box-sizing: border-box;
+        position: relative;
+        margin: 0;
+        padding: 0;
+        padding-left: var(--content-padding-horizontal);
+        padding-right: var(--content-padding-horizontal);
+        width: 100%;
+        height: 100%;
+        min-height: 0;
+        overflow-x: hidden;
         overflow-y: auto;
+        display: flex;
+        flex-direction: column;
+        justify-content: start;
+        align-items: center;
+        scrollbar-width: thin;
+        scrollbar-color: var(--scrollbar-thumb-color) var(--scrollbar-track-color);
     }
 </style>
