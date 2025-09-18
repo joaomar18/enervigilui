@@ -8,7 +8,6 @@ import type { RealTimeCardSectionsState } from "$lib/types/view/device";
 import { RealTimeCardSubSections, emptyRealTimeCardSubSections } from "$lib/types/view/device";
 import { assignRealTimeCardSectionsStateToAllPhases } from "../view/device";
 
-
 /**
  * Determines if a node is incremental (e.g., energy counters).
  * @param node The node to check.
@@ -200,24 +199,62 @@ export function normalizeNode(node: NodeRecord): NodeRecord {
     };
 }
 
+/**
+ * Extracts unique phases from an array of nodes.
+ * @param nodes Array of editable or regular node records.
+ * @returns Array of unique node phases found in the provided nodes.
+ */
 export function getAvailablePhasesFromNodes(nodes: Array<EditableNodeRecord> | Array<NodeRecord>): Array<NodePhase> {
-    return Array.from(new Set(Object.values(nodes).map(node => node.attributes.phase).filter(phase => phase !== null && phase !== undefined))) as NodePhase[];
+    return Array.from(
+        new Set(
+            Object.values(nodes)
+                .map((node) => node.attributes.phase)
+                .filter((phase) => phase !== null && phase !== undefined)
+        )
+    ) as NodePhase[];
 }
 
+/**
+ * Extracts unique phases from a nodes state record.
+ * @param nodesState Record mapping node keys to their state information.
+ * @returns Array of unique node phases found in the provided nodes state.
+ */
 export function getAvailablePhasesFromNodesState(nodesState: Record<string, NodeState>): Array<NodePhase> {
-    return Array.from(new Set(Object.values(nodesState).map(nodeState => nodeState.phase).filter(phase => phase !== null && phase !== undefined))) as NodePhase[];
+    return Array.from(
+        new Set(
+            Object.values(nodesState)
+                .map((nodeState) => nodeState.phase)
+                .filter((phase) => phase !== null && phase !== undefined)
+        )
+    ) as NodePhase[];
 }
 
-
-
-export function getNodesStateBySubSection(nodesState: Record<string, NodeState>): { nodesStateBySubSection: Record<NodePhase, Record<RealTimeCardSubSections, Record<string, NodeState>>>, availableSubSections: Record<NodePhase, RealTimeCardSectionsState> } {
-
+/**
+ * Organizes nodes state by phase and subsection, categorizing them based on their data types.
+ *
+ * This function takes a flat record of node states and organizes them into a hierarchical structure
+ * grouped by phase (L1, L2, L3, etc.) and then by subsection type (Measurements, Counters, States,
+ * Texts, Other) based on the node's data type and characteristics.
+ *
+ * Categorization rules:
+ * - Numeric incremental nodes → Counters
+ * - Numeric non-incremental nodes → Measurements
+ * - Boolean nodes → States
+ * - String nodes → Texts
+ * - Other types → Other
+ *
+ * @param nodesState Record mapping node keys to their state information.
+ * @returns Object containing the organized nodes by subsection and available subsections per phase.
+ */
+export function getNodesStateBySubSection(nodesState: Record<string, NodeState>): {
+    nodesStateBySubSection: Record<NodePhase, Record<RealTimeCardSubSections, Record<string, NodeState>>>;
+    availableSubSections: Record<NodePhase, RealTimeCardSectionsState>;
+} {
     let availableSubSections: Record<NodePhase, RealTimeCardSectionsState> = assignRealTimeCardSectionsStateToAllPhases(defaultRealTimeCardSectionsState);
 
-    const nodesStateBySubSection: Record<NodePhase, Record<RealTimeCardSubSections, Record<string, NodeState>>> =
-        Object.fromEntries(
-            phaseOrder.map(phase => [phase, { ...emptyRealTimeCardSubSections }])
-        ) as Record<NodePhase, Record<RealTimeCardSubSections, Record<string, NodeState>>>;
+    const nodesStateBySubSection: Record<NodePhase, Record<RealTimeCardSubSections, Record<string, NodeState>>> = Object.fromEntries(
+        phaseOrder.map((phase) => [phase, { ...emptyRealTimeCardSubSections }])
+    ) as Record<NodePhase, Record<RealTimeCardSubSections, Record<string, NodeState>>>;
 
     for (const [nodeKey, nodeState] of Object.entries(nodesState)) {
         const phase = nodeState.phase;
@@ -225,11 +262,9 @@ export function getNodesStateBySubSection(nodesState: Record<string, NodeState>)
         if (nodeState.type === NodeType.FLOAT || nodeState.type === NodeType.INT) {
             if (nodeState.incremental) {
                 subsection = RealTimeCardSubSections.Counters;
-            }
-            else {
+            } else {
                 subsection = RealTimeCardSubSections.Measurements;
             }
-
         } else if (nodeState.type === NodeType.BOOLEAN) {
             subsection = RealTimeCardSubSections.States;
         } else if (nodeState.type === NodeType.STRING) {

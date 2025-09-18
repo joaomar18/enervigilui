@@ -12,7 +12,7 @@
     import { assignRealTimeCardSectionsStateToAllPhases } from "$lib/logic/view/device";
     import type { NodeState } from "$lib/types/nodes/base";
     import type { RealTimeCardSubSections, RealTimeCardSectionsState } from "$lib/types/view/device";
-    import DeviceRealTimeCard from "../../../components/Devices/DeviceRealTimeCard.svelte";
+    import ContentCard from "../../../components/General/ContentCard.svelte";
     import ExpandableSection from "../../../components/General/ExpandableSection.svelte";
     import Action from "../../../components/General/Action.svelte";
 
@@ -40,6 +40,19 @@
         ({ nodesStateBySubSection, availableSubSections } = getNodesStateBySubSection(nodesState));
     }
 
+    // Functions
+    function expandAllOnPhaseCard(phase: NodePhase): void {
+        for (const state of Object.keys(expandedState[phase]) as (keyof RealTimeCardSectionsState)[]) {
+            expandedState[phase][state] = false;
+        }
+    }
+
+    function collapseAllOnPhaseCard(phase: NodePhase): void {
+        for (const state of Object.keys(expandedState[phase]) as (keyof RealTimeCardSectionsState)[]) {
+            expandedState[phase][state] = true;
+        }
+    }
+
     onMount(() => {
         let nodesStatePoller: MethodPoller | null;
         if ($currentDeviceID) {
@@ -64,26 +77,18 @@
         <div class="grid">
             {#each nodeSections.filter((section) => availablePhases.includes(section.phase)) as section (section.key)}
                 <div class="grid-col">
-                    <DeviceRealTimeCard titleText={section.phase !== NodePhase.SINGLEPHASE ? $texts[section.labelKey] : $texts.variables}>
+                    <ContentCard titleText={section.phase !== NodePhase.SINGLEPHASE ? $texts[section.labelKey] : $texts.variables}>
                         <div class="slot-div" slot="header">
                             <div class="phase-actions-div">
                                 <Action
                                     style={$RealTimeCardActionStyle}
                                     imageURL="/img/collapse-all.svg"
-                                    onClick={() => {
-                                        for (const state of Object.keys(expandedState[section.phase]) as (keyof RealTimeCardSectionsState)[]) {
-                                            expandedState[section.phase][state] = false;
-                                        }
-                                    }}
+                                    onClick={() => expandAllOnPhaseCard(section.phase)}
                                 />
                                 <Action
                                     style={$RealTimeCardActionStyle}
                                     imageURL="/img/expand-all.svg"
-                                    onClick={() => {
-                                        for (const state of Object.keys(expandedState[section.phase]) as (keyof RealTimeCardSectionsState)[]) {
-                                            expandedState[section.phase][state] = true;
-                                        }
-                                    }}
+                                    onClick={() => collapseAllOnPhaseCard(section.phase)}
                                 />
                             </div>
                         </div>
@@ -99,20 +104,20 @@
                                 {/if}
                             {/each}
                         </div>
-                    </DeviceRealTimeCard>
+                    </ContentCard>
                 </div>
             {/each}
             <div class="grid-col">
-                <DeviceRealTimeCard titleText={$texts.metrics}>
+                <ContentCard titleText={$texts.metrics}>
                     <div class="slot-div" slot="header"></div>
                     <div class="slot-div" slot="content"></div>
-                </DeviceRealTimeCard>
+                </ContentCard>
             </div>
             <div class="grid-col span-2">
-                <DeviceRealTimeCard titleText={$texts.energyConsumption}>
+                <ContentCard titleText={$texts.energyConsumption}>
                     <div class="slot-div" slot="header"></div>
                     <div class="slot-div" slot="content"></div>
-                </DeviceRealTimeCard>
+                </ContentCard>
             </div>
         </div>
     {/if}

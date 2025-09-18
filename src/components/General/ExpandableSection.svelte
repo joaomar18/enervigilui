@@ -1,25 +1,55 @@
 <script lang="ts">
+    // Styles
+    import { mergeStyle } from "$lib/style/components";
+    import { ExpandableSectionStyle } from "$lib/style/general";
+
+    // Style object (from theme)
+    export let style: { [property: string]: string | number } | null = null;
+    $: effectiveStyle = style ?? $ExpandableSectionStyle;
+
     // Props
     export let titleText: string;
     export let contentExpanded: boolean = false;
 
     // Layout / styling props
-    export let width: string | undefined = "calc(100%)";
-    export let paddingTop: string | undefined = "5px";
-    export let paddingBottom: string | undefined = "5px";
-    export let headerHeight: string | undefined = "fit-content";
-    export let headerBorderBottom: string | undefined = "1px solid rgba(255, 255, 255, 0.07)";
-    export let headerPaddingBottom: string | undefined = "5px";
-    export let titleSize: string | undefined = "14px";
-    export let titleColor: string | undefined = "rgba(255, 255, 255, 0.7)";
-    export let titleWeight: string | undefined = "400";
-    export let titleMarginLeft: string | undefined = "10px";
-    export let expandButtonWidth: string | undefined = "40px";
-    export let expandButtonHeight: string | undefined = "40px";
-    export let expandButtonHoverColor: string | undefined = "#1c1f26";
-    export let expandButtonMarginRight: string | undefined = "0px";
-    export let expandButtonArrowWidth: string | undefined = "24px";
-    export let expandButtonArrowHeight: string | undefined = "24px";
+    export let width: string | undefined = undefined;
+    export let paddingTop: string | undefined = undefined;
+    export let paddingBottom: string | undefined = undefined;
+    export let headerHeight: string | undefined = undefined;
+    export let headerBorderBottom: string | undefined = undefined;
+    export let headerPaddingBottom: string | undefined = undefined;
+    export let titleSize: string | undefined = undefined;
+    export let titleColor: string | undefined = undefined;
+    export let titleWeight: string | undefined = undefined;
+    export let titleMarginLeft: string | undefined = undefined;
+    export let expandButtonWidth: string | undefined = undefined;
+    export let expandButtonHeight: string | undefined = undefined;
+    export let expandButtonHoverColor: string | undefined = undefined;
+    export let expandButtonMarginRight: string | undefined = undefined;
+    export let expandButtonArrowWidth: string | undefined = undefined;
+    export let expandButtonArrowHeight: string | undefined = undefined;
+
+    $: localOverrides = {
+        width,
+        paddingTop,
+        paddingBottom,
+        headerHeight,
+        headerBorderBottom,
+        headerPaddingBottom,
+        titleSize,
+        titleColor,
+        titleWeight,
+        titleMarginLeft,
+        expandButtonWidth,
+        expandButtonHeight,
+        expandButtonHoverColor,
+        expandButtonMarginRight,
+        expandButtonArrowWidth,
+        expandButtonArrowHeight,
+    };
+
+    // Merged style
+    $: mergedStyle = mergeStyle(effectiveStyle, localOverrides);
 
     // Functions
     function toogleExpand() {
@@ -27,39 +57,42 @@
     }
 </script>
 
+<!-- Expandable section component: displays a clickable header with title and arrow that expands/collapses content below -->
 <div
     style="
-        --width: {width};
-        --padding-top: {paddingTop};
-        --padding-bottom: {paddingBottom};
-        --header-height: {headerHeight};
-        --header-border-bottom: {headerBorderBottom};
-        --header-padding-bottom: {headerPaddingBottom};
-        --title-size: {titleSize};
-        --title-color: {titleColor};
-        --title-weight: {titleWeight};
-        --title-margin-left: {titleMarginLeft};
-        --expand-button-width: {expandButtonWidth};
-        --expand-button-height: {expandButtonHeight};
-        --expand-button-hover-color: {expandButtonHoverColor};
-        --expand-button-margin-right: {expandButtonMarginRight};
-        --expand-button-arrow-width: {expandButtonArrowWidth};
-        --expand-button-arrow-height: {expandButtonArrowHeight};
+        --width: {mergedStyle.width};
+        --padding-top: {mergedStyle.paddingTop};
+        --padding-bottom: {mergedStyle.paddingBottom};
+        --header-height: {mergedStyle.headerHeight};
+        --header-border-bottom: {mergedStyle.headerBorderBottom};
+        --header-padding-bottom: {mergedStyle.headerPaddingBottom};
+        --title-size: {mergedStyle.titleSize};
+        --title-color: {mergedStyle.titleColor};
+        --title-weight: {mergedStyle.titleWeight};
+        --title-margin-left: {mergedStyle.titleMarginLeft};
+        --expand-button-width: {mergedStyle.expandButtonWidth};
+        --expand-button-height: {mergedStyle.expandButtonHeight};
+        --expand-button-hover-color: {mergedStyle.expandButtonHoverColor};
+        --expand-button-margin-right: {mergedStyle.expandButtonMarginRight};
+        --expand-button-arrow-width: {mergedStyle.expandButtonArrowWidth};
+        --expand-button-arrow-height: {mergedStyle.expandButtonArrowHeight};
     "
     class="container"
 >
     <div class="content">
         <div class="header">
             <div class="header-content">
-                <h3>{titleText}</h3>
-                <div class="arrow-div">
-                    <img
-                        class="arrow"
-                        src={contentExpanded ? "/img/up-arrow.svg" : "/img/down-arrow.svg"}
-                        alt={contentExpanded ? "up-arrow" : "down-arrow"}
-                    />
+                <div class="wrapper">
+                    <h3>{titleText}</h3>
+                    <div class="arrow-div">
+                        <img
+                            class="arrow"
+                            src={contentExpanded ? "/img/up-arrow.svg" : "/img/down-arrow.svg"}
+                            alt={contentExpanded ? "up-arrow" : "down-arrow"}
+                        />
+                    </div>
+                    <button on:click={toogleExpand} aria-label="Absolute header button"></button>
                 </div>
-                <button on:click={toogleExpand} aria-label="Absolute header button"></button>
             </div>
         </div>
         <div class="section-content" class:close={!contentExpanded}>
@@ -71,6 +104,7 @@
 </div>
 
 <style>
+    /* Main container: sets section width and vertical padding */
     .container {
         width: var(--width);
         height: fit-content;
@@ -80,6 +114,7 @@
         padding-bottom: var(--padding-bottom);
     }
 
+    /* Content wrapper: contains both header and expandable sections in vertical layout */
     .content {
         width: 100%;
         height: fit-content;
@@ -91,6 +126,7 @@
         min-height: 0;
     }
 
+    /* Expandable content area: uses CSS Grid for smooth expand/collapse animation */
     .section-content {
         width: 100%;
         flex: 1 1 auto;
@@ -100,40 +136,54 @@
         overflow: hidden;
     }
 
+    /* Collapsed state: hides content by setting grid row height to 0 */
     .section-content.close {
         grid-template-rows: 0fr;
         flex: 0 0 auto;
         pointer-events: none;
     }
 
+    /* Content wrapper: handles overflow during animation transitions */
     .section-content .wrapper {
         min-height: 0;
         overflow: hidden;
     }
 
+    /* Header section: contains the clickable title and expand/collapse controls */
     .header {
         width: 100%;
         height: var(--header-height);
         border-bottom: var(--header-border-bottom);
     }
 
+    /* Header content container: provides padding and full height layout */
     .header .header-content {
+        margin: 0;
+        padding: 0;
+        width: 100%;
+        height: 100%;
+        padding-bottom: var(--header-padding-bottom);
+    }
+
+    /* Header wrapper: positions title and arrow icon with flex layout */
+    .header .header-content .wrapper {
         margin: 0;
         padding: 0;
         position: relative;
         width: 100%;
         height: 100%;
-        padding-bottom: var(--header-padding-bottom);
         display: flex;
         align-items: center;
         justify-content: space-between;
     }
 
-    .header .header-content:hover {
+    /* Header hover state: changes background color for visual feedback */
+    .header .header-content .wrapper:hover {
         background-color: var(--expand-button-hover-color);
     }
 
-    .header .header-content h3 {
+    /* Section title: styled text positioned on the left side of header */
+    .header .header-content .wrapper h3 {
         font-size: var(--title-size);
         color: var(--title-color);
         font-weight: var(--title-weight);
@@ -142,7 +192,8 @@
         margin-left: var(--title-margin-left);
     }
 
-    .header .header-content .arrow-div {
+    /* Arrow container: circular area that holds the expand/collapse arrow icon */
+    .header .header-content .wrapper .arrow-div {
         width: var(--expand-button-width);
         height: var(--expand-button-height);
         border-radius: 50%;
@@ -154,17 +205,19 @@
         margin-right: var(--expand-button-margin-right);
     }
 
-    .header .header-content .arrow-div img {
+    /* Arrow icon: sized expand/collapse indicator that changes based on state */
+    .header .header-content .wrapper .arrow-div img {
         width: var(--expand-button-arrow-width);
         height: var(--expand-button-arrow-height);
     }
 
-    .header .header-content button {
+    /* Invisible button overlay: captures clicks across entire header area */
+    .header .header-content .wrapper button {
         position: absolute;
         width: 100%;
         height: 100%;
         background: none;
         border: none;
-        cursor:pointer;
+        cursor: pointer;
     }
 </style>

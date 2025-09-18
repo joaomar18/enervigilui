@@ -23,7 +23,7 @@ export const emptyRealTimeCardSubSections = {
     [RealTimeCardSubSections.States]: {},
     [RealTimeCardSubSections.Texts]: {},
     [RealTimeCardSubSections.Other]: {},
-} as Record<RealTimeCardSubSections, Record<any, any>>
+} as Record<RealTimeCardSubSections, Record<any, any>>;
 
 /** Default state with all real-time card sections disabled */
 export const defaultRealTimeCardSectionsState = {
@@ -34,6 +34,7 @@ export const defaultRealTimeCardSectionsState = {
     Other: false,
 } as RealTimeCardSectionsState;
 
+/** Initial expanded state with all real-time card sections expanded by default */
 export const initialRealTimeCardSectionsExpandState = {
     Measurements: true,
     Counters: true,

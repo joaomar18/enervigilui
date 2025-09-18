@@ -1,11 +1,11 @@
 <script lang="ts">
     // Styles
     import { mergeStyle } from "$lib/style/components";
-    import { DeviceRealTimeCardStyle } from "$lib/style/device";
+    import { ContentCardStyle } from "$lib/style/general";
 
     // Style object (from theme)
     export let style: { [property: string]: string | number } | null = null;
-    $: effectiveStyle = style ?? $DeviceRealTimeCardStyle;
+    $: effectiveStyle = style ?? $ContentCardStyle;
 
     // Props
     export let titleText: string = "";
@@ -61,6 +61,7 @@
     $: mergedStyle = mergeStyle(effectiveStyle, localOverrides);
 </script>
 
+<!-- Reusable card component: displays a title header with optional slot content and scrollable body content -->
 <div
     style="
         --width: {mergedStyle.width};
@@ -101,6 +102,7 @@
 </div>
 
 <style>
+    /* Main container: sets card dimensions, background, border, and layout structure */
     .container {
         margin: 0;
         padding: 0;
@@ -117,6 +119,8 @@
         justify-content: start;
         align-items: center;
     }
+
+    /* Header section: contains title and optional slot content, positioned at top of card */
     .header {
         margin: 0;
         padding: 0;
@@ -131,6 +135,7 @@
         align-items: center;
     }
 
+    /* Header title: styled text element positioned on the left side of header */
     .header h3 {
         margin: 0;
         padding: 0;
@@ -140,11 +145,13 @@
         font-weight: var(--title-weight);
     }
 
+    /* Header slot area: flexible container for additional header content */
     .header .slot-content {
         flex: 1;
         height: 100%;
     }
 
+    /* Content section: flexible container that fills remaining card height */
     .content {
         box-sizing: border-box;
         margin: 0;
@@ -156,6 +163,7 @@
         flex: 1;
     }
 
+    /* Content wrapper: provides scrollable area with custom scrollbar styling */
     .wrapper {
         box-sizing: border-box;
         position: relative;

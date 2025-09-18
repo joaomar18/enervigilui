@@ -337,3 +337,58 @@ const LoaderStyleConfig: ComponentStyles = {
 };
 
 export const LoaderStyle = createStyleStore(LoaderStyleConfig);
+
+//////////     C O N T E N T     C A R D     //////////
+
+const ContentCardStyleConfig: ComponentStyles = {
+    dark: {
+        width: "100%",
+        height: "clamp(400px, 40vh, 680px)",
+        minHeight: "400px",
+        maxHeight: "680px",
+        backgroundColor: "#14161c",
+        borderColor: "rgba(255,255,255,0.07)",
+        shadow: "0 8px 16px rgba(0, 0, 0, 0.1)",
+        borderRadius: "20px",
+        titleColor: "#f5f5f5",
+        titleWeight: "300",
+        titlePaddingLeft: "10px",
+        headerWidth: "calc(100% - 40px)",
+        headerHeight: "32px",
+        headerBorder: "1px solid rgba(255,255,255,0.1)",
+        headerPaddingTop: "10px",
+        headerPaddingBottom: "10px",
+        contentPaddingTop: "10px",
+        contentPaddingBottom: "30px",
+        contentPaddingHorizontal: "20px",
+        scrollbarTrackColor: "#1a1c22",
+        scrollbarThumbColor: "#4a5059",
+    },
+};
+
+export const ContentCardStyle = createStyleStore(ContentCardStyleConfig);
+
+//////////     E X P A N D A B L E     S E C T I O N     //////////
+
+const ExpandableSectionStyleConfig: ComponentStyles = {
+    dark: {
+        width: "100%",
+        paddingTop: "5px",
+        paddingBottom: "5px",
+        headerHeight: "fit-content",
+        headerBorderBottom: "1px solid rgba(255, 255, 255, 0.07)",
+        headerPaddingBottom: "5px",
+        titleSize: "14px",
+        titleColor: "rgba(255, 255, 255, 0.7)",
+        titleWeight: "400",
+        titleMarginLeft: "10px",
+        expandButtonWidth: "40px",
+        expandButtonHeight: "40px",
+        expandButtonHoverColor: "#1c1f26",
+        expandButtonMarginRight: "0px",
+        expandButtonArrowWidth: "24px",
+        expandButtonArrowHeight: "24px",
+    },
+};
+
+export const ExpandableSectionStyle = createStyleStore(ExpandableSectionStyleConfig);

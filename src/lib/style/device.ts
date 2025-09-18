@@ -49,36 +49,6 @@ const DeviceCardStyleConfig: ComponentStyles = {
 
 export const DeviceCardStyle = createStyleStore(DeviceCardStyleConfig);
 
-//////////     D E V I C E     R E A L     T I M E     C A R D     //////////
-
-const DeviceRealTimeCardStyleConfig: ComponentStyles = {
-    dark: {
-        width: "100%",
-        height: "clamp(400px, 40vh, 680px)",
-        minHeight: "400px",
-        maxHeight: "680px",
-        backgroundColor: "#14161c",
-        borderColor: "rgba(255,255,255,0.07)",
-        shadow: "0 8px 16px rgba(0, 0, 0, 0.1)",
-        borderRadius: "20px",
-        titleColor: "#f5f5f5",
-        titleWeight: "300",
-        titlePaddingLeft: "10px",
-        headerWidth: "calc(100% - 40px)",
-        headerHeight: "32px",
-        headerBorder: "1px solid rgba(255,255,255,0.1)",
-        headerPaddingTop: "20px",
-        headerPaddingBottom: "10px",
-        contentPaddingTop: "20px",
-        contentPaddingBottom: "30px",
-        contentPaddingHorizontal: "20px",
-        scrollbarTrackColor: "#1a1c22",
-        scrollbarThumbColor: "#4a5059",
-    },
-};
-
-export const DeviceRealTimeCardStyle = createStyleStore(DeviceRealTimeCardStyleConfig);
-
 //////////     D E V I C E     I N F O     H E A D E R     //////////
 
 const DeviceInfoHeaderStyleConfig: ComponentStyles = {
