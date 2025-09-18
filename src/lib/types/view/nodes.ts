@@ -1,8 +1,10 @@
+/** Column visibility configuration with optional width and visibility state */
 export interface ColumnVisibilityState {
     hideWidth?: number;
     visible: boolean;
 }
 
+/** Visibility configuration for all table columns in the nodes view */
 export interface ColumnVisibilityMap {
     name: ColumnVisibilityState;
     unit: ColumnVisibilityState;

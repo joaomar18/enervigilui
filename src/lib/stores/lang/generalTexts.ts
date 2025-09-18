@@ -599,9 +599,9 @@ const textsObject: TextsObject = {
         PT: "Editar configuração",
         EN: "Edit configuration",
     },
-    realTimeData: {
-        PT: "Dados em tempo real",
-        EN: "Real time data",
+    generalView: {
+        PT: "Vista geral",
+        EN: "General view",
     },
     dataAnalytics: {
         PT: "Análise de dados",
@@ -619,6 +619,22 @@ const textsObject: TextsObject = {
         PT: "Variáveis",
         EN: "Variables",
     },
+    measurements: {
+        PT: "Medições",
+        EN: "Measurements",
+    },
+    counters: {
+        PT: "Contadores",
+        EN: "Counters",
+    },
+    texts: {
+        PT: "Textos",
+        EN: "Texts",
+    },
+    other: {
+        PT: "Outros",
+        EN: "Other",
+    }
 
 };
 

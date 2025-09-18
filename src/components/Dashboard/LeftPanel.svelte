@@ -146,12 +146,12 @@
                         <Link
                             style={$SubLinkStyle}
                             disabled={!$currentDeviceID}
-                            selected={activeSection.includes("/realtime")}
-                            buttonText={$texts.realTimeData}
-                            imageURL="/img/realtime.svg"
-                            disabledImageURL="/img/realtime_muted.svg"
+                            selected={activeSection.includes("/general")}
+                            buttonText={$texts.generalView}
+                            imageURL="/img/general_view.svg"
+                            disabledImageURL="/img/general_view_muted.svg"
                             onClick={() => {
-                                browseTo("/devices/realtime", { deviceId: String($currentDeviceID) });
+                                browseTo("/devices/general_view", { deviceId: String($currentDeviceID) });
                             }}
                         />
                         <Link
@@ -305,6 +305,7 @@
         justify-content: space-between;
         scrollbar-width: thin;
         scrollbar-color: var(--scrollbar-track-color) var(--scrollbar-thumb-color);
+        scrollbar-gutter: stable;
     }
 
     /* Navigation section */

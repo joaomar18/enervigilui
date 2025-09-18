@@ -2,7 +2,6 @@ import { callAPI } from "$lib/logic/api/api";
 import { processInitialNodes, initNodes } from "../factory/nodes";
 import { NodePhase } from "$lib/types/nodes/base";
 import type { NodeRecord, EditableNodeRecord, NodeState } from "$lib/types/nodes/base";
-import { getAvailablePhasesFromNodesState } from "../util/nodes";
 import { nodeSections } from "$lib/types/nodes/base";
 import { navigateTo } from "../view/navigation";
 
@@ -40,9 +39,9 @@ export async function getDeviceNodesConfig(id: number): Promise<{ initialNodes: 
     return { initialNodes, nodes };
 }
 
-export async function getDeviceNodesState(id: number): Promise<{ nodesStateBySection: Record<NodePhase, Record<string, NodeState>>, availablePhases: Array<NodePhase> }> {
+export async function getDeviceNodesState(id: number): Promise<{ nodesState: Record<string, NodeState>, }> {
+    let nodesState: Record<string, NodeState>;
     let nodesStateBySection: Record<NodePhase, Record<string, NodeState>>;
-    let availablePhases: Array<NodePhase> = [];
     const { sucess, data } = await callAPI({
         endpoint: "/api/nodes/get_nodes_state",
         method: "GET",
@@ -51,18 +50,11 @@ export async function getDeviceNodesState(id: number): Promise<{ nodesStateBySec
     });
 
     if (sucess) {
-        let nodesState = data as Record<string, NodeState>;
-        availablePhases = getAvailablePhasesFromNodesState(nodesState);
-        nodesStateBySection = nodeSections.reduce((acc: Record<NodePhase, Record<string, NodeState>>, section) => {
-            acc[section.key] = Object.fromEntries(
-                Object.entries(nodesState)
-                    .filter(([key, nodeState]) => section.filter(nodeState.phase))
-            ); return acc;
-        }, {} as Record<NodePhase, Record<string, NodeState>>);
+        nodesState = data as Record<string, NodeState>;
     }
     else {
         throw new Error("Get device nodes state error");
     }
 
-    return { nodesStateBySection, availablePhases };
+    return { nodesState };
 }

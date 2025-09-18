@@ -7,7 +7,11 @@
     import { showToast } from "$lib/logic/view/toast";
     import { ToastType } from "$lib/stores/view/toast";
     import { nodeSections } from "$lib/types/nodes/base";
+    import { getAvailablePhasesFromNodesState, getNodesStateBySubSection } from "$lib/logic/util/nodes";
+    import { initialRealTimeCardSectionsExpandState } from "$lib/types/view/device";
+    import { assignRealTimeCardSectionsStateToAllPhases } from "$lib/logic/view/device";
     import type { NodeState } from "$lib/types/nodes/base";
+    import type { RealTimeCardSubSections, RealTimeCardSectionsState } from "$lib/types/view/device";
     import DeviceRealTimeCard from "../../../components/Devices/DeviceRealTimeCard.svelte";
     import ExpandableSection from "../../../components/General/ExpandableSection.svelte";
     import Action from "../../../components/General/Action.svelte";
@@ -23,15 +27,24 @@
     import { RealTimeCardActionStyle } from "$lib/style/device";
 
     // Variables
-    let nodesStateBySection: Record<NodePhase, Record<string, NodeState>>;
+    let nodesState: Record<string, NodeState>;
+    let nodesStateBySubSection: Record<NodePhase, Record<RealTimeCardSubSections, Record<string, NodeState>>>;
     let availablePhases: Array<NodePhase>;
-    
+    let availableSubSections: Record<NodePhase, RealTimeCardSectionsState>;
+    let expandedState = assignRealTimeCardSectionsStateToAllPhases(initialRealTimeCardSectionsExpandState);
+
+    // Reactive Statements
+
+    $: if (nodesState) {
+        availablePhases = getAvailablePhasesFromNodesState(nodesState);
+        ({ nodesStateBySubSection, availableSubSections } = getNodesStateBySubSection(nodesState));
+    }
 
     onMount(() => {
         let nodesStatePoller: MethodPoller | null;
         if ($currentDeviceID) {
             nodesStatePoller = new MethodPoller(async (signal) => {
-                ({ nodesStateBySection, availablePhases } = await getDeviceNodesState($currentDeviceID));
+                ({ nodesState } = await getDeviceNodesState($currentDeviceID));
             }, 5000);
         } else {
             showToast("errorEditDeviceParams", ToastType.ALERT);
@@ -47,33 +60,44 @@
 </script>
 
 <div class="content" in:fade={{ duration: 300 }}>
-    {#if nodesStateBySection}
+    {#if nodesStateBySubSection && availableSubSections}
         <div class="grid">
             {#each nodeSections.filter((section) => availablePhases.includes(section.phase)) as section (section.key)}
                 <div class="grid-col">
                     <DeviceRealTimeCard titleText={section.phase !== NodePhase.SINGLEPHASE ? $texts[section.labelKey] : $texts.variables}>
                         <div class="slot-div" slot="header">
                             <div class="phase-actions-div">
-                                <Action style={$RealTimeCardActionStyle} imageURL="/img/collapse-all.svg" onClick={() => {}} />
-                                <Action style={$RealTimeCardActionStyle} imageURL="/img/expand-all.svg" onClick={() => {}} />
+                                <Action
+                                    style={$RealTimeCardActionStyle}
+                                    imageURL="/img/collapse-all.svg"
+                                    onClick={() => {
+                                        for (const state of Object.keys(expandedState[section.phase]) as (keyof RealTimeCardSectionsState)[]) {
+                                            expandedState[section.phase][state] = false;
+                                        }
+                                    }}
+                                />
+                                <Action
+                                    style={$RealTimeCardActionStyle}
+                                    imageURL="/img/expand-all.svg"
+                                    onClick={() => {
+                                        for (const state of Object.keys(expandedState[section.phase]) as (keyof RealTimeCardSectionsState)[]) {
+                                            expandedState[section.phase][state] = true;
+                                        }
+                                    }}
+                                />
                             </div>
                         </div>
                         <div class="slot-div" slot="content">
-                            <ExpandableSection titleText="Medições" >
-                                <div style="width:100%; height: 700px; background-color: white;"></div>
-                            </ExpandableSection>
-                            <ExpandableSection titleText="Contadores">
-                                <div style="width:100%; height: 700px; background-color: white;"></div>
-                            </ExpandableSection>
-                            <ExpandableSection titleText="Estados">
-                                <div style="width:100%; height: 700px; background-color: white;"></div>
-                            </ExpandableSection>
-                            <ExpandableSection titleText="Textos">
-                                <div style="width:100%; height: 700px; background-color: white;"></div>
-                            </ExpandableSection>
-                            <ExpandableSection titleText="Outros">
-                                <div style="width:100%; height: 700px; background-color: white;"></div>
-                            </ExpandableSection>
+                            {#each Object.entries(availableSubSections[section.phase]) as [subsection, isActive] (subsection)}
+                                {#if isActive}
+                                    <ExpandableSection
+                                        titleText={$texts[subsection.toLowerCase()]}
+                                        bind:contentExpanded={expandedState[section.phase][subsection as keyof RealTimeCardSectionsState]}
+                                    >
+                                        <div style="width:100%; height: 700px; background-color: white;"></div>
+                                    </ExpandableSection>
+                                {/if}
+                            {/each}
                         </div>
                     </DeviceRealTimeCard>
                 </div>

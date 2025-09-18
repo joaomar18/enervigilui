@@ -290,6 +290,7 @@ export interface NodeRecordEditingState {
  *
  * @property {number | string | boolean | null} value - The current value of the node.
  * @property {NodeType} type - The data type of the node's value.
+ * @property {boolean} incremental - Whether the node accumulates values over time (counter)
  * @property {string} unit - The measurement unit for the value.
  * @property {NodePhase} phase - The electrical phase associated with the node.
  * @property {boolean} [min_alarm_state] - Optional: Indicates if the minimum alarm is active.
@@ -298,6 +299,7 @@ export interface NodeRecordEditingState {
 export interface NodeState {
     value: number | string | boolean | null;
     type: NodeType;
+    incremental: boolean;
     unit: string;
     phase: NodePhase;
     min_alarm_state?: boolean;

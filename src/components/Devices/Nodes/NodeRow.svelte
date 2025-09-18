@@ -13,7 +13,7 @@
     // Types
     import type { EditableDevice, NewDevice } from "$lib/types/device/base";
     import type { EditableNodeRecord, NodeRecordEditingState } from "$lib/types/nodes/base";
-    import type { ColumnVisibilityMap } from "$lib/logic/view/nodes";
+    import type { ColumnVisibilityMap } from "$lib/types/view/nodes";
 
     // Texts
     import { texts } from "$lib/stores/lang/generalTexts";

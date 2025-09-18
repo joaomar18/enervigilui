@@ -2,7 +2,12 @@ import { get } from "svelte/store";
 import { protocolPlugins } from "$lib/stores/device/protocol";
 import { Protocol } from "$lib/types/device/base";
 import { NodePrefix, NodePhase, NodeType, phaseOrder } from "$lib/types/nodes/base";
+import { defaultRealTimeCardSectionsState } from "$lib/types/view/device";
 import type { BaseNodeConfig, EditableBaseNodeConfig, NodeRecord, EditableNodeRecord, NodeState } from "$lib/types/nodes/base";
+import type { RealTimeCardSectionsState } from "$lib/types/view/device";
+import { RealTimeCardSubSections, emptyRealTimeCardSubSections } from "$lib/types/view/device";
+import { assignRealTimeCardSectionsStateToAllPhases } from "../view/device";
+
 
 /**
  * Determines if a node is incremental (e.g., energy counters).
@@ -201,4 +206,39 @@ export function getAvailablePhasesFromNodes(nodes: Array<EditableNodeRecord> | A
 
 export function getAvailablePhasesFromNodesState(nodesState: Record<string, NodeState>): Array<NodePhase> {
     return Array.from(new Set(Object.values(nodesState).map(nodeState => nodeState.phase).filter(phase => phase !== null && phase !== undefined))) as NodePhase[];
+}
+
+
+
+export function getNodesStateBySubSection(nodesState: Record<string, NodeState>): { nodesStateBySubSection: Record<NodePhase, Record<RealTimeCardSubSections, Record<string, NodeState>>>, availableSubSections: Record<NodePhase, RealTimeCardSectionsState> } {
+
+    let availableSubSections: Record<NodePhase, RealTimeCardSectionsState> = assignRealTimeCardSectionsStateToAllPhases(defaultRealTimeCardSectionsState);
+
+    const nodesStateBySubSection: Record<NodePhase, Record<RealTimeCardSubSections, Record<string, NodeState>>> =
+        Object.fromEntries(
+            phaseOrder.map(phase => [phase, { ...emptyRealTimeCardSubSections }])
+        ) as Record<NodePhase, Record<RealTimeCardSubSections, Record<string, NodeState>>>;
+
+    for (const [nodeKey, nodeState] of Object.entries(nodesState)) {
+        const phase = nodeState.phase;
+        let subsection: RealTimeCardSubSections;
+        if (nodeState.type === NodeType.FLOAT || nodeState.type === NodeType.INT) {
+            if (nodeState.incremental) {
+                subsection = RealTimeCardSubSections.Counters;
+            }
+            else {
+                subsection = RealTimeCardSubSections.Measurements;
+            }
+
+        } else if (nodeState.type === NodeType.BOOLEAN) {
+            subsection = RealTimeCardSubSections.States;
+        } else if (nodeState.type === NodeType.STRING) {
+            subsection = RealTimeCardSubSections.Texts;
+        } else {
+            subsection = RealTimeCardSubSections.Other;
+        }
+        nodesStateBySubSection[phase][subsection][nodeKey] = nodeState;
+        availableSubSections[phase][subsection] = true;
+    }
+    return { nodesStateBySubSection, availableSubSections };
 }

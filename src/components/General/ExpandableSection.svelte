@@ -16,7 +16,7 @@
     export let titleMarginLeft: string | undefined = "10px";
     export let expandButtonWidth: string | undefined = "40px";
     export let expandButtonHeight: string | undefined = "40px";
-    export let expandButtonHoverColor: string | undefined = "#323a45";
+    export let expandButtonHoverColor: string | undefined = "#1c1f26";
     export let expandButtonMarginRight: string | undefined = "0px";
     export let expandButtonArrowWidth: string | undefined = "24px";
     export let expandButtonArrowHeight: string | undefined = "24px";
@@ -52,13 +52,14 @@
         <div class="header">
             <div class="header-content">
                 <h3>{titleText}</h3>
-                <button on:click={toogleExpand}>
+                <div class="arrow-div">
                     <img
                         class="arrow"
                         src={contentExpanded ? "/img/up-arrow.svg" : "/img/down-arrow.svg"}
                         alt={contentExpanded ? "up-arrow" : "down-arrow"}
-                    /></button
-                >
+                    />
+                </div>
+                <button on:click={toogleExpand} aria-label="Absolute header button"></button>
             </div>
         </div>
         <div class="section-content" class:close={!contentExpanded}>
@@ -95,7 +96,7 @@
         flex: 1 1 auto;
         display: grid;
         grid-template-rows: 1fr;
-        transition: grid-template-rows 0.3s ease-in-out;
+        transition: grid-template-rows 0.2s ease-in-out;
         overflow: hidden;
     }
 
@@ -117,12 +118,19 @@
     }
 
     .header .header-content {
+        margin: 0;
+        padding: 0;
+        position: relative;
         width: 100%;
         height: 100%;
         padding-bottom: var(--header-padding-bottom);
         display: flex;
         align-items: center;
         justify-content: space-between;
+    }
+
+    .header .header-content:hover {
+        background-color: var(--expand-button-hover-color);
     }
 
     .header .header-content h3 {
@@ -134,12 +142,9 @@
         margin-left: var(--title-margin-left);
     }
 
-    .header .header-content button {
+    .header .header-content .arrow-div {
         width: var(--expand-button-width);
         height: var(--expand-button-height);
-        background: none;
-        cursor: pointer;
-        border: none;
         border-radius: 50%;
         margin: 0;
         padding: 0;
@@ -149,12 +154,17 @@
         margin-right: var(--expand-button-margin-right);
     }
 
-    .header .header-content button:hover {
-        background-color: var(--expand-button-hover-color);
-    }
-
-    .header .header-content button img {
+    .header .header-content .arrow-div img {
         width: var(--expand-button-arrow-width);
         height: var(--expand-button-arrow-height);
+    }
+
+    .header .header-content button {
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        background: none;
+        border: none;
+        cursor:pointer;
     }
 </style>

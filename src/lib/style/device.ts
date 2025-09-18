@@ -65,6 +65,7 @@ const DeviceRealTimeCardStyleConfig: ComponentStyles = {
         titleWeight: "300",
         titlePaddingLeft: "10px",
         headerWidth: "calc(100% - 40px)",
+        headerHeight: "32px",
         headerBorder: "1px solid rgba(255,255,255,0.1)",
         headerPaddingTop: "20px",
         headerPaddingBottom: "10px",

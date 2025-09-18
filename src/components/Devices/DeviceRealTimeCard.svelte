@@ -23,6 +23,7 @@
     export let titleWeight: string | undefined = undefined;
     export let titlePaddingLeft: string | undefined = undefined;
     export let headerWidth: string | undefined = undefined;
+    export let headerHeight: string | undefined = undefined;
     export let headerBorder: string | undefined = undefined;
     export let headerPaddingTop: string | undefined = undefined;
     export let headerPaddingBottom: string | undefined = undefined;
@@ -45,6 +46,7 @@
         titleWeight,
         titlePaddingLeft,
         headerWidth,
+        headerHeight,
         headerBorder,
         headerPaddingTop,
         headerPaddingBottom,
@@ -73,6 +75,7 @@
         --title-weight: {mergedStyle.titleWeight};
         --title-padding-left: {mergedStyle.titlePaddingLeft};
         --header-width: {mergedStyle.headerWidth};
+        --header-height: {mergedStyle.headerHeight};
         --header-border: {mergedStyle.headerBorder};
         --header-padding-top: {mergedStyle.headerPaddingTop};
         --header-padding-bottom: {mergedStyle.headerPaddingBottom};
@@ -118,7 +121,7 @@
         margin: 0;
         padding: 0;
         width: var(--header-width);
-        height: fit-content;
+        height: var(--header-height);
         padding-top: var(--header-padding-top);
         padding-bottom: var(--header-padding-bottom);
         border-bottom: var(--header-border);
@@ -171,5 +174,6 @@
         align-items: center;
         scrollbar-width: thin;
         scrollbar-color: var(--scrollbar-thumb-color) var(--scrollbar-track-color);
+        scrollbar-gutter: stable both-edges;
     }
 </style>

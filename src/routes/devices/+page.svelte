@@ -28,9 +28,9 @@
         });
     }
 
-    // Go to device main configured page (right now enters real time)
+    // Go to device main configured page (right now enters general view)
     async function enterDevice(deviceId: number): Promise<void> {
-        await navigateTo("devices/realtime", {
+        await navigateTo("devices/general_view", {
             deviceId: String(deviceId),
         });
     }

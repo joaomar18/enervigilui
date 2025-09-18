@@ -4,7 +4,6 @@
     import { onMount, onDestroy } from "svelte";
     import { addNode } from "$lib/logic/factory/nodes";
     import { deleteNodeFromArray } from "$lib/logic/handlers/nodes";
-    import { getAvailablePhasesFromNodes } from "$lib/logic/util/nodes";
     import { nodeSections } from "$lib/types/nodes/base";
     import { protocolPlugins } from "$lib/stores/device/protocol";
 
@@ -15,7 +14,7 @@
     // Types
     import type { EditableDevice, NewDevice } from "$lib/types/device/base";
     import type { EditableNodeRecord, NodeRecordEditingState } from "$lib/types/nodes/base";
-    import type { ColumnVisibilityMap } from "$lib/logic/view/nodes";
+    import type { ColumnVisibilityMap } from "$lib/types/view/nodes";
 
     // Texts
     import { texts } from "$lib/stores/lang/generalTexts";
