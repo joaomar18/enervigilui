@@ -343,9 +343,9 @@ export const LoaderStyle = createStyleStore(LoaderStyleConfig);
 const ContentCardStyleConfig: ComponentStyles = {
     dark: {
         width: "100%",
-        height: "clamp(400px, 40vh, 680px)",
-        minHeight: "400px",
-        maxHeight: "680px",
+        height: "100%",
+        minHeight: "auto",
+        maxHeight: "auto",
         backgroundColor: "#14161c",
         borderColor: "rgba(255,255,255,0.07)",
         shadow: "0 8px 16px rgba(0, 0, 0, 0.1)",

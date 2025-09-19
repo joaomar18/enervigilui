@@ -81,6 +81,7 @@
             <div class="content">
                 <span class="value">{valueText}</span>
                 <span class="unit">{unitText}</span>
+                <div class="stripe"></div>
             </div>
         </div>
     </div>
@@ -148,6 +149,7 @@
     .display-div .content {
         margin: 0;
         padding: 0;
+        position: relative;
         height: var(--display-height);
         width: 100%;
         background-color: var(--display-background-color);
@@ -198,5 +200,15 @@
         text-overflow: ellipsis;
         min-width: 0;
         line-height: 1;
+    }
+
+    .content .stripe{
+        position:absolute;
+        top:0px;
+        left:50%;
+        transform: translateX(-50%);
+        width:calc(100% - 40px);
+        height:3px;
+        background-color: red;
     }
 </style>

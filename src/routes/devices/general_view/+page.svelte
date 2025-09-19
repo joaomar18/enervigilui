@@ -100,7 +100,7 @@
                                         titleText={$texts[subsection.toLowerCase()]}
                                         bind:contentExpanded={expandedState[section.phase][subsection as keyof RealTimeCardSectionsState]}
                                     >
-                                        <Counter labelText="Potência Ativa" valueText="3.53" unitText="kW"/>
+                                        <Counter labelText="Potência Ativa" valueText="3.53" unitText="kW" />
                                         <Counter />
                                     </ExpandableSection>
                                 {/if}
@@ -145,6 +145,14 @@
         align-content: start;
     }
 
+    .grid-col {
+        margin: 0;
+        padding: 0;
+        width: 100%;
+        height: calc(50vh - 74px - 5px);
+        min-height: 400px;
+    }
+
     .grid .grid-col.span-2 {
         grid-column: span 2;
     }
@@ -168,6 +176,9 @@
         .grid {
             max-width: calc(2 * 540px + 1 * 20px);
             grid-template-columns: repeat(2, minmax(300px, 1fr));
+        }
+        .grid-col {
+            max-height: 680px;
         }
     }
 
