@@ -82,6 +82,8 @@
                 <span class="value">{valueText}</span>
                 <span class="unit">{unitText}</span>
                 <div class="stripe"></div>
+                <div class="min-alarm"></div>
+                <div class="max-alarm"></div>
             </div>
         </div>
     </div>
@@ -136,7 +138,7 @@
     .display-div {
         margin: 0;
         padding: 0;
-        height:fit-content;
+        height: fit-content;
         width: var(--display-width);
         max-width: var(--display-max-width);
         width: 100%;
@@ -202,13 +204,33 @@
         line-height: 1;
     }
 
-    .content .stripe{
-        position:absolute;
-        top:0px;
-        left:50%;
+    .content .stripe {
+        position: absolute;
+        bottom: 0px;
+        left: 50%;
         transform: translateX(-50%);
-        width:calc(100% - 40px);
-        height:3px;
+        width: calc(100% - 40px);
+        height: 2px;
         background-color: red;
+    }
+
+    .content .min-alarm {
+        position: absolute;
+        bottom: 1px;
+        left: 20px;
+        background-color: white;
+        height: 2px;
+        width: 20px;
+        opacity: 0.7;
+    }
+
+    .content .max-alarm {
+        position: absolute;
+        bottom: 2px;
+        right: 20px;
+        background-color: white;
+        height: 2px;
+        width: 20px;
+        opacity: 0.7;
     }
 </style>
