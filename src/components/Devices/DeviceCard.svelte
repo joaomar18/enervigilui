@@ -178,7 +178,7 @@
         color: var(--title-color);
         width: 100%;
         text-align: center;
-        font-weight: 400;
+        font-weight: 500;
         white-space: nowrap;
         overflow: hidden;
         text-overflow: ellipsis;

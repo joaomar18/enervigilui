@@ -19,6 +19,7 @@
     export let borderColor: string | undefined = undefined;
     export let shadow: string | undefined = undefined;
     export let borderRadius: string | undefined = undefined;
+    export let titleSize: string | undefined = undefined;
     export let titleColor: string | undefined = undefined;
     export let titleWeight: string | undefined = undefined;
     export let titlePaddingLeft: string | undefined = undefined;
@@ -42,6 +43,7 @@
         borderColor,
         shadow,
         borderRadius,
+        titleSize,
         titleColor,
         titleWeight,
         titlePaddingLeft,
@@ -72,6 +74,7 @@
         --border-color: {mergedStyle.borderColor};
         --border-radius: {mergedStyle.borderRadius};
         --shadow: {mergedStyle.shadow};
+        --title-size: {mergedStyle.titleSize};
         --title-color: {mergedStyle.titleColor};
         --title-weight: {mergedStyle.titleWeight};
         --title-padding-left: {mergedStyle.titlePaddingLeft};
@@ -143,6 +146,7 @@
         text-align: left;
         color: var(--title-color);
         font-weight: var(--title-weight);
+        font-size: var(--title-size);
     }
 
     /* Header slot area: flexible container for additional header content */

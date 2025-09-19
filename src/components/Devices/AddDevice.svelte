@@ -151,7 +151,7 @@
         color: var(--title-color);
         width: 100%;
         text-align: center;
-        font-weight: 400;
+        font-weight: 500;
     }
 
     /* Image div: placeholder with background and sizing */

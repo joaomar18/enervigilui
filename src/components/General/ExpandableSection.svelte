@@ -18,9 +18,12 @@
     export let headerHeight: string | undefined = undefined;
     export let headerBorderBottom: string | undefined = undefined;
     export let headerPaddingBottom: string | undefined = undefined;
+    export let contentPaddingTop: string | undefined = undefined;
     export let titleSize: string | undefined = undefined;
     export let titleColor: string | undefined = undefined;
     export let titleWeight: string | undefined = undefined;
+    export let titleSpacing: string | undefined = undefined;
+    export let titleTextTransform: string | undefined = undefined;
     export let titleMarginLeft: string | undefined = undefined;
     export let expandButtonWidth: string | undefined = undefined;
     export let expandButtonHeight: string | undefined = undefined;
@@ -36,9 +39,12 @@
         headerHeight,
         headerBorderBottom,
         headerPaddingBottom,
+        contentPaddingTop,
         titleSize,
         titleColor,
         titleWeight,
+        titleSpacing,
+        titleTextTransform,
         titleMarginLeft,
         expandButtonWidth,
         expandButtonHeight,
@@ -66,9 +72,12 @@
         --header-height: {mergedStyle.headerHeight};
         --header-border-bottom: {mergedStyle.headerBorderBottom};
         --header-padding-bottom: {mergedStyle.headerPaddingBottom};
+        --content-padding-top: {mergedStyle.contentPaddingTop};
         --title-size: {mergedStyle.titleSize};
         --title-color: {mergedStyle.titleColor};
         --title-weight: {mergedStyle.titleWeight};
+        --title-spacing: {mergedStyle.titleSpacing};
+        --title-text-transform: {mergedStyle.titleTextTransform};
         --title-margin-left: {mergedStyle.titleMarginLeft};
         --expand-button-width: {mergedStyle.expandButtonWidth};
         --expand-button-height: {mergedStyle.expandButtonHeight};
@@ -97,7 +106,9 @@
         </div>
         <div class="section-content" class:close={!contentExpanded}>
             <div class="wrapper">
-                <slot />
+                <div class="inner-wrapper">
+                    <slot />
+                </div>
             </div>
         </div>
     </div>
@@ -128,6 +139,8 @@
 
     /* Expandable content area: uses CSS Grid for smooth expand/collapse animation */
     .section-content {
+        margin: 0;
+        padding: 0;
         width: 100%;
         flex: 1 1 auto;
         display: grid;
@@ -145,8 +158,18 @@
 
     /* Content wrapper: handles overflow during animation transitions */
     .section-content .wrapper {
+        padding: 0;
+        margin: 0;
         min-height: 0;
         overflow: hidden;
+    }
+
+    /* Inner wrapper: contains the slotted content inside the expandable section */
+    .section-content .wrapper .inner-wrapper {
+        padding: 0;
+        margin: 0;
+        padding-top: var(--content-padding-top);
+        position: relative;
     }
 
     /* Header section: contains the clickable title and expand/collapse controls */
@@ -190,6 +213,8 @@
         padding: 0;
         margin: 0;
         margin-left: var(--title-margin-left);
+        letter-spacing: var(--title-spacing);
+        text-transform: var(--title-text-transform);
     }
 
     /* Arrow container: circular area that holds the expand/collapse arrow icon */

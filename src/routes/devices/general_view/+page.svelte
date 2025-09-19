@@ -15,6 +15,7 @@
     import ContentCard from "../../../components/General/ContentCard.svelte";
     import ExpandableSection from "../../../components/General/ExpandableSection.svelte";
     import Action from "../../../components/General/Action.svelte";
+    import Counter from "../../../components/Devices/Nodes/RealTimeDisplay/Counter.svelte";
 
     // Texts
     import { texts } from "$lib/stores/lang/generalTexts";
@@ -99,7 +100,8 @@
                                         titleText={$texts[subsection.toLowerCase()]}
                                         bind:contentExpanded={expandedState[section.phase][subsection as keyof RealTimeCardSectionsState]}
                                     >
-                                        <div style="width:100%; height: 700px; background-color: white;"></div>
+                                        <Counter labelText="Potência Ativa" valueText="3.53" unitText="kW"/>
+                                        <Counter />
                                     </ExpandableSection>
                                 {/if}
                             {/each}
