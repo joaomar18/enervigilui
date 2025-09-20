@@ -8,6 +8,14 @@
     export let valueText: string = "234.57";
     export let unitText: string = "V";
 
+    // Alarm props
+    export let hasValueAlarm: boolean = true;
+    export let hasMinAlarm: boolean = true;
+    export let hasMaxAlarm: boolean = false;
+    export let alarmColor: string = "#FF4444";
+    export let minAlarmColor: string = "#FF4444";
+    export let maxAlarmColor: string = "#FF4444";
+
     // Style object (from theme)
     export let style: { [property: string]: string | number } | null = null;
     $: effectiveStyle = style ?? $ActionStyle;
@@ -81,9 +89,18 @@
             <div class="content">
                 <span class="value">{valueText}</span>
                 <span class="unit">{unitText}</span>
-                <div class="stripe"></div>
-                <div class="min-alarm"></div>
-                <div class="max-alarm"></div>
+
+                <!-- Alarm indicators -->
+                {#if hasValueAlarm}
+                    <!-- Full width stripe for value alarms -->
+                    <div class="alarm-stripe" style="background-color: {alarmColor};"></div>
+                {/if}
+                {#if hasMinAlarm}
+                    <div class="arrow left-arrow" style="border-right-color: {minAlarmColor};"></div>
+                {/if}
+                {#if hasMaxAlarm}
+                    <div class="arrow right-arrow" style="border-left-color: {maxAlarmColor};"></div>
+                {/if}
             </div>
         </div>
     </div>
@@ -204,33 +221,30 @@
         line-height: 1;
     }
 
-    .content .stripe {
+    .content .alarm-stripe {
         position: absolute;
         bottom: 0px;
-        left: 50%;
-        transform: translateX(-50%);
-        width: calc(100% - 40px);
+        left: 20px;
+        right: 20px;
         height: 2px;
         background-color: red;
     }
 
-    .content .min-alarm {
+    .content .arrow {
+        bottom: 2px;
+        width: 0;
+        height: 0;
         position: absolute;
-        bottom: 1px;
-        left: 20px;
-        background-color: white;
-        height: 2px;
-        width: 20px;
-        opacity: 0.7;
+        border-top: 4px solid transparent;
     }
 
-    .content .max-alarm {
-        position: absolute;
-        bottom: 2px;
+    .content .left-arrow {
+        left: 20px;
+        border-right: 7px solid transparent;
+    }
+
+    .content .right-arrow {
         right: 20px;
-        background-color: white;
-        height: 2px;
-        width: 20px;
-        opacity: 0.7;
+        border-left: 7px solid transparent;
     }
 </style>
