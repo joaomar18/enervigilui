@@ -7,11 +7,10 @@
 
     // Props
     export let labelText: string = "Direção do Fator de Potência";
-    export let value: number = 0.0;
+    export let minAlarmValue: number | null = null;
+    export let maxAlarmValue: number | null = null;
+    export let value: number | null = null;
     export let unitText: string = "V";
-
-    // Alarm props
-    export let hasValueAlarm: boolean = true;
 
     // Style object (from theme)
     export let style: { [property: string]: string | number } | null = null;
@@ -23,11 +22,11 @@
     export let paddingVertical: string | undefined = "10px";
     export let labelPaddingTop: string | undefined = undefined;
     export let labelPaddingBottom: string | undefined = "8px";
+    export let labelPaddingLeft: string | undefined = "20px";
+    export let labelPaddingRight: string | undefined = "20px";
     export let labelSize: string | undefined = "1rem";
     export let labelColor: string | undefined = "#D4D4D8";
     export let labelWeight: string | undefined = "500";
-    export let labelPaddingLeft: string | undefined = undefined;
-    export let labelPaddingRight: string | undefined = "20px";
     export let displayHeight: string | undefined = "40px";
     export let displayWidth: string | undefined = "100%";
     export let displayMaxWidth: string | undefined = "300px";
@@ -47,6 +46,16 @@
 
     // Merged style
     $: mergedStyle = mergeStyle(effectiveStyle, localOverrides);
+
+    // Variables
+    let variableAlarm: boolean = false;
+    let variableWarning: boolean = false;
+    let valueAlarm: boolean = false;
+    let valueWarning: boolean = false;
+
+    // Reactive Statements
+    $: variableAlarm = valueAlarm;
+    $: variableWarning = valueWarning;
 </script>
 
 <div
@@ -56,11 +65,11 @@
         --padding-vertical: {paddingVertical};
         --label-padding-top: {labelPaddingTop};
         --label-padding-bottom: {labelPaddingBottom};
+        --label-padding-left: {labelPaddingLeft};
+        --label-padding-right: {labelPaddingRight};
         --label-size: {labelSize};
         --label-color: {labelColor};
         --label-weight: {labelWeight};
-        --label-padding-left: {labelPaddingLeft};
-        --label-padding-right: {labelPaddingRight};
         --display-height: {displayHeight};
         --display-width: {displayWidth};
         --display-max-width: {displayMaxWidth};
@@ -90,14 +99,16 @@
                 <span class="value">{value}</span>
                 <span class="unit">{unitText}</span>
 
-                {#if hasValueAlarm}
+                {#if (minAlarmValue !== null || maxAlarmValue !== null) && value !== null}
                     <div class="bar-value-div">
                         <Bar
-                            currentValue={200}
-                            minAlarmValue={230 * 0.9}
-                            minWarningValue={230 * 0.95}
-                            maxAlarmValue={230 * 1.1}
-                            maxWarningValue={230 * 1.05}
+                            bind:alarmDetected={valueAlarm}
+                            bind:warningDetected={valueWarning}
+                            currentValue={value}
+                            {minAlarmValue}
+                            minWarningValue={minAlarmValue !== null ? minAlarmValue * 1.05 : null}
+                            {maxAlarmValue}
+                            maxWarningValue={maxAlarmValue !== null ? maxAlarmValue * 0.95 : null}
                         />
                     </div>
                 {/if}
@@ -172,7 +183,7 @@
         width: 10px;
         height: 10px;
         border-radius: 50%;
-        background-color: #ef4444;
+        background-color: #6b7280;
     }
 
     .display-div {

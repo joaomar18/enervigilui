@@ -8,10 +8,12 @@
     $: effectiveStyle = style ?? $BarStyle;
 
     // Props
-    export let minAlarmValue: number | undefined = undefined;
-    export let maxAlarmValue: number | undefined = undefined;
-    export let minWarningValue: number | undefined = undefined;
-    export let maxWarningValue: number | undefined = undefined;
+    export let alarmDetected: boolean;
+    export let warningDetected: boolean;
+    export let minAlarmValue: number | null = null;
+    export let maxAlarmValue: number | null = null;
+    export let minWarningValue: number | null = null;
+    export let maxWarningValue: number | null = null;
     export let currentValue: number;
     export let enableMinArrow: boolean = true;
     export let enableMaxArrow: boolean = true;
@@ -64,7 +66,7 @@
     $: mergedStyle = mergeStyle(effectiveStyle, localOverrides);
 
     // Variables
-    let currentValueScaled: number | undefined = undefined;
+    let currentValueScaled: number | null = null;
     let showArrow: boolean = false;
     let minAlarm: boolean = false;
     let minWarning: boolean = false;
@@ -73,7 +75,7 @@
 
     // Reactive Statements
     $: showArrow =
-        (enableArrowDefault && minAlarmValue !== undefined && maxAlarmValue !== undefined) || (minAlarm && enableMinArrow) || (maxAlarm && enableMaxArrow); // Show arrow
+        (enableArrowDefault && minAlarmValue !== null && maxAlarmValue !== null) || (minAlarm && enableMinArrow) || (maxAlarm && enableMaxArrow); // Show arrow
 
     // Current Value Scaled
     $: {
@@ -81,26 +83,28 @@
             currentValueScaled = 0;
         } else if (maxAlarm) {
             currentValueScaled = 100;
-        } else if (minAlarmValue !== undefined && maxAlarmValue !== undefined) {
+        } else if (minAlarmValue !== null && maxAlarmValue !== null) {
             currentValueScaled = Math.round(((currentValue - minAlarmValue) / (maxAlarmValue - minAlarmValue)) * 100);
         } else {
-            currentValueScaled = undefined;
+            currentValueScaled = null;
         }
     }
 
     // Mininum Alarm and Warning
     $: {
-        minAlarm = minAlarmValue !== undefined && minAlarmValue >= currentValue;
-        minWarning = !minAlarm && minWarningValue !== undefined && minWarningValue >= currentValue;
+        minAlarm = minAlarmValue !== null && minAlarmValue >= currentValue;
+        minWarning = !minAlarm && minWarningValue !== null && minWarningValue >= currentValue;
     }
 
     // Maximum Alarm and Warning
     $: {
-        maxAlarm = maxAlarmValue !== undefined && currentValue >= maxAlarmValue;
-        maxWarning = !maxAlarm && maxWarningValue !== undefined && currentValue >= maxWarningValue;
+        maxAlarm = maxAlarmValue !== null && currentValue >= maxAlarmValue;
+        maxWarning = !maxAlarm && maxWarningValue !== null && currentValue >= maxWarningValue;
     }
 
-    $: console.log(currentValueScaled);
+    // Alarm or Warning
+    $: alarmDetected = minAlarm || maxAlarm;
+    $: warningDetected = !alarmDetected && (minWarning || maxWarning);
 </script>
 
 <!--
@@ -137,7 +141,7 @@
         --fill-max-alarm-color: {mergedStyle.fillMaxAlarmColor};
         --fill-min-warning-color: {mergedStyle.fillMinWarningColor};
         --fill-max-warning-color: {mergedStyle.fillMaxWarningColor};
-        --scaled-value-width: {currentValueScaled !== undefined ? `${currentValueScaled}%` : '0%'};
+        --scaled-value-width: {currentValueScaled !== null ? `${currentValueScaled}%` : '0%'};
         --arrow-width: {mergedStyle.arrowWidth};
         --arrow-height: {mergedStyle.arrowHeight};
         --arrow-color: {mergedStyle.arrowColor};
@@ -150,7 +154,7 @@
 >
     <div class="content" class:min-alarm={minAlarm} class:min-warning={minWarning} class:max-alarm={maxAlarm} class:max-warning={maxWarning}>
         <div class="fill-div">
-            {#if currentValueScaled !== undefined}
+            {#if currentValueScaled !== null}
                 <div class="fill-value"></div>
             {/if}
             {#if showArrow}
