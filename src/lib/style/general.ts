@@ -396,3 +396,31 @@ const ExpandableSectionStyleConfig: ComponentStyles = {
 };
 
 export const ExpandableSectionStyle = createStyleStore(ExpandableSectionStyleConfig);
+
+//////////     B A R     //////////
+
+const BarStyleConfig: ComponentStyles = {
+    dark: {
+        width: "100%",
+        height: "100%",
+        backgroundColor: "#1f2937",
+        border: "1px solid #374151",
+        borderRadius: "0px",
+        fillWidth: "100%",
+        fillHeight: "100%",
+        fillColor: "#10b981",
+        fillMinAlarmColor: "#ef4444",
+        fillMaxAlarmColor: "#ef4444",
+        fillMinWarningColor: "#f59e0b",
+        fillMaxWarningColor: "#f59e0b",
+        arrowWidth: "5px",
+        arrowHeight: "6px",
+        arrowColor: "#9ca3af",
+        arrowMinAlarmColor: "#ef4444",
+        arrowMaxAlarmColor: "#ef4444",
+        arrowMinWarningColor: "#f59e0b",
+        arrowMaxWarningColor: "#f59e0b",
+    },
+};
+
+export const BarStyle = createStyleStore(BarStyleConfig);

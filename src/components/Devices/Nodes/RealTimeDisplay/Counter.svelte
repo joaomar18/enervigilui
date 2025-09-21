@@ -1,20 +1,17 @@
 <script lang="ts">
+    import Bar from "../../../General/Bar.svelte";
+
     // Styles
     import { mergeStyle } from "$lib/style/components";
     import { ActionStyle } from "$lib/style/general";
 
     // Props
-    export let labelText: string = "Voltage";
-    export let valueText: string = "234.57";
+    export let labelText: string = "Direção do Fator de Potência";
+    export let value: number = 0.0;
     export let unitText: string = "V";
 
     // Alarm props
     export let hasValueAlarm: boolean = true;
-    export let hasMinAlarm: boolean = true;
-    export let hasMaxAlarm: boolean = false;
-    export let alarmColor: string = "#FF4444";
-    export let minAlarmColor: string = "#FF4444";
-    export let maxAlarmColor: string = "#FF4444";
 
     // Style object (from theme)
     export let style: { [property: string]: string | number } | null = null;
@@ -29,7 +26,6 @@
     export let labelSize: string | undefined = "1rem";
     export let labelColor: string | undefined = "#D4D4D8";
     export let labelWeight: string | undefined = "500";
-    export let labelAlignment: string | undefined = "right";
     export let labelPaddingLeft: string | undefined = undefined;
     export let labelPaddingRight: string | undefined = "20px";
     export let displayHeight: string | undefined = "40px";
@@ -63,7 +59,6 @@
         --label-size: {labelSize};
         --label-color: {labelColor};
         --label-weight: {labelWeight};
-        --label-alignment: {labelAlignment};
         --label-padding-left: {labelPaddingLeft};
         --label-padding-right: {labelPaddingRight};
         --display-height: {displayHeight};
@@ -85,21 +80,26 @@
 >
     <div class="content">
         <div class="display-div">
-            <div class="label-div"><span>{labelText}</span></div>
+            <div class="label-div">
+                <span>{labelText}</span>
+                <div class="alerts-div">
+                    <div class="alert-state"></div>
+                </div>
+            </div>
             <div class="content">
-                <span class="value">{valueText}</span>
+                <span class="value">{value}</span>
                 <span class="unit">{unitText}</span>
 
-                <!-- Alarm indicators -->
                 {#if hasValueAlarm}
-                    <!-- Full width stripe for value alarms -->
-                    <div class="alarm-stripe" style="background-color: {alarmColor};"></div>
-                {/if}
-                {#if hasMinAlarm}
-                    <div class="arrow left-arrow" style="border-right-color: {minAlarmColor};"></div>
-                {/if}
-                {#if hasMaxAlarm}
-                    <div class="arrow right-arrow" style="border-left-color: {maxAlarmColor};"></div>
+                    <div class="bar-value-div">
+                        <Bar
+                            currentValue={200}
+                            minAlarmValue={230 * 0.9}
+                            minWarningValue={230 * 0.95}
+                            maxAlarmValue={230 * 1.1}
+                            maxWarningValue={230 * 1.05}
+                        />
+                    </div>
                 {/if}
             </div>
         </div>
@@ -138,18 +138,41 @@
         width: 100%;
         height: fit-content;
         display: flex;
+        flex-direction: row;
+        justify-content: space-between;
         align-items: center;
     }
 
     .label-div span {
         margin: 0;
         padding: 0;
-        width: 100%;
+        flex: 1;
+        min-width: 0;
         text-align: left;
         padding-left: 20px;
         font-size: var(--label-size);
         color: var(--label-color);
         font-weight: var(--label-weight);
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .label-div .alerts-div {
+        height: fit-content;
+        padding-right: 20px;
+        display: flex;
+        flex-direction: row;
+        gap: 10px;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .label-div .alerts-div .alert-state {
+        width: 10px;
+        height: 10px;
+        border-radius: 50%;
+        background-color: #ef4444;
     }
 
     .display-div {
@@ -221,30 +244,11 @@
         line-height: 1;
     }
 
-    .content .alarm-stripe {
+    .content .bar-value-div {
         position: absolute;
         bottom: 0px;
         left: 20px;
         right: 20px;
-        height: 2px;
-        background-color: red;
-    }
-
-    .content .arrow {
-        bottom: 2px;
-        width: 0;
-        height: 0;
-        position: absolute;
-        border-top: 4px solid transparent;
-    }
-
-    .content .left-arrow {
-        left: 20px;
-        border-right: 7px solid transparent;
-    }
-
-    .content .right-arrow {
-        right: 20px;
-        border-left: 7px solid transparent;
+        height: 3px;
     }
 </style>
