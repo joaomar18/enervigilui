@@ -104,11 +104,10 @@ export async function getDeviceInfo(id: number): Promise<{ deviceInfo: DeviceInf
         deviceHistory = requestDeviceInfo.history as DeviceHistory;
         deviceInfo = requestDeviceInfo as DeviceInfo;
         deviceInfo.history = processDeviceHistory(deviceHistory);
-    }
-    else {
+    } else {
         throw new Error("Get device info error");
     }
-    return { deviceInfo }
+    return { deviceInfo };
 }
 
 /**
@@ -139,7 +138,7 @@ export async function getDeviceWithImage(id: number): Promise<{ initialDeviceDat
     return { initialDeviceData, deviceData };
 }
 
-export async function getDeviceInfoWithImage(id: number): Promise<{ deviceInfo: DeviceInfo, deviceImageUrl: string }> {
+export async function getDeviceInfoWithImage(id: number): Promise<{ deviceInfo: DeviceInfo; deviceImageUrl: string }> {
     let deviceInfo: DeviceInfo;
     let deviceHistory: DeviceHistory;
     let deviceImageUrl: string;
@@ -155,8 +154,7 @@ export async function getDeviceInfoWithImage(id: number): Promise<{ deviceInfo: 
         deviceInfo = requestDeviceInfo as DeviceInfo;
         deviceInfo.history = processDeviceHistory(deviceHistory);
         deviceImageUrl = `data:${requestDeviceImage["type"]};base64,${requestDeviceImage["data"]}`;
-    }
-    else {
+    } else {
         throw new Error("Get device info with image error");
     }
     return { deviceInfo, deviceImageUrl };

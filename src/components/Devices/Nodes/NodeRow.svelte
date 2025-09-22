@@ -129,6 +129,7 @@ properties and action buttons for configuration and deletion. -->
                         style={$NodeInputFieldStyle}
                         bind:inputValue={node.display_name}
                         onChange={() => {
+                            nodeNameChange(node, node.attributes.phase);
                             onPropertyChanged();
                         }}
                         inputInvalid={!node.validation.variableName}

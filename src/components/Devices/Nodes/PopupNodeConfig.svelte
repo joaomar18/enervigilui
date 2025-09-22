@@ -145,6 +145,7 @@ Displays contextual hints and supports multi-language labels for all fields. -->
                                                 style={$NodeInputFieldStyle}
                                                 bind:inputValue={node.display_name}
                                                 onChange={() => {
+                                                    nodeNameChange(node, node.attributes.phase);
                                                     onPropertyChanged();
                                                 }}
                                                 inputInvalid={!node.validation.variableName}
