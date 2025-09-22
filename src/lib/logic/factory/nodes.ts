@@ -2,7 +2,16 @@ import { get } from "svelte/store";
 import { MeterType } from "$lib/types/device/base";
 import { NodeType, NodePhase, NodePrefix, nodeSections } from "$lib/types/nodes/base";
 import type { EditableDevice, MeterOptions, NewDevice } from "$lib/types/device/base";
-import type { NodeRecord, EditableNodeRecord, EditableBaseNodeConfig, NodeAttributes, DefaultNodeInfo, BaseNodeConfig } from "$lib/types/nodes/base";
+import type {
+    NodeRecord,
+    EditableNodeRecord,
+    EditableBaseNodeConfig,
+    NodeAttributes,
+    DefaultNodeInfo,
+    BaseNodeConfig,
+    NodeState,
+    ProcessedNodeState,
+} from "$lib/types/nodes/base";
 import { defaultVariables } from "$lib/stores/device/variables";
 import { addPrefix, removePrefix, getNodePrefix, getCommunicationID } from "../util/nodes";
 import { sortNodesLogically } from "../handlers/nodes";
@@ -12,6 +21,7 @@ import { protocolPlugins } from "$lib/stores/device/protocol";
 import { normalizeNode } from "../util/nodes";
 import { showToast } from "../view/toast";
 import { ToastType } from "$lib/stores/view/toast";
+import { getDisplayComponent } from "../view/device";
 
 /**
  * Converts a BaseNodeConfig object to an EditableBaseNodeConfig for use in UI forms.
@@ -141,7 +151,11 @@ export function processInitialBaseNodeConfig(config: BaseNodeConfig): BaseNodeCo
     } as BaseNodeConfig;
 }
 
-
+/**
+ * Converts an array of NodeRecord objects to EditableNodeRecord objects for UI editing.
+ * @param nodes - Array of device nodes to convert.
+ * @returns Array of editable nodes suitable for UI forms.
+ */
 export function convertToEditableNodes(nodes: Array<NodeRecord>): Array<EditableNodeRecord> {
     let editableNodes: Array<EditableNodeRecord> = [];
 
@@ -167,7 +181,11 @@ export function convertToEditableNodes(nodes: Array<NodeRecord>): Array<Editable
     return sortNodesLogically(editableNodes) as Array<EditableNodeRecord>;
 }
 
-
+/**
+ * Converts an array of EditableNodeRecord objects back to NodeRecord objects for API operations.
+ * @param nodes - Array of editable nodes to convert.
+ * @returns Array of device nodes suitable for backend operations.
+ */
 export function convertToNodes(nodes: Array<EditableNodeRecord>): Array<NodeRecord> {
     const deviceNodes: Array<NodeRecord> = [];
 
@@ -189,7 +207,11 @@ export function convertToNodes(nodes: Array<EditableNodeRecord>): Array<NodeReco
     return sortNodesLogically(deviceNodes) as Array<NodeRecord>;
 }
 
-
+/**
+ * Processes and normalizes initial node data from the API.
+ * @param nodes - Array of nodes to process and normalize.
+ * @returns Array of processed and sorted NodeRecord objects.
+ */
 export function processInitialNodes(nodes: Array<NodeRecord>): Array<NodeRecord> {
     const deviceNodes: Array<NodeRecord> = [];
 
@@ -211,7 +233,11 @@ export function processInitialNodes(nodes: Array<NodeRecord>): Array<NodeRecord>
     return (sortNodesLogically(deviceNodes) as Array<NodeRecord>).map(normalizeNode);
 }
 
-
+/**
+ * Initializes nodes configuration by converting to editable format with error handling.
+ * @param initialNodes - Array of initial nodes to initialize.
+ * @returns Object containing success status and converted editable nodes array.
+ */
 export function initNodes(initialNodes: Array<NodeRecord>): { sucess: boolean; editableNodes: Array<EditableNodeRecord> } {
     let editableNodes: Array<EditableNodeRecord> = [];
     let sucess = false;
@@ -225,12 +251,14 @@ export function initNodes(initialNodes: Array<NodeRecord>): { sucess: boolean; e
     return { sucess, editableNodes };
 }
 
-
-function createDefaultEditableDeviceNode(
-    variable: DefaultNodeInfo,
-    phase: NodePhase,
-    device_data: EditableDevice | NewDevice
-): EditableNodeRecord {
+/**
+ * Creates a default editable node from variable definition and device configuration.
+ * @param variable - Default variable information.
+ * @param phase - Electrical phase for the node.
+ * @param device_data - Device configuration data.
+ * @returns EditableNodeRecord configured with defaults.
+ */
+function createDefaultEditableDeviceNode(variable: DefaultNodeInfo, phase: NodePhase, device_data: EditableDevice | NewDevice): EditableNodeRecord {
     const full_name = getNodePrefix(phase) + variable.name;
     let plugin = get(protocolPlugins)[device_data.protocol];
     let editableConfig = plugin.createNodeConfigFromDefaultVar(variable, device_data.options);
@@ -252,7 +280,11 @@ function createDefaultEditableDeviceNode(
     return node;
 }
 
-
+/**
+ * Generates a list of default nodes based on device type (single-phase or three-phase).
+ * @param device_data - Device configuration to determine which default nodes to create.
+ * @returns Array of default editable nodes for the device type.
+ */
 export function getDefaultNodesList(device_data: EditableDevice | NewDevice): Array<EditableNodeRecord> {
     const nodes: Array<EditableNodeRecord> = [];
     const defaultVars = get(defaultVariables);
@@ -278,7 +310,13 @@ export function getDefaultNodesList(device_data: EditableDevice | NewDevice): Ar
     return sortNodesLogically(nodes) as Array<EditableNodeRecord>;
 }
 
-
+/**
+ * Creates a new empty editable node for a specific phase and device configuration.
+ * @param sectionPhase - The electrical phase for the new node.
+ * @param sectionPrefix - The prefix to apply to the node name.
+ * @param device_data - Device configuration data.
+ * @returns A new empty EditableNodeRecord ready for configuration.
+ */
 export function addNode(sectionPhase: NodePhase, sectionPrefix: NodePrefix, device_data: EditableDevice | NewDevice): EditableNodeRecord {
     const nodeBaseName = ``;
     const fullNodeName = addPrefix(nodeBaseName, sectionPrefix);
@@ -301,4 +339,21 @@ export function addNode(sectionPhase: NodePhase, sectionPrefix: NodePrefix, devi
     };
 
     return newFormattedNode;
+}
+
+/**
+ * Processes raw node state data into UI-ready format with display components.
+ * @param nodesState - Record of node names to their current state values.
+ * @returns Array of processed node states ready for UI consumption.
+ */
+export function processNodesState(nodesState: Record<string, NodeState>): Array<ProcessedNodeState> {
+    let processedNodesState: Array<ProcessedNodeState> = [];
+
+    for (let [nodeName, nodeState] of Object.entries(nodesState)) {
+        const processedName = removePrefix(nodeName);
+        const displayComponent = getDisplayComponent(nodeState);
+        processedNodesState.push({ ...nodeState, name: processedName, displayComponent: displayComponent } as ProcessedNodeState);
+    }
+
+    return sortNodesLogically(processedNodesState) as Array<ProcessedNodeState>;
 }

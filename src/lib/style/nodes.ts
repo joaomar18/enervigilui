@@ -168,3 +168,90 @@ const NodesGridStyleConfig: ComponentStyles = {
 };
 
 export const NodesGridStyle = createStyleStore(NodesGridStyleConfig);
+
+//////////     N O D E S     B A S E     D I S P L A Y     //////////
+
+const NodesBaseDisplayStyleConfig: ComponentStyles = {
+    dark: {
+        width: "100%",
+        paddingHorizontal: "0px",
+        paddingVertical: "10px",
+        labelPaddingTop: "0px",
+        labelPaddingBottom: "8px",
+        labelPaddingRight: "20px",
+        labelSize: "1rem",
+        labelColor: "#D4D4D8",
+        labelWeight: "500",
+        displayHeight: "40px",
+        displayWidth: "100%",
+        displayMaxWidth: "300px",
+        displayBorder: "1px solid #52525B",
+        displayBackgroundColor: "rgba(82, 82, 91, 0.1)",
+        displayDisconnectedBorder: "1px solid #52525B",
+        displayDisconnectedBackgroundColor: "rgba(107, 114, 128, 0.15)",
+        displayRadius: "20px",
+        displayPaddingHorizontal: "20px",
+        alertsDivItemGap: "10px",
+        stateCircleDiameter: "10px",
+        stateCircleAlarmColor: "#ef4444",
+        stateCircleWarningColor: "#f59e0b",
+        disconnectedImageWidth: "25px",
+        disconnectedImageHeight: "25px",
+    },
+};
+
+export const NodesBaseDisplayStyle = createStyleStore(NodesBaseDisplayStyleConfig);
+
+//////////     M E A S U R E M E N T     D I S P L A Y     //////////
+
+const MeasurementDisplayStyleConfig: ComponentStyles = {
+    dark: {
+        valueTextSize: "1.0625rem",
+        valueTextColor: "#E4E4E7",
+        valueTextSpacing: "0.25px",
+        valueTextWeight: "600",
+        valueTextPaddingRight: "20px",
+        unitTextSize: "1.0625rem",
+        unitTextColor: "#A1A1AA",
+        unitTextWeight: "400",
+        unitTextPaddingLeft: "20px",
+        barWidth: "100%",
+        barHeight: "3px",
+    },
+};
+
+export const MeasurementDisplayStyle = createStyleStore(MeasurementDisplayStyleConfig);
+
+//////////     T E X T     D I S P L A Y     //////////
+
+const TextDisplayStyleConfig: ComponentStyles = {
+    dark: {
+        valueTextSize: "1.0625rem",
+        valueTextColor: "#E4E4E7",
+        valueTextSpacing: "0.25px",
+        valueTextWeight: "600",
+        valueTextPaddingRight: "20px",
+    },
+};
+
+export const TextDisplayStyle = createStyleStore(TextDisplayStyleConfig);
+
+//////////     C O U N T E R     D I S P L A Y     //////////
+
+const CounterDisplayStyleConfig: ComponentStyles = {
+    dark: {
+        valueTextSize: "1.0625rem",
+        valueTextColor: "#E4E4E7",
+        valueTextSpacing: "0.25px",
+        valueTextWeight: "600",
+        valueTextPaddingRight: "20px",
+        unitTextSize: "1.0625rem",
+        unitTextColor: "#A1A1AA",
+        unitTextWeight: "400",
+        unitTextPaddingLeft: "20px",
+        barWidth: "100%",
+        barHeight: "3px",
+    },
+};
+
+export const CounterDisplayStyle = createStyleStore(CounterDisplayStyleConfig);

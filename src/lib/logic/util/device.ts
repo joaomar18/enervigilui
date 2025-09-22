@@ -7,7 +7,12 @@ import { areNodesEqual } from "../validation/nodes/base";
 import { convertToDevice } from "../factory/device";
 import { convertToNodes } from "../factory/nodes";
 
-
+/**
+ * Filters devices by name or ID based on a search query with smart matching logic.
+ * @param devices - Array of devices to filter.
+ * @param searchQuery - Search string to match against device names and IDs.
+ * @returns Filtered and sorted array of devices matching the search criteria.
+ */
 export function filterDevices(devices: Array<Device>, searchQuery: string): Array<Device> {
     let filteredDevices: Array<Device> = Array.isArray(devices) ? [...devices].sort((a, b) => a.id - b.id) : [];
 
@@ -34,7 +39,11 @@ export function filterDevices(devices: Array<Device>, searchQuery: string): Arra
     return filteredDevices;
 }
 
-
+/**
+ * Normalizes a device object by sorting communication options alphabetically for consistent structure.
+ * @param device - The device object to normalize.
+ * @returns Normalized device with sorted communication options.
+ */
 export function normalizeDevice(device: Device): Device {
     return {
         connected: device.connected,
@@ -49,7 +58,14 @@ export function normalizeDevice(device: Device): Device {
     };
 }
 
-
+/**
+ * Checks if there are any changes between initial and current device/nodes data to determine if saving is needed.
+ * @param initialDeviceData - Original device data from the backend.
+ * @param deviceData - Current editable device data from the form.
+ * @param initialNodes - Original nodes data from the backend.
+ * @param nodes - Current editable nodes data from the form.
+ * @returns True if no changes detected, false if there are pending changes to save.
+ */
 export function noChangesToDevice(
     initialDeviceData: Device,
     deviceData: EditableDevice | NewDevice,

@@ -7,18 +7,18 @@
     import { showToast } from "$lib/logic/view/toast";
     import { ToastType } from "$lib/stores/view/toast";
     import { nodeSections } from "$lib/types/nodes/base";
-    import { getAvailablePhasesFromNodesState, getNodesStateBySubSection } from "$lib/logic/util/nodes";
+    import { getAvailablePhasesFromRecordsOrStates, getNodesStateBySubSection } from "$lib/logic/util/nodes";
     import { initialRealTimeCardSectionsExpandState } from "$lib/types/view/device";
     import { assignRealTimeCardSectionsStateToAllPhases } from "$lib/logic/view/device";
-    import type { NodeState } from "$lib/types/nodes/base";
+    import type { NodeState, ProcessedNodeState } from "$lib/types/nodes/base";
     import type { RealTimeCardSubSections, RealTimeCardSectionsState } from "$lib/types/view/device";
     import ContentCard from "../../../components/General/ContentCard.svelte";
     import ExpandableSection from "../../../components/General/ExpandableSection.svelte";
     import Action from "../../../components/General/Action.svelte";
-    import Counter from "../../../components/Devices/Nodes/RealTimeDisplay/Counter.svelte";
 
     // Texts
     import { texts } from "$lib/stores/lang/generalTexts";
+    import { variableNameTexts } from "$lib/stores/lang/energyMeterTexts";
 
     // Stores
     import { loadedDone } from "$lib/stores/view/navigation";
@@ -29,16 +29,17 @@
 
     // Variables
     let nodesState: Record<string, NodeState>;
-    let nodesStateBySubSection: Record<NodePhase, Record<RealTimeCardSubSections, Record<string, NodeState>>>;
+    let processedNodesState: Array<ProcessedNodeState>;
+    let nodesStateBySubSection: Record<NodePhase, Record<RealTimeCardSubSections, Array<ProcessedNodeState>>>;
     let availablePhases: Array<NodePhase>;
     let availableSubSections: Record<NodePhase, RealTimeCardSectionsState>;
     let expandedState = assignRealTimeCardSectionsStateToAllPhases(initialRealTimeCardSectionsExpandState);
 
     // Reactive Statements
 
-    $: if (nodesState) {
-        availablePhases = getAvailablePhasesFromNodesState(nodesState);
-        ({ nodesStateBySubSection, availableSubSections } = getNodesStateBySubSection(nodesState));
+    $: if (nodesState && processedNodesState) {
+        availablePhases = getAvailablePhasesFromRecordsOrStates(processedNodesState);
+        ({ nodesStateBySubSection, availableSubSections } = getNodesStateBySubSection(processedNodesState));
     }
 
     // Functions
@@ -58,7 +59,7 @@
         let nodesStatePoller: MethodPoller | null;
         if ($currentDeviceID) {
             nodesStatePoller = new MethodPoller(async (signal) => {
-                ({ nodesState } = await getDeviceNodesState($currentDeviceID));
+                ({ nodesState, processedNodesState } = await getDeviceNodesState($currentDeviceID));
             }, 5000);
         } else {
             showToast("errorEditDeviceParams", ToastType.ALERT);
@@ -79,7 +80,7 @@
             {#each nodeSections.filter((section) => availablePhases.includes(section.phase)) as section (section.key)}
                 <div class="grid-col">
                     <ContentCard titleText={section.phase !== NodePhase.SINGLEPHASE ? $texts[section.labelKey] : $texts.variables}>
-                        <div class="slot-div" slot="header">
+                        <div class="slot-div header" slot="header">
                             <div class="phase-actions-div">
                                 <Action
                                     style={$RealTimeCardActionStyle}
@@ -93,15 +94,25 @@
                                 />
                             </div>
                         </div>
-                        <div class="slot-div" slot="content">
+                        <div class="slot-div content" slot="content">
                             {#each Object.entries(availableSubSections[section.phase]) as [subsection, isActive] (subsection)}
                                 {#if isActive}
                                     <ExpandableSection
                                         titleText={$texts[subsection.toLowerCase()]}
                                         bind:contentExpanded={expandedState[section.phase][subsection as keyof RealTimeCardSectionsState]}
                                     >
-                                        <Counter labelText="Potência Ativa" valueText="3.53" unitText="kW" />
-                                        <Counter />
+                                        <div class="phase-subsection-div">
+                                            {#each nodesStateBySubSection[section.phase][subsection as keyof RealTimeCardSectionsState] as nodeState (nodeState.name)}
+                                                <svelte:component
+                                                    this={nodeState.displayComponent}
+                                                    labelText={$variableNameTexts[nodeState.name] || nodeState.name}
+                                                    value={nodeState.value}
+                                                    minAlarmValue={nodeState.min_alarm_value}
+                                                    maxAlarmValue={nodeState.max_alarm_value}
+                                                    unitText={nodeState.unit}
+                                                />
+                                            {/each}
+                                        </div>
                                     </ExpandableSection>
                                 {/if}
                             {/each}
@@ -157,15 +168,21 @@
         grid-column: span 2;
     }
 
-    .slot-div {
+    .slot-div.content,
+    .slot-div.content .phase-subsection-div {
         position: relative;
         width: 100%;
         height: 100%;
         margin: 0;
         padding: 0;
+        display: flex;
+        flex-direction: column;
+        justify-content: start;
+        align-items: center;
+        min-height: 0;
     }
 
-    .slot-div .phase-actions-div {
+    .slot-div.header .phase-actions-div {
         display: flex;
         justify-content: end;
         align-items: center;

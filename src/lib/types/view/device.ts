@@ -1,3 +1,8 @@
+import type { SvelteComponent } from "svelte";
+import Measurement from "../../../components/Devices/Nodes/RealTimeDisplay/Measurement.svelte";
+import Counter from "../../../components/Devices/Nodes/RealTimeDisplay/Counter.svelte";
+import Text from "../../../components/Devices/Nodes/RealTimeDisplay/Text.svelte";
+
 /** String literal keys for all real-time card subsections */
 export enum RealTimeCardSubSections {
     Measurements = "Measurements",
@@ -16,15 +21,6 @@ export interface RealTimeCardSectionsState {
     Other: boolean;
 }
 
-/** Empty subsection structure with all real-time card subsections initialized as empty objects */
-export const emptyRealTimeCardSubSections = {
-    [RealTimeCardSubSections.Measurements]: {},
-    [RealTimeCardSubSections.Counters]: {},
-    [RealTimeCardSubSections.States]: {},
-    [RealTimeCardSubSections.Texts]: {},
-    [RealTimeCardSubSections.Other]: {},
-} as Record<RealTimeCardSubSections, Record<any, any>>;
-
 /** Default state with all real-time card sections disabled */
 export const defaultRealTimeCardSectionsState = {
     Measurements: false,
@@ -42,3 +38,15 @@ export const initialRealTimeCardSectionsExpandState = {
     Texts: true,
     Other: true,
 } as RealTimeCardSectionsState;
+
+/**
+ * Mapping of real-time card subsections to their corresponding Svelte display components.
+ * This object maps each subsection type to the appropriate component for rendering node data.
+ */
+export const subSectionComponentMap: Record<RealTimeCardSubSections, typeof SvelteComponent<any> | null> = {
+    [RealTimeCardSubSections.Measurements]: Measurement,
+    [RealTimeCardSubSections.Counters]: Counter,
+    [RealTimeCardSubSections.States]: null, // Not implemented yet
+    [RealTimeCardSubSections.Texts]: Text,
+    [RealTimeCardSubSections.Other]: null, // Not implemented yet
+};

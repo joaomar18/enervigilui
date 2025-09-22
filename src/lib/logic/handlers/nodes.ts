@@ -1,21 +1,39 @@
 import { get } from "svelte/store";
 import { MeterType, Protocol } from "$lib/types/device/base";
 import { NodeType, NodePhase } from "$lib/types/nodes/base";
-import { getNodePhasePriority, getNodePriority, getNodeSubPriority, isDefault, isCustom, isIncremental, isNumeric, removePrefix, getNodePrefix, getNodeIndex, getCommunicationID } from "../util/nodes";
+import {
+    getNodePhasePriority,
+    getNodePriority,
+    getNodeSubPriority,
+    isDefault,
+    isCustom,
+    isIncremental,
+    isNumeric,
+    removePrefix,
+    getNodePrefix,
+    getNodeIndex,
+    getCommunicationID,
+    getNodePhaseFromRecordOrState,
+} from "../util/nodes";
 import { defaultVariables } from "$lib/stores/device/variables";
 import { protocolPlugins } from "$lib/stores/device/protocol";
 import { nodeSections } from "$lib/types/nodes/base";
-import type { NodeRecordEditingState, EditableNodeRecord, NodeRecord } from "$lib/types/nodes/base";
+import type { NodeRecordEditingState, EditableNodeRecord, NodeRecord, ProcessedNodeState } from "$lib/types/nodes/base";
 
-
-export function sortNodesLogically(nodes: Array<EditableNodeRecord | NodeRecord>): Array<EditableNodeRecord | NodeRecord> {
-
+/**
+ * Sorts nodes logically by phase, type, incremental status, and variable groups for consistent UI display.
+ * @param nodes - Array of nodes to sort (supports EditableNodeRecord, NodeRecord, or ProcessedNodeState).
+ * @returns Sorted array maintaining the same type as input.
+ */
+export function sortNodesLogically(
+    nodes: Array<EditableNodeRecord | NodeRecord | ProcessedNodeState>
+): Array<EditableNodeRecord | NodeRecord | ProcessedNodeState> {
     return nodes.slice().sort((a, b) => {
         // Priority is organized from top to bottom
 
         // Phase order (higher priority)
-        const phaseA = getNodePhasePriority(a.attributes.phase);
-        const phaseB = getNodePhasePriority(b.attributes.phase);
+        const phaseA = getNodePhasePriority(getNodePhaseFromRecordOrState(a));
+        const phaseB = getNodePhasePriority(getNodePhaseFromRecordOrState(b));
         if (phaseA !== phaseB) return phaseA - phaseB;
 
         // Non-incremental numeric types (default nodes first)
@@ -27,8 +45,8 @@ export function sortNodesLogically(nodes: Array<EditableNodeRecord | NodeRecord>
         if (!isCustom(a) && isCustom(b)) return -1;
 
         // Non-incremental numeric before non-incremental non-numeric
-        if (!isIncremental(a) && isNumeric(a) && (!isIncremental(b) && !isNumeric(b))) return -1;
-        if ((!isIncremental(a) && !isNumeric(a)) && !isIncremental(b) && isNumeric(b)) return 1;
+        if (!isIncremental(a) && isNumeric(a) && !isIncremental(b) && !isNumeric(b)) return -1;
+        if (!isIncremental(a) && !isNumeric(a) && !isIncremental(b) && isNumeric(b)) return 1;
 
         // Incremental nodes after non-incremental
         if (isIncremental(a) && !isIncremental(b)) return 1;
@@ -56,9 +74,9 @@ export function sortNodesLogically(nodes: Array<EditableNodeRecord | NodeRecord>
 }
 
 /**
- * Handles node name changes, updating prefix and unit.
- * @param node Node to update
- * @param phase Phase for prefix
+ * Handles node name changes by updating the full name with correct prefix and unit.
+ * @param node - The editable node to update.
+ * @param phase - The electrical phase to determine the correct prefix.
  */
 export function nodeNameChange(node: EditableNodeRecord, phase: NodePhase): void {
     const newName = getNodePrefix(phase) + node.display_name;
@@ -83,9 +101,9 @@ export function communicationIDChange(node: EditableNodeRecord): void {
 }
 
 /**
- * Updates unit when node type changes.
- * @param node Node to update
- * @param nodeState Previous edit state
+ * Handles node type changes by updating unit settings and clearing type-specific fields when needed.
+ * @param node - The editable node to update.
+ * @param nodeState - Previous editing state to restore values when switching back.
  */
 export function nodeTypeChange(node: EditableNodeRecord, nodeState: NodeRecordEditingState): void {
     if (!node.config.custom) {
@@ -110,10 +128,10 @@ export function nodeTypeChange(node: EditableNodeRecord, nodeState: NodeRecordEd
 }
 
 /**
- * Handles changes to custom status, updating name and unit.
- * @param node Node to update
- * @param nodeState Previous edit state
- * @param phase Phase for prefix
+ * Handles changes to custom status by updating node name and unit configuration.
+ * @param node - The editable node to update.
+ * @param nodeState - Previous editing state to store/restore values.
+ * @param phase - The electrical phase to determine the correct prefix.
  */
 export function customNodeChange(node: EditableNodeRecord, nodeState: NodeRecordEditingState, phase: NodePhase): void {
     if (node.config.custom) {
@@ -129,10 +147,10 @@ export function customNodeChange(node: EditableNodeRecord, nodeState: NodeRecord
 }
 
 /**
- * Handles changes to calculated status, updating communication ID and protocol.
- * @param node Node to update
- * @param nodeState Previous edit state
- * @param selectedProtocol Protocol to set
+ * Handles changes to calculated/virtual status by updating communication ID and protocol settings.
+ * @param node - The editable node to update.
+ * @param nodeState - Previous editing state to store/restore communication ID.
+ * @param selectedProtocol - The protocol to set when switching from calculated to physical node.
  */
 export function virtualNodeChange(node: EditableNodeRecord, nodeState: NodeRecordEditingState, selectedProtocol: Protocol): void {
     if (node.config.calculated && node.communication_id !== undefined) {
@@ -146,9 +164,9 @@ export function virtualNodeChange(node: EditableNodeRecord, nodeState: NodeRecor
 }
 
 /**
- * Updates protocol and communication ID of a node.
- * @param protocol New protocol
- * @param node Node to update
+ * Changes a node's protocol and updates its communication ID to protocol defaults.
+ * @param protocol - The new protocol to assign to the node.
+ * @param node - The editable node to update.
  */
 export function changeNodeProtocol(protocol: Protocol, node: EditableNodeRecord): void {
     let plugin = get(protocolPlugins)[protocol];
@@ -158,10 +176,10 @@ export function changeNodeProtocol(protocol: Protocol, node: EditableNodeRecord)
 }
 
 /**
- * Updates a node in the nodes array and returns a new array with the changes.
- * @param node Node with updated data
- * @param nodes Array of nodes to update
- * @returns New array with the updated node
+ * Updates a specific node in the nodes array and returns a new array with the changes.
+ * @param node - The node with updated data to replace in the array.
+ * @param nodes - The array of nodes to update.
+ * @returns New array with the updated node, maintaining immutability.
  */
 export function updateNodes(node: EditableNodeRecord, nodes: Array<EditableNodeRecord>): Array<EditableNodeRecord> {
     const editNodesIndex = getNodeIndex(node, nodes);
@@ -173,10 +191,10 @@ export function updateNodes(node: EditableNodeRecord, nodes: Array<EditableNodeR
 }
 
 /**
- * Groups nodes by their respective sections based on meter type.
- * @param meterType Type of meter to filter nodes for
- * @param nodes Array of nodes to group
- * @returns Record with nodes grouped by phase sections
+ * Groups nodes by their respective electrical phase sections for organized display.
+ * @param meterType - Type of meter to determine which phase sections to include.
+ * @param nodes - Array of nodes to group by phase sections.
+ * @returns Record with nodes organized by phase sections (L1, L2, L3, Total, etc.).
  */
 export function updateNodesBySection(meterType: MeterType, nodes: Array<EditableNodeRecord>): Record<NodePhase, Array<EditableNodeRecord>> {
     return nodeSections.reduce((acc: Record<NodePhase, Array<EditableNodeRecord>>, section) => {
@@ -186,11 +204,11 @@ export function updateNodesBySection(meterType: MeterType, nodes: Array<Editable
 }
 
 /**
- * Updates the editing node reference if it matches the updated node.
- * @param node Node that was updated
- * @param editingNode Currently editing node
- * @param nodes Array of all nodes
- * @returns Updated editing node reference
+ * Updates the editing node reference if it matches the updated node in the array.
+ * @param node - The node that was updated.
+ * @param editingNode - The currently active editing node reference.
+ * @param nodes - Array of all nodes to find the updated reference.
+ * @returns Updated editing node reference or the original if no match found.
  */
 export function updateEditingNode(node: EditableNodeRecord, editingNode: EditableNodeRecord, nodes: Array<EditableNodeRecord>): EditableNodeRecord {
     const editNodesIndex = getNodeIndex(node, nodes);
@@ -202,10 +220,10 @@ export function updateEditingNode(node: EditableNodeRecord, editingNode: Editabl
 }
 
 /**
- * Removes a node from the nodes array and returns a new array.
- * @param node Node to delete
- * @param nodes Array of nodes to delete from
- * @returns New array with the node removed
+ * Removes a specific node from the nodes array and returns a new array without it.
+ * @param node - The node to delete from the array.
+ * @param nodes - Array of nodes to delete from.
+ * @returns New array with the specified node removed, maintaining immutability.
  */
 export function deleteNodeFromArray(node: EditableNodeRecord, nodes: Array<EditableNodeRecord>): Array<EditableNodeRecord> {
     let deletedNodeIndex = getNodeIndex(node, nodes);

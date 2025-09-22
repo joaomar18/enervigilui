@@ -1,46 +1,64 @@
 import { get } from "svelte/store";
 import { protocolPlugins } from "$lib/stores/device/protocol";
+import { defaultVariableNames } from "$lib/stores/device/variables";
 import { Protocol } from "$lib/types/device/base";
 import { NodePrefix, NodePhase, NodeType, phaseOrder } from "$lib/types/nodes/base";
 import { defaultRealTimeCardSectionsState } from "$lib/types/view/device";
-import type { BaseNodeConfig, EditableBaseNodeConfig, NodeRecord, EditableNodeRecord, NodeState } from "$lib/types/nodes/base";
+import { RealTimeCardSubSections } from "$lib/types/view/device";
+import { assignRealTimeCardSectionsStateToAllPhases, createEmptyRealTimeCardSubSectionsArrays, getNodeSubSection } from "../view/device";
+import type { BaseNodeConfig, EditableBaseNodeConfig, NodeRecord, EditableNodeRecord, NodeState, ProcessedNodeState } from "$lib/types/nodes/base";
 import type { RealTimeCardSectionsState } from "$lib/types/view/device";
-import { RealTimeCardSubSections, emptyRealTimeCardSubSections } from "$lib/types/view/device";
-import { assignRealTimeCardSectionsStateToAllPhases } from "../view/device";
 
 /**
- * Determines if a node is incremental (e.g., energy counters).
- * @param node The node to check.
+ * Checks if a node is configured as incremental (accumulating values over time).
+ * @param node - The node to check (supports EditableNodeRecord, NodeRecord, or ProcessedNodeState).
  * @returns True if the node is incremental, false otherwise.
  */
-export function isIncremental(node: EditableNodeRecord | NodeRecord): boolean {
-    return Boolean(node.config.incremental_node);
+export function isIncremental(node: EditableNodeRecord | NodeRecord | ProcessedNodeState): boolean {
+    if ("config" in node) {
+        return Boolean(node.config.incremental_node);
+    } else if ("incremental" in node) {
+        return node.incremental;
+    } else {
+        throw Error("Couldn't obtain incremental property from node.");
+    }
 }
 
 /**
- * Determines if a node's value is numeric (float or integer).
- * @param node The node to check.
- * @returns True if the node is numeric, false otherwise.
+ * Checks if a node has a numeric data type (FLOAT or INT).
+ * @param node - The node to check (supports EditableNodeRecord, NodeRecord, or ProcessedNodeState).
+ * @returns True if the node type is numeric, false otherwise.
  */
-export function isNumeric(node: EditableNodeRecord | NodeRecord): boolean {
-    return node.config.type === NodeType.FLOAT || node.config.type === NodeType.INT;
+export function isNumeric(node: EditableNodeRecord | NodeRecord | ProcessedNodeState): boolean {
+    if ("config" in node) {
+        return node.config.type === NodeType.FLOAT || node.config.type === NodeType.INT;
+    } else if ("type" in node) {
+        return node.type === NodeType.FLOAT || node.type === NodeType.INT;
+    } else {
+        throw Error("Couldn't obtain type property from node.");
+    }
 }
 
 /**
- * Determines if a node is custom (user-defined).
- * @param node The node to check.
- * @returns True if the node is custom, false otherwise.
+ * Checks if a node is custom (user-defined) rather than a default system variable.
+ * @param node - The node to check (supports EditableNodeRecord, NodeRecord, or ProcessedNodeState).
+ * @returns True if the node is custom, false if it's a default variable.
  */
-export function isCustom(node: EditableNodeRecord | NodeRecord): boolean {
-    return node.config.custom;
+export function isCustom(node: EditableNodeRecord | NodeRecord | ProcessedNodeState): boolean {
+    if ("config" in node) {
+        return node.config.custom;
+    } else {
+        const defaultNames = get(defaultVariableNames);
+        return !defaultNames.includes(node.name);
+    }
 }
 
 /**
- * Determines if a node is a default (not custom) node.
- * @param node The node to check.
- * @returns True if the node is default, false otherwise.
+ * Checks if a node is a default system variable (opposite of custom).
+ * @param node - The node to check (supports EditableNodeRecord, NodeRecord, or ProcessedNodeState).
+ * @returns True if the node is a default variable, false if it's custom.
  */
-export function isDefault(node: EditableNodeRecord | NodeRecord): boolean {
+export function isDefault(node: EditableNodeRecord | NodeRecord | ProcessedNodeState): boolean {
     return !isCustom(node);
 }
 
@@ -95,19 +113,19 @@ export function sortNodesByName(nodes: Array<EditableNodeRecord | NodeRecord>): 
 }
 
 /**
- * Gets index of a node in an array.
- * @param node Node to find.
- * @param nodesArray Array of nodes.
- * @returns Index or -1.
+ * Gets the index of a specific editable node in an array by reference comparison.
+ * @param node - The editable node to find in the array.
+ * @param nodesArray - Array of editable nodes to search in.
+ * @returns Index of the node in the array, or -1 if not found.
  */
 export function getNodeIndex(node: EditableNodeRecord, nodesArray: Array<EditableNodeRecord>): number {
     return nodesArray.findIndex((n) => n === node);
 }
 
 /**
- * Maps NodePhase to prefix string.
- * @param phase NodePhase.
- * @returns Prefix string.
+ * Maps a NodePhase to its corresponding prefix string for node naming.
+ * @param phase - The electrical phase to get the prefix for.
+ * @returns The prefix string corresponding to the phase.
  */
 export function getNodePrefix(phase: NodePhase): string {
     switch (phase) {
@@ -129,9 +147,9 @@ export function getNodePrefix(phase: NodePhase): string {
 }
 
 /**
- * Removes prefix from node name.
- * @param name Node name.
- * @returns Name without prefix.
+ * Removes the electrical phase prefix from a node name with smart prefix detection.
+ * @param name - The full node name including prefix.
+ * @returns The node name without the phase prefix.
  */
 export function removePrefix(name: string): string {
     const prefixes = Object.values(NodePrefix).sort((a, b) => b.length - a.length);
@@ -163,21 +181,21 @@ export function removePrefix(name: string): string {
 }
 
 /**
- * Adds prefix to node name.
- * @param name Node name.
- * @param prefix Prefix to add.
- * @returns Prefixed name.
+ * Adds an electrical phase prefix to a node name.
+ * @param name - The base node name without prefix.
+ * @param prefix - The NodePrefix to prepend to the name.
+ * @returns The node name with the prefix added.
  */
 export function addPrefix(name: string, prefix: NodePrefix): string {
     return prefix + name;
 }
 
 /**
- * Gets communication ID for node based on protocol and config.
- * @param protocol Protocol.
- * @param config Node config.
- * @param no_format If true, returns plain number for Modbus RTU.
- * @returns Communication ID.
+ * Gets the communication ID for a node using the appropriate protocol plugin.
+ * @param protocol - The communication protocol for the node.
+ * @param config - The node configuration containing communication settings.
+ * @param no_format - If true, returns plain number format for certain protocols.
+ * @returns The communication ID string for the node.
  */
 export function getCommunicationID(protocol: Protocol, config: BaseNodeConfig | EditableBaseNodeConfig, no_format: boolean = false): string {
     let plugin = get(protocolPlugins)[protocol];
@@ -185,9 +203,36 @@ export function getCommunicationID(protocol: Protocol, config: BaseNodeConfig | 
 }
 
 /**
- * Normalizes a DeviceNode for comparison.
- * @param node DeviceNode.
- * @returns Normalized node.
+ * Extracts the electrical phase from different node object types.
+ * @param node - The node object to extract phase from.
+ * @returns The NodePhase of the node.
+ * @throws Error if phase cannot be extracted from the node object.
+ */
+export function getNodePhaseFromRecordOrState(node: EditableNodeRecord | NodeRecord | ProcessedNodeState | NodeState): NodePhase {
+    if ("attributes" in node) {
+        return node.attributes.phase;
+    } else if ("phase" in node) {
+        return node.phase;
+    } else {
+        throw new Error("Couldn't obtain phase from node record or state.");
+    }
+}
+
+/**
+ * Extracts unique phases from an array of mixed node records and states.
+ * @param nodes - Array of mixed node types (EditableNodeRecord, NodeRecord, ProcessedNodeState, or NodeState).
+ * @returns Array of unique node phases found in the provided nodes.
+ */
+export function getAvailablePhasesFromRecordsOrStates(nodes: Array<EditableNodeRecord | NodeRecord | ProcessedNodeState | NodeState>): Array<NodePhase> {
+    return Array.from(
+        new Set(nodes.map((node) => getNodePhaseFromRecordOrState(node)).filter((phase) => phase !== null && phase !== undefined))
+    ) as NodePhase[];
+}
+
+/**
+ * Normalizes a node record by sorting its configuration properties alphabetically for consistent comparison.
+ * @param node - The NodeRecord to normalize.
+ * @returns Normalized NodeRecord with sorted configuration properties.
  */
 export function normalizeNode(node: NodeRecord): NodeRecord {
     return {
@@ -200,80 +245,25 @@ export function normalizeNode(node: NodeRecord): NodeRecord {
 }
 
 /**
- * Extracts unique phases from an array of nodes.
- * @param nodes Array of editable or regular node records.
- * @returns Array of unique node phases found in the provided nodes.
+ * Organizes processed node state data by electrical phase and subsection type for UI display.
+ * @param processedNodesState - Array of processed node states to organize.
+ * @returns Object containing nodes organized by phase/subsection and available subsection flags.
  */
-export function getAvailablePhasesFromNodes(nodes: Array<EditableNodeRecord> | Array<NodeRecord>): Array<NodePhase> {
-    return Array.from(
-        new Set(
-            Object.values(nodes)
-                .map((node) => node.attributes.phase)
-                .filter((phase) => phase !== null && phase !== undefined)
-        )
-    ) as NodePhase[];
-}
-
-/**
- * Extracts unique phases from a nodes state record.
- * @param nodesState Record mapping node keys to their state information.
- * @returns Array of unique node phases found in the provided nodes state.
- */
-export function getAvailablePhasesFromNodesState(nodesState: Record<string, NodeState>): Array<NodePhase> {
-    return Array.from(
-        new Set(
-            Object.values(nodesState)
-                .map((nodeState) => nodeState.phase)
-                .filter((phase) => phase !== null && phase !== undefined)
-        )
-    ) as NodePhase[];
-}
-
-/**
- * Organizes nodes state by phase and subsection, categorizing them based on their data types.
- *
- * This function takes a flat record of node states and organizes them into a hierarchical structure
- * grouped by phase (L1, L2, L3, etc.) and then by subsection type (Measurements, Counters, States,
- * Texts, Other) based on the node's data type and characteristics.
- *
- * Categorization rules:
- * - Numeric incremental nodes → Counters
- * - Numeric non-incremental nodes → Measurements
- * - Boolean nodes → States
- * - String nodes → Texts
- * - Other types → Other
- *
- * @param nodesState Record mapping node keys to their state information.
- * @returns Object containing the organized nodes by subsection and available subsections per phase.
- */
-export function getNodesStateBySubSection(nodesState: Record<string, NodeState>): {
-    nodesStateBySubSection: Record<NodePhase, Record<RealTimeCardSubSections, Record<string, NodeState>>>;
+export function getNodesStateBySubSection(processedNodesState: Array<ProcessedNodeState>): {
+    nodesStateBySubSection: Record<NodePhase, Record<RealTimeCardSubSections, Array<ProcessedNodeState>>>;
     availableSubSections: Record<NodePhase, RealTimeCardSectionsState>;
 } {
     let availableSubSections: Record<NodePhase, RealTimeCardSectionsState> = assignRealTimeCardSectionsStateToAllPhases(defaultRealTimeCardSectionsState);
 
-    const nodesStateBySubSection: Record<NodePhase, Record<RealTimeCardSubSections, Record<string, NodeState>>> = Object.fromEntries(
-        phaseOrder.map((phase) => [phase, { ...emptyRealTimeCardSubSections }])
-    ) as Record<NodePhase, Record<RealTimeCardSubSections, Record<string, NodeState>>>;
+    const nodesStateBySubSection: Record<NodePhase, Record<RealTimeCardSubSections, Array<ProcessedNodeState>>> = Object.fromEntries(
+        phaseOrder.map((phase) => [phase, createEmptyRealTimeCardSubSectionsArrays()])
+    ) as Record<NodePhase, Record<RealTimeCardSubSections, Array<ProcessedNodeState>>>;
 
-    for (const [nodeKey, nodeState] of Object.entries(nodesState)) {
-        const phase = nodeState.phase;
-        let subsection: RealTimeCardSubSections;
-        if (nodeState.type === NodeType.FLOAT || nodeState.type === NodeType.INT) {
-            if (nodeState.incremental) {
-                subsection = RealTimeCardSubSections.Counters;
-            } else {
-                subsection = RealTimeCardSubSections.Measurements;
-            }
-        } else if (nodeState.type === NodeType.BOOLEAN) {
-            subsection = RealTimeCardSubSections.States;
-        } else if (nodeState.type === NodeType.STRING) {
-            subsection = RealTimeCardSubSections.Texts;
-        } else {
-            subsection = RealTimeCardSubSections.Other;
-        }
-        nodesStateBySubSection[phase][subsection][nodeKey] = nodeState;
-        availableSubSections[phase][subsection] = true;
+    for (const nodeState of processedNodesState) {
+        const subsection = getNodeSubSection(nodeState);
+        nodesStateBySubSection[nodeState.phase][subsection].push(nodeState);
+        availableSubSections[nodeState.phase][subsection] = true;
     }
+
     return { nodesStateBySubSection, availableSubSections };
 }

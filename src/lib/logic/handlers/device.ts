@@ -5,8 +5,11 @@ import { changeNodeProtocol } from "./nodes";
 import { protocolPlugins } from "$lib/stores/device/protocol";
 import { convertDateToLocalDate } from "../util/generic";
 
-
-
+/**
+ * Handles device protocol changes by updating communication options and converting all nodes to the new protocol.
+ * @param deviceData - The device configuration being edited.
+ * @param nodes - Array of device nodes to update with the new protocol.
+ */
 export function deviceProtocolChange(deviceData: EditableDevice | NewDevice, nodes: Array<EditableNodeRecord>): void {
     let newDefaultOptions = { ...get(protocolPlugins)[deviceData.protocol].defaultOptions };
     deviceData.communication_options = newDefaultOptions;
@@ -20,13 +23,17 @@ export function deviceProtocolChange(deviceData: EditableDevice | NewDevice, nod
     nodes = [...nodes];
 }
 
-
+/**
+ * Processes device history timestamps by converting them to local timezone format.
+ * @param initialDeviceHistory - Raw device history data with UTC timestamps.
+ * @returns DeviceHistory object with timestamps converted to local timezone.
+ */
 export function processDeviceHistory(initialDeviceHistory: DeviceHistory): DeviceHistory {
     let newDeviceHistory: DeviceHistory = {
         connection_on_datetime: convertDateToLocalDate(initialDeviceHistory.connection_on_datetime ?? ""),
         connection_off_datetime: convertDateToLocalDate(initialDeviceHistory.connection_off_datetime ?? ""),
         created_at: convertDateToLocalDate(initialDeviceHistory.created_at ?? ""),
         updated_at: convertDateToLocalDate(initialDeviceHistory.updated_at ?? ""),
-    }
+    };
     return newDeviceHistory;
 }

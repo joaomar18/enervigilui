@@ -1,7 +1,7 @@
 import { callAPI } from "$lib/logic/api/api";
-import { processInitialNodes, initNodes } from "../factory/nodes";
-import type { NodeRecord, EditableNodeRecord, NodeState } from "$lib/types/nodes/base";
+import { processInitialNodes, initNodes, processNodesState } from "../factory/nodes";
 import { navigateTo } from "../view/navigation";
+import type { NodeRecord, EditableNodeRecord, NodeState, ProcessedNodeState } from "$lib/types/nodes/base";
 
 /**
  * Fetches and processes the configuration for all nodes of a device by its ID.
@@ -12,7 +12,7 @@ import { navigateTo } from "../view/navigation";
  * @returns A promise resolving to an object containing the initial DeviceNode array and the processed EditableDeviceNode array.
  * @throws Error if the API call fails.
  */
-export async function getDeviceNodesConfig(id: number): Promise<{ initialNodes: Array<NodeRecord>, nodes: Array<EditableNodeRecord> }> {
+export async function getDeviceNodesConfig(id: number): Promise<{ initialNodes: Array<NodeRecord>; nodes: Array<EditableNodeRecord> }> {
     let initialNodes: Array<NodeRecord> = [];
     let nodes: Array<EditableNodeRecord> = [];
     const { sucess, data } = await callAPI({
@@ -38,17 +38,16 @@ export async function getDeviceNodesConfig(id: number): Promise<{ initialNodes: 
 }
 
 /**
- * Fetches the real-time state for all nodes of a device by its ID.
+ * Fetches and processes the real-time state for all nodes of a device by its ID.
+ * Retrieves current node values from the backend API and converts them to processed format for UI consumption.
  *
- * Calls the backend API to retrieve the current state of each node for the specified device.
- * Throws an error if the API call fails.
- *
- * @param id - The unique identifier of the device.
- * @returns A promise resolving to an object containing a record of node states keyed by node name.
+ * @param id The unique identifier of the device.
+ * @returns A promise resolving to an object containing the raw nodes state record and processed nodes state array.
  * @throws Error if the API call fails.
  */
-export async function getDeviceNodesState(id: number): Promise<{ nodesState: Record<string, NodeState>, }> {
+export async function getDeviceNodesState(id: number): Promise<{ nodesState: Record<string, NodeState>; processedNodesState: Array<ProcessedNodeState> }> {
     let nodesState: Record<string, NodeState>;
+    let processedNodesState: Array<ProcessedNodeState>;
     const { sucess, data } = await callAPI({
         endpoint: "/api/nodes/get_nodes_state",
         method: "GET",
@@ -58,10 +57,10 @@ export async function getDeviceNodesState(id: number): Promise<{ nodesState: Rec
 
     if (sucess) {
         nodesState = data as Record<string, NodeState>;
-    }
-    else {
+        processedNodesState = processNodesState(nodesState);
+    } else {
         throw new Error("Get device nodes state error");
     }
 
-    return { nodesState };
+    return { nodesState, processedNodesState };
 }

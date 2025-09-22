@@ -51,6 +51,13 @@ export function getInitialNodeValidation(): NodeValidation {
 }
 
 
+/**
+ * Validates node variable name based on custom/default status and uniqueness within the phase.
+ * @param nodeName - The display name of the node to validate.
+ * @param customVariable - True if this is a custom user-defined variable.
+ * @param currentNodes - Array of current nodes in the same phase to check for duplicates.
+ * @returns True if the node name is valid according to the rules.
+ */
 export function validateNodeName(nodeName: string, customVariable: boolean, currentNodes: Array<EditableNodeRecord>): boolean {
     const names: Array<string> = get(defaultVariableNames);
 
@@ -84,12 +91,12 @@ export function validateNodeName(nodeName: string, customVariable: boolean, curr
 }
 
 /**
- * Validates node unit.
- * @param nodeName Variable name.
- * @param nodeType Variable type.
- * @param nodeUnit Unit string.
- * @param customVariable True for custom variable.
- * @returns True if valid.
+ * Validates node unit based on variable type and custom/default status.
+ * @param nodeName - Variable name to check against default units.
+ * @param nodeType - The data type of the node (FLOAT, INT, STRING, BOOLEAN).
+ * @param nodeUnit - The unit string to validate.
+ * @param customVariable - True if this is a custom user-defined variable.
+ * @returns True if the unit is valid for the given node type and variable.
  */
 export function validateNodeUnit(nodeName: string, nodeType: NodeType, nodeUnit: string, customVariable: boolean): boolean {
     if (customVariable) {
@@ -108,10 +115,10 @@ export function validateNodeUnit(nodeName: string, nodeType: NodeType, nodeUnit:
 }
 
 /**
- * Validates communication ID for protocol.
- * @param communicationID Communication ID.
- * @param protocol Protocol type.
- * @returns True if valid.
+ * Validates communication ID format using the appropriate protocol plugin.
+ * @param communicationID - The communication ID string to validate.
+ * @param protocol - The communication protocol type.
+ * @returns True if the communication ID is valid for the specified protocol.
  */
 export function validateCommunicationID(communicationID: string | undefined, protocol: Protocol): boolean {
     if (!communicationID) {
@@ -125,10 +132,10 @@ export function validateCommunicationID(communicationID: string | undefined, pro
 }
 
 /**
- * Validates node protocol.
- * @param protocol Protocol.
- * @param virtual True if virtual node.
- * @returns True if valid.
+ * Validates node protocol based on virtual/physical status and available protocols.
+ * @param protocol - The protocol to validate.
+ * @param virtual - True if this is a calculated/virtual node.
+ * @returns True if the protocol is valid for the node type.
  */
 export function validateNodeProtocol(protocol: Protocol, virtual: boolean): boolean {
     if (!virtual) {
@@ -139,11 +146,11 @@ export function validateNodeProtocol(protocol: Protocol, virtual: boolean): bool
 }
 
 /**
- * Validates node type.
- * @param type NodeType.
- * @param name Variable name.
- * @param custom True for custom variable.
- * @returns True if valid.
+ * Validates node data type against applicable types for default variables or any type for custom variables.
+ * @param type - The NodeType to validate.
+ * @param name - Variable name to check against default variable constraints.
+ * @param custom - True if this is a custom user-defined variable.
+ * @returns True if the type is valid for the variable.
  */
 export function validateNodeType(type: NodeType, name: string, custom: boolean): boolean {
     if (custom) {
@@ -162,10 +169,10 @@ export function validateNodeType(type: NodeType, name: string, custom: boolean):
 }
 
 /**
- * Validates decimal places.
- * @param decimal_places String value.
- * @param type NodeType.
- * @returns True if valid.
+ * Validates decimal places value based on node type and defined limits.
+ * @param decimal_places - String representation of decimal places count.
+ * @param type - The NodeType to determine if decimal places are applicable.
+ * @returns True if decimal places value is valid for the node type.
  */
 export function validateDecimalPlaces(decimal_places: string, type: NodeType): boolean {
     if (type === NodeType.FLOAT || type === NodeType.INT) {
@@ -183,10 +190,10 @@ export function validateDecimalPlaces(decimal_places: string, type: NodeType): b
 }
 
 /**
- * Validates logging period.
- * @param logging_period String value.
- * @param logging_enabled True if logging enabled.
- * @returns True if valid.
+ * Validates logging period value against defined limits when logging is enabled.
+ * @param logging_period - String representation of logging period in minutes.
+ * @param logging_enabled - True if logging is enabled for the node.
+ * @returns True if logging period is valid or logging is disabled.
  */
 export function validateLoggingPeriod(logging_period: string, logging_enabled: boolean): boolean {
     if (!logging_enabled) {
@@ -199,11 +206,11 @@ export function validateLoggingPeriod(logging_period: string, logging_enabled: b
 }
 
 /**
- * Validates alarm value.
- * @param alarm_value String value.
- * @param alarm_enabled True if alarm enabled.
- * @param type NodeType.
- * @returns True if valid.
+ * Validates alarm threshold value based on node type and alarm enabled status.
+ * @param alarm_value - String representation of the alarm threshold value.
+ * @param alarm_enabled - True if the alarm is enabled.
+ * @param type - The NodeType to determine numeric validation requirements.
+ * @returns True if alarm value is valid or alarm is disabled.
  */
 export function validateAlarm(alarm_value: string, alarm_enabled: boolean, type: NodeType): boolean {
     if (!alarm_enabled) {
@@ -220,11 +227,11 @@ export function validateAlarm(alarm_value: string, alarm_enabled: boolean, type:
 }
 
 /**
- * Validates if node can be virtual.
- * @param virtual True if virtual.
- * @param name Variable name.
- * @param custom True for custom variable.
- * @returns True if valid.
+ * Validates if a node can be configured as virtual/calculated based on variable constraints.
+ * @param virtual - True if the node is configured as virtual/calculated.
+ * @param name - Variable name to check against default variable capabilities.
+ * @param custom - True if this is a custom user-defined variable.
+ * @returns True if the virtual configuration is valid for the variable.
  */
 export function validateVirtualNode(virtual: boolean, name: string, custom: boolean): boolean {
     if (custom && virtual) {
@@ -246,11 +253,11 @@ export function validateVirtualNode(virtual: boolean, name: string, custom: bool
 }
 
 /**
- * Validates if node can be incremental.
- * @param incremental True if incremental.
- * @param name Variable name.
- * @param custom True for custom variable.
- * @returns True if valid.
+ * Validates if a node can be configured as incremental based on variable type constraints.
+ * @param incremental - True if the node is configured as incremental.
+ * @param name - Variable name to check against default variable characteristics.
+ * @param custom - True if this is a custom user-defined variable.
+ * @returns True if the incremental configuration is valid for the variable.
  */
 export function validateIncrementalNode(incremental: boolean, name: string, custom: boolean): boolean {
     if (custom) {
@@ -269,9 +276,9 @@ export function validateIncrementalNode(incremental: boolean, name: string, cust
 }
 
 /**
- * Updates validation state for all nodes.
- * @param nodes Array of editable nodes.
- * @param nodesBySection Nodes grouped by phase.
+ * Updates validation state for all nodes by running all validation checks and updating their validation objects.
+ * @param nodes - Array of editable nodes to validate.
+ * @param nodesBySection - Nodes organized by phase for duplicate checking within each phase.
  */
 export function updateNodesValidation(nodes: Array<EditableNodeRecord>, nodesBySection: Record<NodePhase, Array<EditableNodeRecord>>): void {
     for (let node of nodes) {
@@ -293,9 +300,9 @@ export function updateNodesValidation(nodes: Array<EditableNodeRecord>, nodesByS
 }
 
 /**
- * Checks if all nodes pass validation.
- * @param nodes Array of editable nodes.
- * @returns True if all valid.
+ * Checks if all nodes in the array pass their validation checks.
+ * @param nodes - Array of editable nodes to check for validation compliance.
+ * @returns True if all nodes pass validation, false if any node fails validation.
  */
 export function getAllNodesValidation(nodes: Array<EditableNodeRecord>): boolean {
     for (let node of nodes) {
@@ -307,10 +314,10 @@ export function getAllNodesValidation(nodes: Array<EditableNodeRecord>): boolean
 }
 
 /**
- * Compares an initial nodes array configuration with a new array configuration for equality.
- * @param a Initial configuration array.
- * @param b New configuration array.
- * @returns True if equal.
+ * Compares two node arrays for equality by normalizing and sorting them for consistent comparison.
+ * @param initialNodes - Initial configuration array from the backend.
+ * @param newNodes - New configuration array to compare against.
+ * @returns True if the arrays are equivalent after normalization and sorting.
  */
 export function areNodesEqual(initialNodes: NodeRecord[], newNodes: NodeRecord[]): boolean {
     return isEqual(initialNodes, (sortNodesByName(newNodes) as NodeRecord[]).map(normalizeNode));

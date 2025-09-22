@@ -1,4 +1,5 @@
 import { Protocol } from "../device/base";
+import type { SvelteComponent } from "svelte";
 
 /*****     C O N S T A N T S     *****/
 
@@ -293,6 +294,8 @@ export interface NodeRecordEditingState {
  * @property {boolean} incremental - Whether the node accumulates values over time (counter)
  * @property {string} unit - The measurement unit for the value.
  * @property {NodePhase} phase - The electrical phase associated with the node.
+ * @property {number} [min_alarm_value] - Optional: Indicates the minimum alarm value.
+ * @property {number} [max_alarm_value] - Optional: Indicates the maximum alarm value.
  * @property {boolean} [min_alarm_state] - Optional: Indicates if the minimum alarm is active.
  * @property {boolean} [max_alarm_state] - Optional: Indicates if the maximum alarm is active.
  */
@@ -302,6 +305,37 @@ export interface NodeState {
     incremental: boolean;
     unit: string;
     phase: NodePhase;
+    min_alarm_value?: number;
+    max_alarm_value?: number;
+    min_alarm_state?: boolean;
+    max_alarm_state?: boolean;
+}
+
+/**
+ * Enhanced node state containing processed information ready for UI consumption and display.
+ *
+ * @property {string} name - The full node name including any phase prefixes
+ * @property {typeof SvelteComponent<any>} displayComponent - The Svelte component used to render this node type
+ * @property {number | string | boolean | null} value - The current runtime value of the node
+ * @property {NodeType} type - The data type of the node's value (FLOAT, INT, STRING, BOOLEAN)
+ * @property {boolean} incremental - Whether the node accumulates values over time (counters/energy)
+ * @property {string} unit - The measurement unit for display (e.g., "V", "A", "kW", "kWh")
+ * @property {NodePhase} phase - The electrical phase associated with the node
+ * @property {number} [min_alarm_value] - Optional: Minimum threshold value that triggers alarms
+ * @property {number} [max_alarm_value] - Optional: Maximum threshold value that triggers alarms
+ * @property {boolean} [min_alarm_state] - Optional: Current state of the minimum alarm (active/inactive)
+ * @property {boolean} [max_alarm_state] - Optional: Current state of the maximum alarm (active/inactive)
+ */
+export interface ProcessedNodeState {
+    name: string;
+    displayComponent: typeof SvelteComponent<any>;
+    value: number | string | boolean | null;
+    type: NodeType;
+    incremental: boolean;
+    unit: string;
+    phase: NodePhase;
+    min_alarm_value?: number;
+    max_alarm_value?: number;
     min_alarm_state?: boolean;
     max_alarm_state?: boolean;
 }
@@ -350,14 +384,7 @@ export interface NodeValidation {
  * Defines the logical order of electrical phases for sorting and grouping nodes.
  * Used to consistently organize nodes by phase in UI lists and processing logic.
  */
-export const phaseOrder = [
-    NodePhase.SINGLEPHASE,
-    NodePhase.L1,
-    NodePhase.L2,
-    NodePhase.L3,
-    NodePhase.TOTAL,
-    NodePhase.GENERAL
-];
+export const phaseOrder = [NodePhase.SINGLEPHASE, NodePhase.L1, NodePhase.L2, NodePhase.L3, NodePhase.TOTAL, NodePhase.GENERAL];
 
 /**
  * Default editable base node configuration used for initializing new nodes in UI forms.
