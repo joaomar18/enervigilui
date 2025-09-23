@@ -243,6 +243,7 @@
         z-index: 1;
     }
 
+    /* Tooltip container - hidden by default, shows only when text is hidden on small screens */
     .tooltip-div {
         position: absolute;
         inset: 0;
