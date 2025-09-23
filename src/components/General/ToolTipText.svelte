@@ -25,6 +25,13 @@
     $: mergedStyle = mergeStyle(effectiveStyle, localOverrides);
 </script>
 
+<!--
+  ToolTipText component
+
+  A simple text component designed for use within tooltips.
+  - Displays text with customizable typography (color, weight, size).
+  - Centered alignment with no-wrap to maintain tooltip layout.
+-->
 <span
     style="
         --text-color: {mergedStyle.textColor};
@@ -34,6 +41,7 @@
 >
 
 <style>
+    /* Text span: centered tooltip text with customizable typography and no-wrap layout */
     span {
         color: var(--text-color);
         font-weight: var(--text-weight);

@@ -95,6 +95,15 @@
     }
 </script>
 
+<!--
+  ToolTip component
+
+  A customizable tooltip that appears on hover or when triggered.
+  - Automatically positions itself above or below the trigger element based on available space.
+  - Supports horizontal alignment (left, center, right) to stay within viewport bounds.
+  - Fade in/out animation with configurable duration.
+  - Only shows on devices with mouse capability unless forceShowMobile is true.
+-->
 {#if showToolTip && ($hasMouseCapability || forceShowMobile)}
     <div
         bind:this={tooltipElement}
@@ -126,6 +135,7 @@
 {/if}
 
 <style>
+    /* Main tooltip container: positioned absolutely with customizable dimensions and styling */
     .tooltip-div {
         margin: 0;
         width: var(--width);
@@ -149,24 +159,29 @@
         z-index: 1;
     }
 
+    /* Tooltip positioned above the trigger element */
     .tooltip-div.show-on-top {
         bottom: var(--offset);
         transform-origin: bottom center;
     }
 
+    /* Tooltip positioned below the trigger element */
     .tooltip-div.show-on-bottom {
         top: var(--offset);
         transform-origin: top center;
     }
 
+    /* Left-aligned tooltip (when close to left edge of viewport) */
     .tooltip-div.align-left {
         transform: translateX(50%);
     }
 
+    /* Right-aligned tooltip (when close to right edge of viewport) */
     .tooltip-div.align-right {
         transform: translateX(-50%);
     }
 
+    /* Content wrapper: fills the tooltip container */
     .content {
         position: relative;
         margin: 0;
