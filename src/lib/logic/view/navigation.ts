@@ -14,6 +14,7 @@ import {
     searchQuery,
     subLoaderTimer,
     resetSubLoaderSubscription,
+    hasMouseCapability,
 } from "../../stores/view/navigation";
 
 // Current device store
@@ -248,22 +249,25 @@ export async function getSearchQuery() {
 }
 
 /**
- * Initializes the application layout by handling authentication, loading state, and navigation setup.
- *
- * Performs essential startup tasks including:
- * - Checking for automatic login and handling authentication state
- * - Loading and applying search query from URL parameters
- * - Managing splash screen with minimum duration guarantee
- * - Handling authentication-based redirects
- * - Setting up sub-loader triggers for subsequent navigation
- *
- * Runs multiple initialization tasks concurrently while ensuring the splash screen
- * remains visible for at least the minimum duration for smooth user experience.
- *
- * @param minSplashDuration - Minimum time (ms) to show splash screen during initialization (default: 300)
- * @param showSubLoaderTime - Time (ms) before showing sub-loader for subsequent navigation (default: 600)
+ * Detects and sets client mouse capability based on hover and pointer precision.
+ * Updates hasMouseCapability store to determine if tooltips should be enabled.
+ */
+export function checkClientHasMouse() {
+    const canHover = window.matchMedia('(hover: hover)').matches;
+    const hasFinePointer = window.matchMedia('(pointer: fine)').matches;
+    hasMouseCapability.set(canHover && hasFinePointer);
+}
+
+/**
+ * Initializes the application layout with authentication, search state, and navigation setup.
+ * Handles splash screen timing, auto-login checks, and redirects if necessary.
+ * 
+ * @param minSplashDuration - Minimum time (ms) to display splash screen.
+ * @param showSubLoaderTime - Time (ms) before showing sub-loader if initialization takes too long.
  */
 export async function initLayout(minSplashDuration: number = 300, showSubLoaderTime: number = 600) {
+
+    checkClientHasMouse();
     const checkAutoLoginPromise = checkAutoLogin();
     const getSearchQueryPromise = getSearchQuery();
     const minTimePromise = new Promise((res) => setTimeout(res, minSplashDuration));
