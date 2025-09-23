@@ -20,6 +20,7 @@
     export let searchString: string;
     export let placeholderText: string;
     export let enableToolTip: boolean = true;
+    export let toolTipAutoPos: boolean = true;
 
     // Layout / styling props
     export let width: string | undefined = undefined;
@@ -177,7 +178,7 @@
         >
             <img src="/img/search.svg" alt="Search Loop" />
             <button aria-label="Search Button" on:click={handleChange} on:mouseenter={handleMouseEnter} on:mouseleave={handleMouseLeave}></button>
-            <ToolTip {showToolTip}>
+            <ToolTip {showToolTip} autoPosition={toolTipAutoPos}>
                 <ToolTipText text={$texts.searchDevice} />
             </ToolTip>
         </div>

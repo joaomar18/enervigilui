@@ -1,10 +1,14 @@
 <script lang="ts">
     import { tick, onDestroy } from "svelte";
     import Action from "./Action.svelte";
+    import ToolTipText from "./ToolTipText.svelte";
 
     // Styles
     import { mergeStyle } from "$lib/style/components";
     import { EditableTextStyle } from "$lib/style/general";
+
+    // Texts
+    import { texts } from "$lib/stores/lang/generalTexts";
 
     //Props
     export let text: string;
@@ -131,8 +135,13 @@
                     imageURL="/img/edit_pencil.svg"
                     imageWidth={String(mergedStyle.buttonImageWidth)}
                     imageHeight={String(mergedStyle.buttonImageHeight)}
+                    enableToolTip={true}
                     onClick={activeInput}
-                />
+                >
+                    <div slot="tooltip">
+                        <ToolTipText text={$texts.edit} />
+                    </div>
+                </Action>
             </div>
         {/if}
     </div>
@@ -144,8 +153,13 @@
                 imageURL="/img/acept.svg"
                 imageWidth={String(mergedStyle.buttonImageWidth)}
                 imageHeight={String(mergedStyle.buttonImageHeight)}
+                enableToolTip={true}
                 onClick={confirmInput}
-            />
+            >
+                <div slot="tooltip">
+                    <ToolTipText text={$texts.confirm} />
+                </div>
+            </Action>
         </div>
         <div class="button-div cancel-button-div" class:hide={!enableInput}>
             <Action
@@ -154,8 +168,13 @@
                 imageURL="/img/previous.svg"
                 imageWidth={String(mergedStyle.buttonImageWidth)}
                 imageHeight={String(mergedStyle.buttonImageHeight)}
+                enableToolTip={true}
                 onClick={cancelInput}
-            />
+            >
+                <div slot="tooltip">
+                    <ToolTipText text={$texts.goBack} />
+                </div>
+            </Action>
         </div>
     {/if}
 </div>

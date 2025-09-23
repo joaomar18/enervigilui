@@ -226,6 +226,10 @@ const textsObject: TextsObject = {
         PT: "Confirmar",
         EN: "Confirm",
     },
+    edit: {
+        PT: "Editar",
+        EN: "Edit",
+    },
     save: {
         PT: "Guardar",
         EN: "Save",
@@ -650,6 +654,10 @@ const textsObject: TextsObject = {
     notifications: {
         PT: "Notificações",
         EN: "Notifications",
+    },
+    goBack: {
+        PT: "Voltar Atrás",
+        EN: "Go Back",
     }
 };
 

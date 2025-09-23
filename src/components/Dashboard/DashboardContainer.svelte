@@ -17,7 +17,9 @@
     import { displayToast, toastKey, toastType, toastVariables } from "$lib/stores/view/toast";
 
     // Texts
+    import { texts } from "$lib/stores/lang/generalTexts";
     import { toastTexts } from "$lib/stores/lang/toastTexts";
+    import ToolTipText from "../General/ToolTipText.svelte";
 
     // Variables
     let headerEl: HTMLDivElement;
@@ -78,10 +80,13 @@
         <div class="close-mobile-search-div" class:open={mobileSearchOpen}>
             <Action
                 imageURL="/img/previous.svg"
+                enableToolTip={true}
                 onClick={() => {
                     mobileSearchOpen = false;
                 }}
-            />
+            >
+                <div slot="tooltip"><ToolTipText text={$texts.goBack} /></div>
+            </Action>
         </div>
         <div
             class="logo-div"

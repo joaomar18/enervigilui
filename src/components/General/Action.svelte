@@ -9,6 +9,7 @@
     // Props
     export let imageURL: string = "";
     export let enableToolTip: boolean = false;
+    export let toolTipAutoPos: boolean = true;
 
     // Style object (from theme)
     export let style: { [property: string]: string | number } | null = null;
@@ -104,7 +105,7 @@
             />
         {/if}
         <button on:click={handleClick} on:mouseenter={handleMouseEnter} on:mouseleave={handleMouseLeave} aria-label="Action Button"></button>
-        <ToolTip style={toolTipStyle} {showToolTip}>
+        <ToolTip style={toolTipStyle} {showToolTip} autoPosition={toolTipAutoPos}>
             <slot name="tooltip" />
         </ToolTip>
     </div>

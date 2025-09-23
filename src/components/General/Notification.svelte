@@ -13,6 +13,7 @@
     export let notificationsOpen: boolean = false;
     export let notificationsNumber: string;
     export let enableToolTip: boolean = true;
+    export let toolTipAutoPos: boolean = true;
 
     // Style object (from theme)
     export let style: { [property: string]: string | number } | null = null;
@@ -109,7 +110,7 @@
         </div>
     {/if}
     <button on:click={handleClick} on:mouseenter={handleMouseEnter} on:mouseleave={handleMouseLeave} aria-label="Toggle Notifications"></button>
-    <ToolTip {showToolTip}>
+    <ToolTip {showToolTip} autoPosition={toolTipAutoPos}>
         <ToolTipText text={$texts.notifications} />
     </ToolTip>
 </div>

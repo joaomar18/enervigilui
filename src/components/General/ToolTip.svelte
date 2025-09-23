@@ -1,6 +1,5 @@
 <script lang="ts">
     import { fade } from "svelte/transition";
-    import { onMount } from "svelte";
     import { hasMouseCapability } from "$lib/stores/view/navigation";
 
     // Styles
@@ -13,7 +12,7 @@
 
     // Props
     export let pushToTop: boolean = false;
-    export let autoPosition: boolean = false;
+    export let autoPosition: boolean = true;
     export let forceShowMobile: boolean = false;
     export let showToolTip: boolean;
 
@@ -55,53 +54,45 @@
     let tooltipElement: HTMLDivElement;
     let showOnTop = pushToTop;
     let animationTimeNumber: number;
+    let tooltipAlign: "left" | "right" | "center" = "center";
 
     // Reactive Statements
     $: animationTimeNumber = parseInt(String(mergedStyle.animationTime));
 
-    // Functions
-    function checkPosition() {
-        if (!autoPosition || !tooltipElement) return;
-
-        const rect = tooltipElement.getBoundingClientRect();
-        const viewportHeight = window.innerHeight;
-        const spaceBelow = viewportHeight - rect.bottom;
-        const spaceAbove = rect.top;
-        const offset = parseInt(String(mergedStyle.offsetPx));
-
-        if (spaceBelow < offset && spaceAbove > spaceBelow) {
-            showOnTop = true;
-        } else {
-            showOnTop = false;
-        }
+    $: if (showToolTip && tooltipElement && autoPosition) {
+        updatePosition();
     }
 
-    onMount(() => {
-        if (autoPosition) {
-            let timeout: ReturnType<typeof setTimeout> | null = null;
+    // Functions
+    function updatePosition(): void {
+        tooltipAlign = "center"; // Reset alignment to center
+        requestAnimationFrame(() => {
+            const rect = tooltipElement.getBoundingClientRect();
+            const viewportHeight = window.innerHeight;
+            const viewPortWidth = window.innerWidth;
 
-            const checkPositionThrottled = () => {
-                if (timeout) {
-                    clearTimeout(timeout);
-                    timeout = null;
-                }
-                timeout = setTimeout(checkPosition, 10); // Limit to 10 ms
-            };
+            const spaceAbove = rect.top;
+            const spaceBelow = viewportHeight - rect.bottom;
 
-            checkPosition();
-            window.addEventListener("resize", checkPositionThrottled, { passive: true });
-            window.addEventListener("scroll", checkPositionThrottled, { passive: true });
+            const offset = parseInt(String(mergedStyle.offsetPx));
 
-            return () => {
-                window.removeEventListener("resize", checkPositionThrottled);
-                window.removeEventListener("scroll", checkPositionThrottled);
-                if (timeout) {
-                    clearTimeout(timeout);
-                    timeout = null;
-                }
-            };
-        }
-    });
+            // Vertical Position
+            if (spaceBelow < offset && spaceAbove > spaceBelow) {
+                showOnTop = true;
+            } else {
+                showOnTop = false;
+            }
+
+            // Horizontal Position
+            if (rect.left < offset) {
+                tooltipAlign = "left";
+            } else if (rect.right + offset > viewPortWidth) {
+                tooltipAlign = "right";
+            } else {
+                tooltipAlign = "center";
+            }
+        });
+    }
 </script>
 
 {#if showToolTip && ($hasMouseCapability || forceShowMobile)}
@@ -125,6 +116,8 @@
         class="tooltip-div"
         class:show-on-top={showOnTop}
         class:show-on-bottom={!showOnTop}
+        class:align-left={tooltipAlign === "left"}
+        class:align-right={tooltipAlign === "right"}
     >
         <div class="content">
             <slot />
@@ -164,6 +157,14 @@
     .tooltip-div.show-on-bottom {
         top: var(--offset);
         transform-origin: top center;
+    }
+
+    .tooltip-div.align-left {
+        transform: translateX(50%);
+    }
+
+    .tooltip-div.align-right {
+        transform: translateX(-50%);
     }
 
     .content {
