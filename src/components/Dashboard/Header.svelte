@@ -6,6 +6,7 @@
     import SearchBar from "./SearchBar.svelte";
     import Notification from "../General/Notification.svelte";
     import Logout from "./Logout.svelte";
+    import ToolTipText from "../General/ToolTipText.svelte";
 
     // Texts
     import { texts } from "$lib/stores/lang/generalTexts";
@@ -48,7 +49,10 @@
                         leftPanelOpen.set(false);
                         mobileSearchOpen = true;
                     }}
-                />
+                    enableToolTip={true}
+                >
+                    <div slot="tooltip"><ToolTipText text={$texts.searchDevice} /></div>
+                </Action>
             </div>
             <Notification notificationsNumber={"1"} />
             <Logout

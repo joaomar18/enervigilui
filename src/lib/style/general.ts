@@ -13,6 +13,7 @@ const ActionStyleConfig: ComponentStyles = {
         hoverColor: "#2a2e3a",
         imageWidth: "32px",
         imageHeight: "32px",
+        showToolTipDelay: 300,
     },
 };
 
@@ -28,6 +29,7 @@ const SlottedActionStyleConfig: ComponentStyles = {
         backgroundColor: "#14161c",
         borderColor: "#2a2e3a",
         hoverColor: "#2a2e3a",
+        showToolTipDelay: 300,
     },
 };
 
@@ -256,6 +258,7 @@ const NotificationStyleConfig: ComponentStyles = {
         imageHeight: "32px",
         numberBackgroundColor: "#e53935",
         numberTextColor: "#eee",
+        showToolTipDelay: 300,
     },
 };
 
@@ -424,3 +427,37 @@ const BarStyleConfig: ComponentStyles = {
 };
 
 export const BarStyle = createStyleStore(BarStyleConfig);
+
+//////////     T O O L     T I P     //////////
+
+const ToolTipStyleConfig: ComponentStyles = {
+    dark: {
+        width: "fit-content",
+        minWidth: "auto",
+        maxWidth: "300px",
+        height: "fit-content",
+        minHeight: "auto",
+        maxHeight: "300px",
+        offsetPx: "45px",
+        border: "1px solid #3a4149",
+        borderRadius: "10px",
+        backgroundColor: "#0a0c0f",
+        paddingHorizontal: "10px",
+        paddingVertical: "10px",
+        animationTime: 200,
+    },
+};
+
+export const ToolTipStyle = createStyleStore(ToolTipStyleConfig);
+
+//////////     T E X T     C O L O R S     //////////
+
+const ToolTipTexStyleConfig: ComponentStyles = {
+    dark: {
+        textColor: "#eeee",
+        textWeight: "300",
+        textSize: "14px",
+    }
+}
+
+export const ToolTipTextStyle = createStyleStore(ToolTipTexStyleConfig);

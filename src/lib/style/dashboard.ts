@@ -122,6 +122,7 @@ const SearchBarStyleConfig: ComponentStyles = {
         imageWidth: "32px",
         imageHeight: "32px",
         textColor: "#eee",
+        showToolTipDelay: 300,
     },
 };
 

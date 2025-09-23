@@ -634,8 +634,23 @@ const textsObject: TextsObject = {
     other: {
         PT: "Outros",
         EN: "Other",
+    },
+    collapseAll: {
+        PT: "Colapsar Tudo",
+        EN: "Collapse All",
+    },
+    expandAll: {
+        PT: "Expandir Tudo",
+        EN: "Expand All",
+    },
+    devicesList: {
+        PT: "Lista de Dispositivos",
+        EN: "Devices List",
+    },
+    notifications: {
+        PT: "Notificações",
+        EN: "Notifications",
     }
-
 };
 
 export const texts = createLangStore(textsObject);

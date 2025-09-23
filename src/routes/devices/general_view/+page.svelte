@@ -15,6 +15,7 @@
     import ContentCard from "../../../components/General/ContentCard.svelte";
     import ExpandableSection from "../../../components/General/ExpandableSection.svelte";
     import Action from "../../../components/General/Action.svelte";
+    import ToolTipText from "../../../components/General/ToolTipText.svelte";
 
     // Texts
     import { texts } from "$lib/stores/lang/generalTexts";
@@ -26,6 +27,8 @@
 
     // Styles
     import { RealTimeCardActionStyle } from "$lib/style/device";
+    import { RealTimeCardActionToolTipStyle } from "$lib/style/device";
+    import { ToolTipTextStyle } from "$lib/style/general";
 
     // Variables
     let nodesState: Record<string, NodeState>;
@@ -74,7 +77,14 @@
     });
 </script>
 
-<div class="content" in:fade={{ duration: 300 }}>
+<div
+    style="
+        --tool-tip-text-color: {$ToolTipTextStyle.color};
+        --tool-tip-text-weight: {$ToolTipTextStyle.weight};
+    "
+    class="content"
+    in:fade={{ duration: 300 }}
+>
     {#if nodesStateBySubSection && availableSubSections}
         <div class="grid">
             {#each nodeSections.filter((section) => availablePhases.includes(section.phase)) as section (section.key)}
@@ -84,14 +94,22 @@
                             <div class="phase-actions-div">
                                 <Action
                                     style={$RealTimeCardActionStyle}
+                                    toolTipStyle={$RealTimeCardActionToolTipStyle}
                                     imageURL="/img/collapse-all.svg"
                                     onClick={() => expandAllOnPhaseCard(section.phase)}
-                                />
+                                    enableToolTip={true}
+                                >
+                                    <div slot="tooltip"><ToolTipText text={$texts.expandAll} /></div>
+                                </Action>
                                 <Action
                                     style={$RealTimeCardActionStyle}
+                                    toolTipStyle={$RealTimeCardActionToolTipStyle}
                                     imageURL="/img/expand-all.svg"
                                     onClick={() => collapseAllOnPhaseCard(section.phase)}
-                                />
+                                    enableToolTip={true}
+                                >
+                                    <div slot="tooltip"><ToolTipText text={$texts.collapseAll} /></div>
+                                </Action>
                             </div>
                         </div>
                         <div class="slot-div content" slot="content">

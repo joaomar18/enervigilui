@@ -1,13 +1,18 @@
 <script lang="ts">
+    import ToolTip from "./ToolTip.svelte";
+
     // Styles
     import { mergeStyle } from "$lib/style/components";
     import { ActionStyle } from "$lib/style/general";
+    import { ToolTipStyle } from "$lib/style/general";
 
     // Props
     export let imageURL: string = "";
+    export let enableToolTip: boolean = false;
 
     // Style object (from theme)
     export let style: { [property: string]: string | number } | null = null;
+    export let toolTipStyle: { [property: string]: string | number } = $ToolTipStyle;
     $: effectiveStyle = style ?? $ActionStyle;
 
     // Layout / styling props
@@ -19,6 +24,7 @@
     export let hoverColor: string | undefined = undefined;
     export let imageWidth: string | undefined = undefined;
     export let imageHeight: string | undefined = undefined;
+    export let showToolTipDelay: number | undefined = undefined;
 
     $: localOverrides = {
         width,
@@ -29,12 +35,21 @@
         hoverColor,
         imageWidth,
         imageHeight,
+        showToolTipDelay,
     };
 
     // Merged style
     $: mergedStyle = mergeStyle(effectiveStyle, localOverrides);
 
-    // Click Export Funcion
+    // Variables
+    let showToolTip: boolean = false;
+    let showToolTipTimeout: ReturnType<typeof setTimeout> | null = null;
+    let showToolTipDelayNumber: number;
+
+    // Reactive Statements
+    $: showToolTipDelayNumber = parseInt(String(mergedStyle.showToolTipDelay));
+
+    // Click Export Function
     export let onClick: () => void;
 
     // Functions
@@ -43,10 +58,28 @@
             onClick();
         }
     }
+
+    function handleMouseEnter(): void {
+        if (enableToolTip) {
+            showToolTipTimeout = setTimeout(() => {
+                showToolTip = true;
+            }, showToolTipDelayNumber);
+        }
+    }
+
+    function handleMouseLeave(): void {
+        if (enableToolTip) {
+            if (showToolTipTimeout) {
+                clearTimeout(showToolTipTimeout);
+                showToolTipTimeout = null;
+            }
+            showToolTip = false;
+        }
+    }
 </script>
 
 <!-- 
-  Action Button: Reusable clickable component with optional image.  
+  Action Button: Reusable clickable component with optional image and tool tip
 -->
 <div
     class="action-button-div"
@@ -70,7 +103,10 @@
                 alt={imageURL}
             />
         {/if}
-        <button on:click={handleClick} aria-label="Action Button"></button>
+        <button on:click={handleClick} on:mouseenter={handleMouseEnter} on:mouseleave={handleMouseLeave} aria-label="Action Button"></button>
+        <ToolTip style={toolTipStyle} {showToolTip}>
+            <slot name="tooltip" />
+        </ToolTip>
     </div>
 </div>
 

@@ -1,6 +1,7 @@
 <script lang="ts">
     import type { DeviceInfo } from "$lib/types/device/base";
     import Action from "../General/Action.svelte";
+    import ToolTipText from "../General/ToolTipText.svelte";
 
     // Styles
     import { mergeStyle } from "$lib/style/components";
@@ -9,6 +10,9 @@
     // Style object (from theme)
     export let style: { [property: string]: string | number } | null = null;
     $: effectiveStyle = style ?? $DeviceInfoHeaderStyle;
+
+    // Texts
+    import { texts } from "$lib/stores/lang/generalTexts";
 
     // Props
     export let deviceInfo: DeviceInfo;
@@ -74,7 +78,9 @@
             </div>
         </div>
         <div class="expand-more-div">
-            <Action imageURL="/img/expand-down.svg" onClick={() => {}} />
+            <Action imageURL="/img/expand-down.svg" enableToolTip={true} onClick={() => {}}>
+                <div slot="tooltip"><ToolTipText text={$texts.devicesList} /></div>
+            </Action>
         </div>
     </div>
 {/if}

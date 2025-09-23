@@ -71,6 +71,7 @@
     let backgroundColor: string;
     let borderColor: string;
 
+    // Reactive Statements
     $: {
         message = toastText;
         if (toastVariables) {

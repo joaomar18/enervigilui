@@ -98,6 +98,7 @@ const DeviceActionStyleConfig: ComponentStyles = {
         hoverColor: "rgba(255, 255, 255, 0.2)",
         imageWidth: "32px",
         imageHeight: "32px",
+        showToolTipDelay: 300,
     },
 };
 
@@ -134,7 +135,30 @@ const RealTimeCardActionStyleConfig: ComponentStyles = {
         hoverColor: "#3b4250",
         imageWidth: "20px",
         imageHeight: "20px",
+        showToolTipDelay: 300,
     },
 };
 
 export const RealTimeCardActionStyle = createStyleStore(RealTimeCardActionStyleConfig);
+
+//////////     D E V I C E     R E A L     T I M E     C A R D     A C T I O N     T O O L     T I P     //////////
+
+const RealTimeCardActionToolTipStyleConfig: ComponentStyles = {
+    dark: {
+        width: "fit-content",
+        minWidth: "auto",
+        maxWidth: "300px",
+        height: "fit-content",
+        minHeight: "auto",
+        maxHeight: "300px",
+        offsetPx: "40px",
+        border: "1px solid #3a4149",
+        borderRadius: "10px",
+        backgroundColor: "#0a0c0f",
+        paddingHorizontal: "10px",
+        paddingVertical: "10px",
+        animationTime: 200,
+    },
+};
+
+export const RealTimeCardActionToolTipStyle = createStyleStore(RealTimeCardActionToolTipStyleConfig);

@@ -1,11 +1,18 @@
 <script lang="ts">
+    import ToolTip from "./ToolTip.svelte";
+    import ToolTipText from "./ToolTipText.svelte";
+
     // Styles
     import { mergeStyle } from "$lib/style/components";
     import { NotificationStyle } from "$lib/style/general";
 
+    // Texts
+    import { texts } from "$lib/stores/lang/generalTexts";
+
     // Props
     export let notificationsOpen: boolean = false;
     export let notificationsNumber: string;
+    export let enableToolTip: boolean = true;
 
     // Style object (from theme)
     export let style: { [property: string]: string | number } | null = null;
@@ -22,6 +29,7 @@
     export let imageHeight: string | undefined = undefined;
     export let numberBackgroundColor: string | undefined = undefined;
     export let numberTextColor: string | undefined = undefined;
+    export let showToolTipDelay: number | undefined = undefined;
 
     $: localOverrides = {
         width,
@@ -34,14 +42,41 @@
         imageHeight,
         numberBackgroundColor,
         numberTextColor,
+        showToolTipDelay,
     };
 
     // Merged style
     $: mergedStyle = mergeStyle(effectiveStyle, localOverrides);
 
+    // Variables
+    let showToolTip: boolean = false;
+    let showToolTipTimeout: ReturnType<typeof setTimeout> | null = null;
+    let showToolTipDelayNumber: number;
+
+    // Reactive Statements
+    $: showToolTipDelayNumber = parseInt(String(mergedStyle.showToolTipDelay));
+
     // Functions
     function handleClick(): void {
         notificationsOpen = !notificationsOpen;
+    }
+
+    function handleMouseEnter(): void {
+        if (enableToolTip) {
+            showToolTipTimeout = setTimeout(() => {
+                showToolTip = true;
+            }, showToolTipDelayNumber);
+        }
+    }
+
+    function handleMouseLeave(): void {
+        if (enableToolTip) {
+            if (showToolTipTimeout) {
+                clearTimeout(showToolTipTimeout);
+                showToolTipTimeout = null;
+            }
+            showToolTip = false;
+        }
     }
 </script>
 
@@ -73,7 +108,10 @@
             <span>{notificationsNumber}</span>
         </div>
     {/if}
-    <button on:click={handleClick} aria-label="Toggle Notifications"></button>
+    <button on:click={handleClick} on:mouseenter={handleMouseEnter} on:mouseleave={handleMouseLeave} aria-label="Toggle Notifications"></button>
+    <ToolTip {showToolTip}>
+        <ToolTipText text={$texts.notifications} />
+    </ToolTip>
 </div>
 
 <style>

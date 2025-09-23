@@ -6,6 +6,11 @@
     // Styles
     import { mergeStyle } from "$lib/style/components";
     import { SearchBarStyle } from "$lib/style/dashboard";
+    import ToolTip from "../General/ToolTip.svelte";
+    import ToolTipText from "../General/ToolTipText.svelte";
+
+    // Texts
+    import { texts } from "$lib/stores/lang/generalTexts";
 
     // Style object (from theme)
     export let style: { [property: string]: string | number } | null = null;
@@ -14,6 +19,7 @@
     // Props
     export let searchString: string;
     export let placeholderText: string;
+    export let enableToolTip: boolean = true;
 
     // Layout / styling props
     export let width: string | undefined = undefined;
@@ -31,6 +37,7 @@
     export let imageWidth: string | undefined = undefined;
     export let imageHeight: string | undefined = undefined;
     export let textColor: string | undefined = undefined;
+    export let showToolTipDelay: number | undefined = undefined;
 
     $: localOverrides = {
         width,
@@ -46,6 +53,7 @@
         imageWidth,
         imageHeight,
         textColor,
+        showToolTipDelay,
     };
 
     // Merged style
@@ -55,6 +63,13 @@
     let inputValue: string;
     let currentSearchString: string;
     let inputElement: HTMLInputElement;
+
+    let showToolTip: boolean = false;
+    let showToolTipTimeout: ReturnType<typeof setTimeout> | null = null;
+    let showToolTipDelayNumber: number;
+
+    // Reactive Statements
+    $: showToolTipDelayNumber = parseInt(String(mergedStyle.showToolTipDelay));
 
     // Sync input value when search string changes externally
     $: if (currentSearchString !== searchString) {
@@ -96,6 +111,24 @@
     onMount(() => {
         inputValue = searchString;
     });
+
+    function handleMouseEnter(): void {
+        if (enableToolTip) {
+            showToolTipTimeout = setTimeout(() => {
+                showToolTip = true;
+            }, showToolTipDelayNumber);
+        }
+    }
+
+    function handleMouseLeave(): void {
+        if (enableToolTip) {
+            if (showToolTipTimeout) {
+                clearTimeout(showToolTipTimeout);
+                showToolTipTimeout = null;
+            }
+            showToolTip = false;
+        }
+    }
 </script>
 
 <!-- 
@@ -143,7 +176,10 @@
             class="search-button-div"
         >
             <img src="/img/search.svg" alt="Search Loop" />
-            <button aria-label="Search Button" on:click={handleChange}></button>
+            <button aria-label="Search Button" on:click={handleChange} on:mouseenter={handleMouseEnter} on:mouseleave={handleMouseLeave}></button>
+            <ToolTip {showToolTip}>
+                <ToolTipText text={$texts.searchDevice} />
+            </ToolTip>
         </div>
     </div>
 </div>
