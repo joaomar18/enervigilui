@@ -14,6 +14,7 @@
     // Props
     export let pushToTop: boolean = false;
     export let autoPosition: boolean = false;
+    export let forceShowMobile: boolean = false;
     export let showToolTip: boolean;
 
     // Layout / styling props
@@ -103,7 +104,7 @@
     });
 </script>
 
-{#if showToolTip && $hasMouseCapability}
+{#if showToolTip && ($hasMouseCapability || forceShowMobile)}
     <div
         bind:this={tooltipElement}
         transition:fade={{ duration: animationTimeNumber }}
