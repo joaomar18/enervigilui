@@ -65,7 +65,9 @@
 
     // Functions
     function updatePosition(): void {
+        showOnTop = false; // Reset alignment to bottom
         tooltipAlign = "center"; // Reset alignment to center
+
         requestAnimationFrame(() => {
             const rect = tooltipElement.getBoundingClientRect();
             const viewportHeight = window.innerHeight;
