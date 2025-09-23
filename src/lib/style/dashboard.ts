@@ -100,6 +100,7 @@ const LogoutStyleConfig: ComponentStyles = {
         imageHeight: "32px",
         textColor: "#eeeeee",
         textWeight: "400",
+        showToolTipDelay: 300,
     },
 };
 

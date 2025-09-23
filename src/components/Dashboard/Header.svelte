@@ -58,10 +58,13 @@
             <Logout
                 buttonText={$texts.logout}
                 imageUrl="/img/logout.svg"
+                enableToolTip={true}
                 onClick={async () => {
                     await logoutUser();
                 }}
-            />
+            >
+                <div slot="tooltip"><ToolTipText text={$texts.logout} /></div>
+            </Logout>
         </div>
     </div>
 </div>

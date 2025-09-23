@@ -9,6 +9,7 @@
     import Logout from "./Logout.svelte";
     import DeviceInfoHeader from "../Devices/DeviceInfoHeader.svelte";
     import MobileDeviceInfoHeader from "../Devices/MobileDeviceInfoHeader.svelte";
+    import ToolTipText from "../General/ToolTipText.svelte";
 
     // Texts
     import { texts } from "$lib/stores/lang/generalTexts";
@@ -57,10 +58,13 @@
             <Logout
                 buttonText={$texts.logout}
                 imageUrl="/img/logout.svg"
+                enableToolTip={true}
                 onClick={async () => {
                     await logoutUser();
                 }}
-            />
+            >
+                <div slot="tooltip"><ToolTipText text={$texts.logout} /></div>
+            </Logout>
         </div>
     </div>
 </div>

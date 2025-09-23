@@ -99,7 +99,7 @@
                                     onClick={() => expandAllOnPhaseCard(section.phase)}
                                     enableToolTip={true}
                                 >
-                                    <div slot="tooltip"><ToolTipText text={$texts.expandAll} /></div>
+                                    <div slot="tooltip"><ToolTipText text={$texts.collapseAll} /></div>
                                 </Action>
                                 <Action
                                     style={$RealTimeCardActionStyle}
@@ -108,7 +108,7 @@
                                     onClick={() => collapseAllOnPhaseCard(section.phase)}
                                     enableToolTip={true}
                                 >
-                                    <div slot="tooltip"><ToolTipText text={$texts.collapseAll} /></div>
+                                    <div slot="tooltip"><ToolTipText text={$texts.expandAll} /></div>
                                 </Action>
                             </div>
                         </div>

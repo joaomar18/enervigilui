@@ -121,6 +121,9 @@
         flex-direction: column;
         justify-content: start;
         align-items: center;
+        -webkit-tap-highlight-color: transparent;
+        -webkit-touch-callout: none;
+        user-select: none;
     }
 
     /* Header section: contains title and optional slot content, positioned at top of card */

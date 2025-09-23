@@ -1,5 +1,6 @@
 <script lang="ts">
     import { isDeviceViewPage } from "$lib/logic/view/navigation";
+    import ToolTip from "../General/ToolTip.svelte";
 
     // Stores
     import { currentPage } from "$lib/stores/view/navigation";
@@ -7,14 +8,18 @@
     // Styles
     import { mergeStyle } from "$lib/style/components";
     import { LogoutStyle } from "$lib/style/dashboard";
+    import { ToolTipStyle } from "$lib/style/general";
 
     // Style object (from theme)
     export let style: { [property: string]: string | number } | null = null;
+    export let toolTipStyle: { [property: string]: string | number } = $ToolTipStyle;
     $: effectiveStyle = style ?? $LogoutStyle;
 
     // Props
     export let buttonText: string;
     export let imageUrl: string | undefined = undefined;
+    export let enableToolTip: boolean = false;
+    export let toolTipAutoPos: boolean = true;
 
     // Layout / styling props
     export let width: string | undefined = undefined;
@@ -31,6 +36,7 @@
     export let imageHeight: string | undefined = undefined;
     export let textColor: string | undefined = undefined;
     export let textWeight: string | undefined = undefined;
+    export let showToolTipDelay: number | undefined = undefined;
 
     $: localOverrides = {
         width,
@@ -47,6 +53,7 @@
         imageHeight,
         textColor,
         textWeight,
+        showToolTipDelay,
     };
 
     // Merged style
@@ -55,10 +62,14 @@
     // Variables
     let deviceViewPage: boolean = false;
     let managementPage: boolean = false;
+    let showToolTip: boolean = false;
+    let showToolTipTimeout: ReturnType<typeof setTimeout> | null = null;
+    let showToolTipDelayNumber: number;
 
     // Reactive Statements
     $: deviceViewPage = isDeviceViewPage($currentPage);
     $: managementPage = !deviceViewPage;
+    $: showToolTipDelayNumber = parseInt(String(mergedStyle.showToolTipDelay));
 
     // Click Export Funcion
     export let onClick: () => void | Promise<void>;
@@ -67,6 +78,24 @@
     async function handleClick(): Promise<void> {
         if (onClick) {
             await onClick();
+        }
+    }
+
+    function handleMouseEnter(): void {
+        if (enableToolTip) {
+            showToolTipTimeout = setTimeout(() => {
+                showToolTip = true;
+            }, showToolTipDelayNumber);
+        }
+    }
+
+    function handleMouseLeave(): void {
+        if (enableToolTip) {
+            if (showToolTipTimeout) {
+                clearTimeout(showToolTipTimeout);
+                showToolTipTimeout = null;
+            }
+            showToolTip = false;
         }
     }
 </script>
@@ -108,7 +137,7 @@
                 alt={imageUrl}
             />
         {/if}
-        <div class="text-div" class:management-page={managementPage} class:device-view-page={deviceViewPage}>
+        <div class="text-div">
             <span
                 style="
                 --font-size: {mergedStyle.fontSize};
@@ -118,7 +147,12 @@
             ">{buttonText}</span
             >
         </div>
-        <button on:click={handleClick} aria-label="Action Button"></button>
+        <button on:click={handleClick} on:mouseenter={handleMouseEnter} on:mouseleave={handleMouseLeave} aria-label="Action Button"></button>
+        <div class="tooltip-div">
+            <ToolTip style={toolTipStyle} {showToolTip} autoPosition={toolTipAutoPos}>
+                <slot name="tooltip" />
+            </ToolTip>
+        </div>
     </div>
 </div>
 
@@ -131,7 +165,6 @@
         height: var(--height);
         border-radius: var(--border-radius, 0px);
         right: 20px;
-        cursor: pointer;
         -webkit-tap-highlight-color: transparent;
         -webkit-touch-callout: none;
         user-select: none;
@@ -207,6 +240,19 @@
         cursor: pointer;
         outline: none;
         -webkit-tap-highlight-color: transparent;
+        z-index: 1;
+    }
+
+    .tooltip-div {
+        position: absolute;
+        inset: 0;
+        margin: 0;
+        padding: 0;
+        width: 100%;
+        height: 100%;
+        display: none;
+        justify-content: center;
+        align-items: center;
     }
 
     /* Responsive: hide text on small screens for management page */
@@ -220,8 +266,11 @@
             padding: 0;
         }
 
-        .text-div.management-page {
+        .content.management-page .text-div {
             display: none;
+        }
+        .content.management-page .tooltip-div {
+            display: flex;
         }
     }
 
@@ -236,8 +285,11 @@
             padding: 0;
         }
 
-        .text-div.device-view-page {
+        .content.device-view-page .text-div {
             display: none;
+        }
+        .content.device-view-page .tooltip-div {
+            display: flex;
         }
     }
 </style>
