@@ -174,6 +174,7 @@ export const NodesGridStyle = createStyleStore(NodesGridStyleConfig);
 const NodesBaseDisplayStyleConfig: ComponentStyles = {
     dark: {
         width: "100%",
+        maxWidth: "300px",
         paddingHorizontal: "0px",
         paddingVertical: "10px",
         labelPaddingTop: "0px",
@@ -183,8 +184,6 @@ const NodesBaseDisplayStyleConfig: ComponentStyles = {
         labelColor: "#D4D4D8",
         labelWeight: "500",
         displayHeight: "40px",
-        displayWidth: "100%",
-        displayMaxWidth: "300px",
         displayBorder: "1px solid #52525B",
         displayHoverBorder: "1px solid #6B7280",
         displayDisconnectedBorder: "1px solid #52525B",

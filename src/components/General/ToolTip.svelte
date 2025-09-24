@@ -1,5 +1,6 @@
 <script lang="ts">
-    import Portal from "svelte-portal";
+    import { onDestroy } from "svelte";
+    import { computePosition, flip, shift, offset } from "@floating-ui/dom";
     import { fade } from "svelte/transition";
     import { hasMouseCapability } from "$lib/stores/view/navigation";
 
@@ -15,6 +16,7 @@
     export let originalParent: HTMLElement | null = null;
     export let pushToTop: boolean = false;
     export let autoPosition: boolean = true;
+    export let autoPositionContinuous: boolean = false;
     export let forceShowMobile: boolean = false;
     export let showToolTip: boolean;
 
@@ -55,12 +57,14 @@
     // Variables
     let parentElement: HTMLElement;
     let tooltipElement: HTMLDivElement;
-    let showOnTop = pushToTop;
     let animationTimeNumber: number;
-    let tooltipAlign: "left" | "right" | "center" = "center";
+    let eventListenersDefined: boolean = false;
+    let enableUpdatePosition: boolean = false;
 
     // Reactive Statements
     $: animationTimeNumber = parseInt(String(mergedStyle.animationTime));
+    $: enableUpdatePosition = showToolTip && tooltipElement && parentElement && autoPosition && ($hasMouseCapability || forceShowMobile);
+
     $: if (tooltipElement) {
         if (originalParent) {
             parentElement = originalParent;
@@ -71,42 +75,43 @@
         }
     }
 
-    $: if (showToolTip && tooltipElement && parentElement && autoPosition) {
+    $: if (enableUpdatePosition) {
         updatePosition();
     }
 
+    $: if (autoPositionContinuous && enableUpdatePosition && !eventListenersDefined) {
+        window.addEventListener("resize", updatePosition);
+        window.addEventListener("scroll", updatePosition);
+        eventListenersDefined = true;
+    }
+
+    $: if (!enableUpdatePosition && eventListenersDefined) {
+        window.removeEventListener("resize", updatePosition);
+        window.removeEventListener("scroll", updatePosition);
+        eventListenersDefined = false;
+    }
+
     // Functions
-    function updatePosition(): void {
-        showOnTop = false; // Reset alignment to bottom
-        tooltipAlign = "center"; // Reset alignment to center
+    async function updatePosition(): Promise<void> {
+        if (!parentElement || !tooltipElement) return;
 
-        requestAnimationFrame(() => {
-            const rect = tooltipElement.getBoundingClientRect();
-            const viewportHeight = window.innerHeight;
-            const viewPortWidth = window.innerWidth;
+        const { x, y } = await computePosition(parentElement, tooltipElement, {
+            placement: pushToTop ? "top" : "bottom",
+            middleware: [offset(parseInt(String(mergedStyle.offsetPx))), flip(), shift({ padding: parseInt(String(mergedStyle.offsetPx)) })],
+        });
 
-            const spaceAbove = rect.top;
-            const spaceBelow = viewportHeight - rect.bottom;
-
-            const offset = parseInt(String(mergedStyle.offsetPx));
-
-            // Vertical Position
-            if (spaceBelow < offset && spaceAbove > spaceBelow) {
-                showOnTop = true;
-            } else {
-                showOnTop = false;
-            }
-
-            // Horizontal Position
-            if (rect.left < offset) {
-                tooltipAlign = "left";
-            } else if (rect.right + offset > viewPortWidth) {
-                tooltipAlign = "right";
-            } else {
-                tooltipAlign = "center";
-            }
+        Object.assign(tooltipElement.style, {
+            left: `${x}px`,
+            top: `${y}px`,
         });
     }
+
+    onDestroy(() => {
+        if (eventListenersDefined) {
+            window.removeEventListener("resize", updatePosition);
+            window.removeEventListener("scroll", updatePosition);
+        }
+    });
 </script>
 
 <!--
@@ -137,10 +142,6 @@
         --padding-vertical: {mergedStyle.paddingVertical};
     "
         class="tooltip-div"
-        class:show-on-top={showOnTop}
-        class:show-on-bottom={!showOnTop}
-        class:align-left={tooltipAlign === "left"}
-        class:align-right={tooltipAlign === "right"}
     >
         <div class="content">
             <slot />
@@ -170,29 +171,7 @@
         flex-direction: column;
         justify-content: start;
         align-items: center;
-        z-index: 1;
-    }
-
-    /* Tooltip positioned above the trigger element */
-    .tooltip-div.show-on-top {
-        bottom: var(--offset);
-        transform-origin: bottom center;
-    }
-
-    /* Tooltip positioned below the trigger element */
-    .tooltip-div.show-on-bottom {
-        top: var(--offset);
-        transform-origin: top center;
-    }
-
-    /* Left-aligned tooltip (when close to left edge of viewport) */
-    .tooltip-div.align-left {
-        transform: translateX(50%);
-    }
-
-    /* Right-aligned tooltip (when close to right edge of viewport) */
-    .tooltip-div.align-right {
-        transform: translateX(-50%);
+        z-index: 2;
     }
 
     /* Content wrapper: fills the tooltip container */

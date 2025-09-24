@@ -438,7 +438,7 @@ const ToolTipStyleConfig: ComponentStyles = {
         height: "fit-content",
         minHeight: "auto",
         maxHeight: "300px",
-        offsetPx: "45px",
+        offsetPx: "10px",
         border: "1px solid #3a4149",
         borderRadius: "10px",
         backgroundColor: "#0a0c0f",

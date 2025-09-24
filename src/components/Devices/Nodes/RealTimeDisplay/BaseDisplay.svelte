@@ -1,5 +1,5 @@
 <script lang="ts">
-    import DetailedInfoToolTip from "./DetailedInfoToolTip.svelte";
+    import DetailedInfoDisplay from "./DetailedInfoDisplay.svelte";
 
     // Styles
     import { mergeStyle } from "$lib/style/components";
@@ -17,6 +17,7 @@
 
     // Layout / styling props
     export let width: string | undefined = undefined;
+    export let maxWidth: string | undefined = undefined;
     export let paddingHorizontal: string | undefined = undefined;
     export let paddingVertical: string | undefined = undefined;
     export let labelPaddingTop: string | undefined = undefined;
@@ -26,8 +27,6 @@
     export let labelColor: string | undefined = undefined;
     export let labelWeight: string | undefined = undefined;
     export let displayHeight: string | undefined = undefined;
-    export let displayWidth: string | undefined = undefined;
-    export let displayMaxWidth: string | undefined = undefined;
     export let displayBorder: string | undefined = undefined;
     export let displayHoverBorder: string | undefined = undefined;
     export let displayDisconnectedBorder: string | undefined = undefined;
@@ -54,6 +53,7 @@
 
     $: localOverrides = {
         width,
+        maxWidth,
         paddingHorizontal,
         paddingVertical,
         labelPaddingTop,
@@ -63,8 +63,6 @@
         labelColor,
         labelWeight,
         displayHeight,
-        displayWidth,
-        displayMaxWidth,
         displayBorder,
         displayHoverBorder,
         displayDisconnectedBorder,
@@ -94,17 +92,18 @@
     $: mergedStyle = mergeStyle(effectiveStyle, localOverrides);
 
     // Variables
-    let showDetailedInfoToolTip: boolean;
+    let showDetailedInfo: boolean;
 
     // Functions
     function openVariableDetailedInfo(): void {
-        showDetailedInfoToolTip = true;
+        showDetailedInfo = true;
     }
 </script>
 
 <div
     style="
         --width: {mergedStyle.width};
+        --max-width: {mergedStyle.maxWidth};
         --padding-horizontal: {mergedStyle.paddingHorizontal};
         --padding-vertical: {mergedStyle.paddingVertical};
         --label-padding-top: {mergedStyle.labelPaddingTop};
@@ -114,8 +113,6 @@
         --label-color: {mergedStyle.labelColor};
         --label-weight: {mergedStyle.labelWeight};
         --display-height: {mergedStyle.displayHeight};
-        --display-width: {mergedStyle.displayWidth};
-        --display-max-width: {mergedStyle.displayMaxWidth};
         --display-border: {mergedStyle.displayBorder};
         --display-hover-border: {mergedStyle.displayHoverBorder};
         --display-disconnected-border: {mergedStyle.displayDisconnectedBorder};
@@ -156,30 +153,32 @@
             <slot name="content" />
         </div>
         <button on:click={openVariableDetailedInfo} aria-label="Open Variable Detailed Info"></button>
-        <DetailedInfoToolTip bind:showToolTip={showDetailedInfoToolTip} />
     </div>
+    <DetailedInfoDisplay {showDetailedInfo} />
 </div>
 
 <style>
     .container {
         padding: 0;
         margin: 0;
+        position: relative;
         width: var(--width);
+        max-width: var(--max-width);
         height: fit-content;
         padding-left: var(--padding-horizontal);
         padding-right: var(--padding-horizontal);
         padding-top: var(--padding-vertical);
         padding-bottom: var(--padding-vertical);
         display: flex;
-        justify-content: center;
+        flex-direction: column;
+        justify-content: start;
         align-items: center;
     }
 
     .content {
         margin: 0;
         padding: 0;
-        width: var(--display-width);
-        max-width: var(--display-max-width);
+        width: 100%;
         height: 100%;
         position: relative;
         display: flex;
