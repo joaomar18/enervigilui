@@ -1,4 +1,5 @@
 <script lang="ts">
+    import Portal from "svelte-portal";
     import { fade } from "svelte/transition";
     import { hasMouseCapability } from "$lib/stores/view/navigation";
 
@@ -11,6 +12,7 @@
     $: effectiveStyle = style ?? $ToolTipStyle;
 
     // Props
+    export let originalParent: HTMLElement | null = null;
     export let pushToTop: boolean = false;
     export let autoPosition: boolean = true;
     export let forceShowMobile: boolean = false;
@@ -51,6 +53,7 @@
     $: mergedStyle = mergeStyle(effectiveStyle, localOverrides);
 
     // Variables
+    let parentElement: HTMLElement;
     let tooltipElement: HTMLDivElement;
     let showOnTop = pushToTop;
     let animationTimeNumber: number;
@@ -58,8 +61,17 @@
 
     // Reactive Statements
     $: animationTimeNumber = parseInt(String(mergedStyle.animationTime));
+    $: if (tooltipElement) {
+        if (originalParent) {
+            parentElement = originalParent;
+        } else if (tooltipElement.parentElement) {
+            parentElement = tooltipElement.parentElement;
+        } else {
+            throw new Error("Parent element needs to be defined by prop or by dom relationship.");
+        }
+    }
 
-    $: if (showToolTip && tooltipElement && autoPosition) {
+    $: if (showToolTip && tooltipElement && parentElement && autoPosition) {
         updatePosition();
     }
 

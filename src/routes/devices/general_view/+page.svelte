@@ -29,6 +29,7 @@
     import { RealTimeCardActionStyle } from "$lib/style/device";
     import { RealTimeCardActionToolTipStyle } from "$lib/style/device";
     import { ToolTipTextStyle } from "$lib/style/general";
+    import Measurement from "../../../components/Devices/Nodes/RealTimeDisplay/Measurement.svelte";
 
     // Variables
     let nodesState: Record<string, NodeState>;
@@ -141,7 +142,9 @@
             <div class="grid-col">
                 <ContentCard titleText={$texts.metrics}>
                     <div class="slot-div" slot="header"></div>
-                    <div class="slot-div" slot="content"></div>
+                    <div class="slot-div content" slot="content">
+                        <Measurement labelText="Voltage" minAlarmValue={230 * 0.9} maxAlarmValue={230 * 1.1} value={210.45} unitText="V" />
+                    </div>
                 </ContentCard>
             </div>
             <div class="grid-col span-2">
@@ -167,7 +170,7 @@
         position: relative;
         display: grid;
         grid-template-columns: repeat(4, minmax(300px, 1fr));
-        max-width: calc(4 * 540px + 1 * 20px);
+        max-width: calc(4 * 400px + 1 * 20px);
         gap: 20px;
         justify-items: stretch;
         align-items: stretch;
@@ -180,6 +183,7 @@
         width: 100%;
         height: calc(50vh - 74px - 5px);
         min-height: 400px;
+        max-height: 800px;
     }
 
     .grid .grid-col.span-2 {
@@ -209,17 +213,14 @@
 
     @media (max-width: 1569px) {
         .grid {
-            max-width: calc(2 * 540px + 1 * 20px);
+            max-width: calc(2 * 400px + 1 * 20px);
             grid-template-columns: repeat(2, minmax(300px, 1fr));
-        }
-        .grid-col {
-            max-height: 680px;
         }
     }
 
     @media (max-width: 946px) {
         .grid {
-            max-width: 540px;
+            max-width: 400px;
             grid-template-columns: repeat(1, minmax(300px, 1fr));
         }
         .grid .grid-col.span-2 {

@@ -1,4 +1,6 @@
 <script lang="ts">
+    import DetailedInfoToolTip from "./DetailedInfoToolTip.svelte";
+
     // Styles
     import { mergeStyle } from "$lib/style/components";
     import { NodesBaseDisplayStyle } from "$lib/style/nodes";
@@ -27,17 +29,28 @@
     export let displayWidth: string | undefined = undefined;
     export let displayMaxWidth: string | undefined = undefined;
     export let displayBorder: string | undefined = undefined;
-    export let displayBackgroundColor: string | undefined = undefined;
+    export let displayHoverBorder: string | undefined = undefined;
     export let displayDisconnectedBorder: string | undefined = undefined;
+    export let displayDisconnectedHoverBorder: string | undefined = undefined;
+    export let displayBackgroundColor: string | undefined = undefined;
+    export let displayHoverBackgroundColor: string | undefined = undefined;
     export let displayDisconnectedBackgroundColor: string | undefined = undefined;
+    export let displayDisconnectedHoverBackgroundColor: string | undefined = undefined;
+    export let displayHoverShadow: string | undefined = undefined;
+    export let displayDisconnectedHoverShadow: string | undefined = undefined;
     export let displayRadius: string | undefined = undefined;
     export let displayPaddingHorizontal: string | undefined = undefined;
     export let alertsDivItemGap: string | undefined = undefined;
     export let stateCircleDiameter: string | undefined = undefined;
     export let stateCircleAlarmColor: string | undefined = undefined;
+    export let stateCircleAlarmHoverColor: string | undefined = undefined;
+    export let stateCircleAlarmHoverShadow: string | undefined = undefined;
     export let stateCircleWarningColor: string | undefined = undefined;
+    export let stateCircleWarningHoverColor: string | undefined = undefined;
+    export let stateCircleWarningHoverShadow: string | undefined = undefined;
     export let disconnectedImageWidth: string | undefined = undefined;
     export let disconnectedImageHeight: string | undefined = undefined;
+    export let animationDuration: string | undefined = undefined;
 
     $: localOverrides = {
         width,
@@ -53,21 +66,40 @@
         displayWidth,
         displayMaxWidth,
         displayBorder,
-        displayBackgroundColor,
+        displayHoverBorder,
         displayDisconnectedBorder,
+        displayDisconnectedHoverBorder,
+        displayBackgroundColor,
+        displayHoverBackgroundColor,
         displayDisconnectedBackgroundColor,
+        displayDisconnectedHoverBackgroundColor,
+        displayHoverShadow,
+        displayDisconnectedHoverShadow,
         displayRadius,
         displayPaddingHorizontal,
         alertsDivItemGap,
         stateCircleDiameter,
         stateCircleAlarmColor,
+        stateCircleAlarmHoverColor,
+        stateCircleAlarmHoverShadow,
         stateCircleWarningColor,
+        stateCircleWarningHoverColor,
+        stateCircleWarningHoverShadow,
         disconnectedImageWidth,
         disconnectedImageHeight,
+        animationDuration,
     };
 
     // Merged style
     $: mergedStyle = mergeStyle(effectiveStyle, localOverrides);
+
+    // Variables
+    let showDetailedInfoToolTip: boolean;
+
+    // Functions
+    function openVariableDetailedInfo(): void {
+        showDetailedInfoToolTip = true;
+    }
 </script>
 
 <div
@@ -85,17 +117,28 @@
         --display-width: {mergedStyle.displayWidth};
         --display-max-width: {mergedStyle.displayMaxWidth};
         --display-border: {mergedStyle.displayBorder};
-        --display-background-color: {mergedStyle.displayBackgroundColor};
+        --display-hover-border: {mergedStyle.displayHoverBorder};
         --display-disconnected-border: {mergedStyle.displayDisconnectedBorder};
-        --display-disconnected-background-color: {mergedStyle.displayBackgroundColor};
+        --display-disconnected-hover-border: {mergedStyle.displayDisconnectedHoverBorder};
+        --display-background-color: {mergedStyle.displayBackgroundColor};
+        --display-hover-background-color: {mergedStyle.displayHoverBackgroundColor};
+        --display-disconnected-background-color: {mergedStyle.displayDisconnectedBackgroundColor};
+        --display-disconnected-hover-background-color: {mergedStyle.displayDisconnectedHoverBackgroundColor};
+        --display-hover-shadow: {mergedStyle.displayHoverShadow};
+        --display-disconnected-hover-shadow: {mergedStyle.displayDisconnectedHoverShadow};
         --display-radius: {mergedStyle.displayRadius};
         --display-padding-horizontal: {mergedStyle.displayPaddingHorizontal};
         --alerts-div-item-gap: {mergedStyle.alertsDivItemGap};
         --state-circle-diameter: {mergedStyle.stateCircleDiameter};
         --state-circle-alarm-color: {mergedStyle.stateCircleAlarmColor};
+        --state-circle-alarm-hover-color: {mergedStyle.stateCircleAlarmHoverColor};
+        --state-circle-alarm-hover-shadow: {mergedStyle.stateCircleAlarmHoverShadow};
         --state-circle-warning-color: {mergedStyle.stateCircleWarningColor};
+        --state-circle-warning-hover-color: {mergedStyle.stateCircleWarningHoverColor};
+        --state-circle-warning-hover-shadow: {mergedStyle.stateCircleWarningHoverShadow};
         --disconnected-image-width: {mergedStyle.disconnectedImageWidth};
         --disconnected-image-height: {mergedStyle.disconnectedImageHeight};
+        --animation-duration: {mergedStyle.animationDuration};
     "
     class="container"
 >
@@ -112,6 +155,8 @@
             <img src="/img/disconnected.svg" alt="disconnected" />
             <slot name="content" />
         </div>
+        <button on:click={openVariableDetailedInfo} aria-label="Open Variable Detailed Info"></button>
+        <DetailedInfoToolTip bind:showToolTip={showDetailedInfoToolTip} />
     </div>
 </div>
 
@@ -143,7 +188,7 @@
         align-items: center;
     }
 
-    .label-div {
+    .content .label-div {
         margin: 0;
         padding: 0;
         padding-top: var(--label-padding-top);
@@ -156,7 +201,7 @@
         align-items: center;
     }
 
-    .label-div span {
+    .content .label-div span {
         margin: 0;
         padding: 0;
         flex: 1;
@@ -172,7 +217,7 @@
         text-overflow: ellipsis;
     }
 
-    .label-div .alerts-div {
+    .content .label-div .alerts-div {
         height: fit-content;
         padding-right: var(--display-padding-horizontal);
         display: flex;
@@ -182,21 +227,34 @@
         align-items: center;
     }
 
-    .label-div .alerts-div .alert-state {
+    .content .label-div .alerts-div .alert-state {
         width: var(--state-circle-diameter);
         height: var(--state-circle-diameter);
         border-radius: 50%;
+        transition:
+            background-color var(--animation-duration) ease-in-out,
+            box-shadow var(--animation-duration) ease-in-out;
     }
 
-    .label-div .alerts-div.alarm .alert-state {
+    .content .label-div .alerts-div.alarm .alert-state {
         background-color: var(--state-circle-alarm-color);
     }
 
-    .label-div .alerts-div.warning .alert-state {
+    .content:hover .label-div .alerts-div.alarm .alert-state {
+        background-color: var(--state-circle-alarm-hover-color);
+        box-shadow: var(--state-circle-alarm-hover-shadow);
+    }
+
+    .content .label-div .alerts-div.warning .alert-state {
         background-color: var(--state-circle-warning-color);
     }
 
-    .display-content {
+    .content:hover .label-div .alerts-div.warning .alert-state {
+        background-color: var(--state-circle-warning-hover-color);
+        box-shadow: var(--state-circle-warning-hover-shadow);
+    }
+
+    .content .display-content {
         margin: 0;
         padding: 0;
         position: relative;
@@ -212,20 +270,47 @@
         padding: 0 var(--display-padding-horizontal);
         box-sizing: border-box;
         overflow: hidden;
+        transition:
+            background-color var(--animation-duration) ease-in-out,
+            border var(--animation-duration) ease-in-out,
+            box-shadow var(--animation-duration) ease-in-out;
     }
 
-    .display-content.disconnected {
+    .content:hover .display-content {
+        background-color: var(--display-hover-background-color);
+        border: var(--display-hover-border);
+        box-shadow: var(--display-hover-shadow);
+    }
+
+    .content .display-content.disconnected {
         background-color: var(--display-disconnected-background-color);
         border: var(--display-disconnected-border);
     }
 
-    .display-content img {
+    .content:hover .display-content.disconnected {
+        background-color: var(--display-disconnected-hover-background-color);
+        border: var(--display-disconnected-hover-border);
+        box-shadow: var(--display-disconnected-hover-shadow);
+    }
+
+    .content .display-content img {
         display: none;
         width: var(--disconnected-image-width);
         height: var(--disconnected-image-height);
     }
 
-    .display-content.disconnected img {
+    .content .display-content.disconnected img {
         display: block;
+    }
+
+    .content button {
+        margin: 0;
+        padding: 0;
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        opacity: 0;
+        cursor: pointer;
+        z-index: 1;
     }
 </style>
