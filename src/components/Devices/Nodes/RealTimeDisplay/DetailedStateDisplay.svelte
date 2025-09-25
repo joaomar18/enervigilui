@@ -55,11 +55,17 @@
     export let border: string | undefined = "1px solid rgba(255, 255, 255, 0.1)";
     export let pushTopPx: string | undefined = "20px";
     export let borderRadius: string | undefined = "20px";
-    export let paddingTop: string | undefined = "10px";
-    export let paddingBottom: string | undefined = "20px";
-    export let paddingHorizontal: string | undefined = "10px";
+    export let paddingTop: string | undefined = "15px";
+    export let paddingBottom: string | undefined = "15px";
+    export let paddingHorizontal: string | undefined = "20px";
+    export let rowHeight: string | undefined = "30px";
+    export let titleSize: string | undefined = "13px";
+    export let titleColor: string | undefined = "#9CA3AF";
+    export let titleWeight: string | undefined = "400";
+    export let titleSpacing: string | undefined = "0.5px";
+    export let titleTextTransform: string | undefined = "uppercase";
     export let labelSize: string | undefined = "14px";
-    export let labelColor: string | undefined = "#eeeee";
+    export let labelColor: string | undefined = "white";
     export let labelWeight: string | undefined = "400";
 
     $: localOverrides = {
@@ -71,6 +77,12 @@
         paddingTop,
         paddingBottom,
         paddingHorizontal,
+        rowHeight,
+        titleSize,
+        titleColor,
+        titleWeight,
+        titleSpacing,
+        titleTextTransform,
         labelSize,
         labelColor,
         labelWeight,
@@ -87,9 +99,15 @@
         --border: {mergedStyle.border};
         --push-top: {`${-parseInt(String(mergedStyle.pushTopPx))}px`};
         --border-radius: {mergedStyle.borderRadius};
-        --padding-top: {mergedStyle.paddingTop};
+        --padding-top: {`${parseInt(String(mergedStyle.pushTopPx)) + parseInt(String(mergedStyle.paddingTop))}px`};
         --padding-bottom: {mergedStyle.paddingBottom};
         --padding-horizontal: {mergedStyle.paddingHorizontal};
+        --row-height: {mergedStyle.rowHeight};
+        --title-size: {mergedStyle.titleSize};
+        --title-color: {mergedStyle.titleColor};
+        --title-weight: {mergedStyle.titleWeight};
+        --title-spacing: {mergedStyle.titleSpacing};
+        --title-text-transform: {mergedStyle.titleTextTransform};
         --label-size: {mergedStyle.labelSize};
         --label-color: {mergedStyle.labelColor};
         --label-weight: {mergedStyle.labelWeight};
@@ -101,25 +119,41 @@
             <div class="state-div">
                 <div class="row">
                     <span class="label">Estado</span>
+                    <div class="row-content"></div>
+                </div>
+                <div class="header">
+                    <h3>Alarmes</h3>
                 </div>
                 <div class="row">
-                    <span class="label">Valor Mínimo para Alarme</span>
+                    <span class="label">Valor Mínimo</span>
+                    <div class="row-content"></div>
                 </div>
                 <div class="row">
-                    <span class="label">Valor Máximo para Alarme</span>
+                    <span class="label">Valor Máximo</span>
+                    <div class="row-content"></div>
+                </div>
+                <div class="header">
+                    <h3>AVISOS</h3>
                 </div>
                 <div class="row">
-                    <span class="label">Valor Mínimo para Aviso</span>
+                    <span class="label">Valor Mínimo</span>
+                    <div class="row-content"></div>
                 </div>
                 <div class="row">
-                    <span class="label">Valor Máximo para Aviso</span>
+                    <span class="label">Valor Máximo</span>
+                    <div class="row-content"></div>
+                </div>
+                <div class="header">
+                    <h3>AVISOS</h3>
                 </div>
                 <div class="row">
                     <span class="label">Última Atualização</span>
+                    <div class="row-content"></div>
                 </div>
                 {#if nodeDetailedState.incremental}
                     <div class="row">
                         <span class="label">Última Inicialização</span>
+                        <div class="row-content"></div>
                     </div>
                 {/if}
             </div>
@@ -146,13 +180,65 @@
     }
 
     .content {
+        box-sizing: border-box;
         position: relative;
         width: 100%;
         height: fit-content;
-        padding-top: calc(var(--padding-top) - var(--push-top));
+        padding-top: var(--padding-top);
         padding-bottom: var(--padding-bottom);
         padding-left: var(--padding-horizontal);
         padding-right: var(--padding-horizontal);
         min-height: var(--min-height);
+        overflow-x: hidden;
+        overflow-y: auto;
+        max-height: 200px;
+        scrollbar-width: thin;
+        scrollbar-color: var(--scrollbar-thumb-color) var(--scrollbar-track-color);
+        scrollbar-gutter: stable both-edges;
+    }
+
+    .content .state-div {
+        display: flex;
+        flex-direction: column;
+        justify-content: start;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .content .state-div .row {
+        display: flex;
+        flex-direction: row;
+        justify-content: space-between;
+        align-items: center;
+        width: 100%;
+        height: var(--row-height);
+    }
+
+    .header {
+        width: 100%;
+        border-bottom: var(--border);
+    }
+
+    .header h3 {
+        margin: 0;
+        padding: 0;
+        font-size: var(--title-size);
+        color: var(--title-color);
+        font-weight: var(--title-weight);
+        letter-spacing: var(--title-spacing);
+        text-transform: var(--title-text-transform);
+    }
+
+    .label {
+        font-size: var(--label-size);
+        color: var(--label-color);
+        font-weight: var(--label-weight);
+    }
+
+    .row-content {
+        flex-grow: 1;
+        min-width: 0;
+        display: flex;
+        height: 100%;
     }
 </style>
