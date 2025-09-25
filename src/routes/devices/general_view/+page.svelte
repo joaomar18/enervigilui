@@ -32,6 +32,7 @@
     import Measurement from "../../../components/Devices/Nodes/RealTimeDisplay/Measurement.svelte";
 
     // Variables
+    let phaseContentCardsElements = {} as Record<NodePhase, HTMLElement>;
     let nodesState: Record<string, NodeState>;
     let processedNodesState: Array<ProcessedNodeState>;
     let nodesStateBySubSection: Record<NodePhase, Record<RealTimeCardSubSections, Array<ProcessedNodeState>>>;
@@ -89,7 +90,7 @@
     {#if nodesStateBySubSection && availableSubSections}
         <div class="grid">
             {#each nodeSections.filter((section) => availablePhases.includes(section.phase)) as section (section.key)}
-                <div class="grid-col">
+                <div class="grid-col" bind:this={phaseContentCardsElements[section.phase]}>
                     <ContentCard titleText={section.phase !== NodePhase.SINGLEPHASE ? $texts[section.labelKey] : $texts.variables}>
                         <div class="slot-div header" slot="header">
                             <div class="phase-actions-div">
@@ -124,6 +125,9 @@
                                             {#each nodesStateBySubSection[section.phase][subsection as keyof RealTimeCardSectionsState] as nodeState (nodeState.name)}
                                                 <svelte:component
                                                     this={nodeState.displayComponent}
+                                                    nodeName={nodeState.name}
+                                                    nodePhase={nodeState.phase}
+                                                    contentCardEl={phaseContentCardsElements[section.phase]}
                                                     labelText={$variableNameTexts[nodeState.name] || nodeState.name}
                                                     value={nodeState.value}
                                                     minAlarmValue={nodeState.min_alarm_value}
@@ -142,9 +146,7 @@
             <div class="grid-col">
                 <ContentCard titleText={$texts.metrics}>
                     <div class="slot-div" slot="header"></div>
-                    <div class="slot-div content" slot="content">
-                        <Measurement labelText="Voltage" minAlarmValue={230 * 0.9} maxAlarmValue={230 * 1.1} value={210.45} unitText="V" />
-                    </div>
+                    <div class="slot-div content" slot="content"></div>
                 </ContentCard>
             </div>
             <div class="grid-col span-2">

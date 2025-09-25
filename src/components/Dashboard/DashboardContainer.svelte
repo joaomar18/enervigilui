@@ -10,7 +10,7 @@
     import MenuButton from "../General/MenuButton.svelte";
     import Logo from "../General/Logo.svelte";
     import Action from "../General/Action.svelte";
-    import Loader from "../General/Loader.svelte";
+    import CircularLoaderFullScreen from "../General/CircularLoaderFullScreen.svelte";
 
     // Stores
     import { currentPage, leftPanelOpen, loadedDone, showSubLoader } from "$lib/stores/view/navigation";
@@ -110,7 +110,7 @@
         </div>
         <div class="container-div">
             <div class="content-div">
-                <Loader closeWrapper={$loadedDone} showLoader={$showSubLoader} />
+                <CircularLoaderFullScreen closeWrapper={$loadedDone} showLoader={$showSubLoader} />
                 <div class="section-content-div" class:hide={!$loadedDone}>
                     <slot class="section-content-div" />
                 </div>

@@ -183,10 +183,10 @@ export function removePrefix(name: string): string {
 /**
  * Adds an electrical phase prefix to a node name.
  * @param name - The base node name without prefix.
- * @param prefix - The NodePrefix to prepend to the name.
+ * @param prefix - The NodePrefix or prefix to prepend to the name.
  * @returns The node name with the prefix added.
  */
-export function addPrefix(name: string, prefix: NodePrefix): string {
+export function addPrefix(name: string, prefix: string | NodePrefix): string {
     return prefix + name;
 }
 

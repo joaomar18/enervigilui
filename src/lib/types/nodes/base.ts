@@ -341,6 +341,28 @@ export interface ProcessedNodeState {
 }
 
 /**
+ * Represents detailed runtime state information for a node variable.
+ * Contains current value, type information, alarm thresholds, and timestamps for monitoring purposes.
+ * 
+ * @property {number | string | boolean | null} value - Current measured or calculated value
+ * @property {NodeType} type - Data type of the variable (FLOAT, STRING, INT, BOOLEAN)
+ * @property {boolean} incremental - Whether this is a counter variable that accumulates over time
+ * @property {number} [min_alarm_value] - Optional minimum threshold for alarm detection
+ * @property {number} [max_alarm_value] - Optional maximum threshold for alarm detection
+ * @property {string} [lastUpdateTimeStamp] - ISO timestamp of when the value was last updated
+ * @property {string} [lastResetTimeStamp] - ISO timestamp of when counter was last reset (incremental variables only)
+ */
+export interface NodeDetailedState {
+    value: number | string | boolean | null;
+    type: NodeType;
+    incremental?: boolean;
+    min_alarm_value?: number;
+    max_alarm_value?: number;
+    last_update_date?: string;
+    last_reset_date?: string;
+}
+
+/**
  * Represents the validation state for all editable properties of a node.
  * Each boolean property indicates whether the corresponding node field passes validation.
  * Used to provide real-time feedback in the UI and prevent invalid configurations from being saved.

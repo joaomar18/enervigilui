@@ -327,9 +327,30 @@ const UploadImageStyleConfig: ComponentStyles = {
 
 export const UploadImageStyle = createStyleStore(UploadImageStyleConfig);
 
-//////////     L O A D E R     //////////
+//////////     C I R C U L A R     L O A D E R     //////////
 
-const LoaderStyleConfig: ComponentStyles = {
+const CircularLoaderStyleConfig: ComponentStyles = {
+    dark: {
+        width: "64px",
+        height: "64px",
+        loaderTopPos: "0px",
+        wrapperTopPos: "0px",
+        wrapperBackgroundColor: "rgba(20, 22, 28, 0.8)",
+        wrapperOpacity: "1",
+        wrapperTopLeftRadius: "0px",
+        wrapperTopRightRadius: "0px",
+        wrapperBottomLeftRadius: "20px",
+        wrapperBottomRightRadius: "20px",
+        border: "4px solid rgba(255, 255, 255, 0.2)",
+        loaderColor: "#fff",
+    },
+};
+
+export const CircularLoaderStyle = createStyleStore(CircularLoaderStyleConfig);
+
+//////////     C I R C U L A R     L O A D E R     F U L L     S C R E E N     //////////
+
+const CircularLoaderFullScreenStyleConfig: ComponentStyles = {
     dark: {
         width: "128px",
         height: "128px",
@@ -339,7 +360,7 @@ const LoaderStyleConfig: ComponentStyles = {
     },
 };
 
-export const LoaderStyle = createStyleStore(LoaderStyleConfig);
+export const CircularLoaderFullScreenStyle = createStyleStore(CircularLoaderFullScreenStyleConfig);
 
 //////////     C O N T E N T     C A R D     //////////
 

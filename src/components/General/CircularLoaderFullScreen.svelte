@@ -1,7 +1,7 @@
 <script lang="ts">
     // Styles
     import { mergeStyle } from "$lib/style/components";
-    import { LoaderStyle } from "$lib/style/general";
+    import { CircularLoaderFullScreenStyle } from "$lib/style/general";
 
     // Props
     export let closeWrapper: boolean;
@@ -9,7 +9,7 @@
 
     // Style object (from theme)
     export let style: { [property: string]: string | number } | null = null;
-    $: effectiveStyle = style ?? $LoaderStyle;
+    $: effectiveStyle = style ?? $CircularLoaderFullScreenStyle;
 
     // Layout / styling props
     export let width: string | undefined = undefined;
@@ -31,7 +31,7 @@
 </script>
 
 <!--
-    Loader: fullscreen or container-based loading spinner overlay.
+    Circular Loader Full Screen: fullscreen or container-based loading spinner overlay.
     Shows a centered animated spinner, with optional fade/close and color customization.
     Used to indicate loading states for pages or components.
 -->
@@ -74,7 +74,7 @@
         justify-content: center;
         align-items: center;
         background-color: #181d23;
-        z-index: 1;
+        z-index: 98;
     }
 
     /* Hide/fade loader when closed */

@@ -1,5 +1,11 @@
 <script lang="ts">
-    import DetailedInfoDisplay from "./DetailedInfoDisplay.svelte";
+    import { onDestroy } from "svelte";
+    import { fly } from "svelte/transition";
+    import { cubicOut } from "svelte/easing";
+    import { getNodeDetailedState } from "$lib/logic/api/nodes";
+    import type { NodeDetailedState, NodePhase } from "$lib/types/nodes/base";
+    import DetailedStateDisplay from "./DetailedStateDisplay.svelte";
+    import { currentDeviceID } from "$lib/stores/device/current";
 
     // Styles
     import { mergeStyle } from "$lib/style/components";
@@ -10,6 +16,9 @@
     $: effectiveStyle = style ?? $NodesBaseDisplayStyle;
 
     // Props
+    export let nodeName: string;
+    export let nodePhase: NodePhase;
+    export let contentCardEl: HTMLElement;
     export let labelText: string;
     export let alarmState: boolean = false;
     export let warningState: boolean = false;
@@ -27,6 +36,7 @@
     export let labelColor: string | undefined = undefined;
     export let labelWeight: string | undefined = undefined;
     export let displayHeight: string | undefined = undefined;
+    export let displayWrapperBackgroundColor: string | undefined = undefined;
     export let displayBorder: string | undefined = undefined;
     export let displayHoverBorder: string | undefined = undefined;
     export let displayDisconnectedBorder: string | undefined = undefined;
@@ -63,6 +73,7 @@
         labelColor,
         labelWeight,
         displayHeight,
+        displayWrapperBackgroundColor,
         displayBorder,
         displayHoverBorder,
         displayDisconnectedBorder,
@@ -92,12 +103,49 @@
     $: mergedStyle = mergeStyle(effectiveStyle, localOverrides);
 
     // Variables
-    let showDetailedInfo: boolean;
+    let showDetailedState: boolean;
+    let clickEventListenerDefined: boolean = false;
+    let containerDiv: HTMLDivElement;
+    let nodeDetailedState: NodeDetailedState | null = null;
+
+    // Reactive Statements
+    $: if (!showDetailedState && clickEventListenerDefined) {
+        window.removeEventListener("click", handleClickOutside);
+        clickEventListenerDefined = false;
+    }
 
     // Functions
-    function openVariableDetailedInfo(): void {
-        showDetailedInfo = true;
+    async function toogleDetailedState(): Promise<void> {
+        if (!$currentDeviceID) {
+            throw new Error("Can't do the request because current device id is not defined.");
+        }
+        showDetailedState = !showDetailedState;
+        if (showDetailedState) {
+            window.addEventListener("click", handleClickOutside);
+            clickEventListenerDefined = true;
+            ({ nodeDetailedState } = await getNodeDetailedState($currentDeviceID, nodeName, nodePhase));
+            return;
+        }
+        nodeDetailedState = null;
     }
+
+    function handleClickOutside(event: MouseEvent): void {
+        if (
+            showDetailedState &&
+            containerDiv &&
+            contentCardEl &&
+            !containerDiv.contains(event.target as HTMLElement) &&
+            contentCardEl.contains(event.target as HTMLElement)
+        ) {
+            showDetailedState = false;
+        }
+    }
+
+    onDestroy(() => {
+        if (clickEventListenerDefined) {
+            window.removeEventListener("click", handleClickOutside);
+        }
+    });
 </script>
 
 <div
@@ -113,6 +161,7 @@
         --label-color: {mergedStyle.labelColor};
         --label-weight: {mergedStyle.labelWeight};
         --display-height: {mergedStyle.displayHeight};
+        --display-wrapper-background-color: {mergedStyle.displayWrapperBackgroundColor};
         --display-border: {mergedStyle.displayBorder};
         --display-hover-border: {mergedStyle.displayHoverBorder};
         --display-disconnected-border: {mergedStyle.displayDisconnectedBorder};
@@ -138,6 +187,7 @@
         --animation-duration: {mergedStyle.animationDuration};
     "
     class="container"
+    bind:this={containerDiv}
 >
     <div class="content">
         <div class="label-div">
@@ -148,13 +198,20 @@
                 </div>
             {/if}
         </div>
-        <div class="display-content" class:disconnected={valueDisconnected}>
-            <img src="/img/disconnected.svg" alt="disconnected" />
-            <slot name="content" />
+        <div class="display-content-wrapper">
+            <div class="background-color-div" class:show={showDetailedState}></div>
+            <div class="display-content" class:disconnected={valueDisconnected}>
+                <img src="/img/disconnected.svg" alt="disconnected" />
+                <slot name="content" />
+            </div>
         </div>
-        <button on:click={openVariableDetailedInfo} aria-label="Open Variable Detailed Info"></button>
+        <button on:click={toogleDetailedState} aria-label="Open Variable Detailed Info"></button>
     </div>
-    <DetailedInfoDisplay {showDetailedInfo} />
+    {#if showDetailedState}
+        <div class="detailed-info-div" transition:fly={{ y: 20, duration: 200, easing: cubicOut }}>
+            <DetailedStateDisplay {nodeDetailedState} />
+        </div>
+    {/if}
 </div>
 
 <style>
@@ -179,12 +236,13 @@
         margin: 0;
         padding: 0;
         width: 100%;
-        height: 100%;
+        height: fit-content;
         position: relative;
         display: flex;
         flex-direction: column;
         justify-content: center;
         align-items: center;
+        z-index: 1;
     }
 
     .content .label-div {
@@ -253,11 +311,36 @@
         box-shadow: var(--state-circle-warning-hover-shadow);
     }
 
-    .content .display-content {
+    .content .display-content-wrapper {
         margin: 0;
         padding: 0;
         position: relative;
+        width: 100%;
         height: var(--display-height);
+        border-radius: var(--display-radius);
+        background-color: var(--display-wrapper-background-color);
+    }
+
+    .content .display-content-wrapper .background-color-div {
+        margin: 0;
+        padding: 0;
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        display: none;
+        border-radius: var(--display-radius);
+        background-color: var(--display-wrapper-background-color);
+    }
+
+    .content .display-content-wrapper .background-color-div.show {
+        display: block;
+    }
+
+    .content .display-content-wrapper .display-content {
+        margin: 0;
+        padding: 0;
+        position: absolute;
+        height: 100%;
         width: 100%;
         background-color: var(--display-background-color);
         border: var(--display-border);
@@ -275,30 +358,30 @@
             box-shadow var(--animation-duration) ease-in-out;
     }
 
-    .content:hover .display-content {
+    .content:hover .display-content-wrapper .display-content {
         background-color: var(--display-hover-background-color);
         border: var(--display-hover-border);
         box-shadow: var(--display-hover-shadow);
     }
 
-    .content .display-content.disconnected {
+    .content .display-content-wrapper .display-content.disconnected {
         background-color: var(--display-disconnected-background-color);
         border: var(--display-disconnected-border);
     }
 
-    .content:hover .display-content.disconnected {
+    .content:hover .display-content-wrapper .display-content.disconnected {
         background-color: var(--display-disconnected-hover-background-color);
         border: var(--display-disconnected-hover-border);
         box-shadow: var(--display-disconnected-hover-shadow);
     }
 
-    .content .display-content img {
+    .content .display-content-wrapper .display-content img {
         display: none;
         width: var(--disconnected-image-width);
         height: var(--disconnected-image-height);
     }
 
-    .content .display-content.disconnected img {
+    .content .display-content-wrapper .display-content.disconnected img {
         display: block;
     }
 
@@ -311,5 +394,10 @@
         opacity: 0;
         cursor: pointer;
         z-index: 1;
+    }
+
+    .detailed-info-div {
+        width: 100%;
+        height: fit-content;
     }
 </style>
