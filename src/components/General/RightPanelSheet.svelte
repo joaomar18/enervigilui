@@ -2,45 +2,83 @@
     import { tick } from "svelte";
     import { onDestroy } from "svelte";
 
+    // Styles
+    import { mergeStyle } from "$lib/style/components";
+    import { RightPanelSheetStyle } from "$lib/style/general";
+
+    // Style object (from theme)
+    export let style: { [property: string]: string | number } | null = null;
+    $: effectiveStyle = style ?? $RightPanelSheetStyle;
+
     // Props
     export let useMask: boolean = true;
     export let showPanel: boolean;
 
     // Layout / styling props
-    export let maskBlurFilter: string | undefined = "8px";
-    export let maskBackground: string | undefined = "rgba(24, 29, 35, 0.25)";
-    export let width: string | undefined = "100vw";
-    export let maxWidth: string | undefined = "420px";
-    export let paddingTop: string | undefined = "10px";
-    export let paddingBottom: string | undefined = "20px";
-    export let paddingHorizontal: string | undefined = "10px";
-    export let backgroundColor: string | undefined = "#1c2026";
-    export let borderLeft: string | undefined = "1px solid rgba(255, 255, 255, 0.08)";
-    export let shadow: string | undefined = "-4px 0 12px rgba(0, 0, 0, 0.6)";
+    export let maskBlurFilter: string | undefined = undefined;
+    export let maskBackground: string | undefined = undefined;
+    export let width: string | undefined = undefined;
+    export let maxWidth: string | undefined = undefined;
+    export let paddingTop: string | undefined = undefined;
+    export let paddingBottom: string | undefined = undefined;
+    export let paddingHorizontal: string | undefined = undefined;
+    export let backgroundColor: string | undefined = undefined;
+    export let borderLeft: string | undefined = undefined;
+    export let shadow: string | undefined = undefined;
+    export let titlePaddingLeft: string | undefined = undefined;
+    export let titlePaddingRight: string | undefined = undefined;
+    export let titlePaddingBottom: string | undefined = undefined;
+    export let borderBottomTitle: string | undefined = undefined;
+    export let headerPaddingHorizontal: string | undefined = undefined;
+    export let headerPaddingTop: string | undefined = undefined;
+    export let headerPaddingBottom: string | undefined = undefined;
+    export let borderBottomHeader: string | undefined = undefined;
+    export let closeButtonWidth: string | undefined = undefined;
+    export let closeButtonHeight: string | undefined = undefined;
+    export let closeButtonImageWidth: number | undefined = undefined;
+    export let closeButtonImageHeight: number | undefined = undefined;
+    export let closeButtonColor: string | undefined = undefined;
+    export let closeButtonHoverColor: string | undefined = undefined;
+    export let contentMarginTop: string | undefined = undefined;
+    export let contentMarginBottom: string | undefined = undefined;
+    export let contentPaddingHorizontal: string | undefined = undefined;
+    export let scrollbarTrackColor: string | undefined = undefined;
+    export let scrollbarThumbColor: string | undefined = undefined;
 
-    export let titlePaddingLeft: string | undefined = "0px";
-    export let titlePaddingRight: string | undefined = "20px";
-    export let titlePaddingBottom: string | undefined = "5px";
-    export let borderBottomTitle: string | undefined = "1px solid white";
+    $: localOverrides = {
+        maskBlurFilter,
+        maskBackground,
+        width,
+        maxWidth,
+        paddingTop,
+        paddingBottom,
+        paddingHorizontal,
+        backgroundColor,
+        borderLeft,
+        shadow,
+        titlePaddingLeft,
+        titlePaddingRight,
+        titlePaddingBottom,
+        borderBottomTitle,
+        headerPaddingHorizontal,
+        headerPaddingTop,
+        headerPaddingBottom,
+        borderBottomHeader,
+        closeButtonWidth,
+        closeButtonHeight,
+        closeButtonImageWidth,
+        closeButtonImageHeight,
+        closeButtonColor,
+        closeButtonHoverColor,
+        contentMarginTop,
+        contentMarginBottom,
+        contentPaddingHorizontal,
+        scrollbarTrackColor,
+        scrollbarThumbColor,
+    };
 
-    export let headerPaddingHorizontal: string | undefined = "";
-    export let headerPaddingTop: string | undefined = "";
-    export let headerPaddingBottom: string | undefined = "";
-    export let borderBottomHeader: string | undefined = "1px solid white";
-
-    export let closeButtonWidth: string | undefined = "40px";
-    export let closeButtonHeight: string | undefined = "40px";
-    export let closeButtonImageWidth: number | undefined = 32;
-    export let closeButtonImageHeight: number | undefined = 32;
-    export let closeButtonColor: string | undefined = "white";
-    export let closeButtonHoverColor: string | undefined = "gray";
-
-    export let contentMarginTop: string | undefined = "20px";
-    export let contentMarginBottom: string | undefined = "0px";
-    export let contentPaddingHorizontal: string | undefined = "0px";
-
-    export let scrollbarTrackColor: string | undefined = "#323a45";
-    export let scrollbarThumbColor: string | undefined = "#1e242b";
+    // Merged style
+    $: mergedStyle = mergeStyle(effectiveStyle, localOverrides);
 
     // Variables
     let contentEl: HTMLDivElement;
@@ -80,13 +118,15 @@
             window.removeEventListener("click", handleClickOutside);
         }
     });
+
+    $: console.log();
 </script>
 
 {#if useMask && showPanel}
     <div
         style="
-            --mask-blur-filter: {maskBlurFilter};
-            --mask-background-color: {maskBackground};
+            --mask-blur-filter: {mergedStyle.maskBlurFilter};
+            --mask-background-color: {mergedStyle.maskBackground};
         "
         class="mask"
     ></div>
@@ -95,35 +135,31 @@
 <div
     bind:this={contentEl}
     style="
-        --width: {width};
-        --max-width: {maxWidth};
-        --padding-top: {paddingTop};
-        --padding-bottom: {paddingBottom};
-        --padding-horizontal: {paddingHorizontal};
-        --background-color: {backgroundColor};
-        --border-left: {borderLeft};
-        --shadow: {shadow};
-
-        --title-padding-left: {titlePaddingLeft};
-        --title-padding-right: {titlePaddingRight};
-        --title-padding-bottom: {titlePaddingBottom};
-        --border-bottom-title: {borderBottomTitle};
-
-        --header-padding-horizontal: {headerPaddingHorizontal};
-        --header-padding-top: {headerPaddingTop};
-        --header-padding-bottom: {headerPaddingBottom};
-        --border-bottom-header: {borderBottomHeader};
-
-        --close-button-width: {closeButtonWidth};
-        --close-button-height: {closeButtonHeight};
-        --close-button-color: {closeButtonColor};
-        --close-button-hover-color: {closeButtonHoverColor};
-
-        --content-margin-top: {contentMarginTop};
-        --content-margin-bottom: {contentMarginBottom};
-        --content-padding-horizontal: {contentPaddingHorizontal};
-        --scrollbar-track-color: {scrollbarTrackColor};
-        --scrollbar-thumb-color: {scrollbarThumbColor};
+        --width: {mergedStyle.width};
+        --max-width: {mergedStyle.maxWidth};
+        --padding-top: {mergedStyle.paddingTop};
+        --padding-bottom: {mergedStyle.paddingBottom};
+        --padding-horizontal: {mergedStyle.paddingHorizontal};
+        --background-color: {mergedStyle.backgroundColor};
+        --border-left: {mergedStyle.borderLeft};
+        --shadow: {mergedStyle.shadow};
+        --title-padding-left: {mergedStyle.titlePaddingLeft};
+        --title-padding-right: {mergedStyle.titlePaddingRight};
+        --title-padding-bottom: {mergedStyle.titlePaddingBottom};
+        --border-bottom-title: {mergedStyle.borderBottomTitle};
+        --header-padding-horizontal: {mergedStyle.headerPaddingHorizontal};
+        --header-padding-top: {mergedStyle.headerPaddingTop};
+        --header-padding-bottom: {mergedStyle.headerPaddingBottom};
+        --border-bottom-header: {mergedStyle.borderBottomHeader};
+        --close-button-width: {mergedStyle.closeButtonWidth};
+        --close-button-height: {mergedStyle.closeButtonHeight};
+        --close-button-color: {mergedStyle.closeButtonColor};
+        --close-button-hover-color: {mergedStyle.closeButtonHoverColor};
+        --content-margin-top: {mergedStyle.contentMarginTop};
+        --content-margin-bottom: {mergedStyle.contentMarginBottom};
+        --content-padding-horizontal: {mergedStyle.contentPaddingHorizontal};
+        --scrollbar-track-color: {mergedStyle.scrollbarTrackColor};
+        --scrollbar-thumb-color: {mergedStyle.scrollbarThumbColor};
     "
     class="content"
     class:open={showPanel}
@@ -135,8 +171,8 @@
             </div>
             <button class="close-button" on:click={closePanel} aria-label="Close Window">
                 <svg
-                    width={closeButtonImageWidth}
-                    height={closeButtonImageHeight}
+                    width={mergedStyle.closeButtonImageWidth}
+                    height={mergedStyle.closeButtonImageHeight}
                     viewBox="0 0 24 24"
                     fill="none"
                     stroke=""
@@ -149,12 +185,12 @@
                 </svg></button
             >
         </div>
-        <div class="header-div" style="height:200px;">
+        <div class="header-div">
             <slot name="header"></slot>
         </div>
     </div>
     <div class="content-div">
-        <slot />
+        <slot name="content" />
     </div>
 </div>
 
@@ -262,9 +298,11 @@
     }
 
     .top-div .header-div {
+        box-sizing: border-box;
         margin: 0;
         padding: 0;
         width: 100%;
+        height:fit-content;
         padding-left: var(--header-padding-horizontal);
         padding-right: var(--header-padding-horizontal);
         padding-top: var(--header-padding-top);
@@ -274,6 +312,7 @@
 
     /* Content area: fills remaining space */
     .content-div {
+        box-sizing: border-box;
         padding: 0;
         margin: 0;
         margin-top: var(--content-margin-top);

@@ -16,7 +16,7 @@
     import ExpandableSection from "../../../components/General/ExpandableSection.svelte";
     import Action from "../../../components/General/Action.svelte";
     import ToolTipText from "../../../components/General/ToolTipText.svelte";
-    import RightPanel from "../../../components/General/RightPanel.svelte";
+    import NodeDetailSheet from "../../../components/Devices/Nodes/RealTimeDisplay/NodeDetailSheet.svelte";
 
     // Texts
     import { texts } from "$lib/stores/lang/generalTexts";
@@ -161,7 +161,7 @@
             </div>
         </div>
     {/if}
-    <RightPanel bind:showPanel={showDetailDiv} />
+    <NodeDetailSheet bind:showPanel={showDetailDiv} />
 </div>
 
 <style>
@@ -216,31 +216,6 @@
         justify-content: end;
         align-items: center;
         gap: 10px;
-    }
-
-    .slide-detail-div {
-        position: fixed;
-        padding: 0;
-        margin: 0;
-        top: 0;
-        bottom: 0;
-        right: 0;
-        width: fit-content;
-
-        display: flex;
-        flex-direction: row;
-        transform: translateX(100%);
-        transition: transform 0.2s ease-in-out;
-    }
-
-    .slide-detail-div.open {
-        transform: translateX(0%);
-    }
-
-    .slide-detail-div .content {
-        width: 90vw;
-        max-width: 420px;
-        height: 100%;
     }
 
     @media (max-width: 1569px) {

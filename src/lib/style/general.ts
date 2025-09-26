@@ -393,6 +393,44 @@ const ContentCardStyleConfig: ComponentStyles = {
 
 export const ContentCardStyle = createStyleStore(ContentCardStyleConfig);
 
+//////////     R I G H T     P A N E L     S H E E T     //////////
+
+const RightPanelSheetStyleConfig: ComponentStyles = {
+    dark: {
+        maskBlurFilter: "8px",
+        maskBackground: "rgba(24, 29, 35, 0.25)",
+        width: "100vw",
+        maxWidth: "420px",
+        paddingTop: "5px",
+        paddingBottom: "20px",
+        paddingHorizontal: "10px",
+        backgroundColor: "#1c2026",
+        borderLeft: "1px solid rgba(255, 255, 255, 0.08)",
+        shadow: "-4px 0 12px rgba(0, 0, 0, 0.6)",
+        titlePaddingLeft: "0px",
+        titlePaddingRight: "20px",
+        titlePaddingBottom: "5px",
+        borderBottomTitle: "1px solid rgba(255, 255, 255, 0.1)",
+        headerPaddingHorizontal: "20px",
+        headerPaddingTop: "15px",
+        headerPaddingBottom: "15px",
+        borderBottomHeader: "1px solid rgba(255, 255, 255, 0.08)",
+        closeButtonWidth: "40px",
+        closeButtonHeight: "40px",
+        closeButtonImageWidth: 32,
+        closeButtonImageHeight: 32,
+        closeButtonColor: "rgba(255, 255, 255, 0.7)",
+        closeButtonHoverColor: "rgba(255, 255, 255, 0.9)",
+        contentMarginTop: "20px",
+        contentMarginBottom: "0px",
+        contentPaddingHorizontal: "20px",
+        scrollbarTrackColor: "#323a45",
+        scrollbarThumbColor: "#1e242b",
+    },
+};
+
+export const RightPanelSheetStyle = createStyleStore(RightPanelSheetStyleConfig);
+
 //////////     E X P A N D A B L E     S E C T I O N     //////////
 
 const ExpandableSectionStyleConfig: ComponentStyles = {
