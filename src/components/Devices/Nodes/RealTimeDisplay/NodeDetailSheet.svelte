@@ -22,10 +22,6 @@
     export let headerValueSize: string | undefined = "1rem";
     export let headerValueColor: string | undefined = "rgba(255, 255, 255, 0.8)";
     export let headerValueWeight: string | undefined = "600";
-
-    
-
-
 </script>
 
 <RightPanelSheet useMask={false} bind:showPanel>
@@ -74,25 +70,7 @@
             <span class="label">Estado</span>
             <div class="row no-extend">
                 <span class="value">OK</span>
-                <div class="dot-state"></div>e: {headerLabelSize};
-            --header-label-color: {headerLabelColor};
-            --header-label-weight: {headerLabelWeight};
-
-            --header-value-size: {headerValueSize};
-            --header-value-color: {headerValueColor};
-            --header-value-weight: {headerValueWeight};
-        "
-        class="header-div"
-        slot="header"
-    >
-        <div class="row">
-            <span class="label">Nome</span>
-            <span class="value">Potência Ativa</span>
-        </div>
-        <div class="row">
-            <span class="label">Fase</span>
-            <span class="value">L1</span>
-        </div>
+                <div class="dot-state"></div>
             </div>
         </div>
     </div>
