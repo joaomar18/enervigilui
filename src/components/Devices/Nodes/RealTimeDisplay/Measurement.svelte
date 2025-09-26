@@ -1,5 +1,4 @@
 <script lang="ts">
-    import { NodePhase } from "$lib/types/nodes/base";
     import BaseDisplay from "./BaseDisplay.svelte";
     import Bar from "../../../General/Bar.svelte";
 
@@ -8,9 +7,6 @@
     import { MeasurementDisplayStyle } from "$lib/style/nodes";
 
     // Props
-    export let nodeName: string;
-    export let nodePhase: NodePhase;
-    export let contentCardEl: HTMLElement;
     export let labelText: string;
     export let minAlarmValue: number | null = null;
     export let maxAlarmValue: number | null = null;
@@ -62,9 +58,12 @@
     $: variableAlarm = valueAlarm;
     $: variableWarning = valueWarning;
     $: valueDisconnected = value === null;
+
+    // Click Export Function
+    export let onClick: () => void;
 </script>
 
-<BaseDisplay {nodeName} {nodePhase} {contentCardEl} {labelText} alarmState={variableAlarm} warningState={variableWarning} {valueDisconnected}>
+<BaseDisplay {labelText} alarmState={variableAlarm} warningState={variableWarning} {valueDisconnected} {onClick}>
     <div
         style="
             --value-text-size: {mergedStyle.valueTextSize};

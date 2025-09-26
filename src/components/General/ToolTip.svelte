@@ -166,12 +166,12 @@
         padding-right: var(--padding-horizontal);
         padding-top: var(--padding-vertical);
         padding-bottom: var(--padding-vertical);
-        position: absolute;
+        position: fixed;
         display: flex;
         flex-direction: column;
         justify-content: start;
         align-items: center;
-        z-index: 2;
+        z-index: 200;
     }
 
     /* Content wrapper: fills the tooltip container */

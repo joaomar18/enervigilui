@@ -16,6 +16,7 @@
     import ExpandableSection from "../../../components/General/ExpandableSection.svelte";
     import Action from "../../../components/General/Action.svelte";
     import ToolTipText from "../../../components/General/ToolTipText.svelte";
+    import RightPanel from "../../../components/General/RightPanel.svelte";
 
     // Texts
     import { texts } from "$lib/stores/lang/generalTexts";
@@ -29,16 +30,15 @@
     import { RealTimeCardActionStyle } from "$lib/style/device";
     import { RealTimeCardActionToolTipStyle } from "$lib/style/device";
     import { ToolTipTextStyle } from "$lib/style/general";
-    import Measurement from "../../../components/Devices/Nodes/RealTimeDisplay/Measurement.svelte";
 
     // Variables
-    let phaseContentCardsElements = {} as Record<NodePhase, HTMLElement>;
     let nodesState: Record<string, NodeState>;
     let processedNodesState: Array<ProcessedNodeState>;
     let nodesStateBySubSection: Record<NodePhase, Record<RealTimeCardSubSections, Array<ProcessedNodeState>>>;
     let availablePhases: Array<NodePhase>;
     let availableSubSections: Record<NodePhase, RealTimeCardSectionsState>;
     let expandedState = assignRealTimeCardSectionsStateToAllPhases(initialRealTimeCardSectionsExpandState);
+    let showDetailDiv = false;
 
     // Reactive Statements
 
@@ -58,6 +58,10 @@
         for (const state of Object.keys(expandedState[phase]) as (keyof RealTimeCardSectionsState)[]) {
             expandedState[phase][state] = true;
         }
+    }
+
+    function openDetailDiv(): void {
+        showDetailDiv = true;
     }
 
     onMount(() => {
@@ -90,7 +94,7 @@
     {#if nodesStateBySubSection && availableSubSections}
         <div class="grid">
             {#each nodeSections.filter((section) => availablePhases.includes(section.phase)) as section (section.key)}
-                <div class="grid-col" bind:this={phaseContentCardsElements[section.phase]}>
+                <div class="grid-col">
                     <ContentCard titleText={section.phase !== NodePhase.SINGLEPHASE ? $texts[section.labelKey] : $texts.variables}>
                         <div class="slot-div header" slot="header">
                             <div class="phase-actions-div">
@@ -127,12 +131,12 @@
                                                     this={nodeState.displayComponent}
                                                     nodeName={nodeState.name}
                                                     nodePhase={nodeState.phase}
-                                                    contentCardEl={phaseContentCardsElements[section.phase]}
                                                     labelText={$variableNameTexts[nodeState.name] || nodeState.name}
                                                     value={nodeState.value}
                                                     minAlarmValue={nodeState.min_alarm_value}
                                                     maxAlarmValue={nodeState.max_alarm_value}
                                                     unitText={nodeState.unit}
+                                                    onClick={openDetailDiv}
                                                 />
                                             {/each}
                                         </div>
@@ -157,6 +161,7 @@
             </div>
         </div>
     {/if}
+    <RightPanel bind:showPanel={showDetailDiv} />
 </div>
 
 <style>
@@ -211,6 +216,31 @@
         justify-content: end;
         align-items: center;
         gap: 10px;
+    }
+
+    .slide-detail-div {
+        position: fixed;
+        padding: 0;
+        margin: 0;
+        top: 0;
+        bottom: 0;
+        right: 0;
+        width: fit-content;
+
+        display: flex;
+        flex-direction: row;
+        transform: translateX(100%);
+        transition: transform 0.2s ease-in-out;
+    }
+
+    .slide-detail-div.open {
+        transform: translateX(0%);
+    }
+
+    .slide-detail-div .content {
+        width: 90vw;
+        max-width: 420px;
+        height: 100%;
     }
 
     @media (max-width: 1569px) {

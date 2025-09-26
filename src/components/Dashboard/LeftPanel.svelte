@@ -240,7 +240,7 @@
         bottom: 0;
         left: 0;
         right: 0;
-        z-index: 102;
+        z-index: 110;
         display: block;
     }
 
@@ -273,7 +273,7 @@
         flex-direction: column;
         transform: translateX(-100%);
         transition: transform 0.2s ease-in-out;
-        z-index: 103;
+        z-index: 111;
     }
 
     /* Slide in when open */

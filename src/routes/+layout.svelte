@@ -1,16 +1,13 @@
 <script lang="ts">
     import { onMount } from "svelte";
     import { initLayout } from "$lib/logic/view/navigation";
-    import { isAuthenticationPage, isDashboardPage, updateScrollingState } from "$lib/logic/view/navigation";
+    import { isAuthenticationPage, isDashboardPage } from "$lib/logic/view/navigation";
     import { setInitialLeftPanelState } from "$lib/logic/view/navigation";
     import SplashLoader from "../components/Dashboard/SplashLoader.svelte";
 
     // Authorization stores
-    import { currentPage, splashDone, loadedDone } from "$lib/stores/view/navigation";
+    import { currentPage, splashDone } from "$lib/stores/view/navigation";
     import DashboardContainer from "../components/Dashboard/DashboardContainer.svelte";
-
-    // Reactive Statements
-    $: updateScrollingState($splashDone && $loadedDone); // Enable scrolling after content loaded
 
     // On Mount Function
     onMount(async () => {

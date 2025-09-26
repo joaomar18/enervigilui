@@ -1,12 +1,4 @@
 <script lang="ts">
-    import { onDestroy } from "svelte";
-    import { fly } from "svelte/transition";
-    import { cubicOut } from "svelte/easing";
-    import { getNodeDetailedState } from "$lib/logic/api/nodes";
-    import type { NodeDetailedState, NodePhase } from "$lib/types/nodes/base";
-    import DetailedStateDisplay from "./DetailedStateDisplay.svelte";
-    import { currentDeviceID } from "$lib/stores/device/current";
-
     // Styles
     import { mergeStyle } from "$lib/style/components";
     import { NodesBaseDisplayStyle } from "$lib/style/nodes";
@@ -16,9 +8,6 @@
     $: effectiveStyle = style ?? $NodesBaseDisplayStyle;
 
     // Props
-    export let nodeName: string;
-    export let nodePhase: NodePhase;
-    export let contentCardEl: HTMLElement;
     export let labelText: string;
     export let alarmState: boolean = false;
     export let warningState: boolean = false;
@@ -36,7 +25,6 @@
     export let labelColor: string | undefined = undefined;
     export let labelWeight: string | undefined = undefined;
     export let displayHeight: string | undefined = undefined;
-    export let displayWrapperBackgroundColor: string | undefined = undefined;
     export let displayBorder: string | undefined = undefined;
     export let displayHoverBorder: string | undefined = undefined;
     export let displayDisconnectedBorder: string | undefined = undefined;
@@ -73,7 +61,6 @@
         labelColor,
         labelWeight,
         displayHeight,
-        displayWrapperBackgroundColor,
         displayBorder,
         displayHoverBorder,
         displayDisconnectedBorder,
@@ -102,50 +89,15 @@
     // Merged style
     $: mergedStyle = mergeStyle(effectiveStyle, localOverrides);
 
-    // Variables
-    let showDetailedState: boolean;
-    let clickEventListenerDefined: boolean = false;
-    let containerDiv: HTMLDivElement;
-    let nodeDetailedState: NodeDetailedState | null = null;
-
-    // Reactive Statements
-    $: if (!showDetailedState && clickEventListenerDefined) {
-        window.removeEventListener("click", handleClickOutside);
-        clickEventListenerDefined = false;
-    }
+    // Click Export Function
+    export let onClick: () => void;
 
     // Functions
-    async function toogleDetailedState(): Promise<void> {
-        if (!$currentDeviceID) {
-            throw new Error("Can't do the request because current device id is not defined.");
-        }
-        showDetailedState = !showDetailedState;
-        if (showDetailedState) {
-            window.addEventListener("click", handleClickOutside);
-            clickEventListenerDefined = true;
-            ({ nodeDetailedState } = await getNodeDetailedState($currentDeviceID, nodeName, nodePhase));
-            return;
-        }
-        nodeDetailedState = null;
-    }
-
-    function handleClickOutside(event: MouseEvent): void {
-        if (
-            showDetailedState &&
-            containerDiv &&
-            contentCardEl &&
-            !containerDiv.contains(event.target as HTMLElement) &&
-            contentCardEl.contains(event.target as HTMLElement)
-        ) {
-            showDetailedState = false;
+    function handleClick(): void {
+        if (onClick) {
+            onClick();
         }
     }
-
-    onDestroy(() => {
-        if (clickEventListenerDefined) {
-            window.removeEventListener("click", handleClickOutside);
-        }
-    });
 </script>
 
 <div
@@ -161,7 +113,6 @@
         --label-color: {mergedStyle.labelColor};
         --label-weight: {mergedStyle.labelWeight};
         --display-height: {mergedStyle.displayHeight};
-        --display-wrapper-background-color: {mergedStyle.displayWrapperBackgroundColor};
         --display-border: {mergedStyle.displayBorder};
         --display-hover-border: {mergedStyle.displayHoverBorder};
         --display-disconnected-border: {mergedStyle.displayDisconnectedBorder};
@@ -187,7 +138,6 @@
         --animation-duration: {mergedStyle.animationDuration};
     "
     class="container"
-    bind:this={containerDiv}
 >
     <div class="content">
         <div class="label-div">
@@ -199,19 +149,13 @@
             {/if}
         </div>
         <div class="display-content-wrapper">
-            <div class="background-color-div" class:show={showDetailedState}></div>
             <div class="display-content" class:disconnected={valueDisconnected}>
                 <img src="/img/disconnected.svg" alt="disconnected" />
                 <slot name="content" />
             </div>
         </div>
-        <button on:click={toogleDetailedState} aria-label="Open Variable Detailed Info"></button>
+        <button on:click={handleClick} aria-label="Open Variable Detailed Info"></button>
     </div>
-    {#if showDetailedState}
-        <div class="detailed-info-div" transition:fly={{ y: 20, duration: 200, easing: cubicOut }}>
-            <DetailedStateDisplay {nodeDetailedState} />
-        </div>
-    {/if}
 </div>
 
 <style>
@@ -242,7 +186,6 @@
         flex-direction: column;
         justify-content: center;
         align-items: center;
-        z-index: 1;
     }
 
     .content .label-div {
@@ -321,21 +264,6 @@
         background-color: var(--display-wrapper-background-color);
     }
 
-    .content .display-content-wrapper .background-color-div {
-        margin: 0;
-        padding: 0;
-        position: absolute;
-        width: 100%;
-        height: 100%;
-        display: none;
-        border-radius: var(--display-radius);
-        background-color: var(--display-wrapper-background-color);
-    }
-
-    .content .display-content-wrapper .background-color-div.show {
-        display: block;
-    }
-
     .content .display-content-wrapper .display-content {
         margin: 0;
         padding: 0;
@@ -394,10 +322,5 @@
         opacity: 0;
         cursor: pointer;
         z-index: 1;
-    }
-
-    .detailed-info-div {
-        width: 100%;
-        height: fit-content;
     }
 </style>

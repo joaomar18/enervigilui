@@ -1,5 +1,4 @@
 <script lang="ts">
-    import { NodePhase } from "$lib/types/nodes/base";
     import BaseDisplay from "./BaseDisplay.svelte";
 
     // Styles
@@ -7,9 +6,6 @@
     import { CounterDisplayStyle } from "$lib/style/nodes";
 
     // Props
-    export let nodeName: string;
-    export let nodePhase: NodePhase;
-    export let contentCardEl: HTMLElement;
     export let labelText: string;
     export let value: number | null;
     export let unitText: string;
@@ -53,9 +49,12 @@
 
     // Reactive Statements
     $: valueDisconnected = value === null;
+
+    // Click Export Function
+    export let onClick: () => void;
 </script>
 
-<BaseDisplay {nodeName} {nodePhase} {contentCardEl} {labelText} {valueDisconnected}>
+<BaseDisplay {labelText} {valueDisconnected} {onClick}>
     <div
         style="
             --value-text-size: {mergedStyle.valueTextSize};

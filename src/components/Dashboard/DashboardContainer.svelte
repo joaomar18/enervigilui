@@ -130,7 +130,7 @@
         display: flex;
         justify-content: center;
         align-items: center;
-        z-index: 103;
+        z-index: 111;
     }
 
     /* Hidden logo slot until enabled */
@@ -207,7 +207,7 @@
 
     /* Send alerts div to front */
     .dashboard-container .content .alerts-div.prioritize {
-        z-index: 102;
+        z-index: 110;
     }
 
     /* Container: outer wrapper with padding and full height */

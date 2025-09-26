@@ -184,7 +184,6 @@ const NodesBaseDisplayStyleConfig: ComponentStyles = {
         labelColor: "#D4D4D8",
         labelWeight: "500",
         displayHeight: "40px",
-        displayWrapperBackgroundColor: "#14161c",
         displayBorder: "1px solid #52525B",
         displayHoverBorder: "1px solid #6B7280",
         displayDisconnectedBorder: "1px solid #52525B",

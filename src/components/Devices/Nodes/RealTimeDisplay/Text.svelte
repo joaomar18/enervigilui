@@ -36,9 +36,12 @@
 
     // Reactive Statements
     $: valueDisconnected = value === null;
+
+    // Click Export Function
+    export let onClick: () => void;
 </script>
 
-<BaseDisplay {labelText} {valueDisconnected}>
+<BaseDisplay {labelText} {valueDisconnected} {onClick}>
     <div
         style="
             --value-text-size: {mergedStyle.valueTextSize};
