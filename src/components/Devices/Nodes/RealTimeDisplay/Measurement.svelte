@@ -4,9 +4,10 @@
 
     // Styles
     import { mergeStyle } from "$lib/style/components";
-    import { MeasurementDisplayStyle } from "$lib/style/nodes";
+    import { MeasurementDisplayStyle, NodesBaseDisplayStyle } from "$lib/style/nodes";
 
     // Props
+    export let disableClick: boolean = false;
     export let labelText: string;
     export let minAlarmValue: number | null = null;
     export let maxAlarmValue: number | null = null;
@@ -15,7 +16,9 @@
 
     // Style object (from theme)
     export let style: { [property: string]: string | number } | null = null;
+    export let baseDisplayStyle: { [property: string]: string | number } | null = null;
     $: effectiveStyle = style ?? $MeasurementDisplayStyle;
+    $: baseDisplayStyle = baseDisplayStyle ?? $NodesBaseDisplayStyle;
 
     // Layout / styling props
     export let valueTextSize: string | undefined = undefined;
@@ -60,10 +63,10 @@
     $: valueDisconnected = value === null;
 
     // Click Export Function
-    export let onClick: () => void;
+    export let onClick: (() => void) | null = null;
 </script>
 
-<BaseDisplay {labelText} alarmState={variableAlarm} warningState={variableWarning} {valueDisconnected} {onClick}>
+<BaseDisplay style={baseDisplayStyle} {disableClick} {labelText} alarmState={variableAlarm} warningState={variableWarning} {valueDisconnected} {onClick}>
     <div
         style="
             --value-text-size: {mergedStyle.valueTextSize};

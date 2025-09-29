@@ -18,6 +18,7 @@
     export let maskBlurFilter: string | undefined = undefined;
     export let maskBackground: string | undefined = undefined;
     export let width: string | undefined = undefined;
+    export let minWidth: string | undefined = undefined;
     export let maxWidth: string | undefined = undefined;
     export let paddingTop: string | undefined = undefined;
     export let paddingBottom: string | undefined = undefined;
@@ -49,6 +50,7 @@
         maskBlurFilter,
         maskBackground,
         width,
+        minWidth,
         maxWidth,
         paddingTop,
         paddingBottom,
@@ -136,6 +138,7 @@
     bind:this={contentEl}
     style="
         --width: {mergedStyle.width};
+        --min-width: {mergedStyle.minWidth};
         --max-width: {mergedStyle.maxWidth};
         --padding-top: {mergedStyle.paddingTop};
         --padding-bottom: {mergedStyle.paddingBottom};
@@ -222,6 +225,7 @@
         padding-left: var(--padding-horizontal);
         padding-right: var(--padding-horizontal);
         width: var(--width);
+        min-width: var(--min-width);
         max-width: var(--max-width);
         background-color: var(--background-color);
         border-left: var(--border-left);
@@ -302,7 +306,7 @@
         margin: 0;
         padding: 0;
         width: 100%;
-        height:fit-content;
+        height: fit-content;
         padding-left: var(--header-padding-horizontal);
         padding-right: var(--header-padding-horizontal);
         padding-top: var(--header-padding-top);
@@ -330,6 +334,6 @@
         overflow-x: hidden;
         scrollbar-width: thin;
         scrollbar-color: var(--scrollbar-track-color) var(--scrollbar-thumb-color);
-        scrollbar-gutter: stable;
+        scrollbar-gutter: stable both-edges;
     }
 </style>

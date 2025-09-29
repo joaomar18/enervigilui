@@ -212,6 +212,49 @@ const NodesBaseDisplayStyleConfig: ComponentStyles = {
 
 export const NodesBaseDisplayStyle = createStyleStore(NodesBaseDisplayStyleConfig);
 
+//////////     N O D E S     B A S E     D I S P L A Y     D E T A I L     //////////
+
+const NodesBaseDisplayDetailStyleConfig: ComponentStyles = {
+    dark: {
+        width: "100%",
+        maxWidth: "300px",
+        paddingHorizontal: "0px",
+        paddingVertical: "0px",
+        labelPaddingTop: "0px",
+        labelPaddingBottom: "0px",
+        labelPaddingRight: "20px",
+        labelSize: "1rem",
+        labelColor: "#D4D4D8",
+        labelWeight: "500",
+        displayHeight: "40px",
+        displayBorder: "1px solid #52525B",
+        displayHoverBorder: "1px solid #6B7280",
+        displayDisconnectedBorder: "1px solid #52525B",
+        displayDisconnectedHoverBorder: "1px solid #6B7280",
+        displayBackgroundColor: "rgba(82, 82, 91, 0.1)",
+        displayHoverBackgroundColor: "rgba(82, 82, 91, 0.18)",
+        displayDisconnectedBackgroundColor: "rgba(107, 114, 128, 0.15)",
+        displayDisconnectedHoverBackgroundColor: "rgba(107, 114, 128, 0.22)",
+        displayHoverShadow: "0 1px 4px rgba(0, 0, 0, 0.25)",
+        displayDisconnectedHoverShadow: "0 1px 3px rgba(0, 0, 0, 0.2)",
+        displayRadius: "20px",
+        displayPaddingHorizontal: "20px",
+        alertsDivItemGap: "10px",
+        stateCircleDiameter: "10px",
+        stateCircleAlarmColor: "#ef4444",
+        stateCircleAlarmHoverColor: "#ef4444",
+        stateCircleAlarmHoverShadow: "0 0 3px rgba(239, 68, 68, 0.4)",
+        stateCircleWarningColor: "#f59e0b",
+        stateCircleWarningHoverColor: "#f59e0b",
+        stateCircleWarningHoverShadow: "0 0 3px rgba(245, 158, 11, 0.4)",
+        disconnectedImageWidth: "25px",
+        disconnectedImageHeight: "25px",
+        animationDuration: "0.2s",
+    },
+};
+
+export const NodesBaseDisplayDetailStyle = createStyleStore(NodesBaseDisplayDetailStyleConfig);
+
 //////////     M E A S U R E M E N T     D I S P L A Y     //////////
 
 const MeasurementDisplayStyleConfig: ComponentStyles = {

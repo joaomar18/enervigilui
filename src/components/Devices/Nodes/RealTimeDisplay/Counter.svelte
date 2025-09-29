@@ -3,16 +3,19 @@
 
     // Styles
     import { mergeStyle } from "$lib/style/components";
-    import { CounterDisplayStyle } from "$lib/style/nodes";
+    import { CounterDisplayStyle, NodesBaseDisplayStyle } from "$lib/style/nodes";
 
     // Props
+    export let disableClick: boolean = false;
     export let labelText: string;
     export let value: number | null;
     export let unitText: string;
 
     // Style object (from theme)
     export let style: { [property: string]: string | number } | null = null;
+    export let baseDisplayStyle: { [property: string]: string | number } | null = null;
     $: effectiveStyle = style ?? $CounterDisplayStyle;
+    $: baseDisplayStyle = baseDisplayStyle ?? $NodesBaseDisplayStyle;
 
     // Layout / styling props
     export let valueTextSize: string | undefined = undefined;
@@ -51,10 +54,10 @@
     $: valueDisconnected = value === null;
 
     // Click Export Function
-    export let onClick: () => void;
+    export let onClick: (() => void) | null = null;
 </script>
 
-<BaseDisplay {labelText} {valueDisconnected} {onClick}>
+<BaseDisplay style={baseDisplayStyle} {disableClick} {labelText} {valueDisconnected} {onClick}>
     <div
         style="
             --value-text-size: {mergedStyle.valueTextSize};

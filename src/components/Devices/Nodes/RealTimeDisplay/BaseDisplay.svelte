@@ -8,6 +8,7 @@
     $: effectiveStyle = style ?? $NodesBaseDisplayStyle;
 
     // Props
+    export let disableClick: boolean = false;
     export let labelText: string;
     export let alarmState: boolean = false;
     export let warningState: boolean = false;
@@ -90,11 +91,11 @@
     $: mergedStyle = mergeStyle(effectiveStyle, localOverrides);
 
     // Click Export Function
-    export let onClick: () => void;
+    export let onClick: (() => void) | null = null;
 
     // Functions
     function handleClick(): void {
-        if (onClick) {
+        if (onClick && !disableClick) {
             onClick();
         }
     }
@@ -139,7 +140,7 @@
     "
     class="container"
 >
-    <div class="content">
+    <div class="content" class:enable-hover={!disableClick}>
         <div class="label-div">
             <span>{labelText}</span>
             {#if alarmState || warningState}
@@ -240,7 +241,7 @@
         background-color: var(--state-circle-alarm-color);
     }
 
-    .content:hover .label-div .alerts-div.alarm .alert-state {
+    .content.enable-hover:hover .label-div .alerts-div.alarm .alert-state {
         background-color: var(--state-circle-alarm-hover-color);
         box-shadow: var(--state-circle-alarm-hover-shadow);
     }
@@ -249,7 +250,7 @@
         background-color: var(--state-circle-warning-color);
     }
 
-    .content:hover .label-div .alerts-div.warning .alert-state {
+    .content.enable-hover:hover .label-div .alerts-div.warning .alert-state {
         background-color: var(--state-circle-warning-hover-color);
         box-shadow: var(--state-circle-warning-hover-shadow);
     }
@@ -286,7 +287,7 @@
             box-shadow var(--animation-duration) ease-in-out;
     }
 
-    .content:hover .display-content-wrapper .display-content {
+    .content.enable-hover:hover .display-content-wrapper .display-content {
         background-color: var(--display-hover-background-color);
         border: var(--display-hover-border);
         box-shadow: var(--display-hover-shadow);
@@ -297,7 +298,7 @@
         border: var(--display-disconnected-border);
     }
 
-    .content:hover .display-content-wrapper .display-content.disconnected {
+    .content.enable-hover:hover .display-content-wrapper .display-content.disconnected {
         background-color: var(--display-disconnected-hover-background-color);
         border: var(--display-disconnected-hover-border);
         box-shadow: var(--display-disconnected-hover-shadow);
@@ -320,7 +321,10 @@
         width: 100%;
         height: 100%;
         opacity: 0;
-        cursor: pointer;
         z-index: 1;
+    }
+
+    .content.enable-hover button:hover {
+        cursor: pointer;
     }
 </style>
