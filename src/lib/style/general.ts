@@ -403,7 +403,7 @@ const RightPanelSheetStyleConfig: ComponentStyles = {
         minWidth: "350px",
         maxWidth: "420px",
         paddingTop: "5px",
-        paddingBottom: "20px",
+        paddingBottom: "10px",
         paddingHorizontal: "10px",
         backgroundColor: "#1c2026",
         borderLeft: "1px solid rgba(255, 255, 255, 0.08)",
