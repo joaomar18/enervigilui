@@ -166,7 +166,7 @@
         padding-right: var(--padding-horizontal);
         padding-top: var(--padding-vertical);
         padding-bottom: var(--padding-vertical);
-        position: fixed;
+        position: absolute;
         display: flex;
         flex-direction: column;
         justify-content: start;

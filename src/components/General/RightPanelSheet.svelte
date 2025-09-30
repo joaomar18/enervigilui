@@ -334,6 +334,6 @@
         overflow-x: hidden;
         scrollbar-width: thin;
         scrollbar-color: var(--scrollbar-track-color) var(--scrollbar-thumb-color);
-        scrollbar-gutter: stable both-edges;
+        scrollbar-gutter: stable;
     }
 </style>

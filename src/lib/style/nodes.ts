@@ -32,6 +32,31 @@ const AddNodeButtonStyleConfig: ComponentStyles = {
 
 export const AddNodeButtonStyle = createStyleStore(AddNodeButtonStyleConfig);
 
+//////////     N O D E     D E T A I L     P I C K E R     B U T T O N     //////////
+
+const NodeDetailPickerButtonStyleConfig: ComponentStyles = {
+    dark: {
+        width: "40px",
+        height: "40px",
+        borderRadius: "5px",
+        backgroundColor: "#2F80ED",
+        disabledBackgroundColor: "#7da5d9",
+        borderColor: "#1456B0",
+        disabledBorderColor: "#6287b6",
+        hoverColor: "#1C6DD0",
+        disabledHoverColor: "#7da5d9",
+        fontColor: "#f5f5f5",
+        disabledFontColor: "#f5f5f5",
+        fontSize: "1rem",
+        fontWeight: "400",
+        imageWidth: "32px",
+        imageHeight: "32px",
+        showToolTipDelay: 300,
+    },
+};
+
+export const NodeDetailPickerButtonStyle = createStyleStore(NodeDetailPickerButtonStyleConfig);
+
 //////////     N O D E     C O N F I G U R A T I O N     W I N D O W     //////////
 
 const NodeConfigWindowStyleConfig: ComponentStyles = {

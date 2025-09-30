@@ -1,12 +1,12 @@
 <script lang="ts">
     import RightPanelSheet from "../../../General/RightPanelSheet.svelte";
     import Measurement from "./Measurement.svelte";
-    import Action from "../../../General/Action.svelte";
     import Button from "../../../General/Button.svelte";
+    import ToolTipText from "../../../General/ToolTipText.svelte";
 
     // Styles
-    import { NodesBaseDisplayDetailStyle } from "$lib/style/nodes";
-    import type { ProcessedNodeState } from "$lib/types/nodes/base";
+    import { NodesBaseDisplayDetailStyle, NodeDetailPickerButtonStyle } from "$lib/style/nodes";
+    import LineGraph from "../../../General/LineGraph.svelte";
 
     // Props
     //export let nodeState: ProcessedNodeState;
@@ -64,6 +64,23 @@
     export let contentValueColor: string | undefined = "rgba(255,255,255, 0.8)";
     export let contentValueWeight: string | undefined = "600";
     export let historyButtonPickerGap: string | undefined = "10px";
+
+    // Sample chart data for testing
+    const sampleChartData = [
+        { 1696118400: 220.551 }, // 2023-10-01 00:00:00 - 230.5V
+        { 1696118460: 231.212 }, // 00:01:00 - 231.2V
+        { 1696118520: 229.812 }, // 00:02:00 - 229.8V
+        { 1696118580: 230.912 }, // 00:03:00 - 230.9V
+        { 1696118640: 232.143 }, // 00:04:00 - 232.1V
+        { 1696118700: 229.454 }, // 00:05:00 - 229.4V
+        { 1696118760: 230.723 }, // 00:06:00 - 230.7V
+        { 1696118820: 231.511 }, // 00:07:00 - 231.5V
+        { 1696118880: 230.242 }, // 00:08:00 - 230.2V
+        { 1696118940: 231.808 }, // 00:09:00 - 231.8V
+    ] as any; // Temporary fix for TypeScript
+
+    const sampleColors = ["#3B82F6"]; // Blue color matching your theme
+    const sampleLabels = ["Voltage L1 (V)"];
 </script>
 
 <div
@@ -206,15 +223,19 @@
             </div>
 
             <div class="section-title"><h3>Histórico</h3></div>
-            <div class="inner-content-div">
+            <div class="inner-content-div no-horizontal-padding">
                 <div class="history-btn-picker-div">
-                    <Button buttonText="1h" onClick={() => {}} />
-                    <Button buttonText="24H" onClick={() => {}} />
-                    <Button buttonText="7D" onClick={() => {}} />
-                    <Button buttonText="1M" onClick={() => {}} />
-                    <Action imageURL="/img/custom-date.svg" onClick={() => {}} />
+                    <Button style={$NodeDetailPickerButtonStyle} buttonText="1H" onClick={() => {}} />
+                    <Button style={$NodeDetailPickerButtonStyle} buttonText="24H" onClick={() => {}} />
+                    <Button style={$NodeDetailPickerButtonStyle} buttonText="7D" onClick={() => {}} />
+                    <Button style={$NodeDetailPickerButtonStyle} buttonText="1M" onClick={() => {}} />
+                    <Button enableToolTip={true} style={$NodeDetailPickerButtonStyle} buttonText="" imageURL="/img/custom-date.svg" onClick={() => {}}>
+                        <div slot="tooltip"><ToolTipText text="Personalizado" /></div>
+                    </Button>
                 </div>
-                <div style="width:100%; height:750px; background-color:darkblue"></div>
+                <div class="chart-container">
+                    <LineGraph data={sampleChartData} dataColors={sampleColors} dataLabel={sampleLabels} width="100%" height="400px" />
+                </div>
             </div>
 
             <div class="section-title"><h3>Dados Técnicos</h3></div>
@@ -350,10 +371,12 @@
         margin: 0;
         padding: 0;
     }
+
     .header-div .row {
         gap: var(--header-col-gap);
         block-size: var(--header-row-height);
     }
+
     .header-div .label {
         inline-size: var(--header-label-width);
         min-inline-size: var(--header-label-width);
@@ -361,11 +384,13 @@
         color: var(--header-label-color);
         font-weight: var(--header-label-weight);
     }
+
     .header-div .value {
         font-size: var(--header-value-size);
         color: var(--header-value-color);
         font-weight: var(--header-value-weight);
     }
+
     .header-div .dot-state-div {
         inline-size: var(--header-state-div-width);
         block-size: var(--header-row-height);
@@ -376,11 +401,13 @@
         margin: 0;
         padding: 0;
     }
+
     .content-div .section-title {
         margin: 0;
         padding: 0;
         border-bottom: var(--content-title-border-bottom);
     }
+
     .content-div .section-title h3 {
         margin: 0;
         padding: 0 var(--content-title-padding-left) var(--content-title-padding-bottom) var(--content-title-padding-left);
@@ -402,13 +429,21 @@
         align-items: center;
         gap: var(--content-row-gap);
     }
+
+    .inner-content-div.no-horizontal-padding {
+        padding-left: 0;
+        padding-right: 0;
+    }
+
     .content-div .inner-content-div .row {
         gap: var(--content-col-gap);
         block-size: var(--content-row-height);
     }
+
     .content-div .inner-content-div .row.fit-height {
         block-size: auto;
     }
+
     .content-div .inner-content-div .label {
         inline-size: var(--content-label-width);
         min-inline-size: var(--content-label-width);
@@ -416,11 +451,13 @@
         color: var(--content-label-color);
         font-weight: var(--content-label-weight);
     }
+
     .content-div .inner-content-div .value {
         font-size: var(--content-value-size);
         color: var(--content-value-color);
         font-weight: var(--content-value-weight);
     }
+
     .content-div .dot-state-div {
         inline-size: var(--content-state-div-width);
         block-size: var(--content-row-height);
@@ -433,6 +470,12 @@
         width: 100%;
         justify-content: start;
         align-items: center;
+        height: fit-content;
+    }
+
+    .chart-container {
+        padding-top: 5px;
+        width: 100%;
         height: fit-content;
     }
 </style>

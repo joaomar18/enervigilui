@@ -1,16 +1,22 @@
 <script lang="ts">
+    import ToolTip from "./ToolTip.svelte";
+
     // Styles
     import { mergeStyle } from "$lib/style/components";
     import { DefaultButtonStyle } from "$lib/style/button";
+    import { ToolTipStyle } from "$lib/style/general";
 
     //Props
     export let enabled: boolean = true;
     export let processing: boolean = false;
     export let buttonText: string;
     export let imageURL: string = "";
+    export let enableToolTip: boolean = false;
+    export let toolTipAutoPos: boolean = true;
 
     // Style object (from theme)
     export let style: { [property: string]: string | number } | null = null;
+    export let toolTipStyle: { [property: string]: string | number } = $ToolTipStyle;
     $: effectiveStyle = style ?? $DefaultButtonStyle;
 
     // Layout / styling props
@@ -57,6 +63,14 @@
     // Merged style
     $: mergedStyle = mergeStyle(effectiveStyle, localOverrides);
 
+    // Variables
+    let showToolTip: boolean = false;
+    let showToolTipTimeout: ReturnType<typeof setTimeout> | null = null;
+    let showToolTipDelayNumber: number;
+
+    // Reactive Statements
+    $: showToolTipDelayNumber = parseInt(String(mergedStyle.showToolTipDelay));
+
     // Click Export Function
     export let onClick: () => void;
 
@@ -64,6 +78,24 @@
     function handleClick(): void {
         if (onClick && enabled) {
             onClick();
+        }
+    }
+
+    function handleMouseEnter(): void {
+        if (enableToolTip) {
+            showToolTipTimeout = setTimeout(() => {
+                showToolTip = true;
+            }, showToolTipDelayNumber);
+        }
+    }
+
+    function handleMouseLeave(): void {
+        if (enableToolTip) {
+            if (showToolTipTimeout) {
+                clearTimeout(showToolTipTimeout);
+                showToolTipTimeout = null;
+            }
+            showToolTip = false;
         }
     }
 </script>
@@ -104,17 +136,24 @@
     class:disabled={!enabled || processing}
     aria-label={buttonText}
     on:click={handleClick}
+    on:mouseenter={handleMouseEnter}
+    on:mouseleave={handleMouseLeave}
 >
     {#if !processing}
-        {buttonText}
+        {#if buttonText}
+            {buttonText}
+        {/if}
         {#if imageURL}
-            <img src={imageURL} alt={imageURL} />
+            <img class:center={!buttonText} src={imageURL} alt={imageURL} />
         {/if}
     {:else}
         <svg class="loader" width={mergedStyle.imageWidth} height={mergedStyle.imageHeight} viewBox="0 0 50 50" xmlns="http://www.w3.org/2000/svg">
             <circle class="path" cx="25" cy="25" r="20" fill="none" stroke-width="4" />
         </svg>
     {/if}
+    <ToolTip style={toolTipStyle} {showToolTip} autoPosition={toolTipAutoPos}>
+        <slot name="tooltip" />
+    </ToolTip>
 </button>
 
 <style>
@@ -177,6 +216,12 @@
         left: var(--image-left-position);
         right: var(--image-right-position);
         transform: translateY(-50%);
+    }
+
+    /* Center the image on the button when there is no text */
+    button img.center {
+        left: 50%;
+        transform: translate(-50%, -50%);
     }
 
     /* Loading spinner: rotating animation */
