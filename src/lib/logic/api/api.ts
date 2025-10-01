@@ -2,9 +2,8 @@ import { get } from "svelte/store";
 import { showToast } from "../view/toast";
 import { ToastType } from "$lib/stores/view/toast";
 import { navigateTo } from "../view/navigation";
-import { selectedLang } from "$lib/stores/lang/definition";
 import { loadedDone } from "$lib/stores/view/navigation";
-import { convertDateToLocalTime } from "../util/generic";
+import { convertDateToLocalTime } from "../util/date";
 
 export type CallAPIOptions = {
     endpoint: string;

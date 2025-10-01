@@ -1,9 +1,9 @@
 import { get } from "svelte/store";
-import type { EditableDevice, NewDevice, MeterType, DeviceHistory } from "$lib/types/device/base";
-import type { EditableNodeRecord, NodeRecord } from "$lib/types/nodes/base";
+import type { EditableDevice, NewDevice, DeviceHistory } from "$lib/types/device/base";
+import type { EditableNodeRecord } from "$lib/types/nodes/base";
 import { changeNodeProtocol } from "./nodes";
 import { protocolPlugins } from "$lib/stores/device/protocol";
-import { convertDateToLocalDate } from "../util/generic";
+import { convertDateToLocalDate } from "../util/date";
 
 /**
  * Handles device protocol changes by updating communication options and converting all nodes to the new protocol.

@@ -226,9 +226,10 @@
             <div class="inner-content-div no-horizontal-padding">
                 <div class="history-btn-picker-div">
                     <Button style={$NodeDetailPickerButtonStyle} buttonText="1H" onClick={() => {}} />
-                    <Button style={$NodeDetailPickerButtonStyle} buttonText="24H" onClick={() => {}} />
+                    <Button style={$NodeDetailPickerButtonStyle} buttonText="1D" onClick={() => {}} />
                     <Button style={$NodeDetailPickerButtonStyle} buttonText="7D" onClick={() => {}} />
                     <Button style={$NodeDetailPickerButtonStyle} buttonText="1M" onClick={() => {}} />
+                    <Button style={$NodeDetailPickerButtonStyle} buttonText="1A" onClick={() => {}} />
                     <Button enableToolTip={true} style={$NodeDetailPickerButtonStyle} buttonText="" imageURL="/img/custom-date.svg" onClick={() => {}}>
                         <div slot="tooltip"><ToolTipText text="Personalizado" /></div>
                     </Button>
@@ -249,12 +250,16 @@
                     <span class="value">MODBUS RTU</span>
                 </div>
                 <div class="row">
-                    <span class="label">Registo</span>
+                    <span class="label">Endereço</span>
                     <span class="value">0x0020</span>
                 </div>
                 <div class="row">
                     <span class="label">Intervalo</span>
                     <span class="value">5 s</span>
+                </div>
+                <div class="row">
+                    <span class="label">Registo</span>
+                    <span class="value">15 min.</span>
                 </div>
             </div>
         </main>

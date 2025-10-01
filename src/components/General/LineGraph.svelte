@@ -89,7 +89,6 @@
                 },
                 {
                     // y-axis (values)
-                    label: "V",
                     alignTo: 1,
                     align: 2,
                     font: `12px ${rootFont}`,
