@@ -1,49 +1,62 @@
-import { GraphTimeStep, GraphTimePeriod } from "$lib/types/view/graph";
+import { GraphTimeSpan, GraphTimeStep } from "$lib/types/view/graph";
+import { minDurationMs, min15DurationMs, hourDurationMs, dayDurationMs, monthDurationMs, yearDurationMs } from "../util/date";
+import type { MeasurementLogPoint } from "$lib/types/nodes/base";
 
-/**
- * Classify the span between two dates into a coarse GraphTimePeriod bucket.
- * Month & year are resolved using calendar boundaries (variable length aware).
- */
-export function getTimePeriod(startTime: Date, endTime: Date): GraphTimePeriod {
-    if (endTime < startTime) {
-        [startTime, endTime] = [endTime, startTime];
-    }
 
-    const spanMs = endTime.getTime() - startTime.getTime();
+export function getGraphBounds(startTimeMs: number, endTimeMs: number): { timeSpan: GraphTimeSpan, timeStep: GraphTimeStep } {
 
-    // Compute dynamic month/year lengths from start anchor.
-    const ms1Month = monthDurationMs(startTime);
-    const ms1Year = yearDurationMs(startTime);
+    const spanMs = endTimeMs - startTimeMs;
 
-    if (spanMs >= ms1Year) {
-        return GraphTimePeriod.min1Year;
+    if (spanMs > yearDurationMs(startTimeMs)) {
+        return { timeSpan: GraphTimeSpan._MY, timeStep: GraphTimeStep._1Y };
     }
-    if (spanMs >= ms1Month) {
-        return GraphTimePeriod.min1Month;
+    else if (spanMs > monthDurationMs(startTimeMs)) {
+        return { timeSpan: GraphTimeSpan._1Y, timeStep: GraphTimeStep._1M };
     }
-    if (spanMs >= MS_DAY) {
-        return GraphTimePeriod.min1Day;
+    else if (spanMs > dayDurationMs(startTimeMs)) {
+        return { timeSpan: GraphTimeSpan._1M, timeStep: GraphTimeStep._1d };
     }
-    if (spanMs >= MS_HOUR) {
-        return GraphTimePeriod.min1Hour;
+    else if (spanMs > hourDurationMs(startTimeMs)) {
+        return { timeSpan: GraphTimeSpan._1d, timeStep: GraphTimeStep._1h };
     }
-    // Everything smaller defaults to 15-minute bucket
-    return GraphTimePeriod.min15Min;
+    else if (spanMs > min15DurationMs(startTimeMs)) {
+        return { timeSpan: GraphTimeSpan._15m, timeStep: GraphTimeStep._15m };
+    }
+    else {
+        return { timeSpan: GraphTimeSpan._15m, timeStep: GraphTimeStep._1m };
+    }
 }
 
-export function mapTimePeriodToTimeStep(timePeriod: GraphTimePeriod): GraphTimeStep {
-    switch (timePeriod) {
-        case GraphTimePeriod.min15Min:
-            return GraphTimeStep._1m;
-        case GraphTimePeriod.min1Hour:
-            return GraphTimeStep._15m;
-        case GraphTimePeriod.min1Day:
-            return GraphTimeStep._1h;
-        case GraphTimePeriod.min1Month:
-            return GraphTimeStep._1d;
-        case GraphTimePeriod.min1Year:
-            return GraphTimeStep._1M;
-        default:
-            throw new Error(`Can't map unknown time period ${timePeriod}.`);
+export function getStepToMs(step: GraphTimeStep, startTimeMs: number): number {
+    switch (step) {
+        case GraphTimeStep._1m:
+            return minDurationMs(startTimeMs);
+        case GraphTimeStep._15m:
+            return min15DurationMs(startTimeMs);
+        case GraphTimeStep._1h:
+            return hourDurationMs(startTimeMs);
+        case GraphTimeStep._1d:
+            return dayDurationMs(startTimeMs);
+        case GraphTimeStep._1M:
+            return monthDurationMs(startTimeMs);
+        case GraphTimeStep._1Y:
+            return yearDurationMs(startTimeMs);
     }
+}
+
+
+
+export function measurementPointsToUPlotData(points: Array<MeasurementLogPoint>, startTimeMs: number, endTimeMs: number, stepTimeMs: number): Array<Array<number>> {
+    let timestamps = [] as Array<number>;
+    let average = [] as Array<number>;
+    let minimum = [] as Array<number>;
+    let maximum = [] as Array<number>;
+    let currentTimeStamp = startTimeMs;
+
+    while (currentTimeStamp < endTimeMs) {
+        timestamps.push(currentTimeStamp);
+        currentTimeStamp += stepTimeMs;
+    }
+
+    return [timestamps, average, minimum, maximum];
 }

@@ -363,6 +363,51 @@ export interface NodeDetailedState {
 }
 
 /**
+ * Base time range metadata for a log bucket.
+ * start/end provided both as ISO strings (startTime/endTime) and epoch ms (startTimeMs/endTimeMs)
+ * to avoid repeated parsing and enable efficient numeric range operations.
+ */
+export interface BaseLogPoint {
+    startTime: string,
+    endTime: string,
+    startTimeMs: number,
+    endTimeMs: number,
+}
+
+/**
+ * Aggregated numeric measurement statistics for a time slice.
+ * Provides average, min and max derived from all raw samples within the slice.
+ */
+export interface MeasurementLogPoint extends BaseLogPoint {
+    average: number,
+    minimum: number,
+    maximum: number,
+}
+
+/**
+ * Single counter value (typically monotonically increasing) captured for a slice.
+ * Counter semantics (delta vs absolute) are interpreted at a higher layer.
+ */
+export interface CounterLogPoint {
+    value: number;
+}
+
+/**
+ * Arbitrary textual log content for a slice (status, message, annotation, etc.).
+ */
+export interface TextLogPoint {
+    value: string;
+}
+
+/**
+ * Boolean state snapshot for a slice (on/off, open/closed, alarm active/inactive).
+ */
+export interface StateLogPoint {
+    value: boolean;
+}
+
+
+/**
  * Represents the validation state for all editable properties of a node.
  * Each boolean property indicates whether the corresponding node field passes validation.
  * Used to provide real-time feedback in the UI and prevent invalid configurations from being saved.

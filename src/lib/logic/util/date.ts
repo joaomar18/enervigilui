@@ -2,33 +2,77 @@ import { get } from "svelte/store";
 import { selectedLang } from "$lib/stores/lang/definition";
 
 /**
- * Time duration constants (in milliseconds).
+ * Difference in milliseconds between two Date objects (b - a).
  */
-export const MS_MIN = 60 * 1000;        // One minute
-export const MS_15_MIN = 15 * MS_MIN;    // Fifteen minutes
-export const MS_HOUR = 60 * MS_MIN;      // One hour
-export const MS_DAY = 24 * MS_HOUR;      // Nominal 24-hour day
-
 export function diffMs(a: Date, b: Date): number {
     return b.getTime() - a.getTime();
 }
 
-export function addMonths(date: Date, months: number): Date {
-    const newDate = new Date(date.getTime());
-    newDate.setMonth(newDate.getMonth() + months);
+/**
+ * Returns a new Date offset from the given date by specified components.
+ * Note: JavaScript Date normalizes overflow (e.g., month 13 → next year January).
+ */
+export function addToDate(date: Date, years: number = 0, months: number = 0, days: number = 0, hours: number = 0, minutes: number = 0): Date {
+    const newDate = new Date(date.getFullYear() + years,
+        date.getMonth() + months,
+        date.getDate() + days,
+        date.getHours() + hours,
+        date.getMinutes() + minutes);
     return newDate;
 }
 
-export function monthDurationMs(date: Date): number {
-    const start = new Date(date.getFullYear(), date.getMonth(), 1, 0, 0, 0, 0);
-    const next = addMonths(start, 1);
-    return diffMs(start, next);
+/**
+ * Duration of the next minute interval starting from the given date in ms.
+ */
+export function minDurationMs(dateMs: number): number {
+    let date = new Date(dateMs);
+    const next = addToDate(date, 0, 0, 0, 0, 1);
+    return diffMs(date, next);
 }
 
-export function yearDurationMs(date: Date): number {
-    const start = new Date(date.getFullYear(), 0, 1, 0, 0, 0, 0);
-    const next = new Date(date.getFullYear() + 1, 0, 1, 0, 0, 0, 0);
-    return diffMs(start, next);
+/**
+ * Duration of the next 15-minute interval starting from the given date in ms.
+ */
+export function min15DurationMs(dateMs: number): number {
+    let date = new Date(dateMs);
+    const next = addToDate(date, 0, 0, 0, 0, 15);
+    return diffMs(date, next);
+}
+
+/**
+ * Duration of the next hour from the provided date in ms.
+ */
+export function hourDurationMs(dateMs: number): number {
+    let date = new Date(dateMs);
+    const next = addToDate(date, 0, 0, 0, 1);
+    return diffMs(date, next);
+}
+
+/**
+ * Calendar-aware duration of the next day in ms.
+ */
+export function dayDurationMs(dateMs: number): number {
+    let date = new Date(dateMs);
+    const next = addToDate(date, 0, 0, 1);
+    return diffMs(date, next);
+}
+
+/**
+ * Calendar month duration from the given date in ms.
+ */
+export function monthDurationMs(dateMs: number): number {
+    let date = new Date(dateMs);
+    const next = addToDate(date, 0, 1);
+    return diffMs(date, next);
+}
+
+/**
+ * Calendar year duration from the given date in ms.
+ */
+export function yearDurationMs(dateMs: number): number {
+    let date = new Date(dateMs);
+    const next = addToDate(date, 1);
+    return diffMs(date, next);
 }
 
 /**
