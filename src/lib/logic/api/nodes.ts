@@ -95,3 +95,32 @@ export async function getNodeDetailedState(device_id: number, nodeName: string, 
 
     return { nodeDetailedState };
 }
+
+export async function getNodeLogs(device_id: number, nodeName: string, nodePhase: NodePhase, formatted: boolean | null = null, timeStepMs: number | null = null, start_time: Date | null = null, end_time: Date | null = null): Promise<{ nodeLogs: any }> {
+    let nodeLogs: any;
+    const prefix = getNodePrefix(nodePhase);
+    const processedName = addPrefix(removePrefix(nodeName), prefix);
+
+    let start_time_str: string | null = null;
+    let end_time_str: string | null = null;
+
+    start_time_str = start_time !== null ? start_time.toISOString() : null;
+    end_time_str = end_time !== null ? end_time.toISOString() : null;
+
+    console.log("Time step ms: ", timeStepMs);
+
+    const { sucess, data } = await callAPI({
+        endpoint: "/api/nodes//get_logs_from_node",
+        method: "GET",
+        params: { device_id, node_name: processedName, formatted, time_step: timeStepMs, start_time: start_time_str, end_time: end_time_str },
+    })
+
+    if (sucess) {
+        nodeLogs = data;
+    }
+    else {
+        throw new Error("Get Node Logs error");
+    }
+
+    return { nodeLogs };
+}

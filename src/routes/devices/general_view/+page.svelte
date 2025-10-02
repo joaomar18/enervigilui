@@ -2,8 +2,9 @@
     import { fade } from "svelte/transition";
     import { onMount } from "svelte";
     import { MethodPoller } from "$lib/logic/api/poller";
+    import { MethodRetrier } from "$lib/logic/api/retrier";
     import { NodePhase } from "$lib/types/nodes/base";
-    import { getDeviceNodesState } from "$lib/logic/api/nodes";
+    import { getDeviceNodesState, getNodeLogs } from "$lib/logic/api/nodes";
     import { showToast } from "$lib/logic/view/toast";
     import { ToastType } from "$lib/stores/view/toast";
     import { nodeSections } from "$lib/types/nodes/base";
@@ -17,6 +18,8 @@
     import Action from "../../../components/General/Action.svelte";
     import ToolTipText from "../../../components/General/ToolTipText.svelte";
     import NodeDetailSheet from "../../../components/Devices/Nodes/RealTimeDisplay/NodeDetailSheet.svelte";
+    import { getStepToMs } from "$lib/logic/view/graph";
+    import { GraphTimeStep } from "$lib/types/view/graph";
 
     // Texts
     import { texts } from "$lib/stores/lang/generalTexts";
@@ -32,6 +35,7 @@
     import { ToolTipTextStyle } from "$lib/style/general";
 
     // Variables
+    let nodeLogs: any;
     let nodesState: Record<string, NodeState>;
     let processedNodesState: Array<ProcessedNodeState>;
     let nodesStateBySubSection: Record<NodePhase, Record<RealTimeCardSubSections, Array<ProcessedNodeState>>>;
@@ -66,10 +70,27 @@
 
     onMount(() => {
         let nodesStatePoller: MethodPoller | null;
+        let nodeLogsTest: MethodRetrier | null;
         if ($currentDeviceID) {
             nodesStatePoller = new MethodPoller(async (signal) => {
                 ({ nodesState, processedNodesState } = await getDeviceNodesState($currentDeviceID));
             }, 5000);
+            nodeLogsTest = new MethodRetrier(async (signal) => {
+                let initial_date = new Date();
+                initial_date.setFullYear(initial_date.getFullYear() - 6);
+                let inital_date_ms = initial_date.getTime();
+                let end_date = new Date();
+
+                ({ nodeLogs } = await getNodeLogs(
+                    $currentDeviceID,
+                    "voltage",
+                    NodePhase.L1,
+                    true,
+                    getStepToMs(GraphTimeStep._1Y, inital_date_ms),
+                    initial_date,
+                    end_date,
+                ));
+            }, 3000);
         } else {
             showToast("errorEditDeviceParams", ToastType.ALERT);
             loadedDone.set(true);
@@ -81,6 +102,8 @@
             nodesStatePoller = null;
         };
     });
+
+    $: console.log(nodeLogs);
 </script>
 
 <div

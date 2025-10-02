@@ -13,11 +13,13 @@ export function diffMs(a: Date, b: Date): number {
  * Note: JavaScript Date normalizes overflow (e.g., month 13 → next year January).
  */
 export function addToDate(date: Date, years: number = 0, months: number = 0, days: number = 0, hours: number = 0, minutes: number = 0): Date {
-    const newDate = new Date(date.getFullYear() + years,
-        date.getMonth() + months,
-        date.getDate() + days,
-        date.getHours() + hours,
-        date.getMinutes() + minutes);
+    const newDate = new Date(Date.UTC(date.getUTCFullYear() + years,
+        date.getUTCMonth() + months,
+        date.getUTCDate() + days,
+        date.getUTCHours() + hours,
+        date.getUTCMinutes() + minutes,
+        date.getUTCSeconds(),
+        date.getUTCMilliseconds()));
     return newDate;
 }
 
