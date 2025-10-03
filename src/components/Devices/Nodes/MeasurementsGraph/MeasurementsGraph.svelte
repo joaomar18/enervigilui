@@ -1,8 +1,5 @@
 <script lang="ts">
-    import { getGraphBounds, getStepToMs } from "$lib/logic/view/graph";
-    import { GraphTimeSpan, GraphTimeStep } from "$lib/types/view/graph";
     import type { MeasurementLogPoint } from "$lib/types/nodes/base";
-    import { createMeasurementChart } from "./MeasurementsGraph";
 
     // Props
     export let measurementPoints: Array<MeasurementLogPoint> = [];
@@ -14,21 +11,9 @@
     // Variables
     let divContainer: HTMLDivElement;
     let dataAvailable: boolean;
-    let timeSpan: GraphTimeSpan;
-    let timeStep: GraphTimeStep;
 
     // Reactive Statements
     $: dataAvailable = !!measurementPoints && measurementPoints.length > 0;
-    $: if (dataAvailable && divContainer) {
-        ({ timeSpan, timeStep } = getGraphBounds(measurementPoints[0].startTimeMs, measurementPoints[measurementPoints.length - 1].endTimeMs));
-        createMeasurementChart(
-            divContainer,
-            measurementPoints,
-            measurementPoints[0].startTimeMs,
-            measurementPoints[measurementPoints.length - 1].endTimeMs,
-            getStepToMs(timeStep, measurementPoints[0].startTimeMs),
-        );
-    }
 </script>
 
 <div

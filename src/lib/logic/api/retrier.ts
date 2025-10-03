@@ -121,7 +121,6 @@ export class MethodRetrier {
         if (this.#currentInterval > this.#maxIntervalMs) {
             this.#currentInterval = this.#maxIntervalMs;
         }
-        console.log(this.#currentInterval);
         this.#timer = setTimeout(() => this.#run(), this.#currentInterval);
     }
 

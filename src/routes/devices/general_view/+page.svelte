@@ -18,8 +18,6 @@
     import Action from "../../../components/General/Action.svelte";
     import ToolTipText from "../../../components/General/ToolTipText.svelte";
     import NodeDetailSheet from "../../../components/Devices/Nodes/RealTimeDisplay/NodeDetailSheet.svelte";
-    import { getStepToMs } from "$lib/logic/view/graph";
-    import { GraphTimeStep } from "$lib/types/view/graph";
 
     // Texts
     import { texts } from "$lib/stores/lang/generalTexts";
@@ -77,20 +75,11 @@
             }, 5000);
             nodeLogsTest = new MethodRetrier(async (signal) => {
                 let initial_date = new Date();
-                initial_date.setFullYear(initial_date.getFullYear() - 6);
-                let inital_date_ms = initial_date.getTime();
+                initial_date.setHours(initial_date.getHours() - 1);
                 let end_date = new Date();
 
-                ({ nodeLogs } = await getNodeLogs(
-                    $currentDeviceID,
-                    "voltage",
-                    NodePhase.L1,
-                    true,
-                    getStepToMs(GraphTimeStep._1Y, inital_date_ms),
-                    initial_date,
-                    end_date,
-                ));
-            }, 3000);
+                ({ nodeLogs } = await getNodeLogs($currentDeviceID, "voltage", NodePhase.L1, true, initial_date, end_date));
+            }, 20000);
         } else {
             showToast("errorEditDeviceParams", ToastType.ALERT);
             loadedDone.set(true);

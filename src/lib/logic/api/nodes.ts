@@ -1,7 +1,14 @@
 import { callAPI } from "$lib/logic/api/api";
 import { processInitialNodes, initNodes, processNodesState } from "../factory/nodes";
 import { navigateTo } from "../view/navigation";
-import { type NodeRecord, type EditableNodeRecord, type NodeState, type ProcessedNodeState, type NodeDetailedState, NodePhase } from "$lib/types/nodes/base";
+import {
+    type NodeRecord,
+    type EditableNodeRecord,
+    type NodeState,
+    type ProcessedNodeState,
+    type NodeDetailedState,
+    NodePhase,
+} from "$lib/types/nodes/base";
 import { addPrefix, getNodePrefix, removePrefix } from "../util/nodes";
 
 /**
@@ -68,7 +75,7 @@ export async function getDeviceNodesState(id: number): Promise<{ nodesState: Rec
 
 /**
  * Retrieves detailed runtime state information for a specific node variable.
- * 
+ *
  * @param device_id - The ID of the device containing the node
  * @param nodeName - The name of the node variable (with or without phase prefix)
  * @param nodePhase - The electrical phase of the node variable
@@ -84,19 +91,26 @@ export async function getNodeDetailedState(device_id: number, nodeName: string, 
         endpoint: "/api/nodes/get_node_detailed_state",
         method: "GET",
         params: { device_id, node_name: processedName },
-    })
+    });
 
     if (sucess) {
         nodeDetailedState = data as NodeDetailedState;
-    }
-    else {
+    } else {
         throw new Error("Get Node Detailed state error");
     }
 
     return { nodeDetailedState };
 }
 
-export async function getNodeLogs(device_id: number, nodeName: string, nodePhase: NodePhase, formatted: boolean | null = null, timeStepMs: number | null = null, start_time: Date | null = null, end_time: Date | null = null): Promise<{ nodeLogs: any }> {
+export async function getNodeLogs(
+    device_id: number,
+    nodeName: string,
+    nodePhase: NodePhase,
+    formatted: boolean | null = null,
+    start_time: Date | null = null,
+    end_time: Date | null = null,
+    time_step: string | null = null
+): Promise<{ nodeLogs: any }> {
     let nodeLogs: any;
     const prefix = getNodePrefix(nodePhase);
     const processedName = addPrefix(removePrefix(nodeName), prefix);
@@ -107,18 +121,16 @@ export async function getNodeLogs(device_id: number, nodeName: string, nodePhase
     start_time_str = start_time !== null ? start_time.toISOString() : null;
     end_time_str = end_time !== null ? end_time.toISOString() : null;
 
-    console.log("Time step ms: ", timeStepMs);
-
     const { sucess, data } = await callAPI({
         endpoint: "/api/nodes//get_logs_from_node",
         method: "GET",
-        params: { device_id, node_name: processedName, formatted, time_step: timeStepMs, start_time: start_time_str, end_time: end_time_str },
-    })
+        params: { device_id, node_name: processedName, formatted, start_time: start_time_str, end_time: end_time_str, time_step },
+        timeout: 20000,
+    });
 
     if (sucess) {
         nodeLogs = data;
-    }
-    else {
+    } else {
         throw new Error("Get Node Logs error");
     }
 
