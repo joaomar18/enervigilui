@@ -471,6 +471,10 @@ const textsObject: TextsObject = {
         PT: "Protocolo",
         EN: "Protocol",
     },
+    noProtocol: {
+        PT: "Sem protocolo",
+        EN: "No protocol",
+    },
     l1: {
         PT: "L1",
         EN: "L1",
@@ -763,7 +767,22 @@ const textsObject: TextsObject = {
         PT: "Dados Técnicos",
         EN: "Technical Data",
     },
-
+    alarmState: {
+        PT: "em alarme",
+        EN: "in alarm",
+    },
+    warningState: {
+        PT: "em aviso",
+        EN: "in warning",
+    },
+    okState: {
+        PT: "OK",
+        EN: "OK",
+    },
+    disconnectedState: {
+        PT: "desconectado",
+        EN: "disconnected",
+    }
 };
 
 export const texts = createLangStore(textsObject);

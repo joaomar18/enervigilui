@@ -285,21 +285,7 @@ export interface NodeRecordEditingState {
     oldCommunicationID: string | undefined;
 }
 
-/**
- * Represents the real-time state and metadata of a device node for display or monitoring.
- * Includes the node's value, type, unit, phase, and optional alarm states.
- *
- * @property {number | string | boolean | null} value - The current value of the node.
- * @property {NodeType} type - The data type of the node's value.
- * @property {boolean} incremental - Whether the node accumulates values over time (counter)
- * @property {string} unit - The measurement unit for the value.
- * @property {NodePhase} phase - The electrical phase associated with the node.
- * @property {number} [decimal_places] - Optional: Number of decimal places to display for numeric values.
- * @property {number} [min_alarm_value] - Optional: Indicates the minimum alarm value.
- * @property {number} [max_alarm_value] - Optional: Indicates the maximum alarm value.
- * @property {boolean} [min_alarm_state] - Optional: Indicates if the minimum alarm is active.
- * @property {boolean} [max_alarm_state] - Optional: Indicates if the maximum alarm is active.
- */
+
 export interface NodeState {
     value: number | string | boolean | null;
     type: NodeType;
@@ -307,28 +293,15 @@ export interface NodeState {
     unit: string;
     phase: NodePhase;
     decimal_places?: number;
-    min_alarm_value?: number;
-    max_alarm_value?: number;
+    min_value_range?: number;
+    max_value_range?: number;
     min_alarm_state?: boolean;
     max_alarm_state?: boolean;
+    min_warning_state?: boolean;
+    max_warning_state?: boolean;
 }
 
-/**
- * Enhanced node state containing processed information ready for UI consumption and display.
- *
- * @property {string} name - The full node name including any phase prefixes
- * @property {typeof SvelteComponent<any>} displayComponent - The Svelte component used to render this node type
- * @property {number | string | boolean | null} value - The current runtime value of the node
- * @property {NodeType} type - The data type of the node's value (FLOAT, INT, STRING, BOOLEAN)
- * @property {boolean} incremental - Whether the node accumulates values over time (counters/energy)
- * @property {string} unit - The measurement unit for display (e.g., "V", "A", "kW", "kWh")
- * @property {NodePhase} phase - The electrical phase associated with the node
- * @property {number} [decimal_places] - Optional: Number of decimal places to display for numeric values.
- * @property {number} [min_alarm_value] - Optional: Minimum threshold value that triggers alarms
- * @property {number} [max_alarm_value] - Optional: Maximum threshold value that triggers alarms
- * @property {boolean} [min_alarm_state] - Optional: Current state of the minimum alarm (active/inactive)
- * @property {boolean} [max_alarm_state] - Optional: Current state of the maximum alarm (active/inactive)
- */
+
 export interface ProcessedNodeState {
     name: string;
     displayComponent: typeof SvelteComponent<any>;
@@ -338,32 +311,26 @@ export interface ProcessedNodeState {
     unit: string;
     phase: NodePhase;
     decimal_places?: number;
-    min_alarm_value?: number;
-    max_alarm_value?: number;
+    min_value_range?: number;
+    max_value_range?: number;
     min_alarm_state?: boolean;
     max_alarm_state?: boolean;
+    min_warning_state?: boolean;
+    max_warning_state?: boolean;
 }
 
-/**
- * Represents detailed runtime state information for a node variable.
- * Contains current value, type information, alarm thresholds, and timestamps for monitoring purposes.
- * 
- * @property {number | string | boolean | null} value - Current measured or calculated value
- * @property {NodeType} type - Data type of the variable (FLOAT, STRING, INT, BOOLEAN)
- * @property {boolean} incremental - Whether this is a counter variable that accumulates over time
- * @property {number} [min_alarm_value] - Optional minimum threshold for alarm detection
- * @property {number} [max_alarm_value] - Optional maximum threshold for alarm detection
- * @property {string} [lastUpdateTimeStamp] - ISO timestamp of when the value was last updated
- * @property {string} [lastResetTimeStamp] - ISO timestamp of when counter was last reset (incremental variables only)
- */
-export interface NodeDetailedState {
-    value: number | string | boolean | null;
-    type: NodeType;
-    incremental?: boolean;
-    min_alarm_value?: number;
-    max_alarm_value?: number;
+
+export interface BaseNodeAdditionalInfo {
     last_update_date?: string;
     last_reset_date?: string;
+    min_alarm_value?: number;
+    max_alarm_value?: number;
+    min_warning_value?: number;
+    max_warning_value?: number;
+    type: NodeType;
+    protocol: Protocol;
+    read_period: number;
+    logging_period: number;
 }
 
 /**

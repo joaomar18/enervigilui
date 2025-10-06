@@ -1,17 +1,17 @@
 <script lang="ts">
     import { fade } from "svelte/transition";
-    import { onMount } from "svelte";
+    import { onDestroy, onMount } from "svelte";
     import { MethodPoller } from "$lib/logic/api/poller";
     import { MethodRetrier } from "$lib/logic/api/retrier";
     import { NodePhase } from "$lib/types/nodes/base";
-    import { getDeviceNodesState, getNodeLogs } from "$lib/logic/api/nodes";
+    import { getDeviceNodesState, getNodeAdditionalInfo } from "$lib/logic/api/nodes";
     import { showToast } from "$lib/logic/view/toast";
     import { ToastType } from "$lib/stores/view/toast";
     import { nodeSections } from "$lib/types/nodes/base";
     import { getAvailablePhasesFromRecordsOrStates, getNodesStateBySubSection } from "$lib/logic/util/nodes";
     import { initialRealTimeCardSectionsExpandState } from "$lib/types/view/device";
     import { assignRealTimeCardSectionsStateToAllPhases } from "$lib/logic/view/device";
-    import type { NodeState, ProcessedNodeState } from "$lib/types/nodes/base";
+    import type { BaseNodeAdditionalInfo, NodeState, ProcessedNodeState } from "$lib/types/nodes/base";
     import type { RealTimeCardSubSections, RealTimeCardSectionsState } from "$lib/types/view/device";
     import ContentCard from "../../../components/General/ContentCard.svelte";
     import ExpandableSection from "../../../components/General/ExpandableSection.svelte";
@@ -33,7 +33,6 @@
     import { ToolTipTextStyle } from "$lib/style/general";
 
     // Variables
-    let nodeLogs: any;
     let nodesState: Record<string, NodeState>;
     let processedNodesState: Array<ProcessedNodeState>;
     let nodesStateBySubSection: Record<NodePhase, Record<RealTimeCardSubSections, Array<ProcessedNodeState>>>;
@@ -42,6 +41,8 @@
     let expandedState = assignRealTimeCardSectionsStateToAllPhases(initialRealTimeCardSectionsExpandState);
     let showDetailDiv = false;
     let detailedNodeState: ProcessedNodeState;
+    let detailedNodeAdditionalInfo: BaseNodeAdditionalInfo;
+    let detailedNodeAddInfoRetrier: MethodRetrier | null = null;
 
     // Reactive Statements
 
@@ -65,21 +66,26 @@
 
     function openDetailDiv(nodeState: ProcessedNodeState): void {
         showDetailDiv = true;
+        detailedNodeAddInfoRetrier?.stop();
+        detailedNodeAddInfoRetrier = null;
         detailedNodeState = nodeState;
+        if (!$currentDeviceID || !nodeState) {
+            return;
+        }
+        detailedNodeAddInfoRetrier = new MethodRetrier(async (signal) => {
+            let { nodeAdditionalInfo } = await getNodeAdditionalInfo($currentDeviceID, nodeState.name, nodeState.phase);
+            detailedNodeAdditionalInfo = nodeAdditionalInfo;
+            detailedNodeAddInfoRetrier?.stop();
+            detailedNodeAddInfoRetrier = null;
+        }, 3000);
     }
 
     onMount(() => {
         let nodesStatePoller: MethodPoller | null;
-        let nodeLogsTest: MethodRetrier | null;
         if ($currentDeviceID) {
             nodesStatePoller = new MethodPoller(async (signal) => {
                 ({ nodesState, processedNodesState } = await getDeviceNodesState($currentDeviceID));
             }, 5000);
-            nodeLogsTest = new MethodRetrier(async (signal) => {
-                let initial_date = new Date(2025, 9, 3, 21, 30, 0);
-                let end_date = new Date(2025, 9, 3, 22, 30, 0);
-                ({ nodeLogs } = await getNodeLogs($currentDeviceID, "voltage", NodePhase.L1, true, initial_date, end_date));
-            }, 20000);
         } else {
             showToast("errorEditDeviceParams", ToastType.ALERT);
             loadedDone.set(true);
@@ -92,7 +98,10 @@
         };
     });
 
-    $: console.log(nodeLogs);
+    onDestroy(() => {
+        detailedNodeAddInfoRetrier?.stop();
+        detailedNodeAddInfoRetrier = null;
+    });
 </script>
 
 <div
@@ -144,12 +153,16 @@
                                                     nodeName={nodeState.name}
                                                     nodePhase={nodeState.phase}
                                                     labelText={$variableNameTexts[nodeState.name] || nodeState.name}
+                                                    minRangeValue={nodeState.min_value_range}
+                                                    maxRangeValue={nodeState.max_value_range}
+                                                    minAlarmState={nodeState.min_alarm_state}
+                                                    maxAlarmState={nodeState.max_alarm_state}
+                                                    minWarningState={nodeState.min_warning_state}
+                                                    maxWarningState={nodeState.max_warning_state}
                                                     value={nodeState.value}
-                                                    minAlarmValue={nodeState.min_alarm_value}
-                                                    maxAlarmValue={nodeState.max_alarm_value}
                                                     unitText={nodeState.unit}
                                                     decimalPlaces={nodeState.decimal_places}
-                                                    onClick={openDetailDiv(nodeState)}
+                                                    onClick={() => openDetailDiv(nodeState)}
                                                 />
                                             {/each}
                                         </div>
@@ -174,7 +187,7 @@
             </div>
         </div>
     {/if}
-    <NodeDetailSheet bind:showPanel={showDetailDiv} nodeState={detailedNodeState} />
+    <NodeDetailSheet bind:showPanel={showDetailDiv} nodeState={detailedNodeState} nodeAdditionalInfo={detailedNodeAdditionalInfo} />
 </div>
 
 <style>

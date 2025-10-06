@@ -1,4 +1,4 @@
-import type { BaseNodeConfig, EditableBaseNodeConfig } from "./base";
+import type { BaseNodeAdditionalInfo, BaseNodeConfig, EditableBaseNodeConfig } from "./base";
 
 /*****     C O N S T A N T S     *****/
 
@@ -20,6 +20,10 @@ export interface NodeModbusRTUConfig extends BaseNodeConfig {
  */
 export interface EditableNodeModbusRTUConfig extends EditableBaseNodeConfig {
     register: string;
+}
+
+export interface ModbusRTUNodeAdditionalInfo extends BaseNodeAdditionalInfo {
+    register: number;
 }
 
 /*****     T Y P E S     *****/

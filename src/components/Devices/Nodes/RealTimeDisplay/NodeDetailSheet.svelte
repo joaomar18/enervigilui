@@ -1,23 +1,23 @@
 <script lang="ts">
     import RightPanelSheet from "../../../General/RightPanelSheet.svelte";
-    import Measurement from "./Measurement.svelte";
     import Button from "../../../General/Button.svelte";
     import ToolTipText from "../../../General/ToolTipText.svelte";
     import LineGraph from "../../../General/LineGraph.svelte";
-    import type { ProcessedNodeState } from "$lib/types/nodes/base";
     import { getNodeSection } from "$lib/logic/util/nodes";
-
-    // Styles
-    import { NodesBaseDisplayDetailStyle, NodeDetailPickerButtonStyle } from "$lib/style/nodes";
+    import type { BaseNodeAdditionalInfo, ProcessedNodeState } from "$lib/types/nodes/base";
 
     // Texts
     import { texts } from "$lib/stores/lang/generalTexts";
     import { variableNameTextsByPhase } from "$lib/stores/lang/energyMeterTexts";
+    import { protocolTexts } from "$lib/stores/lang/energyMeterTexts";
+
+    // Styles
+    import { NodesBaseDisplayDetailStyle, NodeDetailPickerButtonStyle } from "$lib/style/nodes";
 
     // Props
     export let nodeState: ProcessedNodeState;
+    export let nodeAdditionalInfo: BaseNodeAdditionalInfo;
     export let showPanel: boolean;
-    export let state: "alarm" | "warning" | "ok" | "disconnected" = "disconnected";
 
     // Layout / styling props
 
@@ -71,6 +71,26 @@
     export let contentValueWeight: string | undefined = "600";
     export let historyButtonPickerGap: string | undefined = "10px";
 
+    // Variables
+    let state: "alarmState" | "warningState" | "okState" | "disconnectedState";
+
+    // Reactive Statements
+    $: console.log(nodeAdditionalInfo);
+
+    $: if (nodeState) {
+        if (nodeState.value === null) {
+            state = "disconnectedState";
+        } else if (nodeState.min_alarm_state || nodeState.max_alarm_state) {
+            state = "alarmState";
+        } else if (nodeState.min_warning_state || nodeState.max_warning_state) {
+            state = "warningState";
+        } else {
+            state = "okState";
+        }
+    }
+
+    // Functions
+
     // Sample chart data for testing
     const sampleChartData = [
         { 1696118400: 220.551 }, // 2023-10-01 00:00:00 - 230.5V
@@ -89,10 +109,9 @@
     const sampleLabels = ["Voltage L1 (V)"];
 </script>
 
-{#if nodeState}
-    <div
-        class="variable-panel"
-        style="
+<div
+    class="variable-panel"
+    style="
             --title-size: {titleSize};
             --title-color: {titleColor};
             --title-weight: {titleWeight};
@@ -139,14 +158,15 @@
             --content-value-weight: {contentValueWeight};
             --history-btn-picker-gap: {historyButtonPickerGap};
         "
-    >
-        <RightPanelSheet useMask={false} bind:showPanel>
-            <header slot="title" class="title-div">
-                <img src="/img/variable.svg" alt="Estado da variável" />
-                <h3>{$texts.variableDetails}</h3>
-            </header>
+>
+    <RightPanelSheet useMask={false} bind:showPanel>
+        <header slot="title" class="title-div">
+            <img src="/img/variable.svg" alt="Estado da variável" />
+            <h3>{$texts.variableDetails}</h3>
+        </header>
 
-            <section slot="header" class="header-div" aria-labelledby="hdr-title">
+        <section slot="header" class="header-div" aria-labelledby="hdr-title">
+            {#if nodeState}
                 <div class="row">
                     <span class="label">{$texts.name}</span>
                     <span class="value">
@@ -162,28 +182,37 @@
                 <div class="row">
                     <span class="label">{$texts.state}</span>
                     <span class="value with-adornment">
-                        <span class="value">OK</span>
+                        <span class="value">{$texts[state]}</span>
                         <div class="dot-state-div">
                             <div class="dot-state" data-state={state}></div>
                         </div>
                     </span>
                 </div>
-            </section>
+            {/if}
+        </section>
 
-            <main slot="content" class="content-div">
+        <main slot="content" class="content-div">
+            {#if nodeState}
                 <div class="section-title"><h3>{$texts.currentState}</h3></div>
                 <div class="inner-content-div">
                     <div class="row fit-height">
                         <span class="label">{$texts.value}</span>
                         <span class="value">
-                            <Measurement
+                            <svelte:component
+                                this={nodeState.displayComponent}
                                 baseDisplayStyle={$NodesBaseDisplayDetailStyle}
                                 disableLabel
                                 disableClick
                                 labelText=""
-                                minAlarmValue={nodeState.min_alarm_value}
-                                maxAlarmValue={nodeState.max_alarm_value}
-                                value={230.45}
+                                nodeName={nodeState.name}
+                                nodePhase={nodeState.phase}
+                                minRangeValue={nodeState.min_value_range}
+                                maxRangeValue={nodeState.max_value_range}
+                                minAlarmState={nodeState.min_alarm_state}
+                                maxAlarmState={nodeState.max_alarm_state}
+                                minWarningState={nodeState.min_warning_state}
+                                maxWarningState={nodeState.max_warning_state}
+                                value={nodeState.value}
                                 unitText={nodeState.unit}
                                 decimalPlaces={nodeState.decimal_places}
                             />
@@ -199,10 +228,10 @@
                     </div>
                 </div>
 
-                {#if nodeState.min_alarm_value !== undefined || nodeState.max_alarm_value !== undefined}
+                {#if nodeState.min_alarm_state !== undefined || nodeState.max_alarm_state !== undefined}
                     <div class="section-title"><h3>{$texts.alarms}</h3></div>
                     <div class="inner-content-div">
-                        {#if nodeState.min_alarm_value !== undefined}
+                        {#if nodeState.min_alarm_state !== undefined}
                             <div class="row">
                                 <span class="label">{$texts.lowerLimit}</span>
                                 <span class="value with-adornment">
@@ -211,7 +240,7 @@
                                 </span>
                             </div>
                         {/if}
-                        {#if nodeState.max_alarm_value !== undefined}
+                        {#if nodeState.max_alarm_state !== undefined}
                             <div class="row">
                                 <span class="label">{$texts.upperLimit}</span>
                                 <span class="value with-adornment">
@@ -223,10 +252,10 @@
                     </div>
                 {/if}
 
-                {#if nodeState.min_alarm_value !== undefined || nodeState.max_alarm_value !== undefined}
+                {#if nodeState.min_alarm_state !== undefined || nodeState.max_alarm_state !== undefined}
                     <div class="section-title"><h3>{$texts.warnings}</h3></div>
                     <div class="inner-content-div">
-                        {#if nodeState.min_alarm_value !== undefined}
+                        {#if nodeState.min_alarm_state !== undefined}
                             <div class="row">
                                 <span class="label">{$texts.lowerLimit}</span>
                                 <span class="value with-adornment">
@@ -235,7 +264,7 @@
                                 </span>
                             </div>
                         {/if}
-                        {#if nodeState.max_alarm_value !== undefined}
+                        {#if nodeState.max_alarm_state !== undefined}
                             <div class="row">
                                 <span class="label">{$texts.upperLimit}</span>
                                 <span class="value with-adornment">
@@ -282,7 +311,7 @@
                     </div>
                     <div class="row">
                         <span class="label">{$texts.protocol}</span>
-                        <span class="value">MODBUS RTU</span>
+                        <span class="value">{$protocolTexts[nodeAdditionalInfo?.protocol] || $texts.noProtocol}</span>
                     </div>
                     <div class="row">
                         <span class="label">{$texts.address}</span>
@@ -290,17 +319,17 @@
                     </div>
                     <div class="row">
                         <span class="label">{$texts.interval}</span>
-                        <span class="value">5 s</span>
+                        <span class="value"> {nodeAdditionalInfo?.read_period} s</span>
                     </div>
                     <div class="row">
                         <span class="label">{$texts.logging}</span>
-                        <span class="value">15 min.</span>
+                        <span class="value">{nodeAdditionalInfo?.logging_period} min.</span>
                     </div>
                 </div>
-            </main>
-        </RightPanelSheet>
-    </div>
-{/if}
+            {/if}
+        </main>
+    </RightPanelSheet>
+</div>
 
 <style>
     .dot-state {
@@ -314,19 +343,19 @@
         background: var(--state-dim-color);
     }
 
-    .dot-state[data-state="ok"] {
+    .dot-state[data-state="okState"] {
         background: var(--state-ok-color);
     }
 
-    .dot-state[data-state="alarm"] {
+    .dot-state[data-state="alarmState"] {
         background: var(--state-alarm-color);
     }
 
-    .dot-state[data-state="warning"] {
+    .dot-state[data-state="warningState"] {
         background: var(--state-warning-color);
     }
 
-    .dot-state[data-state="disconnected"] {
+    .dot-state[data-state="disconnectedState"] {
         background: var(--state-disconnected-color);
     }
 

@@ -1,4 +1,4 @@
-import type { BaseNodeConfig, EditableBaseNodeConfig } from "./base";
+import type { BaseNodeConfig, EditableBaseNodeConfig, BaseNodeAdditionalInfo } from "./base";
 
 /*****     C O N S T A N T S     *****/
 
@@ -19,6 +19,10 @@ export interface NodeOPCUAConfig extends BaseNodeConfig {
  * @property node_id Node identifier (string).
  */
 export interface EditableNodeOPCUAConfig extends EditableBaseNodeConfig {
+    node_id: string;
+}
+
+export interface OPCUANodeAdditionalInfo extends BaseNodeAdditionalInfo {
     node_id: string;
 }
 

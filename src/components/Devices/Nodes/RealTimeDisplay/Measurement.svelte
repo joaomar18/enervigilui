@@ -10,8 +10,12 @@
     export let disableLabel: boolean = false;
     export let disableClick: boolean = false;
     export let labelText: string;
-    export let minAlarmValue: number | null = null;
-    export let maxAlarmValue: number | null = null;
+    export let minRangeValue: number | undefined = undefined;
+    export let maxRangeValue: number | undefined = undefined;
+    export let minAlarmState: boolean | undefined = undefined;
+    export let maxAlarmState: boolean | undefined = undefined;
+    export let minWarningState: boolean | undefined = undefined;
+    export let maxWarningState: boolean | undefined = undefined;
     export let value: number | null;
     export let unitText: string;
     export let decimalPlaces: number | undefined;
@@ -53,15 +57,9 @@
     $: mergedStyle = mergeStyle(effectiveStyle, localOverrides);
 
     // Variables
-    let variableAlarm: boolean = false;
-    let variableWarning: boolean = false;
-    let valueAlarm: boolean = false;
-    let valueWarning: boolean = false;
     let valueDisconnected: boolean = false;
 
     // Reactive Statements
-    $: variableAlarm = valueAlarm;
-    $: variableWarning = valueWarning;
     $: valueDisconnected = value === null;
 
     // Click Export Function
@@ -73,8 +71,8 @@
     {disableLabel}
     {disableClick}
     {labelText}
-    alarmState={variableAlarm}
-    warningState={variableWarning}
+    alarmState={minAlarmState || maxAlarmState}
+    warningState={minWarningState || maxWarningState}
     {valueDisconnected}
     {onClick}
 >
@@ -103,17 +101,9 @@
 
         <span class="unit">{unitText}</span>
 
-        {#if (minAlarmValue !== null || maxAlarmValue !== null) && value !== null}
+        {#if (minRangeValue !== undefined || maxRangeValue !== undefined) && value !== null}
             <div class="bar-value-div">
-                <Bar
-                    bind:alarmDetected={valueAlarm}
-                    bind:warningDetected={valueWarning}
-                    currentValue={value}
-                    {minAlarmValue}
-                    minWarningValue={minAlarmValue !== null ? minAlarmValue * 1.05 : null}
-                    {maxAlarmValue}
-                    maxWarningValue={maxAlarmValue !== null ? maxAlarmValue * 0.95 : null}
-                />
+                <Bar {minRangeValue} {maxRangeValue} {minAlarmState} {maxAlarmState} {minWarningState} {maxWarningState} currentValue={value} />
             </div>
         {/if}
     </div>

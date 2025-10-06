@@ -8,12 +8,12 @@
     $: effectiveStyle = style ?? $BarStyle;
 
     // Props
-    export let alarmDetected: boolean;
-    export let warningDetected: boolean;
-    export let minAlarmValue: number | null = null;
-    export let maxAlarmValue: number | null = null;
-    export let minWarningValue: number | null = null;
-    export let maxWarningValue: number | null = null;
+    export let minRangeValue: number | undefined = undefined;
+    export let maxRangeValue: number | undefined = undefined;
+    export let minAlarmState: boolean | undefined = undefined;
+    export let maxAlarmState: boolean | undefined = undefined;
+    export let minWarningState: boolean | undefined = undefined;
+    export let maxWarningState: boolean | undefined = undefined;
     export let currentValue: number;
     export let enableMinArrow: boolean = true;
     export let enableMaxArrow: boolean = true;
@@ -68,64 +68,32 @@
     // Variables
     let currentValueScaled: number | null = null;
     let showArrow: boolean = false;
-    let minAlarm: boolean = false;
-    let minWarning: boolean = false;
-    let maxAlarm: boolean = false;
-    let maxWarning: boolean = false;
 
     // Reactive Statements
     $: showArrow =
-        (enableArrowDefault && minAlarmValue !== null && maxAlarmValue !== null) || (minAlarm && enableMinArrow) || (maxAlarm && enableMaxArrow); // Show arrow
+        (enableArrowDefault && minRangeValue !== undefined && maxRangeValue !== undefined) ||
+        (minAlarmState === true && enableMinArrow) ||
+        (maxAlarmState === true && enableMaxArrow); // Show arrow
 
     // Current Value Scaled
     $: {
-        if (minAlarm) {
+        if (minAlarmState) {
             currentValueScaled = 0;
-        } else if (maxAlarm) {
+        } else if (maxAlarmState) {
             currentValueScaled = 100;
-        } else if (minAlarmValue !== null && maxAlarmValue !== null) {
-            currentValueScaled = Math.round(((currentValue - minAlarmValue) / (maxAlarmValue - minAlarmValue)) * 100);
+        } else if (minRangeValue !== undefined && maxRangeValue !== undefined) {
+            currentValueScaled = Math.round(((currentValue - minRangeValue) / (maxRangeValue - minRangeValue)) * 100);
+            if (currentValueScaled < 0) {
+                currentValueScaled = 0;
+            }
+            if (currentValueScaled > 100) {
+                currentValueScaled = 100;
+            }
         } else {
             currentValueScaled = null;
         }
     }
-
-    // Mininum Alarm and Warning
-    $: {
-        minAlarm = minAlarmValue !== null && minAlarmValue >= currentValue;
-        minWarning = !minAlarm && minWarningValue !== null && minWarningValue >= currentValue;
-    }
-
-    // Maximum Alarm and Warning
-    $: {
-        maxAlarm = maxAlarmValue !== null && currentValue >= maxAlarmValue;
-        maxWarning = !maxAlarm && maxWarningValue !== null && currentValue >= maxWarningValue;
-    }
-
-    // Alarm or Warning
-    $: alarmDetected = minAlarm || maxAlarm;
-    $: warningDetected = !alarmDetected && (minWarning || maxWarning);
 </script>
-
-<!--
-    Bar Component
-    
-    A customizable progress bar component with alarm and warning indicators.
-    Displays current value as a filled bar with optional directional arrow.
-    Supports min/max alarm and warning thresholds with color-coded states.
-    
-    Props:
-    - currentValue: The current value to display
-    - minAlarmValue, maxAlarmValue: Alarm threshold values
-    - minWarningValue, maxWarningValue: Warning threshold values
-    - enableMinArrow, enableMaxArrow, enableArrowDefault: Control arrow display
-    
-    States:
-    - Normal: Default fill color
-    - Min/Max Warning: Warning color when thresholds exceeded
-    - Min/Max Alarm: Alarm color when critical thresholds exceeded
-    - Arrow: Indicates current position on the bar
--->
 
 <div
     style="
@@ -152,7 +120,13 @@
     "
     class="bar-div"
 >
-    <div class="content" class:min-alarm={minAlarm} class:min-warning={minWarning} class:max-alarm={maxAlarm} class:max-warning={maxWarning}>
+    <div
+        class="content"
+        class:min-alarm={minAlarmState}
+        class:min-warning={minWarningState}
+        class:max-alarm={maxAlarmState}
+        class:max-warning={maxWarningState}
+    >
         <div class="fill-div">
             {#if currentValueScaled !== null}
                 <div class="fill-value"></div>
@@ -210,20 +184,20 @@
     }
 
     /* Alarm state colors for progress fill */
-    .content.min-alarm .fill-value {
-        background-color: var(--fill-min-alarm-color);
-    }
-
     .content.min-warning .fill-value {
         background-color: var(--fill-min-warning-color);
     }
 
-    .content.max-alarm .fill-value {
-        background-color: var(--fill-max-alarm-color);
-    }
-
     .content.max-warning .fill-value {
         background-color: var(--fill-max-warning-color);
+    }
+
+    .content.min-alarm .fill-value {
+        background-color: var(--fill-min-alarm-color);
+    }
+
+    .content.max-alarm .fill-value {
+        background-color: var(--fill-max-alarm-color);
     }
 
     /* Directional arrow - points to current value position */

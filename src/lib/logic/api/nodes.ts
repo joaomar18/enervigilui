@@ -6,8 +6,8 @@ import {
     type EditableNodeRecord,
     type NodeState,
     type ProcessedNodeState,
-    type NodeDetailedState,
     NodePhase,
+    type BaseNodeAdditionalInfo,
 } from "$lib/types/nodes/base";
 import { addPrefix, getNodePrefix, removePrefix } from "../util/nodes";
 
@@ -73,33 +73,25 @@ export async function getDeviceNodesState(id: number): Promise<{ nodesState: Rec
     return { nodesState, processedNodesState };
 }
 
-/**
- * Retrieves detailed runtime state information for a specific node variable.
- *
- * @param device_id - The ID of the device containing the node
- * @param nodeName - The name of the node variable (with or without phase prefix)
- * @param nodePhase - The electrical phase of the node variable
- * @returns Promise resolving to detailed node state including current value, type, alarm thresholds, and timestamps
- * @throws Error if the API call fails or the node is not found
- */
-export async function getNodeDetailedState(device_id: number, nodeName: string, nodePhase: NodePhase): Promise<{ nodeDetailedState: NodeDetailedState }> {
-    let nodeDetailedState: NodeDetailedState;
+
+export async function getNodeAdditionalInfo(device_id: number, nodeName: string, nodePhase: NodePhase): Promise<{ nodeAdditionalInfo: BaseNodeAdditionalInfo }> {
+    let nodeAdditionalInfo: BaseNodeAdditionalInfo;
     const prefix = getNodePrefix(nodePhase);
     const processedName = addPrefix(removePrefix(nodeName), prefix);
 
     const { sucess, data } = await callAPI({
-        endpoint: "/api/nodes/get_node_detailed_state",
+        endpoint: "/api/nodes/get_node_additional_info",
         method: "GET",
         params: { device_id, node_name: processedName },
     });
 
     if (sucess) {
-        nodeDetailedState = data as NodeDetailedState;
+        nodeAdditionalInfo = data as BaseNodeAdditionalInfo;
     } else {
-        throw new Error("Get Node Detailed state error");
+        throw new Error("Get node additional info error");
     }
 
-    return { nodeDetailedState };
+    return { nodeAdditionalInfo };
 }
 
 export async function getNodeLogs(
