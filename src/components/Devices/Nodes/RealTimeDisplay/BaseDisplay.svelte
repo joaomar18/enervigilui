@@ -8,6 +8,7 @@
     $: effectiveStyle = style ?? $NodesBaseDisplayStyle;
 
     // Props
+    export let disableLabel: boolean = false;
     export let disableClick: boolean = false;
     export let labelText: string;
     export let alarmState: boolean = false;
@@ -141,14 +142,16 @@
     class="container"
 >
     <div class="content" class:enable-hover={!disableClick}>
-        <div class="label-div">
-            <span>{labelText}</span>
-            {#if alarmState || warningState}
-                <div class="alerts-div" class:alarm={alarmState} class:warning={warningState && !alarmState}>
-                    <div class="alert-state"></div>
-                </div>
-            {/if}
-        </div>
+        {#if !disableLabel}
+            <div class="label-div">
+                <span>{labelText}</span>
+                {#if alarmState || warningState}
+                    <div class="alerts-div" class:alarm={alarmState} class:warning={warningState && !alarmState}>
+                        <div class="alert-state"></div>
+                    </div>
+                {/if}
+            </div>
+        {/if}
         <div class="display-content-wrapper">
             <div class="display-content" class:disconnected={valueDisconnected}>
                 <img src="/img/disconnected.svg" alt="disconnected" />

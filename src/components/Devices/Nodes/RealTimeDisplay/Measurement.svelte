@@ -7,12 +7,14 @@
     import { MeasurementDisplayStyle, NodesBaseDisplayStyle } from "$lib/style/nodes";
 
     // Props
+    export let disableLabel: boolean = false;
     export let disableClick: boolean = false;
     export let labelText: string;
     export let minAlarmValue: number | null = null;
     export let maxAlarmValue: number | null = null;
     export let value: number | null;
     export let unitText: string;
+    export let decimalPlaces: number | undefined;
 
     // Style object (from theme)
     export let style: { [property: string]: string | number } | null = null;
@@ -66,7 +68,16 @@
     export let onClick: (() => void) | null = null;
 </script>
 
-<BaseDisplay style={baseDisplayStyle} {disableClick} {labelText} alarmState={variableAlarm} warningState={variableWarning} {valueDisconnected} {onClick}>
+<BaseDisplay
+    style={baseDisplayStyle}
+    {disableLabel}
+    {disableClick}
+    {labelText}
+    alarmState={variableAlarm}
+    warningState={variableWarning}
+    {valueDisconnected}
+    {onClick}
+>
     <div
         style="
             --value-text-size: {mergedStyle.valueTextSize};
@@ -86,7 +97,7 @@
     >
         <div class="value-div">
             {#if !valueDisconnected}
-                <span class="value">{value}</span>
+                <span class="value">{value?.toFixed(decimalPlaces || 0)}</span>
             {/if}
         </div>
 

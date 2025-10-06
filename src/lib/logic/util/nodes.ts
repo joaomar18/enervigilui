@@ -2,11 +2,11 @@ import { get } from "svelte/store";
 import { protocolPlugins } from "$lib/stores/device/protocol";
 import { defaultVariableNames } from "$lib/stores/device/variables";
 import { Protocol } from "$lib/types/device/base";
-import { NodePrefix, NodePhase, NodeType, phaseOrder } from "$lib/types/nodes/base";
+import { NodePrefix, NodePhase, NodeType, phaseOrder, nodeSections } from "$lib/types/nodes/base";
 import { defaultRealTimeCardSectionsState } from "$lib/types/view/device";
 import { RealTimeCardSubSections } from "$lib/types/view/device";
 import { assignRealTimeCardSectionsStateToAllPhases, createEmptyRealTimeCardSubSectionsArrays, getNodeSubSection } from "../view/device";
-import type { BaseNodeConfig, EditableBaseNodeConfig, NodeRecord, EditableNodeRecord, NodeState, ProcessedNodeState } from "$lib/types/nodes/base";
+import type { BaseNodeConfig, EditableBaseNodeConfig, NodeRecord, EditableNodeRecord, NodeState, ProcessedNodeState, NodeSection } from "$lib/types/nodes/base";
 import type { RealTimeCardSectionsState } from "$lib/types/view/device";
 
 /**
@@ -144,6 +144,20 @@ export function getNodePrefix(phase: NodePhase): string {
         default:
             return "";
     }
+}
+
+/**
+ * Retrieves the unique node section that matches the specified electrical phase.
+ * @param phase - The electrical phase to find the corresponding section for.
+ * @returns The NodeSection that contains the specified phase.
+ * @throws Error if no unique section is found for the given phase.
+ */
+export function getNodeSection(phase: NodePhase): NodeSection {
+    let filteredNodeSections = nodeSections.filter((section) => section.filter(phase));
+    if (filteredNodeSections.length != 1) {
+        throw new Error(`Didn't got a unique node section for phase: ${phase}.`);
+    }
+    return filteredNodeSections[0];
 }
 
 /**

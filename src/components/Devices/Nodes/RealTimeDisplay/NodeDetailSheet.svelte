@@ -3,13 +3,19 @@
     import Measurement from "./Measurement.svelte";
     import Button from "../../../General/Button.svelte";
     import ToolTipText from "../../../General/ToolTipText.svelte";
+    import LineGraph from "../../../General/LineGraph.svelte";
+    import type { ProcessedNodeState } from "$lib/types/nodes/base";
+    import { getNodeSection } from "$lib/logic/util/nodes";
 
     // Styles
     import { NodesBaseDisplayDetailStyle, NodeDetailPickerButtonStyle } from "$lib/style/nodes";
-    import LineGraph from "../../../General/LineGraph.svelte";
+
+    // Texts
+    import { texts } from "$lib/stores/lang/generalTexts";
+    import { variableNameTextsByPhase } from "$lib/stores/lang/energyMeterTexts";
 
     // Props
-    //export let nodeState: ProcessedNodeState;
+    export let nodeState: ProcessedNodeState;
     export let showPanel: boolean;
     export let state: "alarm" | "warning" | "ok" | "disconnected" = "disconnected";
 
@@ -83,188 +89,218 @@
     const sampleLabels = ["Voltage L1 (V)"];
 </script>
 
-<div
-    class="variable-panel"
-    style="
-    --title-size: {titleSize};
-    --title-color: {titleColor};
-    --title-weight: {titleWeight};
-    --title-item-gap: {titleItemGap};
-    --title-image-width: {titleImageWidth};
-    --title-image-height: {titleImageHeight};
-    --state-dim-color: {stateDimColor};
-    --state-alarm-color: {stateAlarmColor};
-    --state-warning-color: {stateWarningColor};
-    --state-ok-color: {stateOKColor};
-    --state-disconnected-color: {stateDisconnectedColor};
-    --header-row-height: {headerRowHeigth};
-    --header-state-div-width: {headerStateDivWidth};
-    --header-row-gap: {headerRowGap};
-    --header-col-gap: {headerColGap};
-    --header-label-width: {headerLabelWidth};
-    --header-label-size: {headerLabelSize};
-    --header-label-color: {headerLabelColor};
-    --header-label-weight: {headerLabelWeight};
-    --header-value-size: {headerValueSize};
-    --header-value-color: {headerValueColor};
-    --header-value-weight: {headerValueWeight};
-    --content-state-div-width: {contentStateDivWidth};
-    --content-title-size: {contentTitleSize};
-    --content-title-color: {contentTitleColor};
-    --content-title-weight: {contentTitleWeight};
-    --content-title-padding-left: {contentTitlePaddingLeft};
-    --content-title-padding-bottom: {contentTitlePaddingBottom};
-    --content-title-border-bottom: {contentTitleBorderBottom};
-    --content-title-spacing: {contentTitleSpacing};
-    --content-title-transform: {contentTitleTransform};
-    --content-inner-padding-top: {contentInnerPaddingTop};
-    --content-inner-padding-bottom: {contentInnerPaddingBottom};
-    --content-inner-padding-horizontal: {contentInnerPaddingHorizontal};
-    --content-row-height: {contentRowHeight};
-    --content-row-gap: {contentRowGap};
-    --content-col-gap: {contentColGap};
-    --content-label-width: {contentLabelWidth};
-    --content-label-size: {contentLabelSize};
-    --content-label-color: {contentLabelColor};
-    --content-label-weight: {contentLabelWeight};
-    --content-value-size: {contentValueSize};
-    --content-value-color: {contentValueColor};
-    --content-value-weight: {contentValueWeight};
-    --history-btn-picker-gap: {historyButtonPickerGap};
-  "
->
-    <RightPanelSheet useMask={false} bind:showPanel>
-        <header slot="title" class="title-div">
-            <img src="/img/variable.svg" alt="Estado da variável" />
-            <h3>Detalhes da Variável</h3>
-        </header>
+{#if nodeState}
+    <div
+        class="variable-panel"
+        style="
+            --title-size: {titleSize};
+            --title-color: {titleColor};
+            --title-weight: {titleWeight};
+            --title-item-gap: {titleItemGap};
+            --title-image-width: {titleImageWidth};
+            --title-image-height: {titleImageHeight};
+            --state-dim-color: {stateDimColor};
+            --state-alarm-color: {stateAlarmColor};
+            --state-warning-color: {stateWarningColor};
+            --state-ok-color: {stateOKColor};
+            --state-disconnected-color: {stateDisconnectedColor};
+            --header-row-height: {headerRowHeigth};
+            --header-state-div-width: {headerStateDivWidth};
+            --header-row-gap: {headerRowGap};
+            --header-col-gap: {headerColGap};
+            --header-label-width: {headerLabelWidth};
+            --header-label-size: {headerLabelSize};
+            --header-label-color: {headerLabelColor};
+            --header-label-weight: {headerLabelWeight};
+            --header-value-size: {headerValueSize};
+            --header-value-color: {headerValueColor};
+            --header-value-weight: {headerValueWeight};
+            --content-state-div-width: {contentStateDivWidth};
+            --content-title-size: {contentTitleSize};
+            --content-title-color: {contentTitleColor};
+            --content-title-weight: {contentTitleWeight};
+            --content-title-padding-left: {contentTitlePaddingLeft};
+            --content-title-padding-bottom: {contentTitlePaddingBottom};
+            --content-title-border-bottom: {contentTitleBorderBottom};
+            --content-title-spacing: {contentTitleSpacing};
+            --content-title-transform: {contentTitleTransform};
+            --content-inner-padding-top: {contentInnerPaddingTop};
+            --content-inner-padding-bottom: {contentInnerPaddingBottom};
+            --content-inner-padding-horizontal: {contentInnerPaddingHorizontal};
+            --content-row-height: {contentRowHeight};
+            --content-row-gap: {contentRowGap};
+            --content-col-gap: {contentColGap};
+            --content-label-width: {contentLabelWidth};
+            --content-label-size: {contentLabelSize};
+            --content-label-color: {contentLabelColor};
+            --content-label-weight: {contentLabelWeight};
+            --content-value-size: {contentValueSize};
+            --content-value-color: {contentValueColor};
+            --content-value-weight: {contentValueWeight};
+            --history-btn-picker-gap: {historyButtonPickerGap};
+        "
+    >
+        <RightPanelSheet useMask={false} bind:showPanel>
+            <header slot="title" class="title-div">
+                <img src="/img/variable.svg" alt="Estado da variável" />
+                <h3>{$texts.variableDetails}</h3>
+            </header>
 
-        <section slot="header" class="header-div" aria-labelledby="hdr-title">
-            <div class="row">
-                <span class="label">Nome</span>
-                <span class="value">Potência Ativa</span>
-            </div>
-            <div class="row">
-                <span class="label">Secção</span>
-                <span class="value">Fase L1</span>
-            </div>
-            <div class="row">
-                <span class="label">Estado</span>
-                <span class="value with-adornment">
-                    <span class="value">OK</span>
-                    <div class="dot-state-div">
-                        <div class="dot-state" data-state={state}></div>
-                    </div>
-                </span>
-            </div>
-        </section>
-
-        <main slot="content" class="content-div">
-            <div class="section-title"><h3>Estado Atual</h3></div>
-            <div class="inner-content-div">
-                <div class="row fit-height">
-                    <span class="label">Valor</span>
+            <section slot="header" class="header-div" aria-labelledby="hdr-title">
+                <div class="row">
+                    <span class="label">{$texts.name}</span>
                     <span class="value">
-                        <Measurement
-                            baseDisplayStyle={$NodesBaseDisplayDetailStyle}
-                            disableClick
-                            labelText=""
-                            minAlarmValue={230 * 0.9}
-                            maxAlarmValue={230 * 1.1}
-                            value={234.45}
-                            unitText="V"
-                        />
+                        {#if nodeState.name !== "" && nodeState.name !== undefined}
+                            {$variableNameTextsByPhase[nodeState.phase][nodeState.name] || nodeState.name}
+                        {/if}
                     </span>
                 </div>
                 <div class="row">
-                    <span class="label">Atualizado</span>
-                    <span class="value">à 7 segundos</span>
+                    <span class="label">{$texts.section}</span>
+                    <span class="value">{$texts[getNodeSection(nodeState.phase).labelKey]}</span>
                 </div>
                 <div class="row">
-                    <dt class="label">Reiniciado</dt>
-                    <dd class="value">à 13 minutos</dd>
-                </div>
-            </div>
-
-            <div class="section-title"><h3>Alarmes</h3></div>
-            <div class="inner-content-div">
-                <div class="row">
-                    <span class="label">Limite Inf.</span>
+                    <span class="label">{$texts.state}</span>
                     <span class="value with-adornment">
-                        <span class="value">{(230 * 0.9).toFixed(2)} V</span>
-                        <div class="dot-state-div"><div class="dot-state" data-state="dim"></div></div>
+                        <span class="value">OK</span>
+                        <div class="dot-state-div">
+                            <div class="dot-state" data-state={state}></div>
+                        </div>
                     </span>
                 </div>
-                <div class="row">
-                    <span class="label">Limite Sup.</span>
-                    <span class="value with-adornment">
-                        <span class="value">{(230 * 1.1).toFixed(2)} V</span>
-                        <div class="dot-state-div"><div class="dot-state" data-state="dim"></div></div>
-                    </span>
-                </div>
-            </div>
+            </section>
 
-            <div class="section-title"><h3>Avisos</h3></div>
-            <div class="inner-content-div">
-                <div class="row">
-                    <span class="label">Limite Inf.</span>
-                    <span class="value with-adornment">
-                        <span class="value">{(230 * 0.95).toFixed(2)} V</span>
-                        <div class="dot-state-div"><div class="dot-state" data-state="dim"></div></div>
-                    </span>
+            <main slot="content" class="content-div">
+                <div class="section-title"><h3>{$texts.currentState}</h3></div>
+                <div class="inner-content-div">
+                    <div class="row fit-height">
+                        <span class="label">{$texts.value}</span>
+                        <span class="value">
+                            <Measurement
+                                baseDisplayStyle={$NodesBaseDisplayDetailStyle}
+                                disableLabel
+                                disableClick
+                                labelText=""
+                                minAlarmValue={nodeState.min_alarm_value}
+                                maxAlarmValue={nodeState.max_alarm_value}
+                                value={230.45}
+                                unitText={nodeState.unit}
+                                decimalPlaces={nodeState.decimal_places}
+                            />
+                        </span>
+                    </div>
+                    <div class="row">
+                        <span class="label">{$texts.updated}</span>
+                        <span class="value">à 7 segundos</span>
+                    </div>
+                    <div class="row">
+                        <dt class="label">{$texts.restarted}</dt>
+                        <dd class="value">à 13 minutos</dd>
+                    </div>
                 </div>
-                <div class="row">
-                    <span class="label">Limite Sup.</span>
-                    <span class="value with-adornment">
-                        <span class="value">{(230 * 1.05).toFixed(2)} V</span>
-                        <div class="dot-state-div"><div class="dot-state" data-state="dim"></div></div>
-                    </span>
-                </div>
-            </div>
 
-            <div class="section-title"><h3>Histórico</h3></div>
-            <div class="inner-content-div no-horizontal-padding">
-                <div class="history-btn-picker-div">
-                    <Button style={$NodeDetailPickerButtonStyle} buttonText="1H" onClick={() => {}} />
-                    <Button style={$NodeDetailPickerButtonStyle} buttonText="1D" onClick={() => {}} />
-                    <Button style={$NodeDetailPickerButtonStyle} buttonText="7D" onClick={() => {}} />
-                    <Button style={$NodeDetailPickerButtonStyle} buttonText="1M" onClick={() => {}} />
-                    <Button style={$NodeDetailPickerButtonStyle} buttonText="1A" onClick={() => {}} />
-                    <Button enableToolTip={true} style={$NodeDetailPickerButtonStyle} buttonText="" imageURL="/img/custom-date.svg" onClick={() => {}}>
-                        <div slot="tooltip"><ToolTipText text="Personalizado" /></div>
-                    </Button>
-                </div>
-                <div class="chart-container">
-                    <LineGraph data={sampleChartData} dataColors={sampleColors} dataLabel={sampleLabels} width="100%" height="400px" />
-                </div>
-            </div>
+                {#if nodeState.min_alarm_value !== undefined || nodeState.max_alarm_value !== undefined}
+                    <div class="section-title"><h3>{$texts.alarms}</h3></div>
+                    <div class="inner-content-div">
+                        {#if nodeState.min_alarm_value !== undefined}
+                            <div class="row">
+                                <span class="label">{$texts.lowerLimit}</span>
+                                <span class="value with-adornment">
+                                    <span class="value">{(230 * 0.9).toFixed(2)} V</span>
+                                    <div class="dot-state-div"><div class="dot-state" data-state="dim"></div></div>
+                                </span>
+                            </div>
+                        {/if}
+                        {#if nodeState.max_alarm_value !== undefined}
+                            <div class="row">
+                                <span class="label">{$texts.upperLimit}</span>
+                                <span class="value with-adornment">
+                                    <span class="value">{(230 * 1.1).toFixed(2)} V</span>
+                                    <div class="dot-state-div"><div class="dot-state" data-state="dim"></div></div>
+                                </span>
+                            </div>
+                        {/if}
+                    </div>
+                {/if}
 
-            <div class="section-title"><h3>Dados Técnicos</h3></div>
-            <div class="inner-content-div">
-                <div class="row">
-                    <span class="label">Tipo</span>
-                    <span class="value">FLOAT</span>
+                {#if nodeState.min_alarm_value !== undefined || nodeState.max_alarm_value !== undefined}
+                    <div class="section-title"><h3>{$texts.warnings}</h3></div>
+                    <div class="inner-content-div">
+                        {#if nodeState.min_alarm_value !== undefined}
+                            <div class="row">
+                                <span class="label">{$texts.lowerLimit}</span>
+                                <span class="value with-adornment">
+                                    <span class="value">{(230 * 0.95).toFixed(2)} V</span>
+                                    <div class="dot-state-div"><div class="dot-state" data-state="dim"></div></div>
+                                </span>
+                            </div>
+                        {/if}
+                        {#if nodeState.max_alarm_value !== undefined}
+                            <div class="row">
+                                <span class="label">{$texts.upperLimit}</span>
+                                <span class="value with-adornment">
+                                    <span class="value">{(230 * 1.05).toFixed(2)} V</span>
+                                    <div class="dot-state-div"><div class="dot-state" data-state="dim"></div></div>
+                                </span>
+                            </div>
+                        {/if}
+                    </div>
+                {/if}
+
+                <div class="section-title"><h3>{$texts.history}</h3></div>
+                <div class="inner-content-div no-horizontal-padding">
+                    <div class="history-btn-picker-div">
+                        <Button enableToolTip={true} style={$NodeDetailPickerButtonStyle} buttonText={$texts._1h} onClick={() => {}}>
+                            <div slot="tooltip"><ToolTipText text={$texts._1hourAgo} /></div>
+                        </Button>
+                        <Button enableToolTip={true} style={$NodeDetailPickerButtonStyle} buttonText={$texts._1d} onClick={() => {}}>
+                            <div slot="tooltip"><ToolTipText text={$texts._1dayAgo} /></div>
+                        </Button>
+                        <Button enableToolTip={true} style={$NodeDetailPickerButtonStyle} buttonText={$texts._7d} onClick={() => {}}>
+                            <div slot="tooltip"><ToolTipText text={$texts._7daysAgo} /></div>
+                        </Button>
+                        <Button enableToolTip={true} style={$NodeDetailPickerButtonStyle} buttonText={$texts._1M} onClick={() => {}}>
+                            <div slot="tooltip"><ToolTipText text={$texts._1MonthAgo} /></div>
+                        </Button>
+                        <Button enableToolTip={true} style={$NodeDetailPickerButtonStyle} buttonText={$texts._1Y} onClick={() => {}}>
+                            <div slot="tooltip"><ToolTipText text={$texts._1YearAgo} /></div>
+                        </Button>
+                        <Button enableToolTip={true} style={$NodeDetailPickerButtonStyle} buttonText="" imageURL="/img/custom-date.svg" onClick={() => {}}>
+                            <div slot="tooltip"><ToolTipText text={$texts.customPeriod} /></div>
+                        </Button>
+                    </div>
+                    <div class="chart-container">
+                        <LineGraph data={sampleChartData} dataColors={sampleColors} dataLabel={sampleLabels} width="100%" height="400px" />
+                    </div>
                 </div>
-                <div class="row">
-                    <span class="label">Protocolo</span>
-                    <span class="value">MODBUS RTU</span>
+
+                <div class="section-title"><h3>{$texts.technicalData}</h3></div>
+                <div class="inner-content-div">
+                    <div class="row">
+                        <span class="label">{$texts.type}</span>
+                        <span class="value">FLOAT</span>
+                    </div>
+                    <div class="row">
+                        <span class="label">{$texts.protocol}</span>
+                        <span class="value">MODBUS RTU</span>
+                    </div>
+                    <div class="row">
+                        <span class="label">{$texts.address}</span>
+                        <span class="value">0x0020</span>
+                    </div>
+                    <div class="row">
+                        <span class="label">{$texts.interval}</span>
+                        <span class="value">5 s</span>
+                    </div>
+                    <div class="row">
+                        <span class="label">{$texts.logging}</span>
+                        <span class="value">15 min.</span>
+                    </div>
                 </div>
-                <div class="row">
-                    <span class="label">Endereço</span>
-                    <span class="value">0x0020</span>
-                </div>
-                <div class="row">
-                    <span class="label">Intervalo</span>
-                    <span class="value">5 s</span>
-                </div>
-                <div class="row">
-                    <span class="label">Registo</span>
-                    <span class="value">15 min.</span>
-                </div>
-            </div>
-        </main>
-    </RightPanelSheet>
-</div>
+            </main>
+        </RightPanelSheet>
+    </div>
+{/if}
 
 <style>
     .dot-state {

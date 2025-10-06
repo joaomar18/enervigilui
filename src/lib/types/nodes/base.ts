@@ -294,6 +294,7 @@ export interface NodeRecordEditingState {
  * @property {boolean} incremental - Whether the node accumulates values over time (counter)
  * @property {string} unit - The measurement unit for the value.
  * @property {NodePhase} phase - The electrical phase associated with the node.
+ * @property {number} [decimal_places] - Optional: Number of decimal places to display for numeric values.
  * @property {number} [min_alarm_value] - Optional: Indicates the minimum alarm value.
  * @property {number} [max_alarm_value] - Optional: Indicates the maximum alarm value.
  * @property {boolean} [min_alarm_state] - Optional: Indicates if the minimum alarm is active.
@@ -305,6 +306,7 @@ export interface NodeState {
     incremental: boolean;
     unit: string;
     phase: NodePhase;
+    decimal_places?: number;
     min_alarm_value?: number;
     max_alarm_value?: number;
     min_alarm_state?: boolean;
@@ -321,6 +323,7 @@ export interface NodeState {
  * @property {boolean} incremental - Whether the node accumulates values over time (counters/energy)
  * @property {string} unit - The measurement unit for display (e.g., "V", "A", "kW", "kWh")
  * @property {NodePhase} phase - The electrical phase associated with the node
+ * @property {number} [decimal_places] - Optional: Number of decimal places to display for numeric values.
  * @property {number} [min_alarm_value] - Optional: Minimum threshold value that triggers alarms
  * @property {number} [max_alarm_value] - Optional: Maximum threshold value that triggers alarms
  * @property {boolean} [min_alarm_state] - Optional: Current state of the minimum alarm (active/inactive)
@@ -334,6 +337,7 @@ export interface ProcessedNodeState {
     incremental: boolean;
     unit: string;
     phase: NodePhase;
+    decimal_places?: number;
     min_alarm_value?: number;
     max_alarm_value?: number;
     min_alarm_state?: boolean;

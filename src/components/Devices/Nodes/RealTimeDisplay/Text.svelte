@@ -4,9 +4,9 @@
     // Styles
     import { mergeStyle } from "$lib/style/components";
     import { TextDisplayStyle, NodesBaseDisplayStyle } from "$lib/style/nodes";
-    import { base } from "$app/paths";
 
     // Props
+    export let disableLabel: boolean = false;
     export let disableClick: boolean = false;
     export let labelText: string;
     export let value: string | null;
@@ -45,7 +45,7 @@
     export let onClick: (() => void) | null = null;
 </script>
 
-<BaseDisplay style={baseDisplayStyle} {disableClick} {labelText} {valueDisconnected} {onClick}>
+<BaseDisplay style={baseDisplayStyle} {disableLabel} {disableClick} {labelText} {valueDisconnected} {onClick}>
     <div
         style="
             --value-text-size: {mergedStyle.valueTextSize};

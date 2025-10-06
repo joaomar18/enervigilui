@@ -41,6 +41,7 @@
     let availableSubSections: Record<NodePhase, RealTimeCardSectionsState>;
     let expandedState = assignRealTimeCardSectionsStateToAllPhases(initialRealTimeCardSectionsExpandState);
     let showDetailDiv = false;
+    let detailedNodeState: ProcessedNodeState;
 
     // Reactive Statements
 
@@ -62,8 +63,9 @@
         }
     }
 
-    function openDetailDiv(): void {
+    function openDetailDiv(nodeState: ProcessedNodeState): void {
         showDetailDiv = true;
+        detailedNodeState = nodeState;
     }
 
     onMount(() => {
@@ -74,10 +76,8 @@
                 ({ nodesState, processedNodesState } = await getDeviceNodesState($currentDeviceID));
             }, 5000);
             nodeLogsTest = new MethodRetrier(async (signal) => {
-                let initial_date = new Date();
-                initial_date.setHours(initial_date.getHours() - 1);
-                let end_date = new Date();
-
+                let initial_date = new Date(2025, 9, 3, 21, 30, 0);
+                let end_date = new Date(2025, 9, 3, 22, 30, 0);
                 ({ nodeLogs } = await getNodeLogs($currentDeviceID, "voltage", NodePhase.L1, true, initial_date, end_date));
             }, 20000);
         } else {
@@ -148,7 +148,8 @@
                                                     minAlarmValue={nodeState.min_alarm_value}
                                                     maxAlarmValue={nodeState.max_alarm_value}
                                                     unitText={nodeState.unit}
-                                                    onClick={openDetailDiv}
+                                                    decimalPlaces={nodeState.decimal_places}
+                                                    onClick={openDetailDiv(nodeState)}
                                                 />
                                             {/each}
                                         </div>
@@ -173,7 +174,7 @@
             </div>
         </div>
     {/if}
-    <NodeDetailSheet bind:showPanel={showDetailDiv} />
+    <NodeDetailSheet bind:showPanel={showDetailDiv} nodeState={detailedNodeState} />
 </div>
 
 <style>

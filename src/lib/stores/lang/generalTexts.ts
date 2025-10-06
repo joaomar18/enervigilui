@@ -22,6 +22,10 @@ const textsObject: TextsObject = {
         PT: "Criado para desenvolvedores, empresas e entusiastas",
         EN: "Built for developers, enterprises, and enthusiasts",
     },
+    name: {
+        PT: "Nome",
+        EN: "Name",
+    },
     username: {
         PT: "Utilizador",
         EN: "Username",
@@ -41,6 +45,10 @@ const textsObject: TextsObject = {
     register: {
         PT: "Registar",
         EN: "Register",
+    },
+    state: {
+        PT: "Estado",
+        EN: "State",
     },
     userInvalid: {
         PT: "Nome de utilizador inválido.",
@@ -262,6 +270,10 @@ const textsObject: TextsObject = {
         PT: "Aplicar as alterações irá atualizar as configurações do dispositivo. Tem a certeza que pretende continuar?",
         EN: "Applying changes will update the device settings. Are you sure you want to continue?",
     },
+    address: {
+        PT: "Endereço",
+        EN: "Address",
+    },
     networkAddress: {
         PT: "Endereço de Rede",
         EN: "Network Address",
@@ -273,6 +285,10 @@ const textsObject: TextsObject = {
     readPeriod: {
         PT: "Período de Leitura",
         EN: "Read Period",
+    },
+    interval: {
+        PT: "Intervalo",
+        EN: "Interval",
     },
     readPeriodInfo: {
         PT: "Intervalo de tempo (em segundos) entre as leituras de dados do dispositivo.",
@@ -434,6 +450,10 @@ const textsObject: TextsObject = {
     actions: {
         PT: "Ações",
         EN: "Actions",
+    },
+    value: {
+        PT: "Valor",
+        EN: "Value",
     },
     minValue: {
         PT: "Valor Mínimo",
@@ -658,7 +678,92 @@ const textsObject: TextsObject = {
     goBack: {
         PT: "Voltar Atrás",
         EN: "Go Back",
-    }
+    },
+    _1h: {
+        PT: "1H",
+        EN: "1H",
+    },
+    _1hourAgo: {
+        PT: "1 hora atrás",
+        EN: "1 hour ago",
+    },
+    _1d: {
+        PT: "1D",
+        EN: "1D",
+    },
+    _1dayAgo: {
+        PT: "1 dia atrás",
+        EN: "1 day ago",
+    },
+    _7d: {
+        PT: "7D",
+        EN: "7D",
+    },
+    _7daysAgo: {
+        PT: "7 dias atrás",
+        EN: "7 days ago",
+    },
+    _1M: {
+        PT: "1M",
+        EN: "1M",
+    },
+    _1MonthAgo: {
+        PT: "1 mês atrás",
+        EN: "1 month ago",
+    },
+    _1Y: {
+        PT: "1A",
+        EN: "1Y",
+    },
+    _1YearAgo: {
+        PT: "1 ano atrás",
+        EN: "1 year ago",
+    },
+    customPeriod: {
+        PT: "Período Definido",
+        EN: "Custom Period",
+    },
+    variableDetails: {
+        PT: "Detalhes da Variável",
+        EN: "Variable Details",
+    },
+    currentState: {
+        PT: "Estado Atual",
+        EN: "Current State",
+    },
+    updated: {
+        PT: "Atualizado",
+        EN: "Updated",
+    },
+    restarted: {
+        PT: "Reiniciado",
+        EN: "Restarted",
+    },
+    alarms: {
+        PT: "Alarmes",
+        EN: "Alarms",
+    },
+    warnings: {
+        PT: "Avisos",
+        EN: "Warnings",
+    },
+    upperLimit: {
+        PT: "Limite Sup.",
+        EN: "Upper Limit",
+    },
+    lowerLimit: {
+        PT: "Limite Inf.",
+        EN: "Lower Limit",
+    },
+    history: {
+        PT: "Histórico",
+        EN: "History",
+    },
+    technicalData: {
+        PT: "Dados Técnicos",
+        EN: "Technical Data",
+    },
+
 };
 
 export const texts = createLangStore(textsObject);
