@@ -6,7 +6,7 @@ import { NodePrefix, NodePhase, NodeType, phaseOrder, nodeSections } from "$lib/
 import { defaultRealTimeCardSectionsState } from "$lib/types/view/device";
 import { RealTimeCardSubSections } from "$lib/types/view/device";
 import { assignRealTimeCardSectionsStateToAllPhases, createEmptyRealTimeCardSubSectionsArrays, getNodeSubSection } from "../view/device";
-import type { BaseNodeConfig, EditableBaseNodeConfig, NodeRecord, EditableNodeRecord, NodeState, ProcessedNodeState, NodeSection } from "$lib/types/nodes/base";
+import type { BaseNodeAdditionalInfo, BaseNodeConfig, EditableBaseNodeConfig, NodeRecord, EditableNodeRecord, NodeState, ProcessedNodeState, NodeSection } from "$lib/types/nodes/base";
 import type { RealTimeCardSectionsState } from "$lib/types/view/device";
 
 /**
@@ -204,16 +204,10 @@ export function addPrefix(name: string, prefix: string | NodePrefix): string {
     return prefix + name;
 }
 
-/**
- * Gets the communication ID for a node using the appropriate protocol plugin.
- * @param protocol - The communication protocol for the node.
- * @param config - The node configuration containing communication settings.
- * @param no_format - If true, returns plain number format for certain protocols.
- * @returns The communication ID string for the node.
- */
-export function getCommunicationID(protocol: Protocol, config: BaseNodeConfig | EditableBaseNodeConfig, no_format: boolean = false): string {
+
+export function getCommunicationID(protocol: Protocol, node_object: BaseNodeConfig | EditableBaseNodeConfig | BaseNodeAdditionalInfo, no_format: boolean = false): string {
     let plugin = get(protocolPlugins)[protocol];
-    return plugin.getCommID(config, no_format);
+    return plugin.getCommID(node_object, no_format);
 }
 
 /**

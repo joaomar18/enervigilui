@@ -22,7 +22,7 @@ export interface EditableNodeOPCUAConfig extends EditableBaseNodeConfig {
     node_id: string;
 }
 
-export interface OPCUANodeAdditionalInfo extends BaseNodeAdditionalInfo {
+export interface NodeOPCUAAdditionalInfo extends BaseNodeAdditionalInfo {
     node_id: string;
 }
 

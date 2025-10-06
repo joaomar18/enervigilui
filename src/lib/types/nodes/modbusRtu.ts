@@ -22,7 +22,7 @@ export interface EditableNodeModbusRTUConfig extends EditableBaseNodeConfig {
     register: string;
 }
 
-export interface ModbusRTUNodeAdditionalInfo extends BaseNodeAdditionalInfo {
+export interface NodeModbusRTUAdditionalInfo extends BaseNodeAdditionalInfo {
     register: number;
 }
 

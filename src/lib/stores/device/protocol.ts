@@ -3,15 +3,15 @@ import { Protocol } from "$lib/types/device/base";
 import type { BaseCommunicationConfig, EditableBaseCommunicationConfig, MeterOptions } from "$lib/types/device/base";
 import type { DeviceOPCUAConfig, EditableDeviceOPCUAConfig } from "$lib/types/device/opcUa";
 import type { DeviceModbusRTUConfig, EditableDeviceModbusRTUConfig } from "$lib/types/device/modbusRtu";
-import type { NodeModbusRTUConfig, EditableNodeModbusRTUConfig } from "$lib/types/nodes/modbusRtu";
-import type { NodeOPCUAConfig, EditableNodeOPCUAConfig } from "$lib/types/nodes/opcUa";
+import type { NodeModbusRTUConfig, EditableNodeModbusRTUConfig, NodeModbusRTUAdditionalInfo } from "$lib/types/nodes/modbusRtu";
+import type { NodeOPCUAConfig, EditableNodeOPCUAConfig, NodeOPCUAAdditionalInfo } from "$lib/types/nodes/opcUa";
 import type { SvelteComponent } from "svelte";
 import { defaultModbusRTUOptions } from "$lib/types/device/modbusRtu";
 import { defaultOPCUAOptions } from "$lib/types/device/opcUa";
 import { defaultBaseNodeConfig } from "$lib/types/nodes/base";
 import ModbusRtuConfig from "../../../components/Devices/ModbusRTUConfig.svelte";
 import OpcuaConfig from "../../../components/Devices/OPCUAConfig.svelte";
-import type { BaseNodeConfig, DefaultNodeInfo, EditableBaseNodeConfig, EditableNodeRecord } from "$lib/types/nodes/base";
+import type { BaseNodeAdditionalInfo, BaseNodeConfig, DefaultNodeInfo, EditableBaseNodeConfig, EditableNodeRecord } from "$lib/types/nodes/base";
 import {
     convertToBaseNodeConfig,
     convertToEditableBaseNodeConfig,
@@ -34,7 +34,7 @@ export interface ProtocolPlugin {
     processInitialNodeConfig: (configuration: BaseNodeConfig) => BaseNodeConfig;
     createNodeConfigFromDefaultVar: (variable: DefaultNodeInfo, options: MeterOptions) => EditableBaseNodeConfig;
     createNewEditableNodeConfig: () => EditableBaseNodeConfig;
-    getCommID: (config: BaseNodeConfig | EditableBaseNodeConfig, noFormat: boolean) => string;
+    getCommID: (node_object: BaseNodeConfig | EditableBaseNodeConfig | BaseNodeAdditionalInfo, noFormat: boolean) => string;
     validateCommID: (communicationID: string) => boolean;
     setCommID: (node: EditableNodeRecord) => void;
     setCommIDToDefault: (node: EditableNodeRecord) => void;
@@ -68,7 +68,7 @@ const noProtocolPlugin: ProtocolPlugin = {
     createNewEditableNodeConfig() {
         return { ...defaultBaseNodeConfig };
     },
-    getCommID(config, noFormat) {
+    getCommID(node_object, noFormat) {
         return "";
     },
     validateCommID(communicationID) {
@@ -154,8 +154,8 @@ const modbusRtuPlugin: ProtocolPlugin = {
             register: this.defaultCommID,
         } as EditableNodeModbusRTUConfig;
     },
-    getCommID(config, noFormat) {
-        let register = (config as EditableNodeModbusRTUConfig | NodeModbusRTUConfig).register;
+    getCommID(node_object, noFormat) {
+        let register = (node_object as EditableNodeModbusRTUConfig | NodeModbusRTUConfig | NodeModbusRTUAdditionalInfo).register;
         return noFormat ? String(register) : this.defaultCommID + Number(register).toString(16).toUpperCase().padStart(4, "0");
     },
     validateCommID(communicationID) {
@@ -233,8 +233,8 @@ const opcUaPlugin: ProtocolPlugin = {
             node_id: this.defaultCommID,
         } as EditableNodeOPCUAConfig;
     },
-    getCommID(config, noFormat) {
-        return (config as EditableNodeOPCUAConfig | NodeOPCUAConfig).node_id;
+    getCommID(node_object, noFormat) {
+        return (node_object as EditableNodeOPCUAConfig | NodeOPCUAConfig | NodeOPCUAAdditionalInfo).node_id;
     },
     validateCommID(communicationID) {
         return validateOpcUaNodeId(communicationID);

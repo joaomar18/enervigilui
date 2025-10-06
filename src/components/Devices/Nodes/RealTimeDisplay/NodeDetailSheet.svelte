@@ -3,7 +3,7 @@
     import Button from "../../../General/Button.svelte";
     import ToolTipText from "../../../General/ToolTipText.svelte";
     import LineGraph from "../../../General/LineGraph.svelte";
-    import { getNodeSection } from "$lib/logic/util/nodes";
+    import { getNodeSection, getCommunicationID } from "$lib/logic/util/nodes";
     import type { BaseNodeAdditionalInfo, ProcessedNodeState } from "$lib/types/nodes/base";
 
     // Texts
@@ -307,7 +307,7 @@
                 <div class="inner-content-div">
                     <div class="row">
                         <span class="label">{$texts.type}</span>
-                        <span class="value">FLOAT</span>
+                        <span class="value">{nodeAdditionalInfo?.type}</span>
                     </div>
                     <div class="row">
                         <span class="label">{$texts.protocol}</span>
@@ -315,11 +315,13 @@
                     </div>
                     <div class="row">
                         <span class="label">{$texts.address}</span>
-                        <span class="value">0x0020</span>
+                        {#if nodeAdditionalInfo}
+                            <span class="value">{getCommunicationID(nodeAdditionalInfo.protocol, nodeAdditionalInfo)}</span>
+                        {/if}
                     </div>
                     <div class="row">
                         <span class="label">{$texts.interval}</span>
-                        <span class="value"> {nodeAdditionalInfo?.read_period} s</span>
+                        <span class="value">{nodeAdditionalInfo?.read_period} s</span>
                     </div>
                     <div class="row">
                         <span class="label">{$texts.logging}</span>
