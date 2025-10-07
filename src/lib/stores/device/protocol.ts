@@ -23,6 +23,7 @@ import { validateOpcUaNodeId } from "$lib/logic/validation/nodes/opcUa";
 
 export interface ProtocolPlugin {
     textKey: string;
+    shortTextKey: string;
     infoTextKey: string;
     defaultCommID?: string;
     defaultOptions: EditableBaseCommunicationConfig;
@@ -44,6 +45,7 @@ export interface ProtocolPlugin {
 
 const noProtocolPlugin: ProtocolPlugin = {
     textKey: "noProtocol",
+    shortTextKey: "address",
     infoTextKey: "noProtocolInfo",
     defaultOptions: { valid: false },
     ConfigComponent: null,
@@ -86,6 +88,7 @@ const noProtocolPlugin: ProtocolPlugin = {
 
 const modbusRtuPlugin: ProtocolPlugin = {
     textKey: "modbusRegister",
+    shortTextKey: "address",
     infoTextKey: "registerInfo",
     defaultCommID: "0x",
     defaultOptions: defaultModbusRTUOptions,
@@ -173,6 +176,7 @@ const modbusRtuPlugin: ProtocolPlugin = {
 
 const opcUaPlugin: ProtocolPlugin = {
     textKey: "opcuaID",
+    shortTextKey: "opcuaID",
     infoTextKey: "nodespaceInfo",
     defaultCommID: "ns=;i=",
     defaultOptions: defaultOPCUAOptions,

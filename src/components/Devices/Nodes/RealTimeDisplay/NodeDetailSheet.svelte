@@ -3,13 +3,19 @@
     import Button from "../../../General/Button.svelte";
     import ToolTipText from "../../../General/ToolTipText.svelte";
     import LineGraph from "../../../General/LineGraph.svelte";
+    import InlineLoader from "../../../General/InlineLoader.svelte";
+    import { LogSpanPeriod } from "$lib/types/view/nodes";
     import { getNodeSection, getCommunicationID } from "$lib/logic/util/nodes";
     import type { BaseNodeAdditionalInfo, ProcessedNodeState } from "$lib/types/nodes/base";
+
+    // Stores
+    import { protocolPlugins } from "$lib/stores/device/protocol";
 
     // Texts
     import { texts } from "$lib/stores/lang/generalTexts";
     import { variableNameTextsByPhase } from "$lib/stores/lang/energyMeterTexts";
     import { protocolTexts } from "$lib/stores/lang/energyMeterTexts";
+    import { pluginTexts } from "$lib/stores/lang/protocolPlugin";
 
     // Styles
     import { NodesBaseDisplayDetailStyle, NodeDetailPickerButtonStyle } from "$lib/style/nodes";
@@ -73,10 +79,9 @@
 
     // Variables
     let state: "alarmState" | "warningState" | "okState" | "disconnectedState";
+    let selectedHistoryTimeSpan: LogSpanPeriod = LogSpanPeriod.lastDay;
 
     // Reactive Statements
-    $: console.log(nodeAdditionalInfo);
-
     $: if (nodeState) {
         if (nodeState.value === null) {
             state = "disconnectedState";
@@ -170,9 +175,7 @@
                 <div class="row">
                     <span class="label">{$texts.name}</span>
                     <span class="value">
-                        {#if nodeState.name !== "" && nodeState.name !== undefined}
-                            {$variableNameTextsByPhase[nodeState.phase][nodeState.name] || nodeState.name}
-                        {/if}
+                        {$variableNameTextsByPhase[nodeState.phase][nodeState.name] || nodeState.name}
                     </span>
                 </div>
                 <div class="row">
@@ -220,11 +223,15 @@
                     </div>
                     <div class="row">
                         <span class="label">{$texts.updated}</span>
-                        <span class="value">à 7 segundos</span>
+                        <InlineLoader loaded={nodeAdditionalInfo !== undefined}>
+                            <span class="value align-right">à 7 segundos</span>
+                        </InlineLoader>
                     </div>
                     <div class="row">
                         <dt class="label">{$texts.restarted}</dt>
-                        <dd class="value">à 13 minutos</dd>
+                        <InlineLoader loaded={nodeAdditionalInfo !== undefined}>
+                            <span class="value align-right">à 13 minutos</span>
+                        </InlineLoader>
                     </div>
                 </div>
 
@@ -234,19 +241,27 @@
                         {#if nodeState.min_alarm_state !== undefined}
                             <div class="row">
                                 <span class="label">{$texts.lowerLimit}</span>
-                                <span class="value with-adornment">
-                                    <span class="value">{(230 * 0.9).toFixed(2)} V</span>
-                                    <div class="dot-state-div"><div class="dot-state" data-state="dim"></div></div>
-                                </span>
+                                <InlineLoader loaded={nodeAdditionalInfo?.min_alarm_value !== undefined}>
+                                    <span class="value with-adornment align-right">
+                                        <span class="value"
+                                            >{nodeAdditionalInfo?.min_alarm_value?.toFixed(nodeState.decimal_places || 0)} {nodeState.unit}</span
+                                        >
+                                        <div class="dot-state-div"><div class="dot-state" data-state="dim"></div></div>
+                                    </span>
+                                </InlineLoader>
                             </div>
                         {/if}
                         {#if nodeState.max_alarm_state !== undefined}
                             <div class="row">
                                 <span class="label">{$texts.upperLimit}</span>
-                                <span class="value with-adornment">
-                                    <span class="value">{(230 * 1.1).toFixed(2)} V</span>
-                                    <div class="dot-state-div"><div class="dot-state" data-state="dim"></div></div>
-                                </span>
+                                <InlineLoader loaded={nodeAdditionalInfo?.max_alarm_value !== undefined}>
+                                    <span class="value with-adornment align-right">
+                                        <span class="value"
+                                            >{nodeAdditionalInfo?.max_alarm_value?.toFixed(nodeState.decimal_places || 0)} {nodeState.unit}</span
+                                        >
+                                        <div class="dot-state-div"><div class="dot-state" data-state="dim"></div></div>
+                                    </span>
+                                </InlineLoader>
                             </div>
                         {/if}
                     </div>
@@ -258,19 +273,27 @@
                         {#if nodeState.min_alarm_state !== undefined}
                             <div class="row">
                                 <span class="label">{$texts.lowerLimit}</span>
-                                <span class="value with-adornment">
-                                    <span class="value">{(230 * 0.95).toFixed(2)} V</span>
-                                    <div class="dot-state-div"><div class="dot-state" data-state="dim"></div></div>
-                                </span>
+                                <InlineLoader loaded={nodeAdditionalInfo?.min_warning_value !== undefined}>
+                                    <span class="value with-adornment align-right">
+                                        <span class="value"
+                                            >{nodeAdditionalInfo?.min_warning_value?.toFixed(nodeState.decimal_places || 0)} {nodeState.unit}</span
+                                        >
+                                        <div class="dot-state-div"><div class="dot-state" data-state="dim"></div></div>
+                                    </span>
+                                </InlineLoader>
                             </div>
                         {/if}
                         {#if nodeState.max_alarm_state !== undefined}
                             <div class="row">
                                 <span class="label">{$texts.upperLimit}</span>
-                                <span class="value with-adornment">
-                                    <span class="value">{(230 * 1.05).toFixed(2)} V</span>
-                                    <div class="dot-state-div"><div class="dot-state" data-state="dim"></div></div>
-                                </span>
+                                <InlineLoader loaded={nodeAdditionalInfo?.max_warning_value !== undefined}>
+                                    <span class="value with-adornment align-right">
+                                        <span class="value"
+                                            >{nodeAdditionalInfo?.max_warning_value?.toFixed(nodeState.decimal_places || 0)} {nodeState.unit}</span
+                                        >
+                                        <div class="dot-state-div"><div class="dot-state" data-state="dim"></div></div>
+                                    </span>
+                                </InlineLoader>
                             </div>
                         {/if}
                     </div>
@@ -279,22 +302,71 @@
                 <div class="section-title"><h3>{$texts.history}</h3></div>
                 <div class="inner-content-div no-horizontal-padding">
                     <div class="history-btn-picker-div">
-                        <Button enableToolTip={true} style={$NodeDetailPickerButtonStyle} buttonText={$texts._1h} onClick={() => {}}>
+                        <Button
+                            enableToolTip={true}
+                            selected={selectedHistoryTimeSpan == LogSpanPeriod.lastHour}
+                            style={$NodeDetailPickerButtonStyle}
+                            buttonText={$texts._1h}
+                            onClick={() => {
+                                selectedHistoryTimeSpan = LogSpanPeriod.lastHour;
+                            }}
+                        >
                             <div slot="tooltip"><ToolTipText text={$texts._1hourAgo} /></div>
                         </Button>
-                        <Button enableToolTip={true} style={$NodeDetailPickerButtonStyle} buttonText={$texts._1d} onClick={() => {}}>
+                        <Button
+                            enableToolTip={true}
+                            selected={selectedHistoryTimeSpan == LogSpanPeriod.lastDay}
+                            style={$NodeDetailPickerButtonStyle}
+                            buttonText={$texts._1d}
+                            onClick={() => {
+                                selectedHistoryTimeSpan = LogSpanPeriod.lastDay;
+                            }}
+                        >
                             <div slot="tooltip"><ToolTipText text={$texts._1dayAgo} /></div>
                         </Button>
-                        <Button enableToolTip={true} style={$NodeDetailPickerButtonStyle} buttonText={$texts._7d} onClick={() => {}}>
+                        <Button
+                            enableToolTip={true}
+                            selected={selectedHistoryTimeSpan == LogSpanPeriod.last7Days}
+                            style={$NodeDetailPickerButtonStyle}
+                            buttonText={$texts._7d}
+                            onClick={() => {
+                                selectedHistoryTimeSpan = LogSpanPeriod.last7Days;
+                            }}
+                        >
                             <div slot="tooltip"><ToolTipText text={$texts._7daysAgo} /></div>
                         </Button>
-                        <Button enableToolTip={true} style={$NodeDetailPickerButtonStyle} buttonText={$texts._1M} onClick={() => {}}>
+                        <Button
+                            enableToolTip={true}
+                            selected={selectedHistoryTimeSpan == LogSpanPeriod.lastMonth}
+                            style={$NodeDetailPickerButtonStyle}
+                            buttonText={$texts._1M}
+                            onClick={() => {
+                                selectedHistoryTimeSpan = LogSpanPeriod.lastMonth;
+                            }}
+                        >
                             <div slot="tooltip"><ToolTipText text={$texts._1MonthAgo} /></div>
                         </Button>
-                        <Button enableToolTip={true} style={$NodeDetailPickerButtonStyle} buttonText={$texts._1Y} onClick={() => {}}>
+                        <Button
+                            enableToolTip={true}
+                            selected={selectedHistoryTimeSpan == LogSpanPeriod.lastYear}
+                            style={$NodeDetailPickerButtonStyle}
+                            buttonText={$texts._1Y}
+                            onClick={() => {
+                                selectedHistoryTimeSpan = LogSpanPeriod.lastYear;
+                            }}
+                        >
                             <div slot="tooltip"><ToolTipText text={$texts._1YearAgo} /></div>
                         </Button>
-                        <Button enableToolTip={true} style={$NodeDetailPickerButtonStyle} buttonText="" imageURL="/img/custom-date.svg" onClick={() => {}}>
+                        <Button
+                            enableToolTip={true}
+                            selected={selectedHistoryTimeSpan == LogSpanPeriod.customDate}
+                            style={$NodeDetailPickerButtonStyle}
+                            buttonText=""
+                            imageURL="/img/custom-date.svg"
+                            onClick={() => {
+                                selectedHistoryTimeSpan = LogSpanPeriod.customDate;
+                            }}
+                        >
                             <div slot="tooltip"><ToolTipText text={$texts.customPeriod} /></div>
                         </Button>
                     </div>
@@ -307,25 +379,43 @@
                 <div class="inner-content-div">
                     <div class="row">
                         <span class="label">{$texts.type}</span>
-                        <span class="value">{nodeAdditionalInfo?.type}</span>
+                        <InlineLoader loaded={nodeAdditionalInfo?.type !== undefined}>
+                            <span class="value align-right">{nodeAdditionalInfo?.type}</span>
+                        </InlineLoader>
                     </div>
                     <div class="row">
                         <span class="label">{$texts.protocol}</span>
-                        <span class="value">{$protocolTexts[nodeAdditionalInfo?.protocol] || $texts.noProtocol}</span>
+                        <InlineLoader loaded={nodeAdditionalInfo?.protocol !== undefined}>
+                            <span class="value align-right">{$protocolTexts[nodeAdditionalInfo?.protocol] || $pluginTexts.noProtocol}</span>
+                        </InlineLoader>
                     </div>
                     <div class="row">
-                        <span class="label">{$texts.address}</span>
                         {#if nodeAdditionalInfo}
-                            <span class="value">{getCommunicationID(nodeAdditionalInfo.protocol, nodeAdditionalInfo)}</span>
+                            <span class="label">{$pluginTexts[$protocolPlugins[nodeAdditionalInfo.protocol].shortTextKey]}</span>
+                            <InlineLoader loaded={nodeAdditionalInfo?.protocol !== undefined}>
+                                {#if nodeAdditionalInfo}
+                                    <span class="value align-right"
+                                        >{getCommunicationID(nodeAdditionalInfo.protocol, nodeAdditionalInfo) || $texts.virtual}</span
+                                    >
+                                {/if}
+                            </InlineLoader>
                         {/if}
                     </div>
                     <div class="row">
                         <span class="label">{$texts.interval}</span>
-                        <span class="value">{nodeAdditionalInfo?.read_period} s</span>
+                        <InlineLoader loaded={nodeAdditionalInfo?.read_period !== undefined}>
+                            <span class="value align-right">{nodeAdditionalInfo?.read_period} s</span>
+                        </InlineLoader>
                     </div>
                     <div class="row">
                         <span class="label">{$texts.logging}</span>
-                        <span class="value">{nodeAdditionalInfo?.logging_period} min.</span>
+                        <InlineLoader loaded={nodeAdditionalInfo !== undefined}>
+                            {#if nodeAdditionalInfo?.logging_period !== undefined}
+                                <span class="value align-right">{nodeAdditionalInfo?.logging_period} min.</span>
+                            {:else}
+                                <span class="value align-right">{$texts.disabled}</span>
+                            {/if}
+                        </InlineLoader>
                     </div>
                 </div>
             {/if}
@@ -426,6 +516,10 @@
         line-height: 1;
         block-size: 100%;
         gap: var(--value-adornment-gap, 0.5rem);
+    }
+
+    .value.align-right {
+        float: right;
     }
 
     .value.with-adornment {

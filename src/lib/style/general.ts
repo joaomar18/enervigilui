@@ -488,6 +488,22 @@ const BarStyleConfig: ComponentStyles = {
 
 export const BarStyle = createStyleStore(BarStyleConfig);
 
+//////////     I N L I N E     L O A D E R     //////////
+
+const InlineLoaderStyleConfig: ComponentStyles = {
+    dark: {
+        width: "100%",
+        height: "100%",
+        backgroundColor: "transparent",
+        border: "none",
+        shadow: "none",
+        waveBackground: "linear-gradient(120deg, transparent 0%, rgba(255, 255, 255, 0.5) 50%, transparent 100%)",
+        waveAnimationTime: "1.6s",
+    },
+};
+
+export const InlineLoaderStyle = createStyleStore(InlineLoaderStyleConfig);
+
 //////////     T O O L     T I P     //////////
 
 const ToolTipStyleConfig: ComponentStyles = {

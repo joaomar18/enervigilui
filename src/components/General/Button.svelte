@@ -8,6 +8,7 @@
 
     //Props
     export let enabled: boolean = true;
+    export let selected: boolean = false;
     export let processing: boolean = false;
     export let buttonText: string;
     export let imageURL: string = "";
@@ -27,12 +28,16 @@
     export let borderRadius: string | undefined = undefined;
     export let backgroundColor: string | undefined = undefined;
     export let disabledBackgroundColor: string | undefined = undefined;
+    export let selectedBackgroundColor: string | undefined = undefined;
     export let borderColor: string | undefined = undefined;
     export let disabledBorderColor: string | undefined = undefined;
+    export let selectedBorderColor: string | undefined = undefined;
     export let hoverColor: string | undefined = undefined;
     export let disabledHoverColor: string | undefined = undefined;
+    export let selectedHoverColor: string | undefined = undefined;
     export let fontColor: string | undefined = undefined;
     export let disabledFontColor: string | undefined = undefined;
+    export let selectedFontColor: string | undefined = undefined;
     export let fontSize: string | undefined = undefined;
     export let fontWeight: string | undefined = undefined;
     export let imageWidth: string | undefined = undefined;
@@ -46,12 +51,16 @@
         borderRadius,
         backgroundColor,
         disabledBackgroundColor,
+        selectedBackgroundColor,
         borderColor,
         disabledBorderColor,
+        selectedBorderColor,
         hoverColor,
         disabledHoverColor,
+        selectedHoverColor,
         fontColor,
         disabledFontColor,
+        selectedFontColor,
         fontSize,
         fontWeight,
         imageWidth,
@@ -118,12 +127,16 @@
         --border-radius: {mergedStyle.borderRadius};
         --background-color: {mergedStyle.backgroundColor};
         --disabled-background-color: {mergedStyle.disabledBackgroundColor};
+        --selected-background-color: {mergedStyle.selectedBackgroundColor};
         --border-color: {mergedStyle.borderColor};
         --disabled-border-color: {mergedStyle.disabledBorderColor};
+        --selected-border-color: {mergedStyle.selectedBorderColor};
         --hover-color: {mergedStyle.hoverColor};
         --disabled-hover-color: {mergedStyle.disabledHoverColor};
+        --selected-hover-color: {mergedStyle.selectedHoverColor};
         --font-color: {mergedStyle.fontColor};
         --disabled-font-color: {mergedStyle.disabledFontColor};
+        --selected-font-color: {mergedStyle.selectedFontColor};
         --font-size: {mergedStyle.fontSize};
         --font-weight: {mergedStyle.fontWeight};
         --image-width: {mergedStyle.imageWidth};
@@ -134,6 +147,7 @@
     class:align-left={mergedStyle.imageRightPos != "auto" && imageURL && !processing}
     class:align-right={mergedStyle.imageLeftPos != "auto" && imageURL && !processing}
     class:disabled={!enabled || processing}
+    class:selected={enabled && selected}
     aria-label={buttonText}
     on:click={handleClick}
     on:mouseenter={handleMouseEnter}
@@ -185,6 +199,11 @@
         cursor: auto;
     }
 
+    button.selected {
+        background-color: var(--selected-background-color);
+        border: 1px solid var(--selected-border-color);
+    }
+
     /* Icon on the left: align text left and add left padding */
     button.align-left {
         text-align: left;
@@ -205,6 +224,10 @@
     /* Disabled hover: keep disabled background */
     button.disabled:hover {
         background-color: var(--disabled-hover-color);
+    }
+
+    button.selected:hover {
+        background-color: var(--selected-hover-color);
     }
 
     /* Icon styles: size and vertical centering, position left or right */

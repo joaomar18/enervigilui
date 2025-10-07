@@ -6,6 +6,10 @@ const textsObjectsPlugin: TextsObject = {
         PT: "Sem protocolo",
         EN: "No protocol",
     },
+    address: {
+        PT: "Endereço",
+        EN: "Address",
+    },
     noProtocolInfo: {
         PT: "Sem protocolo de comunicação selecionado.",
         EN: "No communication protocol selected.",

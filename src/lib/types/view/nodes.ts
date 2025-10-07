@@ -22,3 +22,16 @@ export interface ColumnVisibilityMap {
     enable: ColumnVisibilityState;
     actions: ColumnVisibilityState;
 }
+
+/**
+ * Time period options for displaying node historical data and logs.
+ * Used in date range selectors for filtering node data by time spans.
+ */
+export enum LogSpanPeriod {
+    lastHour = "lastHour",
+    lastDay = "lastDay",
+    last7Days = "last7Days",
+    lastMonth = "lastMonth",
+    lastYear = "lastYear",
+    customDate = "customDate",
+}

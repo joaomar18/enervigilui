@@ -22,6 +22,10 @@ const textsObject: TextsObject = {
         PT: "Criado para desenvolvedores, empresas e entusiastas",
         EN: "Built for developers, enterprises, and enthusiasts",
     },
+    disabled: {
+        PT: "Desabilitado",
+        EN: "Disabled",
+    },
     name: {
         PT: "Nome",
         EN: "Name",
@@ -270,10 +274,6 @@ const textsObject: TextsObject = {
         PT: "Aplicar as alterações irá atualizar as configurações do dispositivo. Tem a certeza que pretende continuar?",
         EN: "Applying changes will update the device settings. Are you sure you want to continue?",
     },
-    address: {
-        PT: "Endereço",
-        EN: "Address",
-    },
     networkAddress: {
         PT: "Endereço de Rede",
         EN: "Network Address",
@@ -470,10 +470,6 @@ const textsObject: TextsObject = {
     protocol: {
         PT: "Protocolo",
         EN: "Protocol",
-    },
-    noProtocol: {
-        PT: "Sem protocolo",
-        EN: "No protocol",
     },
     l1: {
         PT: "L1",
