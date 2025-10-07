@@ -683,45 +683,45 @@ const textsObject: TextsObject = {
         PT: "1H",
         EN: "1H",
     },
-    _1hourAgo: {
-        PT: "1 hora atrás",
-        EN: "1 hour ago",
+    currentHour: {
+        PT: "hora atual",
+        EN: "current hour",
     },
     _1d: {
         PT: "1D",
         EN: "1D",
     },
-    _1dayAgo: {
-        PT: "1 dia atrás",
-        EN: "1 day ago",
+    currentDay: {
+        PT: "dia atual",
+        EN: "current hour",
     },
     _7d: {
         PT: "7D",
         EN: "7D",
     },
-    _7daysAgo: {
-        PT: "7 dias atrás",
-        EN: "7 days ago",
+    currentWeek: {
+        PT: "semana atual",
+        EN: "current week",
     },
     _1M: {
         PT: "1M",
         EN: "1M",
     },
-    _1MonthAgo: {
-        PT: "1 mês atrás",
-        EN: "1 month ago",
+    currentMonth: {
+        PT: "mês atual",
+        EN: "current month",
     },
     _1Y: {
         PT: "1A",
         EN: "1Y",
     },
-    _1YearAgo: {
-        PT: "1 ano atrás",
-        EN: "1 year ago",
+    currentYear: {
+        PT: "ano atual",
+        EN: "current year",
     },
     customPeriod: {
-        PT: "Período Definido",
-        EN: "Custom Period",
+        PT: "definir período",
+        EN: "choose period",
     },
     variableDetails: {
         PT: "Detalhes da Variável",

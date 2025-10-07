@@ -1,17 +1,16 @@
 <script lang="ts">
     import { fade } from "svelte/transition";
-    import { onDestroy, onMount } from "svelte";
+    import { onMount } from "svelte";
     import { MethodPoller } from "$lib/logic/api/poller";
-    import { MethodRetrier } from "$lib/logic/api/retrier";
     import { NodePhase } from "$lib/types/nodes/base";
-    import { getDeviceNodesState, getNodeAdditionalInfo } from "$lib/logic/api/nodes";
+    import { getDeviceNodesState } from "$lib/logic/api/nodes";
     import { showToast } from "$lib/logic/view/toast";
     import { ToastType } from "$lib/stores/view/toast";
     import { nodeSections } from "$lib/types/nodes/base";
     import { getAvailablePhasesFromRecordsOrStates, getNodesStateBySubSection } from "$lib/logic/util/nodes";
     import { initialRealTimeCardSectionsExpandState } from "$lib/types/view/device";
     import { assignRealTimeCardSectionsStateToAllPhases } from "$lib/logic/view/device";
-    import type { BaseNodeAdditionalInfo, NodeState, ProcessedNodeState } from "$lib/types/nodes/base";
+    import type { NodeState, ProcessedNodeState } from "$lib/types/nodes/base";
     import type { RealTimeCardSubSections, RealTimeCardSectionsState } from "$lib/types/view/device";
     import ContentCard from "../../../components/General/ContentCard.svelte";
     import ExpandableSection from "../../../components/General/ExpandableSection.svelte";
@@ -41,11 +40,10 @@
     let expandedState = assignRealTimeCardSectionsStateToAllPhases(initialRealTimeCardSectionsExpandState);
     let showDetailDiv = false;
     let detailedNodeState: ProcessedNodeState;
-    let detailedNodeAdditionalInfo: BaseNodeAdditionalInfo;
-    let detailedNodeAddInfoRetrier: MethodRetrier | null = null;
+    //let detailedNodeAdditionalInfo: BaseNodeAdditionalInfo;
+    //let detailedNodeAddInfoRetrier: MethodRetrier | null = null;
 
     // Reactive Statements
-
     $: if (nodesState && processedNodesState) {
         availablePhases = getAvailablePhasesFromRecordsOrStates(processedNodesState);
         ({ nodesStateBySubSection, availableSubSections } = getNodesStateBySubSection(processedNodesState));
@@ -66,18 +64,20 @@
 
     function openDetailDiv(nodeState: ProcessedNodeState): void {
         showDetailDiv = true;
-        detailedNodeAddInfoRetrier?.stop();
-        detailedNodeAddInfoRetrier = null;
+        //detailedNodeAddInfoRetrier?.stop();
+        //detailedNodeAddInfoRetrier = null;
         detailedNodeState = nodeState;
-        if (!$currentDeviceID || !nodeState) {
-            return;
-        }
+        //if (!$currentDeviceID || !nodeState) {
+        //    return;
+        //}
+        /*
         detailedNodeAddInfoRetrier = new MethodRetrier(async (signal) => {
             let { nodeAdditionalInfo } = await getNodeAdditionalInfo($currentDeviceID, nodeState.name, nodeState.phase);
             detailedNodeAdditionalInfo = nodeAdditionalInfo;
             detailedNodeAddInfoRetrier?.stop();
             detailedNodeAddInfoRetrier = null;
         }, 3000);
+        */
     }
 
     onMount(() => {
@@ -98,10 +98,12 @@
         };
     });
 
+    /*
     onDestroy(() => {
         detailedNodeAddInfoRetrier?.stop();
         detailedNodeAddInfoRetrier = null;
     });
+    */
 </script>
 
 <div
@@ -187,7 +189,8 @@
             </div>
         </div>
     {/if}
-    <NodeDetailSheet bind:showPanel={showDetailDiv} nodeState={detailedNodeState} nodeAdditionalInfo={detailedNodeAdditionalInfo} />
+    <!--<NodeDetailSheet bind:showPanel={showDetailDiv} nodeState={detailedNodeState} nodeAdditionalInfo={detailedNodeAdditionalInfo} />-->
+    <NodeDetailSheet bind:showPanel={showDetailDiv} nodeState={detailedNodeState} /> 
 </div>
 
 <style>

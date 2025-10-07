@@ -28,10 +28,10 @@ export interface ColumnVisibilityMap {
  * Used in date range selectors for filtering node data by time spans.
  */
 export enum LogSpanPeriod {
-    lastHour = "lastHour",
-    lastDay = "lastDay",
-    last7Days = "last7Days",
-    lastMonth = "lastMonth",
-    lastYear = "lastYear",
+    currentHour = "lastHour",
+    currentDay = "lastDay",
+    current7Days = "current7Days",
+    currentMonth = "currentMonth",
+    currentYear = "currentYear",
     customDate = "customDate",
 }

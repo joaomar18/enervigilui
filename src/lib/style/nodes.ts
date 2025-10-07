@@ -44,7 +44,7 @@ const NodeDetailPickerButtonStyleConfig: ComponentStyles = {
         selectedBackgroundColor: "#0066ff",
         borderColor: "#30363d",
         disabledBorderColor: "#21262d",
-        selectedBorderColor: "#0052cc",
+        selectedBorderColor: "#30363d",
         hoverColor: "#010203",
         disabledHoverColor: "#070a0f",
         selectedHoverColor: "#0052cc",

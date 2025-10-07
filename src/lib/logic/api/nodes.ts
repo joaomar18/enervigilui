@@ -113,11 +113,12 @@ export async function getNodeLogs(
     start_time_str = start_time !== null ? start_time.toISOString() : null;
     end_time_str = end_time !== null ? end_time.toISOString() : null;
 
+    console.log(`Start time: ${start_time_str}, End time: ${end_time_str}`);
+
     const { sucess, data } = await callAPI({
         endpoint: "/api/nodes//get_logs_from_node",
         method: "GET",
         params: { device_id, node_name: processedName, formatted, start_time: start_time_str, end_time: end_time_str, time_step },
-        timeout: 20000,
     });
 
     if (sucess) {
