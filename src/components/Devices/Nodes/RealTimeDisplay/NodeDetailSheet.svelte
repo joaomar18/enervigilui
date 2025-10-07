@@ -304,7 +304,7 @@
                     <div class="history-btn-picker-div">
                         <Button
                             enableToolTip={true}
-                            selected={selectedHistoryTimeSpan == LogSpanPeriod.lastHour}
+                            selected={selectedHistoryTimeSpan === LogSpanPeriod.lastHour}
                             style={$NodeDetailPickerButtonStyle}
                             buttonText={$texts._1h}
                             onClick={() => {
@@ -315,7 +315,7 @@
                         </Button>
                         <Button
                             enableToolTip={true}
-                            selected={selectedHistoryTimeSpan == LogSpanPeriod.lastDay}
+                            selected={selectedHistoryTimeSpan === LogSpanPeriod.lastDay}
                             style={$NodeDetailPickerButtonStyle}
                             buttonText={$texts._1d}
                             onClick={() => {
@@ -326,7 +326,7 @@
                         </Button>
                         <Button
                             enableToolTip={true}
-                            selected={selectedHistoryTimeSpan == LogSpanPeriod.last7Days}
+                            selected={selectedHistoryTimeSpan === LogSpanPeriod.last7Days}
                             style={$NodeDetailPickerButtonStyle}
                             buttonText={$texts._7d}
                             onClick={() => {
@@ -337,7 +337,7 @@
                         </Button>
                         <Button
                             enableToolTip={true}
-                            selected={selectedHistoryTimeSpan == LogSpanPeriod.lastMonth}
+                            selected={selectedHistoryTimeSpan === LogSpanPeriod.lastMonth}
                             style={$NodeDetailPickerButtonStyle}
                             buttonText={$texts._1M}
                             onClick={() => {
@@ -348,7 +348,7 @@
                         </Button>
                         <Button
                             enableToolTip={true}
-                            selected={selectedHistoryTimeSpan == LogSpanPeriod.lastYear}
+                            selected={selectedHistoryTimeSpan === LogSpanPeriod.lastYear}
                             style={$NodeDetailPickerButtonStyle}
                             buttonText={$texts._1Y}
                             onClick={() => {
@@ -359,7 +359,7 @@
                         </Button>
                         <Button
                             enableToolTip={true}
-                            selected={selectedHistoryTimeSpan == LogSpanPeriod.customDate}
+                            selected={selectedHistoryTimeSpan === LogSpanPeriod.customDate}
                             style={$NodeDetailPickerButtonStyle}
                             buttonText=""
                             imageURL="/img/custom-date.svg"
