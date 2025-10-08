@@ -127,14 +127,15 @@
         }, 3000);
     }
 
-    function loadNodeLogs(initial_date: Date, end_date: Date | null = null) {
+    function loadNodeLogs(initial_date: Date | null = null, end_date: Date | null = null) {
         nodeLogsRetrier?.stop();
         nodeLogsRetrier = null;
         if (!$currentDeviceID || !nodeState) {
             return;
         }
+
         nodeLogsRetrier = new MethodRetrier(async (signal) => {
-            ({ nodeLogs } = await getNodeLogs($currentDeviceID, nodeState.name, nodeState.phase, true, initial_date, end_date));
+            ({ nodeLogs } = await getNodeLogs($currentDeviceID, nodeState.name, nodeState.phase, initial_date !== null, initial_date, end_date));
             nodeLogsRetrier?.stop();
             nodeLogsRetrier = null;
         }, 3000);
@@ -426,6 +427,7 @@
                             imageURL="/img/custom-date.svg"
                             onClick={() => {
                                 selectedHistoryTimeSpan = LogSpanPeriod.customDate;
+                                loadNodeLogs();
                             }}
                         >
                             <div slot="tooltip"><ToolTipText text={$texts.customPeriod} /></div>

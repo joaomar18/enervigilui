@@ -33,3 +33,44 @@ export function convertDateToLocalTime(date: string | null): string | null {
     });
     return localTime;
 }
+
+/**
+ * Converts a Date object to an ISO string representation with local timezone offset.
+ *
+ * Unlike the native Date.toISOString() which always returns UTC time (ending with 'Z'),
+ * this function returns the date in the local timezone with the appropriate offset
+ * (e.g., '+01:00', '-05:00').
+ *
+ * @param date - The Date object to convert
+ * @returns ISO string with local timezone offset (e.g., "2025-10-08T14:30:00.000+01:00")
+ * @throws TypeError if the input is not a Date object
+ */
+export function toISOStringLocal(date: Date): string {
+    if (!(date instanceof Date)) throw new TypeError("Expected a Date object");
+
+    const pad = (n: number, z: number = 2) => ("00" + n).slice(-z);
+    const offset = -date.getTimezoneOffset();
+    const sign = offset >= 0 ? "+" : "-";
+    const offsetHours = pad(Math.floor(Math.abs(offset) / 60));
+    const offsetMinutes = pad(Math.abs(offset) % 60);
+
+    return (
+        date.getFullYear() +
+        "-" +
+        pad(date.getMonth() + 1) +
+        "-" +
+        pad(date.getDate()) +
+        "T" +
+        pad(date.getHours()) +
+        ":" +
+        pad(date.getMinutes()) +
+        ":" +
+        pad(date.getSeconds()) +
+        "." +
+        pad(date.getMilliseconds(), 3) +
+        sign +
+        offsetHours +
+        ":" +
+        offsetMinutes
+    );
+}

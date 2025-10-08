@@ -124,7 +124,7 @@
 
     /* Hover: scale up and apply subtle shadow */
     .container:hover {
-        transform: scale(1.1) translateZ(0);
+        transform: scale(1.0625) translateZ(0);
         box-shadow: 0 8px 16px var(--shadow-color);
     }
 

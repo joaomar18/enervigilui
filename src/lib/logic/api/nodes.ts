@@ -1,15 +1,10 @@
 import { callAPI } from "$lib/logic/api/api";
 import { processInitialNodes, initNodes, processNodesState } from "../factory/nodes";
 import { navigateTo } from "../view/navigation";
-import {
-    type NodeRecord,
-    type EditableNodeRecord,
-    type NodeState,
-    type ProcessedNodeState,
-    NodePhase,
-    type BaseNodeAdditionalInfo,
-} from "$lib/types/nodes/base";
+import { NodePhase } from "$lib/types/nodes/base";
 import { addPrefix, getNodePrefix, removePrefix } from "../util/nodes";
+import { toISOStringLocal } from "../util/date";
+import type { NodeRecord, EditableNodeRecord, NodeState, ProcessedNodeState, BaseNodeAdditionalInfo } from "$lib/types/nodes/base";
 
 /**
  * Fetches and processes the configuration for all nodes of a device by its ID.
@@ -73,8 +68,11 @@ export async function getDeviceNodesState(id: number): Promise<{ nodesState: Rec
     return { nodesState, processedNodesState };
 }
 
-
-export async function getNodeAdditionalInfo(device_id: number, nodeName: string, nodePhase: NodePhase): Promise<{ nodeAdditionalInfo: BaseNodeAdditionalInfo }> {
+export async function getNodeAdditionalInfo(
+    device_id: number,
+    nodeName: string,
+    nodePhase: NodePhase
+): Promise<{ nodeAdditionalInfo: BaseNodeAdditionalInfo }> {
     let nodeAdditionalInfo: BaseNodeAdditionalInfo;
     const prefix = getNodePrefix(nodePhase);
     const processedName = addPrefix(removePrefix(nodeName), prefix);
@@ -110,15 +108,14 @@ export async function getNodeLogs(
     let start_time_str: string | null = null;
     let end_time_str: string | null = null;
 
-    start_time_str = start_time !== null ? start_time.toISOString() : null;
-    end_time_str = end_time !== null ? end_time.toISOString() : null;
-
-    console.log(`Start time: ${start_time_str}, End time: ${end_time_str}`);
+    start_time_str = start_time !== null ? toISOStringLocal(start_time) : null;
+    end_time_str = end_time !== null ? toISOStringLocal(end_time) : null;
+    const time_zone = Intl.DateTimeFormat().resolvedOptions().timeZone;
 
     const { sucess, data } = await callAPI({
         endpoint: "/api/nodes//get_logs_from_node",
         method: "GET",
-        params: { device_id, node_name: processedName, formatted, start_time: start_time_str, end_time: end_time_str, time_step },
+        params: { device_id, node_name: processedName, formatted, start_time: start_time_str, end_time: end_time_str, time_step, time_zone },
     });
 
     if (sucess) {
