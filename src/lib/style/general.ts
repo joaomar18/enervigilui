@@ -526,6 +526,29 @@ const ToolTipStyleConfig: ComponentStyles = {
 
 export const ToolTipStyle = createStyleStore(ToolTipStyleConfig);
 
+//////////     T O O L     T I P     D A T E     P I C K E R     //////////
+
+const ToolTipDatePickerStyleConfig: ComponentStyles = {
+    dark: {
+        width: "fit-content",
+        minWidth: "auto",
+        maxWidth: "300px",
+        height: "fit-content",
+        minHeight: "auto",
+        maxHeight: "300px",
+        offsetPx: "10px",
+        border: "1px solid #3a4149",
+        borderRadius: "10px",
+        backgroundColor: "#0a0c0f",
+        paddingHorizontal: "0px",
+        paddingVertical: "0px",
+        animationTime: 200,
+    },
+};
+
+export const ToolTipDatePickerStyle = createStyleStore(ToolTipDatePickerStyleConfig);
+
+
 //////////     T E X T     C O L O R S     //////////
 
 const ToolTipTexStyleConfig: ComponentStyles = {

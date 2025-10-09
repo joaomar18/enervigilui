@@ -13,6 +13,7 @@
     $: effectiveStyle = style ?? $ToolTipStyle;
 
     // Props
+    export let zIndex: number = 200; // Default z-index
     export let originalParent: HTMLElement | null = null;
     export let pushToTop: boolean = false;
     export let autoPosition: boolean = true;
@@ -128,6 +129,7 @@
         bind:this={tooltipElement}
         transition:fade={{ duration: animationTimeNumber }}
         style="
+        --z-index: {zIndex};
         --width: {mergedStyle.width};
         --min-width: {mergedStyle.minWidth};
         --max-width: {mergedStyle.maxWidth};
@@ -171,7 +173,7 @@
         flex-direction: column;
         justify-content: start;
         align-items: center;
-        z-index: 200;
+        z-index: var(--z-index);
     }
 
     /* Content wrapper: fills the tooltip container */

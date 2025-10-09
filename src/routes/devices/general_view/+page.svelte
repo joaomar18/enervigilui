@@ -156,7 +156,8 @@
             <div class="grid-col">
                 <ContentCard titleText={$texts.metrics}>
                     <div class="slot-div" slot="header"></div>
-                    <div class="slot-div content" slot="content"></div>
+                    <div class="slot-div content" slot="content">
+                    </div>
                 </ContentCard>
             </div>
             <div class="grid-col span-2">

@@ -9,7 +9,8 @@
     import { getNodeSection, getCommunicationID, isNumeric } from "$lib/logic/util/nodes";
     import { getNodeAdditionalInfo, getNodeLogs } from "$lib/logic/api/nodes";
     import { getTimeSpanFromLogPeriod } from "$lib/logic/view/device";
-    import type { BaseNodeAdditionalInfo, NodeType, ProcessedNodeState } from "$lib/types/nodes/base";
+    import ToolTip from "../../../General/ToolTip.svelte";
+    import type { BaseNodeAdditionalInfo, ProcessedNodeState } from "$lib/types/nodes/base";
 
     // Stores
     import { currentDeviceID } from "$lib/stores/device/current";
@@ -22,8 +23,9 @@
     import { pluginTexts } from "$lib/stores/lang/protocolPlugin";
 
     // Styles
-    import { NodesBaseDisplayDetailStyle, NodeDetailPickerButtonStyle } from "$lib/style/nodes";
+    import { NodesBaseDisplayDetailStyle, NodeDetailPickerButtonStyle, CustomDatePickerButtonStyle } from "$lib/style/nodes";
     import { onDestroy } from "svelte";
+    import DatePickerTooltip from "../../../General/DatePickerTooltip.svelte";
 
     // Props
     export let nodeState: ProcessedNodeState;
@@ -88,6 +90,8 @@
     let nodeLogs: any;
     let nodeLogsRetrier: MethodRetrier | null = null;
     let selectedHistoryTimeSpan: LogSpanPeriod = LogSpanPeriod.currentDay;
+
+    let showCustomDatePicker: boolean = false;
 
     // Reactive Statements
 
@@ -427,19 +431,23 @@
                             >
                                 <div slot="tooltip"><ToolTipText text={$texts.currentYear} /></div>
                             </Button>
-                            <Button
-                                enableToolTip={true}
-                                selected={selectedHistoryTimeSpan === LogSpanPeriod.customDate}
-                                style={$NodeDetailPickerButtonStyle}
-                                buttonText=""
-                                imageURL="/img/custom-date.svg"
-                                onClick={() => {
-                                    selectedHistoryTimeSpan = LogSpanPeriod.customDate;
-                                    loadNodeLogs();
-                                }}
-                            >
-                                <div slot="tooltip"><ToolTipText text={$texts.customPeriod} /></div>
-                            </Button>
+                            <div class="custom-date-div">
+                                <Button
+                                    enableToolTip={true}
+                                    selected={showCustomDatePicker}
+                                    style={selectedHistoryTimeSpan === LogSpanPeriod.customDate
+                                        ? $NodeDetailPickerButtonStyle
+                                        : $CustomDatePickerButtonStyle}
+                                    buttonText=""
+                                    imageURL="/img/custom-date.svg"
+                                    onClick={() => {
+                                        showCustomDatePicker = !showCustomDatePicker;
+                                    }}
+                                >
+                                    <div slot="tooltip"><ToolTipText text={$texts.customPeriod} /></div>
+                                </Button>
+                                <DatePickerTooltip bind:showToolTip={showCustomDatePicker} />
+                            </div>
                         </div>
                         <div class="chart-container">
                             <LineGraph data={sampleChartData} dataColors={sampleColors} dataLabel={sampleLabels} width="100%" height="400px" />
@@ -709,6 +717,14 @@
         justify-content: start;
         align-items: center;
         height: fit-content;
+    }
+
+    .content-div .inner-content-div .custom-date-div {
+        margin: 0;
+        padding: 0;
+        position: relative;
+        width: fit-content;
+        height: 100%;
     }
 
     .chart-container {

@@ -61,6 +61,35 @@ const NodeDetailPickerButtonStyleConfig: ComponentStyles = {
 
 export const NodeDetailPickerButtonStyle = createStyleStore(NodeDetailPickerButtonStyleConfig);
 
+//////////     C U S T O M     D A T E     P I C K E R     B U T T O N     //////////
+
+const CustomDatePickerButtonStyleConfig: ComponentStyles = {
+    dark: {
+        width: "40px",
+        height: "40px",
+        borderRadius: "5px",
+        backgroundColor: "#0d1117",
+        disabledBackgroundColor: "#161b22",
+        selectedBackgroundColor: "#30363d",
+        borderColor: "#30363d",
+        disabledBorderColor: "#21262d",
+        selectedBorderColor: "#484f58",
+        hoverColor: "#010203",
+        disabledHoverColor: "#070a0f",
+        selectedHoverColor: "#21262d",
+        fontColor: "#f0f6fc",
+        disabledFontColor: "#484f58",
+        selectedFontColor: "#f0f6fc",
+        fontSize: "1rem",
+        fontWeight: "400",
+        imageWidth: "32px",
+        imageHeight: "32px",
+        showToolTipDelay: 300,
+    },
+};
+
+export const CustomDatePickerButtonStyle = createStyleStore(CustomDatePickerButtonStyleConfig);
+
 //////////     N O D E     C O N F I G U R A T I O N     W I N D O W     //////////
 
 const NodeConfigWindowStyleConfig: ComponentStyles = {
