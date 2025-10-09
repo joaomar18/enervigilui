@@ -491,12 +491,6 @@ export const nodeSections: Array<NodeSection> = [
         phase: NodePhase.GENERAL,
         prefix: NodePrefix.GENERAL,
         labelKey: "general",
-        filter: (phase) => {
-            const isL1 = phase === NodePhase.L1;
-            const isL2 = phase === NodePhase.L2;
-            const isL3 = phase === NodePhase.L3;
-            const isTotal = phase === NodePhase.TOTAL;
-            return !isL1 && !isL2 && !isL3 && !isTotal;
-        },
+        filter: (phase) => phase === NodePhase.GENERAL,
     },
 ];

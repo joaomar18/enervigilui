@@ -40,8 +40,6 @@
     let expandedState = assignRealTimeCardSectionsStateToAllPhases(initialRealTimeCardSectionsExpandState);
     let showDetailDiv = false;
     let detailedNodeState: ProcessedNodeState;
-    //let detailedNodeAdditionalInfo: BaseNodeAdditionalInfo;
-    //let detailedNodeAddInfoRetrier: MethodRetrier | null = null;
 
     // Reactive Statements
     $: if (nodesState && processedNodesState) {
@@ -64,20 +62,7 @@
 
     function openDetailDiv(nodeState: ProcessedNodeState): void {
         showDetailDiv = true;
-        //detailedNodeAddInfoRetrier?.stop();
-        //detailedNodeAddInfoRetrier = null;
         detailedNodeState = nodeState;
-        //if (!$currentDeviceID || !nodeState) {
-        //    return;
-        //}
-        /*
-        detailedNodeAddInfoRetrier = new MethodRetrier(async (signal) => {
-            let { nodeAdditionalInfo } = await getNodeAdditionalInfo($currentDeviceID, nodeState.name, nodeState.phase);
-            detailedNodeAdditionalInfo = nodeAdditionalInfo;
-            detailedNodeAddInfoRetrier?.stop();
-            detailedNodeAddInfoRetrier = null;
-        }, 3000);
-        */
     }
 
     onMount(() => {
@@ -97,13 +82,6 @@
             nodesStatePoller = null;
         };
     });
-
-    /*
-    onDestroy(() => {
-        detailedNodeAddInfoRetrier?.stop();
-        detailedNodeAddInfoRetrier = null;
-    });
-    */
 </script>
 
 <div
@@ -189,8 +167,7 @@
             </div>
         </div>
     {/if}
-    <!--<NodeDetailSheet bind:showPanel={showDetailDiv} nodeState={detailedNodeState} nodeAdditionalInfo={detailedNodeAdditionalInfo} />-->
-    <NodeDetailSheet bind:showPanel={showDetailDiv} nodeState={detailedNodeState} /> 
+    <NodeDetailSheet bind:showPanel={showDetailDiv} nodeState={detailedNodeState} />
 </div>
 
 <style>

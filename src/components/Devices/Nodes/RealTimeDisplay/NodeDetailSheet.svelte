@@ -6,10 +6,10 @@
     import InlineLoader from "../../../General/InlineLoader.svelte";
     import { MethodRetrier } from "$lib/logic/api/retrier";
     import { LogSpanPeriod } from "$lib/types/view/nodes";
-    import { getNodeSection, getCommunicationID } from "$lib/logic/util/nodes";
+    import { getNodeSection, getCommunicationID, isNumeric } from "$lib/logic/util/nodes";
     import { getNodeAdditionalInfo, getNodeLogs } from "$lib/logic/api/nodes";
     import { getTimeSpanFromLogPeriod } from "$lib/logic/view/device";
-    import type { BaseNodeAdditionalInfo, ProcessedNodeState } from "$lib/types/nodes/base";
+    import type { BaseNodeAdditionalInfo, NodeType, ProcessedNodeState } from "$lib/types/nodes/base";
 
     // Stores
     import { currentDeviceID } from "$lib/stores/device/current";
@@ -92,11 +92,16 @@
     // Reactive Statements
 
     // Node Change
+    $: if (!showPanel) {
+        selectedHistoryTimeSpan = LogSpanPeriod.currentDay; // Default Period
+    }
+
     $: if (nodeState) {
-        selectedHistoryTimeSpan = LogSpanPeriod.currentDay;
         loadNodeAdditionalInfo();
-        let { initial_date, end_date } = getTimeSpanFromLogPeriod(LogSpanPeriod.currentDay);
-        loadNodeLogs(initial_date, end_date);
+        if (isNumeric(nodeState)) {
+            let { initial_date, end_date } = loadDateSpan();
+            loadNodeLogs(initial_date, end_date);
+        }
     }
 
     $: if (nodeState) {
@@ -111,8 +116,6 @@
         }
     }
 
-    $: console.log(nodeLogs);
-
     // Functions
     function loadNodeAdditionalInfo() {
         nodeAddInfoRetrier?.stop();
@@ -125,6 +128,10 @@
             nodeAddInfoRetrier?.stop();
             nodeAddInfoRetrier = null;
         }, 3000);
+    }
+
+    function loadDateSpan(): { initial_date: Date; end_date: Date } {
+        return getTimeSpanFromLogPeriod(selectedHistoryTimeSpan);
     }
 
     function loadNodeLogs(initial_date: Date | null = null, end_date: Date | null = null) {
@@ -232,7 +239,7 @@
                 </div>
                 <div class="row">
                     <span class="label">{$texts.section}</span>
-                    <span class="value">{$texts[getNodeSection(nodeState.phase).labelKey]}</span>
+                    <span class="value">{$texts[getNodeSection(nodeState.phase).labelKey] || $texts.variables}</span>
                 </div>
                 <div class="row">
                     <span class="label">{$texts.state}</span>
@@ -351,92 +358,94 @@
                     </div>
                 {/if}
 
-                <div class="section-title"><h3>{$texts.history}</h3></div>
-                <div class="inner-content-div no-horizontal-padding">
-                    <div class="history-btn-picker-div">
-                        <Button
-                            enableToolTip={true}
-                            selected={selectedHistoryTimeSpan === LogSpanPeriod.currentHour}
-                            style={$NodeDetailPickerButtonStyle}
-                            buttonText={$texts._1h}
-                            onClick={() => {
-                                selectedHistoryTimeSpan = LogSpanPeriod.currentHour;
-                                let { initial_date, end_date } = getTimeSpanFromLogPeriod(selectedHistoryTimeSpan);
-                                loadNodeLogs(initial_date, end_date);
-                            }}
-                        >
-                            <div slot="tooltip"><ToolTipText text={$texts.currentHour} /></div>
-                        </Button>
-                        <Button
-                            enableToolTip={true}
-                            selected={selectedHistoryTimeSpan === LogSpanPeriod.currentDay}
-                            style={$NodeDetailPickerButtonStyle}
-                            buttonText={$texts._1d}
-                            onClick={() => {
-                                selectedHistoryTimeSpan = LogSpanPeriod.currentDay;
-                                let { initial_date, end_date } = getTimeSpanFromLogPeriod(selectedHistoryTimeSpan);
-                                loadNodeLogs(initial_date, end_date);
-                            }}
-                        >
-                            <div slot="tooltip"><ToolTipText text={$texts.currentDay} /></div>
-                        </Button>
-                        <Button
-                            enableToolTip={true}
-                            selected={selectedHistoryTimeSpan === LogSpanPeriod.current7Days}
-                            style={$NodeDetailPickerButtonStyle}
-                            buttonText={$texts._7d}
-                            onClick={() => {
-                                selectedHistoryTimeSpan = LogSpanPeriod.current7Days;
-                                let { initial_date, end_date } = getTimeSpanFromLogPeriod(selectedHistoryTimeSpan);
-                                loadNodeLogs(initial_date, end_date);
-                            }}
-                        >
-                            <div slot="tooltip"><ToolTipText text={$texts.currentWeek} /></div>
-                        </Button>
-                        <Button
-                            enableToolTip={true}
-                            selected={selectedHistoryTimeSpan === LogSpanPeriod.currentMonth}
-                            style={$NodeDetailPickerButtonStyle}
-                            buttonText={$texts._1M}
-                            onClick={() => {
-                                selectedHistoryTimeSpan = LogSpanPeriod.currentMonth;
-                                let { initial_date, end_date } = getTimeSpanFromLogPeriod(selectedHistoryTimeSpan);
-                                loadNodeLogs(initial_date, end_date);
-                            }}
-                        >
-                            <div slot="tooltip"><ToolTipText text={$texts.currentMonth} /></div>
-                        </Button>
-                        <Button
-                            enableToolTip={true}
-                            selected={selectedHistoryTimeSpan === LogSpanPeriod.currentYear}
-                            style={$NodeDetailPickerButtonStyle}
-                            buttonText={$texts._1Y}
-                            onClick={() => {
-                                selectedHistoryTimeSpan = LogSpanPeriod.currentYear;
-                                let { initial_date, end_date } = getTimeSpanFromLogPeriod(selectedHistoryTimeSpan);
-                                loadNodeLogs(initial_date, end_date);
-                            }}
-                        >
-                            <div slot="tooltip"><ToolTipText text={$texts.currentYear} /></div>
-                        </Button>
-                        <Button
-                            enableToolTip={true}
-                            selected={selectedHistoryTimeSpan === LogSpanPeriod.customDate}
-                            style={$NodeDetailPickerButtonStyle}
-                            buttonText=""
-                            imageURL="/img/custom-date.svg"
-                            onClick={() => {
-                                selectedHistoryTimeSpan = LogSpanPeriod.customDate;
-                                loadNodeLogs();
-                            }}
-                        >
-                            <div slot="tooltip"><ToolTipText text={$texts.customPeriod} /></div>
-                        </Button>
+                {#if isNumeric(nodeState)}
+                    <div class="section-title"><h3>{$texts.history}</h3></div>
+                    <div class="inner-content-div no-horizontal-padding">
+                        <div class="history-btn-picker-div">
+                            <Button
+                                enableToolTip={true}
+                                selected={selectedHistoryTimeSpan === LogSpanPeriod.currentHour}
+                                style={$NodeDetailPickerButtonStyle}
+                                buttonText={$texts._1h}
+                                onClick={() => {
+                                    selectedHistoryTimeSpan = LogSpanPeriod.currentHour;
+                                    let { initial_date, end_date } = getTimeSpanFromLogPeriod(selectedHistoryTimeSpan);
+                                    loadNodeLogs(initial_date, end_date);
+                                }}
+                            >
+                                <div slot="tooltip"><ToolTipText text={$texts.currentHour} /></div>
+                            </Button>
+                            <Button
+                                enableToolTip={true}
+                                selected={selectedHistoryTimeSpan === LogSpanPeriod.currentDay}
+                                style={$NodeDetailPickerButtonStyle}
+                                buttonText={$texts._1d}
+                                onClick={() => {
+                                    selectedHistoryTimeSpan = LogSpanPeriod.currentDay;
+                                    let { initial_date, end_date } = getTimeSpanFromLogPeriod(selectedHistoryTimeSpan);
+                                    loadNodeLogs(initial_date, end_date);
+                                }}
+                            >
+                                <div slot="tooltip"><ToolTipText text={$texts.currentDay} /></div>
+                            </Button>
+                            <Button
+                                enableToolTip={true}
+                                selected={selectedHistoryTimeSpan === LogSpanPeriod.current7Days}
+                                style={$NodeDetailPickerButtonStyle}
+                                buttonText={$texts._7d}
+                                onClick={() => {
+                                    selectedHistoryTimeSpan = LogSpanPeriod.current7Days;
+                                    let { initial_date, end_date } = getTimeSpanFromLogPeriod(selectedHistoryTimeSpan);
+                                    loadNodeLogs(initial_date, end_date);
+                                }}
+                            >
+                                <div slot="tooltip"><ToolTipText text={$texts.currentWeek} /></div>
+                            </Button>
+                            <Button
+                                enableToolTip={true}
+                                selected={selectedHistoryTimeSpan === LogSpanPeriod.currentMonth}
+                                style={$NodeDetailPickerButtonStyle}
+                                buttonText={$texts._1M}
+                                onClick={() => {
+                                    selectedHistoryTimeSpan = LogSpanPeriod.currentMonth;
+                                    let { initial_date, end_date } = getTimeSpanFromLogPeriod(selectedHistoryTimeSpan);
+                                    loadNodeLogs(initial_date, end_date);
+                                }}
+                            >
+                                <div slot="tooltip"><ToolTipText text={$texts.currentMonth} /></div>
+                            </Button>
+                            <Button
+                                enableToolTip={true}
+                                selected={selectedHistoryTimeSpan === LogSpanPeriod.currentYear}
+                                style={$NodeDetailPickerButtonStyle}
+                                buttonText={$texts._1Y}
+                                onClick={() => {
+                                    selectedHistoryTimeSpan = LogSpanPeriod.currentYear;
+                                    let { initial_date, end_date } = getTimeSpanFromLogPeriod(selectedHistoryTimeSpan);
+                                    loadNodeLogs(initial_date, end_date);
+                                }}
+                            >
+                                <div slot="tooltip"><ToolTipText text={$texts.currentYear} /></div>
+                            </Button>
+                            <Button
+                                enableToolTip={true}
+                                selected={selectedHistoryTimeSpan === LogSpanPeriod.customDate}
+                                style={$NodeDetailPickerButtonStyle}
+                                buttonText=""
+                                imageURL="/img/custom-date.svg"
+                                onClick={() => {
+                                    selectedHistoryTimeSpan = LogSpanPeriod.customDate;
+                                    loadNodeLogs();
+                                }}
+                            >
+                                <div slot="tooltip"><ToolTipText text={$texts.customPeriod} /></div>
+                            </Button>
+                        </div>
+                        <div class="chart-container">
+                            <LineGraph data={sampleChartData} dataColors={sampleColors} dataLabel={sampleLabels} width="100%" height="400px" />
+                        </div>
                     </div>
-                    <div class="chart-container">
-                        <LineGraph data={sampleChartData} dataColors={sampleColors} dataLabel={sampleLabels} width="100%" height="400px" />
-                    </div>
-                </div>
+                {/if}
 
                 <div class="section-title"><h3>{$texts.technicalData}</h3></div>
                 <div class="inner-content-div">
