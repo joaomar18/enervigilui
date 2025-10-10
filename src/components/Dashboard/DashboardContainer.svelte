@@ -73,7 +73,7 @@
 -->
 <div class="dashboard-container" in:fade={{ duration: 300 }}>
     <LeftPanel bind:leftPanelOpen={$leftPanelOpen} activeSection={$currentPage} />
-    <div class="left-header-div" bind:this={leftHeaderEl}>
+    <div class="left-header-div" bind:this={leftHeaderEl} class:left-panel-open={$leftPanelOpen}>
         <div class="menu-button-div" class:close={mobileSearchOpen}>
             <MenuButton bind:menuOpen={$leftPanelOpen} />
         </div>
@@ -130,13 +130,17 @@
         display: flex;
         justify-content: center;
         align-items: center;
+        z-index: 101;
+    }
+
+    .left-header-div.left-panel-open {
         z-index: 111;
     }
 
     /* Hidden logo slot until enabled */
     .left-header-div .logo-div {
         box-sizing: border-box;
-        position: absolute;
+        position: fixed;
         left: 56px;
         width: calc(250px - 56px);
         display: none;
@@ -214,7 +218,7 @@
     .dashboard-container .content .container-div {
         box-sizing: border-box;
         margin: 0;
-        padding: 30px;
+        padding: 20px;
         height: 100%;
         min-height: calc(100vh - 74px);
         width: 100%;
@@ -269,6 +273,9 @@
         }
         .left-header-div .logo-div.management-page.close {
             display: none;
+        }
+        .dashboard-container .content .container-div {
+            padding: 30px;
         }
     }
 </style>

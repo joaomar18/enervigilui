@@ -273,12 +273,13 @@
         flex-direction: column;
         transform: translateX(-100%);
         transition: transform 0.2s ease-in-out;
-        z-index: 111;
+        z-index: 101;
     }
 
     /* Slide in when open */
     .container.open {
         transform: translateX(0);
+        z-index: 111;
     }
 
     /* Logo area at top of sidebar */

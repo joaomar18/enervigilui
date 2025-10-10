@@ -2,6 +2,9 @@
     import { tick } from "svelte";
     import { onDestroy } from "svelte";
 
+    // Stores
+    import { leftPanelOpen } from "$lib/stores/view/navigation";
+
     // Styles
     import { mergeStyle } from "$lib/style/components";
     import { RightPanelSheetStyle } from "$lib/style/general";
@@ -83,7 +86,7 @@
     $: mergedStyle = mergeStyle(effectiveStyle, localOverrides);
 
     // Variables
-    let contentEl: HTMLDivElement;
+    let containerEl: HTMLDivElement;
     let closePanelEventListenerDefined: boolean = false;
 
     // Reactive Statements
@@ -102,7 +105,7 @@
     // Functions
     async function handleClickOutside(event: MouseEvent): Promise<void> {
         await tick();
-        if (showPanel && contentEl && !contentEl.contains(event.target as Node)) {
+        if (showPanel && containerEl && !containerEl.contains(event.target as Node)) {
             showPanel = false;
         }
     }
@@ -120,8 +123,6 @@
             window.removeEventListener("click", handleClickOutside);
         }
     });
-
-    $: console.log();
 </script>
 
 {#if useMask && showPanel}
@@ -135,7 +136,6 @@
 {/if}
 
 <div
-    bind:this={contentEl}
     style="
         --width: {mergedStyle.width};
         --min-width: {mergedStyle.minWidth};
@@ -164,36 +164,39 @@
         --scrollbar-track-color: {mergedStyle.scrollbarTrackColor};
         --scrollbar-thumb-color: {mergedStyle.scrollbarThumbColor};
     "
-    class="content"
+    class="container"
+    bind:this={containerEl}
     class:open={showPanel}
 >
-    <div class="top-div">
-        <div class="title-div">
-            <div class="title-content">
-                <slot name="title"></slot>
-            </div>
-            <button class="close-button" on:click={closePanel} aria-label="Close Window">
-                <svg
-                    width={mergedStyle.closeButtonImageWidth}
-                    height={mergedStyle.closeButtonImageHeight}
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke=""
-                    stroke-width="2"
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
+    <div class="content">
+        <div class="top-div">
+            <div class="title-div">
+                <div class="title-content">
+                    <slot name="title"></slot>
+                </div>
+                <button class="close-button" on:click={closePanel} aria-label="Close Window">
+                    <svg
+                        width={mergedStyle.closeButtonImageWidth}
+                        height={mergedStyle.closeButtonImageHeight}
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke=""
+                        stroke-width="2"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                    >
+                        <line x1="6" y1="6" x2="18" y2="18" />
+                        <line x1="18" y1="6" x2="6" y2="18" />
+                    </svg></button
                 >
-                    <line x1="6" y1="6" x2="18" y2="18" />
-                    <line x1="18" y1="6" x2="6" y2="18" />
-                </svg></button
-            >
+            </div>
+            <div class="header-div">
+                <slot name="header"></slot>
+            </div>
         </div>
-        <div class="header-div">
-            <slot name="header"></slot>
+        <div class="content-div">
+            <slot name="content" />
         </div>
-    </div>
-    <div class="content-div">
-        <slot name="content" />
     </div>
 </div>
 
@@ -212,11 +215,12 @@
         z-index: 108;
     }
 
-    .content {
+    .container {
         box-sizing: border-box;
         padding: 0;
         margin: 0;
         right: 0;
+        left: auto;
         top: 0;
         bottom: 0;
         position: fixed;
@@ -233,14 +237,22 @@
         transform: translateX(100%);
         transition: transform 0.2s ease-in-out;
         z-index: 109;
+    }
+
+    .container.open {
+        transform: translateX(0%);
+    }
+
+    .content {
+        margin: 0;
+        padding: 0;
+        position: relative;
         display: flex;
         flex-direction: column;
         justify-content: start;
         align-items: center;
-    }
-
-    .content.open {
-        transform: translateX(0%);
+        width: 100%;
+        height: 100%;
     }
 
     .top-div {

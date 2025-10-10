@@ -1,37 +1,75 @@
 <script lang="ts">
     import { onMount } from "svelte";
     import InputField from "../InputField.svelte";
+    import { validateStringNumber } from "./DateTimeValidation";
 
     // Styles
     import { InputTimeFieldStyle } from "$lib/style/general";
 
     // Props
-    export let inputValue: string;
-    export let inputType: "HOURS" | "MINUTES" | "SECONDS";
+    export let hours: string = "";
+    export let minutes: string = "";
+    export let seconds: string = "";
+    export let useHours: boolean = true;
+    export let useMinutes: boolean = true;
+    export let useSeconds: boolean = true;
     export let inputInvalid: boolean = false;
 
     // Variables
-    let maxValue: number;
-    let placeHolderText: string;
+    let hoursId: string = "HH";
+    let minutesId: string = "mm";
+    let secondsId: string = "ss";
+    let formatterSep: string = " : ";
+    let usedFields: Array<string> = [];
+
+    let inputValue: string;
+
+    let placeHolderText: string = "";
 
     // Reactive Statements
 
     // Functions
-    function createTypeSpecificVars(): void {
-        if (inputType === "HOURS") {
-            placeHolderText = "HH";
-            maxValue = 23;
-        } else if (inputType === "MINUTES") {
-            placeHolderText = "mm";
-            maxValue = 59;
-        } else if (inputType === "SECONDS") {
-            placeHolderText = "ss";
-            maxValue = 59;
+
+    function validateTime(): void {
+        let values = inputValue.split(formatterSep);
+        let validValues: Array<string> = [];
+        for (let i = 0; i < values.length; i++) {
+            validValues[i] = validateStringNumber(values[i]);
+        }
+
+        for (let field of usedFields) {
+            if (field === hoursId) {
+                // Hours
+            } else if (field === "mm") {
+                // Minutes
+            } else if (field === "ss") {
+                // Seconds
+            }
+        }
+    }
+
+    function constructFields(): void {
+        if (useHours) {
+            usedFields.push(hoursId);
+        }
+        if (useMinutes) {
+            usedFields.push(minutesId);
+        }
+        if (useSeconds) {
+            usedFields.push(secondsId);
+        }
+    }
+
+    function constructPlaceHolder(): void {
+        for (let field of usedFields) {
+            if (placeHolderText) placeHolderText += formatterSep;
+            placeHolderText += field;
         }
     }
 
     onMount(() => {
-        createTypeSpecificVars();
+        constructFields();
+        constructPlaceHolder();
     });
 </script>
 
@@ -42,10 +80,8 @@
     bind:inputValue
     {placeHolderText}
     zeroPaddingDigits={2}
-    inputType="POSITIVE_INT"
-    {maxValue}
-    validateOnInput={true}
     disableHints={true}
+    onChange={validateTime}
 />
 
 <style>

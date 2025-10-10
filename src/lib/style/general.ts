@@ -206,7 +206,7 @@ export const DangerInputFieldStyle = createStyleStore(DangerInputFieldStyleConfi
 
 const InputTimeFieldStyleConfig: ComponentStyles = {
     dark: {
-        width: "100px",
+        width: "35%",
         height: "40px",
         borderRadius: "5px",
         backgroundColor: "#252b33",
@@ -237,7 +237,7 @@ export const InputTimeFieldStyle = createStyleStore(InputTimeFieldStyleConfig);
 
 const InputDateFieldStyleConfig: ComponentStyles = {
     dark: {
-        width: "200px",
+        width: "100%",
         height: "40px",
         borderRadius: "5px",
         backgroundColor: "#252b33",
@@ -465,7 +465,7 @@ const RightPanelSheetStyleConfig: ComponentStyles = {
     dark: {
         maskBlurFilter: "8px",
         maskBackground: "rgba(24, 29, 35, 0.25)",
-        width: "100vw",
+        width: "100%",
         minWidth: "350px",
         maxWidth: "420px",
         paddingTop: "5px",

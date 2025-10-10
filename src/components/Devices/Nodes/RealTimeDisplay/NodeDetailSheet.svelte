@@ -9,7 +9,6 @@
     import { getNodeSection, getCommunicationID, isNumeric } from "$lib/logic/util/nodes";
     import { getNodeAdditionalInfo, getNodeLogs } from "$lib/logic/api/nodes";
     import { getTimeSpanFromLogPeriod } from "$lib/logic/view/device";
-    import ToolTip from "../../../General/ToolTip.svelte";
     import type { BaseNodeAdditionalInfo, ProcessedNodeState } from "$lib/types/nodes/base";
 
     // Stores
@@ -101,6 +100,7 @@
     }
 
     $: if (nodeState) {
+        showCustomDatePicker = false;
         loadNodeAdditionalInfo();
         if (isNumeric(nodeState)) {
             let { initial_date, end_date } = loadDateSpan();
@@ -725,7 +725,6 @@
         position: relative;
         width: fit-content;
         height: 100%;
-        background-color: red;
     }
 
     .chart-container {

@@ -16,7 +16,9 @@
     export let showToolTip: boolean;
 
     // Layout / styling props
-    export let padding: string | undefined = "10px";
+    export let paddingHorizontal: string | undefined = "20px";
+    export let paddingTop: string | undefined = "20px";
+    export let paddingBottom: string | undefined = "20px";
     export let labelSize: string | undefined = "15px";
     export let labelColor: string | undefined = "white";
     export let labelWeight: string | undefined = "400";
@@ -62,10 +64,21 @@
     });
 </script>
 
-<ToolTip style={$ToolTipDatePickerStyle} zIndex={198} width="400px" minWidth="auto" maxWidth="auto" {showToolTip}>
+<ToolTip
+    style={$ToolTipDatePickerStyle}
+    autoPositionContinuous={true}
+    zIndex={198}
+    width="50vw"
+    minWidth="300px"
+    maxWidth="375px"
+    maxHeight="auto"
+    {showToolTip}
+>
     <div
         style="
-            --padding: {padding};
+            --padding-horizontal: {paddingHorizontal};
+            --padding-top: {paddingTop};
+            --padding-bottom: {paddingBottom};
             --label-size: {labelSize};
             --label-color: {labelColor};
             --label-weight: {labelWeight};
@@ -81,39 +94,55 @@
             <div class="field">
                 <span>Início</span>
                 <div class="row">
-                    <InputDateField inputValue={startDate} />
-                    <InputTimeField inputValue={startHours} inputType="HOURS" />
+                    <div class="extend">
+                        <InputDateField inputValue={startDate} />
+                    </div>
+                    <InputTimeField hours={startHours} minutes={startMinutes} useSeconds={false} />
+                    <!--<InputTimeField inputValue={startHours} inputType="HOURS" />
                     <span class="time-sep">:</span>
-                    <InputTimeField inputValue={startMinutes} inputType="MINUTES" />
+                    <InputTimeField inputValue={startMinutes} inputType="MINUTES" />-->
                 </div>
             </div>
             <div class="field">
                 <span>Fim</span>
                 <div class="row">
-                    <InputDateField inputValue={endDate} />
-                    <InputTimeField inputValue={endHours} inputType="HOURS" />
-                    <span class="time-sep">:</span>
-                    <InputTimeField inputValue={endMinutes} inputType="MINUTES" />
+                    <div class="extend">
+                        <InputDateField inputValue={endDate} />
+                    </div>
+                    <InputTimeField hours={endHours} minutes={endMinutes} useSeconds={false} />
                 </div>
             </div>
-            <Button buttonText={$texts.confirm} style={$SubPrimaryButtonStyle} onClick={() => {}} />
-            <Button buttonText={$texts.cancel} style={$SubDefaultButtonStyle} onClick={() => {}} />
+            <div class="action-buttons-div">
+                <Button buttonText={$texts.confirm} style={$SubPrimaryButtonStyle} onClick={() => {}} />
+                <Button
+                    buttonText={$texts.cancel}
+                    style={$SubDefaultButtonStyle}
+                    onClick={() => {
+                        showToolTip = false;
+                    }}
+                />
+            </div>
         </div>
     </div>
 </ToolTip>
 
 <style>
     .date-picker-div {
-        width: fit-content;
-        height: fit-content;
-        padding: var(--padding);
+        width: 100%;
+        height: 100%;
+        box-sizing: border-box;
+        padding-top: var(--padding-top);
+        padding-bottom: var(--padding-bottom);
+        padding-left: var(--padding-horizontal);
+        padding-right: var(--padding-horizontal);
+        container-type: inline-size; /* Enable container queries */
     }
     .content {
         margin: 0;
         padding: 0;
         position: relative;
-        width: fit-content;
-        height: fit-content;
+        width: 100%;
+        height: 100%;
         display: flex;
         flex-direction: column;
         justify-content: start;
@@ -140,8 +169,26 @@
     .content .field .row {
         display: flex;
         flex-direction: row;
-        justify-content: center;
+        justify-content: space-between;
+        width: 100%;
+        height: fit-content;
         align-items: center;
         gap: var(--row-gap);
+    }
+
+    .content .field .row .extend {
+        flex: 1;
+        min-width: 0;
+        height: fit-content;
+    }
+
+    .content .action-buttons-div {
+        padding-top: 10px;
+        display: flex;
+        flex-direction: row;
+        gap: 20px;
+        justify-content: center;
+        align-items: center;
+        flex-wrap: wrap;
     }
 </style>
