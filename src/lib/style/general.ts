@@ -164,6 +164,8 @@ const InputFieldStyleConfig: ComponentStyles = {
         infoTextSize: "0.9rem",
         infoTextWeight: "400",
         unitTextColor: "rgb(170,170,170)",
+        placeHolderTextColor: "rgb(170,170,170)",
+        placeHolderTextWeight: "400",
     },
 };
 
@@ -193,10 +195,74 @@ const DangerInputFieldStyleConfig: ComponentStyles = {
         infoTextSize: "0.95rem",
         infoTextWeight: "400",
         unitTextColor: "rgb(170,170,170)",
+        placeHolderTextColor: "rgb(170,170,170)",
+        placeHolderTextWeight: "400",
     },
 };
 
 export const DangerInputFieldStyle = createStyleStore(DangerInputFieldStyleConfig);
+
+//////////     I N P U T     T I M E     F I E L D     //////////
+
+const InputTimeFieldStyleConfig: ComponentStyles = {
+    dark: {
+        width: "100px",
+        height: "40px",
+        borderRadius: "5px",
+        backgroundColor: "#252b33",
+        borderColor: "#323a45",
+        disabledBackgroundColor: "#252b33",
+        disabledBorderColor: "#323a45",
+        selectedBackgroundColor: "#252b33",
+        selectedBorderColor: "#2F80ED",
+        badFormatBackgroundColor: "#252b33",
+        badFormatBorderColor: "#e74c3c",
+        paddingLeft: "10px",
+        fontSize: "1rem",
+        fontColor: "#f5f5f5",
+        fontWeight: "400",
+        textAlign: "center",
+        infoTextColor: "#f5f5f5",
+        infoTextSize: "0.9rem",
+        infoTextWeight: "400",
+        unitTextColor: "rgb(170,170,170)",
+        placeHolderTextColor: "rgb(170,170,170)",
+        placeHolderTextWeight: "400",
+    },
+};
+
+export const InputTimeFieldStyle = createStyleStore(InputTimeFieldStyleConfig);
+
+//////////     I N P U T     D A T E     F I E L D     //////////
+
+const InputDateFieldStyleConfig: ComponentStyles = {
+    dark: {
+        width: "200px",
+        height: "40px",
+        borderRadius: "5px",
+        backgroundColor: "#252b33",
+        borderColor: "#323a45",
+        disabledBackgroundColor: "#252b33",
+        disabledBorderColor: "#323a45",
+        selectedBackgroundColor: "#252b33",
+        selectedBorderColor: "#2F80ED",
+        badFormatBackgroundColor: "#252b33",
+        badFormatBorderColor: "#e74c3c",
+        paddingLeft: "10px",
+        fontSize: "1rem",
+        fontColor: "#f5f5f5",
+        fontWeight: "400",
+        textAlign: "center",
+        infoTextColor: "#f5f5f5",
+        infoTextSize: "0.9rem",
+        infoTextWeight: "400",
+        unitTextColor: "rgb(170,170,170)",
+        placeHolderTextColor: "rgb(170,170,170)",
+        placeHolderTextWeight: "400",
+    },
+};
+
+export const InputDateFieldStyle = createStyleStore(InputDateFieldStyleConfig);
 
 //////////     L A N G U A G E     S E L E C T O R     //////////
 

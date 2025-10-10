@@ -6,8 +6,8 @@ import { getAllNodesValidation } from "../nodes/base";
 import { showToast } from "$lib/logic/view/toast";
 import { ToastType } from "$lib/stores/view/toast";
 import { protocolTexts } from "$lib/stores/lang/energyMeterTexts";
-import isEqualPkg from "lodash";
-const { isEqual } = isEqualPkg;
+import { isEqual } from "$lib/logic/util/generic";
+
 
 /**
  * Creates and returns a new DeviceValidation object with all validation properties set to false.

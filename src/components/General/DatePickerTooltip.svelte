@@ -1,7 +1,6 @@
 <script lang="ts">
     import { onDestroy } from "svelte";
     import ToolTip from "./ToolTip.svelte";
-    import DatePicker from "./DatePicker.svelte";
     import Button from "./Button.svelte";
 
     // Texts
@@ -10,6 +9,8 @@
     // Styles
     import { ToolTipDatePickerStyle } from "$lib/style/general";
     import { SubPrimaryButtonStyle, SubDefaultButtonStyle } from "$lib/style/button";
+    import InputTimeField from "./TimeDate/InputTimeField.svelte";
+    import InputDateField from "./TimeDate/InputDateField.svelte";
 
     // Props
     export let showToolTip: boolean;
@@ -22,9 +23,15 @@
     export let labelPaddingLeft: string | undefined = "5px";
     export let contentGap: string | undefined = "20px";
     export let fieldGap: string | undefined = "10px";
-    export let columnGap: string | undefined = "10px";
+    export let rowGap: string | undefined = "10px";
 
     // Variables
+    let startDate = "";
+    let startHours = "";
+    let startMinutes = "";
+    let endHours = "";
+    let endMinutes = "";
+    let endDate = "";
     let containerDiv: HTMLDivElement;
     let clickEventListenerDefined: boolean = false;
 
@@ -36,8 +43,8 @@
 
     $: if (showToolTip && !clickEventListenerDefined) {
         requestAnimationFrame(() => {
-            //window.addEventListener("click", handleClickOutside);
-            //clickEventListenerDefined = true;
+            window.addEventListener("click", handleClickOutside);
+            clickEventListenerDefined = true;
         });
     }
 
@@ -55,7 +62,7 @@
     });
 </script>
 
-<ToolTip style={$ToolTipDatePickerStyle} zIndex={199} {showToolTip}>
+<ToolTip style={$ToolTipDatePickerStyle} zIndex={198} width="400px" minWidth="auto" maxWidth="auto" {showToolTip}>
     <div
         style="
             --padding: {padding};
@@ -65,7 +72,7 @@
             --label-padding-left: {labelPaddingLeft};
             --content-gap: {contentGap};
             --field-gap: {fieldGap};
-            --column-gap: {columnGap};
+            --row-gap: {rowGap};
         "
         bind:this={containerDiv}
         class="date-picker-div"
@@ -74,13 +81,19 @@
             <div class="field">
                 <span>Início</span>
                 <div class="row">
-                    <DatePicker />
+                    <InputDateField inputValue={startDate} />
+                    <InputTimeField inputValue={startHours} inputType="HOURS" />
+                    <span class="time-sep">:</span>
+                    <InputTimeField inputValue={startMinutes} inputType="MINUTES" />
                 </div>
             </div>
             <div class="field">
                 <span>Fim</span>
                 <div class="row">
-                    <DatePicker />
+                    <InputDateField inputValue={endDate} />
+                    <InputTimeField inputValue={endHours} inputType="HOURS" />
+                    <span class="time-sep">:</span>
+                    <InputTimeField inputValue={endMinutes} inputType="MINUTES" />
                 </div>
             </div>
             <Button buttonText={$texts.confirm} style={$SubPrimaryButtonStyle} onClick={() => {}} />
@@ -122,5 +135,13 @@
         font-weight: var(--label-weight);
         padding: 0;
         padding-left: var(--label-padding-left);
+    }
+
+    .content .field .row {
+        display: flex;
+        flex-direction: row;
+        justify-content: center;
+        align-items: center;
+        gap: var(--row-gap);
     }
 </style>

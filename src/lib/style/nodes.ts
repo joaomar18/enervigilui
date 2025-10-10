@@ -145,6 +145,8 @@ const NodeInputFieldStyleConfig: ComponentStyles = {
         infoTextSize: "0.9rem",
         infoTextWeight: "400",
         unitTextColor: "rgb(170,170,170)",
+        placeHolderTextColor: "rgb(170,170,170)",
+        placeHolderTextWeight: "400",
     },
 };
 

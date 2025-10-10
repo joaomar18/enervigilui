@@ -26,9 +26,6 @@
     },
     "dependencies": {
         "@floating-ui/dom": "^1.7.4",
-        "date-picker-svelte": "^2.16.0",
-        "lodash": "^4.17.21",
-        "lodash-es": "^4.17.21",
         "uplot": "^1.6.32"
     }
 }

@@ -7,9 +7,9 @@ import { normalizeNode, sortNodesByName } from "$lib/logic/util/nodes";
 import { protocolTexts } from "$lib/stores/lang/energyMeterTexts";
 import { stringIsValidInteger, stringIsValidFloat } from "$lib/logic/util/generic";
 import { DECIMAL_PLACES_LIM, LOGGING_PERIOD_LIM } from "$lib/types/nodes/base";
-import isEqualPkg from "lodash";
 import { protocolPlugins } from "$lib/stores/device/protocol";
-const { isEqual } = isEqualPkg;
+import { isEqual } from "$lib/logic/util/generic";
+
 
 /**
  * Creates and returns a new NodeValidation object with all validation properties set to false.

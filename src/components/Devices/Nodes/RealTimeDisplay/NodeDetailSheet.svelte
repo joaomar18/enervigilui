@@ -725,6 +725,7 @@
         position: relative;
         width: fit-content;
         height: 100%;
+        background-color: red;
     }
 
     .chart-container {

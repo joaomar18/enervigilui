@@ -9,12 +9,16 @@
     export let disabled: boolean = false;
     export let inputInvalid: boolean = false;
     export let enableInputInvalid: boolean = false;
+    export let disableHints: boolean = false;
     export let inputValue: string;
-    export let inputType: string = "STRING";
+    export let inputType: "STRING" | "INT" | "POSITIVE_INT" | "FLOAT" | "POSITIVE_FLOAT" | "USERNAME" | "PASSWORD" = "STRING";
     export let inputUnit: string | null = null;
     export let minValue: number = inputType !== "POSITIVE_INT" ? Number.MIN_SAFE_INTEGER : 0;
     export let maxValue: number = Number.MAX_SAFE_INTEGER;
     export let infoText: string = "";
+    export let placeHolderText: string = "";
+    export let zeroPaddingDigits: number = 0;
+    export let validateOnInput = false; // Validates Input on value change
 
     // Style object (from theme)
     export let style: { [property: string]: string | number } | null = null;
@@ -43,6 +47,8 @@
     export let infoTextSize: string | undefined = undefined;
     export let infoTextWeight: string | undefined = undefined;
     export let unitTextColor: string | undefined = undefined;
+    export let placeHolderTextColor: string | undefined = undefined;
+    export let placeHolderTextWeight: string | undefined = undefined;
 
     $: localOverrides = {
         width,
@@ -65,6 +71,8 @@
         infoTextSize,
         infoTextWeight,
         unitTextColor,
+        placeHolderTextColor,
+        placeHolderTextWeight,
     };
 
     // Merged style
@@ -94,9 +102,13 @@
         if (inputType === "INT") {
             // Allow only integers
             input = input.replace(/[^0-9-]/g, ""); // Allow negative integers
+            input = String(Number(input));
+            input = input.padStart(zeroPaddingDigits, "0");
         } else if (inputType === "POSITIVE_INT") {
             // Allow only positive integers
             input = input.replace(/[^0-9]/g, "");
+            input = String(Number(input));
+            input = input.padStart(zeroPaddingDigits, "0");
         } else if (inputType === "FLOAT") {
             // Allow only floating-point numbers
             input = input.replace(/[^0-9.-]/g, ""); // Allow negative floats
@@ -104,19 +116,27 @@
             if ((input.match(/\./g) || []).length > 1 || (input.match(/-/g) || []).length > 1) {
                 input = input.slice(0, -1);
             }
+            input = String(Number(input));
+            input = input.padStart(zeroPaddingDigits, "0");
         } else if (inputType === "POSITIVE_FLOAT") {
             // Allow only positive floating-point numbers
-            input = input.replace(/[^0-9.]/g, "");
+            input = input.replace(/[^0-9.]/g, "").padStart(zeroPaddingDigits, "0");
             // Prevent multiple dots
             if ((input.match(/\./g) || []).length > 1) {
                 input = input.slice(0, -1);
             }
+            input = String(Number(input));
+            input = input.padStart(zeroPaddingDigits, "0");
         }
 
         inputValue = input;
 
         if (onChange) {
             onChange();
+        }
+
+        if (validateOnInput) {
+            validateBounds();
         }
     }
 
@@ -195,6 +215,8 @@ Applies special styling when focused.
         --info-text-size: {mergedStyle.infoTextSize};
         --info-text-weight: {mergedStyle.infoTextWeight};    
         --unit-text-color: {mergedStyle.unitTextColor};
+        --placeholder-text-color: {mergedStyle.placeHolderTextColor};
+        --placeholder-text-weight: {mergedStyle.placeHolderTextWeight};
     "
     class="container"
 >
@@ -209,15 +231,21 @@ Applies special styling when focused.
                 <input
                     class:selected
                     type="password"
-                    autocomplete="new-password"
+                    autocomplete={disableHints ? "off" : "new-password"}
+                    autocorrect={disableHints ? "off" : "on"}
+                    autocapitalize={disableHints ? "off" : "on"}
+                    spellcheck={disableHints ? "false" : "true"}
                     name="Password"
                     on:focus={() => (selected = true)}
                     on:blur={() => {
                         selected = false;
-                        validateBounds();
+                        if (!validateOnInput) {
+                            validateBounds();
+                        }
                     }}
                     bind:value={inputValue}
                     on:input={handleInput}
+                    placeholder={placeHolderText}
                     {disabled}
                     class:disabled
                     class:bad-format={inputInvalid && enableInputInvalid && !disabled}
@@ -226,15 +254,21 @@ Applies special styling when focused.
                 <input
                     class:selected
                     type="text"
-                    autocomplete="username"
+                    autocomplete={disableHints ? "off" : "username"}
+                    autocorrect={disableHints ? "off" : "on"}
+                    autocapitalize={disableHints ? "off" : "on"}
+                    spellcheck={disableHints ? "false" : "true"}
                     name="Username"
                     on:focus={() => (selected = true)}
                     on:blur={() => {
                         selected = false;
-                        validateBounds();
+                        if (!validateOnInput) {
+                            validateBounds();
+                        }
                     }}
                     bind:value={inputValue}
                     on:input={handleInput}
+                    placeholder={placeHolderText}
                     {disabled}
                     class:disabled
                     class:bad-format={inputInvalid && enableInputInvalid && !disabled}
@@ -243,16 +277,23 @@ Applies special styling when focused.
                 <input
                     class:selected
                     type="text"
+                    autocomplete={disableHints ? "off" : "on"}
+                    autocorrect={disableHints ? "off" : "on"}
+                    autocapitalize={disableHints ? "off" : "on"}
+                    spellcheck={disableHints ? "false" : "true"}
                     name="Input Field"
                     on:focus={() => {
                         selected = true;
                     }}
                     on:blur={() => {
                         selected = false;
-                        validateBounds();
+                        if (!validateOnInput) {
+                            validateBounds();
+                        }
                     }}
                     bind:value={inputValue}
                     on:input={handleInput}
+                    placeholder={placeHolderText}
                     {disabled}
                     class:disabled
                     class:bad-format={inputInvalid && enableInputInvalid && !disabled}
@@ -316,6 +357,13 @@ Applies special styling when focused.
         transition:
             background-color 0.2s,
             border 0.2s;
+    }
+
+    /* Input Placeholder styles */
+    input::placeholder {
+        color: var(--placeholder-text-color);
+        font-weight: var(--placeholder-text-weight);
+        font-size: var(--font-size);
     }
 
     /* Input element disabled */

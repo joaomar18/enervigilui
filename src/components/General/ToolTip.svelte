@@ -100,6 +100,8 @@
             placement: pushToTop ? "top" : "bottom",
             middleware: [offset(parseInt(String(mergedStyle.offsetPx))), flip(), shift({ padding: parseInt(String(mergedStyle.offsetPx)) })],
         });
+        console.log(parentElement);
+        console.log(x, y);
 
         Object.assign(tooltipElement.style, {
             left: `${x}px`,
