@@ -90,6 +90,35 @@ const CustomDatePickerButtonStyleConfig: ComponentStyles = {
 
 export const CustomDatePickerButtonStyle = createStyleStore(CustomDatePickerButtonStyleConfig);
 
+//////////     S E L E C T E D     C U S T O M     D A T E     P I C K E R     B U T T O N     //////////
+
+const SelectedCustomDatePickerButtonStyleConfig: ComponentStyles = {
+    dark: {
+        width: "40px",
+        height: "40px",
+        borderRadius: "5px",
+        backgroundColor: "#0066ff",
+        disabledBackgroundColor: "#161b22",
+        selectedBackgroundColor: "#0061e6",
+        borderColor: "#30363d",
+        disabledBorderColor: "#21262d",
+        selectedBorderColor: "#30363d",
+        hoverColor: "#0052cc",
+        disabledHoverColor: "#070a0f",
+        selectedHoverColor: "#004db3",
+        fontColor: "#f0f6fc",
+        disabledFontColor: "#484f58",
+        selectedFontColor: "#f0f6fc",
+        fontSize: "1rem",
+        fontWeight: "400",
+        imageWidth: "32px",
+        imageHeight: "32px",
+        showToolTipDelay: 300,
+    },
+};
+
+export const SelectedCustomDatePickerButtonStyle = createStyleStore(SelectedCustomDatePickerButtonStyleConfig);
+
 //////////     N O D E     C O N F I G U R A T I O N     W I N D O W     //////////
 
 const NodeConfigWindowStyleConfig: ComponentStyles = {

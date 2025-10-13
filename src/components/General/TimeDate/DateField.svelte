@@ -1,5 +1,6 @@
 <script lang="ts">
     import { interpretYY, getShortYear } from "./DateTimeValidation";
+    import { getDaysInMonth } from "$lib/logic/util/date";
     import InputField from "../InputField.svelte";
 
     // Styles
@@ -17,7 +18,8 @@
     export let useYear: boolean = true;
     export let useMonth: boolean = true;
     export let useDay: boolean = true;
-    export let inputInvalid: boolean = false;
+    export let invalidInput: boolean = false;
+    export let enableInvalidInput: boolean = true;
 
     // Layout / styling props
     export let width: string | undefined = undefined;
@@ -58,9 +60,13 @@
     let formatterSep: string = "-";
     let selected: boolean = false;
     let shortYear: string = "";
+    let daysInMonth: number;
 
     // Reactive Statements
     $: shortYear = getShortYear(yearValue);
+    $: if (Number(monthValue) >= 1 && Number(monthValue) <= 12) {
+        daysInMonth = getDaysInMonth(Number(yearValue), Number(monthValue));
+    }
 </script>
 
 <div
@@ -79,7 +85,7 @@
         --text-weight: {mergedStyle.textWeight};
     "
     class="input-time-div"
-    class:bad-format={inputInvalid}
+    class:bad-format={invalidInput && enableInvalidInput}
     class:selected
 >
     <div class="content">
@@ -93,7 +99,6 @@
                 disableHints={true}
                 minValue={0}
                 maxValue={99}
-                validateOnInput={true}
                 onSelected={() => {
                     selected = true;
                 }}
@@ -116,9 +121,8 @@
                 placeHolderText={monthsId}
                 zeroPaddingDigits={2}
                 disableHints={true}
-                minValue={0}
+                minValue={1}
                 maxValue={12}
-                validateOnInput={true}
                 onSelected={() => {
                     selected = true;
                 }}
@@ -139,8 +143,7 @@
                 zeroPaddingDigits={2}
                 disableHints={true}
                 minValue={0}
-                maxValue={31}
-                validateOnInput={true}
+                maxValue={daysInMonth}
                 onSelected={() => {
                     selected = true;
                 }}
@@ -161,14 +164,14 @@
         border: var(--border);
     }
 
-    .input-time-div.bad-format {
-        background-color: var(--bad-format-background-color);
-        border: var(--bad-format-border);
-    }
-
     .input-time-div.selected {
         background-color: var(--selected-background-color);
         border: var(--selected-border);
+    }
+
+    .input-time-div.bad-format {
+        background-color: var(--bad-format-background-color);
+        border: var(--bad-format-border);
     }
 
     .content {

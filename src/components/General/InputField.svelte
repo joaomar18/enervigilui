@@ -146,7 +146,7 @@
         // For numeric input types, do not allow empty string
         if (["INT", "POSITIVE_INT", "FLOAT", "POSITIVE_FLOAT"].includes(inputType)) {
             if (inputValue === "") {
-                inputValue = minValue.toString();
+                inputValue = minValue.toString().padStart(zeroPaddingDigits, "0");
                 if (limitsPassed) {
                     limitsPassed();
                 }
@@ -156,7 +156,7 @@
             } else {
                 const numericValue = parseFloat(inputValue.toString());
                 if (numericValue < minValue) {
-                    inputValue = minValue.toString();
+                    inputValue = minValue.toString().padStart(zeroPaddingDigits, "0");
                     if (limitsPassed) {
                         limitsPassed();
                     }
@@ -164,7 +164,7 @@
                         onChange();
                     }
                 } else if (numericValue > maxValue) {
-                    inputValue = maxValue.toString();
+                    inputValue = maxValue.toString().padStart(zeroPaddingDigits, "0");
                     if (limitsPassed) {
                         limitsPassed();
                     }

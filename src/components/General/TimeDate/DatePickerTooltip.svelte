@@ -1,10 +1,11 @@
 <script lang="ts">
     import { onDestroy } from "svelte";
-    import { createDateTimeField } from "$lib/logic/util/date";
-    import ToolTip from "./ToolTip.svelte";
-    import Button from "./Button.svelte";
-    import TimeField from "./TimeDate/TimeField.svelte";
-    import DateField from "./TimeDate/DateField.svelte";
+    import { createDateTimeField, getDateFromField } from "$lib/logic/util/date";
+    import ToolTip from "../ToolTip.svelte";
+    import Button from "../Button.svelte";
+    import TimeField from "./TimeField.svelte";
+    import DateField from "./DateField.svelte";
+    import type { DateTimeField } from "$lib/types/date";
 
     // Texts
     import { texts } from "$lib/stores/lang/generalTexts";
@@ -12,6 +13,7 @@
     // Styles
     import { ToolTipDatePickerStyle } from "$lib/style/general";
     import { SubPrimaryButtonStyle, SubDefaultButtonStyle } from "$lib/style/button";
+    import { validDate, validTime } from "$lib/logic/validation/date";
 
     // Props
     export let showToolTip: boolean;
@@ -31,6 +33,13 @@
     // Variables
     let startDateTime = createDateTimeField();
     let endDateTime = createDateTimeField(new Date());
+    let validStartDate: boolean = false;
+    let validStartTime: boolean = false;
+    let validEndDate: boolean = false;
+    let validEndTime: boolean = false;
+    let validTimeSpan: boolean = false;
+    let invalidTimePeriod: boolean = false;
+    let firstRequestDone: boolean = false;
     let containerDiv: HTMLDivElement;
     let clickEventListenerDefined: boolean = false;
 
@@ -39,6 +48,7 @@
         window.removeEventListener("click", handleClickOutside);
         startDateTime = createDateTimeField();
         endDateTime = createDateTimeField(new Date());
+        firstRequestDone = false;
         clickEventListenerDefined = false;
     }
 
@@ -49,11 +59,29 @@
         });
     }
 
+    $: validStartDate = validDate({ year: startDateTime.year, month: startDateTime.month, day: startDateTime.day });
+    $: validStartTime = validTime({ hour: startDateTime.hour, minute: startDateTime.minute, second: null });
+    $: validEndDate = validDate({ year: endDateTime.year, month: endDateTime.month, day: endDateTime.day });
+    $: validEndTime = validTime({ hour: endDateTime.hour, minute: endDateTime.minute, second: null });
+    $: validTimeSpan = validStartDate && validStartTime && validEndDate && validEndTime && getDateFromField(startDateTime) < getDateFromField(endDateTime);
+    $: invalidTimePeriod = validStartDate && validStartTime && validEndDate && validEndTime && !validTimeSpan;
+
+    // Export Functions
+    export let requestCustomPeriod: (startDateTime: DateTimeField, endDateTime: DateTimeField) => void;
+
     // Functions
     function handleClickOutside(event: MouseEvent): void {
         if (showToolTip && containerDiv && !containerDiv.contains(event.target as Node)) {
             showToolTip = false;
         }
+    }
+
+    function handleConfirm(): void {
+        firstRequestDone = true;
+        if (!validTimeSpan) {
+            return;
+        }
+        requestCustomPeriod(startDateTime, endDateTime);
     }
 
     onDestroy(() => {
@@ -91,25 +119,51 @@
     >
         <div class="content">
             <div class="field">
-                <span>Início</span>
+                <span>{$texts.fromDate}</span>
                 <div class="row">
                     <div class="extend">
-                        <DateField bind:yearValue={startDateTime.year} bind:monthValue={startDateTime.month} bind:dayValue={startDateTime.day} />
+                        <DateField
+                            bind:yearValue={startDateTime.year}
+                            bind:monthValue={startDateTime.month}
+                            bind:dayValue={startDateTime.day}
+                            invalidInput={!validStartDate || invalidTimePeriod}
+                            enableInvalidInput={firstRequestDone}
+                        />
                     </div>
-                    <TimeField bind:hourValue={startDateTime.hour} bind:minuteValue={startDateTime.minute} useSecond={false} width="35%" />
+                    <TimeField
+                        bind:hourValue={startDateTime.hour}
+                        bind:minuteValue={startDateTime.minute}
+                        useSecond={false}
+                        width="35%"
+                        invalidInput={!validStartTime || invalidTimePeriod}
+                        enableInvalidInput={firstRequestDone}
+                    />
                 </div>
             </div>
             <div class="field">
-                <span>Fim</span>
+                <span>{$texts.toDate}</span>
                 <div class="row">
                     <div class="extend">
-                        <DateField bind:yearValue={endDateTime.year} bind:monthValue={endDateTime.month} bind:dayValue={endDateTime.day} />
+                        <DateField
+                            bind:yearValue={endDateTime.year}
+                            bind:monthValue={endDateTime.month}
+                            bind:dayValue={endDateTime.day}
+                            invalidInput={!validEndDate || invalidTimePeriod}
+                            enableInvalidInput={firstRequestDone}
+                        />
                     </div>
-                    <TimeField bind:hourValue={endDateTime.hour} bind:minuteValue={endDateTime.minute} useSecond={false} width="35%" />
+                    <TimeField
+                        bind:hourValue={endDateTime.hour}
+                        bind:minuteValue={endDateTime.minute}
+                        useSecond={false}
+                        width="35%"
+                        invalidInput={!validEndTime || invalidTimePeriod}
+                        enableInvalidInput={firstRequestDone}
+                    />
                 </div>
             </div>
             <div class="action-buttons-div">
-                <Button buttonText={$texts.confirm} style={$SubPrimaryButtonStyle} onClick={() => {}} />
+                <Button buttonText={$texts.confirm} style={$SubPrimaryButtonStyle} onClick={handleConfirm} />
                 <Button
                     buttonText={$texts.cancel}
                     style={$SubDefaultButtonStyle}

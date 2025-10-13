@@ -778,6 +778,14 @@ const textsObject: TextsObject = {
     disconnectedState: {
         PT: "desconectado",
         EN: "disconnected",
+    },
+    fromDate: {
+        PT: "From",
+        EN: "De",
+    },
+    toDate: {
+        PT: "To",
+        EN: "Até",
     }
 };
 

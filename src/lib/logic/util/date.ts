@@ -1,6 +1,7 @@
 import { get } from "svelte/store";
 import { selectedLang } from "$lib/stores/lang/definition";
 import type { DateTimeField } from "$lib/types/date";
+import { LogSpanPeriod } from "$lib/types/view/nodes";
 
 
 /**
@@ -11,12 +12,25 @@ import type { DateTimeField } from "$lib/types/date";
 export function createDateTimeField(date: Date | null = null): DateTimeField {
     return {
         year: date ? String(date.getFullYear()).padStart(4, "0") : "",
-        month: date ? String(date.getMonth()).padStart(2, "0") : "",
+        month: date ? String(date.getMonth() + 1).padStart(2, "0") : "",
         day: date ? String(date.getDate()).padStart(2, "0") : "",
         hour: date ? String(date.getHours()).padStart(2, "0") : "",
         minute: date ? String(date.getMinutes()).padStart(2, "0") : "",
     } as DateTimeField;
 }
+
+
+/**
+ * Gets the number of days in a specific month and year (handles leap years).
+ * @param year - Full year number
+ * @param month - Month number (1-12)
+ * @returns Number of days in the month
+ */
+export function getDaysInMonth(year: number, month: number): number {
+    if (month < 1 || month > 12) throw new Error(`Month number is out of index: ${month}.`);
+    return new Date(year, month, 0).getDate();
+}
+
 
 /**
  * Converts a date string to a localized date string with time, based on the selected language.
@@ -90,4 +104,58 @@ export function toISOStringLocal(date: Date): string {
         ":" +
         offsetMinutes
     );
+}
+
+/**
+ * Converts a log period enum to complete date ranges for full periods.
+ * @param period - The time span period to convert
+ * @returns Object with initial_date (period start) and end_date (next period start)
+ */
+export function getTimeSpanFromLogPeriod(period: LogSpanPeriod): { initial_date: Date; end_date: Date } {
+    let initial_date = new Date();
+    let end_date: Date;
+
+    switch (period) {
+        case LogSpanPeriod.currentHour:
+            initial_date.setMinutes(0, 0, 0);
+            end_date = new Date(initial_date);
+            end_date.setHours(end_date.getHours() + 1);
+            return { initial_date, end_date };
+
+        case LogSpanPeriod.currentDay:
+            initial_date.setHours(0, 0, 0, 0);
+            end_date = new Date(initial_date);
+            end_date.setDate(end_date.getDate() + 1);
+            return { initial_date, end_date };
+
+        case LogSpanPeriod.current7Days:
+            initial_date.setHours(0, 0, 0, 0);
+            while (initial_date.getDay() != 1) {
+                initial_date.setDate(initial_date.getDate() - 1);
+            }
+            end_date = new Date(initial_date);
+            end_date.setDate(end_date.getDate() + 7);
+            return { initial_date, end_date };
+
+        case LogSpanPeriod.currentMonth:
+            initial_date.setHours(0, 0, 0, 0);
+            initial_date.setDate(1);
+            end_date = new Date(initial_date);
+            end_date.setMonth(end_date.getMonth() + 1);
+            return { initial_date, end_date };
+
+        case LogSpanPeriod.currentYear:
+            initial_date.setHours(0, 0, 0, 0);
+            initial_date.setMonth(0, 1);
+            end_date = new Date(initial_date);
+            end_date.setFullYear(end_date.getFullYear() + 1);
+            return { initial_date, end_date };
+
+        default:
+            throw new Error(`Invalid Log Span Period: ${period}`);
+    }
+}
+
+export function getDateFromField(dateTimeField: DateTimeField): Date {
+    return new Date(Number(dateTimeField.year), Number(dateTimeField.month) - 1, Number(dateTimeField.day), Number(dateTimeField.hour), Number(dateTimeField.minute));
 }

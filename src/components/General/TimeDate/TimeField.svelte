@@ -16,7 +16,8 @@
     export let useHour: boolean = true;
     export let useMinute: boolean = true;
     export let useSecond: boolean = true;
-    export let inputInvalid: boolean = false;
+    export let invalidInput: boolean = false;
+    export let enableInvalidInput: boolean = true;
 
     // Layout / styling props
     export let width: string | undefined = undefined;
@@ -74,7 +75,7 @@
         --text-weight: {mergedStyle.textWeight};
     "
     class="input-time-div"
-    class:bad-format={inputInvalid}
+    class:bad-format={invalidInput && enableInvalidInput}
     class:selected
 >
     <div class="content">
@@ -153,14 +154,14 @@
         border: var(--border);
     }
 
-    .input-time-div.bad-format {
-        background-color: var(--bad-format-background-color);
-        border: var(--bad-format-border);
-    }
-
     .input-time-div.selected {
         background-color: var(--selected-background-color);
         border: var(--selected-border);
+    }
+
+    .input-time-div.bad-format {
+        background-color: var(--bad-format-background-color);
+        border: var(--bad-format-border);
     }
 
     .content {
