@@ -61,8 +61,6 @@
 
     // Reactive Statements
     $: shortYear = getShortYear(yearValue);
-
-    $: console.log(yearValue);
 </script>
 
 <div

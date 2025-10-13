@@ -20,7 +20,11 @@ export function interpretYY(yy: string): string {
     }));
 }
 
+/**
+ * Extracts the last two digits of a year string to get the short year format.
+ * @param yyyy - Full year string (e.g., "2025")
+ * @returns Two-digit year string (e.g., "25")
+ */
 export function getShortYear(yyyy: string): string {
-    console.log(typeof (yyyy));
     return yyyy.slice(-2);
 }
