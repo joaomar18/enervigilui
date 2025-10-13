@@ -1,5 +1,22 @@
 import { get } from "svelte/store";
 import { selectedLang } from "$lib/stores/lang/definition";
+import type { DateTimeField } from "$lib/types/date";
+
+
+/**
+ * Creates a new DateTimeField object with zero-padded string values from a Date object or empty strings.
+ * @param date - Optional Date object to populate the fields from. If null, all fields are empty strings.
+ * @returns A DateTimeField with zero-padded strings: year (4 digits), month/day/hour/minute (2 digits each), or empty strings if date is null.
+ */
+export function createDateTimeField(date: Date | null = null): DateTimeField {
+    return {
+        year: date ? String(date.getFullYear()).padStart(4, "0") : "",
+        month: date ? String(date.getMonth()).padStart(2, "0") : "",
+        day: date ? String(date.getDate()).padStart(2, "0") : "",
+        hour: date ? String(date.getHours()).padStart(2, "0") : "",
+        minute: date ? String(date.getMinutes()).padStart(2, "0") : "",
+    } as DateTimeField;
+}
 
 /**
  * Converts a date string to a localized date string with time, based on the selected language.

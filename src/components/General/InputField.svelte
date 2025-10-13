@@ -92,8 +92,10 @@
     // Detected Limits Violation Export Funcion
     export let limitsPassed: (() => void) | null = null;
 
-    // Change Export Function
+    // Export Functions
     export let onChange: (() => void) | undefined = undefined;
+    export let onSelected: (() => void) | undefined = undefined;
+    export let onBlur: (() => void) | undefined = undefined;
 
     // Functions
     function handleInput(event: Event): void {
@@ -205,7 +207,7 @@ Applies special styling when focused.
         --selected-border-color: {mergedStyle.selectedBorderColor};
         --bad-format-background-color: {mergedStyle.badFormatBackgroundColor};
         --bad-format-border-color: {mergedStyle.badFormatBorderColor};
-        --input-padding-right: {unitWidth > 0 ? unitWidth + 10 + 'px' : '10px'};
+        --input-padding-right: {unitWidth > 0 ? unitWidth + 10 + 'px' : mergedStyle.paddingLeft};
         --padding-left: {mergedStyle.paddingLeft};
         --font-size: {mergedStyle.fontSize};
         --font-color: {mergedStyle.fontColor};
@@ -236,11 +238,19 @@ Applies special styling when focused.
                     autocapitalize={disableHints ? "off" : "on"}
                     spellcheck={disableHints ? "false" : "true"}
                     name="Password"
-                    on:focus={() => (selected = true)}
+                    on:focus={() => {
+                        selected = true;
+                        if (onSelected) {
+                            onSelected();
+                        }
+                    }}
                     on:blur={() => {
                         selected = false;
                         if (!validateOnInput) {
                             validateBounds();
+                        }
+                        if (onBlur) {
+                            onBlur();
                         }
                     }}
                     bind:value={inputValue}
@@ -259,11 +269,19 @@ Applies special styling when focused.
                     autocapitalize={disableHints ? "off" : "on"}
                     spellcheck={disableHints ? "false" : "true"}
                     name="Username"
-                    on:focus={() => (selected = true)}
+                    on:focus={() => {
+                        selected = true;
+                        if (onSelected) {
+                            onSelected();
+                        }
+                    }}
                     on:blur={() => {
                         selected = false;
                         if (!validateOnInput) {
                             validateBounds();
+                        }
+                        if (onBlur) {
+                            onBlur();
                         }
                     }}
                     bind:value={inputValue}
@@ -284,11 +302,17 @@ Applies special styling when focused.
                     name="Input Field"
                     on:focus={() => {
                         selected = true;
+                        if (onSelected) {
+                            onSelected();
+                        }
                     }}
                     on:blur={() => {
                         selected = false;
                         if (!validateOnInput) {
                             validateBounds();
+                        }
+                        if (onBlur) {
+                            onBlur();
                         }
                     }}
                     bind:value={inputValue}

@@ -1,7 +1,10 @@
 <script lang="ts">
     import { onDestroy } from "svelte";
+    import { createDateTimeField } from "$lib/logic/util/date";
     import ToolTip from "./ToolTip.svelte";
     import Button from "./Button.svelte";
+    import TimeField from "./TimeDate/TimeField.svelte";
+    import DateField from "./TimeDate/DateField.svelte";
 
     // Texts
     import { texts } from "$lib/stores/lang/generalTexts";
@@ -9,8 +12,6 @@
     // Styles
     import { ToolTipDatePickerStyle } from "$lib/style/general";
     import { SubPrimaryButtonStyle, SubDefaultButtonStyle } from "$lib/style/button";
-    import InputTimeField from "./TimeDate/InputTimeField.svelte";
-    import InputDateField from "./TimeDate/InputDateField.svelte";
 
     // Props
     export let showToolTip: boolean;
@@ -28,18 +29,16 @@
     export let rowGap: string | undefined = "10px";
 
     // Variables
-    let startDate = "";
-    let startHours = "";
-    let startMinutes = "";
-    let endHours = "";
-    let endMinutes = "";
-    let endDate = "";
+    let startDateTime = createDateTimeField();
+    let endDateTime = createDateTimeField(new Date());
     let containerDiv: HTMLDivElement;
     let clickEventListenerDefined: boolean = false;
 
     // Reactive Statements
     $: if (!showToolTip && clickEventListenerDefined) {
         window.removeEventListener("click", handleClickOutside);
+        startDateTime = createDateTimeField();
+        endDateTime = createDateTimeField(new Date());
         clickEventListenerDefined = false;
     }
 
@@ -95,21 +94,18 @@
                 <span>Início</span>
                 <div class="row">
                     <div class="extend">
-                        <InputDateField inputValue={startDate} />
+                        <DateField bind:yearValue={startDateTime.year} bind:monthValue={startDateTime.month} bind:dayValue={startDateTime.day} />
                     </div>
-                    <InputTimeField hours={startHours} minutes={startMinutes} useSeconds={false} />
-                    <!--<InputTimeField inputValue={startHours} inputType="HOURS" />
-                    <span class="time-sep">:</span>
-                    <InputTimeField inputValue={startMinutes} inputType="MINUTES" />-->
+                    <TimeField bind:hourValue={startDateTime.hour} bind:minuteValue={startDateTime.minute} useSecond={false} width="35%" />
                 </div>
             </div>
             <div class="field">
                 <span>Fim</span>
                 <div class="row">
                     <div class="extend">
-                        <InputDateField inputValue={endDate} />
+                        <DateField bind:yearValue={endDateTime.year} bind:monthValue={endDateTime.month} bind:dayValue={endDateTime.day} />
                     </div>
-                    <InputTimeField hours={endHours} minutes={endMinutes} useSeconds={false} />
+                    <TimeField bind:hourValue={endDateTime.hour} bind:minuteValue={endDateTime.minute} useSecond={false} width="35%" />
                 </div>
             </div>
             <div class="action-buttons-div">

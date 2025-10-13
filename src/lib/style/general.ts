@@ -202,22 +202,22 @@ const DangerInputFieldStyleConfig: ComponentStyles = {
 
 export const DangerInputFieldStyle = createStyleStore(DangerInputFieldStyleConfig);
 
-//////////     I N P U T     T I M E     F I E L D     //////////
+//////////     I N P U T     D A T E     /     T I M E     F I E L D     //////////
 
-const InputTimeFieldStyleConfig: ComponentStyles = {
+const InputDateTimeFieldStyleConfig: ComponentStyles = {
     dark: {
-        width: "35%",
+        width: "fit-content",
         height: "40px",
-        borderRadius: "5px",
-        backgroundColor: "#252b33",
-        borderColor: "#323a45",
-        disabledBackgroundColor: "#252b33",
-        disabledBorderColor: "#323a45",
-        selectedBackgroundColor: "#252b33",
-        selectedBorderColor: "#2F80ED",
-        badFormatBackgroundColor: "#252b33",
-        badFormatBorderColor: "#e74c3c",
-        paddingLeft: "10px",
+        borderRadius: "0px",
+        backgroundColor: "none",
+        borderColor: "none",
+        disabledBackgroundColor: "none",
+        disabledBorderColor: "none",
+        selectedBackgroundColor: "none",
+        selectedBorderColor: "none",
+        badFormatBackgroundColor: "none",
+        badFormatBorderColor: "none",
+        paddingLeft: "5px",
         fontSize: "1rem",
         fontColor: "#f5f5f5",
         fontWeight: "400",
@@ -231,38 +231,28 @@ const InputTimeFieldStyleConfig: ComponentStyles = {
     },
 };
 
-export const InputTimeFieldStyle = createStyleStore(InputTimeFieldStyleConfig);
+export const InputDateTimeFieldStyle = createStyleStore(InputDateTimeFieldStyleConfig);
 
-//////////     I N P U T     D A T E     F I E L D     //////////
+//////////     T I M E     /     D A T E     F I E L D     //////////
 
-const InputDateFieldStyleConfig: ComponentStyles = {
+const TimeDateFieldStyleConfig: ComponentStyles = {
     dark: {
         width: "100%",
-        height: "40px",
+        height: "fit-content",
         borderRadius: "5px",
         backgroundColor: "#252b33",
-        borderColor: "#323a45",
-        disabledBackgroundColor: "#252b33",
-        disabledBorderColor: "#323a45",
         selectedBackgroundColor: "#252b33",
-        selectedBorderColor: "#2F80ED",
         badFormatBackgroundColor: "#252b33",
-        badFormatBorderColor: "#e74c3c",
-        paddingLeft: "10px",
-        fontSize: "1rem",
-        fontColor: "#f5f5f5",
-        fontWeight: "400",
-        textAlign: "center",
-        infoTextColor: "#f5f5f5",
-        infoTextSize: "0.9rem",
-        infoTextWeight: "400",
-        unitTextColor: "rgb(170,170,170)",
-        placeHolderTextColor: "rgb(170,170,170)",
-        placeHolderTextWeight: "400",
+        border: "1px solid #323a45",
+        selectedBorder: "1px solid #2F80ED",
+        badFormatBorder: "1px solid #e74c3c",
+        textSize: "1rem",
+        textColor: "#f5f5f5",
+        textWeight: "500",
     },
 };
 
-export const InputDateFieldStyle = createStyleStore(InputDateFieldStyleConfig);
+export const TimeDateFieldStyle = createStyleStore(TimeDateFieldStyleConfig);
 
 //////////     L A N G U A G E     S E L E C T O R     //////////
 
