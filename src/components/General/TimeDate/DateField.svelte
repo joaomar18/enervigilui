@@ -1,5 +1,5 @@
 <script lang="ts">
-    import { interpretYY, getShortYear } from "./DateTimeValidation";
+    import { interpretYY, getShortYear } from "$lib/logic/util/date";
     import { getDaysInMonth } from "$lib/logic/util/date";
     import InputField from "../InputField.svelte";
 
@@ -67,8 +67,27 @@
     $: if (Number(monthValue) >= 1 && Number(monthValue) <= 12) {
         daysInMonth = getDaysInMonth(Number(yearValue), Number(monthValue));
     }
+
+    // Export Functions
+    export let submit: (() => void) | undefined = undefined;
+
+    // Functions
+    function handleEnter(): void {
+        if (submit) {
+            submit();
+        }
+    }
 </script>
 
+<!--
+    DateField Component
+    
+    A flexible date input component that allows selective display of year, month, and day fields.
+    Features smart 2-digit year conversion, dynamic day validation based on month/year, and 
+    comprehensive styling support. Handles focus states, validation errors, and provides
+    seamless integration with form validation systems. Each field can be individually
+    enabled/disabled and supports theming through CSS custom properties.
+-->
 <div
     style="
         --width: {mergedStyle.width};
@@ -108,6 +127,7 @@
                 onChange={() => {
                     yearValue = interpretYY(shortYear);
                 }}
+                onEnterKey={handleEnter}
             />
             {#if useMonth}
                 <span class="separator">{formatterSep}</span>
@@ -129,6 +149,7 @@
                 onBlur={() => {
                     selected = false;
                 }}
+                onEnterKey={handleEnter}
             />
             {#if useDay}
                 <span class="separator">{formatterSep}</span>
@@ -150,12 +171,14 @@
                 onBlur={() => {
                     selected = false;
                 }}
+                onEnterKey={handleEnter}
             />
         {/if}
     </div>
 </div>
 
 <style>
+    /* Main container styling - uses CSS custom properties for theming */
     .input-time-div {
         width: var(--width);
         height: var(--height);
@@ -164,16 +187,19 @@
         border: var(--border);
     }
 
+    /* Focus state styling - applied when any input field is focused */
     .input-time-div.selected {
         background-color: var(--selected-background-color);
         border: var(--selected-border);
     }
 
+    /* Error state styling - applied when input validation fails */
     .input-time-div.bad-format {
         background-color: var(--bad-format-background-color);
         border: var(--bad-format-border);
     }
 
+    /* Content container - arranges input fields horizontally */
     .content {
         width: 100%;
         height: 100%;
@@ -186,6 +212,7 @@
         align-items: center;
     }
 
+    /* Separator styling characters between date fields */
     .separator {
         font-size: var(--text-size);
         color: var(--text-color);

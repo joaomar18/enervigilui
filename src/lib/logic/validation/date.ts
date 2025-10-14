@@ -1,5 +1,5 @@
-import { getDaysInMonth } from "../util/date";
-import { texts } from "$lib/stores/lang/generalTexts";
+import { getDaysInMonth, getDateFromField } from "../util/date";
+import type { DateTimeField, DateTimeSpanValidation } from "$lib/types/date";
 
 
 /**
@@ -45,4 +45,41 @@ export function validTime(time: { hour: string | number | null, minute: string |
     return true;
 }
 
-//export function validTimeSpan(): {valid: boolean, validRange: boolean, messageKey: string | null}
+/**
+ * Validates a complete date-time range and provides detailed validation results with error information.
+ * @param startDateTime - Start date and time fields to validate
+ * @param endDateTime - End date and time fields to validate
+ * @returns Object containing detailed validation breakdown, localized error message key, and variables for message substitution
+ */
+export function validTimeSpan(startDateTime: DateTimeField, endDateTime: DateTimeField): { validation: DateTimeSpanValidation, messageKey: string | null, messageVariables: Record<string, string | number> } {
+    let validStartDate = validDate({ year: startDateTime.year, month: startDateTime.month, day: startDateTime.day });
+    let validStartTime = validTime({ hour: startDateTime.hour, minute: startDateTime.minute, second: null });
+    let validEndDate = validDate({ year: endDateTime.year, month: endDateTime.month, day: endDateTime.day });
+    let validEndTime = validTime({ hour: endDateTime.hour, minute: endDateTime.minute, second: null });
+    let invalidRange = validStartDate && validStartTime && validEndDate && validEndTime && getDateFromField(startDateTime) >= getDateFromField(endDateTime);
+    let validation = {
+        validStartDate: validStartDate,
+        validStartTime: validStartTime,
+        validEndDate: validEndDate,
+        validEndTime: validEndTime,
+        invalidRange: invalidRange,
+        valid: validStartDate && validStartTime && validEndDate && validEndTime && !invalidRange
+    } as DateTimeSpanValidation;
+    let { messageKey, messageVariables } = getValidationErrorMessage(validation);
+    return { validation, messageKey, messageVariables };
+}
+
+/**
+ * Determines the appropriate error message key based on validation results.
+ * Returns the first validation error found in priority order.
+ * @param validation - DateTimeSpanValidation object with individual validation flags
+ * @returns Object with error message key and variables for localization, or null if all valid
+ */
+export function getValidationErrorMessage(validation: DateTimeSpanValidation): { messageKey: string | null, messageVariables: Record<string, string | number> } {
+    if (!validation.validStartDate) return { messageKey: "invalidStartDate", messageVariables: {} };
+    if (!validation.validStartTime) return { messageKey: "invalidStartTime", messageVariables: {} };
+    if (!validation.validEndDate) return { messageKey: "invalidEndDate", messageVariables: {} };
+    if (!validation.validEndTime) return { messageKey: "invalidEndTime", messageVariables: {} };
+    if (validation.invalidRange) return { messageKey: "invalidPeriodRange", messageVariables: {} };
+    return { messageKey: null, messageVariables: {} };
+}

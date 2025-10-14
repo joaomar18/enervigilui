@@ -15,8 +15,8 @@
     import ContentCard from "../../../components/General/ContentCard.svelte";
     import ExpandableSection from "../../../components/General/ExpandableSection.svelte";
     import Action from "../../../components/General/Action.svelte";
-    import ToolTipText from "../../../components/General/ToolTipText.svelte";
     import NodeDetailSheet from "../../../components/Devices/Nodes/RealTimeDisplay/NodeDetailSheet.svelte";
+    import ToolTipText from "../../../components/General/ToolTipText.svelte";
 
     // Texts
     import { texts } from "$lib/stores/lang/generalTexts";

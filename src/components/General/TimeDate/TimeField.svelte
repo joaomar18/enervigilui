@@ -57,8 +57,27 @@
     let secondsId: string = "ss";
     let formatterSep: string = ":";
     let selected: boolean = false;
+
+    // Export Functions
+    export let submit: (() => void) | undefined = undefined;
+
+    // Functions
+    function handleEnter(): void {
+        if (submit) {
+            submit();
+        }
+    }
 </script>
 
+<!--
+    DateField Component
+    
+    A flexible date input component that allows selective display of year, month, and day fields.
+    Features smart 2-digit year conversion, dynamic day validation based on month/year, and 
+    comprehensive styling support. Handles focus states, validation errors, and provides
+    seamless integration with form validation systems. Each field can be individually
+    enabled/disabled and supports theming through CSS custom properties.
+-->
 <div
     style="
         --width: {mergedStyle.width};
@@ -89,13 +108,13 @@
                 disableHints={true}
                 minValue={0}
                 maxValue={23}
-                validateOnInput={true}
                 onSelected={() => {
                     selected = true;
                 }}
                 onBlur={() => {
                     selected = false;
                 }}
+                onEnterKey={handleEnter}
             />
             {#if useMinute}
                 <span class="separator">{formatterSep}</span>
@@ -111,13 +130,13 @@
                 disableHints={true}
                 minValue={0}
                 maxValue={59}
-                validateOnInput={true}
                 onSelected={() => {
                     selected = true;
                 }}
                 onBlur={() => {
                     selected = false;
                 }}
+                onEnterKey={handleEnter}
             />
             {#if useSecond}
                 <span class="separator">{formatterSep}</span>
@@ -140,12 +159,14 @@
                 onBlur={() => {
                     selected = false;
                 }}
+                onEnterKey={handleEnter}
             />
         {/if}
     </div>
 </div>
 
 <style>
+    /* Main container styling - defines the overall appearance of the time input component */
     .input-time-div {
         width: var(--width);
         height: var(--height);
@@ -154,16 +175,19 @@
         border: var(--border);
     }
 
+    /* Focus state styling - applied when any time input field receives focus */
     .input-time-div.selected {
         background-color: var(--selected-background-color);
         border: var(--selected-border);
     }
 
+    /* Error state styling - applied when input validation fails and error display is enabled */
     .input-time-div.bad-format {
         background-color: var(--bad-format-background-color);
         border: var(--bad-format-border);
     }
 
+    /* Content container - manages the layout of time input fields and separators */
     .content {
         width: 100%;
         height: 100%;
@@ -176,6 +200,7 @@
         align-items: center;
     }
 
+    /* Separator styling - the ":" characters between time fields (HH:mm:ss) */
     .separator {
         font-size: var(--text-size);
         color: var(--text-color);

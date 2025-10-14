@@ -78,6 +78,30 @@ const alertTextsObject: TextsObject = {
         PT: "Não foi possível iniciar corretamente a configuração das variáveis: {error}.",
         EN: "Could not properly initialize the variables configuration: {error}.",
     },
+    invalidStartDate: {
+        PT: "A data inicial é inválida. Use o formato YY/MM/DD.",
+        EN: "The start date is invalid. Use YY/MM/DD format.",
+    },
+    invalidStartTime: {
+        PT: "A hora inicial é inválida. Use o formato HH:mm.",
+        EN: "The start time is invalid. Use HH:mm format.",
+    },
+    invalidEndDate: {
+        PT: "A data final é inválida. Use o formato YY/MM/AAAA.",
+        EN: "The end date is invalid. Use YY/MM/DD format.",
+    },
+    invalidEndTime: {
+        PT: "A hora final é inválida. Use o formato HH:mm.",
+        EN: "The end time is invalid. Use HH:mm format.",
+    },
+    invalidPeriodRange: {
+        PT: "A data final deve ser posterior à data final.",
+        EN: "The end date must be later than the initial date.",
+    },
+    noKeyError: {
+        PT: "Erro desconhecido.",
+        EN: "Unknown error."
+    },
 };
 
 export const alertTexts = createLangStore(alertTextsObject);

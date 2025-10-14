@@ -1,51 +1,75 @@
 <script lang="ts">
     import { onDestroy } from "svelte";
-    import { createDateTimeField, getDateFromField } from "$lib/logic/util/date";
+    import { createDateTimeField } from "$lib/logic/util/date";
+    import { validTimeSpan } from "$lib/logic/validation/date";
     import ToolTip from "../ToolTip.svelte";
     import Button from "../Button.svelte";
     import TimeField from "./TimeField.svelte";
     import DateField from "./DateField.svelte";
     import FormAlert from "../FormAlert.svelte";
-    import type { DateTimeField } from "$lib/types/date";
+    import type { DateTimeField, DateTimeSpanValidation } from "$lib/types/date";
 
     // Stores
     import { AlertType } from "$lib/stores/view/toast";
 
     // Texts
     import { texts } from "$lib/stores/lang/generalTexts";
+    import { alertTexts } from "$lib/stores/lang/alertTexts";
 
     // Styles
-    import { ToolTipDatePickerStyle } from "$lib/style/general";
+    import { mergeStyle } from "$lib/style/components";
+    import { DateRangePickerStyle, ToolTipDatePickerStyle } from "$lib/style/general";
     import { SubPrimaryButtonStyle, SubDefaultButtonStyle } from "$lib/style/button";
-    import { validDate, validTime } from "$lib/logic/validation/date";
+
+    // Style object (from theme)
+    export let style: { [property: string]: string | number } | null = null;
+    $: effectiveStyle = style ?? $DateRangePickerStyle;
 
     // Props
     export let showToolTip: boolean;
 
     // Layout / styling props
-    export let paddingHorizontal: string | undefined = "20px";
-    export let paddingTop: string | undefined = "20px";
-    export let paddingBottom: string | undefined = "20px";
-    export let labelSize: string | undefined = "15px";
-    export let labelColor: string | undefined = "white";
-    export let labelWeight: string | undefined = "400";
-    export let labelPaddingLeft: string | undefined = "5px";
-    export let contentGap: string | undefined = "20px";
-    export let fieldGap: string | undefined = "10px";
-    export let rowGap: string | undefined = "10px";
+    export let paddingHorizontal: string | undefined = undefined;
+    export let paddingTop: string | undefined = undefined;
+    export let paddingBottom: string | undefined = undefined;
+    export let labelSize: string | undefined = undefined;
+    export let labelColor: string | undefined = undefined;
+    export let labelWeight: string | undefined = undefined;
+    export let labelPaddingLeft: string | undefined = undefined;
+    export let contentGap: string | undefined = undefined;
+    export let fieldGap: string | undefined = undefined;
+    export let rowGap: string | undefined = undefined;
+    export let buttonsPaddingTop: string | undefined = undefined;
+    export let buttonsGap: string | undefined = undefined;
+
+    $: localOverrides = {
+        paddingHorizontal,
+        paddingTop,
+        paddingBottom,
+        labelSize,
+        labelColor,
+        labelWeight,
+        labelPaddingLeft,
+        contentGap,
+        fieldGap,
+        rowGap,
+        buttonsPaddingTop,
+        buttonsGap,
+    };
+
+    // Merged style
+    $: mergedStyle = mergeStyle(effectiveStyle, localOverrides);
 
     // Variables
-    let startDateTime = createDateTimeField();
-    let endDateTime = createDateTimeField(new Date());
-    let validStartDate: boolean = false;
-    let validStartTime: boolean = false;
-    let validEndDate: boolean = false;
-    let validEndTime: boolean = false;
-    let validTimeSpan: boolean = false;
-    let invalidTimePeriod: boolean = false;
-    let firstRequestDone: boolean = false;
     let containerDiv: HTMLDivElement;
     let clickEventListenerDefined: boolean = false;
+    let startDateTime = createDateTimeField();
+    let endDateTime = createDateTimeField(new Date());
+    let validation: DateTimeSpanValidation;
+    let messageKey: string | null = null;
+    let messageVariables: Record<string, string | number>;
+    let firstRequestDone: boolean = false;
+    let processingRequest: boolean = false;
 
     // Reactive Statements
     $: if (!showToolTip && clickEventListenerDefined) {
@@ -53,22 +77,16 @@
         startDateTime = createDateTimeField();
         endDateTime = createDateTimeField(new Date());
         firstRequestDone = false;
+        processingRequest = false;
         clickEventListenerDefined = false;
     }
-
     $: if (showToolTip && !clickEventListenerDefined) {
         requestAnimationFrame(() => {
             window.addEventListener("click", handleClickOutside);
             clickEventListenerDefined = true;
         });
     }
-
-    $: validStartDate = validDate({ year: startDateTime.year, month: startDateTime.month, day: startDateTime.day });
-    $: validStartTime = validTime({ hour: startDateTime.hour, minute: startDateTime.minute, second: null });
-    $: validEndDate = validDate({ year: endDateTime.year, month: endDateTime.month, day: endDateTime.day });
-    $: validEndTime = validTime({ hour: endDateTime.hour, minute: endDateTime.minute, second: null });
-    $: validTimeSpan = validStartDate && validStartTime && validEndDate && validEndTime && getDateFromField(startDateTime) < getDateFromField(endDateTime);
-    $: invalidTimePeriod = validStartDate && validStartTime && validEndDate && validEndTime && !validTimeSpan;
+    $: ({ validation, messageKey, messageVariables } = validTimeSpan(startDateTime, endDateTime));
 
     // Export Functions
     export let requestCustomPeriod: (startDateTime: DateTimeField, endDateTime: DateTimeField) => void;
@@ -82,10 +100,12 @@
 
     function handleConfirm(): void {
         firstRequestDone = true;
-        if (!validTimeSpan) {
+        if (!validation || !validation.valid) {
             return;
         }
+        processingRequest = true;
         requestCustomPeriod(startDateTime, endDateTime);
+        processingRequest = false;
     }
 
     onDestroy(() => {
@@ -95,35 +115,28 @@
     });
 </script>
 
-<ToolTip
-    style={$ToolTipDatePickerStyle}
-    autoPositionContinuous={true}
-    zIndex={198}
-    width="50vw"
-    minWidth="300px"
-    maxWidth="375px"
-    maxHeight="auto"
-    {showToolTip}
->
+<ToolTip style={$ToolTipDatePickerStyle} autoPositionContinuous={true} zIndex={198} {showToolTip}>
     <div
         style="
-            --padding-horizontal: {paddingHorizontal};
-            --padding-top: {paddingTop};
-            --padding-bottom: {paddingBottom};
-            --label-size: {labelSize};
-            --label-color: {labelColor};
-            --label-weight: {labelWeight};
-            --label-padding-left: {labelPaddingLeft};
-            --content-gap: {contentGap};
-            --field-gap: {fieldGap};
-            --row-gap: {rowGap};
+            --padding-horizontal: {mergedStyle.paddingHorizontal};
+            --padding-top: {mergedStyle.paddingTop};
+            --padding-bottom: {mergedStyle.paddingBottom};
+            --label-size: {mergedStyle.labelSize};
+            --label-color: {mergedStyle.labelColor};
+            --label-weight: {mergedStyle.labelWeight};
+            --label-padding-left: {mergedStyle.labelPaddingLeft};
+            --content-gap: {mergedStyle.contentGap};
+            --field-gap: {mergedStyle.fieldGap};
+            --row-gap: {mergedStyle.rowGap};
+            --buttons-padding-top: {mergedStyle.buttonsPaddingTop};
+            --buttons-gap: {mergedStyle.buttonsGap};
         "
         bind:this={containerDiv}
         class="date-picker-div"
     >
         <div class="content">
-            {#if firstRequestDone && !validTimeSpan}
-                <FormAlert alertText="Data inválida" alertType={AlertType.ALERT} />
+            {#if firstRequestDone && !validation?.valid}
+                <FormAlert alertText={$alertTexts[messageKey || "noKeyError"]} alertType={AlertType.ALERT} alertVariables={messageVariables} />
             {/if}
 
             <div class="field">
@@ -134,8 +147,9 @@
                             bind:yearValue={startDateTime.year}
                             bind:monthValue={startDateTime.month}
                             bind:dayValue={startDateTime.day}
-                            invalidInput={!validStartDate || invalidTimePeriod}
+                            invalidInput={!validation?.validStartDate || validation?.invalidRange}
                             enableInvalidInput={firstRequestDone}
+                            submit={handleConfirm}
                         />
                     </div>
                     <TimeField
@@ -143,8 +157,9 @@
                         bind:minuteValue={startDateTime.minute}
                         useSecond={false}
                         width="35%"
-                        invalidInput={!validStartTime || invalidTimePeriod}
+                        invalidInput={!validation?.validStartTime || validation?.invalidRange}
                         enableInvalidInput={firstRequestDone}
+                        submit={handleConfirm}
                     />
                 </div>
             </div>
@@ -156,8 +171,9 @@
                             bind:yearValue={endDateTime.year}
                             bind:monthValue={endDateTime.month}
                             bind:dayValue={endDateTime.day}
-                            invalidInput={!validEndDate || invalidTimePeriod}
+                            invalidInput={!validation?.validEndDate || validation?.invalidRange}
                             enableInvalidInput={firstRequestDone}
+                            submit={handleConfirm}
                         />
                     </div>
                     <TimeField
@@ -165,13 +181,14 @@
                         bind:minuteValue={endDateTime.minute}
                         useSecond={false}
                         width="35%"
-                        invalidInput={!validEndTime || invalidTimePeriod}
+                        invalidInput={!validation?.validEndTime || validation?.invalidRange}
                         enableInvalidInput={firstRequestDone}
+                        submit={handleConfirm}
                     />
                 </div>
             </div>
             <div class="action-buttons-div">
-                <Button buttonText={$texts.confirm} style={$SubPrimaryButtonStyle} onClick={handleConfirm} />
+                <Button processing={processingRequest} buttonText={$texts.confirm} style={$SubPrimaryButtonStyle} onClick={handleConfirm} />
                 <Button
                     buttonText={$texts.cancel}
                     style={$SubDefaultButtonStyle}
@@ -241,10 +258,10 @@
     }
 
     .content .action-buttons-div {
-        padding-top: 10px;
+        padding-top: var(--buttons-padding-top);
         display: flex;
         flex-direction: row;
-        gap: 20px;
+        gap: var(--buttons-gap);
         justify-content: center;
         align-items: center;
         flex-wrap: wrap;

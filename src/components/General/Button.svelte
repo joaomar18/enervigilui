@@ -85,7 +85,7 @@
 
     // Functions
     function handleClick(): void {
-        if (onClick && enabled) {
+        if (onClick && enabled && !processing) {
             onClick();
         }
     }

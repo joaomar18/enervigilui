@@ -4,7 +4,7 @@
     import ToolTipText from "../../../General/ToolTipText.svelte";
     import LineGraph from "../../../General/LineGraph.svelte";
     import InlineLoader from "../../../General/InlineLoader.svelte";
-    import { MethodRetrier } from "$lib/logic/api/retrier";
+    import DateRangePicker from "../../../General/TimeDate/DateRangePicker.svelte";
     import { LogSpanPeriod } from "$lib/types/view/nodes";
     import { getNodeSection, getCommunicationID, isNumeric } from "$lib/logic/util/nodes";
     import { getNodeAdditionalInfo, getNodeLogs } from "$lib/logic/api/nodes";
@@ -28,28 +28,23 @@
         CustomDatePickerButtonStyle,
         SelectedCustomDatePickerButtonStyle,
     } from "$lib/style/nodes";
-    import { onDestroy } from "svelte";
-    import DatePickerTooltip from "../../../General/TimeDate/DatePickerTooltip.svelte";
 
     // Props
     export let nodeState: ProcessedNodeState;
     export let showPanel: boolean;
 
     // Layout / styling props
-
     export let stateDimColor: string | undefined = "#374151";
     export let stateAlarmColor: string | undefined = "#ef4444";
     export let stateWarningColor: string | undefined = "#f59e0b";
     export let stateOKColor: string | undefined = "#22c55e";
     export let stateDisconnectedColor: string | undefined = "#6b7280";
-
     export let titleSize: string | undefined = "1.25rem";
     export let titleColor: string | undefined = "rgba(255, 255, 255, 0.8)";
     export let titleWeight: string | undefined = "500";
     export let titleItemGap: string | undefined = "10px";
     export let titleImageWidth: string | undefined = "32px";
     export let titleImageHeight: string | undefined = "32px";
-
     export let headerRowHeigth: string | undefined = "25px";
     export let headerStateDivWidth: string | undefined = "25px";
     export let headerRowGap: string | undefined = "10px";
@@ -61,7 +56,6 @@
     export let headerValueSize: string | undefined = "1rem";
     export let headerValueColor: string | undefined = "rgba(255, 255, 255, 0.8)";
     export let headerValueWeight: string | undefined = "600";
-
     export let contentTitleSize: string | undefined = "13px";
     export let contentTitleColor: string | undefined = "rgba(255, 255, 255, 0.4)";
     export let contentTitleWeight: string | undefined = "500";
@@ -70,7 +64,6 @@
     export let contentTitleBorderBottom: string | undefined = "1px solid rgba(255, 255, 255, 0.08)";
     export let contentTitleSpacing: string | undefined = "1px";
     export let contentTitleTransform: string | undefined = "uppercase";
-
     export let contentInnerPaddingTop: string | undefined = "20px";
     export let contentInnerPaddingBottom: string | undefined = "20px";
     export let contentInnerPaddingHorizontal: string | undefined = "10px";
@@ -90,9 +83,7 @@
     // Variables
     let state: "alarmState" | "warningState" | "okState" | "disconnectedState";
     let nodeAdditionalInfo: BaseNodeAdditionalInfo;
-    let nodeAddInfoRetrier: MethodRetrier | null = null;
     let nodeLogs: any;
-    let nodeLogsRetrier: MethodRetrier | null = null;
     let selectedHistoryTimeSpan: LogSpanPeriod = LogSpanPeriod.currentDay;
 
     let showCustomDatePicker: boolean = false;
@@ -125,46 +116,24 @@
         }
     }
 
-    $: console.log(nodeLogs);
-
     // Functions
-    function loadNodeAdditionalInfo() {
-        nodeAddInfoRetrier?.stop();
-        nodeAddInfoRetrier = null;
+    async function loadNodeAdditionalInfo() {
         if (!$currentDeviceID || !nodeState) {
             return;
         }
-        nodeAddInfoRetrier = new MethodRetrier(async (signal) => {
-            ({ nodeAdditionalInfo } = await getNodeAdditionalInfo($currentDeviceID, nodeState.name, nodeState.phase));
-            nodeAddInfoRetrier?.stop();
-            nodeAddInfoRetrier = null;
-        }, 3000);
+        ({ nodeAdditionalInfo } = await getNodeAdditionalInfo($currentDeviceID, nodeState.name, nodeState.phase));
     }
 
     function loadDateSpan(): { initial_date: Date; end_date: Date } {
         return getTimeSpanFromLogPeriod(selectedHistoryTimeSpan);
     }
 
-    function loadNodeLogs(initial_date: Date | null = null, end_date: Date | null = null) {
-        nodeLogsRetrier?.stop();
-        nodeLogsRetrier = null;
+    async function loadNodeLogs(initial_date: Date | null = null, end_date: Date | null = null) {
         if (!$currentDeviceID || !nodeState) {
             return;
         }
-
-        nodeLogsRetrier = new MethodRetrier(async (signal) => {
-            ({ nodeLogs } = await getNodeLogs($currentDeviceID, nodeState.name, nodeState.phase, initial_date !== null, initial_date, end_date));
-            nodeLogsRetrier?.stop();
-            nodeLogsRetrier = null;
-        }, 3000);
+        ({ nodeLogs } = await getNodeLogs($currentDeviceID, nodeState.name, nodeState.phase, initial_date !== null, initial_date, end_date));
     }
-
-    onDestroy(() => {
-        nodeAddInfoRetrier?.stop();
-        nodeLogsRetrier?.stop();
-        nodeAddInfoRetrier = null;
-        nodeLogsRetrier = null;
-    });
 
     // Sample chart data for testing
     const sampleChartData = [
@@ -453,7 +422,7 @@
                                 >
                                     <div slot="tooltip"><ToolTipText text={$texts.customPeriod} /></div>
                                 </Button>
-                                <DatePickerTooltip
+                                <DateRangePicker
                                     bind:showToolTip={showCustomDatePicker}
                                     requestCustomPeriod={(startDateTime, endDateTime) => {
                                         let initial_date = getDateFromField(startDateTime);

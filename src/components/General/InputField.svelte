@@ -79,6 +79,7 @@
     $: mergedStyle = mergeStyle(effectiveStyle, localOverrides);
 
     // Variables
+    let inputEl: HTMLInputElement;
     let selected = false;
     let unitElement: HTMLElement | null = null;
     let unitWidth = 0;
@@ -94,6 +95,8 @@
 
     // Export Functions
     export let onChange: (() => void) | undefined = undefined;
+    export let onEnterKey: (() => void) | undefined = undefined;
+    export let onEscKey: (() => void) | undefined = undefined;
     export let onSelected: (() => void) | undefined = undefined;
     export let onBlur: (() => void) | undefined = undefined;
 
@@ -146,13 +149,7 @@
         // For numeric input types, do not allow empty string
         if (["INT", "POSITIVE_INT", "FLOAT", "POSITIVE_FLOAT"].includes(inputType)) {
             if (inputValue === "") {
-                inputValue = minValue.toString().padStart(zeroPaddingDigits, "0");
-                if (limitsPassed) {
-                    limitsPassed();
-                }
-                if (onChange) {
-                    onChange();
-                }
+                return;
             } else {
                 const numericValue = parseFloat(inputValue.toString());
                 if (numericValue < minValue) {
@@ -172,6 +169,20 @@
                         onChange();
                     }
                 }
+            }
+        }
+    }
+
+    function handleKeydown(event: KeyboardEvent): void {
+        if (event.key === "Enter") {
+            event.preventDefault();
+            if (onEnterKey) {
+                onEnterKey();
+            }
+        } else if (event.key === "Escape") {
+            inputEl.blur();
+            if (onEscKey) {
+                onEscKey();
             }
         }
     }
@@ -231,6 +242,7 @@ Applies special styling when focused.
         <div class="input-field-div">
             {#if inputType === "PASSWORD"}
                 <input
+                    bind:this={inputEl}
                     class:selected
                     type="password"
                     autocomplete={disableHints ? "off" : "new-password"}
@@ -255,6 +267,7 @@ Applies special styling when focused.
                     }}
                     bind:value={inputValue}
                     on:input={handleInput}
+                    on:keydown={handleKeydown}
                     placeholder={placeHolderText}
                     {disabled}
                     class:disabled
@@ -262,6 +275,7 @@ Applies special styling when focused.
                 />
             {:else if inputType === "USERNAME"}
                 <input
+                    bind:this={inputEl}
                     class:selected
                     type="text"
                     autocomplete={disableHints ? "off" : "username"}
@@ -286,6 +300,7 @@ Applies special styling when focused.
                     }}
                     bind:value={inputValue}
                     on:input={handleInput}
+                    on:keydown={handleKeydown}
                     placeholder={placeHolderText}
                     {disabled}
                     class:disabled
@@ -293,6 +308,7 @@ Applies special styling when focused.
                 />
             {:else}
                 <input
+                    bind:this={inputEl}
                     class:selected
                     type="text"
                     autocomplete={disableHints ? "off" : "on"}
@@ -317,6 +333,7 @@ Applies special styling when focused.
                     }}
                     bind:value={inputValue}
                     on:input={handleInput}
+                    on:keydown={handleKeydown}
                     placeholder={placeHolderText}
                     {disabled}
                     class:disabled

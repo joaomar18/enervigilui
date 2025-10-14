@@ -63,7 +63,7 @@ const FormAlertStyleConfig: ComponentStyles = {
         padding: "10px",
         textSize: "15px",
         textWeight: "400",
-        textLeftPadding: "5px",
+        textLeftPadding: "10px",
         borderRadiusRight: "5px",
         iconSize: "30px",
         alertBackgroundColor: "rgba(245, 101, 101, 0.08)",
@@ -620,12 +620,12 @@ export const ToolTipStyle = createStyleStore(ToolTipStyleConfig);
 
 const ToolTipDatePickerStyleConfig: ComponentStyles = {
     dark: {
-        width: "fit-content",
-        minWidth: "auto",
-        maxWidth: "300px",
+        width: "50vw",
+        minWidth: "300px",
+        maxWidth: "375px",
         height: "fit-content",
         minHeight: "auto",
-        maxHeight: "300px",
+        maxHeight: "auto",
         offsetPx: "10px",
         border: "1px solid #3a4149",
         borderRadius: "10px",
@@ -637,6 +637,27 @@ const ToolTipDatePickerStyleConfig: ComponentStyles = {
 };
 
 export const ToolTipDatePickerStyle = createStyleStore(ToolTipDatePickerStyleConfig);
+
+//////////     D A T E     R A N G E     P I C K E R     //////////
+
+const DateRangePickerStyleConfig: ComponentStyles = {
+    dark: {
+        paddingHorizontal: "20px",
+        paddingTop: "20px",
+        paddingBottom: "20px",
+        labelSize: "15px",
+        labelColor: "#eeee",
+        labelWeight: "400",
+        labelPaddingLeft: "5px",
+        contentGap: "20px",
+        fieldGap: "10px",
+        rowGap: "10px",
+        buttonsPaddingTop: "10px",
+        buttonsGap: "20px",
+    },
+};
+
+export const DateRangePickerStyle = createStyleStore(DateRangePickerStyleConfig);
 
 
 //////////     T E X T     C O L O R S     //////////
