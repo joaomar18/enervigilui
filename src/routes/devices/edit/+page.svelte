@@ -10,7 +10,7 @@
     import { updateNodes, updateEditingNode, updateNodesBySection } from "$lib/logic/handlers/nodes";
     import { protocolPlugins } from "$lib/stores/device/protocol";
     import { showToast } from "$lib/logic/view/toast";
-    import { ToastType } from "$lib/stores/view/toast";
+    import { AlertType } from "$lib/stores/view/toast";
     import { MethodRetrier } from "$lib/logic/api/retrier";
     import { deviceProtocolChange } from "$lib/logic/handlers/device";
     import { noChangesToDevice } from "$lib/logic/util/device";
@@ -95,7 +95,7 @@
                 }, 100); // Small timeout to give a bit of time for the page to load before the nodes
             }, 3000);
         } else {
-            showToast("errorEditDeviceParams", ToastType.ALERT);
+            showToast("errorEditDeviceParams", AlertType.ALERT);
             loadedDone.set(true);
         }
 
@@ -207,7 +207,7 @@ Shows input forms for protocol-specific parameters and organizes device nodes fo
                     onClick={async () => {
                         if (validDeviceOperation(deviceData)) {
                             if (noChangesToDevice(initialDeviceData, deviceData, initialNodes, nodes)) {
-                                showToast("noChangesToDevice", ToastType.INFO);
+                                showToast("noChangesToDevice", AlertType.INFO);
                                 return;
                             }
                             showSaveWindow = true;
@@ -242,7 +242,7 @@ Shows input forms for protocol-specific parameters and organizes device nodes fo
             onSave={async () => {
                 if (validDeviceOperation(deviceData)) {
                     if (noChangesToDevice(initialDeviceData, deviceData, initialNodes, nodes)) {
-                        showToast("noChangesToDevice", ToastType.INFO);
+                        showToast("noChangesToDevice", AlertType.INFO);
                         return;
                     }
                     performingSaveRequest = true;

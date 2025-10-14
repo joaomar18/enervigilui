@@ -18,7 +18,7 @@
 
     // Texts
     import { texts } from "$lib/stores/lang/generalTexts";
-    import { toastTexts } from "$lib/stores/lang/toastTexts";
+    import { alertTexts } from "$lib/stores/lang/alertTexts";
     import ToolTipText from "../General/ToolTipText.svelte";
 
     // Variables
@@ -105,7 +105,7 @@
     <main class="content" class:open={$leftPanelOpen}>
         <div class="alerts-div" class:prioritize={$displayToast} class:sidebar-open={$leftPanelOpen}>
             {#if $displayToast}
-                <Toast bottomPos="0px" toastText={$toastTexts[$toastKey]} toastType={$toastType} toastVariables={$toastVariables} onClick={closeToast} />
+                <Toast bottomPos="0px" toastText={$alertTexts[$toastKey]} toastType={$toastType} toastVariables={$toastVariables} onClick={closeToast} />
             {/if}
         </div>
         <div class="container-div">

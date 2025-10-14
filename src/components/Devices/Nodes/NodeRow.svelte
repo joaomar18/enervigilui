@@ -8,7 +8,7 @@
     import { NodeType, LOGGING_PERIOD_LIM } from "$lib/types/nodes/base";
     import { defaultVariableUnits } from "$lib/stores/device/variables";
     import { showToast } from "$lib/logic/view/toast";
-    import { ToastType } from "$lib/stores/view/toast";
+    import { AlertType } from "$lib/stores/view/toast";
 
     // Types
     import type { EditableDevice, NewDevice } from "$lib/types/device/base";
@@ -231,7 +231,7 @@ properties and action buttons for configuration and deletion. -->
                     minValue={LOGGING_PERIOD_LIM.MIN}
                     maxValue={LOGGING_PERIOD_LIM.MAX}
                     limitsPassed={() => {
-                        showToast("loggingPeriodError", ToastType.ALERT, {
+                        showToast("loggingPeriodError", AlertType.ALERT, {
                             minValue: LOGGING_PERIOD_LIM.MIN,
                             maxValue: LOGGING_PERIOD_LIM.MAX,
                         });
@@ -254,7 +254,7 @@ properties and action buttons for configuration and deletion. -->
                     onChange={() => {
                         onPropertyChanged();
                     }}
-                    inputType={node.config.type}
+                    inputType={node.config.type === NodeType.FLOAT ? "FLOAT" : "INT"}
                     inputUnit={node.config.unit}
                     height={rowHeight}
                 />
@@ -273,7 +273,7 @@ properties and action buttons for configuration and deletion. -->
                     onChange={() => {
                         onPropertyChanged();
                     }}
-                    inputType={node.config.type}
+                    inputType={node.config.type === NodeType.FLOAT ? "FLOAT" : "INT"}
                     inputUnit={node.config.unit}
                     height={rowHeight}
                 />

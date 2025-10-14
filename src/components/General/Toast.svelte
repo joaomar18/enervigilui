@@ -1,6 +1,6 @@
 <script lang="ts">
     import { fade } from "svelte/transition";
-    import { ToastType } from "$lib/stores/view/toast";
+    import { AlertType } from "$lib/stores/view/toast";
 
     // Styles
     import { mergeStyle } from "$lib/style/components";
@@ -10,7 +10,7 @@
     export let pushTop: boolean = false; //push alert to top
     export let pushBottom: boolean = false; //push alert to bottom
     export let toastText: string;
-    export let toastType: ToastType;
+    export let toastType: AlertType;
     export let toastVariables: Record<string, string | number> | undefined = undefined;
     export let topPos: string = "";
     export let bottomPos: string = "";
@@ -47,19 +47,19 @@
 
     // Color Picking
     const colorMap = {
-        [ToastType.ALERT]: {
+        [AlertType.ALERT]: {
             background: () => String(mergedStyle.alertBackgroundColor),
             border: () => String(mergedStyle.alertBorderColor),
         },
-        [ToastType.WARNING]: {
+        [AlertType.WARNING]: {
             background: () => String(mergedStyle.warningBackgroundColor),
             border: () => String(mergedStyle.warningBorderColor),
         },
-        [ToastType.INFO]: {
+        [AlertType.INFO]: {
             background: () => String(mergedStyle.infoBackgroundColor),
             border: () => String(mergedStyle.infoBorderColor),
         },
-        [ToastType.NEUTRAL]: {
+        [AlertType.NEUTRAL]: {
             background: () => String(mergedStyle.neutralBackgroundColor),
             border: () => String(mergedStyle.neutralBorderColor),
         },
@@ -82,7 +82,7 @@
     }
     $: transformY = pushTop ? "-100%" : pushBottom ? "100%" : "0%";
     $: {
-        const typeColors = colorMap[toastType] ?? colorMap[ToastType.ALERT];
+        const typeColors = colorMap[toastType] ?? colorMap[AlertType.ALERT];
         backgroundColor = typeColors.background();
         borderColor = typeColors.border();
     }

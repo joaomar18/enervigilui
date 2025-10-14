@@ -20,7 +20,7 @@ import { stringIsValidInteger, stringIsValidFloat } from "$lib/logic/util/generi
 import { protocolPlugins } from "$lib/stores/device/protocol";
 import { normalizeNode } from "../util/nodes";
 import { showToast } from "../view/toast";
-import { ToastType } from "$lib/stores/view/toast";
+import { AlertType } from "$lib/stores/view/toast";
 import { getDisplayComponent } from "../view/device";
 
 /**
@@ -246,7 +246,7 @@ export function initNodes(initialNodes: Array<NodeRecord>): { sucess: boolean; e
         sucess = true;
     } catch (e) {
         console.error(`Could not initialize the nodes configuration: ${e}`);
-        showToast("initNodesError", ToastType.ALERT, { error: String(e) });
+        showToast("initNodesError", AlertType.ALERT, { error: String(e) });
     }
     return { sucess, editableNodes };
 }

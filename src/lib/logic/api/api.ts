@@ -1,6 +1,6 @@
 import { get } from "svelte/store";
 import { showToast } from "../view/toast";
-import { ToastType } from "$lib/stores/view/toast";
+import { AlertType } from "$lib/stores/view/toast";
 import { navigateTo } from "../view/navigation";
 import { loadedDone } from "$lib/stores/view/navigation";
 import { convertDateToLocalTime } from "../util/date";
@@ -171,11 +171,11 @@ export async function callAPI({
         if (status !== 200) {
             switch (status) {
                 case -1:
-                    showToast("timeout", ToastType.ALERT);
+                    showToast("timeout", AlertType.ALERT);
                     break;
                 case 401:
                     if (loginPage) {
-                        showToast("wrongCredentials", ToastType.ALERT, { remaining: String(data.remaining) });
+                        showToast("wrongCredentials", AlertType.ALERT, { remaining: String(data.remaining) });
                     } else {
                         await navigateTo("/login", {}, true);
                     }
@@ -183,14 +183,14 @@ export async function callAPI({
                 case 429:
                     const localTime = convertDateToLocalTime(data.unlocked);
                     if (localTime !== null) {
-                        showToast("tooManyAttempts", ToastType.ALERT, { localTime: localTime });
+                        showToast("tooManyAttempts", AlertType.ALERT, { localTime: localTime });
                     }
                     else {
-                        showToast("unknownError", ToastType.ALERT);
+                        showToast("unknownError", AlertType.ALERT);
                     }
                     break;
                 default:
-                    showToast("unknownError", ToastType.ALERT);
+                    showToast("unknownError", AlertType.ALERT);
                     break;
             }
             return { sucess: false, data: null };
@@ -200,7 +200,7 @@ export async function callAPI({
         }
         return { sucess: true, data: data };
     } catch (e) {
-        showToast("unexpectedError", ToastType.ALERT);
+        showToast("unexpectedError", AlertType.ALERT);
         console.error(`Error processing request: ${e}`);
         return { sucess: false, data: null };
     }

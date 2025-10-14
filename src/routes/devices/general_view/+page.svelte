@@ -5,7 +5,7 @@
     import { NodePhase } from "$lib/types/nodes/base";
     import { getDeviceNodesState } from "$lib/logic/api/nodes";
     import { showToast } from "$lib/logic/view/toast";
-    import { ToastType } from "$lib/stores/view/toast";
+    import { AlertType } from "$lib/stores/view/toast";
     import { nodeSections } from "$lib/types/nodes/base";
     import { getAvailablePhasesFromRecordsOrStates, getNodesStateBySubSection } from "$lib/logic/util/nodes";
     import { initialRealTimeCardSectionsExpandState } from "$lib/types/view/device";
@@ -72,7 +72,7 @@
                 ({ nodesState, processedNodesState } = await getDeviceNodesState($currentDeviceID));
             }, 5000);
         } else {
-            showToast("errorEditDeviceParams", ToastType.ALERT);
+            showToast("errorEditDeviceParams", AlertType.ALERT);
             loadedDone.set(true);
         }
 

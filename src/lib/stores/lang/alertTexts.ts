@@ -1,7 +1,7 @@
 import { createLangStore } from "$lib/stores/lang/definition";
 import type { TextsObject } from "$lib/stores/lang/definition";
 
-const toastTextsObject: TextsObject = {
+const alertTextsObject: TextsObject = {
     decimalPlacesError: {
         PT: "O número de casas decimais deve estar compreendido entre {minValue} e {maxValue}.",
         EN: "The number of decimal places must be between {minValue} and {maxValue}.",
@@ -80,4 +80,4 @@ const toastTextsObject: TextsObject = {
     },
 };
 
-export const toastTexts = createLangStore(toastTextsObject);
+export const alertTexts = createLangStore(alertTextsObject);

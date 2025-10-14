@@ -1,4 +1,5 @@
 import { getDaysInMonth } from "../util/date";
+import { texts } from "$lib/stores/lang/generalTexts";
 
 
 /**
@@ -43,3 +44,5 @@ export function validTime(time: { hour: string | number | null, minute: string |
     }
     return true;
 }
+
+//export function validTimeSpan(): {valid: boolean, validRange: boolean, messageKey: string | null}

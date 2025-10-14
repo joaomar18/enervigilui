@@ -4,7 +4,6 @@ import { subSectionComponentMap } from "$lib/types/view/device";
 import type { NodeState, ProcessedNodeState } from "$lib/types/nodes/base";
 import type { RealTimeCardSectionsState } from "$lib/types/view/device";
 import type { SvelteComponent } from "svelte";
-import { LogSpanPeriod } from "$lib/types/view/nodes";
 
 /**
  * Creates a mapping of all node phases to the same real-time card sections state

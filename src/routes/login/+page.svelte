@@ -14,7 +14,7 @@
     import { closeToast } from "$lib/logic/view/toast";
 
     // Texts
-    import { toastTexts } from "$lib/stores/lang/toastTexts";
+    import { alertTexts } from "$lib/stores/lang/alertTexts";
 
     // Mount function
     onMount(() => {
@@ -31,7 +31,7 @@
     <div class="column" id="first-col">
         <LoginForm />
         {#if $displayToast}
-            <Toast topPos="94px" toastText={$toastTexts[$toastKey]} toastType={$toastType} toastVariables={$toastVariables} onClick={closeToast} />
+            <Toast topPos="94px" toastText={$alertTexts[$toastKey]} toastType={$toastType} toastVariables={$toastVariables} onClick={closeToast} />
         {/if}
     </div>
     <div class="column" id="second-col">

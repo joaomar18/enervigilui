@@ -7,7 +7,7 @@
     import ModalWindow from "../../General/ModalWindow.svelte";
     import { nodeNameChange, communicationIDChange, nodeTypeChange, customNodeChange, virtualNodeChange } from "$lib/logic/handlers/nodes";
     import { showToast } from "$lib/logic/view/toast";
-    import { ToastType } from "$lib/stores/view/toast";
+    import { AlertType } from "$lib/stores/view/toast";
     import { NodeType, DECIMAL_PLACES_LIM, LOGGING_PERIOD_LIM } from "$lib/types/nodes/base";
 
     // Types
@@ -236,7 +236,7 @@ Displays contextual hints and supports multi-language labels for all fields. -->
                                                 minValue={DECIMAL_PLACES_LIM.MIN}
                                                 maxValue={DECIMAL_PLACES_LIM.MAX}
                                                 limitsPassed={() => {
-                                                    showToast("decimalPlacesError", ToastType.ALERT, {
+                                                    showToast("decimalPlacesError", AlertType.ALERT, {
                                                         minValue: DECIMAL_PLACES_LIM.MIN,
                                                         maxValue: DECIMAL_PLACES_LIM.MAX,
                                                     });
@@ -329,7 +329,7 @@ Displays contextual hints and supports multi-language labels for all fields. -->
                                             minValue={LOGGING_PERIOD_LIM.MIN}
                                             maxValue={LOGGING_PERIOD_LIM.MAX}
                                             limitsPassed={() => {
-                                                showToast("loggingPeriodError", ToastType.ALERT, {
+                                                showToast("loggingPeriodError", AlertType.ALERT, {
                                                     minValue: LOGGING_PERIOD_LIM.MIN,
                                                     maxValue: LOGGING_PERIOD_LIM.MAX,
                                                 });

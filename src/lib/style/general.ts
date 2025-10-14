@@ -53,6 +53,40 @@ const ToastStyleConfig: ComponentStyles = {
 
 export const ToastStyle = createStyleStore(ToastStyleConfig);
 
+
+//////////     F O R M     A L E R T     //////////
+
+const FormAlertStyleConfig: ComponentStyles = {
+    dark: {
+        width: "calc(100% - 20px)",
+        height: "fit-content",
+        padding: "10px",
+        textSize: "15px",
+        textWeight: "400",
+        textLeftPadding: "5px",
+        borderRadiusRight: "5px",
+        iconSize: "30px",
+        alertBackgroundColor: "rgba(245, 101, 101, 0.08)",
+        alertBorderLeft: "2px solid #f56565",
+        alertIconColor: "#f56565",
+        alertTextColor: "#ff7979",
+        warningBackgroundColor: "rgba(245, 158, 11, 0.08)",
+        warningBorderLeft: "2px solid #f59e0b",
+        warningIconColor: "#f59e0b",
+        warningTextColor: "#fbbf24",
+        infoBackgroundColor: "rgba(59, 130, 246, 0.08)",
+        infoBorderLeft: "2px solid #3b82f6",
+        infoIconColor: "#3b82f6",
+        infoTextColor: "#60a5fa",
+        neutralBackgroundColor: "rgba(107, 114, 128, 0.08)",
+        neutralBorderLeft: "2px solid #6b7280",
+        neutralIconColor: "#6b7280",
+        neutralTextColor: "#9ca3af",
+    },
+};
+
+export const FormAlertStyle = createStyleStore(FormAlertStyleConfig);
+
 //////////     C H E C K B O X     //////////
 
 const CheckboxStyleConfig: ComponentStyles = {

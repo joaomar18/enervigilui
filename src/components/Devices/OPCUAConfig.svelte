@@ -4,7 +4,7 @@
     import { validateOpcUaUrl } from "$lib/logic/validation/device/opcUa";
     import { READ_PERIOD_LIM, TIMEOUT_LIM } from "$lib/types/device/base";
     import { showToast } from "$lib/logic/view/toast";
-    import { ToastType } from "$lib/stores/view/toast";
+    import { AlertType } from "$lib/stores/view/toast";
 
     // Texts
     import { texts } from "$lib/stores/lang/generalTexts";
@@ -60,7 +60,7 @@
                 minValue={READ_PERIOD_LIM.MIN}
                 maxValue={READ_PERIOD_LIM.MAX}
                 limitsPassed={() => {
-                    showToast("readPeriodError", ToastType.ALERT, {
+                    showToast("readPeriodError", AlertType.ALERT, {
                         minValue: READ_PERIOD_LIM.MIN,
                         maxValue: READ_PERIOD_LIM.MAX,
                     });
@@ -87,7 +87,7 @@
                 minValue={TIMEOUT_LIM.MIN}
                 maxValue={TIMEOUT_LIM.MAX}
                 limitsPassed={() => {
-                    showToast("commTimeoutError", ToastType.ALERT, {
+                    showToast("commTimeoutError", AlertType.ALERT, {
                         minValue: TIMEOUT_LIM.MIN,
                         maxValue: TIMEOUT_LIM.MAX,
                     });

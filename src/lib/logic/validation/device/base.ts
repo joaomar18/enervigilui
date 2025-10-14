@@ -4,7 +4,7 @@ import type { EditableNodeRecord } from "$lib/types/nodes/base";
 import { normalizeDevice } from "$lib/logic/util/device";
 import { getAllNodesValidation } from "../nodes/base";
 import { showToast } from "$lib/logic/view/toast";
-import { ToastType } from "$lib/stores/view/toast";
+import { AlertType } from "$lib/stores/view/toast";
 import { protocolTexts } from "$lib/stores/lang/energyMeterTexts";
 import { isEqual } from "$lib/logic/util/generic";
 
@@ -65,15 +65,15 @@ export function validDeviceOperation(deviceData: EditableDevice | NewDevice): bo
         return true;
     }
     if (!deviceData.validation.deviceName) {
-        showToast("invalidDeviceName", ToastType.ALERT); // Invalid device name
+        showToast("invalidDeviceName", AlertType.ALERT); // Invalid device name
     } else if (!deviceData.validation.deviceProtocol) {
-        showToast("invalidProtocol", ToastType.ALERT); // Invalid device protocol
+        showToast("invalidProtocol", AlertType.ALERT); // Invalid device protocol
     } else if (!deviceData.validation.communicationOptions) {
-        showToast("invalidCommunicationOptions", ToastType.ALERT); // Invalid Communication Options
+        showToast("invalidCommunicationOptions", AlertType.ALERT); // Invalid Communication Options
     } else if (!deviceData.validation.meterOptions) {
-        showToast("invalidMeterOptions", ToastType.ALERT); // Invalid Meter Options
+        showToast("invalidMeterOptions", AlertType.ALERT); // Invalid Meter Options
     } else if (!deviceData.validation.nodes) {
-        showToast("invalidDeviceNodes", ToastType.ALERT); // Invalid Device Nodes
+        showToast("invalidDeviceNodes", AlertType.ALERT); // Invalid Device Nodes
     }
     return false;
 }

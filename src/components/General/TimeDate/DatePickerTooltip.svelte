@@ -5,7 +5,11 @@
     import Button from "../Button.svelte";
     import TimeField from "./TimeField.svelte";
     import DateField from "./DateField.svelte";
+    import FormAlert from "../FormAlert.svelte";
     import type { DateTimeField } from "$lib/types/date";
+
+    // Stores
+    import { AlertType } from "$lib/stores/view/toast";
 
     // Texts
     import { texts } from "$lib/stores/lang/generalTexts";
@@ -118,6 +122,10 @@
         class="date-picker-div"
     >
         <div class="content">
+            {#if firstRequestDone && !validTimeSpan}
+                <FormAlert alertText="Data inválida" alertType={AlertType.ALERT} />
+            {/if}
+
             <div class="field">
                 <span>{$texts.fromDate}</span>
                 <div class="row">
@@ -185,7 +193,7 @@
         padding-bottom: var(--padding-bottom);
         padding-left: var(--padding-horizontal);
         padding-right: var(--padding-horizontal);
-        container-type: inline-size; /* Enable container queries */
+        container-type: inline-size;
     }
     .content {
         margin: 0;
