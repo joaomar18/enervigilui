@@ -17,8 +17,9 @@ import {
 } from "../util/nodes";
 import { defaultVariables } from "$lib/stores/device/variables";
 import { protocolPlugins } from "$lib/stores/device/protocol";
-import { nodeSections } from "$lib/types/nodes/base";
-import type { NodeRecordEditingState, EditableNodeRecord, NodeRecord, ProcessedNodeState } from "$lib/types/nodes/base";
+import { nodePhaseSections } from "$lib/types/nodes/base";
+import type { NodeRecordEditingState, EditableNodeRecord, NodeRecord } from "$lib/types/nodes/config";
+import type { ProcessedNodeState } from "$lib/types/nodes/realtime";
 
 /**
  * Sorts nodes logically by phase, type, incremental status, and variable groups for consistent UI display.
@@ -196,8 +197,8 @@ export function updateNodes(node: EditableNodeRecord, nodes: Array<EditableNodeR
  * @param nodes - Array of nodes to group by phase sections.
  * @returns Record with nodes organized by phase sections (L1, L2, L3, Total, etc.).
  */
-export function updateNodesBySection(meterType: MeterType, nodes: Array<EditableNodeRecord>): Record<NodePhase, Array<EditableNodeRecord>> {
-    return nodeSections.reduce((acc: Record<NodePhase, Array<EditableNodeRecord>>, section) => {
+export function updateNodesBySection(nodes: Array<EditableNodeRecord>): Record<NodePhase, Array<EditableNodeRecord>> {
+    return nodePhaseSections.reduce((acc: Record<NodePhase, Array<EditableNodeRecord>>, section) => {
         acc[section.key] = nodes.filter((node) => section.filter(node.attributes.phase));
         return acc;
     }, {} as Record<NodePhase, Array<EditableNodeRecord>>);

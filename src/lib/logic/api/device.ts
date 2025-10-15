@@ -1,6 +1,6 @@
 import { callAPI } from "$lib/logic/api/api";
 import type { Device, EditableDevice, DeviceHistory, DeviceInfo } from "$lib/types/device/base";
-import type { NodeRecord } from "$lib/types/nodes/base";
+import type { NodeRecord } from "$lib/types/nodes/config";
 import { processInitialDevice, convertToEditableDevice } from "../factory/device";
 import { processDeviceHistory } from "../handlers/device";
 import { navigateTo } from "../view/navigation";

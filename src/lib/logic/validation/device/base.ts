@@ -1,6 +1,6 @@
 import { get } from "svelte/store";
 import type { DeviceValidation, Device, EditableDevice, NewDevice } from "$lib/types/device/base";
-import type { EditableNodeRecord } from "$lib/types/nodes/base";
+import type { EditableNodeRecord } from "$lib/types/nodes/config";
 import { normalizeDevice } from "$lib/logic/util/device";
 import { getAllNodesValidation } from "../nodes/base";
 import { showToast } from "$lib/logic/view/toast";

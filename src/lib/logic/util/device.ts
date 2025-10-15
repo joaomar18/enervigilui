@@ -1,5 +1,5 @@
 import type { Device, EditableDevice, NewDevice } from "$lib/types/device/base";
-import type { NodeRecord, EditableNodeRecord } from "$lib/types/nodes/base";
+import type { NodeRecord, EditableNodeRecord } from "$lib/types/nodes/config";
 import type { DeviceOPCUAConfig } from "$lib/types/device/opcUa";
 import type { DeviceModbusRTUConfig } from "$lib/types/device/modbusRtu";
 import { areDevicesEqual } from "../validation/device/base";

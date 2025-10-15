@@ -3,15 +3,17 @@ import { Protocol } from "$lib/types/device/base";
 import type { BaseCommunicationConfig, EditableBaseCommunicationConfig, MeterOptions } from "$lib/types/device/base";
 import type { DeviceOPCUAConfig, EditableDeviceOPCUAConfig } from "$lib/types/device/opcUa";
 import type { DeviceModbusRTUConfig, EditableDeviceModbusRTUConfig } from "$lib/types/device/modbusRtu";
-import type { NodeModbusRTUConfig, EditableNodeModbusRTUConfig, NodeModbusRTUAdditionalInfo } from "$lib/types/nodes/modbusRtu";
-import type { NodeOPCUAConfig, EditableNodeOPCUAConfig, NodeOPCUAAdditionalInfo } from "$lib/types/nodes/opcUa";
+import type { NodeModbusRTUConfig, EditableNodeModbusRTUConfig, NodeModbusRTUAdditionalInfo } from "$lib/types/nodes/protocol/modbusRtu";
+import type { NodeOPCUAConfig, EditableNodeOPCUAConfig, NodeOPCUAAdditionalInfo } from "$lib/types/nodes/protocol/opcUa";
 import type { SvelteComponent } from "svelte";
 import { defaultModbusRTUOptions } from "$lib/types/device/modbusRtu";
 import { defaultOPCUAOptions } from "$lib/types/device/opcUa";
-import { defaultBaseNodeConfig } from "$lib/types/nodes/base";
+import { defaultBaseNodeConfig } from "$lib/types/nodes/config";
 import ModbusRtuConfig from "../../../components/Devices/ModbusRTUConfig.svelte";
 import OpcuaConfig from "../../../components/Devices/OPCUAConfig.svelte";
-import type { BaseNodeAdditionalInfo, BaseNodeConfig, DefaultNodeInfo, EditableBaseNodeConfig, EditableNodeRecord } from "$lib/types/nodes/base";
+import type { DefaultNodeInfo } from "$lib/types/nodes/base";
+import type { BaseNodeConfig, EditableBaseNodeConfig, EditableNodeRecord } from "$lib/types/nodes/config";
+import type { BaseNodeAdditionalInfo } from "$lib/types/nodes/realtime";
 import {
     convertToBaseNodeConfig,
     convertToEditableBaseNodeConfig,

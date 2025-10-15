@@ -28,7 +28,8 @@
 
     // Types
     import type { Device, EditableDevice } from "$lib/types/device/base";
-    import type { NodeRecord, EditableNodeRecord, NodeRecordEditingState, NodePhase } from "$lib/types/nodes/base";
+    import type { NodePhase } from "$lib/types/nodes/base";
+    import type { NodeRecord, EditableNodeRecord, NodeRecordEditingState } from "$lib/types/nodes/config";
 
     // Styles
     import { PrimaryButtonStyle, DangerButtonStyle } from "$lib/style/button";
@@ -73,7 +74,7 @@
 
     // Get nodes from the nodes array by section
     $: if (contentInit) {
-        nodesBySection = updateNodesBySection(deviceData.type, nodes);
+        nodesBySection = updateNodesBySection(nodes);
         updateNodesValidation(nodes, nodesBySection);
         updateDeviceValidation(deviceData, nodes);
     }

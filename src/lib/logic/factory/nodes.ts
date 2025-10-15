@@ -1,19 +1,11 @@
 import { get } from "svelte/store";
 import { MeterType } from "$lib/types/device/base";
-import { NodeType, NodePhase, NodePrefix, nodeSections } from "$lib/types/nodes/base";
+import { NodeType, NodePhase, NodePrefix, nodePhaseSections } from "$lib/types/nodes/base";
+import type { DefaultNodeInfo } from "$lib/types/nodes/base";
 import type { EditableDevice, MeterOptions, NewDevice } from "$lib/types/device/base";
-import type {
-    NodeRecord,
-    EditableNodeRecord,
-    EditableBaseNodeConfig,
-    NodeAttributes,
-    DefaultNodeInfo,
-    BaseNodeConfig,
-    NodeState,
-    ProcessedNodeState,
-    ProcessedBaseLogPoint,
-    BaseLogPoint,
-} from "$lib/types/nodes/base";
+import type { BaseNodeConfig, NodeRecord, EditableNodeRecord, EditableBaseNodeConfig, NodeAttributes } from "$lib/types/nodes/config";
+import type { NodeState, ProcessedNodeState } from "$lib/types/nodes/realtime";
+import type { BaseLogPoint, NodeLogs, ProcessedBaseLogPoint, ProcessedNodeLogs } from "$lib/types/nodes/logs";
 import { defaultVariables } from "$lib/stores/device/variables";
 import { addPrefix, removePrefix, getNodePrefix, getCommunicationID } from "../util/nodes";
 import { sortNodesLogically } from "../handlers/nodes";
@@ -300,7 +292,7 @@ export function getDefaultNodesList(device_data: EditableDevice | NewDevice): Ar
             nodes.push(createDefaultEditableDeviceNode(variable, NodePhase.SINGLEPHASE, device_data));
         }
     } else if (device_data.type === MeterType.THREE_PHASE) {
-        const threePhaseeSections = nodeSections.filter((section) => section.phase !== NodePhase.SINGLEPHASE);
+        const threePhaseeSections = nodePhaseSections.filter((section) => section.phase !== NodePhase.SINGLEPHASE);
 
         for (const section of threePhaseeSections) {
             const phaseVars = defaultVars.filter((v) => v.useByDefault && v.applicablePhases.includes(section.phase));
@@ -362,25 +354,37 @@ export function processNodesState(nodesState: Record<string, NodeState>): Array<
     return sortNodesLogically(processedNodesState) as Array<ProcessedNodeState>;
 }
 
-export function processNodeLogs(nodeLogs: Array<BaseLogPoint>): Array<ProcessedBaseLogPoint> {
-    let processedNodeLogs: Array<ProcessedBaseLogPoint> = [];
-    for (let log of nodeLogs) {
-        const { start_time: start_time_str, end_time: end_time_str, ...logData } = log;
+/**
+ * Processes raw node logs into UI-ready format with converted timestamps and display components.
+ * Converts ISO timestamps to Unix seconds for uPlot compatibility and adds appropriate graph/metrics components.
+ * @param nodeLogs - Raw node logs with ISO timestamps and metadata
+ * @returns Processed node logs with Unix timestamps and UI components for visualization
+ */
+export function processNodeLogs(nodeLogs: NodeLogs): ProcessedNodeLogs {
+    let processedPoints: Array<ProcessedBaseLogPoint> = [];
+    let { graphComponent, metricsComponent } = getNodeLogDisplayComponents(nodeLogs);
+    for (let point of nodeLogs.points) {
+        const { start_time: start_time_str, end_time: end_time_str, ...logData } = point;
 
         let start_time = convertISOToTimestamp(start_time_str) / 1000;
         let end_time = convertISOToTimestamp(end_time_str) / 1000;
-        let { graphComponent, metricsComponent } = getNodeLogDisplayComponents(log);
+
 
         let processedLog = {
             start_time: start_time,
             end_time: end_time,
-            displayGraph: graphComponent,
-            displayMetrics: metricsComponent,
             ...logData
         } as ProcessedBaseLogPoint;
 
-        processedNodeLogs.push(processedLog);
+        processedPoints.push(processedLog);
     }
-    return processedNodeLogs;
-}
 
+    return {
+        unit: nodeLogs.unit,
+        type: nodeLogs.type,
+        incremental: nodeLogs.incremental,
+        graphComponent: graphComponent,
+        metricsComponent: metricsComponent,
+        points: processedPoints,
+    } as ProcessedNodeLogs;
+}

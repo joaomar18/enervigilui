@@ -6,17 +6,18 @@
     import { getDeviceNodesState } from "$lib/logic/api/nodes";
     import { showToast } from "$lib/logic/view/toast";
     import { AlertType } from "$lib/stores/view/toast";
-    import { nodeSections } from "$lib/types/nodes/base";
-    import { getAvailablePhasesFromRecordsOrStates, getNodesStateBySubSection } from "$lib/logic/util/nodes";
-    import { initialRealTimeCardSectionsExpandState } from "$lib/types/view/device";
-    import { assignRealTimeCardSectionsStateToAllPhases } from "$lib/logic/view/device";
-    import type { NodeState, ProcessedNodeState } from "$lib/types/nodes/base";
-    import type { RealTimeCardSubSections, RealTimeCardSectionsState } from "$lib/types/view/device";
+    import { nodePhaseSections } from "$lib/types/nodes/base";
+    import { getAvailablePhasesFromRecordsOrStates, getNodesStateByCategory } from "$lib/logic/util/nodes";
+    import { initialRealTimeCardCategoriesExpandState } from "$lib/types/view/device";
+    import { assignRealTimeCardCategoriesStateToAllPhases } from "$lib/logic/view/device";
     import ContentCard from "../../../components/General/ContentCard.svelte";
     import ExpandableSection from "../../../components/General/ExpandableSection.svelte";
     import Action from "../../../components/General/Action.svelte";
     import NodeDetailSheet from "../../../components/Devices/Nodes/RealTimeDisplay/NodeDetailSheet.svelte";
     import ToolTipText from "../../../components/General/ToolTipText.svelte";
+    import type { NodeCategory } from "$lib/types/nodes/base";
+    import type { NodeState, ProcessedNodeState } from "$lib/types/nodes/realtime";
+    import type { RealTimeCardCategoriesState } from "$lib/types/view/device";
 
     // Texts
     import { texts } from "$lib/stores/lang/generalTexts";
@@ -34,28 +35,28 @@
     // Variables
     let nodesState: Record<string, NodeState>;
     let processedNodesState: Array<ProcessedNodeState>;
-    let nodesStateBySubSection: Record<NodePhase, Record<RealTimeCardSubSections, Array<ProcessedNodeState>>>;
+    let nodesStateByCategory: Record<NodePhase, Record<NodeCategory, Array<ProcessedNodeState>>>;
     let availablePhases: Array<NodePhase>;
-    let availableSubSections: Record<NodePhase, RealTimeCardSectionsState>;
-    let expandedState = assignRealTimeCardSectionsStateToAllPhases(initialRealTimeCardSectionsExpandState);
+    let availableCategories: Record<NodePhase, RealTimeCardCategoriesState>;
+    let expandedState = assignRealTimeCardCategoriesStateToAllPhases(initialRealTimeCardCategoriesExpandState);
     let showDetailDiv = false;
     let detailedNodeState: ProcessedNodeState;
 
     // Reactive Statements
     $: if (nodesState && processedNodesState) {
         availablePhases = getAvailablePhasesFromRecordsOrStates(processedNodesState);
-        ({ nodesStateBySubSection, availableSubSections } = getNodesStateBySubSection(processedNodesState));
+        ({ nodesStateByCategory, availableCategories } = getNodesStateByCategory(processedNodesState));
     }
 
     // Functions
     function expandAllOnPhaseCard(phase: NodePhase): void {
-        for (const state of Object.keys(expandedState[phase]) as (keyof RealTimeCardSectionsState)[]) {
+        for (const state of Object.keys(expandedState[phase]) as (keyof RealTimeCardCategoriesState)[]) {
             expandedState[phase][state] = false;
         }
     }
 
     function collapseAllOnPhaseCard(phase: NodePhase): void {
-        for (const state of Object.keys(expandedState[phase]) as (keyof RealTimeCardSectionsState)[]) {
+        for (const state of Object.keys(expandedState[phase]) as (keyof RealTimeCardCategoriesState)[]) {
             expandedState[phase][state] = true;
         }
     }
@@ -92,9 +93,9 @@
     class="content"
     in:fade={{ duration: 300 }}
 >
-    {#if nodesStateBySubSection && availableSubSections}
+    {#if nodesStateByCategory && availableCategories}
         <div class="grid">
-            {#each nodeSections.filter((section) => availablePhases.includes(section.phase)) as section (section.key)}
+            {#each nodePhaseSections.filter((section) => availablePhases.includes(section.phase)) as section (section.key)}
                 <div class="grid-col">
                     <ContentCard titleText={section.phase !== NodePhase.SINGLEPHASE ? $texts[section.labelKey] : $texts.variables}>
                         <div class="slot-div header" slot="header">
@@ -120,14 +121,14 @@
                             </div>
                         </div>
                         <div class="slot-div content" slot="content">
-                            {#each Object.entries(availableSubSections[section.phase]) as [subsection, isActive] (subsection)}
+                            {#each Object.entries(availableCategories[section.phase]) as [subsection, isActive] (subsection)}
                                 {#if isActive}
                                     <ExpandableSection
                                         titleText={$texts[subsection.toLowerCase()]}
-                                        bind:contentExpanded={expandedState[section.phase][subsection as keyof RealTimeCardSectionsState]}
+                                        bind:contentExpanded={expandedState[section.phase][subsection as keyof RealTimeCardCategoriesState]}
                                     >
                                         <div class="phase-subsection-div">
-                                            {#each nodesStateBySubSection[section.phase][subsection as keyof RealTimeCardSectionsState] as nodeState (nodeState.name)}
+                                            {#each nodesStateByCategory[section.phase][subsection as keyof RealTimeCardCategoriesState] as nodeState (nodeState.name)}
                                                 <svelte:component
                                                     this={nodeState.displayComponent}
                                                     nodeName={nodeState.name}
@@ -156,8 +157,7 @@
             <div class="grid-col">
                 <ContentCard titleText={$texts.metrics}>
                     <div class="slot-div" slot="header"></div>
-                    <div class="slot-div content" slot="content">
-                    </div>
+                    <div class="slot-div content" slot="content"></div>
                 </ContentCard>
             </div>
             <div class="grid-col span-2">

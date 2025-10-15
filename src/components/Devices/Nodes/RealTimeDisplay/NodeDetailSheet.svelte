@@ -6,10 +6,10 @@
     import InlineLoader from "../../../General/InlineLoader.svelte";
     import DateRangePicker from "../../../General/TimeDate/DateRangePicker.svelte";
     import { LogSpanPeriod } from "$lib/types/view/nodes";
-    import { getNodeSection, getCommunicationID, isNumeric } from "$lib/logic/util/nodes";
+    import { getNodePhaseSection, getCommunicationID, isNumeric } from "$lib/logic/util/nodes";
     import { getNodeAdditionalInfo, getNodeLogs } from "$lib/logic/api/nodes";
     import { getTimeSpanFromLogPeriod, getDateFromField } from "$lib/logic/util/date";
-    import type { BaseNodeAdditionalInfo, ProcessedNodeState } from "$lib/types/nodes/base";
+    import type { BaseNodeAdditionalInfo, ProcessedNodeState } from "$lib/types/nodes/realtime";
 
     // Stores
     import { currentDeviceID } from "$lib/stores/device/current";
@@ -221,7 +221,7 @@
                 </div>
                 <div class="row">
                     <span class="label">{$texts.section}</span>
-                    <span class="value">{$texts[getNodeSection(nodeState.phase).labelKey] || $texts.variables}</span>
+                    <span class="value">{$texts[getNodePhaseSection(nodeState.phase).labelKey] || $texts.variables}</span>
                 </div>
                 <div class="row">
                     <span class="label">{$texts.state}</span>

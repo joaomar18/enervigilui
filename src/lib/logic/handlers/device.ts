@@ -1,6 +1,6 @@
 import { get } from "svelte/store";
 import type { EditableDevice, NewDevice, DeviceHistory } from "$lib/types/device/base";
-import type { EditableNodeRecord } from "$lib/types/nodes/base";
+import type { EditableNodeRecord } from "$lib/types/nodes/config";
 import { changeNodeProtocol } from "./nodes";
 import { protocolPlugins } from "$lib/stores/device/protocol";
 import { convertDateToLocalDate } from "../util/date";

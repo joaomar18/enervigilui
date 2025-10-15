@@ -8,11 +8,12 @@
     import { nodeNameChange, communicationIDChange, nodeTypeChange, customNodeChange, virtualNodeChange } from "$lib/logic/handlers/nodes";
     import { showToast } from "$lib/logic/view/toast";
     import { AlertType } from "$lib/stores/view/toast";
-    import { NodeType, DECIMAL_PLACES_LIM, LOGGING_PERIOD_LIM } from "$lib/types/nodes/base";
+    import { NodeType } from "$lib/types/nodes/base";
+    import { DECIMAL_PLACES_LIM, LOGGING_PERIOD_LIM } from "$lib/types/nodes/config";
 
     // Types
     import type { EditableDevice, NewDevice } from "$lib/types/device/base";
-    import type { EditableNodeRecord, NodeRecordEditingState } from "$lib/types/nodes/base";
+    import type { EditableNodeRecord, NodeRecordEditingState } from "$lib/types/nodes/config";
 
     // Stores for variable definitions
     import { defaultVariableUnits } from "$lib/stores/device/variables";

@@ -4,7 +4,7 @@
     import { onMount, onDestroy } from "svelte";
     import { addNode } from "$lib/logic/factory/nodes";
     import { deleteNodeFromArray } from "$lib/logic/handlers/nodes";
-    import { nodeSections } from "$lib/types/nodes/base";
+    import { nodePhaseSections } from "$lib/types/nodes/base";
     import { protocolPlugins } from "$lib/stores/device/protocol";
 
     // Stores for variable definitions
@@ -13,7 +13,7 @@
 
     // Types
     import type { EditableDevice, NewDevice } from "$lib/types/device/base";
-    import type { EditableNodeRecord, NodeRecordEditingState } from "$lib/types/nodes/base";
+    import type { EditableNodeRecord, NodeRecordEditingState } from "$lib/types/nodes/config";
     import type { ColumnVisibilityMap } from "$lib/types/view/nodes";
 
     // Texts
@@ -208,7 +208,7 @@ Includes multi-language headers and adapts layout to container size. -->
             <tbody>
                 {#if nodesBySection}
                     <!-- Render each node section -->
-                    {#each nodeSections.filter((section) => {
+                    {#each nodePhaseSections.filter((section) => {
                         if (deviceData.type === MeterType.SINGLE_PHASE) return section.phase === NodePhase.SINGLEPHASE;
                         if (deviceData.type === MeterType.THREE_PHASE) return section.phase !== NodePhase.SINGLEPHASE;
                         return false;

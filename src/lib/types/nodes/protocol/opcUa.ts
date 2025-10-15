@@ -1,4 +1,5 @@
-import type { BaseNodeConfig, EditableBaseNodeConfig, BaseNodeAdditionalInfo } from "./base";
+import type { BaseNodeConfig, EditableBaseNodeConfig } from "../config";
+import type { BaseNodeAdditionalInfo } from "../realtime";
 
 /*****     C O N S T A N T S     *****/
 

@@ -1,10 +1,12 @@
 import { callAPI } from "$lib/logic/api/api";
-import { processInitialNodes, initNodes, processNodesState } from "../factory/nodes";
+import { processInitialNodes, initNodes, processNodesState, processNodeLogs } from "../factory/nodes";
 import { navigateTo } from "../view/navigation";
 import { NodePhase } from "$lib/types/nodes/base";
 import { addPrefix, getNodePrefix, removePrefix } from "../util/nodes";
 import { toISOStringLocal } from "../util/date";
-import type { NodeRecord, EditableNodeRecord, NodeState, ProcessedNodeState, BaseNodeAdditionalInfo, BaseLogPoint, ProcessedBaseLogPoint } from "$lib/types/nodes/base";
+import type { NodeRecord, EditableNodeRecord } from "$lib/types/nodes/config";
+import type { NodeState, ProcessedNodeState, BaseNodeAdditionalInfo } from "$lib/types/nodes/realtime";
+import type { BaseLogPoint, NodeLogs, ProcessedBaseLogPoint, ProcessedNodeLogs } from "$lib/types/nodes/logs";
 
 /**
  * Fetches and processes the configuration for all nodes of a device by its ID.
@@ -92,6 +94,20 @@ export async function getNodeAdditionalInfo(
     return { nodeAdditionalInfo };
 }
 
+/**
+ * Fetches and processes historical log data for a specific node.
+ * Retrieves time-series data from the backend API and converts it to UI-ready format with Unix timestamps.
+ *
+ * @param device_id - The unique identifier of the device
+ * @param nodeName - The name of the node to fetch logs for
+ * @param nodePhase - The electrical phase of the node
+ * @param formatted - Whether to return formatted data (optional)
+ * @param start_time - Start date for the log query (optional)
+ * @param end_time - End date for the log query (optional)
+ * @param time_step - Time aggregation step for the logs (optional)
+ * @returns A promise resolving to processed node logs with UI components and Unix timestamps
+ * @throws Error if the API call fails
+ */
 export async function getNodeLogs(
     device_id: number,
     nodeName: string,
@@ -100,14 +116,13 @@ export async function getNodeLogs(
     start_time: Date | null = null,
     end_time: Date | null = null,
     time_step: string | null = null
-): Promise<{ nodeLogs: Array<ProcessedBaseLogPoint> }> {
-    let nodeLogs: any;
+): Promise<{ nodeLogs: ProcessedNodeLogs }> {
+    let nodeLogs: ProcessedNodeLogs;
+
     const prefix = getNodePrefix(nodePhase);
     const processedName = addPrefix(removePrefix(nodeName), prefix);
-
     let start_time_str: string | null = null;
     let end_time_str: string | null = null;
-
     start_time_str = start_time !== null ? toISOStringLocal(start_time) : null;
     end_time_str = end_time !== null ? toISOStringLocal(end_time) : null;
     const time_zone = Intl.DateTimeFormat().resolvedOptions().timeZone;
@@ -119,8 +134,7 @@ export async function getNodeLogs(
     });
 
     if (sucess) {
-        nodeLogs = data as Array<BaseLogPoint>;
-
+        nodeLogs = processNodeLogs(data as NodeLogs);
 
     } else {
         throw new Error("Get Node Logs error");

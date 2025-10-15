@@ -23,7 +23,8 @@
 
     // Types
     import type { NewDevice } from "$lib/types/device/base";
-    import type { EditableNodeRecord, NodeRecordEditingState, NodePhase } from "$lib/types/nodes/base";
+    import type { NodePhase } from "$lib/types/nodes/base";
+    import type { EditableNodeRecord, NodeRecordEditingState } from "$lib/types/nodes/config";
 
     // Styles
     import { SucessButtonStyle } from "$lib/style/button";
@@ -62,7 +63,7 @@
 
     // Get nodes from the nodes array by section
     $: if (contentInit) {
-        nodesBySection = updateNodesBySection(deviceData.type, nodes);
+        nodesBySection = updateNodesBySection(nodes);
         updateNodesValidation(nodes, nodesBySection);
         updateDeviceValidation(deviceData, nodes);
     }

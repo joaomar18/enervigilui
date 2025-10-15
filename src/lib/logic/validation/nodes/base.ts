@@ -1,13 +1,13 @@
 import { get } from "svelte/store";
 import { Protocol } from "$lib/types/device/base";
 import { NodeType, NodePhase } from "$lib/types/nodes/base";
-import type { NodeRecord, EditableNodeRecord, NodeValidation } from "$lib/types/nodes/base";
 import { defaultVariables, defaultVariableNames, defaultVariableUnits } from "$lib/stores/device/variables";
 import { normalizeNode, sortNodesByName } from "$lib/logic/util/nodes";
 import { protocolTexts } from "$lib/stores/lang/energyMeterTexts";
 import { stringIsValidInteger, stringIsValidFloat } from "$lib/logic/util/generic";
-import { DECIMAL_PLACES_LIM, LOGGING_PERIOD_LIM } from "$lib/types/nodes/base";
+import { DECIMAL_PLACES_LIM, LOGGING_PERIOD_LIM } from "$lib/types/nodes/config";
 import { protocolPlugins } from "$lib/stores/device/protocol";
+import type { NodeRecord, EditableNodeRecord, NodeValidation } from "$lib/types/nodes/config";
 import { isEqual } from "$lib/logic/util/generic";
 
 

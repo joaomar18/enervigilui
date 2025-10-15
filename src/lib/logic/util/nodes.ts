@@ -2,12 +2,15 @@ import { get } from "svelte/store";
 import { protocolPlugins } from "$lib/stores/device/protocol";
 import { defaultVariableNames } from "$lib/stores/device/variables";
 import { Protocol } from "$lib/types/device/base";
-import { NodeSubSection, NodePrefix, NodePhase, NodeType, phaseOrder, nodeSections } from "$lib/types/nodes/base";
-import { defaultRealTimeCardSectionsState } from "$lib/types/view/device";
-import { assignRealTimeCardSectionsStateToAllPhases, createEmptyRealTimeCardSubSectionsArrays } from "../view/device";
-import { getNodeSubSection } from "../view/nodes";
-import type { BaseNodeAdditionalInfo, BaseNodeConfig, EditableBaseNodeConfig, NodeRecord, EditableNodeRecord, NodeState, ProcessedNodeState, NodeSection } from "$lib/types/nodes/base";
-import type { RealTimeCardSectionsState } from "$lib/types/view/device";
+import { NodeCategory, NodePrefix, NodePhase, NodeType, phaseOrder, nodePhaseSections } from "$lib/types/nodes/base";
+import { defaultRealTimeCardCategoriesState } from "$lib/types/view/device";
+import { assignRealTimeCardCategoriesStateToAllPhases, createEmptyRealTimeCardCategoryArrays } from "../view/device";
+import { getNodeCategory } from "../view/nodes";
+import type { NodePhaseSection } from "$lib/types/nodes/base";
+import type { BaseNodeAdditionalInfo } from "$lib/types/nodes/realtime";
+import type { BaseNodeConfig, EditableBaseNodeConfig, NodeRecord, EditableNodeRecord } from "$lib/types/nodes/config";
+import type { NodeState, ProcessedNodeState } from "$lib/types/nodes/realtime";
+import type { RealTimeCardCategoriesState } from "$lib/types/view/device";
 
 /**
  * Checks if a node is configured as incremental (accumulating values over time).
@@ -147,13 +150,13 @@ export function getNodePrefix(phase: NodePhase): string {
 }
 
 /**
- * Retrieves the unique node section that matches the specified electrical phase.
- * @param phase - The electrical phase to find the corresponding section for.
- * @returns The NodeSection that contains the specified phase.
- * @throws Error if no unique section is found for the given phase.
+ * Gets the node phase section configuration for a given electrical phase.
+ * @param phase - The electrical phase to get the section for.
+ * @returns The NodePhaseSection configuration matching the phase.
+ * @throws Error if no unique section is found for the phase.
  */
-export function getNodeSection(phase: NodePhase): NodeSection {
-    let filteredNodeSections = nodeSections.filter((section) => section.filter(phase));
+export function getNodePhaseSection(phase: NodePhase): NodePhaseSection {
+    let filteredNodeSections = nodePhaseSections.filter((section) => section.filter(phase));
     if (filteredNodeSections.length != 1) {
         throw new Error(`Didn't got a unique node section for phase: ${phase}.`);
     }
@@ -253,25 +256,27 @@ export function normalizeNode(node: NodeRecord): NodeRecord {
 }
 
 /**
- * Organizes processed node state data by electrical phase and subsection type for UI display.
- * @param processedNodesState - Array of processed node states to organize.
- * @returns Object containing nodes organized by phase/subsection and available subsection flags.
+ * Groups processed node states by electrical phase and data category for real-time card display.
+ * Creates a nested structure organizing nodes and tracks which categories have available data.
+ * 
+ * @param processedNodesState - Array of processed node states to categorize.
+ * @returns Object containing nodes grouped by phase/category and available categories per phase.
  */
-export function getNodesStateBySubSection(processedNodesState: Array<ProcessedNodeState>): {
-    nodesStateBySubSection: Record<NodePhase, Record<NodeSubSection, Array<ProcessedNodeState>>>;
-    availableSubSections: Record<NodePhase, RealTimeCardSectionsState>;
+export function getNodesStateByCategory(processedNodesState: Array<ProcessedNodeState>): {
+    nodesStateByCategory: Record<NodePhase, Record<NodeCategory, Array<ProcessedNodeState>>>;
+    availableCategories: Record<NodePhase, RealTimeCardCategoriesState>;
 } {
-    let availableSubSections: Record<NodePhase, RealTimeCardSectionsState> = assignRealTimeCardSectionsStateToAllPhases(defaultRealTimeCardSectionsState);
+    let availableCategories: Record<NodePhase, RealTimeCardCategoriesState> = assignRealTimeCardCategoriesStateToAllPhases(defaultRealTimeCardCategoriesState);
 
-    const nodesStateBySubSection: Record<NodePhase, Record<NodeSubSection, Array<ProcessedNodeState>>> = Object.fromEntries(
-        phaseOrder.map((phase) => [phase, createEmptyRealTimeCardSubSectionsArrays()])
-    ) as Record<NodePhase, Record<NodeSubSection, Array<ProcessedNodeState>>>;
+    const nodesStateByCategory: Record<NodePhase, Record<NodeCategory, Array<ProcessedNodeState>>> = Object.fromEntries(
+        phaseOrder.map((phase) => [phase, createEmptyRealTimeCardCategoryArrays()])
+    ) as Record<NodePhase, Record<NodeCategory, Array<ProcessedNodeState>>>;
 
     for (const nodeState of processedNodesState) {
-        const subsection = getNodeSubSection(nodeState);
-        nodesStateBySubSection[nodeState.phase][subsection].push(nodeState);
-        availableSubSections[nodeState.phase][subsection] = true;
+        const category = getNodeCategory(nodeState.type, nodeState.incremental);
+        nodesStateByCategory[nodeState.phase][category].push(nodeState);
+        availableCategories[nodeState.phase][category] = true;
     }
 
-    return { nodesStateBySubSection, availableSubSections };
+    return { nodesStateByCategory, availableCategories };
 }

@@ -6,7 +6,7 @@
 
     // Types
     import type { EditableDevice, NewDevice } from "$lib/types/device/base";
-    import type { EditableNodeRecord } from "$lib/types/nodes/base";
+    import type { EditableNodeRecord } from "$lib/types/nodes/config";
 
     // Texts
     import { texts } from "$lib/stores/lang/generalTexts";

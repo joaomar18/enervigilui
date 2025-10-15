@@ -5,14 +5,15 @@
     import Button from "../../General/Button.svelte";
     import ExpandableButton from "../../General/ExpandableButton.svelte";
     import { nodeNameChange, nodeTypeChange, customNodeChange, virtualNodeChange, communicationIDChange } from "$lib/logic/handlers/nodes";
-    import { NodeType, LOGGING_PERIOD_LIM } from "$lib/types/nodes/base";
+    import { NodeType } from "$lib/types/nodes/base";
+    import { LOGGING_PERIOD_LIM } from "$lib/types/nodes/config";
     import { defaultVariableUnits } from "$lib/stores/device/variables";
     import { showToast } from "$lib/logic/view/toast";
     import { AlertType } from "$lib/stores/view/toast";
 
     // Types
     import type { EditableDevice, NewDevice } from "$lib/types/device/base";
-    import type { EditableNodeRecord, NodeRecordEditingState } from "$lib/types/nodes/base";
+    import type { EditableNodeRecord, NodeRecordEditingState } from "$lib/types/nodes/config";
     import type { ColumnVisibilityMap } from "$lib/types/view/nodes";
 
     // Texts
