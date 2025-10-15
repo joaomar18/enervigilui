@@ -2,7 +2,6 @@
     import RightPanelSheet from "../../../General/RightPanelSheet.svelte";
     import Button from "../../../General/Button.svelte";
     import ToolTipText from "../../../General/ToolTipText.svelte";
-    import LineGraph from "../../../General/LineGraph.svelte";
     import InlineLoader from "../../../General/InlineLoader.svelte";
     import DateRangePicker from "../../../General/TimeDate/DateRangePicker.svelte";
     import { LogSpanPeriod } from "$lib/types/view/nodes";
@@ -10,6 +9,7 @@
     import { getNodeAdditionalInfo, getNodeLogs } from "$lib/logic/api/nodes";
     import { getTimeSpanFromLogPeriod, getDateFromField } from "$lib/logic/util/date";
     import type { BaseNodeAdditionalInfo, ProcessedNodeState } from "$lib/types/nodes/realtime";
+    import type { ProcessedNodeLogs } from "$lib/types/nodes/logs";
 
     // Stores
     import { currentDeviceID } from "$lib/stores/device/current";
@@ -83,7 +83,7 @@
     // Variables
     let state: "alarmState" | "warningState" | "okState" | "disconnectedState";
     let nodeAdditionalInfo: BaseNodeAdditionalInfo;
-    let nodeLogs: any;
+    let nodeLogs: ProcessedNodeLogs;
     let selectedHistoryTimeSpan: LogSpanPeriod = LogSpanPeriod.currentDay;
 
     let showCustomDatePicker: boolean = false;
@@ -437,7 +437,9 @@
                             </div>
                         </div>
                         <div class="chart-container">
-                            <LineGraph data={sampleChartData} dataColors={sampleColors} dataLabel={sampleLabels} width="100%" height="400px" />
+                            {#if nodeLogs}
+                                <svelte:component this={nodeLogs.graphComponent} data={nodeLogs.points} unit={nodeLogs.unit} />
+                            {/if}
                         </div>
                     </div>
                 {/if}
