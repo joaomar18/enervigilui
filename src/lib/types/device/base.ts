@@ -1,5 +1,3 @@
-import type { SvelteComponent } from "svelte";
-
 /*****     C O N S T A N T S     *****/
 
 // Communication Limits

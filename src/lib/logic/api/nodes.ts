@@ -4,7 +4,7 @@ import { navigateTo } from "../view/navigation";
 import { NodePhase } from "$lib/types/nodes/base";
 import { addPrefix, getNodePrefix, removePrefix } from "../util/nodes";
 import { toISOStringLocal } from "../util/date";
-import type { NodeRecord, EditableNodeRecord, NodeState, ProcessedNodeState, BaseNodeAdditionalInfo } from "$lib/types/nodes/base";
+import type { NodeRecord, EditableNodeRecord, NodeState, ProcessedNodeState, BaseNodeAdditionalInfo, BaseLogPoint, ProcessedBaseLogPoint } from "$lib/types/nodes/base";
 
 /**
  * Fetches and processes the configuration for all nodes of a device by its ID.
@@ -100,7 +100,7 @@ export async function getNodeLogs(
     start_time: Date | null = null,
     end_time: Date | null = null,
     time_step: string | null = null
-): Promise<{ nodeLogs: any }> {
+): Promise<{ nodeLogs: Array<ProcessedBaseLogPoint> }> {
     let nodeLogs: any;
     const prefix = getNodePrefix(nodePhase);
     const processedName = addPrefix(removePrefix(nodeName), prefix);
@@ -119,7 +119,9 @@ export async function getNodeLogs(
     });
 
     if (sucess) {
-        nodeLogs = data;
+        nodeLogs = data as Array<BaseLogPoint>;
+
+
     } else {
         throw new Error("Get Node Logs error");
     }

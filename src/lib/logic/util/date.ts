@@ -194,3 +194,12 @@ export function interpretYY(yy: string): string {
 export function getShortYear(yyyy: string): string {
     return yyyy.slice(-2);
 }
+
+/**
+ * Converts an ISO date string to Unix timestamp in milliseconds.
+ * @param date - ISO date string to convert
+ * @returns Unix timestamp in milliseconds since epoch
+ */
+export function convertISOToTimestamp(date: string): number {
+    return new Date(date).getTime();
+}

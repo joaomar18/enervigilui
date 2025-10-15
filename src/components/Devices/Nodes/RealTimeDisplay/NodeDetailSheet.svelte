@@ -116,6 +116,8 @@
         }
     }
 
+    $: console.log(nodeLogs);
+
     // Functions
     async function loadNodeAdditionalInfo() {
         if (!$currentDeviceID || !nodeState) {

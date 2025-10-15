@@ -11,6 +11,8 @@ import type {
     BaseNodeConfig,
     NodeState,
     ProcessedNodeState,
+    ProcessedBaseLogPoint,
+    BaseLogPoint,
 } from "$lib/types/nodes/base";
 import { defaultVariables } from "$lib/stores/device/variables";
 import { addPrefix, removePrefix, getNodePrefix, getCommunicationID } from "../util/nodes";
@@ -21,7 +23,9 @@ import { protocolPlugins } from "$lib/stores/device/protocol";
 import { normalizeNode } from "../util/nodes";
 import { showToast } from "../view/toast";
 import { AlertType } from "$lib/stores/view/toast";
-import { getDisplayComponent } from "../view/device";
+import { getNodeRealTimeDisplayComponent, getNodeLogDisplayComponents } from "../view/nodes";
+import { convertISOToTimestamp } from "../util/date";
+
 
 /**
  * Converts a BaseNodeConfig object to an EditableBaseNodeConfig for use in UI forms.
@@ -351,9 +355,32 @@ export function processNodesState(nodesState: Record<string, NodeState>): Array<
 
     for (let [nodeName, nodeState] of Object.entries(nodesState)) {
         const processedName = removePrefix(nodeName);
-        const displayComponent = getDisplayComponent(nodeState);
+        const displayComponent = getNodeRealTimeDisplayComponent(nodeState);
         processedNodesState.push({ ...nodeState, name: processedName, displayComponent: displayComponent } as ProcessedNodeState);
     }
 
     return sortNodesLogically(processedNodesState) as Array<ProcessedNodeState>;
 }
+
+export function processNodeLogs(nodeLogs: Array<BaseLogPoint>): Array<ProcessedBaseLogPoint> {
+    let processedNodeLogs: Array<ProcessedBaseLogPoint> = [];
+    for (let log of nodeLogs) {
+        const { start_time: start_time_str, end_time: end_time_str, ...logData } = log;
+
+        let start_time = convertISOToTimestamp(start_time_str) / 1000;
+        let end_time = convertISOToTimestamp(end_time_str) / 1000;
+        let { graphComponent, metricsComponent } = getNodeLogDisplayComponents(log);
+
+        let processedLog = {
+            start_time: start_time,
+            end_time: end_time,
+            displayGraph: graphComponent,
+            displayMetrics: metricsComponent,
+            ...logData
+        } as ProcessedBaseLogPoint;
+
+        processedNodeLogs.push(processedLog);
+    }
+    return processedNodeLogs;
+}
+

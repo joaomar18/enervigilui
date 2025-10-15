@@ -73,19 +73,21 @@ export enum NodeType {
     BOOLEAN = "BOOLEAN",
 }
 
+/**
+ * Categorizes nodes by their data type and behavior for UI organization and display.
+ * Used to group nodes into logical categories in monitoring and configuration interfaces.
+ */
+export enum NodeCategory {
+    Measurements = "Measurements",
+    Counters = "Counters",
+    States = "States",
+    Texts = "Texts",
+    Other = "Other",
+}
+
 /*****     I N T E R F A C E S     *****/
 
-/**
- * Represents a section of nodes grouped by electrical phase or type in the energy monitoring system.
- * Used to organize, filter, and label nodes for display, configuration, and UI grouping.
- *
- * @property {NodePhase} key - Unique key identifying the section (typically the phase).
- * @property {NodePhase} phase - The electrical phase associated with this section.
- * @property {NodePrefix} prefix - The prefix used for node names in this section.
- * @property {string} labelKey - The translation key for the section label in the UI.
- * @property {(phase: NodePhase) => boolean} filter - Function to determine if a node phase belongs in this section.
- */
-export interface NodeSection {
+export interface NodePhaseSection {
     key: NodePhase;
     phase: NodePhase;
     prefix: NodePrefix;
@@ -285,7 +287,23 @@ export interface NodeRecordEditingState {
     oldCommunicationID: string | undefined;
 }
 
-
+/**
+ * Represents the current runtime state of a node with its value, configuration, and alarm/warning states.
+ * Used for real-time monitoring and display of node data in the energy monitoring system.
+ *
+ * @property {number | string | boolean | null} value - Current measured or calculated value
+ * @property {NodeType} type - Data type of the value (FLOAT, STRING, INT, BOOLEAN)
+ * @property {boolean} incremental - Whether this node accumulates values over time
+ * @property {string} unit - Measurement unit (e.g., "V", "A", "kW")
+ * @property {NodePhase} phase - Electrical phase this node belongs to
+ * @property {number} [decimal_places] - Number of decimal places for display formatting
+ * @property {number} [min_value_range] - Minimum expected value range
+ * @property {number} [max_value_range] - Maximum expected value range
+ * @property {boolean} [min_alarm_state] - Whether minimum threshold alarm is currently active
+ * @property {boolean} [max_alarm_state] - Whether maximum threshold alarm is currently active
+ * @property {boolean} [min_warning_state] - Whether minimum threshold warning is currently active
+ * @property {boolean} [max_warning_state] - Whether maximum threshold warning is currently active
+ */
 export interface NodeState {
     value: number | string | boolean | null;
     type: NodeType;
@@ -301,7 +319,25 @@ export interface NodeState {
     max_warning_state?: boolean;
 }
 
-
+/**
+ * Enhanced node state with UI-ready properties for display in the energy monitoring system.
+ * Extends NodeState with display name and associated Svelte component for rendering.
+ *
+ * @property {string} name - Display name of the node
+ * @property {typeof SvelteComponent<any>} displayComponent - Svelte component for rendering this node
+ * @property {number | string | boolean | null} value - Current measured or calculated value
+ * @property {NodeType} type - Data type of the value (FLOAT, STRING, INT, BOOLEAN)
+ * @property {boolean} incremental - Whether this node accumulates values over time
+ * @property {string} unit - Measurement unit (e.g., "V", "A", "kW")
+ * @property {NodePhase} phase - Electrical phase this node belongs to
+ * @property {number} [decimal_places] - Number of decimal places for display formatting
+ * @property {number} [min_value_range] - Minimum expected value range
+ * @property {number} [max_value_range] - Maximum expected value range
+ * @property {boolean} [min_alarm_state] - Whether minimum threshold alarm is currently active
+ * @property {boolean} [max_alarm_state] - Whether maximum threshold alarm is currently active
+ * @property {boolean} [min_warning_state] - Whether minimum threshold warning is currently active
+ * @property {boolean} [max_warning_state] - Whether maximum threshold warning is currently active
+ */
 export interface ProcessedNodeState {
     name: string;
     displayComponent: typeof SvelteComponent<any>;
@@ -319,7 +355,21 @@ export interface ProcessedNodeState {
     max_warning_state?: boolean;
 }
 
-
+/**
+ * Additional operational information and metadata for a node.
+ * Contains runtime data, alarm/warning thresholds, and communication settings.
+ *
+ * @property {string} [last_update_date] - ISO timestamp of the last value update
+ * @property {string} [last_reset_date] - ISO timestamp of the last counter reset (for incremental nodes)
+ * @property {number} [min_alarm_value] - Minimum threshold value that triggers alarms
+ * @property {number} [max_alarm_value] - Maximum threshold value that triggers alarms
+ * @property {number} [min_warning_value] - Minimum threshold value that triggers warnings
+ * @property {number} [max_warning_value] - Maximum threshold value that triggers warnings
+ * @property {NodeType} type - Data type of the node value
+ * @property {Protocol} protocol - Communication protocol used by this node
+ * @property {number} read_period - How often the node value is read (in seconds)
+ * @property {number} logging_period - How often the node value is logged (in minutes)
+ */
 export interface BaseNodeAdditionalInfo {
     last_update_date?: string;
     last_reset_date?: string;
@@ -334,49 +384,80 @@ export interface BaseNodeAdditionalInfo {
 }
 
 /**
- * Base time range metadata for a log bucket.
- * start/end provided both as ISO strings (startTime/endTime) and epoch ms (startTimeMs/endTimeMs)
- * to avoid repeated parsing and enable efficient numeric range operations.
+ * Base interface for logged data points with time range information.
+ * Contains the time period during which data was collected or aggregated.
+ *
+ * @property {string} start_time - ISO timestamp marking the beginning of the logging period
+ * @property {string} end_time - ISO timestamp marking the end of the logging period
  */
 export interface BaseLogPoint {
-    startTime: string,
-    endTime: string,
-    startTimeMs: number,
-    endTimeMs: number,
+    start_time: string;
+    end_time: string;
 }
 
 /**
- * Aggregated numeric measurement statistics for a time slice.
- * Provides average, min and max derived from all raw samples within the slice.
+ * Log point for measurement nodes containing statistical data over a time period.
+ * Extends BaseLogPoint with aggregated values for continuous measurements like voltage or power.
+ *
+ * @property {number} average_value - Mean value during the logging period
+ * @property {number} min_value - Minimum value recorded during the logging period
+ * @property {number} max_value - Maximum value recorded during the logging period
  */
 export interface MeasurementLogPoint extends BaseLogPoint {
-    average: number,
-    minimum: number,
-    maximum: number,
+    average_value: number;
+    min_value: number;
+    max_value: number;
 }
 
 /**
- * Single counter value (typically monotonically increasing) captured for a slice.
- * Counter semantics (delta vs absolute) are interpreted at a higher layer.
+ * Log point for counter/incremental nodes containing a single accumulated value.
+ * Extends BaseLogPoint with the total accumulated value for counters like energy consumption.
+ *
+ * @property {number} value - Total accumulated value at the end of the logging period
  */
-export interface CounterLogPoint {
+export interface CounterLogPoint extends BaseLogPoint {
     value: number;
 }
 
 /**
- * Arbitrary textual log content for a slice (status, message, annotation, etc.).
+ * Base interface for processed log points with UI components and converted timestamps.
+ * Contains Svelte components for rendering and timestamps converted to Unix time for charting.
+ *
+ * @property {typeof SvelteComponent<any>} displayGraph - Svelte component for rendering the data graph
+ * @property {typeof SvelteComponent<any>} displayMetrics - Svelte component for displaying metrics
+ * @property {number} start_time - Unix timestamp (seconds) marking the beginning of the logging period
+ * @property {number} end_time - Unix timestamp (seconds) marking the end of the logging period
  */
-export interface TextLogPoint {
-    value: string;
+export interface ProcessedBaseLogPoint {
+    displayGraph: typeof SvelteComponent<any>;
+    displayMetrics: typeof SvelteComponent<any>;
+    start_time: number;
+    end_time: number;
 }
 
 /**
- * Boolean state snapshot for a slice (on/off, open/closed, alarm active/inactive).
+ * Processed log point for measurement nodes with UI components and statistical data.
+ * Extends ProcessedBaseLogPoint with aggregated values for continuous measurements like voltage or power.
+ *
+ * @property {number} average_value - Mean value during the logging period
+ * @property {number} min_value - Minimum value recorded during the logging period
+ * @property {number} max_value - Maximum value recorded during the logging period
  */
-export interface StateLogPoint {
-    value: boolean;
+export interface ProcessedMeasurementLogPoint extends ProcessedBaseLogPoint {
+    average_value: number;
+    min_value: number;
+    max_value: number;
 }
 
+/**
+ * Processed log point for counter/incremental nodes with UI components and accumulated value.
+ * Extends ProcessedBaseLogPoint with the total accumulated value for counters like energy consumption.
+ *
+ * @property {number} value - Total accumulated value at the end of the logging period
+ */
+export interface ProcessedCounterLogPoint extends ProcessedBaseLogPoint {
+    value: number;
+}
 
 /**
  * Represents the validation state for all editable properties of a node.

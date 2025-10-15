@@ -2,10 +2,10 @@ import { get } from "svelte/store";
 import { protocolPlugins } from "$lib/stores/device/protocol";
 import { defaultVariableNames } from "$lib/stores/device/variables";
 import { Protocol } from "$lib/types/device/base";
-import { NodePrefix, NodePhase, NodeType, phaseOrder, nodeSections } from "$lib/types/nodes/base";
+import { NodeSubSection, NodePrefix, NodePhase, NodeType, phaseOrder, nodeSections } from "$lib/types/nodes/base";
 import { defaultRealTimeCardSectionsState } from "$lib/types/view/device";
-import { RealTimeCardSubSections } from "$lib/types/view/device";
-import { assignRealTimeCardSectionsStateToAllPhases, createEmptyRealTimeCardSubSectionsArrays, getNodeSubSection } from "../view/device";
+import { assignRealTimeCardSectionsStateToAllPhases, createEmptyRealTimeCardSubSectionsArrays } from "../view/device";
+import { getNodeSubSection } from "../view/nodes";
 import type { BaseNodeAdditionalInfo, BaseNodeConfig, EditableBaseNodeConfig, NodeRecord, EditableNodeRecord, NodeState, ProcessedNodeState, NodeSection } from "$lib/types/nodes/base";
 import type { RealTimeCardSectionsState } from "$lib/types/view/device";
 
@@ -258,14 +258,14 @@ export function normalizeNode(node: NodeRecord): NodeRecord {
  * @returns Object containing nodes organized by phase/subsection and available subsection flags.
  */
 export function getNodesStateBySubSection(processedNodesState: Array<ProcessedNodeState>): {
-    nodesStateBySubSection: Record<NodePhase, Record<RealTimeCardSubSections, Array<ProcessedNodeState>>>;
+    nodesStateBySubSection: Record<NodePhase, Record<NodeSubSection, Array<ProcessedNodeState>>>;
     availableSubSections: Record<NodePhase, RealTimeCardSectionsState>;
 } {
     let availableSubSections: Record<NodePhase, RealTimeCardSectionsState> = assignRealTimeCardSectionsStateToAllPhases(defaultRealTimeCardSectionsState);
 
-    const nodesStateBySubSection: Record<NodePhase, Record<RealTimeCardSubSections, Array<ProcessedNodeState>>> = Object.fromEntries(
+    const nodesStateBySubSection: Record<NodePhase, Record<NodeSubSection, Array<ProcessedNodeState>>> = Object.fromEntries(
         phaseOrder.map((phase) => [phase, createEmptyRealTimeCardSubSectionsArrays()])
-    ) as Record<NodePhase, Record<RealTimeCardSubSections, Array<ProcessedNodeState>>>;
+    ) as Record<NodePhase, Record<NodeSubSection, Array<ProcessedNodeState>>>;
 
     for (const nodeState of processedNodesState) {
         const subsection = getNodeSubSection(nodeState);

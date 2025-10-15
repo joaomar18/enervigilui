@@ -1,9 +1,6 @@
-import { NodePhase, NodeType } from "$lib/types/nodes/base";
-import { RealTimeCardSubSections } from "$lib/types/view/device";
-import { subSectionComponentMap } from "$lib/types/view/device";
-import type { NodeState, ProcessedNodeState } from "$lib/types/nodes/base";
+import { NodePhase, NodeSubSection } from "$lib/types/nodes/base";
 import type { RealTimeCardSectionsState } from "$lib/types/view/device";
-import type { SvelteComponent } from "svelte";
+
 
 /**
  * Creates a mapping of all node phases to the same real-time card sections state
@@ -44,54 +41,12 @@ export function assignRealTimeCardSectionsStateToAllPhases(state: RealTimeCardSe
  *
  * @returns A fresh object with all RealTimeCardSubSections keys mapped to empty array instances
  */
-export function createEmptyRealTimeCardSubSectionsArrays(): Record<RealTimeCardSubSections, Array<any>> {
+export function createEmptyRealTimeCardSubSectionsArrays(): Record<NodeSubSection, Array<any>> {
     return {
-        [RealTimeCardSubSections.Measurements]: [],
-        [RealTimeCardSubSections.Counters]: [],
-        [RealTimeCardSubSections.States]: [],
-        [RealTimeCardSubSections.Texts]: [],
-        [RealTimeCardSubSections.Other]: [],
+        [NodeSubSection.Measurements]: [],
+        [NodeSubSection.Counters]: [],
+        [NodeSubSection.States]: [],
+        [NodeSubSection.Texts]: [],
+        [NodeSubSection.Other]: [],
     };
-}
-
-/**
- * Determines the appropriate real-time card subsection for a node based on its data type and characteristics.
- * @param nodeState - The node state object to categorize (NodeState or ProcessedNodeState).
- * @returns The RealTimeCardSubSections enum value indicating which subsection the node belongs to.
- */
-export function getNodeSubSection(nodeState: NodeState | ProcessedNodeState) {
-    let subsection: RealTimeCardSubSections;
-
-    if (nodeState.type === NodeType.FLOAT || nodeState.type === NodeType.INT) {
-        if (nodeState.incremental) {
-            subsection = RealTimeCardSubSections.Counters;
-        } else {
-            subsection = RealTimeCardSubSections.Measurements;
-        }
-    } else if (nodeState.type === NodeType.BOOLEAN) {
-        subsection = RealTimeCardSubSections.States;
-    } else if (nodeState.type === NodeType.STRING) {
-        subsection = RealTimeCardSubSections.Texts;
-    } else {
-        subsection = RealTimeCardSubSections.Other;
-    }
-
-    return subsection;
-}
-
-/**
- * Returns the appropriate Svelte component for displaying a node based on its subsection type.
- * @param nodeState - The node state object to get the display component for.
- * @returns The Svelte component constructor for rendering the node.
- * @throws Error if the subsection type is not implemented or unknown.
- */
-export function getDisplayComponent(nodeState: NodeState | ProcessedNodeState): typeof SvelteComponent<any> {
-    let subSection = getNodeSubSection(nodeState);
-
-    const component = subSectionComponentMap[subSection];
-    if (component === null || component === undefined) {
-        throw Error(`${subSection} subsection component not implemented.`);
-    }
-
-    return component;
 }
