@@ -115,4 +115,8 @@
     .graph-div :global(.u-axis) {
         color: white;
     }
+
+    .graph-div :global(.u-legend) {
+        display: none;
+    }
 </style>

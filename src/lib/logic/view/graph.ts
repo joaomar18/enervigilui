@@ -23,6 +23,13 @@ export function getGraphSize(graphContainer: HTMLElement): { width: number; heig
     return { width, height };
 }
 
+export function getGraphTimeSplits(data: AlignedData): Array<number> {
+    const timestamps = data[0] as number[];
+    //const startsOnly = timestamps.filter((_, i) => i % 2 === 0 || i === timestamps.length - 1);
+    const startsOnly = timestamps.filter((_, i) => i % 2 === 0);
+    return startsOnly;
+}
+
 export function getMeasurementGraphFormat(points: Array<ProcessedMeasurementLogPoint>): AlignedData {
     const timestampValues: Array<number> = [];
     const minValues: Array<number> = [];
@@ -54,20 +61,20 @@ export function getCounterGraphFormat(points: Array<ProcessedCounterLogPoint>): 
 }
 
 export function createMeasurementGraph(graphContainer: HTMLElement, data: AlignedData, timeStep: FormattedTimeStep, logSpanPeriod: LogSpanPeriod): uPlot {
-    let { width, height } = getGraphSize(graphContainer);
-    const pxPerPoint = 40;
-    const dataWidth = data[0].length * pxPerPoint;
-    console.log(timeStep);
-    if (dataWidth > width) width = dataWidth;
     const root = document.querySelector("body") as HTMLBodyElement;
     const rootFont = getComputedStyle(root).fontFamily;
+
+    let { width, height } = getGraphSize(graphContainer);
+    const pxPerPoint = 75;
+    const dataWidth = getGraphTimeSplits(data).length * pxPerPoint;
+    width = dataWidth + 50;
 
     let opts: uPlot.Options = {
         width: width,
         height: height,
         scales: {
             x: {
-                time: true,
+                //time: true,
             },
             y: {
                 auto: true,
@@ -106,7 +113,9 @@ export function createMeasurementGraph(graphContainer: HTMLElement, data: Aligne
         axes: [
             {
                 // x-axis (time)
+                splits: () => getGraphTimeSplits(data),
                 values: (u, ticks) => ticks.map((t) => timeStepFormatters[timeStep](t, logSpanPeriod)),
+                space: 0,
                 font: `12px ${rootFont}`,
                 stroke: "white",
                 grid: {
