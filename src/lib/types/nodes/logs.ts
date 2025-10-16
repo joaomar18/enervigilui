@@ -1,5 +1,6 @@
 import type { SvelteComponent } from "svelte";
 import type { NodeType } from "./base";
+import type { FormattedTimeStep } from "../date";
 
 /*****     C O N S T A N T S     *****/
 
@@ -73,12 +74,14 @@ export interface ProcessedCounterLogPoint extends ProcessedBaseLogPoint {
  * @property {NodeType} type - Data type of the logged values
  * @property {boolean} incremental - Whether this node accumulates values over time
  * @property {Array<BaseLogPoint>} points - Array of raw log data points
+ * @property {FormattedTimeStep | null} time_step - Time aggregation interval used for the log data
  */
 export interface NodeLogs {
     unit: string;
     type: NodeType;
     incremental: boolean;
     points: Array<BaseLogPoint>;
+    time_step: FormattedTimeStep | null;
 }
 
 /**
@@ -87,6 +90,7 @@ export interface NodeLogs {
  * @property {NodeType} type - Data type of the logged values
  * @property {boolean} incremental - Whether this node accumulates values over time
  * @property {Array<ProcessedBaseLogPoint>} points - Array of processed log data points with Unix timestamps
+ * @property {FormattedTimeStep | null} time_step - Time aggregation interval used for the log data
  * @property {typeof SvelteComponent<any>} graphComponent - Svelte component for rendering the data graph
  * @property {typeof SvelteComponent<any>} metricsComponent - Svelte component for displaying metrics
  */
@@ -95,6 +99,7 @@ export interface ProcessedNodeLogs {
     type: NodeType;
     incremental: boolean;
     points: Array<ProcessedBaseLogPoint>;
+    time_step: FormattedTimeStep | null;
     graphComponent: typeof SvelteComponent<any>;
     metricsComponent: typeof SvelteComponent<any>;
 }

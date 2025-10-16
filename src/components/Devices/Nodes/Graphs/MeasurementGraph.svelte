@@ -1,132 +1,54 @@
 <script lang="ts">
-    import { onMount, onDestroy } from "svelte";
+    import { onDestroy } from "svelte";
+    import { getMeasurementGraphFormat, createMeasurementGraph } from "$lib/logic/view/graph";
     import uPlot from "uplot";
     import "uplot/dist/uPlot.min.css";
     import type { ProcessedMeasurementLogPoint } from "$lib/types/nodes/logs";
+    import type { FormattedTimeStep } from "$lib/types/date";
+    import type { LogSpanPeriod } from "$lib/types/view/nodes";
 
     //Props
     export let data: Array<ProcessedMeasurementLogPoint>;
+    export let timeStep: FormattedTimeStep;
+    export let logSpanPeriod: LogSpanPeriod;
     export let unit: string = "";
 
     // Layout / styling props
     export let width: string | undefined = "100%";
-    export let height: string | undefined = "400px";
+    export let height: string | undefined = "450px";
     export let borderRadius: string | undefined = "10px";
+    export let paddingHorizontal: string | undefined = "15px";
+    export let paddingTop: string | undefined = "40px";
+    export let paddingBottom: string | undefined = "10px";
     export let backgroundColor: string | undefined = "rgba(20, 22, 28, 0.6)";
     export let borderColor: string | undefined = "rgba(255, 255, 255, 0.08)";
     export let boxShadow: string | undefined = "0 2px 4px rgba(0, 0, 0, 0.1)";
     export let plotBackgroundColor: string | undefined = "rgba(0,0,0,0)";
 
+    export let scrollbarTrackColor: string | undefined = undefined;
+    export let scrollbarThumbColor: string | undefined = undefined;
+
     // Variables
-    let chartContainer: HTMLDivElement;
-    let chart: uPlot;
-    let resizeObserver: ResizeObserver;
+    let graphContainer: HTMLDivElement;
+    let graph: uPlot;
+
+    // Reactive Statements
+    $: if (data && graphContainer) {
+        destroyGraph(graph);
+        let graphData = getMeasurementGraphFormat(data);
+        graph = createMeasurementGraph(graphContainer, graphData, timeStep, logSpanPeriod);
+    }
 
     // Functions
-    function convertDataForUplot(data: Array<ProcessedMeasurementLogPoint>): uPlot.AlignedData {
-        const timestamps: number[] = [];
-        const values: number[] = [];
 
-        for (let point of data) {
-            timestamps.push(point.start_time);
-            values.push(point.average_value);
-        }
-
-        return [timestamps, values] as uPlot.AlignedData;
-    }
-
-    function getContainerSize(): { width: number; height: number } {
-        let width = 0;
-        let height = 0;
-        if (chartContainer) {
-            const containerRect = chartContainer.getBoundingClientRect();
-            width = containerRect.width;
-            height = containerRect.height;
-        }
-        return { width, height };
-    }
-
-    function updateChartSize() {
-        if (chart) {
-            let { width, height } = getContainerSize();
-            if (width > 0 && height > 0) {
-                chart.setSize({ width: width, height: height });
-            }
+    function destroyGraph(graph: uPlot) {
+        if (graph) {
+            graph.destroy();
         }
     }
-
-    onMount(() => {
-        const uplotData = convertDataForUplot(data);
-
-        let { width, height } = getContainerSize();
-        const root = document.querySelector("body") as HTMLBodyElement;
-        const rootFont = getComputedStyle(root).fontFamily;
-
-        let opts: uPlot.Options = {
-            width: width,
-            height: height,
-            series: [
-                {}, // x-axis (time)
-                { stroke: "blue", width: 2 },
-            ],
-            axes: [
-                {
-                    // x-axis (time)
-                    alignTo: 1,
-                    values: (u, ticks) => ticks.map((t) => new Date(t * 1000).toLocaleTimeString()),
-                    gap: 10,
-                    size: 40,
-                    font: `12px ${rootFont}`,
-                    stroke: "white",
-                    grid: {
-                        show: true,
-                        stroke: "rgba(255, 255, 255, 0.06)",
-                        width: 1,
-                    },
-                },
-                {
-                    // y-axis (values)
-                    alignTo: 1,
-                    align: 2,
-                    font: `12px ${rootFont}`,
-                    gap: 10,
-                    size: 60,
-                    stroke: "white",
-                    grid: {
-                        show: true,
-                        stroke: "rgba(255, 255, 255, 0.06)",
-                        width: 1,
-                    },
-                },
-            ],
-            cursor: {
-                drag: {
-                    x: false, // Disable horizontal drag/zoom
-                    y: false, // Disable vertical drag/zoom
-                },
-            },
-        };
-
-        chart = new uPlot(opts, uplotData, chartContainer);
-
-        resizeObserver = new ResizeObserver((entries) => {
-            for (let entry of entries) {
-                if (entry.target === chartContainer) {
-                    updateChartSize();
-                }
-            }
-        });
-
-        resizeObserver.observe(chartContainer);
-    });
 
     onDestroy(() => {
-        if (resizeObserver) {
-            resizeObserver.disconnect();
-        }
-        if (chart) {
-            chart.destroy();
-        }
+        destroyGraph(graph);
     });
 </script>
 
@@ -135,31 +57,49 @@
         --width: {width};
         --height: {height};
         --border-radius: {borderRadius};
+        --padding-horizontal: {paddingHorizontal};
+        --padding-top: {paddingTop};
+        --padding-bottom: {paddingBottom};
         --background-color: {backgroundColor};
         --border-color: {borderColor};
         --box-shadow: {boxShadow};
         --plot-background-color: {plotBackgroundColor};
+
+        --scrollbar-track-color: {scrollbarTrackColor};
+        --scrollbar-thumb-color: {scrollbarThumbColor};
     "
-    class="graph-div"
-    bind:this={chartContainer}
-></div>
+    class="graph-div-wrapper"
+>
+    <div class="graph-div" bind:this={graphContainer}></div>
+</div>
 
 <style>
-    .graph-div {
+    .graph-div-wrapper {
+        box-sizing: border-box;
+        padding-top: var(--padding-top);
+        padding-bottom: var(--padding-bottom);
+        padding-left: var(--padding-horizontal);
+        padding-right: var(--padding-horizontal);
         margin: 0;
-        position: relative;
         width: var(--width);
         height: var(--height);
         border-radius: var(--border-radius);
         background: var(--background-color);
         border: 1px solid var(--border-color);
         box-shadow: var(--box-shadow);
-        overflow: hidden;
-        transition: all 0.2s ease;
-        box-sizing: border-box;
+        overflow-x: auto;
+        overflow-y: hidden;
+        scrollbar-width: thin;
+        scrollbar-color: var(--scrollbar-track-color) var(--scrollbar-thumb-color);
+        scrollbar-gutter: stable;
+    }
 
-        /* Temporary debug - remove later */
-        min-height: 400px;
+    .graph-div {
+        padding: 0;
+        margin: 0;
+        position: relative;
+        width: 100%;
+        height: 100%;
     }
 
     /* uPlot canvas styling */

@@ -5,7 +5,7 @@ import type { DefaultNodeInfo } from "$lib/types/nodes/base";
 import type { EditableDevice, MeterOptions, NewDevice } from "$lib/types/device/base";
 import type { BaseNodeConfig, NodeRecord, EditableNodeRecord, EditableBaseNodeConfig, NodeAttributes } from "$lib/types/nodes/config";
 import type { NodeState, ProcessedNodeState } from "$lib/types/nodes/realtime";
-import type { BaseLogPoint, NodeLogs, ProcessedBaseLogPoint, ProcessedNodeLogs } from "$lib/types/nodes/logs";
+import type { NodeLogs, ProcessedBaseLogPoint, ProcessedNodeLogs } from "$lib/types/nodes/logs";
 import { defaultVariables } from "$lib/stores/device/variables";
 import { addPrefix, removePrefix, getNodePrefix, getCommunicationID } from "../util/nodes";
 import { sortNodesLogically } from "../handlers/nodes";
@@ -383,6 +383,7 @@ export function processNodeLogs(nodeLogs: NodeLogs): ProcessedNodeLogs {
         unit: nodeLogs.unit,
         type: nodeLogs.type,
         incremental: nodeLogs.incremental,
+        time_step: nodeLogs.time_step,
         graphComponent: graphComponent,
         metricsComponent: metricsComponent,
         points: processedPoints,

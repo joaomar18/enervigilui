@@ -438,7 +438,13 @@
                         </div>
                         <div class="chart-container">
                             {#if nodeLogs}
-                                <svelte:component this={nodeLogs.graphComponent} data={nodeLogs.points} unit={nodeLogs.unit} />
+                                <svelte:component
+                                    this={nodeLogs.graphComponent}
+                                    data={nodeLogs.points}
+                                    timeStep={nodeLogs.time_step}
+                                    logSpanPeriod={selectedHistoryTimeSpan}
+                                    unit={nodeLogs.unit}
+                                />
                             {/if}
                         </div>
                     </div>
