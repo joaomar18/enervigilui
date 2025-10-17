@@ -295,10 +295,90 @@ export function createYAxisLabelsGraph(yAxisContainer: HTMLElement, alignedData:
                 stroke: "white",
                 ticks: { show: true },
                 grid: { show: false },
+                values: makeYAxisValuesFormatter({ thin: true, minPxPerLabel: 14, maxDecimals: 4 }),
             },
         ],
         cursor: { show: false },
     };
 
     return new uPlot(opts, alignedData, yAxisContainer);
+}
+
+// Options for Y-axis label formatting
+export type YAxisValuesFormatterOptions = {
+    minDecimals?: number; // minimum decimals to show
+    maxDecimals?: number; // cap to avoid noise
+    thin?: boolean; // drop some labels based on pixels per tick
+    minPxPerLabel?: number; // desired min pixels between shown labels when thinning
+    trimZeros?: boolean; // trim trailing zeros and trailing dot
+};
+
+/**
+ * Build a uPlot axis values formatter that:
+ * - Picks decimal precision from the smallest tick spacing
+ * - Suppresses duplicate strings (keeps grid intact)
+ * - Optionally thins labels when too dense
+ */
+export function makeYAxisValuesFormatter(options: YAxisValuesFormatterOptions = {}) {
+    const {
+        minDecimals = 0,
+    maxDecimals = 6,
+        thin = false,
+        minPxPerLabel = 14,
+    trimZeros = true,
+    } = options;
+
+    return (u: uPlot, splits: number[]): string[] => {
+        const nums = (splits || []) as number[];
+        if (nums.length === 0) return [];
+
+        // Smallest positive delta determines precision
+        let minDelta = Infinity;
+        for (let i = 1; i < nums.length; i++) {
+            const d = Math.abs(nums[i] - nums[i - 1]);
+            if (d > 0 && d < minDelta) minDelta = d;
+        }
+
+        let decimals = minDecimals;
+        if (isFinite(minDelta) && minDelta > 0) {
+            const byDelta = Math.ceil(-Math.log10(minDelta)) + 1; // +1 to avoid equal strings after rounding
+            decimals = Math.max(minDecimals, Math.min(maxDecimals, byDelta));
+        }
+
+        const fmt = (v: number) => {
+            let s = v.toFixed(decimals);
+            if (trimZeros && s.includes('.')) {
+                // remove trailing zeros after decimal
+                while (s.endsWith('0')) s = s.slice(0, -1);
+                // remove trailing dot if no decimals remain
+                if (s.endsWith('.')) s = s.slice(0, -1);
+            }
+            return s;
+        };
+
+        // Optional thinning by available pixels per tick
+        let step = 1;
+        if (thin) {
+            const bbox = (u as any).bbox;
+            const plotHeight = bbox?.height || u.height || 0;
+            const pxPerTick = plotHeight / Math.max(nums.length - 1, 1);
+            step = Math.max(1, Math.ceil(minPxPerLabel / Math.max(pxPerTick, 1)));
+        }
+
+        const out: string[] = [];
+        let prev: string | null = null;
+        for (let i = 0; i < nums.length; i++) {
+            if (i % step !== 0) {
+                out.push("");
+                continue;
+            }
+            const label = fmt(nums[i]);
+            if (label === prev) out.push("");
+            else {
+                out.push(label);
+                prev = label;
+            }
+        }
+        return out;
+    };
 }
