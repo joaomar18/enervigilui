@@ -19,7 +19,7 @@
     export let borderRadius: string | undefined = "10px";
     export let paddingHorizontal: string | undefined = "15px";
     export let paddingTop: string | undefined = "40px";
-    export let paddingBottom: string | undefined = "10px";
+    export let paddingBottom: string | undefined = "0px";
     export let backgroundColor: string | undefined = "rgba(20, 22, 28, 0.6)";
     export let borderColor: string | undefined = "rgba(255, 255, 255, 0.08)";
     export let boxShadow: string | undefined = "0 2px 4px rgba(0, 0, 0, 0.1)";
@@ -29,26 +29,30 @@
     export let scrollbarThumbColor: string | undefined = undefined;
 
     // Variables
+    let yAxisContainer: HTMLDivElement;
     let graphContainer: HTMLDivElement;
+    let yAxis: uPlot;
     let graph: uPlot;
 
     // Reactive Statements
     $: if (data && graphContainer) {
-        destroyGraph(graph);
-        let graphData = getMeasurementGraphFormat(data);
-        graph = createMeasurementGraph(graphContainer, graphData, timeStep, logSpanPeriod);
+        destroyGraph();
+        ({ yAxis, graph } = createMeasurementGraph(graphContainer, yAxisContainer, data, timeStep, logSpanPeriod));
     }
 
     // Functions
 
-    function destroyGraph(graph: uPlot) {
+    function destroyGraph() {
         if (graph) {
             graph.destroy();
+        }
+        if (yAxis) {
+            yAxis.destroy();
         }
     }
 
     onDestroy(() => {
-        destroyGraph(graph);
+        destroyGraph();
     });
 </script>
 
@@ -64,12 +68,12 @@
         --border-color: {borderColor};
         --box-shadow: {boxShadow};
         --plot-background-color: {plotBackgroundColor};
-
         --scrollbar-track-color: {scrollbarTrackColor};
         --scrollbar-thumb-color: {scrollbarThumbColor};
     "
     class="graph-div-wrapper"
 >
+    <div class="y-axis-div" bind:this={yAxisContainer}></div>
     <div class="graph-div" bind:this={graphContainer}></div>
 </div>
 
@@ -87,36 +91,28 @@
         background: var(--background-color);
         border: 1px solid var(--border-color);
         box-shadow: var(--box-shadow);
-        overflow-x: auto;
-        overflow-y: hidden;
-        scrollbar-width: thin;
-        scrollbar-color: var(--scrollbar-track-color) var(--scrollbar-thumb-color);
-        scrollbar-gutter: stable;
+        display: flex;
+    }
+
+    .y-axis-div {
+        padding: 0;
+        margin: 0;
+        position: relative;
+        height: 100%;
+        width: 50px;
+        overflow: hidden;
     }
 
     .graph-div {
         padding: 0;
         margin: 0;
         position: relative;
-        width: 100%;
+        width: calc(100% - 50px);
         height: 100%;
-    }
-
-    /* uPlot canvas styling */
-    .graph-div :global(canvas) {
-        display: block;
-    }
-
-    /* Inner plot background (area where series are drawn) */
-    .graph-div :global(.u-under) {
-        background: var(--plot-background-color);
-    }
-
-    .graph-div :global(.u-axis) {
-        color: white;
-    }
-
-    .graph-div :global(.u-legend) {
-        display: none;
+        overflow-x: auto;
+        overflow-y: hidden;
+        scrollbar-width: thin;
+        scrollbar-color: var(--scrollbar-track-color) var(--scrollbar-thumb-color);
+        scrollbar-gutter: stable;
     }
 </style>

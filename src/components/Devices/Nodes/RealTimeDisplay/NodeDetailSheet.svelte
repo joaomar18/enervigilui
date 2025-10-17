@@ -116,8 +116,6 @@
         }
     }
 
-    $: console.log(nodeLogs);
-
     // Functions
     async function loadNodeAdditionalInfo() {
         if (!$currentDeviceID || !nodeState) {
@@ -136,23 +134,6 @@
         }
         ({ nodeLogs } = await getNodeLogs($currentDeviceID, nodeState.name, nodeState.phase, initial_date !== null, initial_date, end_date));
     }
-
-    // Sample chart data for testing
-    const sampleChartData = [
-        { 1696118400: 220.551 }, // 2023-10-01 00:00:00 - 230.5V
-        { 1696118460: 231.212 }, // 00:01:00 - 231.2V
-        { 1696118520: 229.812 }, // 00:02:00 - 229.8V
-        { 1696118580: 230.912 }, // 00:03:00 - 230.9V
-        { 1696118640: 232.143 }, // 00:04:00 - 232.1V
-        { 1696118700: 229.454 }, // 00:05:00 - 229.4V
-        { 1696118760: 230.723 }, // 00:06:00 - 230.7V
-        { 1696118820: 231.511 }, // 00:07:00 - 231.5V
-        { 1696118880: 230.242 }, // 00:08:00 - 230.2V
-        { 1696118940: 231.808 }, // 00:09:00 - 231.8V
-    ] as any; // Temporary fix for TypeScript
-
-    const sampleColors = ["#3B82F6"]; // Blue color matching your theme
-    const sampleLabels = ["Voltage L1 (V)"];
 </script>
 
 <div
