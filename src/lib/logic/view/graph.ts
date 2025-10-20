@@ -27,7 +27,7 @@ export function getGraphSize(graphContainer: HTMLElement, pxPerPeriod: number, a
         height = containerRect.height;
     }
     const dataWidth = (getGraphTimeSplits(alignedData).length - 1) * pxPerPeriod;
-    width = dataWidth + (measurementsEmpty(alignedData) ? 50 : 35);
+    width = dataWidth + 45;
 
     return { width, height };
 }
@@ -72,17 +72,22 @@ export function getMeasurementGraphFormat(
     points: Array<ProcessedMeasurementLogPoint>,
     timeStep: FormattedTimeStep,
     logSpanPeriod: LogSpanPeriod
-): { alignedData: AlignedData; labels: Array<string> } {
+): { alignedData: AlignedData; labels: Array<string>, noData: boolean } {
     const timestampValues: Array<number> = [];
     const minValues: Array<number> = [];
     const maxValues: Array<number> = [];
     const averageValues: Array<number> = [];
     const labels: Array<string> = [];
+    let noData: boolean = true;
 
     for (let i = 0; i < points.length; i++) {
         timestampValues.push(i);
         timestampValues.push(i + 1);
 
+        if (points[i].min_value !== null || points[i].max_value !== null || points[i].average_value !== null) {
+            noData = false;
+        }
+
         minValues.push(points[i].min_value);
         maxValues.push(points[i].max_value);
         averageValues.push(points[i].average_value);
@@ -90,7 +95,9 @@ export function getMeasurementGraphFormat(
         minValues.push(points[i].min_value);
         maxValues.push(points[i].max_value);
         averageValues.push(points[i].average_value);
+
         labels.push(timeStepFormatters[timeStep](points[i].start_time, logSpanPeriod));
+
         if (i === points.length - 1) {
             timestampValues.push(i + 1);
             minValues.push(points[i].min_value);
@@ -100,16 +107,14 @@ export function getMeasurementGraphFormat(
         }
     }
 
-    return { alignedData: [timestampValues, averageValues, minValues, maxValues], labels };
-}
-
-export function measurementsEmpty(alignedData: AlignedData): boolean {
-    for (let average_value of alignedData[1] as number[]) {
-        if (average_value !== null) {
-            return false;
-        }
+    // Dummy data so the axis are allways properly formatted
+    if (noData) {
+        minValues[0] = 0;
+        maxValues[0] = 0;
+        averageValues[0] = 0;
     }
-    return true;
+
+    return { alignedData: [timestampValues, averageValues, minValues, maxValues], labels, noData };
 }
 
 export function createMeasurementGraph(
@@ -118,8 +123,8 @@ export function createMeasurementGraph(
     points: Array<ProcessedMeasurementLogPoint>,
     timeStep: FormattedTimeStep,
     logSpanPeriod: LogSpanPeriod
-): { yAxis: uPlot; graph: uPlot } {
-    const { alignedData, labels } = getMeasurementGraphFormat(points, timeStep, logSpanPeriod);
+): { yAxis: uPlot | null; graph: uPlot } {
+    const { alignedData, labels, noData } = getMeasurementGraphFormat(points, timeStep, logSpanPeriod);
 
     const root = document.querySelector("body") as HTMLBodyElement;
     const rootFont = getComputedStyle(root).fontFamily;
@@ -181,8 +186,9 @@ export function createMeasurementGraph(
             },
             {
                 // y-axis (values)
-                size: 10,
+                size: 20,
                 values: (u, splits) => splits.map(() => ""),
+                space: 40,
                 grid: {
                     show: true,
                     stroke: "rgba(255, 255, 255, 0.06)",
@@ -248,11 +254,15 @@ export function createMeasurementGraph(
         },
     };
 
-    return { yAxis: createYAxisLabelsGraph(yAxisContainer, alignedData), graph: new uPlot(opts, alignedData, graphContainer) };
+    return { yAxis: createYAxisLabelsGraph(yAxisContainer, alignedData, noData), graph: new uPlot(opts, alignedData, graphContainer) };
 }
 
-// Create a compact uPlot that renders only the Y-axis labels (no series, no grid)
-export function createYAxisLabelsGraph(yAxisContainer: HTMLElement, alignedData: AlignedData): uPlot {
+export function createYAxisLabelsGraph(yAxisContainer: HTMLElement, alignedData: AlignedData, noData: boolean): uPlot | null {
+
+    if (noData) {
+        return null; // when there is no data doesn't create the y axis
+    }
+
     const root = document.querySelector("body") as HTMLBodyElement;
     const rootFont = getComputedStyle(root).fontFamily;
     let { width, height } = getYAxisSize(yAxisContainer);
@@ -291,11 +301,12 @@ export function createYAxisLabelsGraph(yAxisContainer: HTMLElement, alignedData:
             { size: 50 },
             {
                 size: width + 10,
+                space: 40,
                 font: `12px ${rootFont}`,
                 stroke: "white",
                 ticks: { show: true },
                 grid: { show: false },
-                values: makeYAxisValuesFormatter({ thin: true, minPxPerLabel: 14, maxDecimals: 4 }),
+                values: yAxisValuesFormatter(),
             },
         ],
         cursor: { show: false },
@@ -304,74 +315,25 @@ export function createYAxisLabelsGraph(yAxisContainer: HTMLElement, alignedData:
     return new uPlot(opts, alignedData, yAxisContainer);
 }
 
-// Options for Y-axis label formatting
-export type YAxisValuesFormatterOptions = {
-    minDecimals?: number; // minimum decimals to show
-    maxDecimals?: number; // cap to avoid noise
-    thin?: boolean; // drop some labels based on pixels per tick
-    minPxPerLabel?: number; // desired min pixels between shown labels when thinning
-    trimZeros?: boolean; // trim trailing zeros and trailing dot
-};
-
-/**
- * Build a uPlot axis values formatter that:
- * - Picks decimal precision from the smallest tick spacing
- * - Suppresses duplicate strings (keeps grid intact)
- * - Optionally thins labels when too dense
- */
-export function makeYAxisValuesFormatter(options: YAxisValuesFormatterOptions = {}) {
-    const {
-        minDecimals = 0,
-    maxDecimals = 6,
-        thin = false,
-        minPxPerLabel = 14,
-    trimZeros = true,
-    } = options;
-
+export function yAxisValuesFormatter(): (u: uPlot, splits: number[]) => string[] {
     return (u: uPlot, splits: number[]): string[] => {
         const nums = (splits || []) as number[];
         if (nums.length === 0) return [];
 
-        // Smallest positive delta determines precision
-        let minDelta = Infinity;
-        for (let i = 1; i < nums.length; i++) {
-            const d = Math.abs(nums[i] - nums[i - 1]);
-            if (d > 0 && d < minDelta) minDelta = d;
-        }
-
-        let decimals = minDecimals;
-        if (isFinite(minDelta) && minDelta > 0) {
-            const byDelta = Math.ceil(-Math.log10(minDelta)) + 1; // +1 to avoid equal strings after rounding
-            decimals = Math.max(minDecimals, Math.min(maxDecimals, byDelta));
-        }
-
+        // Trim zeros
         const fmt = (v: number) => {
-            let s = v.toFixed(decimals);
-            if (trimZeros && s.includes('.')) {
-                // remove trailing zeros after decimal
+            let s = String(v);
+            if (s.includes('.')) {
                 while (s.endsWith('0')) s = s.slice(0, -1);
-                // remove trailing dot if no decimals remain
                 if (s.endsWith('.')) s = s.slice(0, -1);
             }
             return s;
         };
 
-        // Optional thinning by available pixels per tick
-        let step = 1;
-        if (thin) {
-            const bbox = (u as any).bbox;
-            const plotHeight = bbox?.height || u.height || 0;
-            const pxPerTick = plotHeight / Math.max(nums.length - 1, 1);
-            step = Math.max(1, Math.ceil(minPxPerLabel / Math.max(pxPerTick, 1)));
-        }
-
+        // Removes duplicates
         const out: string[] = [];
         let prev: string | null = null;
         for (let i = 0; i < nums.length; i++) {
-            if (i % step !== 0) {
-                out.push("");
-                continue;
-            }
             const label = fmt(nums[i]);
             if (label === prev) out.push("");
             else {
