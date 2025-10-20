@@ -397,3 +397,38 @@ const CounterDisplayStyleConfig: ComponentStyles = {
 };
 
 export const CounterDisplayStyle = createStyleStore(CounterDisplayStyleConfig);
+
+//////////     M E A S U R E M E N T     G R A P H     //////////
+
+const MeasurementGraphStyleConfig: ComponentStyles = {
+    dark: {
+        width: "100%",
+        height: "100%",
+        headerHeight: "60px",
+        xAxisHeight: "50px",
+        yAxisWidth: "50px",
+        yAxisLabelsWidth: "60px",
+        yAxisRightMargin: "20px",
+        yAxisTickSpacingPx: 40,
+        borderRadius: "10px",
+        paddingHorizontal: "15px",
+        paddingTop: "15px",
+        paddingBottom: "0px",
+        backgroundColor: "rgba(20, 22, 28, 0.6)",
+        borderColor: "rgba(255, 255, 255, 0.08)",
+        boxShadow: "0 2px 4px rgba(0, 0, 0, 0.1)",
+        graphPeriodWidthPx: 70,
+        graphGridWidthPx: 1,
+        graphGridLineColor: "rgba(255, 255, 255, 0.06)",
+        graphAverageLineWidthPx: 1.5,
+        graphAverageLineColor: "rgba(74, 144, 226, 0.85)",
+        graphTextColor: "rgba(255, 255, 255, 0.9)",
+        graphTextWeight: "500",
+        subTextColor: "rgba(255, 255, 255, 0.5)",
+        subTextWeight: "400",
+        scrollbarTrackColor: "#323a45",
+        scrollbarThumbColor: "#1e242b",
+    },
+};
+
+export const MeasurementGraphStyle = createStyleStore(MeasurementGraphStyleConfig);

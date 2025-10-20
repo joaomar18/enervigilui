@@ -7,30 +7,70 @@
     import type { FormattedTimeStep } from "$lib/types/date";
     import type { LogSpanPeriod } from "$lib/types/view/nodes";
 
-    //Props
+    // Texts
+    import { texts } from "$lib/stores/lang/generalTexts";
+
+    // Styles
+    import { mergeStyle } from "$lib/style/components";
+    import { MeasurementGraphStyle } from "$lib/style/nodes";
+
+    // Style object (from theme)
+    export let style: { [property: string]: string | number } | null = null;
+    $: effectiveStyle = style ?? $MeasurementGraphStyle;
+
+    // Props
     export let data: Array<ProcessedMeasurementLogPoint>;
     export let timeStep: FormattedTimeStep;
     export let logSpanPeriod: LogSpanPeriod;
     export let unit: string = "";
 
     // Layout / styling props
-    export let width: string | undefined = "100%";
-    export let height: string | undefined = "450px";
-    export let borderRadius: string | undefined = "10px";
-    export let paddingHorizontal: string | undefined = "15px";
-    export let paddingTop: string | undefined = "40px";
-    export let paddingBottom: string | undefined = "0px";
-    export let backgroundColor: string | undefined = "rgba(20, 22, 28, 0.6)";
-    export let borderColor: string | undefined = "rgba(255, 255, 255, 0.08)";
-    export let boxShadow: string | undefined = "0 2px 4px rgba(0, 0, 0, 0.1)";
-    export let plotBackgroundColor: string | undefined = "rgba(0,0,0,0)";
-    export let textColor: string | undefined = "rgba(255, 255, 255, 0.9)";
-    export let textWeight: string | undefined = "500";
-    export let subTextColor: string | undefined = "rgba(255, 255, 255, 0.5)";
-    export let subTextWeight: string | undefined = "400";
-
+    export let width: string | undefined = undefined;
+    export let height: string | undefined = undefined;
+    export let headerHeight: string | undefined = undefined;
+    export let xAxisHeight: string | undefined = undefined;
+    export let yAxisWidth: string | undefined = undefined;
+    export let yAxisLabelsWidth: string | undefined = undefined;
+    export let yAxisRightMargin: string | undefined = undefined;
+    export let borderRadius: string | undefined = undefined;
+    export let paddingHorizontal: string | undefined = undefined;
+    export let paddingTop: string | undefined = undefined;
+    export let paddingBottom: string | undefined = undefined;
+    export let backgroundColor: string | undefined = undefined;
+    export let borderColor: string | undefined = undefined;
+    export let boxShadow: string | undefined = undefined;
+    export let graphTextColor: string | undefined = undefined;
+    export let graphTextWeight: string | undefined = undefined;
+    export let subTextColor: string | undefined = undefined;
+    export let subTextWeight: string | undefined = undefined;
     export let scrollbarTrackColor: string | undefined = undefined;
     export let scrollbarThumbColor: string | undefined = undefined;
+
+    $: localOverrides = {
+        width,
+        height,
+        headerHeight,
+        xAxisHeight,
+        yAxisWidth,
+        yAxisLabelsWidth,
+        yAxisRightMargin,
+        borderRadius,
+        paddingHorizontal,
+        paddingTop,
+        paddingBottom,
+        backgroundColor,
+        borderColor,
+        boxShadow,
+        graphTextColor,
+        graphTextWeight,
+        subTextColor,
+        subTextWeight,
+        scrollbarTrackColor,
+        scrollbarThumbColor,
+    };
+
+    // Merged style
+    $: mergedStyle = mergeStyle(effectiveStyle, localOverrides);
 
     // Variables
     let yAxisContainer: HTMLDivElement;
@@ -41,7 +81,7 @@
     // Reactive Statements
     $: if (data && graphContainer) {
         destroyGraph();
-        ({ yAxis, graph } = createMeasurementGraph(graphContainer, yAxisContainer, data, timeStep, logSpanPeriod));
+        ({ yAxis, graph } = createMeasurementGraph(graphContainer, yAxisContainer, data, timeStep, logSpanPeriod, mergedStyle));
     }
 
     // Functions
@@ -64,31 +104,58 @@
 
 <div
     style="
-        --width: {width};
-        --height: {height};
-        --border-radius: {borderRadius};
-        --padding-horizontal: {paddingHorizontal};
-        --padding-top: {paddingTop};
-        --padding-bottom: {paddingBottom};
-        --background-color: {backgroundColor};
-        --border-color: {borderColor};
-        --box-shadow: {boxShadow};
-        --plot-background-color: {plotBackgroundColor};
-        --scrollbar-track-color: {scrollbarTrackColor};
-        --scrollbar-thumb-color: {scrollbarThumbColor};
-        --text-color: {textColor};
-        --text-weight: {textWeight};
-        --sub-text-color: {subTextColor};
-        --sub-text-weight: {subTextWeight};
+        --width: {mergedStyle.width};
+        --height: {mergedStyle.height};
+        --header-height: {mergedStyle.headerHeight};
+        --x-axis-height: {mergedStyle.xAxisHeight};
+        --y-axis-width: {mergedStyle.yAxisWidth};
+        --y-axis-labels-width: {mergedStyle.yAxisLabelsWidth};
+        --y-axis-right-margin: {mergedStyle.yAxisRightMargin};
+        --border-radius: {mergedStyle.borderRadius};
+        --padding-horizontal: {mergedStyle.paddingHorizontal};
+        --padding-top: {mergedStyle.paddingTop};
+        --padding-bottom: {mergedStyle.paddingBottom};
+        --background-color: {mergedStyle.backgroundColor};
+        --border-color: {mergedStyle.borderColor};
+        --box-shadow: {mergedStyle.boxShadow};
+        --scrollbar-track-color: {mergedStyle.scrollbarTrackColor};
+        --scrollbar-thumb-color: {mergedStyle.scrollbarThumbColor};
+        --graph-text-color: {mergedStyle.graphTextColor};
+        --graph-text-weight: {mergedStyle.graphTextWeight};
+        --sub-text-color: {mergedStyle.subTextColor};
+        --sub-text-weight: {mergedStyle.subTextWeight};
     "
     class="graph-div-wrapper"
 >
-    <div class="y-axis-div" bind:this={yAxisContainer}>
-        {#if yAxis === null && graph !== null}
-            <span class="no-data-label">No data available</span>
-        {/if}
+    <div class="header">
+        <div class="unit-div">
+            {#if yAxis !== null && graph !== null}
+                <span class="unit-label">{unit}</span>
+            {/if}
+        </div>
+        <div class="header-content">
+            <div class="row">
+                <span class="field-label">De</span>
+                <span class="field-value"></span>
+            </div>
+            <div class="row">
+                <span class="field-label">Até</span>
+                <span class="field-value"></span>
+            </div>
+        </div>
     </div>
-    <div class="graph-div" bind:this={graphContainer}></div>
+    <div class="main">
+        <div class="y-axis-div" bind:this={yAxisContainer}>
+            <div class="y-axis-inner-div">
+                <div class="y-axis-inner-content">
+                    {#if yAxis === null && graph !== null}
+                        <span class="no-data-label">{$texts.noDataAvailable}</span>
+                    {/if}
+                </div>
+            </div>
+        </div>
+        <div class="graph-div" bind:this={graphContainer}></div>
+    </div>
 </div>
 
 <style>
@@ -100,20 +167,97 @@
         padding-right: var(--padding-horizontal);
         margin: 0;
         width: var(--width);
-        height: var(--height);
+        height: fit-content;
         border-radius: var(--border-radius);
         background: var(--background-color);
         border: 1px solid var(--border-color);
         box-shadow: var(--box-shadow);
         display: flex;
+        flex-direction: column;
+        justify-content: start;
+        align-items: center;
+    }
+
+    .header {
+        margin: 0;
+        padding: 0;
+        position: relative;
+        width: 100%;
+        height: var(--header-height);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+
+    .header .unit-div {
+        width: calc(var(--y-axis-width) + var(--y-axis-right-margin));
+        height: 100%;
+        display: flex;
+        gap: var(--header-unit-gap);
+        flex-direction: column;
+        justify-content: end;
+    }
+
+    .unit-label {
+        color: var(--sub-text-color);
+        font-weight: var(--sub-text-weight);
+        font-size: 13px;
+        letter-spacing: 0.5px;
+        text-align: right;
+        pointer-events: none;
+        user-select: none;
+        white-space: nowrap;
+        width: 100%;
+        box-sizing: border-box;
+        padding-bottom: 10px;
+        padding-right: calc(var(--y-axis-right-margin) + ((var(--y-axis-labels-width) - var(--y-axis-width)) / 2));
+    }
+
+    .header .header-content {
+        height: 100%;
+        flex: 1;
+        display:flex;
+        flex-direction: column;
+        justify-content: start;
+        align-items: center;
+    }
+
+    .row {
+        display:flex;
+        flex-direction: row;
+        width:100%;
+        height:100%;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .row .field-label {
+        width:50px;
+        height:100%;
+        background-color: red;
+    }
+
+    .row .field-value {
+        flex: 1;
+        height: 100%;
+        background-color: green;
+    }
+
+    .main {
+        display: flex;
+        flex-direction: row;
+        justify-content: center;
+        align-items: center;
+        width: 100%;
+        height: calc(100% - var(--header-height));
     }
 
     .y-axis-div {
         padding: 0;
         margin: 0;
         position: relative;
-        height: 100%;
-        width: 50px;
+        height: var(--height);
+        width: var(--y-axis-width);
         overflow: hidden;
     }
 
@@ -121,13 +265,32 @@
         padding: 0;
         margin: 0;
         position: relative;
-        width: calc(100% - 50px);
-        height: 100%;
+        width: calc(100% - var(--y-axis-width));
+        height: var(--height);
         overflow-x: auto;
         overflow-y: hidden;
         scrollbar-width: thin;
         scrollbar-color: var(--scrollbar-track-color) var(--scrollbar-thumb-color);
         scrollbar-gutter: stable;
+    }
+
+    .y-axis-inner-div {
+        /* 17 px padding top is the value the graphing value uses by default for the graph canvas*/
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: calc(100% - 17px - var(--x-axis-height));
+        padding-top: 17px;
+        padding-bottom: var(--x-axis-height);
+    }
+
+    .y-axis-inner-content {
+        width: 100%;
+        height: 100%;
+        padding: 0;
+        margin: 0;
+        position: relative;
     }
 
     .no-data-label {
@@ -137,10 +300,13 @@
         color: var(--sub-text-color);
         font-weight: var(--sub-text-weight);
         font-size: 14px;
+        letter-spacing: 0.5px;
+        word-spacing: 0.15em;
+        opacity: 0.7;
         text-align: center;
         pointer-events: none;
         user-select: none;
         white-space: nowrap;
-        transform: translate(calc(-50% + 10px), calc(-50% - 25px)) rotate(-90deg);
+        transform: translate(-50%, -50%) rotate(-90deg);
     }
 </style>

@@ -421,6 +421,7 @@
                             {#if nodeLogs}
                                 <svelte:component
                                     this={nodeLogs.graphComponent}
+                                    height="450px"
                                     data={nodeLogs.points}
                                     timeStep={nodeLogs.time_step}
                                     logSpanPeriod={selectedHistoryTimeSpan}

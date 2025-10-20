@@ -786,6 +786,10 @@ const textsObject: TextsObject = {
     toDate: {
         PT: "To",
         EN: "Até",
+    },
+    noDataAvailable: {
+        PT: "Sem dados disponíveis",
+        EN: "No data available",
     }
 };
 

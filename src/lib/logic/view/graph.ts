@@ -1,4 +1,5 @@
 import { timeStepFormatters } from "$lib/types/date";
+import { getRootFontFamily } from "../util/style";
 import type { FormattedTimeStep } from "$lib/types/date";
 import type { ProcessedMeasurementLogPoint } from "$lib/types/nodes/logs";
 import type { LogSpanPeriod } from "$lib/types/view/nodes";
@@ -19,7 +20,7 @@ export function getYAxisSize(yAxisContainer: HTMLElement): { width: number; heig
     return { width, height };
 }
 
-export function getGraphSize(graphContainer: HTMLElement, pxPerPeriod: number, alignedData: AlignedData): { width: number; height: number } {
+export function getGraphSize(graphContainer: HTMLElement, pxPerPeriod: number, alignedData: AlignedData, style: { [property: string]: string | number }): { width: number; height: number } {
     let width = 0;
     let height = 0;
     if (graphContainer) {
@@ -27,7 +28,7 @@ export function getGraphSize(graphContainer: HTMLElement, pxPerPeriod: number, a
         height = containerRect.height;
     }
     const dataWidth = (getGraphTimeSplits(alignedData).length - 1) * pxPerPeriod;
-    width = dataWidth + 45;
+    width = dataWidth + parseInt(String(style.yAxisRightMargin)) + 25;
 
     return { width, height };
 }
@@ -122,15 +123,12 @@ export function createMeasurementGraph(
     yAxisContainer: HTMLElement,
     points: Array<ProcessedMeasurementLogPoint>,
     timeStep: FormattedTimeStep,
-    logSpanPeriod: LogSpanPeriod
+    logSpanPeriod: LogSpanPeriod,
+    style: { [property: string]: string | number },
 ): { yAxis: uPlot | null; graph: uPlot } {
+
     const { alignedData, labels, noData } = getMeasurementGraphFormat(points, timeStep, logSpanPeriod);
-
-    const root = document.querySelector("body") as HTMLBodyElement;
-    const rootFont = getComputedStyle(root).fontFamily;
-    const pxPerPeriod = 70;
-
-    let { width, height } = getGraphSize(graphContainer, pxPerPeriod, alignedData);
+    let { width, height } = getGraphSize(graphContainer, Number(style.graphPeriodWidthPx), alignedData, style);
 
     let opts: uPlot.Options = {
         width: width,
@@ -148,8 +146,8 @@ export function createMeasurementGraph(
             {
                 // Average line
                 label: "Average",
-                stroke: "rgba(74, 144, 226, 0.85)",
-                width: 1.5,
+                stroke: String(style.graphAverageLineColor),
+                width: Number(style.graphAverageLineWidthPx),
                 points: { show: false },
                 paths: (u, seriesIdx, idx0, idx1) => {
                     return { stroke: getMeasurementGraphAverageLine(u, seriesIdx, idx0, idx1) };
@@ -175,24 +173,24 @@ export function createMeasurementGraph(
                 // x-axis (time)
                 splits: () => getGraphTimeSplits(alignedData),
                 values: () => labels,
-                size: 50,
-                font: `12px ${rootFont}`,
-                stroke: "white",
+                size: parseInt(String(style.xAxisHeight)),
+                font: `13px ${getRootFontFamily()}`,
+                stroke: `${style.graphTextColor}`,
                 grid: {
                     show: true,
-                    stroke: "rgba(255, 255, 255, 0.06)",
-                    width: 1,
+                    stroke: String(style.graphGridLineColor),
+                    width: Number(style.graphGridWidthPx),
                 },
             },
             {
                 // y-axis (values)
-                size: 20,
+                size: parseInt(String(style.yAxisRightMargin)),
                 values: (u, splits) => splits.map(() => ""),
-                space: 40,
+                space: Number(style.yAxisTickSpacingPx),
                 grid: {
                     show: true,
-                    stroke: "rgba(255, 255, 255, 0.06)",
-                    width: 1,
+                    stroke: String(style.graphGridLineColor),
+                    width: Number(style.graphGridWidthPx),
                 },
             },
         ],
@@ -254,17 +252,14 @@ export function createMeasurementGraph(
         },
     };
 
-    return { yAxis: createYAxisLabelsGraph(yAxisContainer, alignedData, noData), graph: new uPlot(opts, alignedData, graphContainer) };
+    return { yAxis: createYAxisLabelsGraph(yAxisContainer, alignedData, noData, style), graph: new uPlot(opts, alignedData, graphContainer) };
 }
 
-export function createYAxisLabelsGraph(yAxisContainer: HTMLElement, alignedData: AlignedData, noData: boolean): uPlot | null {
+export function createYAxisLabelsGraph(yAxisContainer: HTMLElement, alignedData: AlignedData, noData: boolean, style: { [property: string]: string | number }): uPlot | null {
 
     if (noData) {
         return null; // when there is no data doesn't create the y axis
     }
-
-    const root = document.querySelector("body") as HTMLBodyElement;
-    const rootFont = getComputedStyle(root).fontFamily;
     let { width, height } = getYAxisSize(yAxisContainer);
 
     const opts: uPlot.Options = {
@@ -298,12 +293,14 @@ export function createYAxisLabelsGraph(yAxisContainer: HTMLElement, alignedData:
             },
         ],
         axes: [
-            { size: 50 },
             {
-                size: width + 10,
-                space: 40,
-                font: `12px ${rootFont}`,
-                stroke: "white",
+                size: parseInt(String(style.xAxisHeight)),
+            },
+            {
+                size: parseInt(String(style.yAxisLabelsWidth)),
+                space: Number(style.yAxisTickSpacingPx),
+                font: `13px ${getRootFontFamily()}`,
+                stroke: `${style.graphTextColor}`,
                 ticks: { show: true },
                 grid: { show: false },
                 values: yAxisValuesFormatter(),
