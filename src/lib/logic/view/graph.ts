@@ -184,7 +184,7 @@ export function createMeasurementGraph(
             },
             {
                 // y-axis (values)
-                size: parseInt(String(style.yAxisRightMargin)),
+                size: parseInt(String(style.yAxisWidth)),
                 values: (u, splits) => splits.map(() => ""),
                 space: Number(style.yAxisTickSpacingPx),
                 grid: {

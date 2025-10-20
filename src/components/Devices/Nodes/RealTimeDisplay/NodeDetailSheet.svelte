@@ -7,7 +7,7 @@
     import { LogSpanPeriod } from "$lib/types/view/nodes";
     import { getNodePhaseSection, getCommunicationID, isNumeric } from "$lib/logic/util/nodes";
     import { getNodeAdditionalInfo, getNodeLogs } from "$lib/logic/api/nodes";
-    import { getTimeSpanFromLogPeriod, getDateFromField } from "$lib/logic/util/date";
+    import { getTimeSpanFromLogPeriod, getDateFromField, getElegantStringFromDate } from "$lib/logic/util/date";
     import type { BaseNodeAdditionalInfo, ProcessedNodeState } from "$lib/types/nodes/realtime";
     import type { ProcessedNodeLogs } from "$lib/types/nodes/logs";
 
@@ -85,6 +85,8 @@
     let nodeAdditionalInfo: BaseNodeAdditionalInfo;
     let nodeLogs: ProcessedNodeLogs;
     let selectedHistoryTimeSpan: LogSpanPeriod = LogSpanPeriod.currentDay;
+    let initialDate: Date;
+    let endDate: Date;
 
     let showCustomDatePicker: boolean = false;
 
@@ -100,6 +102,7 @@
         loadNodeAdditionalInfo();
         if (isNumeric(nodeState)) {
             let { initial_date, end_date } = loadDateSpan();
+            setDateSpan({ initial_date, end_date });
             loadNodeLogs(initial_date, end_date);
         }
     }
@@ -126,6 +129,11 @@
 
     function loadDateSpan(): { initial_date: Date; end_date: Date } {
         return getTimeSpanFromLogPeriod(selectedHistoryTimeSpan);
+    }
+
+    function setDateSpan(dateSpan: { initial_date: Date; end_date: Date }): void {
+        initialDate = dateSpan.initial_date;
+        endDate = dateSpan.end_date;
     }
 
     async function loadNodeLogs(initial_date: Date | null = null, end_date: Date | null = null) {
@@ -333,6 +341,7 @@
                                 onClick={() => {
                                     selectedHistoryTimeSpan = LogSpanPeriod.currentHour;
                                     let { initial_date, end_date } = getTimeSpanFromLogPeriod(selectedHistoryTimeSpan);
+                                    setDateSpan({ initial_date, end_date });
                                     loadNodeLogs(initial_date, end_date);
                                 }}
                             >
@@ -346,6 +355,7 @@
                                 onClick={() => {
                                     selectedHistoryTimeSpan = LogSpanPeriod.currentDay;
                                     let { initial_date, end_date } = getTimeSpanFromLogPeriod(selectedHistoryTimeSpan);
+                                    setDateSpan({ initial_date, end_date });
                                     loadNodeLogs(initial_date, end_date);
                                 }}
                             >
@@ -359,6 +369,7 @@
                                 onClick={() => {
                                     selectedHistoryTimeSpan = LogSpanPeriod.current7Days;
                                     let { initial_date, end_date } = getTimeSpanFromLogPeriod(selectedHistoryTimeSpan);
+                                    setDateSpan({ initial_date, end_date });
                                     loadNodeLogs(initial_date, end_date);
                                 }}
                             >
@@ -372,6 +383,7 @@
                                 onClick={() => {
                                     selectedHistoryTimeSpan = LogSpanPeriod.currentMonth;
                                     let { initial_date, end_date } = getTimeSpanFromLogPeriod(selectedHistoryTimeSpan);
+                                    setDateSpan({ initial_date, end_date });
                                     loadNodeLogs(initial_date, end_date);
                                 }}
                             >
@@ -385,6 +397,7 @@
                                 onClick={() => {
                                     selectedHistoryTimeSpan = LogSpanPeriod.currentYear;
                                     let { initial_date, end_date } = getTimeSpanFromLogPeriod(selectedHistoryTimeSpan);
+                                    setDateSpan({ initial_date, end_date });
                                     loadNodeLogs(initial_date, end_date);
                                 }}
                             >
@@ -410,6 +423,7 @@
                                     requestCustomPeriod={(startDateTime, endDateTime) => {
                                         let initial_date = getDateFromField(startDateTime);
                                         let end_date = getDateFromField(endDateTime);
+                                        setDateSpan({ initial_date, end_date });
                                         loadNodeLogs(initial_date, end_date);
                                         selectedHistoryTimeSpan = LogSpanPeriod.customDate;
                                         showCustomDatePicker = false;
@@ -422,6 +436,8 @@
                                 <svelte:component
                                     this={nodeLogs.graphComponent}
                                     height="450px"
+                                    initialDateString={getElegantStringFromDate(initialDate)}
+                                    endDateString={getElegantStringFromDate(endDate)}
                                     data={nodeLogs.points}
                                     timeStep={nodeLogs.time_step}
                                     logSpanPeriod={selectedHistoryTimeSpan}

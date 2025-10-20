@@ -203,3 +203,23 @@ export function getShortYear(yyyy: string): string {
 export function convertISOToTimestamp(date: string): number {
     return new Date(date).getTime();
 }
+
+/**
+ * Formats a date into an elegant string with localized day of week and month names.
+ * @param date - Date object to format
+ * @returns Formatted string: "seg. 21 dez. 2025, 14:30" (PT) or "mon. 21 Dec 2025, 14:30" (EN)
+ */
+export function getElegantStringFromDate(date: Date): string {
+
+    const dayOfWeek = date.toLocaleDateString(get(selectedLang), { weekday: "short" });
+    const dayOfMonth = date.getDate();
+    const month = date.toLocaleDateString(get(selectedLang), { month: "short" });
+    const year = date.getFullYear();
+    const time = date.toLocaleTimeString(get(selectedLang), {
+        hour: "2-digit",
+        minute: "2-digit",
+        hour12: false
+    });
+
+    return `${dayOfWeek} ${dayOfMonth} ${month} ${year}, ${time}`;
+}

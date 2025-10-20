@@ -19,6 +19,8 @@
     $: effectiveStyle = style ?? $MeasurementGraphStyle;
 
     // Props
+    export let initialDateString: string;
+    export let endDateString: string;
     export let data: Array<ProcessedMeasurementLogPoint>;
     export let timeStep: FormattedTimeStep;
     export let logSpanPeriod: LogSpanPeriod;
@@ -28,6 +30,8 @@
     export let width: string | undefined = undefined;
     export let height: string | undefined = undefined;
     export let headerHeight: string | undefined = undefined;
+    export let headerRowHeight: string | undefined = undefined;
+    export let headerLeftBorder: string | undefined = undefined;
     export let xAxisHeight: string | undefined = undefined;
     export let yAxisWidth: string | undefined = undefined;
     export let yAxisLabelsWidth: string | undefined = undefined;
@@ -39,6 +43,8 @@
     export let backgroundColor: string | undefined = undefined;
     export let borderColor: string | undefined = undefined;
     export let boxShadow: string | undefined = undefined;
+    export let mainTextColor: string | undefined = undefined;
+    export let mainTextWeight: string | undefined = undefined;
     export let graphTextColor: string | undefined = undefined;
     export let graphTextWeight: string | undefined = undefined;
     export let subTextColor: string | undefined = undefined;
@@ -50,6 +56,8 @@
         width,
         height,
         headerHeight,
+        headerRowHeight,
+        headerLeftBorder,
         xAxisHeight,
         yAxisWidth,
         yAxisLabelsWidth,
@@ -61,6 +69,8 @@
         backgroundColor,
         borderColor,
         boxShadow,
+        mainTextColor,
+        mainTextWeight,
         graphTextColor,
         graphTextWeight,
         subTextColor,
@@ -107,6 +117,8 @@
         --width: {mergedStyle.width};
         --height: {mergedStyle.height};
         --header-height: {mergedStyle.headerHeight};
+        --header-row-height: {mergedStyle.headerRowHeight};
+        --header-left-border: {mergedStyle.headerLeftBorder};
         --x-axis-height: {mergedStyle.xAxisHeight};
         --y-axis-width: {mergedStyle.yAxisWidth};
         --y-axis-labels-width: {mergedStyle.yAxisLabelsWidth};
@@ -120,6 +132,8 @@
         --box-shadow: {mergedStyle.boxShadow};
         --scrollbar-track-color: {mergedStyle.scrollbarTrackColor};
         --scrollbar-thumb-color: {mergedStyle.scrollbarThumbColor};
+        --main-text-color: {mergedStyle.mainTextColor};
+        --main-text-weight: {mergedStyle.mainTextWeight};
         --graph-text-color: {mergedStyle.graphTextColor};
         --graph-text-weight: {mergedStyle.graphTextWeight};
         --sub-text-color: {mergedStyle.subTextColor};
@@ -135,12 +149,20 @@
         </div>
         <div class="header-content">
             <div class="row">
-                <span class="field-label">De</span>
-                <span class="field-value"></span>
+                <div class="label-div">
+                    <span class="label">De</span>
+                </div>
+                <div class="value-div">
+                    <span class="value">{initialDateString}</span>
+                </div>
             </div>
             <div class="row">
-                <span class="field-label">Até</span>
-                <span class="field-value"></span>
+                <div class="label-div">
+                    <span class="label">Até</span>
+                </div>
+                <div class="value-div">
+                    <span class="value">{endDateString}</span>
+                </div>
             </div>
         </div>
     </div>
@@ -215,32 +237,53 @@
 
     .header .header-content {
         height: 100%;
+        border-left: var(--header-left-border);
         flex: 1;
-        display:flex;
-        flex-direction: column;
+        display: flex;
+        flex-direction: row;
         justify-content: start;
         align-items: center;
+        flex-wrap: wrap;
     }
 
     .row {
-        display:flex;
+        display: flex;
         flex-direction: row;
-        width:100%;
-        height:100%;
+        width: 100%;
+        padding-right: 10px;
+        height: var(--header-row-height);
         justify-content: space-between;
         align-items: center;
     }
 
-    .row .field-label {
-        width:50px;
-        height:100%;
-        background-color: red;
+    .label-div {
+        width: 50px;
+        height: 100%;
+        display: flex;
+        flex-direction: row;
+        justify-content: start;
+        align-items: center;
     }
 
-    .row .field-value {
+    .label {
+        font-size: 14px;
+        font-weight: var(--sub-text-weight);
+        color: var(--sub-text-color);
+    }
+
+    .value-div {
         flex: 1;
         height: 100%;
-        background-color: green;
+        display: flex;
+        flex-direction: row;
+        justify-content: end;
+        align-items: center;
+    }
+
+    .value {
+        font-size: 14px;
+        font-weight: var(--main-text-weight);
+        color: var(--main-text-color);
     }
 
     .main {
@@ -299,7 +342,7 @@
         left: 50%;
         color: var(--sub-text-color);
         font-weight: var(--sub-text-weight);
-        font-size: 14px;
+        font-size: 13px;
         letter-spacing: 0.5px;
         word-spacing: 0.15em;
         opacity: 0.7;
