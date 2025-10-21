@@ -28,7 +28,7 @@ export function getGraphSize(graphContainer: HTMLElement, pxPerPeriod: number, a
         height = containerRect.height;
     }
     const dataWidth = (getGraphTimeSplits(alignedData).length - 1) * pxPerPeriod;
-    width = dataWidth + parseInt(String(style.yAxisRightMargin)) + 25;
+    width = dataWidth + parseInt(String(style.yAxisWidth)) + 25;
 
     return { width, height };
 }
@@ -120,12 +120,11 @@ export function getMeasurementGraphFormat(
 
 export function createMeasurementGraph(
     graphContainer: HTMLElement,
-    yAxisContainer: HTMLElement,
     points: Array<ProcessedMeasurementLogPoint>,
     timeStep: FormattedTimeStep,
     logSpanPeriod: LogSpanPeriod,
     style: { [property: string]: string | number },
-): { yAxis: uPlot | null; graph: uPlot } {
+): { graph: uPlot } {
 
     const { alignedData, labels, noData } = getMeasurementGraphFormat(points, timeStep, logSpanPeriod);
     let { width, height } = getGraphSize(graphContainer, Number(style.graphPeriodWidthPx), alignedData, style);
@@ -184,8 +183,10 @@ export function createMeasurementGraph(
             },
             {
                 // y-axis (values)
+                values: (u, splits) => noData ? splits.map(() => "") : yAxisValuesFormatter()(u, splits),
                 size: parseInt(String(style.yAxisWidth)),
-                values: (u, splits) => splits.map(() => ""),
+                font: `13px ${getRootFontFamily()}`,
+                stroke: `${style.graphTextColor}`,
                 space: Number(style.yAxisTickSpacingPx),
                 grid: {
                     show: true,
@@ -252,7 +253,7 @@ export function createMeasurementGraph(
         },
     };
 
-    return { yAxis: createYAxisLabelsGraph(yAxisContainer, alignedData, noData, style), graph: new uPlot(opts, alignedData, graphContainer) };
+    return { graph: new uPlot(opts, alignedData, graphContainer) };
 }
 
 export function createYAxisLabelsGraph(yAxisContainer: HTMLElement, alignedData: AlignedData, noData: boolean, style: { [property: string]: string | number }): uPlot | null {

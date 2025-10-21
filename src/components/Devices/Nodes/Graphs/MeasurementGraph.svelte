@@ -31,7 +31,6 @@
     export let height: string | undefined = undefined;
     export let headerHeight: string | undefined = undefined;
     export let headerRowHeight: string | undefined = undefined;
-    export let headerLeftBorder: string | undefined = undefined;
     export let xAxisHeight: string | undefined = undefined;
     export let yAxisWidth: string | undefined = undefined;
     export let yAxisLabelsWidth: string | undefined = undefined;
@@ -57,7 +56,6 @@
         height,
         headerHeight,
         headerRowHeight,
-        headerLeftBorder,
         xAxisHeight,
         yAxisWidth,
         yAxisLabelsWidth,
@@ -83,15 +81,13 @@
     $: mergedStyle = mergeStyle(effectiveStyle, localOverrides);
 
     // Variables
-    let yAxisContainer: HTMLDivElement;
     let graphContainer: HTMLDivElement;
-    let yAxis: uPlot | null;
     let graph: uPlot | null;
 
     // Reactive Statements
     $: if (data && graphContainer) {
         destroyGraph();
-        ({ yAxis, graph } = createMeasurementGraph(graphContainer, yAxisContainer, data, timeStep, logSpanPeriod, mergedStyle));
+        ({ graph } = createMeasurementGraph(graphContainer, data, timeStep, logSpanPeriod, mergedStyle));
     }
 
     // Functions
@@ -100,10 +96,6 @@
         if (graph) {
             graph.destroy();
             graph = null;
-        }
-        if (yAxis) {
-            yAxis.destroy();
-            yAxis = null;
         }
     }
 
@@ -118,7 +110,6 @@
         --height: {mergedStyle.height};
         --header-height: {mergedStyle.headerHeight};
         --header-row-height: {mergedStyle.headerRowHeight};
-        --header-left-border: {mergedStyle.headerLeftBorder};
         --x-axis-height: {mergedStyle.xAxisHeight};
         --y-axis-width: {mergedStyle.yAxisWidth};
         --y-axis-labels-width: {mergedStyle.yAxisLabelsWidth};
@@ -143,11 +134,12 @@
 >
     <div class="header">
         <div class="unit-div">
-            {#if yAxis !== null && graph !== null}
+            {#if false}
                 <span class="unit-label">{unit}</span>
             {/if}
         </div>
         <div class="header-content">
+            <!--
             <div class="row">
                 <div class="label-div">
                     <span class="label">De</span>
@@ -164,18 +156,19 @@
                     <span class="value">{endDateString}</span>
                 </div>
             </div>
+            -->
         </div>
     </div>
     <div class="main">
-        <div class="y-axis-div" bind:this={yAxisContainer}>
-            <div class="y-axis-inner-div">
-                <div class="y-axis-inner-content">
-                    {#if yAxis === null && graph !== null}
-                        <span class="no-data-label">{$texts.noDataAvailable}</span>
-                    {/if}
-                </div>
+        <!--
+        <div class="y-axis-inner-div">
+            <div class="y-axis-inner-content">
+                {#if false}
+                    <span class="no-data-label">{$texts.noDataAvailable}</span>
+                {/if}
             </div>
         </div>
+        -->
         <div class="graph-div" bind:this={graphContainer}></div>
     </div>
 </div>
@@ -237,7 +230,6 @@
 
     .header .header-content {
         height: 100%;
-        border-left: var(--header-left-border);
         flex: 1;
         display: flex;
         flex-direction: row;
@@ -295,20 +287,11 @@
         height: calc(100% - var(--header-height));
     }
 
-    .y-axis-div {
-        padding: 0;
-        margin: 0;
-        position: relative;
-        height: var(--height);
-        width: var(--y-axis-width);
-        overflow: hidden;
-    }
-
     .graph-div {
         padding: 0;
         margin: 0;
         position: relative;
-        width: calc(100% - var(--y-axis-width));
+        width: 100%;
         height: var(--height);
         overflow-x: auto;
         overflow-y: hidden;
