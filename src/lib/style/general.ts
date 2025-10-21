@@ -638,6 +638,29 @@ const ToolTipDatePickerStyleConfig: ComponentStyles = {
 
 export const ToolTipDatePickerStyle = createStyleStore(ToolTipDatePickerStyleConfig);
 
+//////////     T O O L     T I P     D A T E     C H E C K E R     //////////
+
+const ToolTipDateCheckerStyleConfig: ComponentStyles = {
+    dark: {
+        width: "300px",
+        minWidth: "auto",
+        maxWidth: "auto",
+        height: "fit-content",
+        minHeight: "auto",
+        maxHeight: "auto",
+        offsetPx: "10px",
+        border: "1px solid #3a4149",
+        borderRadius: "10px",
+        backgroundColor: "#0a0c0f",
+        paddingHorizontal: "0px",
+        paddingVertical: "0px",
+        animationTime: 200,
+    },
+};
+
+export const ToolTipDateCheckerStyle = createStyleStore(ToolTipDateCheckerStyleConfig);
+
+
 //////////     D A T E     R A N G E     P I C K E R     //////////
 
 const DateRangePickerStyleConfig: ComponentStyles = {
@@ -658,6 +681,25 @@ const DateRangePickerStyleConfig: ComponentStyles = {
 };
 
 export const DateRangePickerStyle = createStyleStore(DateRangePickerStyleConfig);
+
+
+//////////     D A T E     R A N G E     C H E C K E R     //////////
+
+const DateRangeCheckerStyleConfig: ComponentStyles = {
+    dark: {
+        paddingHorizontal: "20px",
+        paddingTop: "20px",
+        paddingBottom: "20px",
+        textSize: "14px",
+        labelColor: "#9CA3AF",
+        labelWeight: "400",
+        valueColor: "#eeee",
+        valueWeight: "500",
+        rowGap: "20px",
+    },
+};
+
+export const DateRangeCheckerStyle = createStyleStore(DateRangeCheckerStyleConfig);
 
 
 //////////     T E X T     C O L O R S     //////////

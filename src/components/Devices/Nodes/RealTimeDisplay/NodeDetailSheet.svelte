@@ -87,7 +87,6 @@
     let selectedHistoryTimeSpan: LogSpanPeriod = LogSpanPeriod.currentDay;
     let initialDate: Date;
     let endDate: Date;
-
     let showCustomDatePicker: boolean = false;
 
     // Reactive Statements
@@ -436,8 +435,8 @@
                                 <svelte:component
                                     this={nodeLogs.graphComponent}
                                     height="450px"
-                                    initialDateString={getElegantStringFromDate(initialDate)}
-                                    endDateString={getElegantStringFromDate(endDate)}
+                                    {initialDate}
+                                    {endDate}
                                     data={nodeLogs.points}
                                     timeStep={nodeLogs.time_step}
                                     logSpanPeriod={selectedHistoryTimeSpan}

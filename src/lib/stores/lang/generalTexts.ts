@@ -780,16 +780,24 @@ const textsObject: TextsObject = {
         EN: "disconnected",
     },
     fromDate: {
-        PT: "From",
-        EN: "De",
+        PT: "De",
+        EN: "From",
     },
     toDate: {
-        PT: "To",
-        EN: "Até",
+        PT: "Até",
+        EN: "to",
     },
     noDataAvailable: {
         PT: "Sem dados disponíveis",
         EN: "No data available",
+    },
+    fullscreen: {
+        PT: "Ecrã Inteiro",
+        EN: "Full screen"
+    },
+    selectedPeriod: {
+        PT: "Período selecionado",
+        EN: "Selected period",
     }
 };
 

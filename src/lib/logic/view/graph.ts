@@ -1,24 +1,12 @@
 import { timeStepFormatters } from "$lib/types/date";
 import { getRootFontFamily } from "../util/style";
 import type { FormattedTimeStep } from "$lib/types/date";
-import type { ProcessedMeasurementLogPoint } from "$lib/types/nodes/logs";
+import type { ProcessedBaseLogPoint, ProcessedMeasurementLogPoint } from "$lib/types/nodes/logs";
 import type { LogSpanPeriod } from "$lib/types/view/nodes";
 import uPlot, { type AlignedData } from "uplot";
 
 // Global variable to track hover state
 let currentHoverPeriod: number = -1;
-
-export function getYAxisSize(yAxisContainer: HTMLElement): { width: number; height: number } {
-    let width = 0;
-    let height = 0;
-    if (yAxisContainer) {
-        const containerRect = yAxisContainer.getBoundingClientRect();
-        height = containerRect.height;
-        width = containerRect.width;
-    }
-
-    return { width, height };
-}
 
 export function getGraphSize(graphContainer: HTMLElement, pxPerPeriod: number, alignedData: AlignedData, style: { [property: string]: string | number }): { width: number; height: number } {
     let width = 0;
@@ -28,7 +16,7 @@ export function getGraphSize(graphContainer: HTMLElement, pxPerPeriod: number, a
         height = containerRect.height;
     }
     const dataWidth = (getGraphTimeSplits(alignedData).length - 1) * pxPerPeriod;
-    width = dataWidth + parseInt(String(style.yAxisWidth)) + 25;
+    width = dataWidth + parseInt(String(style.yAxisWidth)) + parseInt(String(style.graphPaddingLeft)) + parseInt(String(style.graphPaddingRight));
 
     return { width, height };
 }
@@ -38,6 +26,38 @@ export function getGraphTimeSplits(data: AlignedData): Array<number> {
     const startsOnly = timestamps.filter((_, i) => i % 2 === 0);
     return startsOnly;
 }
+
+export function yAxisValuesFormatter(): (u: uPlot, splits: number[]) => string[] {
+    return (u: uPlot, splits: number[]): string[] => {
+        const nums = (splits || []) as number[];
+        if (nums.length === 0) return [];
+
+        // Trim zeros
+        const fmt = (v: number) => {
+            let s = String(v);
+            if (s.includes('.')) {
+                while (s.endsWith('0')) s = s.slice(0, -1);
+                if (s.endsWith('.')) s = s.slice(0, -1);
+            }
+            return s;
+        };
+
+        // Removes duplicates
+        const out: string[] = [];
+        let prev: string | null = null;
+        for (let i = 0; i < nums.length; i++) {
+            const label = fmt(nums[i]);
+            if (label === prev) out.push("");
+            else {
+                out.push(label);
+                prev = label;
+            }
+        }
+        return out;
+    };
+}
+
+
 
 export function getMeasurementGraphAverageLine(graph: uPlot, seriesIdx: number, idx0: number, idx1: number): Path2D {
     const line = new Path2D();
@@ -124,7 +144,7 @@ export function createMeasurementGraph(
     timeStep: FormattedTimeStep,
     logSpanPeriod: LogSpanPeriod,
     style: { [property: string]: string | number },
-): { graph: uPlot } {
+): { graph: uPlot, graphNoData: boolean } {
 
     const { alignedData, labels, noData } = getMeasurementGraphFormat(points, timeStep, logSpanPeriod);
     let { width, height } = getGraphSize(graphContainer, Number(style.graphPeriodWidthPx), alignedData, style);
@@ -132,6 +152,7 @@ export function createMeasurementGraph(
     let opts: uPlot.Options = {
         width: width,
         height: height,
+        padding: [parseInt(String(style.graphPaddingTop)), parseInt(String(style.graphPaddingRight)), parseInt(String(style.graphPaddingBottom)), parseInt(String(style.graphPaddingLeft))],
         scales: {
             x: {
                 time: true,
@@ -139,6 +160,9 @@ export function createMeasurementGraph(
             y: {
                 auto: true,
             },
+        },
+        legend: {
+            show: false,
         },
         series: [
             {}, // x-axis
@@ -253,92 +277,5 @@ export function createMeasurementGraph(
         },
     };
 
-    return { graph: new uPlot(opts, alignedData, graphContainer) };
-}
-
-export function createYAxisLabelsGraph(yAxisContainer: HTMLElement, alignedData: AlignedData, noData: boolean, style: { [property: string]: string | number }): uPlot | null {
-
-    if (noData) {
-        return null; // when there is no data doesn't create the y axis
-    }
-    let { width, height } = getYAxisSize(yAxisContainer);
-
-    const opts: uPlot.Options = {
-        width: width,
-        height: height,
-        scales: {
-            x: { time: true },
-            y: { auto: true },
-        },
-        series: [
-            {},
-            {
-                label: "Average",
-                points: { show: false },
-                stroke: "transparent",
-                width: 0,
-            },
-            {
-                // Min values (invisible, used for band)
-                label: "Min",
-                stroke: "transparent",
-                width: 0,
-                points: { show: false },
-            },
-            {
-                // Max values (invisible, used for band)
-                label: "Max",
-                stroke: "transparent",
-                width: 0,
-                points: { show: false },
-            },
-        ],
-        axes: [
-            {
-                size: parseInt(String(style.xAxisHeight)),
-            },
-            {
-                size: parseInt(String(style.yAxisLabelsWidth)),
-                space: Number(style.yAxisTickSpacingPx),
-                font: `13px ${getRootFontFamily()}`,
-                stroke: `${style.graphTextColor}`,
-                ticks: { show: true },
-                grid: { show: false },
-                values: yAxisValuesFormatter(),
-            },
-        ],
-        cursor: { show: false },
-    };
-
-    return new uPlot(opts, alignedData, yAxisContainer);
-}
-
-export function yAxisValuesFormatter(): (u: uPlot, splits: number[]) => string[] {
-    return (u: uPlot, splits: number[]): string[] => {
-        const nums = (splits || []) as number[];
-        if (nums.length === 0) return [];
-
-        // Trim zeros
-        const fmt = (v: number) => {
-            let s = String(v);
-            if (s.includes('.')) {
-                while (s.endsWith('0')) s = s.slice(0, -1);
-                if (s.endsWith('.')) s = s.slice(0, -1);
-            }
-            return s;
-        };
-
-        // Removes duplicates
-        const out: string[] = [];
-        let prev: string | null = null;
-        for (let i = 0; i < nums.length; i++) {
-            const label = fmt(nums[i]);
-            if (label === prev) out.push("");
-            else {
-                out.push(label);
-                prev = label;
-            }
-        }
-        return out;
-    };
+    return { graph: new uPlot(opts, alignedData, graphContainer), graphNoData: noData };
 }
