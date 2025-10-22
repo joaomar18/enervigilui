@@ -1,7 +1,7 @@
 <script lang="ts">
     import { onDestroy } from "svelte";
     import { MeasurementGraphObject } from "$lib/logic/view/graph/measurement";
-    import type { ProcessedMeasurementLogPoint } from "$lib/types/nodes/logs";
+    import type { MeasurementLogPoint, ProcessedMeasurementLogPoint } from "$lib/types/nodes/logs";
     import type { FormattedTimeStep } from "$lib/types/date";
     import type { LogSpanPeriod } from "$lib/types/view/nodes";
     import BaseGraph from "./BaseGraph.svelte";
@@ -49,7 +49,11 @@
 
     // Functions
     function createGraphObject(): void {
-        graph = new MeasurementGraphObject(graphContainer, data);
+        graph = new MeasurementGraphObject(graphContainer, hoveredLogPointChange, data);
+    }
+
+    function hoveredLogPointChange(logPoint: MeasurementLogPoint | null): void {
+        console.log(logPoint);
     }
 
     function updateGraphData(): void {

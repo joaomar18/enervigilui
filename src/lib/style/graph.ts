@@ -66,7 +66,7 @@ const MeasurementGraphStyleConfig: ComponentStyles = {
         lineColor: "rgba(74, 144, 226, 0.85)",
         bandColor: "rgba(74, 144, 226, 0.15)",
         bandBorderWidthPx: 1,
-        bandBorderColor: "rgba(74, 144, 226, 0.2)",
+        bandBorderColor: "transparent",
         lineHoverColor: "rgba(74, 144, 226, 1.0)",
         bandHoverColor: "rgba(74, 144, 226, 0.25)",
         bandBorderHoverColor: "rgba(74, 144, 226, 0.3)",

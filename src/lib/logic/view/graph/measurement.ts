@@ -4,15 +4,17 @@ import { getGraphSize, getGraphTimeSplits, yAxisValuesFormatter } from "./helper
 import { BaseGraphObject } from "./base";
 import { FormattedTimeStep } from "$lib/types/date";
 import { LogSpanPeriod } from "$lib/types/view/nodes";
-import type { ProcessedMeasurementLogPoint } from "$lib/types/nodes/logs";
+import type { MeasurementLogPoint, ProcessedMeasurementLogPoint } from "$lib/types/nodes/logs";
 import { timeStepFormatters } from "$lib/types/date";
+import { getElegantStringFromDate } from "$lib/logic/util/date";
 
-export class MeasurementGraphObject extends BaseGraphObject {
+export class MeasurementGraphObject extends BaseGraphObject<MeasurementLogPoint> {
     protected graphType = "measurement";
     protected points: Array<ProcessedMeasurementLogPoint>;
+    public hoveredLogPoint: MeasurementLogPoint | null = null;
 
-    constructor(container: HTMLElement, points: Array<ProcessedMeasurementLogPoint>) {
-        super(container);
+    constructor(container: HTMLElement, hoveredLogPointChange: ((logPoint: MeasurementLogPoint | null) => void) | null, points: Array<ProcessedMeasurementLogPoint>) {
+        super(container, hoveredLogPointChange);
         this.points = points;
     }
 
@@ -42,16 +44,10 @@ export class MeasurementGraphObject extends BaseGraphObject {
             series: [
                 {}, // x-axis
                 {
-                    // Average line
                     label: "Average",
-                    //stroke: String(style.lineColor),
                     stroke: "transparent",
-                    //width: Number(style.lineWidthPx),
                     width: 0,
                     points: { show: false },
-                    //paths: (u, seriesIdx, idx0, idx1) => {
-                    //    return { stroke: this.getAverageLine(seriesIdx, idx0, idx1) };
-                    //},
                 },
                 {
                     // Min values (invisible, used for band)
@@ -104,57 +100,12 @@ export class MeasurementGraphObject extends BaseGraphObject {
             hooks: {
                 setCursor: [
                     (u) => {
-                        const left = u.cursor.left;
-                        if (left != null && left >= 0) {
-                            // Convert cursor position to data value
-                            const xVal = u.posToVal(left, "x");
-                            // Find which period we're hovering over
-                            const hoverPeriod = Math.floor(xVal);
-                            if (hoverPeriod >= 0 && hoverPeriod < this.points.length) {
-                                if (this.currentHoverPeriod !== hoverPeriod) {
-                                    this.currentHoverPeriod = hoverPeriod;
-                                    u.redraw();
-                                }
-                            }
-                        } else {
-                            if (this.currentHoverPeriod !== -1) {
-                                this.currentHoverPeriod = -1;
-                                u.redraw();
-                            }
-                        }
+                        this.currentHoverPeriod = this.getHoveredPeriod(u, this.currentHoverPeriod);
                     },
                 ],
                 draw: [
                     (u) => {
-                        const { ctx } = u;
-                        ctx.save();
-                        this.points.forEach((point, idx) => {
-                            if (point.min_value === null || point.max_value === null || point.average_value === null) {
-                                return;
-                            }
-                            const isHover = this.currentHoverPeriod === idx;
-
-                            ctx.lineWidth = Number(style.bandBorderWidthPx);
-                            const x1 = u.valToPos(idx, "x", true);
-                            const x2 = u.valToPos(idx + 1, "x", true);
-                            const yMin = u.valToPos(point.min_value, "y", true);
-                            const yMax = u.valToPos(point.max_value, "y", true);
-                            const width = x2 - x1;
-                            const height = yMin - yMax;
-                            ctx.fillStyle = isHover ? String(style.bandHoverColor) : String(style.bandColor);
-                            ctx.strokeStyle = isHover ? String(style.bandBorderHoverColor) : String(style.bandBorderColor);
-                            ctx.fillRect(x1, yMax, width, height);
-                            ctx.strokeRect(x1, yMax, width, height);
-                            ctx.save();
-
-                            ctx.lineWidth = Number(style.lineWidthPx);
-                            ctx.strokeStyle = isHover ? String(style.lineHoverColor) : String(style.lineColor);
-                            const segmentLine = this.getAverageLineSegment(idx);
-                            ctx.stroke(segmentLine);
-
-                            ctx.restore();
-                        });
-                        ctx.restore();
+                        this.drawCanvas(u, style);
                     },
                 ],
             },
@@ -207,43 +158,90 @@ export class MeasurementGraphObject extends BaseGraphObject {
         return { alignedData: [timestampValues, averageValues, minValues, maxValues] };
     }
 
-    getAverageLineSegment(periodIdx: number): Path2D {
-        return this.getAverageLine(1, periodIdx * 2, (periodIdx * 2) + 2);
+    getHoveredPeriod(u: uPlot, current: number): number {
+        const left = u.cursor.left;
+        if (left != null && left >= 0) { // Valid Left Value
+            const xVal = u.posToVal(left, "x");
+            const hoverPeriod = Math.floor(xVal);
+
+            if (hoverPeriod >= 0 && hoverPeriod < this.points.length) {
+                if (current !== hoverPeriod) {
+                    current = hoverPeriod;
+                    this.hoveredLogPoint = this.getHoveredLogPoint(current);
+                    if (this.hoveredLogPointCallback) {
+                        this.hoveredLogPointCallback(this.hoveredLogPoint);
+                    }
+                    u.redraw();
+                }
+            }
+        } else { // Cursor outside Graph
+            if (current !== -1) {
+                current = -1;
+                this.hoveredLogPoint = this.getHoveredLogPoint(current);
+                if (this.hoveredLogPointCallback) {
+                    this.hoveredLogPointCallback(this.hoveredLogPoint);
+                }
+                u.redraw();
+            }
+        }
+        return current;
     }
 
-    getAverageLine(seriesIdx: number, idx0: number, idx1: number): Path2D {
+    getHoveredLogPoint(index: number): MeasurementLogPoint | null {
+        if (index < 0 || index >= this.points.length) {
+            return null;
+        }
+        return {
+            start_time: getElegantStringFromDate(new Date(this.points[index].start_time * 1000)),
+            end_time: getElegantStringFromDate(new Date(this.points[index].end_time * 1000)),
+            min_value: this.points[index].min_value,
+            max_value: this.points[index].max_value,
+            average_value: this.points[index].average_value,
+        } as MeasurementLogPoint;
+    }
+
+    getAverageLine(xStart: number, xEnd: number, y: number): Path2D {
         if (!this.graph) {
             throw new Error(`Graph is not instantiated`);
         }
         const line = new Path2D();
-
-        const xData = this.graph.data[0] as number[];
-        const yData = this.graph.data[seriesIdx] as Array<number | null>;
-        let prevXPx: number | null = null;
-
-        for (let i = idx0; i <= idx1; i++) {
-            const yv = yData[i];
-            const xv = xData[i];
-            if (yv == null || xv == null) {
-                prevXPx = null;
-                continue;
-            }
-
-            const xPx = this.graph.valToPos(xv as number, "x", true);
-            const yPx = this.graph.valToPos(yv as number, "y", true);
-
-            if (prevXPx === null || Math.abs(xPx - prevXPx) < 1) {
-                line.moveTo(xPx, yPx);
-            } else {
-                line.lineTo(xPx, yPx);
-            }
-
-            prevXPx = xPx;
-        }
+        line.moveTo(xStart, y);
+        line.lineTo(xEnd, y);
 
         return line;
     }
 
+    drawCanvas(u: uPlot, style: { [property: string]: string | number }): void {
+        const { ctx } = u;
+        ctx.save();
+        this.points.forEach((point, idx) => {
+            if (point.min_value === null || point.max_value === null || point.average_value === null) {
+                return;
+            }
+            const isHover = this.currentHoverPeriod === idx;
 
+            ctx.lineWidth = Number(style.bandBorderWidthPx);
+            const x1 = u.valToPos(idx, "x", true);
+            const x2 = u.valToPos(idx + 1, "x", true);
+            const yAverage = u.valToPos(point.average_value, "y", true);
+            const yMin = u.valToPos(point.min_value, "y", true);
+            const yMax = u.valToPos(point.max_value, "y", true);
+            const width = x2 - x1;
+            const height = yMin - yMax;
 
+            // Min - Max Band
+            ctx.fillStyle = isHover ? String(style.bandHoverColor) : String(style.bandColor);
+            ctx.strokeStyle = isHover ? String(style.bandBorderHoverColor) : String(style.bandBorderColor);
+            ctx.fillRect(x1, yMax, width, height);
+            ctx.strokeRect(x1, yMax, width, height);
+
+            // Average Line
+            ctx.lineWidth = Number(style.lineWidthPx);
+            ctx.strokeStyle = isHover ? String(style.lineHoverColor) : String(style.lineColor);
+            const segmentLine = this.getAverageLine(x1, x2, yAverage);
+            ctx.stroke(segmentLine);
+
+        });
+        ctx.restore();
+    }
 }

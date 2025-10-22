@@ -10,8 +10,8 @@ import type { FormattedTimeStep } from "../date";
 
 /**
  * Base interface for logged data points with time range information.
- * @property {string} start_time - ISO timestamp marking the beginning of the logging period
- * @property {string} end_time - ISO timestamp marking the end of the logging period
+ * @property {string} start_time - ISO timestamp or custom string for display marking the beginning of the logging period
+ * @property {string} end_time - ISO timestamp or custom string for display marking the end of the logging period
  */
 export interface BaseLogPoint {
     start_time: string;
