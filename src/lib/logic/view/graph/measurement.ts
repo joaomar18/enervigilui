@@ -44,12 +44,14 @@ export class MeasurementGraphObject extends BaseGraphObject {
                 {
                     // Average line
                     label: "Average",
-                    stroke: String(style.graphAverageLineColor),
-                    width: Number(style.graphAverageLineWidthPx),
+                    //stroke: String(style.lineColor),
+                    stroke: "transparent",
+                    //width: Number(style.lineWidthPx),
+                    width: 0,
                     points: { show: false },
-                    paths: (u, seriesIdx, idx0, idx1) => {
-                        return { stroke: this.getAverageLine(seriesIdx, idx0, idx1) };
-                    },
+                    //paths: (u, seriesIdx, idx0, idx1) => {
+                    //    return { stroke: this.getAverageLine(seriesIdx, idx0, idx1) };
+                    //},
                 },
                 {
                     // Min values (invisible, used for band)
@@ -126,25 +128,31 @@ export class MeasurementGraphObject extends BaseGraphObject {
                     (u) => {
                         const { ctx } = u;
                         ctx.save();
-                        ctx.lineWidth = 1;
-
-                        const hover = this.currentHoverPeriod;
-
                         this.points.forEach((point, idx) => {
                             if (point.min_value === null || point.max_value === null || point.average_value === null) {
                                 return;
                             }
+                            const isHover = this.currentHoverPeriod === idx;
+
+                            ctx.lineWidth = Number(style.bandBorderWidthPx);
                             const x1 = u.valToPos(idx, "x", true);
                             const x2 = u.valToPos(idx + 1, "x", true);
                             const yMin = u.valToPos(point.min_value, "y", true);
                             const yMax = u.valToPos(point.max_value, "y", true);
                             const width = x2 - x1;
                             const height = yMin - yMax;
-                            const isHover = hover === idx;
-                            ctx.fillStyle = isHover ? "rgba(74, 144, 226, 0.25)" : "rgba(74, 144, 226, 0.15)";
-                            ctx.strokeStyle = isHover ? "rgba(74, 144, 226, 0.3)" : "rgba(74, 144, 226, 0.2)";
+                            ctx.fillStyle = isHover ? String(style.bandHoverColor) : String(style.bandColor);
+                            ctx.strokeStyle = isHover ? String(style.bandBorderHoverColor) : String(style.bandBorderColor);
                             ctx.fillRect(x1, yMax, width, height);
                             ctx.strokeRect(x1, yMax, width, height);
+                            ctx.save();
+
+                            ctx.lineWidth = Number(style.lineWidthPx);
+                            ctx.strokeStyle = isHover ? String(style.lineHoverColor) : String(style.lineColor);
+                            const segmentLine = this.getAverageLineSegment(idx);
+                            ctx.stroke(segmentLine);
+
+                            ctx.restore();
                         });
                         ctx.restore();
                     },
@@ -199,6 +207,10 @@ export class MeasurementGraphObject extends BaseGraphObject {
         return { alignedData: [timestampValues, averageValues, minValues, maxValues] };
     }
 
+    getAverageLineSegment(periodIdx: number): Path2D {
+        return this.getAverageLine(1, periodIdx * 2, (periodIdx * 2) + 2);
+    }
+
     getAverageLine(seriesIdx: number, idx0: number, idx1: number): Path2D {
         if (!this.graph) {
             throw new Error(`Graph is not instantiated`);
@@ -231,5 +243,7 @@ export class MeasurementGraphObject extends BaseGraphObject {
 
         return line;
     }
+
+
 
 }

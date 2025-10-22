@@ -46,8 +46,6 @@ const BaseGraphStyleConfig: ComponentStyles = {
         graphPeriodWidthPx: 70,
         graphGridWidthPx: 1,
         graphGridLineColor: "rgba(255, 255, 255, 0.06)",
-        graphAverageLineWidthPx: 1.5,
-        graphAverageLineColor: "rgba(74, 144, 226, 0.85)",
         graphTextColor: "rgba(255, 255, 255, 0.9)",
         graphTextWeight: "500",
         subTextColor: "rgba(255, 255, 255, 0.5)",
@@ -64,7 +62,14 @@ export const BaseGraphStyle = createStyleStore(BaseGraphStyleConfig);
 
 const MeasurementGraphStyleConfig: ComponentStyles = {
     dark: {
-        
+        lineWidthPx: 1.5,
+        lineColor: "rgba(74, 144, 226, 0.85)",
+        bandColor: "rgba(74, 144, 226, 0.15)",
+        bandBorderWidthPx: 1,
+        bandBorderColor: "rgba(74, 144, 226, 0.2)",
+        lineHoverColor: "rgba(74, 144, 226, 1.0)",
+        bandHoverColor: "rgba(74, 144, 226, 0.25)",
+        bandBorderHoverColor: "rgba(74, 144, 226, 0.3)",
     },
 };
 
