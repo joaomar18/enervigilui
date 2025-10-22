@@ -7,7 +7,6 @@
 
     // Texts
     import { texts } from "$lib/stores/lang/generalTexts";
-    import { selectedLang } from "$lib/stores/lang/definition";
 
     // Styles
     import { mergeStyle } from "$lib/style/components";
@@ -21,7 +20,7 @@
     export let graphContainer: HTMLDivElement;
     export let initialDate: Date;
     export let endDate: Date;
-    export let graph: uPlot | null;
+    export let graphCreated: boolean;
     export let graphNoData: boolean;
     export let unit: string = "";
 
@@ -85,11 +84,6 @@
 
     // Variables
     let showDateRange: boolean = false;
-
-    // Reactive Statements
-    $: if (!graph) {
-        showDateRange = false;
-    }
 </script>
 
 <div
@@ -148,7 +142,7 @@
         <div class="unit-div">
             <div class="unit-content">
                 <div class="unit-wrapper">
-                    {#if graph !== null && !graphNoData}
+                    {#if graphCreated && !graphNoData}
                         <span class="unit-label">{unit}</span>
                     {/if}
                 </div>
@@ -157,7 +151,7 @@
         <div class="graph-div" bind:this={graphContainer}>
             <div class="y-axis-inner-div">
                 <div class="y-axis-inner-content">
-                    {#if graph !== null && graphNoData}
+                    {#if graphCreated && graphNoData}
                         <span class="no-data-label">{$texts.noDataAvailable}</span>
                     {/if}
                 </div>

@@ -1,8 +1,6 @@
 <script lang="ts">
-    import uPlot from "uplot";
-    import "uplot/dist/uPlot.min.css";
     import { onDestroy } from "svelte";
-    import { createMeasurementGraph } from "$lib/logic/view/graph";
+    import { MeasurementGraphObject } from "$lib/logic/view/graph/measurement";
     import type { ProcessedMeasurementLogPoint } from "$lib/types/nodes/logs";
     import type { FormattedTimeStep } from "$lib/types/date";
     import type { LogSpanPeriod } from "$lib/types/view/nodes";
@@ -36,27 +34,37 @@
 
     // Variables
     let graphContainer: HTMLDivElement;
-    let graph: uPlot | null;
-    let graphNoData: boolean = false; // Graph has real data to show
+    let graph: MeasurementGraphObject;
+    let created: boolean = false;
+    let noData: boolean = true;
 
     // Reactive Statements
-    $: if (data && graphContainer && $selectedLang) {
-        destroyGraph();
-        ({ graph, graphNoData } = createMeasurementGraph(graphContainer, data, timeStep, logSpanPeriod, mergedStyle));
+    $: if (graphContainer) {
+        createGraphObject();
+    }
+
+    $: if (graph && data && $selectedLang) {
+        updateGraphData();
     }
 
     // Functions
+    function createGraphObject(): void {
+        graph = new MeasurementGraphObject(graphContainer, data);
+    }
 
-    function destroyGraph() {
-        if (graph) {
-            graph.destroy();
-            graph = null;
-        }
+    function updateGraphData(): void {
+        graph.destroy();
+        graph.updatePoints(data);
+        graph.createGraph(timeStep, logSpanPeriod, mergedStyle);
+        created = true;
+        noData = !graph.hasData();
     }
 
     onDestroy(() => {
-        destroyGraph();
+        if (graph) {
+            graph.destroy();
+        }
     });
 </script>
 
-<BaseGraph {height} bind:graphContainer {initialDate} {endDate} {graph} {graphNoData} {unit} />
+<BaseGraph {height} bind:graphContainer {initialDate} {endDate} graphCreated={created} graphNoData={noData} {unit} />
