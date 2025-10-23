@@ -1,6 +1,4 @@
 <script lang="ts">
-    import { computePosition, limitShift, shift, offset } from "@floating-ui/dom";
-
     // Styles
     import { mergeStyle } from "$lib/style/components";
     import { GraphToolTipStyle } from "$lib/style/graph";
@@ -11,7 +9,7 @@
 
     // Props
     export let zIndex: number = 200; // Default z-index
-    export let originalParent: HTMLElement | null = null;
+    export let gridElement: HTMLDivElement;
     export let cursorPos: { x: number | undefined; y: number | undefined };
     export let insideGraph: boolean;
 
@@ -50,59 +48,48 @@
     // Variables
     let parentElement: HTMLElement;
     let tooltipElement: HTMLDivElement;
+    let firstPosUpdate: boolean = false;
 
     // Reactive Statements
-    $: if (tooltipElement) {
-        if (originalParent) {
-            parentElement = originalParent;
-        } else if (tooltipElement.parentElement) {
-            parentElement = tooltipElement.parentElement;
-        } else {
-            throw new Error("Parent element needs to be defined by prop or by dom relationship.");
+    $: if (tooltipElement && gridElement) {
+        if (tooltipElement.parentElement !== gridElement) {
+            gridElement.appendChild(tooltipElement);
         }
+        parentElement = gridElement;
     }
     $: if (cursorPos && cursorPos.x !== undefined && cursorPos.y !== undefined) {
         updatePosition();
     }
-
-    // Functions
-    function makeVirtualRef(x: number, y: number, parent: HTMLElement) {
-        const parentRect = parent.getBoundingClientRect();
-        const cx = parentRect.left + x;
-        const cy = parentRect.top + y;
-        return {
-            getBoundingClientRect: () => new DOMRect(cx, cy, 0, 0),
-        };
+    $: if (!insideGraph) {
+        firstPosUpdate = false;
     }
 
-    async function updatePosition(): Promise<void> {
-        if (!parentElement || !tooltipElement || cursorPos.x === undefined || cursorPos.y === undefined || cursorPos.x < 0 || cursorPos.y < 0) return;
+    // Functions
+    function updatePosition(): void {
+        if (!parentElement || !tooltipElement || cursorPos.x === undefined || cursorPos.y === undefined) return;
 
-        const virtualRef = makeVirtualRef(cursorPos.x, cursorPos.y, parentElement);
+        const padding = parseInt(String(mergedStyle.offsetPx));
+        const parentWidth = parentElement.clientWidth;
+        const parentHeight = parentElement.clientHeight;
+        const tooltipWidth = tooltipElement.offsetWidth;
+        const tooltipHeight = tooltipElement.offsetHeight;
 
-        const { x, y } = await computePosition(virtualRef, tooltipElement, {
-            placement: "top-start",
-            strategy: "absolute",
-            middleware: [
-                offset({ mainAxis: parseInt(String(mergedStyle.offsetPx)) }),
-                shift({
-                    boundary: parentElement,
-                    crossAxis: true,
-                    padding: parseInt(String(mergedStyle.offsetPx)),
-                    limiter: limitShift(),
-                }),
-            ],
-        });
+        let left = cursorPos.x + padding;
+        let top = cursorPos.y + padding;
+        if (left + tooltipWidth + padding > parentWidth) {
+            left = cursorPos.x - tooltipWidth - padding;
+        }
 
-        let finalX = x - parentElement.getBoundingClientRect().left;
-        let finalY = y - parentElement.getBoundingClientRect().top;
+        // Clamp to parent bounds with padding
+        left = Math.max(padding, Math.min(left, parentWidth - tooltipWidth - padding));
+        top = Math.max(padding, Math.min(top, parentHeight - tooltipHeight - padding));
 
         Object.assign(tooltipElement.style, {
-            left: `${finalX}px`,
-            top: `${finalY}px`,
+            left: `${left}px`,
+            top: `${top}px`,
         });
 
-        console.log(parentElement.getBoundingClientRect().left, parentElement.getBoundingClientRect().top);
+        firstPosUpdate = true;
     }
 </script>
 
@@ -125,6 +112,7 @@
         --padding-vertical: {mergedStyle.paddingVertical};
     "
         class="tooltip-div"
+        class:show={firstPosUpdate}
     >
         <div class="content">
             <slot />
@@ -136,6 +124,7 @@
     /* Main tooltip container: positioned absolutely with customizable dimensions and styling */
     .tooltip-div {
         margin: 0;
+        position: absolute;
         width: var(--width);
         min-width: var(--min-width);
         max-width: var(--max-width);
@@ -150,12 +139,17 @@
         padding-top: var(--padding-vertical);
         padding-bottom: var(--padding-vertical);
         pointer-events: none;
-        position: absolute;
+        opacity: 0;
         display: flex;
         flex-direction: column;
         justify-content: start;
         align-items: center;
         z-index: var(--z-index);
+    }
+
+    /* Show tooltip only when position has first been updated */
+    .tooltip-div.show {
+        opacity: 1;
     }
 
     /* Content wrapper: fills the tooltip container */

@@ -8,6 +8,7 @@ export abstract class BaseGraphObject<T extends BaseLogPoint> {
     protected currentHoverPeriod: number = -1;
     protected container: HTMLElement;
     protected graph: uPlot | null = null;
+    protected gridElement: HTMLDivElement | null = null;
     protected labels: Array<string> = [];
     protected noData: boolean = true;
     protected xPos: number | undefined = undefined;
@@ -28,10 +29,15 @@ export abstract class BaseGraphObject<T extends BaseLogPoint> {
         return !this.noData;
     }
 
+    getGridElement(): HTMLDivElement | null {
+        return this.gridElement;
+    }
+
     destroy(): void {
         if (this.graph) {
             this.graph.destroy()
             this.graph = null;
+            this.gridElement = null;
         }
     }
 }

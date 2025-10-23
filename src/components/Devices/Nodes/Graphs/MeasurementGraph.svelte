@@ -36,6 +36,7 @@
     let cursorPos: { x: number | undefined; y: number | undefined } = { x: undefined, y: undefined };
     let graphContainer: HTMLDivElement;
     let graph: MeasurementGraphObject;
+    let gridElement: HTMLDivElement | null = null;
     let created: boolean = false;
     let noData: boolean = true;
     let insideGraph: boolean = false;
@@ -66,6 +67,7 @@
         graph.destroy();
         graph.updatePoints(data);
         graph.createGraph(timeStep, logSpanPeriod, mergedStyle);
+        gridElement = graph.getGridElement();
         created = true;
         noData = !graph.hasData();
     }
@@ -77,4 +79,15 @@
     });
 </script>
 
-<BaseGraph {insideGraph} {cursorPos} {height} bind:graphContainer {initialDate} {endDate} graphCreated={created} graphNoData={noData} {unit} />
+<BaseGraph
+    {gridElement}
+    {insideGraph}
+    {cursorPos}
+    {height}
+    bind:graphContainer
+    {initialDate}
+    {endDate}
+    graphCreated={created}
+    graphNoData={noData}
+    {unit}
+/>

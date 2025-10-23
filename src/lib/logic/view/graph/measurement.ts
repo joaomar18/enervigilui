@@ -113,6 +113,7 @@ export class MeasurementGraphObject extends BaseGraphObject<MeasurementLogPoint>
         };
 
         this.graph = new uPlot(opts, alignedData, this.container);
+        this.gridElement = this.graph.over;
     }
 
     convertDataToGraph(timeStep: FormattedTimeStep, logSpanPeriod: LogSpanPeriod): { alignedData: AlignedData } {

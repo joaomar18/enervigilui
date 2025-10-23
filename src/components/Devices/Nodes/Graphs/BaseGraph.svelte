@@ -16,6 +16,7 @@
     $: effectiveStyle = style ?? $BaseGraphStyle;
 
     // Props
+    export let gridElement: HTMLDivElement | null = null;
     export let insideGraph: boolean;
     export let cursorPos: { x: number | undefined; y: number | undefined };
     export let graphContainer: HTMLDivElement;
@@ -157,7 +158,9 @@
                     {/if}
                 </div>
             </div>
-            <GraphToolTip width="100px" height="300px" {insideGraph} {cursorPos}></GraphToolTip>
+            {#if gridElement}
+                <GraphToolTip width="100px" height="100px" {gridElement} {insideGraph} {cursorPos}></GraphToolTip>
+            {/if}
         </div>
     </div>
 </div>
