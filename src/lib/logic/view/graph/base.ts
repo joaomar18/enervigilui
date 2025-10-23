@@ -3,8 +3,16 @@ import { FormattedTimeStep } from "$lib/types/date";
 import { LogSpanPeriod } from "$lib/types/view/nodes";
 import type { BaseLogPoint } from "$lib/types/nodes/logs";
 
+/**
+ * Graph visualization types for different data representations.
+ */
+export enum GraphType {
+    Measurement = "Measurement",
+    Counter = "Counter",
+}
+
 export abstract class BaseGraphObject<T extends BaseLogPoint> {
-    protected abstract graphType: string;
+    protected abstract graphType: GraphType;
     protected currentHoverPeriod: number = -1;
     protected container: HTMLElement;
     protected graph: uPlot | null = null;
@@ -27,6 +35,10 @@ export abstract class BaseGraphObject<T extends BaseLogPoint> {
 
     hasData(): boolean {
         return !this.noData;
+    }
+
+    getGraphType(): GraphType {
+        return this.graphType;
     }
 
     getGridElement(): HTMLDivElement | null {

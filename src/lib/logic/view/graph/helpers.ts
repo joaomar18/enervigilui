@@ -1,5 +1,9 @@
 import uPlot from "uplot";
 import type { AlignedData } from "uplot";
+import { GraphType } from "./base";
+import type { SvelteComponent } from "svelte";
+import MeasurementToolTip from "../../../../components/Devices/Nodes/Graphs/MeasurementToolTip.svelte";
+import CounterToolTip from "../../../../components/Devices/Nodes/Graphs/CounterToolTip.svelte";
 
 /**
  * Extracts period start timestamps from aligned data for x-axis splits.
@@ -71,4 +75,19 @@ export function yAxisValuesFormatter(): (u: uPlot, splits: number[]) => string[]
         }
         return out;
     };
+}
+
+/**
+ * Returns the appropriate tooltip component for the given graph type.
+ * 
+ * @param graphType - The type of graph
+ * @returns Svelte component constructor for the tooltip
+ */
+export function getGraphToolTipDisplayComponent(graphType: GraphType): typeof SvelteComponent<any> {
+    switch (graphType) {
+        case GraphType.Measurement:
+            return MeasurementToolTip;
+        case GraphType.Counter:
+            return CounterToolTip;
+    }
 }

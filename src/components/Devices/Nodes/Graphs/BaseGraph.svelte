@@ -10,6 +10,9 @@
     import { mergeStyle } from "$lib/style/components";
     import { BaseGraphStyle, GraphActionStyle } from "$lib/style/graph";
     import GraphToolTip from "./GraphToolTip.svelte";
+    import type { BaseLogPoint } from "$lib/types/nodes/logs";
+    import type { GraphType } from "$lib/logic/view/graph/base";
+    import { getGraphToolTipDisplayComponent } from "$lib/logic/view/graph/helpers";
 
     // Style object (from theme)
     export let style: { [property: string]: string | number } | null = null;
@@ -17,6 +20,7 @@
 
     // Props
     export let gridElement: HTMLDivElement | null = null;
+    export let graphType: GraphType;
     export let insideGraph: boolean;
     export let cursorPos: { x: number | undefined; y: number | undefined };
     export let graphContainer: HTMLDivElement;
@@ -24,6 +28,7 @@
     export let endDate: Date;
     export let graphCreated: boolean;
     export let graphNoData: boolean;
+    export let logPoint: BaseLogPoint | null;
     export let unit: string = "";
 
     // Layout / styling props
@@ -158,8 +163,10 @@
                     {/if}
                 </div>
             </div>
-            {#if gridElement}
-                <GraphToolTip width="100px" height="100px" {gridElement} {insideGraph} {cursorPos}></GraphToolTip>
+            {#if graphType && gridElement}
+                <GraphToolTip width="200px" height="fit-content" {gridElement} {insideGraph} {cursorPos}>
+                    <svelte:component this={getGraphToolTipDisplayComponent(graphType)} {logPoint} {unit} />
+                </GraphToolTip>
             {/if}
         </div>
     </div>

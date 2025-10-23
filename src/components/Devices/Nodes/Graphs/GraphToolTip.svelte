@@ -97,20 +97,20 @@
     <div
         bind:this={tooltipElement}
         style="
-        --z-index: {zIndex};
-        --width: {mergedStyle.width};
-        --min-width: {mergedStyle.minWidth};
-        --max-width: {mergedStyle.maxWidth};
-        --height: {mergedStyle.height};
-        --min-height: {mergedStyle.minHeight};
-        --max-height: {mergedStyle.maxHeight};
-        --offset: {mergedStyle.offsetPx};
-        --border: {mergedStyle.border};
-        --border-radius: {mergedStyle.borderRadius};
-        --background-color: {mergedStyle.backgroundColor};
-        --padding-horizontal: {mergedStyle.paddingHorizontal};
-        --padding-vertical: {mergedStyle.paddingVertical};
-    "
+            --z-index: {zIndex};
+            --width: {mergedStyle.width};
+            --min-width: {mergedStyle.minWidth};
+            --max-width: {mergedStyle.maxWidth};
+            --height: {mergedStyle.height};
+            --min-height: {mergedStyle.minHeight};
+            --max-height: {mergedStyle.maxHeight};
+            --offset: {mergedStyle.offsetPx};
+            --border: {mergedStyle.border};
+            --border-radius: {mergedStyle.borderRadius};
+            --background-color: {mergedStyle.backgroundColor};
+            --padding-horizontal: {mergedStyle.paddingHorizontal};
+            --padding-vertical: {mergedStyle.paddingVertical};
+        "
         class="tooltip-div"
         class:show={firstPosUpdate}
     >

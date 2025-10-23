@@ -96,3 +96,18 @@ const GraphToolTipStyleConfig: ComponentStyles = {
 };
 
 export const GraphToolTipStyle = createStyleStore(GraphToolTipStyleConfig);
+
+//////////     M E A S U R E M E N T     T O O L     T I P     //////////
+
+const MeasurementToolTipStyleConfig: ComponentStyles = {
+    dark: {
+        rowGap: "4px",
+        textSize: "13px",
+        labelColor: "rgba(255, 255, 255, 0.7)",
+        labelWeight: "400",
+        valueColor: "rgba(255, 255, 255, 0.95)",
+        valueWeight: "500",
+    },
+};
+
+export const MeasurementToolTipStyle = createStyleStore(MeasurementToolTipStyleConfig);

@@ -11,6 +11,7 @@
 
     // Styles
     import { MeasurementGraphStyle, BaseGraphStyle } from "$lib/style/graph";
+    import type { GraphType } from "$lib/logic/view/graph/base";
 
     // Style object (from theme)
     export let baseStyle: { [property: string]: string | number } | null = null;
@@ -37,9 +38,11 @@
     let graphContainer: HTMLDivElement;
     let graph: MeasurementGraphObject;
     let gridElement: HTMLDivElement | null = null;
+    let graphType: GraphType;
     let created: boolean = false;
     let noData: boolean = true;
     let insideGraph: boolean = false;
+    let currentLogPoint: MeasurementLogPoint | null = null;
 
     // Reactive Statements
     $: if (graphContainer) {
@@ -53,10 +56,12 @@
     // Functions
     function createGraphObject(): void {
         graph = new MeasurementGraphObject(graphContainer, hoveredLogPointChange, mousePositionChange, data);
+        graphType = graph.getGraphType();
     }
 
     function hoveredLogPointChange(logPoint: MeasurementLogPoint | null): void {
         insideGraph = !!logPoint;
+        currentLogPoint = logPoint;
     }
 
     function mousePositionChange(xPos: number | undefined, yPos: number | undefined): void {
@@ -81,6 +86,7 @@
 
 <BaseGraph
     {gridElement}
+    {graphType}
     {insideGraph}
     {cursorPos}
     {height}
@@ -89,5 +95,6 @@
     {endDate}
     graphCreated={created}
     graphNoData={noData}
+    logPoint={currentLogPoint}
     {unit}
 />

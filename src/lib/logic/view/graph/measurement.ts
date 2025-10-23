@@ -1,15 +1,16 @@
 import uPlot, { type AlignedData } from "uplot";
 import { getRootFontFamily } from "$lib/logic/util/style";
 import { getGraphSize, getGraphTimeSplits, yAxisValuesFormatter } from "./helpers";
-import { BaseGraphObject } from "./base";
+import { BaseGraphObject, GraphType } from "./base";
 import { FormattedTimeStep } from "$lib/types/date";
 import { LogSpanPeriod } from "$lib/types/view/nodes";
-import type { MeasurementLogPoint, ProcessedMeasurementLogPoint } from "$lib/types/nodes/logs";
 import { timeStepFormatters } from "$lib/types/date";
 import { getElegantStringFromDate } from "$lib/logic/util/date";
+import type { MeasurementLogPoint, ProcessedMeasurementLogPoint } from "$lib/types/nodes/logs";
+
 
 export class MeasurementGraphObject extends BaseGraphObject<MeasurementLogPoint> {
-    protected graphType = "measurement";
+    protected graphType = GraphType.Measurement;
     protected points: Array<ProcessedMeasurementLogPoint>;
     public hoveredLogPoint: MeasurementLogPoint | null = null;
 
