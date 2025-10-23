@@ -13,8 +13,8 @@ export class MeasurementGraphObject extends BaseGraphObject<MeasurementLogPoint>
     protected points: Array<ProcessedMeasurementLogPoint>;
     public hoveredLogPoint: MeasurementLogPoint | null = null;
 
-    constructor(container: HTMLElement, hoveredLogPointChange: ((logPoint: MeasurementLogPoint | null) => void) | null, points: Array<ProcessedMeasurementLogPoint>) {
-        super(container, hoveredLogPointChange);
+    constructor(container: HTMLElement, hoveredLogPointChange: ((logPoint: MeasurementLogPoint | null) => void) | null, mousePositionChange: ((xPos: number | undefined, yPos: number | undefined) => void) | null, points: Array<ProcessedMeasurementLogPoint>) {
+        super(container, hoveredLogPointChange, mousePositionChange);
         this.points = points;
     }
 
@@ -100,7 +100,8 @@ export class MeasurementGraphObject extends BaseGraphObject<MeasurementLogPoint>
             hooks: {
                 setCursor: [
                     (u) => {
-                        this.currentHoverPeriod = this.getHoveredPeriod(u, this.currentHoverPeriod);
+                        this.getCursorPosition(u);
+                        this.getHoveredPeriod(u);
                     },
                 ],
                 draw: [
@@ -158,16 +159,23 @@ export class MeasurementGraphObject extends BaseGraphObject<MeasurementLogPoint>
         return { alignedData: [timestampValues, averageValues, minValues, maxValues] };
     }
 
-    getHoveredPeriod(u: uPlot, current: number): number {
-        const left = u.cursor.left;
-        if (left != null && left >= 0) { // Valid Left Value
-            const xVal = u.posToVal(left, "x");
+    getCursorPosition(u: uPlot): void {
+        this.xPos = u.cursor.left;
+        this.yPos = u.cursor.top;
+        if (this.mousePositionChangeCallback) {
+            this.mousePositionChangeCallback(this.xPos, this.yPos);
+        }
+    }
+
+    getHoveredPeriod(u: uPlot): void {
+        if (this.xPos !== undefined && this.xPos >= 0) { // Valid Cursor position
+            const xVal = u.posToVal(this.xPos, "x");
             const hoverPeriod = Math.floor(xVal);
 
             if (hoverPeriod >= 0 && hoverPeriod < this.points.length) {
-                if (current !== hoverPeriod) {
-                    current = hoverPeriod;
-                    this.hoveredLogPoint = this.getHoveredLogPoint(current);
+                if (this.currentHoverPeriod !== hoverPeriod) {
+                    this.currentHoverPeriod = hoverPeriod;
+                    this.hoveredLogPoint = this.getHoveredLogPoint(this.currentHoverPeriod);
                     if (this.hoveredLogPointCallback) {
                         this.hoveredLogPointCallback(this.hoveredLogPoint);
                     }
@@ -175,16 +183,15 @@ export class MeasurementGraphObject extends BaseGraphObject<MeasurementLogPoint>
                 }
             }
         } else { // Cursor outside Graph
-            if (current !== -1) {
-                current = -1;
-                this.hoveredLogPoint = this.getHoveredLogPoint(current);
+            if (this.currentHoverPeriod !== -1) {
+                this.currentHoverPeriod = -1;
+                this.hoveredLogPoint = this.getHoveredLogPoint(this.currentHoverPeriod);
                 if (this.hoveredLogPointCallback) {
                     this.hoveredLogPointCallback(this.hoveredLogPoint);
                 }
                 u.redraw();
             }
         }
-        return current;
     }
 
     getHoveredLogPoint(index: number): MeasurementLogPoint | null {

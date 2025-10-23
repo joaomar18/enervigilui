@@ -10,11 +10,15 @@ export abstract class BaseGraphObject<T extends BaseLogPoint> {
     protected graph: uPlot | null = null;
     protected labels: Array<string> = [];
     protected noData: boolean = true;
+    protected xPos: number | undefined = undefined;
+    protected yPos: number | undefined = undefined;
     protected hoveredLogPointCallback: ((logPoint: T | null) => void) | null = null;
+    protected mousePositionChangeCallback: ((xPos: number | undefined, yPos: number | undefined) => void) | null = null;
 
-    constructor(container: HTMLElement, hoveredLogPointChange: ((logPoint: T | null) => void) | null) {
+    constructor(container: HTMLElement, hoveredLogPointChange: ((logPoint: T | null) => void) | null, mousePositionChange: ((xPos: number | undefined, yPos: number | undefined) => void) | null) {
         this.container = container;
         this.hoveredLogPointCallback = hoveredLogPointChange;
+        this.mousePositionChangeCallback = mousePositionChange;
     }
 
     // Abstract methods (subclasses must implement)

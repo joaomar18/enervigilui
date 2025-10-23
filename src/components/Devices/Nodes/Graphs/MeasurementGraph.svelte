@@ -33,10 +33,12 @@
     $: mergedStyle = Object.assign(effectiveBaseStyle, effectiveStyle);
 
     // Variables
+    let cursorPos: { x: number | undefined; y: number | undefined } = { x: undefined, y: undefined };
     let graphContainer: HTMLDivElement;
     let graph: MeasurementGraphObject;
     let created: boolean = false;
     let noData: boolean = true;
+    let insideGraph: boolean = false;
 
     // Reactive Statements
     $: if (graphContainer) {
@@ -49,11 +51,15 @@
 
     // Functions
     function createGraphObject(): void {
-        graph = new MeasurementGraphObject(graphContainer, hoveredLogPointChange, data);
+        graph = new MeasurementGraphObject(graphContainer, hoveredLogPointChange, mousePositionChange, data);
     }
 
     function hoveredLogPointChange(logPoint: MeasurementLogPoint | null): void {
-        console.log(logPoint);
+        insideGraph = !!logPoint;
+    }
+
+    function mousePositionChange(xPos: number | undefined, yPos: number | undefined): void {
+        cursorPos = { x: xPos, y: yPos };
     }
 
     function updateGraphData(): void {
@@ -71,4 +77,4 @@
     });
 </script>
 
-<BaseGraph {height} bind:graphContainer {initialDate} {endDate} graphCreated={created} graphNoData={noData} {unit} />
+<BaseGraph {insideGraph} {cursorPos} {height} bind:graphContainer {initialDate} {endDate} graphCreated={created} graphNoData={noData} {unit} />

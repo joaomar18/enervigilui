@@ -1,25 +1,19 @@
 <script lang="ts">
-    import { onDestroy } from "svelte";
-    import { computePosition, flip, shift, offset } from "@floating-ui/dom";
-    import { fade } from "svelte/transition";
-    import { hasMouseCapability } from "$lib/stores/view/navigation";
+    import { computePosition, limitShift, shift, offset } from "@floating-ui/dom";
 
     // Styles
     import { mergeStyle } from "$lib/style/components";
-    import { ToolTipStyle } from "$lib/style/general";
+    import { GraphToolTipStyle } from "$lib/style/graph";
 
     // Style object (from theme)
     export let style: { [property: string]: string | number } | null = null;
-    $: effectiveStyle = style ?? $ToolTipStyle;
+    $: effectiveStyle = style ?? $GraphToolTipStyle;
 
     // Props
     export let zIndex: number = 200; // Default z-index
     export let originalParent: HTMLElement | null = null;
-    export let pushToTop: boolean = false;
-    export let autoPosition: boolean = true;
-    export let autoPositionContinuous: boolean = false;
-    export let forceShowMobile: boolean = false;
-    export let showToolTip: boolean;
+    export let cursorPos: { x: number | undefined; y: number | undefined };
+    export let insideGraph: boolean;
 
     // Layout / styling props
     export let width: string | undefined = undefined;
@@ -34,7 +28,6 @@
     export let backgroundColor: string | undefined = undefined;
     export let paddingHorizontal: string | undefined = undefined;
     export let paddingVertical: string | undefined = undefined;
-    export let animationTime: number | undefined = undefined;
 
     $: localOverrides = {
         width,
@@ -49,7 +42,6 @@
         backgroundColor,
         paddingHorizontal,
         paddingVertical,
-        animationTime,
     };
 
     // Merged style
@@ -58,14 +50,8 @@
     // Variables
     let parentElement: HTMLElement;
     let tooltipElement: HTMLDivElement;
-    let animationTimeNumber: number;
-    let eventListenersDefined: boolean = false;
-    let enableUpdatePosition: boolean = false;
 
     // Reactive Statements
-    $: animationTimeNumber = parseInt(String(mergedStyle.animationTime));
-    $: enableUpdatePosition = showToolTip && tooltipElement && parentElement && autoPosition && ($hasMouseCapability || forceShowMobile);
-
     $: if (tooltipElement) {
         if (originalParent) {
             parentElement = originalParent;
@@ -75,59 +61,54 @@
             throw new Error("Parent element needs to be defined by prop or by dom relationship.");
         }
     }
-
-    $: if (enableUpdatePosition) {
+    $: if (cursorPos && cursorPos.x !== undefined && cursorPos.y !== undefined) {
         updatePosition();
     }
 
-    $: if (autoPositionContinuous && enableUpdatePosition && !eventListenersDefined) {
-        window.addEventListener("resize", updatePosition);
-        window.addEventListener("scroll", updatePosition);
-        eventListenersDefined = true;
-    }
-
-    $: if (!enableUpdatePosition && eventListenersDefined) {
-        window.removeEventListener("resize", updatePosition);
-        window.removeEventListener("scroll", updatePosition);
-        eventListenersDefined = false;
-    }
-
     // Functions
-    async function updatePosition(): Promise<void> {
-        if (!parentElement || !tooltipElement) return;
+    function makeVirtualRef(x: number, y: number, parent: HTMLElement) {
+        const parentRect = parent.getBoundingClientRect();
+        const cx = parentRect.left + x;
+        const cy = parentRect.top + y;
+        return {
+            getBoundingClientRect: () => new DOMRect(cx, cy, 0, 0),
+        };
+    }
 
-        const { x, y } = await computePosition(parentElement, tooltipElement, {
-            placement: pushToTop ? "top" : "bottom",
-            middleware: [offset({ mainAxis: parseInt(String(mergedStyle.offsetPx)) }), flip(), shift({ padding: parseInt(String(mergedStyle.offsetPx)) })],
+    async function updatePosition(): Promise<void> {
+        if (!parentElement || !tooltipElement || cursorPos.x === undefined || cursorPos.y === undefined || cursorPos.x < 0 || cursorPos.y < 0) return;
+
+        const virtualRef = makeVirtualRef(cursorPos.x, cursorPos.y, parentElement);
+
+        const { x, y } = await computePosition(virtualRef, tooltipElement, {
+            placement: "top-start",
+            strategy: "absolute",
+            middleware: [
+                offset({ mainAxis: parseInt(String(mergedStyle.offsetPx)) }),
+                shift({
+                    boundary: parentElement,
+                    crossAxis: true,
+                    padding: parseInt(String(mergedStyle.offsetPx)),
+                    limiter: limitShift(),
+                }),
+            ],
         });
+
+        let finalX = x - parentElement.getBoundingClientRect().left;
+        let finalY = y - parentElement.getBoundingClientRect().top;
 
         Object.assign(tooltipElement.style, {
-            left: `${x}px`,
-            top: `${y}px`,
+            left: `${finalX}px`,
+            top: `${finalY}px`,
         });
-    }
 
-    onDestroy(() => {
-        if (eventListenersDefined) {
-            window.removeEventListener("resize", updatePosition);
-            window.removeEventListener("scroll", updatePosition);
-        }
-    });
+        console.log(parentElement.getBoundingClientRect().left, parentElement.getBoundingClientRect().top);
+    }
 </script>
 
-<!--
-  ToolTip component
-
-  A customizable tooltip that appears on hover or when triggered.
-  - Automatically positions itself above or below the trigger element based on available space.
-  - Supports horizontal alignment (left, center, right) to stay within viewport bounds.
-  - Fade in/out animation with configurable duration.
-  - Only shows on devices with mouse capability unless forceShowMobile is true.
--->
-{#if showToolTip && ($hasMouseCapability || forceShowMobile)}
+{#if insideGraph}
     <div
         bind:this={tooltipElement}
-        transition:fade={{ duration: animationTimeNumber }}
         style="
         --z-index: {zIndex};
         --width: {mergedStyle.width};
@@ -168,6 +149,7 @@
         padding-right: var(--padding-horizontal);
         padding-top: var(--padding-vertical);
         padding-bottom: var(--padding-vertical);
+        pointer-events: none;
         position: absolute;
         display: flex;
         flex-direction: column;

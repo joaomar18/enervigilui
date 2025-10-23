@@ -75,3 +75,24 @@ const MeasurementGraphStyleConfig: ComponentStyles = {
 
 export const MeasurementGraphStyle = createStyleStore(MeasurementGraphStyleConfig);
 
+
+//////////     G R A P H     T O O L     T I P     //////////
+
+const GraphToolTipStyleConfig: ComponentStyles = {
+    dark: {
+        width: "fit-content",
+        minWidth: "auto",
+        maxWidth: "300px",
+        height: "fit-content",
+        minHeight: "auto",
+        maxHeight: "300px",
+        offsetPx: "10px",
+        border: "1px solid #3a4149",
+        borderRadius: "10px",
+        backgroundColor: "#0a0c0f",
+        paddingHorizontal: "10px",
+        paddingVertical: "10px",
+    },
+};
+
+export const GraphToolTipStyle = createStyleStore(GraphToolTipStyleConfig);

@@ -1,6 +1,4 @@
 <script lang="ts">
-    import uPlot from "uplot";
-    import "uplot/dist/uPlot.min.css";
     import Action from "../../../General/Action.svelte";
     import ToolTipText from "../../../General/ToolTipText.svelte";
     import DateRangeChecker from "../../../General/TimeDate/DateRangeChecker.svelte";
@@ -11,12 +9,15 @@
     // Styles
     import { mergeStyle } from "$lib/style/components";
     import { BaseGraphStyle, GraphActionStyle } from "$lib/style/graph";
+    import GraphToolTip from "./GraphToolTip.svelte";
 
     // Style object (from theme)
     export let style: { [property: string]: string | number } | null = null;
     $: effectiveStyle = style ?? $BaseGraphStyle;
 
     // Props
+    export let insideGraph: boolean;
+    export let cursorPos: { x: number | undefined; y: number | undefined };
     export let graphContainer: HTMLDivElement;
     export let initialDate: Date;
     export let endDate: Date;
@@ -156,6 +157,7 @@
                     {/if}
                 </div>
             </div>
+            <GraphToolTip width="100px" height="300px" {insideGraph} {cursorPos}></GraphToolTip>
         </div>
     </div>
 </div>
