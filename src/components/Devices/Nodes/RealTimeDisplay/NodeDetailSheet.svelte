@@ -441,6 +441,11 @@
                                     timeStep={nodeLogs.time_step}
                                     logSpanPeriod={selectedHistoryTimeSpan}
                                     unit={nodeLogs.unit}
+                                    getNewTimeSpan={(initial_date: Date, end_date: Date) => {
+                                        setDateSpan({ initial_date, end_date });
+                                        loadNodeLogs(initial_date, end_date);
+                                        selectedHistoryTimeSpan = LogSpanPeriod.customDate;
+                                    }}
                                 />
                             {/if}
                         </div>

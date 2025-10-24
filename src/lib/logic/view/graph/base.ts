@@ -23,15 +23,18 @@ export abstract class BaseGraphObject<T extends BaseLogPoint> {
     protected yPos: number | undefined = undefined;
     protected hoveredLogPointCallback: ((logPoint: T | null) => void) | null = null;
     protected mousePositionChangeCallback: ((xPos: number | undefined, yPos: number | undefined) => void) | null = null;
+    protected gridDoubleClickCallback: ((startTime: Date, endTime: Date) => void) | null = null;
 
-    constructor(container: HTMLElement, hoveredLogPointChange: ((logPoint: T | null) => void) | null, mousePositionChange: ((xPos: number | undefined, yPos: number | undefined) => void) | null) {
+    constructor(container: HTMLElement, hoveredLogPointChange: ((logPoint: T | null) => void) | null, mousePositionChange: ((xPos: number | undefined, yPos: number | undefined) => void) | null, gridDoubleClick: ((startTime: Date, endTime: Date) => void) | null) {
         this.container = container;
         this.hoveredLogPointCallback = hoveredLogPointChange;
         this.mousePositionChangeCallback = mousePositionChange;
+        this.gridDoubleClickCallback = gridDoubleClick;
     }
 
     // Abstract methods (subclasses must implement)
     abstract createGraph(timeStep: FormattedTimeStep, logSpanPeriod: LogSpanPeriod, style: { [property: string]: string | number },): void;
+    abstract processGridDoubleClick(): void;
 
     hasData(): boolean {
         return !this.noData;
@@ -47,6 +50,9 @@ export abstract class BaseGraphObject<T extends BaseLogPoint> {
 
     destroy(): void {
         if (this.graph) {
+            if (this.gridElement && this.gridDoubleClickCallback) {
+                this.gridElement.removeEventListener("dblclick", () => this.processGridDoubleClick());
+            }
             this.graph.destroy()
             this.graph = null;
             this.gridElement = null;

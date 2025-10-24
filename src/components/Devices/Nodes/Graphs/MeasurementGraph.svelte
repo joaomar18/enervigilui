@@ -53,9 +53,12 @@
         updateGraphData();
     }
 
+    // Export Functions
+    export let getNewTimeSpan: (startTime: Date, endTime: Date) => void;
+
     // Functions
     function createGraphObject(): void {
-        graph = new MeasurementGraphObject(graphContainer, hoveredLogPointChange, mousePositionChange, data);
+        graph = new MeasurementGraphObject(graphContainer, hoveredLogPointChange, mousePositionChange, gridDoubleClick, data);
         graphType = graph.getGraphType();
     }
 
@@ -66,6 +69,10 @@
 
     function mousePositionChange(xPos: number | undefined, yPos: number | undefined): void {
         cursorPos = { x: xPos, y: yPos };
+    }
+
+    function gridDoubleClick(startTime: Date, endTime: Date): void {
+        getNewTimeSpan(startTime, endTime);
     }
 
     function updateGraphData(): void {

@@ -14,8 +14,8 @@ export class MeasurementGraphObject extends BaseGraphObject<MeasurementLogPoint>
     protected points: Array<ProcessedMeasurementLogPoint>;
     public hoveredLogPoint: MeasurementLogPoint | null = null;
 
-    constructor(container: HTMLElement, hoveredLogPointChange: ((logPoint: MeasurementLogPoint | null) => void) | null, mousePositionChange: ((xPos: number | undefined, yPos: number | undefined) => void) | null, points: Array<ProcessedMeasurementLogPoint>) {
-        super(container, hoveredLogPointChange, mousePositionChange);
+    constructor(container: HTMLElement, hoveredLogPointChange: ((logPoint: MeasurementLogPoint | null) => void) | null, mousePositionChange: ((xPos: number | undefined, yPos: number | undefined) => void) | null, gridDoubleClick: ((startTime: Date, endTime: Date) => void) | null, points: Array<ProcessedMeasurementLogPoint>) {
+        super(container, hoveredLogPointChange, mousePositionChange, gridDoubleClick);
         this.points = points;
     }
 
@@ -115,6 +115,9 @@ export class MeasurementGraphObject extends BaseGraphObject<MeasurementLogPoint>
 
         this.graph = new uPlot(opts, alignedData, this.container);
         this.gridElement = this.graph.over;
+        if (this.gridDoubleClickCallback) {
+            this.gridElement.addEventListener("dblclick", () => this.processGridDoubleClick());
+        }
     }
 
     convertDataToGraph(timeStep: FormattedTimeStep, logSpanPeriod: LogSpanPeriod): { alignedData: AlignedData } {
@@ -197,9 +200,8 @@ export class MeasurementGraphObject extends BaseGraphObject<MeasurementLogPoint>
     }
 
     getHoveredLogPoint(index: number, timeStep: FormattedTimeStep): MeasurementLogPoint | null {
-        if (index < 0 || index >= this.points.length) {
-            return null;
-        }
+        if (!this.points || index < 0 || index >= this.points.length) return null;
+        
         return {
             start_time: getElegantShortStringFromDate(new Date(this.points[index].start_time * 1000), timeStep),
             end_time: getElegantShortStringFromDate(new Date(this.points[index].end_time * 1000), timeStep),
@@ -207,6 +209,20 @@ export class MeasurementGraphObject extends BaseGraphObject<MeasurementLogPoint>
             max_value: this.points[index].max_value,
             average_value: this.points[index].average_value,
         } as MeasurementLogPoint;
+    }
+
+    processGridDoubleClick(): void {
+        if (!this.points || this.currentHoverPeriod < 0 || this.currentHoverPeriod >= this.points.length) return;
+
+        const index = this.currentHoverPeriod;
+        const noData = this.points[index].min_value === null || this.points[index].average_value === null || this.points[index].max_value === null;
+        if (noData) return;
+
+        if (this.gridDoubleClickCallback) {
+            const startTime = new Date(this.points[index].start_time * 1000);
+            const endTime = new Date(this.points[index].end_time * 1000);
+            this.gridDoubleClickCallback(startTime, endTime);
+        }
     }
 
     getAverageLine(xStart: number, xEnd: number, y: number): Path2D {
