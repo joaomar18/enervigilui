@@ -1,6 +1,6 @@
 import { get } from "svelte/store";
 import { selectedLang } from "$lib/stores/lang/definition";
-import type { DateTimeField } from "$lib/types/date";
+import { FormattedTimeStep, type DateTimeField } from "$lib/types/date";
 import { LogSpanPeriod } from "$lib/types/view/nodes";
 
 
@@ -212,7 +212,7 @@ export function convertISOToTimestamp(date: string): number {
 export function getElegantStringFromDate(date: Date): string {
 
     const dayOfWeek = date.toLocaleDateString(get(selectedLang), { weekday: "short" });
-    const dayOfMonth = date.getDate();
+    const dayOfMonth = String(date.getDate()).padStart(2, "0");
     const month = date.toLocaleDateString(get(selectedLang), { month: "short" });
     const year = date.getFullYear();
     const time = date.toLocaleTimeString(get(selectedLang), {
@@ -222,4 +222,38 @@ export function getElegantStringFromDate(date: Date): string {
     });
 
     return `${dayOfWeek} ${dayOfMonth} ${month} ${year}, ${time}`;
+}
+
+/**
+ * Formats a date into a compact string appropriate for different time steps in tooltips.
+ * @param date - Date object to format
+ * @param timeStep - The time granularity to determine format detail level
+ * @returns Compact formatted string optimized for tooltip display
+ */
+export function getElegantShortStringFromDate(date: Date, timeStep: FormattedTimeStep): string {
+    const lang = get(selectedLang);
+
+    switch (timeStep) {
+        case FormattedTimeStep._1m:
+        case FormattedTimeStep._15m:
+        case FormattedTimeStep._1h:
+            return date.toLocaleTimeString(lang, {
+                hour: "2-digit",
+                minute: "2-digit",
+                hour12: false
+            });
+
+        case FormattedTimeStep._1d:
+            const dayOfWeek = date.toLocaleDateString(lang, { weekday: "short" });
+            const day = String(date.getDate()).padStart(2, "0");
+            return `${dayOfWeek} ${day} `;
+
+        case FormattedTimeStep._1M:
+            const month = date.toLocaleDateString(lang, { month: "short" });
+            const year = date.getFullYear();
+            return `${month} ${year} `;
+
+        case FormattedTimeStep._1Y:
+            return date.getFullYear().toString();
+    }
 }

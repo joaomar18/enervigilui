@@ -164,7 +164,7 @@
                 </div>
             </div>
             {#if graphType && gridElement}
-                <GraphToolTip width="200px" height="fit-content" {gridElement} {insideGraph} {cursorPos}>
+                <GraphToolTip width="175px" height="fit-content" {gridElement} {insideGraph} {cursorPos}>
                     <svelte:component this={getGraphToolTipDisplayComponent(graphType)} {logPoint} {unit} />
                 </GraphToolTip>
             {/if}

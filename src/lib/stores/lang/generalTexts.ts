@@ -463,6 +463,18 @@ const textsObject: TextsObject = {
         PT: "Valor Máximo",
         EN: "Maximum Value",
     },
+    minValueShort: {
+        PT: "Mín",
+        EN: "Min",
+    },
+    maxValueShort: {
+        PT: "Máx",
+        EN: "Max",
+    },
+    averageValueShort: {
+        PT: "Méd",
+        EN: "Avg",
+    },
     section: {
         PT: "Secção",
         EN: "Section",
@@ -785,11 +797,15 @@ const textsObject: TextsObject = {
     },
     toDate: {
         PT: "Até",
-        EN: "to",
+        EN: "To",
     },
     noDataAvailable: {
         PT: "Sem dados disponíveis",
         EN: "No data available",
+    },
+    noDataAvailableShort: {
+        PT: "Sem dados",
+        EN: "No data",
     },
     fullscreen: {
         PT: "Ecrã Inteiro",

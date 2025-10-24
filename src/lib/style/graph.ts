@@ -103,10 +103,17 @@ const MeasurementToolTipStyleConfig: ComponentStyles = {
     dark: {
         rowGap: "4px",
         textSize: "13px",
+        labelWidth: "30px",
         labelColor: "rgba(255, 255, 255, 0.7)",
         labelWeight: "400",
+        valueRightPadding: "5px",
         valueColor: "rgba(255, 255, 255, 0.95)",
         valueWeight: "500",
+        unitMaxWidth: "35px",
+        unitColor: "rgba(255, 255, 255, 0.6)",
+        unitWeight: "400",
+        noDataLabelColor: "rgba(255, 255, 255, 0.5)",
+        noDataLabelWeight: "400",
     },
 };
 

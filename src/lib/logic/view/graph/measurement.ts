@@ -5,7 +5,7 @@ import { BaseGraphObject, GraphType } from "./base";
 import { FormattedTimeStep } from "$lib/types/date";
 import { LogSpanPeriod } from "$lib/types/view/nodes";
 import { timeStepFormatters } from "$lib/types/date";
-import { getElegantStringFromDate } from "$lib/logic/util/date";
+import { getElegantShortStringFromDate } from "$lib/logic/util/date";
 import type { MeasurementLogPoint, ProcessedMeasurementLogPoint } from "$lib/types/nodes/logs";
 
 
@@ -102,7 +102,7 @@ export class MeasurementGraphObject extends BaseGraphObject<MeasurementLogPoint>
                 setCursor: [
                     (u) => {
                         this.getCursorPosition(u);
-                        this.getHoveredPeriod(u);
+                        this.getHoveredPeriod(u, timeStep);
                     },
                 ],
                 draw: [
@@ -169,7 +169,7 @@ export class MeasurementGraphObject extends BaseGraphObject<MeasurementLogPoint>
         }
     }
 
-    getHoveredPeriod(u: uPlot): void {
+    getHoveredPeriod(u: uPlot, timeStep: FormattedTimeStep): void {
         if (this.xPos !== undefined && this.xPos >= 0) { // Valid Cursor position
             const xVal = u.posToVal(this.xPos, "x");
             const hoverPeriod = Math.floor(xVal);
@@ -177,7 +177,7 @@ export class MeasurementGraphObject extends BaseGraphObject<MeasurementLogPoint>
             if (hoverPeriod >= 0 && hoverPeriod < this.points.length) {
                 if (this.currentHoverPeriod !== hoverPeriod) {
                     this.currentHoverPeriod = hoverPeriod;
-                    this.hoveredLogPoint = this.getHoveredLogPoint(this.currentHoverPeriod);
+                    this.hoveredLogPoint = this.getHoveredLogPoint(this.currentHoverPeriod, timeStep);
                     if (this.hoveredLogPointCallback) {
                         this.hoveredLogPointCallback(this.hoveredLogPoint);
                     }
@@ -187,7 +187,7 @@ export class MeasurementGraphObject extends BaseGraphObject<MeasurementLogPoint>
         } else { // Cursor outside Graph
             if (this.currentHoverPeriod !== -1) {
                 this.currentHoverPeriod = -1;
-                this.hoveredLogPoint = this.getHoveredLogPoint(this.currentHoverPeriod);
+                this.hoveredLogPoint = this.getHoveredLogPoint(this.currentHoverPeriod, timeStep);
                 if (this.hoveredLogPointCallback) {
                     this.hoveredLogPointCallback(this.hoveredLogPoint);
                 }
@@ -196,13 +196,13 @@ export class MeasurementGraphObject extends BaseGraphObject<MeasurementLogPoint>
         }
     }
 
-    getHoveredLogPoint(index: number): MeasurementLogPoint | null {
+    getHoveredLogPoint(index: number, timeStep: FormattedTimeStep): MeasurementLogPoint | null {
         if (index < 0 || index >= this.points.length) {
             return null;
         }
         return {
-            start_time: getElegantStringFromDate(new Date(this.points[index].start_time * 1000)),
-            end_time: getElegantStringFromDate(new Date(this.points[index].end_time * 1000)),
+            start_time: getElegantShortStringFromDate(new Date(this.points[index].start_time * 1000), timeStep),
+            end_time: getElegantShortStringFromDate(new Date(this.points[index].end_time * 1000), timeStep),
             min_value: this.points[index].min_value,
             max_value: this.points[index].max_value,
             average_value: this.points[index].average_value,
