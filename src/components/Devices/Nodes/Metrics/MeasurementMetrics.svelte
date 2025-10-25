@@ -8,7 +8,4 @@
 
     // Layout / styling props
     export let fontSize: string | undefined = undefined;
-    
-
-
 </script>
