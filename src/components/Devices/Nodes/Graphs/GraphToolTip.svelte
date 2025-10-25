@@ -93,6 +93,15 @@
     }
 </script>
 
+<!--
+    GraphToolTip Component
+    
+    A specialized tooltip component designed for graph overlays with manual positioning.
+    Features DOM portaling into uPlot's u-over element, boundary-aware positioning with
+    configurable offsets, and real-time cursor tracking. Handles coordinate system integration
+    with graph libraries and provides padding-aware positioning to prevent tooltip overflow.
+    Supports comprehensive theming and conditional rendering based on graph interaction state.
+-->
 {#if insideGraph}
     <div
         bind:this={tooltipElement}
@@ -121,7 +130,7 @@
 {/if}
 
 <style>
-    /* Main tooltip container: positioned absolutely with customizable dimensions and styling */
+    /* Main tooltip container - Absolutely positioned overlay with manual coordinate tracking */
     .tooltip-div {
         margin: 0;
         position: absolute;
@@ -147,12 +156,12 @@
         z-index: var(--z-index);
     }
 
-    /* Show tooltip only when position has first been updated */
+    /* Visible state - Applied when tooltip should be displayed to user */
     .tooltip-div.show {
         opacity: 1;
     }
 
-    /* Content wrapper: fills the tooltip container */
+    /* Content wrapper - Container for tooltip children with full dimensions */
     .content {
         position: relative;
         margin: 0;

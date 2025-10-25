@@ -70,13 +70,13 @@
 </script>
 
 <!--
-    DateField Component
+    TimeField Component
     
-    A flexible date input component that allows selective display of year, month, and day fields.
-    Features smart 2-digit year conversion, dynamic day validation based on month/year, and 
-    comprehensive styling support. Handles focus states, validation errors, and provides
-    seamless integration with form validation systems. Each field can be individually
-    enabled/disabled and supports theming through CSS custom properties.
+    A flexible time input component that allows selective display of hour, minute, and second fields.
+    Features 24-hour format validation, individual field enabling/disabling, and comprehensive
+    styling support. Handles focus states, validation errors, and provides seamless integration
+    with form validation systems. Each time field can be individually controlled and supports
+    theming through CSS custom properties with proper error state visualization.
 -->
 <div
     style="
@@ -166,7 +166,7 @@
 </div>
 
 <style>
-    /* Main container styling - defines the overall appearance of the time input component */
+    /* Main container styling - uses CSS custom properties for theming */
     .input-time-div {
         width: var(--width);
         height: var(--height);
@@ -175,19 +175,19 @@
         border: var(--border);
     }
 
-    /* Focus state styling - applied when any time input field receives focus */
+    /* Focus state styling - applied when any time input field is focused */
     .input-time-div.selected {
         background-color: var(--selected-background-color);
         border: var(--selected-border);
     }
 
-    /* Error state styling - applied when input validation fails and error display is enabled */
+    /* Error state styling - applied when time validation fails */
     .input-time-div.bad-format {
         background-color: var(--bad-format-background-color);
         border: var(--bad-format-border);
     }
 
-    /* Content container - manages the layout of time input fields and separators */
+    /* Content container - arranges time input fields horizontally */
     .content {
         width: 100%;
         height: 100%;
@@ -200,7 +200,7 @@
         align-items: center;
     }
 
-    /* Separator styling - the ":" characters between time fields (HH:mm:ss) */
+    /* Separator styling - colon characters between time fields */
     .separator {
         font-size: var(--text-size);
         color: var(--text-color);

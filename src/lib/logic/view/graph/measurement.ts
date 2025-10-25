@@ -8,7 +8,16 @@ import { timeStepFormatters } from "$lib/types/date";
 import { getElegantShortStringFromDate } from "$lib/logic/util/date";
 import type { MeasurementLogPoint, ProcessedMeasurementLogPoint } from "$lib/types/nodes/logs";
 
-
+/**
+ * Specialized graph object for displaying measurement data with min/max/average visualization.
+ * 
+ * Extends BaseGraphObject to provide measurement-specific rendering including band visualization
+ * for min-max ranges, average line overlays, and interactive data drilling capabilities.
+ * Features custom canvas drawing for measurement bands and comprehensive tooltip integration.
+ * 
+ * @property {Array<ProcessedMeasurementLogPoint>} points - Time-series measurement data points
+ * @property {MeasurementLogPoint} hoveredLogPoint - Currently hovered measurement data for tooltips
+ */
 export class MeasurementGraphObject extends BaseGraphObject<MeasurementLogPoint> {
     protected graphType = GraphType.Measurement;
     protected points: Array<ProcessedMeasurementLogPoint>;
@@ -19,10 +28,16 @@ export class MeasurementGraphObject extends BaseGraphObject<MeasurementLogPoint>
         this.points = points;
     }
 
+    /**
+     * Updates the measurement data points and refreshes the graph display.
+     */
     updatePoints(points: Array<ProcessedMeasurementLogPoint>): void {
         this.points = points;
     }
 
+    /**
+     * Creates and configures the uPlot measurement graph with band visualization and interaction handling.
+     */
     createGraph(timeStep: FormattedTimeStep, logSpanPeriod: LogSpanPeriod, style: { [property: string]: string | number },): void {
         const { alignedData } = this.convertDataToGraph(timeStep, logSpanPeriod);
         let { width, height } = getGraphSize(this.container, Number(style.graphPeriodWidthPx), alignedData, style);
@@ -120,6 +135,9 @@ export class MeasurementGraphObject extends BaseGraphObject<MeasurementLogPoint>
         }
     }
 
+    /**
+     * Converts processed measurement points into uPlot-compatible data arrays with time labels.
+     */
     convertDataToGraph(timeStep: FormattedTimeStep, logSpanPeriod: LogSpanPeriod): { alignedData: AlignedData } {
         const timestampValues: Array<number> = [];
         const minValues: Array<number> = [];
@@ -164,6 +182,9 @@ export class MeasurementGraphObject extends BaseGraphObject<MeasurementLogPoint>
         return { alignedData: [timestampValues, averageValues, minValues, maxValues] };
     }
 
+    /**
+     * Tracks cursor position over the graph and triggers position change callbacks.
+     */
     getCursorPosition(u: uPlot): void {
         this.xPos = u.cursor.left;
         this.yPos = u.cursor.top;
@@ -172,6 +193,9 @@ export class MeasurementGraphObject extends BaseGraphObject<MeasurementLogPoint>
         }
     }
 
+    /**
+     * Determines which time period is being hovered and updates the tooltip data accordingly.
+     */
     getHoveredPeriod(u: uPlot, timeStep: FormattedTimeStep): void {
         if (this.xPos !== undefined && this.xPos >= 0) { // Valid Cursor position
             const xVal = u.posToVal(this.xPos, "x");
@@ -199,6 +223,9 @@ export class MeasurementGraphObject extends BaseGraphObject<MeasurementLogPoint>
         }
     }
 
+    /**
+     * Creates a formatted measurement log point for tooltip display based on hovered time period.
+     */
     getHoveredLogPoint(index: number, timeStep: FormattedTimeStep): MeasurementLogPoint | null {
         if (!this.points || index < 0 || index >= this.points.length) return null;
         
@@ -211,6 +238,9 @@ export class MeasurementGraphObject extends BaseGraphObject<MeasurementLogPoint>
         } as MeasurementLogPoint;
     }
 
+    /**
+     * Handles double-click events on graph periods to trigger data drilling callbacks.
+     */
     processGridDoubleClick(): void {
         if (!this.points || this.currentHoverPeriod < 0 || this.currentHoverPeriod >= this.points.length) return;
 
@@ -225,6 +255,9 @@ export class MeasurementGraphObject extends BaseGraphObject<MeasurementLogPoint>
         }
     }
 
+    /**
+     * Creates a Path2D object for drawing the average line across a measurement period.
+     */
     getAverageLine(xStart: number, xEnd: number, y: number): Path2D {
         if (!this.graph) {
             throw new Error(`Graph is not instantiated`);
@@ -236,6 +269,9 @@ export class MeasurementGraphObject extends BaseGraphObject<MeasurementLogPoint>
         return line;
     }
 
+    /**
+     * Custom canvas drawing method that renders measurement bands and average lines with hover effects.
+     */
     drawCanvas(u: uPlot, style: { [property: string]: string | number }): void {
         const { ctx } = u;
         ctx.save();

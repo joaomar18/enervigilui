@@ -27,6 +27,9 @@
 
     // Props
     export let showToolTip: boolean;
+    export let enableSpanChange: boolean;
+    export let initialDate: Date | null;
+    export let endDate: Date | null;
 
     // Layout / styling props
     export let paddingHorizontal: string | undefined = undefined;
@@ -64,7 +67,7 @@
     let containerDiv: HTMLDivElement;
     let clickEventListenerDefined: boolean = false;
     let startDateTime = createDateTimeField();
-    let endDateTime = createDateTimeField(new Date());
+    let endDateTime = createDateTimeField();
     let validation: DateTimeSpanValidation;
     let messageKey: string | null = null;
     let messageVariables: Record<string, string | number>;
@@ -74,10 +77,6 @@
     // Reactive Statements
     $: if (!showToolTip && clickEventListenerDefined) {
         window.removeEventListener("click", handleClickOutside);
-        startDateTime = createDateTimeField();
-        endDateTime = createDateTimeField(new Date());
-        firstRequestDone = false;
-        processingRequest = false;
         clickEventListenerDefined = false;
     }
     $: if (showToolTip && !clickEventListenerDefined) {
@@ -86,6 +85,9 @@
             clickEventListenerDefined = true;
         });
     }
+    $: if (enableSpanChange) startDateTime = createDateTimeField(initialDate);
+    $: if (enableSpanChange) endDateTime = createDateTimeField(endDate);
+
     $: ({ validation, messageKey, messageVariables } = validTimeSpan(startDateTime, endDateTime));
 
     // Export Functions
@@ -114,6 +116,16 @@
         }
     });
 </script>
+
+<!--
+    DateRangePicker Component
+    
+    A comprehensive date range picker with time selection capabilities and validation.
+    Features separate date and time field inputs for start and end periods, built-in
+    validation for time span logic, and form submission handling. Supports click-outside
+    detection, custom period requests, and comprehensive theming through CSS custom properties.
+    Integrates FormAlert for user feedback and provides seamless date-time field management.
+-->
 
 <ToolTip style={$ToolTipDatePickerStyle} autoPositionContinuous={true} zIndex={198} {showToolTip}>
     <div
@@ -202,6 +214,7 @@
 </ToolTip>
 
 <style>
+    /* Main container - Full date picker tooltip content area with configurable padding */
     .date-picker-div {
         width: 100%;
         height: 100%;
@@ -212,6 +225,8 @@
         padding-right: var(--padding-horizontal);
         container-type: inline-size;
     }
+
+    /* Content wrapper - Vertical flexbox container for all picker elements */
     .content {
         margin: 0;
         padding: 0;
@@ -225,6 +240,7 @@
         gap: var(--content-gap);
     }
 
+    /* Field container - Groups label and input controls for each date/time section */
     .content .field {
         display: flex;
         flex-direction: column;
@@ -233,6 +249,7 @@
         gap: var(--field-gap);
     }
 
+    /* Field label text - Styled labels for "Start Date", "End Date", etc. */
     .content .field span {
         font-size: var(--label-size);
         color: var(--label-color);
@@ -241,6 +258,7 @@
         padding-left: var(--label-padding-left);
     }
 
+    /* Input row - Horizontal layout for date and time field pairs */
     .content .field .row {
         display: flex;
         flex-direction: row;
@@ -251,12 +269,14 @@
         gap: var(--row-gap);
     }
 
+    /* Flexible input container - Expandable area for date/time input components */
     .content .field .row .extend {
         flex: 1;
         min-width: 0;
         height: fit-content;
     }
 
+    /* Action buttons container - Horizontal layout for Cancel/Apply buttons */
     .content .action-buttons-div {
         padding-top: var(--buttons-padding-top);
         display: flex;

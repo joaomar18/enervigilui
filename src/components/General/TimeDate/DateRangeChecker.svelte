@@ -82,6 +82,16 @@
     });
 </script>
 
+<!--
+    DateRangeChecker Component
+    
+    A tooltip component that displays formatted date ranges with customizable styling.
+    Shows initial and end dates in an elegant format with proper internationalization support.
+    Features click-outside detection for automatic hiding and comprehensive theming through
+    CSS custom properties. Integrates seamlessly with the ToolTip system for consistent
+    positioning and z-index management across the application.
+-->
+
 <ToolTip style={$ToolTipDateCheckerStyle} autoPositionContinuous={true} zIndex={198} {showToolTip}>
     <div
         style="
@@ -121,6 +131,7 @@
 </ToolTip>
 
 <style>
+    /* Main container - Full tooltip content area with configurable padding */
     .date-checker-div {
         width: 100%;
         height: 100%;
@@ -132,6 +143,7 @@
         container-type: inline-size;
     }
 
+    /* Content wrapper - Flexbox container for date range rows */
     .content {
         margin: 0;
         padding: 0;
@@ -145,6 +157,7 @@
         gap: var(--row-gap);
     }
 
+    /* Individual date row - Horizontal layout for label and value pairs */
     .row {
         display: flex;
         flex-direction: row;
@@ -153,6 +166,7 @@
         align-items: center;
     }
 
+    /* Label container - Fixed width area for "From/To" labels */
     .label-div {
         width: var(--label-width);
         height: 100%;
@@ -162,12 +176,14 @@
         align-items: center;
     }
 
+    /* Date label text - Styled "From Date" and "To Date" labels */
     .label {
         font-size: var(--text-size);
         font-weight: var(--label-weight);
         color: var(--label-color);
     }
 
+    /* Value container - Flexible area for formatted date values */
     .value-div {
         flex: 1;
         height: 100%;
@@ -177,6 +193,7 @@
         align-items: center;
     }
 
+    /* Date value text - Styled formatted date strings */
     .value {
         font-size: var(--text-size);
         font-weight: var(--value-weight);

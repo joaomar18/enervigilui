@@ -91,6 +91,15 @@
     });
 </script>
 
+<!--
+    MeasurementGraph Component
+    
+    A specialized graph component for displaying measurement data with min/max/average visualization.
+    Features uPlot integration with custom band rendering, real-time cursor tracking, and interactive
+    data drilling functionality. Handles time-series data processing, dynamic graph creation based on
+    time steps, and provides measurement-specific tooltip integration. Supports comprehensive styling
+    through BaseGraph inheritance and measurement-specific theming for industrial data visualization.
+-->
 <BaseGraph
     {gridElement}
     {graphType}

@@ -90,8 +90,6 @@
     let showCustomDatePicker: boolean = false;
 
     // Reactive Statements
-
-    // Node Change
     $: if (!showPanel) {
         selectedHistoryTimeSpan = LogSpanPeriod.currentDay; // Default Period
     }
@@ -100,9 +98,11 @@
         showCustomDatePicker = false;
         loadNodeAdditionalInfo();
         if (isNumeric(nodeState)) {
-            let { initial_date, end_date } = loadDateSpan();
-            setDateSpan({ initial_date, end_date });
-            loadNodeLogs(initial_date, end_date);
+            if (!initialDate || !endDate) {
+                let { initial_date, end_date } = loadDateSpan();
+                setDateSpan({ initial_date, end_date });
+            }
+            loadNodeLogs(initialDate, endDate);
         }
     }
 
@@ -418,6 +418,9 @@
                                     <div slot="tooltip"><ToolTipText text={$texts.customPeriod} /></div>
                                 </Button>
                                 <DateRangePicker
+                                    enableSpanChange={selectedHistoryTimeSpan === LogSpanPeriod.customDate}
+                                    bind:initialDate
+                                    bind:endDate
                                     bind:showToolTip={showCustomDatePicker}
                                     requestCustomPeriod={(startDateTime, endDateTime) => {
                                         let initial_date = getDateFromField(startDateTime);

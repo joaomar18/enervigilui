@@ -51,6 +51,15 @@
     $: mergedStyle = mergeStyle(effectiveStyle, localOverrides);
 </script>
 
+<!--
+    MeasurementToolTip Component
+    
+    A specialized tooltip content component for displaying measurement data with abbreviated labels.
+    Features compact Min/Max/Average value display with proper unit formatting and no-data state
+    handling. Supports flexible styling through CSS custom properties, responsive value alignment,
+    and internationalized label text. Designed specifically for graph overlay tooltips with
+    space-efficient layout and professional measurement data presentation.
+-->
 {#if logPoint}
     <div
         style="
@@ -105,6 +114,7 @@
 {/if}
 
 <style>
+    /* Content container - Vertical flexbox layout for measurement data rows */
     .content {
         margin: 0;
         padding: 0;
@@ -116,6 +126,7 @@
         gap: var(--row-gap);
     }
 
+    /* Data row - Horizontal layout for label, value, and unit triplets */
     .row {
         width: 100%;
         height: fit-content;
@@ -124,6 +135,7 @@
         align-items: center;
     }
 
+    /* Measurement label - Fixed width area for abbreviated labels (Máx, Méd, Mín) */
     .label {
         text-align: left;
         width: var(--label-width);
@@ -132,6 +144,7 @@
         font-weight: var(--label-weight);
     }
 
+    /* Measurement value - Flexible area for numeric data with ellipsis overflow */
     .value {
         min-width: 0;
         padding: 0;
@@ -146,19 +159,23 @@
         text-overflow: ellipsis;
     }
 
+    /* No-data state modifier - Applied when measurement values are null */
     .value.no-data-label {
         color: var(--no-data-label-color);
         font-weight: var(--no-data-label-weight);
     }
 
+    /* Center alignment modifier - Used for special cases like time ranges */
     .value.center {
         text-align: center;
     }
 
+    /* No padding modifier - Removes right padding for specific layouts */
     .value.no-padding {
         padding: 0;
     }
 
+    /* Unit display - Right-aligned area for measurement units with ellipsis overflow */
     .unit {
         width: fit-content;
         max-width: var(--unit-max-width);

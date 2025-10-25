@@ -93,6 +93,15 @@
     let showDateRange: boolean = false;
 </script>
 
+<!--
+    BaseGraph Component
+    
+    A foundational graph component that provides common graph infrastructure and styling.
+    Features header with action buttons, date range display, graph container management, and
+    tooltip integration. Serves as the base for specialized graph components like MeasurementGraph,
+    providing consistent layout, theming, and interaction patterns. Handles graph lifecycle,
+    container binding, and provides extensible styling through comprehensive CSS custom properties.
+-->
 <div
     style="
         --width: {mergedStyle.width};
@@ -173,6 +182,7 @@
 </div>
 
 <style>
+    /* Main graph container - Card-style wrapper with theming and vertical layout */
     .graph-div-wrapper {
         box-sizing: border-box;
         padding-top: var(--padding-top);
@@ -192,6 +202,7 @@
         align-items: center;
     }
 
+    /* Graph header - Container for action buttons and controls */
     .header {
         margin: 0;
         padding: 0;
@@ -204,6 +215,7 @@
         align-items: center;
     }
 
+    /* Header content wrapper - Flexible layout for header elements */
     .header-content {
         height: 100%;
         width: 100%;
@@ -214,6 +226,7 @@
         flex-wrap: wrap;
     }
 
+    /* Action buttons container - Right-aligned controls with configurable spacing */
     .header-content .actions-div {
         width: fit-content;
         height: 100%;
@@ -223,6 +236,7 @@
         gap: var(--header-buttons-gap);
     }
 
+    /* Date checker container - Houses the date range display tooltip */
     .header-content .actions-div .date-checker-div {
         margin: 0;
         padding: 0;
@@ -231,6 +245,7 @@
         height: 100%;
     }
 
+    /* Main content area - Horizontal scrollable container for unit label and graph */
     .main {
         display: flex;
         flex-direction: row;
@@ -245,11 +260,13 @@
         scrollbar-gutter: stable;
     }
 
+    /* Unit label section - Left sidebar for measurement unit display */
     .unit-div {
         width: var(--unit-div-width);
         height: var(--height);
     }
 
+    /* Unit content container - Sized to match graph plotting area */
     .unit-content {
         width: 100%;
         height: calc(100% - var(--graph-padding-top) - var(--graph-padding-bottom) - var(--x-axis-height));
@@ -257,6 +274,7 @@
         padding-bottom: calc(var(--x-axis-height) + var(--graph-padding-bottom));
     }
 
+    /* Unit wrapper - Relative container for absolutely positioned unit label */
     .unit-wrapper {
         padding: 0;
         margin: 0;
@@ -265,6 +283,7 @@
         height: 100%;
     }
 
+    /* Unit label text - Vertically rotated measurement unit (e.g., "kW", "A") */
     .unit-label {
         position: absolute;
         top: 50%;
@@ -284,6 +303,7 @@
         transform: translate(-50%, -50%) rotate(-90deg);
     }
 
+    /* Graph container - Main plotting area where uPlot charts are rendered */
     .graph-div {
         padding: 0;
         margin: 0;
@@ -292,6 +312,7 @@
         height: var(--height);
     }
 
+    /* Y-axis overlay area - Positioned over uPlot's y-axis for custom content */
     .y-axis-inner-div {
         position: absolute;
         left: 0;
@@ -302,6 +323,7 @@
         padding-bottom: calc(var(--x-axis-height) + var(--graph-padding-bottom));
     }
 
+    /* Y-axis content wrapper - Container for y-axis overlay elements */
     .y-axis-inner-content {
         width: 100%;
         height: 100%;
@@ -310,6 +332,7 @@
         position: relative;
     }
 
+    /* No-data indicator - Rotated text displayed when graph has no data */
     .no-data-label {
         position: absolute;
         top: 50%;
