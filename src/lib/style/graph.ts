@@ -39,7 +39,7 @@ const BaseGraphStyleConfig: ComponentStyles = {
         backgroundColor: "rgba(20, 22, 28, 0.6)",
         borderColor: "rgba(255, 255, 255, 0.08)",
         boxShadow: "0 2px 4px rgba(0, 0, 0, 0.1)",
-        graphPaddingTop: "0px",
+        graphPaddingTop: "10px",
         graphPaddingLeft: "20px",
         graphPaddingRight: "20px",
         graphPaddingBottom: "0px",
@@ -80,7 +80,7 @@ export const MeasurementGraphStyle = createStyleStore(MeasurementGraphStyleConfi
 
 const GraphToolTipStyleConfig: ComponentStyles = {
     dark: {
-        width: "fit-content",
+        width: "150px",
         minWidth: "auto",
         maxWidth: "300px",
         height: "fit-content",

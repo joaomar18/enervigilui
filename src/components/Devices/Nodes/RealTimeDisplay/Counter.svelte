@@ -25,6 +25,7 @@
     export let valueTextSpacing: string | undefined = undefined;
     export let valueTextWeight: string | undefined = undefined;
     export let valueTextPaddingRight: string | undefined = undefined;
+    export let unitWidth: string | undefined = undefined;
     export let unitTextSize: string | undefined = undefined;
     export let unitTextColor: string | undefined = undefined;
     export let unitTextWeight: string | undefined = undefined;
@@ -38,6 +39,7 @@
         valueTextSpacing,
         valueTextWeight,
         valueTextPaddingRight,
+        unitWidth,
         unitTextSize,
         unitTextColor,
         unitTextWeight,
@@ -59,6 +61,15 @@
     export let onClick: (() => void) | null = null;
 </script>
 
+<!--
+    Counter Component
+    
+    A real-time counter display component for cumulative measurement values.
+    Features precise decimal formatting, unit display, and disconnection state handling
+    for industrial counter data such as energy consumption totals, production counts,
+    and accumulative measurements. Extends BaseDisplay for consistent styling and
+    interaction patterns while providing counter-specific formatting and visualization.
+-->
 <BaseDisplay style={baseDisplayStyle} {disableLabel} {disableClick} {labelText} {valueDisconnected} {onClick}>
     <div
         style="
@@ -67,6 +78,7 @@
             --value-text-spacing: {mergedStyle.valueTextSpacing};
             --value-text-weight: {mergedStyle.valueTextWeight};
             --value-text-padding-right: {mergedStyle.valueTextPaddingRight};
+            --unit-width: {mergedStyle.unitWidth};
             --unit-text-size: {mergedStyle.unitTextSize};
             --unit-text-color: {mergedStyle.unitTextColor};
             --unit-text-weight: {mergedStyle.unitTextWeight};
@@ -88,6 +100,7 @@
 </BaseDisplay>
 
 <style>
+    /* Main content container - Horizontal layout for counter value and unit display */
     .slot-content {
         margin: 0;
         padding: 0;
@@ -101,11 +114,12 @@
         align-items: center;
     }
 
+    /* Counter value container - Flexible area for cumulative value with overflow handling */
     .value-div {
         box-sizing: border-box;
         padding: 0;
         padding-right: var(--value-text-padding-right);
-        width: 70%;
+        width: calc(100% - var(--unit-width));
         min-width: 0;
         line-height: 1;
         display: flex;
@@ -114,6 +128,7 @@
         align-items: center;
     }
 
+    /* Counter value text - Styled numeric display with tabular formatting for consistent alignment */
     .value-div .value {
         font-size: var(--value-text-size);
         color: var(--value-text-color);
@@ -131,6 +146,7 @@
             "lnum" 1;
     }
 
+    /* Unit display - Fixed-width area for counter units (kWh, counts, etc.) */
     .unit {
         box-sizing: border-box;
         padding: 0;
@@ -139,7 +155,7 @@
         font-weight: var(--unit-text-weight);
         padding-left: var(--unit-text-padding-left);
         text-align: right;
-        width: 30%;
+        width: var(--unit-width);
         line-height: 1;
         white-space: nowrap;
         overflow: hidden;

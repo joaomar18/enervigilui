@@ -32,6 +32,7 @@
     export let valueTextSpacing: string | undefined = undefined;
     export let valueTextWeight: string | undefined = undefined;
     export let valueTextPaddingRight: string | undefined = undefined;
+    export let unitWidth: string | undefined = undefined;
     export let unitTextSize: string | undefined = undefined;
     export let unitTextColor: string | undefined = undefined;
     export let unitTextWeight: string | undefined = undefined;
@@ -45,6 +46,7 @@
         valueTextSpacing,
         valueTextWeight,
         valueTextPaddingRight,
+        unitWidth,
         unitTextSize,
         unitTextColor,
         unitTextWeight,
@@ -66,6 +68,15 @@
     export let onClick: (() => void) | null = null;
 </script>
 
+<!--
+    Measurement Component
+    
+    A real-time measurement display component with value visualization and range indicators.
+    Features alarm/warning state management, visual bar representation, and comprehensive
+    formatting options for industrial measurement data. Supports decimal precision control,
+    unit display, and range-based visual feedback. Extends BaseDisplay for consistent
+    styling and interaction patterns across the monitoring interface.
+-->
 <BaseDisplay
     style={baseDisplayStyle}
     {disableLabel}
@@ -83,6 +94,7 @@
             --value-text-spacing: {mergedStyle.valueTextSpacing};
             --value-text-weight: {mergedStyle.valueTextWeight};
             --value-text-padding-right: {mergedStyle.valueTextPaddingRight};
+            --unit-width: {mergedStyle.unitWidth};
             --unit-text-size: {mergedStyle.unitTextSize};
             --unit-text-color: {mergedStyle.unitTextColor};
             --unit-text-weight: {mergedStyle.unitTextWeight};
@@ -110,6 +122,7 @@
 </BaseDisplay>
 
 <style>
+    /* Main content container - Horizontal layout for value and unit display */
     .slot-content {
         margin: 0;
         padding: 0;
@@ -123,11 +136,12 @@
         align-items: center;
     }
 
+    /* Value container - Flexible area for measurement value with overflow handling */
     .value-div {
         box-sizing: border-box;
         padding: 0;
         padding-right: var(--value-text-padding-right);
-        width: 70%;
+        width: calc(100% - var(--unit-width));
         min-width: 0;
         line-height: 1;
         display: flex;
@@ -136,6 +150,7 @@
         align-items: center;
     }
 
+    /* Measurement value text - Styled numeric display with tabular formatting */
     .value-div .value {
         font-size: var(--value-text-size);
         color: var(--value-text-color);
@@ -153,6 +168,7 @@
             "lnum" 1;
     }
 
+    /* Unit display - Fixed-width area for measurement units (kW, A, etc.) */
     .unit {
         box-sizing: border-box;
         padding: 0;
@@ -161,7 +177,7 @@
         font-weight: var(--unit-text-weight);
         padding-left: var(--unit-text-padding-left);
         text-align: right;
-        width: 30%;
+        width: var(--unit-width);
         line-height: 1;
         white-space: nowrap;
         overflow: hidden;
@@ -169,6 +185,7 @@
         min-width: 0;
     }
 
+    /* Range bar container - Absolutely positioned visual indicator at bottom */
     .bar-value-div {
         position: absolute;
         left: 50%;

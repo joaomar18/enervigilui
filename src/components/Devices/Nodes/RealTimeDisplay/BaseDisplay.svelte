@@ -102,6 +102,15 @@
     }
 </script>
 
+<!--
+    BaseDisplay Component
+    
+    A foundational display component that provides common infrastructure for real-time device data visualization.
+    Features label management, state indicators (alarm/warning), disconnection handling, and comprehensive
+    styling support. Serves as the base for specialized display components like Measurement, Counter, and Text,
+    providing consistent layout patterns, interaction handling, and visual state management. Includes state
+    circles for alarm/warning conditions and disconnected device visualization with proper accessibility support.
+-->
 <div
     style="
         --width: {mergedStyle.width};
@@ -163,6 +172,7 @@
 </div>
 
 <style>
+    /* Main container - Outer wrapper with configurable dimensions and padding */
     .container {
         padding: 0;
         margin: 0;
@@ -180,6 +190,7 @@
         align-items: center;
     }
 
+    /* Content wrapper - Vertical layout container for label and display areas */
     .content {
         margin: 0;
         padding: 0;
@@ -192,6 +203,7 @@
         align-items: center;
     }
 
+    /* Label section - Horizontal layout for device name and status indicators */
     .content .label-div {
         margin: 0;
         padding: 0;
@@ -205,6 +217,7 @@
         align-items: center;
     }
 
+    /* Label text - Device name with ellipsis overflow handling */
     .content .label-div span {
         margin: 0;
         padding: 0;
@@ -221,6 +234,7 @@
         text-overflow: ellipsis;
     }
 
+    /* Alert indicators container - Houses alarm and warning state circles */
     .content .label-div .alerts-div {
         height: fit-content;
         padding-right: var(--display-padding-horizontal);
@@ -231,6 +245,7 @@
         align-items: center;
     }
 
+    /* State circle - Circular indicator for alarm/warning conditions */
     .content .label-div .alerts-div .alert-state {
         width: var(--state-circle-diameter);
         height: var(--state-circle-diameter);
@@ -240,24 +255,29 @@
             box-shadow var(--animation-duration) ease-in-out;
     }
 
+    /* Alarm state styling - Red circle for critical conditions */
     .content .label-div .alerts-div.alarm .alert-state {
         background-color: var(--state-circle-alarm-color);
     }
 
+    /* Alarm hover effects - Enhanced visibility on mouse over */
     .content.enable-hover:hover .label-div .alerts-div.alarm .alert-state {
         background-color: var(--state-circle-alarm-hover-color);
         box-shadow: var(--state-circle-alarm-hover-shadow);
     }
 
+    /* Warning state styling - Yellow/orange circle for caution conditions */
     .content .label-div .alerts-div.warning .alert-state {
         background-color: var(--state-circle-warning-color);
     }
 
+    /* Warning hover effects - Enhanced visibility on mouse over */
     .content.enable-hover:hover .label-div .alerts-div.warning .alert-state {
         background-color: var(--state-circle-warning-hover-color);
         box-shadow: var(--state-circle-warning-hover-shadow);
     }
 
+    /* Display wrapper - Container for the main data display area */
     .content .display-content-wrapper {
         margin: 0;
         padding: 0;
@@ -268,6 +288,7 @@
         background-color: var(--display-wrapper-background-color);
     }
 
+    /* Main display area - Container for measurement/counter/text content with transitions */
     .content .display-content-wrapper .display-content {
         margin: 0;
         padding: 0;
@@ -290,33 +311,39 @@
             box-shadow var(--animation-duration) ease-in-out;
     }
 
+    /* Connected state hover effects - Enhanced styling for interactive feedback */
     .content.enable-hover:hover .display-content-wrapper .display-content {
         background-color: var(--display-hover-background-color);
         border: var(--display-hover-border);
         box-shadow: var(--display-hover-shadow);
     }
 
+    /* Disconnected state styling - Visual indication of device offline status */
     .content .display-content-wrapper .display-content.disconnected {
         background-color: var(--display-disconnected-background-color);
         border: var(--display-disconnected-border);
     }
 
+    /* Disconnected hover effects - Distinct styling for offline device interaction */
     .content.enable-hover:hover .display-content-wrapper .display-content.disconnected {
         background-color: var(--display-disconnected-hover-background-color);
         border: var(--display-disconnected-hover-border);
         box-shadow: var(--display-disconnected-hover-shadow);
     }
 
+    /* Disconnected indicator image - Hidden by default, shown when device is offline */
     .content .display-content-wrapper .display-content img {
         display: none;
         width: var(--disconnected-image-width);
         height: var(--disconnected-image-height);
     }
 
+    /* Show disconnected image - Displays when device is in disconnected state */
     .content .display-content-wrapper .display-content.disconnected img {
         display: block;
     }
 
+    /* Invisible click overlay - Transparent button for click handling without visual interference */
     .content button {
         margin: 0;
         padding: 0;
@@ -327,6 +354,7 @@
         z-index: 1;
     }
 
+    /* Click interaction cursor - Shows pointer cursor on hover when clicks are enabled */
     .content.enable-hover button:hover {
         cursor: pointer;
     }

@@ -13,7 +13,7 @@
     import ContentCard from "../../../components/General/ContentCard.svelte";
     import ExpandableSection from "../../../components/General/ExpandableSection.svelte";
     import Action from "../../../components/General/Action.svelte";
-    import NodeDetailSheet from "../../../components/Devices/Nodes/RealTimeDisplay/NodeDetailSheet.svelte";
+    import NodeDetailSheet from "../../../components/Devices/Nodes/NodeDetailSheet.svelte";
     import ToolTipText from "../../../components/General/ToolTipText.svelte";
     import type { NodeCategory } from "$lib/types/nodes/base";
     import type { NodeState, ProcessedNodeState } from "$lib/types/nodes/realtime";

@@ -45,6 +45,15 @@
     export let onClick: (() => void) | null = null;
 </script>
 
+<!--
+    Text Component
+    
+    A real-time text display component for string-based device information and status values.
+    Features text formatting, disconnection state handling, and overflow management for
+    industrial text data such as device status, operating modes, alarm messages, and
+    configuration strings. Extends BaseDisplay for consistent styling and interaction
+    patterns while providing text-specific formatting and visualization.
+-->
 <BaseDisplay style={baseDisplayStyle} {disableLabel} {disableClick} {labelText} {valueDisconnected} {onClick}>
     <div
         style="
@@ -66,6 +75,7 @@
 </BaseDisplay>
 
 <style>
+    /* Main content container - Horizontal layout for text value display */
     .slot-content {
         margin: 0;
         padding: 0;
@@ -79,6 +89,7 @@
         align-items: center;
     }
 
+    /* Text value container - Fixed-width area for string content with overflow handling */
     .value-div {
         box-sizing: border-box;
         padding: 0;
@@ -92,6 +103,7 @@
         align-items: center;
     }
 
+    /* Text value display - Styled string content with ellipsis truncation for long text */
     .value-div .value {
         font-size: var(--value-text-size);
         color: var(--value-text-color);

@@ -1,13 +1,13 @@
 <script lang="ts">
-    import RightPanelSheet from "../../../General/RightPanelSheet.svelte";
-    import Button from "../../../General/Button.svelte";
-    import ToolTipText from "../../../General/ToolTipText.svelte";
-    import InlineLoader from "../../../General/InlineLoader.svelte";
-    import DateRangePicker from "../../../General/TimeDate/DateRangePicker.svelte";
+    import RightPanelSheet from "../../General/RightPanelSheet.svelte";
+    import Button from "../../General/Button.svelte";
+    import ToolTipText from "../../General/ToolTipText.svelte";
+    import InlineLoader from "../../General/InlineLoader.svelte";
+    import DateRangePicker from "../../General/TimeDate/DateRangePicker.svelte";
     import { LogSpanPeriod } from "$lib/types/view/nodes";
     import { getNodePhaseSection, getCommunicationID, isNumeric } from "$lib/logic/util/nodes";
     import { getNodeAdditionalInfo, getNodeLogs } from "$lib/logic/api/nodes";
-    import { getTimeSpanFromLogPeriod, getDateFromField, getElegantStringFromDate } from "$lib/logic/util/date";
+    import { getTimeSpanFromLogPeriod, getDateFromField } from "$lib/logic/util/date";
     import type { BaseNodeAdditionalInfo, ProcessedNodeState } from "$lib/types/nodes/realtime";
     import type { ProcessedNodeLogs } from "$lib/types/nodes/logs";
 
@@ -228,7 +228,7 @@
                 <div class="section-title"><h3>{$texts.currentState}</h3></div>
                 <div class="inner-content-div">
                     <div class="row fit-height">
-                        <span class="label">{$texts.value}</span>
+                        <span class="label fit-content">{$texts.value}</span>
                         <span class="value">
                             <svelte:component
                                 this={nodeState.displayComponent}
@@ -696,6 +696,12 @@
         font-size: var(--content-label-size);
         color: var(--content-label-color);
         font-weight: var(--content-label-weight);
+    }
+
+    .content-div .inner-content-div .label.fit-content {
+        min-inline-size: 0;
+        width: fit-content;
+        padding-right: 30px;
     }
 
     .content-div .inner-content-div .value {
