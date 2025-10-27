@@ -28,11 +28,19 @@ export class MeasurementGraphObject extends BaseGraphObject<MeasurementLogPoint>
         this.points = points;
     }
 
-    /**
-     * Updates the measurement data points and refreshes the graph display.
-     */
-    updatePoints(points: Array<ProcessedMeasurementLogPoint>): void {
-        this.points = points;
+
+    updatePoints(points: Array<ProcessedMeasurementLogPoint>, decimalPlaces: number | null, roundPoints: boolean = false): void {
+        if (decimalPlaces === null || !roundPoints) {
+            this.points = points;
+        }
+        else {
+            this.points = points.map(point => ({
+                ...point,
+                average_value: point.average_value === null ? null : Number(point.average_value.toFixed(decimalPlaces)),
+                min_value: point.min_value === null ? null : Number(point.min_value.toFixed(decimalPlaces)),
+                max_value: point.max_value === null ? null : Number(point.max_value.toFixed(decimalPlaces)),
+            }));
+        }
     }
 
     /**
@@ -140,9 +148,9 @@ export class MeasurementGraphObject extends BaseGraphObject<MeasurementLogPoint>
      */
     convertDataToGraph(timeStep: FormattedTimeStep, logSpanPeriod: LogSpanPeriod): { alignedData: AlignedData } {
         const timestampValues: Array<number> = [];
-        const minValues: Array<number> = [];
-        const maxValues: Array<number> = [];
-        const averageValues: Array<number> = [];
+        const minValues: Array<number | null> = [];
+        const maxValues: Array<number | null> = [];
+        const averageValues: Array<number | null> = [];
         this.labels = [];
         this.noData = true;
 
@@ -228,7 +236,7 @@ export class MeasurementGraphObject extends BaseGraphObject<MeasurementLogPoint>
      */
     getHoveredLogPoint(index: number, timeStep: FormattedTimeStep): MeasurementLogPoint | null {
         if (!this.points || index < 0 || index >= this.points.length) return null;
-        
+
         return {
             start_time: getElegantShortStringFromDate(new Date(this.points[index].start_time * 1000), timeStep),
             end_time: getElegantShortStringFromDate(new Date(this.points[index].end_time * 1000), timeStep),

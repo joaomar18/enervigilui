@@ -1,7 +1,7 @@
 <script lang="ts">
     import { onDestroy } from "svelte";
     import { MeasurementGraphObject } from "$lib/logic/view/graph/measurement";
-    import type { MeasurementLogPoint, ProcessedMeasurementLogPoint } from "$lib/types/nodes/logs";
+    import type { MeasurementMetrics, MeasurementLogPoint, ProcessedMeasurementLogPoint } from "$lib/types/nodes/logs";
     import type { FormattedTimeStep } from "$lib/types/date";
     import type { LogSpanPeriod } from "$lib/types/view/nodes";
     import BaseGraph from "./BaseGraph.svelte";
@@ -12,6 +12,7 @@
     // Styles
     import { MeasurementGraphStyle, BaseGraphStyle } from "$lib/style/graph";
     import type { GraphType } from "$lib/logic/view/graph/base";
+    import MeasurementMetricsComponent from "../Metrics/MeasurementMetrics.svelte";
 
     // Style object (from theme)
     export let baseStyle: { [property: string]: string | number } | null = null;
@@ -25,7 +26,9 @@
     export let data: Array<ProcessedMeasurementLogPoint>;
     export let timeStep: FormattedTimeStep;
     export let logSpanPeriod: LogSpanPeriod;
+    export let globalMetrics: MeasurementMetrics;
     export let unit: string = "";
+    export let decimalPlaces: number | null = null;
 
     // Layout / styling props
     export let height: string | undefined = undefined;
@@ -77,7 +80,7 @@
 
     function updateGraphData(): void {
         graph.destroy();
-        graph.updatePoints(data);
+        graph.updatePoints(data, decimalPlaces);
         graph.createGraph(timeStep, logSpanPeriod, mergedStyle);
         gridElement = graph.getGridElement();
         created = true;
@@ -113,4 +116,10 @@
     graphNoData={noData}
     logPoint={currentLogPoint}
     {unit}
-/>
+>
+    <div slot="metrics" class="metrics-div">
+        {#if globalMetrics}
+            <MeasurementMetricsComponent metrics={globalMetrics} {unit} />
+        {/if}
+    </div>
+</BaseGraph>

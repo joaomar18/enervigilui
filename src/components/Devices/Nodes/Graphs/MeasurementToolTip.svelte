@@ -6,11 +6,11 @@
 
     // Styles
     import { mergeStyle } from "$lib/style/components";
-    import { MeasurementToolTipStyle } from "$lib/style/graph";
+    import { GraphDataToolTipStyle } from "$lib/style/graph";
 
     // Style object (from theme)
     export let style: { [property: string]: string | number } | null = null;
-    $: effectiveStyle = style ?? $MeasurementToolTipStyle;
+    $: effectiveStyle = style ?? $GraphDataToolTipStyle;
 
     // Props
     export let logPoint: MeasurementLogPoint | null;

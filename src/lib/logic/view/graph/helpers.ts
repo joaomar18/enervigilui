@@ -2,7 +2,9 @@ import uPlot from "uplot";
 import type { AlignedData } from "uplot";
 import { GraphType } from "./base";
 import type { SvelteComponent } from "svelte";
+import MeasurementMetrics from "../../../../components/Devices/Nodes/Metrics/MeasurementMetrics.svelte";
 import MeasurementToolTip from "../../../../components/Devices/Nodes/Graphs/MeasurementToolTip.svelte";
+import CounterMetrics from "../../../../components/Devices/Nodes/Metrics/CounterMetrics.svelte";
 import CounterToolTip from "../../../../components/Devices/Nodes/Graphs/CounterToolTip.svelte";
 
 /**
@@ -89,5 +91,20 @@ export function getGraphToolTipDisplayComponent(graphType: GraphType): typeof Sv
             return MeasurementToolTip;
         case GraphType.Counter:
             return CounterToolTip;
+    }
+}
+
+/**
+ * Returns the appropriate metrics component for the given graph type.
+ * 
+ * @param graphType - The type of graph
+ * @returns Svelte component constructor for the metrics display
+ */
+export function getGraphMetricsComponent(graphType: GraphType): typeof SvelteComponent<any> {
+    switch (graphType) {
+        case GraphType.Measurement:
+            return MeasurementMetrics;
+        case GraphType.Counter:
+            return CounterMetrics;
     }
 }

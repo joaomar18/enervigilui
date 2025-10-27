@@ -362,7 +362,7 @@ export function processNodesState(nodesState: Record<string, NodeState>): Array<
  */
 export function processNodeLogs(nodeLogs: NodeLogs): ProcessedNodeLogs {
     let processedPoints: Array<ProcessedBaseLogPoint> = [];
-    let { graphComponent, metricsComponent } = getNodeLogDisplayComponents(nodeLogs);
+    let graphComponent = getNodeLogDisplayComponents(nodeLogs);
     for (let point of nodeLogs.points) {
         const { start_time: start_time_str, end_time: end_time_str, ...logData } = point;
 
@@ -381,11 +381,12 @@ export function processNodeLogs(nodeLogs: NodeLogs): ProcessedNodeLogs {
 
     return {
         unit: nodeLogs.unit,
+        decimal_places: nodeLogs.decimal_places,
         type: nodeLogs.type,
         incremental: nodeLogs.incremental,
         time_step: nodeLogs.time_step,
         graphComponent: graphComponent,
-        metricsComponent: metricsComponent,
         points: processedPoints,
+        global_metrics: nodeLogs.global_metrics,
     } as ProcessedNodeLogs;
 }

@@ -57,7 +57,6 @@ const BaseGraphStyleConfig: ComponentStyles = {
 
 export const BaseGraphStyle = createStyleStore(BaseGraphStyleConfig);
 
-
 //////////     M E A S U R E M E N T     G R A P H     //////////
 
 const MeasurementGraphStyleConfig: ComponentStyles = {
@@ -74,6 +73,47 @@ const MeasurementGraphStyleConfig: ComponentStyles = {
 };
 
 export const MeasurementGraphStyle = createStyleStore(MeasurementGraphStyleConfig);
+
+//////////     C O U N T E R     G R A P H     //////////
+
+const CounterGraphStyleConfig: ComponentStyles = {
+    dark: {
+        barColor: "rgba(74, 144, 226, 0.15)",
+        barBorderWidthPx: 1,
+        barBorderColor: "transparent",
+        barHoverColor: "rgba(74, 144, 226, 0.25)",
+        barBorderHoverColor: "rgba(74, 144, 226, 0.3)",
+    },
+};
+
+export const CounterGraphStyle = createStyleStore(CounterGraphStyleConfig);
+
+//////////     G R A P H     M E T R I C     //////////
+
+const GraphMetricStyleConfig: ComponentStyles = {
+    dark: {
+        iconSize: "26px",
+        textSize: "14px",
+        rowWidth: "300px",
+        rowPaddingLeft: "0px",
+        rowPaddingRight: "10px",
+        rowBorderRight: "1px solid white",
+        labelWidth: "125px",
+        labelPaddingLeft: "5px",
+        labelColor: "rgba(255, 255, 255, 0.55)",
+        labelWeight: "400",
+        valueRightPadding: "5px",
+        valueColor: "rgba(255, 255, 255, 0.95)",
+        valueWeight: "500",
+        unitMaxWidth: "35px",
+        unitColor: "rgba(255, 255, 255, 0.55)",
+        unitWeight: "400",
+        noDataLabelColor: "rgba(255, 255, 255, 0.4)",
+        noDataLabelWeight: "400",
+    },
+};
+
+export const GraphMetricStyle = createStyleStore(GraphMetricStyleConfig);
 
 
 //////////     G R A P H     T O O L     T I P     //////////
@@ -97,9 +137,9 @@ const GraphToolTipStyleConfig: ComponentStyles = {
 
 export const GraphToolTipStyle = createStyleStore(GraphToolTipStyleConfig);
 
-//////////     M E A S U R E M E N T     T O O L     T I P     //////////
+//////////     G R A P H     D A T A     T O O L     T I P     //////////
 
-const MeasurementToolTipStyleConfig: ComponentStyles = {
+const GraphDataToolTipStyleConfig: ComponentStyles = {
     dark: {
         rowGap: "4px",
         textSize: "13px",
@@ -117,4 +157,4 @@ const MeasurementToolTipStyleConfig: ComponentStyles = {
     },
 };
 
-export const MeasurementToolTipStyle = createStyleStore(MeasurementToolTipStyleConfig);
+export const GraphDataToolTipStyle = createStyleStore(GraphDataToolTipStyleConfig);

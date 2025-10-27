@@ -19,26 +19,6 @@ export interface BaseLogPoint {
 }
 
 /**
- * Log point for measurement nodes with statistical data over a time period.
- * @property {number} average_value - Mean value during the logging period
- * @property {number} min_value - Minimum value recorded during the logging period
- * @property {number} max_value - Maximum value recorded during the logging period
- */
-export interface MeasurementLogPoint extends BaseLogPoint {
-    average_value: number;
-    min_value: number;
-    max_value: number;
-}
-
-/**
- * Log point for counter nodes with accumulated value.
- * @property {number} value - Total accumulated value at the end of the logging period
- */
-export interface CounterLogPoint extends BaseLogPoint {
-    value: number;
-}
-
-/**
  * Base processed log point with Unix timestamps for chart rendering.
  * @property {number} start_time - Unix timestamp (seconds) marking the beginning of the logging period
  * @property {number} end_time - Unix timestamp (seconds) marking the end of the logging period
@@ -49,59 +29,83 @@ export interface ProcessedBaseLogPoint {
 }
 
 /**
- * Processed measurement log point with statistical data and Unix timestamps.
- * @property {number} average_value - Mean value during the logging period
- * @property {number} min_value - Minimum value recorded during the logging period
- * @property {number} max_value - Maximum value recorded during the logging period
+ * Base interface for all metric types providing common structure.
  */
-export interface ProcessedMeasurementLogPoint extends ProcessedBaseLogPoint {
-    average_value: number;
-    min_value: number;
-    max_value: number;
+export interface BaseMetrics {
 }
 
 /**
- * Processed counter log point with accumulated value and Unix timestamps.
- * @property {number} value - Total accumulated value at the end of the logging period
+ * Statistical metrics for measurement data display.
+ * @property {number | null} average_value - Mean value of the dataset
+ * @property {number | null} min_value - Minimum value in the dataset
+ * @property {number | null} max_value - Maximum value in the dataset
  */
-export interface ProcessedCounterLogPoint extends ProcessedBaseLogPoint {
-    value: number;
+export interface MeasurementMetrics extends BaseMetrics {
+    average_value: number | null;
+    min_value: number | null;
+    max_value: number | null;
 }
 
 /**
- * Raw node logs with metadata and unprocessed log points.
+ * Metrics for counter/accumulator data display.
+ * @property {number | null} value - Current accumulated value
+ */
+export interface CounterMetrics extends BaseMetrics {
+    value: number | null;
+}
+
+/**
+ * Raw node logs with metadata and unprocessed log points from backend API.
  * @property {string} unit - Measurement unit (e.g., "V", "A", "kW")
+ * @property {number | null} decimal_places - Number of decimal places for value display formatting
  * @property {NodeType} type - Data type of the logged values
  * @property {boolean} incremental - Whether this node accumulates values over time
- * @property {Array<BaseLogPoint>} points - Array of raw log data points
+ * @property {Array<BaseLogPoint>} points - Array of raw log data points with ISO timestamps
  * @property {FormattedTimeStep | null} time_step - Time aggregation interval used for the log data
+ * @property {BaseMetrics} global_metrics - Overall statistical metrics for the entire dataset
  */
 export interface NodeLogs {
     unit: string;
+    decimal_places: number | null;
     type: NodeType;
     incremental: boolean;
     points: Array<BaseLogPoint>;
     time_step: FormattedTimeStep | null;
+    global_metrics: BaseMetrics;
 }
 
 /**
- * Processed node logs with metadata, UI components, and processed log points.
+ * Processed node logs with metadata, UI components, and chart-ready data points.
  * @property {string} unit - Measurement unit (e.g., "V", "A", "kW")
+ * @property {number | null} decimal_places - Number of decimal places for value display formatting
  * @property {NodeType} type - Data type of the logged values
  * @property {boolean} incremental - Whether this node accumulates values over time
  * @property {Array<ProcessedBaseLogPoint>} points - Array of processed log data points with Unix timestamps
  * @property {FormattedTimeStep | null} time_step - Time aggregation interval used for the log data
+ * @property {BaseMetrics} global_metrics - Overall statistical metrics for the entire dataset
  * @property {typeof SvelteComponent<any>} graphComponent - Svelte component for rendering the data graph
- * @property {typeof SvelteComponent<any>} metricsComponent - Svelte component for displaying metrics
  */
 export interface ProcessedNodeLogs {
     unit: string;
+    decimal_places: number | null;
     type: NodeType;
     incremental: boolean;
     points: Array<ProcessedBaseLogPoint>;
     time_step: FormattedTimeStep | null;
+    global_metrics: BaseMetrics;
     graphComponent: typeof SvelteComponent<any>;
-    metricsComponent: typeof SvelteComponent<any>;
 }
+
+/** Log point combining time range and measurement statistics. */
+export type MeasurementLogPoint = BaseLogPoint & MeasurementMetrics;
+
+/** Processed log point combining Unix timestamps and measurement statistics. */
+export type ProcessedMeasurementLogPoint = ProcessedBaseLogPoint & MeasurementMetrics;
+
+/** Log point combining time range and counter value. */
+export type CounterLogPoint = BaseLogPoint & CounterMetrics;
+
+/** Processed log point combining Unix timestamps and counter value. */
+export type ProcessedCounterLogPoint = ProcessedBaseLogPoint & CounterMetrics;
 
 /*****     O B J E C T S     *****/

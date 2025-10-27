@@ -443,7 +443,9 @@
                                     data={nodeLogs.points}
                                     timeStep={nodeLogs.time_step}
                                     logSpanPeriod={selectedHistoryTimeSpan}
+                                    globalMetrics={nodeLogs.global_metrics}
                                     unit={nodeLogs.unit}
+                                    decimalPlaces={nodeLogs.decimal_places}
                                     getNewTimeSpan={(initial_date: Date, end_date: Date) => {
                                         setDateSpan({ initial_date, end_date });
                                         loadNodeLogs(initial_date, end_date);

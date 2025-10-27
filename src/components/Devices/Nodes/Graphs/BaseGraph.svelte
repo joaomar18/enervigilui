@@ -2,6 +2,7 @@
     import Action from "../../../General/Action.svelte";
     import ToolTipText from "../../../General/ToolTipText.svelte";
     import DateRangeChecker from "../../../General/TimeDate/DateRangeChecker.svelte";
+    import "uplot/dist/uPlot.min.css";
 
     // Texts
     import { texts } from "$lib/stores/lang/generalTexts";
@@ -12,7 +13,7 @@
     import GraphToolTip from "./GraphToolTip.svelte";
     import type { BaseLogPoint } from "$lib/types/nodes/logs";
     import type { GraphType } from "$lib/logic/view/graph/base";
-    import { getGraphToolTipDisplayComponent } from "$lib/logic/view/graph/helpers";
+    import { getGraphToolTipDisplayComponent, getGraphMetricsComponent } from "$lib/logic/view/graph/helpers";
 
     // Style object (from theme)
     export let style: { [property: string]: string | number } | null = null;
@@ -153,6 +154,9 @@
                 </Action>
             </div>
         </div>
+        <div class="metrics-section">
+            <slot name="metrics" />
+        </div>
     </div>
     <div class="main">
         <div class="unit-div">
@@ -211,6 +215,7 @@
         width: 100%;
         height: var(--header-height);
         display: flex;
+        flex-direction: column;
         justify-content: center;
         align-items: center;
     }
@@ -243,6 +248,15 @@
         position: relative;
         width: fit-content;
         height: 100%;
+    }
+
+    /* Metrics section - Container for graph metric displays below header actions */
+    .metrics-section {
+        margin: 0;
+        padding: 0;
+        width: 100%;
+        height: fit-content;
+        padding-top: var(--padding-top);
     }
 
     /* Main content area - Horizontal scrollable container for unit label and graph */

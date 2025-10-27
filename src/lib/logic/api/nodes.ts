@@ -134,6 +134,7 @@ export async function getNodeLogs(
     });
 
     if (sucess) {
+        console.log(data);
         nodeLogs = processNodeLogs(data as NodeLogs);
 
     } else {

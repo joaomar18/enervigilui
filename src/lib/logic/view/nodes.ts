@@ -1,5 +1,5 @@
 import { NodeCategory, NodeType } from "$lib/types/nodes/base";
-import { logsDisplayComponentsMap, realTimeDisplayComponentMap } from "$lib/types/view/device";
+import { logsDisplayGraphComponentMap, realTimeDisplayComponentMap } from "$lib/types/view/device";
 import type { NodeState, ProcessedNodeState } from "$lib/types/nodes/realtime";
 import type { NodeLogs } from "$lib/types/nodes/logs";
 import type { SvelteComponent } from "svelte";
@@ -48,18 +48,17 @@ export function getNodeRealTimeDisplayComponent(nodeState: NodeState | Processed
 }
 
 /**
- * Gets the graph and metrics components for displaying node log data.
- * @param nodeLogs - The node logs to get display components for
- * @returns Object containing graph and metrics Svelte components for log visualization
+ * Gets the graph component for displaying node log data.
+ * @param nodeLogs - The node logs to get display component for
+ * @returns The Svelte component for log visualization
  * @throws Error if the components for the node's category are not implemented
  */
-export function getNodeLogDisplayComponents(nodeLogs: NodeLogs): { graphComponent: typeof SvelteComponent<any>, metricsComponent: typeof SvelteComponent<any> } {
+export function getNodeLogDisplayComponents(nodeLogs: NodeLogs): typeof SvelteComponent<any> {
     let category = getNodeCategory(nodeLogs.type, nodeLogs.incremental);
-
-    const components = logsDisplayComponentsMap[category];
-    if (!components.graph || !components.metrics) {
-        throw new Error(`${category} category graphics or metrics component is not implemented.`);
+    let component = logsDisplayGraphComponentMap[category];
+    if (!component) {
+        throw new Error(`${category} category graphics component is not implemented.`);
     }
 
-    return { graphComponent: components.graph, metricsComponent: components.metrics };
+    return component;
 }

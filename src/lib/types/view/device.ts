@@ -4,8 +4,8 @@ import Measurement from "../../../components/Devices/Nodes/RealTimeDisplay/Measu
 import Counter from "../../../components/Devices/Nodes/RealTimeDisplay/Counter.svelte";
 import Text from "../../../components/Devices/Nodes/RealTimeDisplay/Text.svelte";
 import CounterGraph from "../../../components/Devices/Nodes/Graphs/CounterGraph.svelte";
-import MeasurementGraph from "../../../components/Devices/Nodes/Graphs/MeasurementGraph.svelte";
 import CounterMetrics from "../../../components/Devices/Nodes/Metrics/CounterMetrics.svelte";
+import MeasurementGraph from "../../../components/Devices/Nodes/Graphs/MeasurementGraph.svelte";
 import MeasurementMetrics from "../../../components/Devices/Nodes/Metrics/MeasurementMetrics.svelte";
 
 /** Configuration for which real-time card categories are active/visible */
@@ -38,11 +38,11 @@ export const realTimeDisplayComponentMap: Record<NodeCategory, typeof SvelteComp
     [NodeCategory.Other]: null, // Not implemented yet
 };
 
-/** Maps node categories to their corresponding graph and metrics components for log data visualization */
-export const logsDisplayComponentsMap: Record<NodeCategory, { graph: typeof SvelteComponent<any> | null, metrics: typeof SvelteComponent<any> | null }> = {
-    [NodeCategory.Measurements]: { graph: MeasurementGraph, metrics: MeasurementMetrics },
-    [NodeCategory.Counters]: { graph: CounterGraph, metrics: CounterMetrics },
-    [NodeCategory.States]: { graph: null, metrics: null }, // Not implemented yet
-    [NodeCategory.Texts]: { graph: null, metrics: null }, // Not implemented yet
-    [NodeCategory.Other]: { graph: null, metrics: null }, // Not implemented yet
+/** Maps node categories to their corresponding graph component for log data visualization */
+export const logsDisplayGraphComponentMap: Record<NodeCategory, typeof SvelteComponent<any> | null> = {
+    [NodeCategory.Measurements]: MeasurementGraph,
+    [NodeCategory.Counters]: CounterGraph,
+    [NodeCategory.States]: null, // Not implemented yet
+    [NodeCategory.Texts]: null, // Not implemented yet
+    [NodeCategory.Other]: null, // Not implemented yet
 };

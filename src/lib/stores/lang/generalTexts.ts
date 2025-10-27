@@ -463,6 +463,10 @@ const textsObject: TextsObject = {
         PT: "Valor Máximo",
         EN: "Maximum Value",
     },
+    averageValue: {
+        PT: "Valor Médio",
+        EN: "Average Value",
+    },
     minValueShort: {
         PT: "Mín",
         EN: "Min",
