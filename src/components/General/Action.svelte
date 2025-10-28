@@ -8,8 +8,10 @@
 
     // Props
     export let imageURL: string = "";
+    export let disabledImageURL: string = "";
     export let enableToolTip: boolean = false;
     export let toolTipAutoPos: boolean = true;
+    export let disabled: boolean = false;
 
     // Style object (from theme)
     export let style: { [property: string]: string | number } | null = null;
@@ -55,7 +57,7 @@
 
     // Functions
     function handleClick(): void {
-        if (onClick) {
+        if (onClick && !disabled) {
             onClick();
         }
     }
@@ -84,6 +86,7 @@
 -->
 <div
     class="action-button-div"
+    class:enabled={!disabled}
     style="
         --width: {mergedStyle.width};
         --height: {mergedStyle.height};
@@ -100,11 +103,12 @@
             --image-width: {mergedStyle.imageWidth};
             --image-height: {mergedStyle.imageHeight};
         "
-                src={imageURL}
-                alt={imageURL}
+                src={!disabled ? imageURL : disabledImageURL}
+                alt={!disabled ? imageURL : disabledImageURL}
             />
         {/if}
-        <button on:click={handleClick} on:mouseenter={handleMouseEnter} on:mouseleave={handleMouseLeave} aria-label="Action Button"></button>
+        <button class:disabled on:click={handleClick} on:mouseenter={handleMouseEnter} on:mouseleave={handleMouseLeave} aria-label="Action Button"
+        ></button>
         <ToolTip style={toolTipStyle} {showToolTip} autoPosition={toolTipAutoPos}>
             <slot name="tooltip" />
         </ToolTip>
@@ -123,7 +127,6 @@
         background-color: var(--background-color);
         border: 1px solid var(--border-color);
         border-radius: var(--border-radius);
-        cursor: pointer;
         user-select: none;
         -webkit-tap-highlight-color: transparent;
         -webkit-touch-callout: none;
@@ -133,7 +136,7 @@
     }
 
     /* Hover state: visual feedback on pointer-over */
-    .action-button-div:hover {
+    .action-button-div.enabled:hover {
         background-color: var(--hover-color);
     }
 
@@ -163,6 +166,11 @@
         cursor: pointer;
         outline: none;
         -webkit-tap-highlight-color: transparent;
+    }
+
+    /* When the action is disabled the cursor is unset from pointer */
+    button.disabled {
+        cursor: auto;
     }
 
     /* Icon sizing: driven by CSS variables */

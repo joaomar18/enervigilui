@@ -1,13 +1,13 @@
 <script lang="ts">
     import { onDestroy } from "svelte";
-    import { createDateTimeField } from "$lib/logic/util/date";
+    import { createDateTimeField, getDateFromField } from "$lib/logic/util/date";
     import { validTimeSpan } from "$lib/logic/validation/date";
     import ToolTip from "../ToolTip.svelte";
     import Button from "../Button.svelte";
     import TimeField from "./TimeField.svelte";
     import DateField from "./DateField.svelte";
     import FormAlert from "../FormAlert.svelte";
-    import type { DateTimeField, DateTimeSpanValidation } from "$lib/types/date";
+    import type { DateTimeSpanValidation } from "$lib/types/date";
 
     // Stores
     import { AlertType } from "$lib/stores/view/toast";
@@ -91,7 +91,7 @@
     $: ({ validation, messageKey, messageVariables } = validTimeSpan(startDateTime, endDateTime));
 
     // Export Functions
-    export let requestCustomPeriod: (startDateTime: DateTimeField, endDateTime: DateTimeField) => void;
+    export let requestCustomPeriod: (initial_date: Date, end_date: Date) => void;
 
     // Functions
     function handleClickOutside(event: MouseEvent): void {
@@ -106,7 +106,7 @@
             return;
         }
         processingRequest = true;
-        requestCustomPeriod(startDateTime, endDateTime);
+        requestCustomPeriod(getDateFromField(startDateTime), getDateFromField(endDateTime));
         processingRequest = false;
     }
 

@@ -13,13 +13,14 @@
     import GraphToolTip from "./GraphToolTip.svelte";
     import type { BaseLogPoint } from "$lib/types/nodes/logs";
     import type { GraphType } from "$lib/logic/view/graph/base";
-    import { getGraphToolTipDisplayComponent, getGraphMetricsComponent } from "$lib/logic/view/graph/helpers";
+    import { getGraphToolTipDisplayComponent } from "$lib/logic/view/graph/helpers";
 
     // Style object (from theme)
     export let style: { [property: string]: string | number } | null = null;
     $: effectiveStyle = style ?? $BaseGraphStyle;
 
     // Props
+    export let goBackEnabled: boolean = true;
     export let gridElement: HTMLDivElement | null = null;
     export let graphType: GraphType;
     export let insideGraph: boolean;
@@ -92,6 +93,9 @@
 
     // Variables
     let showDateRange: boolean = false;
+
+    // Export Functions
+    export let goBack: () => void;
 </script>
 
 <!--
@@ -135,6 +139,18 @@
 >
     <div class="header">
         <div class="header-content">
+            <div class="left-actions-div">
+                <Action
+                    style={$GraphActionStyle}
+                    imageURL="/img/previous.svg"
+                    disabledImageURL="/img/previous-disabled.svg"
+                    onClick={() => goBack()}
+                    enableToolTip={true}
+                    disabled={!goBackEnabled}
+                >
+                    <div slot="tooltip"><ToolTipText text={$texts.goBack} /></div>
+                </Action>
+            </div>
             <div class="actions-div">
                 <div class="date-checker-div">
                     <Action
@@ -226,7 +242,7 @@
         width: 100%;
         display: flex;
         flex-direction: row;
-        justify-content: end;
+        justify-content: space-between;
         align-items: center;
         flex-wrap: wrap;
     }
@@ -237,6 +253,16 @@
         height: 100%;
         display: flex;
         justify-content: end;
+        align-items: center;
+        gap: var(--header-buttons-gap);
+    }
+
+    /* Left action buttons container - Left-aligned controls (e.g., back/previous button) */
+    .header-content .left-actions-div {
+        width: fit-content;
+        height: 100%;
+        display: flex;
+        justify-content: start;
         align-items: center;
         gap: var(--header-buttons-gap);
     }

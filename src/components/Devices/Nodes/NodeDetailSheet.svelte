@@ -7,7 +7,9 @@
     import { LogSpanPeriod } from "$lib/types/view/nodes";
     import { getNodePhaseSection, getCommunicationID, isNumeric } from "$lib/logic/util/nodes";
     import { getNodeAdditionalInfo, getNodeLogs } from "$lib/logic/api/nodes";
-    import { getTimeSpanFromLogPeriod, getDateFromField } from "$lib/logic/util/date";
+    import { getTimeSpanFromLogPeriod } from "$lib/logic/util/date";
+    import { SlidingWindow } from "$lib/logic/util/classes/SlidingWindow";
+    import type { NodeTimeSpan } from "$lib/types/view/nodes";
     import type { BaseNodeAdditionalInfo, ProcessedNodeState } from "$lib/types/nodes/realtime";
     import type { ProcessedNodeLogs } from "$lib/types/nodes/logs";
 
@@ -85,24 +87,23 @@
     let nodeAdditionalInfo: BaseNodeAdditionalInfo;
     let nodeLogs: ProcessedNodeLogs;
     let selectedHistoryTimeSpan: LogSpanPeriod = LogSpanPeriod.currentDay;
-    let initialDate: Date;
-    let endDate: Date;
+    let initialDate: Date | null = null;
+    let endDate: Date | null = null;
     let showCustomDatePicker: boolean = false;
+    let currentTimeSpans: SlidingWindow<NodeTimeSpan> = new SlidingWindow(10);
+    let enableGoBack: boolean = false;
 
     // Reactive Statements
     $: if (!showPanel) {
         selectedHistoryTimeSpan = LogSpanPeriod.currentDay; // Default Period
+        currentTimeSpans.clear();
     }
 
     $: if (nodeState) {
         showCustomDatePicker = false;
         loadNodeAdditionalInfo();
         if (isNumeric(nodeState)) {
-            if (!initialDate || !endDate) {
-                let { initial_date, end_date } = loadDateSpan();
-                setDateSpan({ initial_date, end_date });
-            }
-            loadNodeLogs(initialDate, endDate);
+            processNodeStateChange();
         }
     }
 
@@ -126,8 +127,23 @@
         ({ nodeAdditionalInfo } = await getNodeAdditionalInfo($currentDeviceID, nodeState.name, nodeState.phase));
     }
 
-    function loadDateSpan(): { initial_date: Date; end_date: Date } {
-        return getTimeSpanFromLogPeriod(selectedHistoryTimeSpan);
+    function processNodeStateChange(): void {
+        if (!initialDate || !endDate) {
+            getInitialDateSpan(); // First Request
+        } else {
+            loadNodeLogs();
+        }
+    }
+
+    function getInitialDateSpan(): void {
+        let { initial_date, end_date } = loadDateSpan(selectedHistoryTimeSpan);
+        setDateSpan({ initial_date, end_date });
+        loadNodeLogs();
+        addToCurrentTimeSpans({ initial_date, end_date, log_span_period: selectedHistoryTimeSpan } as NodeTimeSpan);
+    }
+
+    function loadDateSpan(timeSpan: LogSpanPeriod): { initial_date: Date; end_date: Date } {
+        return getTimeSpanFromLogPeriod(timeSpan);
     }
 
     function setDateSpan(dateSpan: { initial_date: Date; end_date: Date }): void {
@@ -135,11 +151,44 @@
         endDate = dateSpan.end_date;
     }
 
-    async function loadNodeLogs(initial_date: Date | null = null, end_date: Date | null = null) {
+    function addToCurrentTimeSpans(nodeTimeSpan: NodeTimeSpan): void {
+        currentTimeSpans.add(nodeTimeSpan);
+        enableGoBack = currentTimeSpans.hasPrevious();
+    }
+
+    function setDateSpanToPrevious(): void {
+        let previousNodeTimeSpan = currentTimeSpans.previous();
+        if (!previousNodeTimeSpan) return;
+        setDateSpan({ initial_date: previousNodeTimeSpan.initial_date, end_date: previousNodeTimeSpan.end_date });
+        loadNodeLogs();
+        currentTimeSpans.confirmPrevious();
+        enableGoBack = currentTimeSpans.hasPrevious();
+        selectedHistoryTimeSpan = previousNodeTimeSpan.log_span_period;
+    }
+
+    function loadNodeLogsWithSpanPeriod(timeSpan: LogSpanPeriod): void {
+        let { initial_date, end_date } = getTimeSpanFromLogPeriod(timeSpan);
+        setDateSpan({ initial_date, end_date });
+        loadNodeLogs();
+        addToCurrentTimeSpans({ initial_date, end_date, log_span_period: timeSpan } as NodeTimeSpan);
+        selectedHistoryTimeSpan = timeSpan;
+    }
+
+    function loadNodeLogsWithCustomPeriod(initial_date: Date, end_date: Date): void {
+        setDateSpan({ initial_date, end_date });
+        loadNodeLogs();
+        addToCurrentTimeSpans({ initial_date, end_date, log_span_period: LogSpanPeriod.customDate } as NodeTimeSpan);
+        selectedHistoryTimeSpan = LogSpanPeriod.customDate;
+        currentTimeSpans.add({ initial_date, end_date, log_span_period: LogSpanPeriod.customDate } as NodeTimeSpan);
+        enableGoBack = currentTimeSpans.hasPrevious();
+        if (showCustomDatePicker) showCustomDatePicker = false;
+    }
+
+    async function loadNodeLogs() {
         if (!$currentDeviceID || !nodeState) {
             return;
         }
-        ({ nodeLogs } = await getNodeLogs($currentDeviceID, nodeState.name, nodeState.phase, initial_date !== null, initial_date, end_date));
+        ({ nodeLogs } = await getNodeLogs($currentDeviceID, nodeState.name, nodeState.phase, initialDate !== null, initialDate, endDate));
     }
 </script>
 
@@ -337,12 +386,7 @@
                                 selected={selectedHistoryTimeSpan === LogSpanPeriod.currentHour}
                                 style={$NodeDetailPickerButtonStyle}
                                 buttonText={$texts._1h}
-                                onClick={() => {
-                                    selectedHistoryTimeSpan = LogSpanPeriod.currentHour;
-                                    let { initial_date, end_date } = getTimeSpanFromLogPeriod(selectedHistoryTimeSpan);
-                                    setDateSpan({ initial_date, end_date });
-                                    loadNodeLogs(initial_date, end_date);
-                                }}
+                                onClick={() => loadNodeLogsWithSpanPeriod(LogSpanPeriod.currentHour)}
                             >
                                 <div slot="tooltip"><ToolTipText text={$texts.currentHour} /></div>
                             </Button>
@@ -351,12 +395,7 @@
                                 selected={selectedHistoryTimeSpan === LogSpanPeriod.currentDay}
                                 style={$NodeDetailPickerButtonStyle}
                                 buttonText={$texts._1d}
-                                onClick={() => {
-                                    selectedHistoryTimeSpan = LogSpanPeriod.currentDay;
-                                    let { initial_date, end_date } = getTimeSpanFromLogPeriod(selectedHistoryTimeSpan);
-                                    setDateSpan({ initial_date, end_date });
-                                    loadNodeLogs(initial_date, end_date);
-                                }}
+                                onClick={() => loadNodeLogsWithSpanPeriod(LogSpanPeriod.currentDay)}
                             >
                                 <div slot="tooltip"><ToolTipText text={$texts.currentDay} /></div>
                             </Button>
@@ -365,12 +404,7 @@
                                 selected={selectedHistoryTimeSpan === LogSpanPeriod.current7Days}
                                 style={$NodeDetailPickerButtonStyle}
                                 buttonText={$texts._7d}
-                                onClick={() => {
-                                    selectedHistoryTimeSpan = LogSpanPeriod.current7Days;
-                                    let { initial_date, end_date } = getTimeSpanFromLogPeriod(selectedHistoryTimeSpan);
-                                    setDateSpan({ initial_date, end_date });
-                                    loadNodeLogs(initial_date, end_date);
-                                }}
+                                onClick={() => loadNodeLogsWithSpanPeriod(LogSpanPeriod.current7Days)}
                             >
                                 <div slot="tooltip"><ToolTipText text={$texts.currentWeek} /></div>
                             </Button>
@@ -379,12 +413,7 @@
                                 selected={selectedHistoryTimeSpan === LogSpanPeriod.currentMonth}
                                 style={$NodeDetailPickerButtonStyle}
                                 buttonText={$texts._1M}
-                                onClick={() => {
-                                    selectedHistoryTimeSpan = LogSpanPeriod.currentMonth;
-                                    let { initial_date, end_date } = getTimeSpanFromLogPeriod(selectedHistoryTimeSpan);
-                                    setDateSpan({ initial_date, end_date });
-                                    loadNodeLogs(initial_date, end_date);
-                                }}
+                                onClick={() => loadNodeLogsWithSpanPeriod(LogSpanPeriod.currentMonth)}
                             >
                                 <div slot="tooltip"><ToolTipText text={$texts.currentMonth} /></div>
                             </Button>
@@ -393,12 +422,7 @@
                                 selected={selectedHistoryTimeSpan === LogSpanPeriod.currentYear}
                                 style={$NodeDetailPickerButtonStyle}
                                 buttonText={$texts._1Y}
-                                onClick={() => {
-                                    selectedHistoryTimeSpan = LogSpanPeriod.currentYear;
-                                    let { initial_date, end_date } = getTimeSpanFromLogPeriod(selectedHistoryTimeSpan);
-                                    setDateSpan({ initial_date, end_date });
-                                    loadNodeLogs(initial_date, end_date);
-                                }}
+                                onClick={() => loadNodeLogsWithSpanPeriod(LogSpanPeriod.currentYear)}
                             >
                                 <div slot="tooltip"><ToolTipText text={$texts.currentYear} /></div>
                             </Button>
@@ -422,14 +446,7 @@
                                     bind:initialDate
                                     bind:endDate
                                     bind:showToolTip={showCustomDatePicker}
-                                    requestCustomPeriod={(startDateTime, endDateTime) => {
-                                        let initial_date = getDateFromField(startDateTime);
-                                        let end_date = getDateFromField(endDateTime);
-                                        setDateSpan({ initial_date, end_date });
-                                        loadNodeLogs(initial_date, end_date);
-                                        selectedHistoryTimeSpan = LogSpanPeriod.customDate;
-                                        showCustomDatePicker = false;
-                                    }}
+                                    requestCustomPeriod={(initial_date: Date, end_date: Date) => loadNodeLogsWithCustomPeriod(initial_date, end_date)}
                                 />
                             </div>
                         </div>
@@ -446,11 +463,9 @@
                                     globalMetrics={nodeLogs.global_metrics}
                                     unit={nodeLogs.unit}
                                     decimalPlaces={nodeLogs.decimal_places}
-                                    getNewTimeSpan={(initial_date: Date, end_date: Date) => {
-                                        setDateSpan({ initial_date, end_date });
-                                        loadNodeLogs(initial_date, end_date);
-                                        selectedHistoryTimeSpan = LogSpanPeriod.customDate;
-                                    }}
+                                    getNewTimeSpan={(initial_date: Date, end_date: Date) => loadNodeLogsWithCustomPeriod(initial_date, end_date)}
+                                    goBackEnabled={enableGoBack}
+                                    goBack={() => setDateSpanToPrevious()}
                                 />
                             {/if}
                         </div>

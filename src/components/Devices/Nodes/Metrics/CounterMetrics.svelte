@@ -14,9 +14,11 @@
     $: effectiveStyle = style ?? $GraphMetricStyle;
 
     // Props
-    export let metrics: CounterMetrics;
     export let forceColStack: boolean = false;
+    export let metrics: CounterMetrics;
     export let unit: string = "";
+    export let decimalPlaces: number | null;
+    export let roundMetrics: boolean = false;
 
     // Layout / styling props
     export let iconSize: string | undefined = undefined;
@@ -61,6 +63,11 @@
 
     // Merged style
     $: mergedStyle = mergeStyle(effectiveStyle, localOverrides);
+
+    // Reactive Statements
+    $: if (metrics && roundMetrics && decimalPlaces !== null && decimalPlaces !== undefined) {
+        if (metrics.value !== null) metrics.value = Number(metrics.value.toFixed(decimalPlaces));
+    }
 </script>
 
 <div
@@ -89,7 +96,7 @@
 >
     <div class="content">
         <div class="row">
-            <img class="icon" src="/img/max-value.svg" alt="Max Value" />
+            <img class="icon" src="/img/total-value.svg" alt="Total Value" />
             <span class="label">{$texts.total}:</span>
             <div class="request-content">
                 <InlineLoader loaded={!!metrics}>

@@ -35,3 +35,10 @@ export enum LogSpanPeriod {
     currentYear = "currentYear",
     customDate = "customDate",
 }
+
+/** Time span configuration for node navigation history */
+export interface NodeTimeSpan {
+    initial_date: Date;
+    end_date: Date;
+    log_span_period: LogSpanPeriod;
+}

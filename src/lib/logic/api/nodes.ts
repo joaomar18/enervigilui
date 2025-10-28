@@ -6,7 +6,7 @@ import { addPrefix, getNodePrefix, removePrefix } from "../util/nodes";
 import { toISOStringLocal } from "../util/date";
 import type { NodeRecord, EditableNodeRecord } from "$lib/types/nodes/config";
 import type { NodeState, ProcessedNodeState, BaseNodeAdditionalInfo } from "$lib/types/nodes/realtime";
-import type { BaseLogPoint, NodeLogs, ProcessedBaseLogPoint, ProcessedNodeLogs } from "$lib/types/nodes/logs";
+import type { NodeLogs, ProcessedNodeLogs } from "$lib/types/nodes/logs";
 
 /**
  * Fetches and processes the configuration for all nodes of a device by its ID.
@@ -118,7 +118,6 @@ export async function getNodeLogs(
     time_step: string | null = null
 ): Promise<{ nodeLogs: ProcessedNodeLogs }> {
     let nodeLogs: ProcessedNodeLogs;
-
     const prefix = getNodePrefix(nodePhase);
     const processedName = addPrefix(removePrefix(nodeName), prefix);
     let start_time_str: string | null = null;
@@ -134,7 +133,6 @@ export async function getNodeLogs(
     });
 
     if (sucess) {
-        console.log(data);
         nodeLogs = processNodeLogs(data as NodeLogs);
 
     } else {

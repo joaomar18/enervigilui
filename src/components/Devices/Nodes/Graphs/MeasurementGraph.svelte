@@ -21,6 +21,7 @@
     $: effectiveStyle = style ?? $MeasurementGraphStyle;
 
     // Props
+    export let goBackEnabled: boolean = true;
     export let initialDate: Date;
     export let endDate: Date;
     export let data: Array<ProcessedMeasurementLogPoint>;
@@ -58,6 +59,7 @@
 
     // Export Functions
     export let getNewTimeSpan: (startTime: Date, endTime: Date) => void;
+    export let goBack: () => void;
 
     // Functions
     function createGraphObject(): void {
@@ -116,10 +118,12 @@
     graphNoData={noData}
     logPoint={currentLogPoint}
     {unit}
+    {goBackEnabled}
+    {goBack}
 >
     <div slot="metrics" class="metrics-div">
         {#if globalMetrics}
-            <MeasurementMetricsComponent metrics={globalMetrics} {unit} />
+            <MeasurementMetricsComponent metrics={globalMetrics} {unit} {decimalPlaces} />
         {/if}
     </div>
 </BaseGraph>

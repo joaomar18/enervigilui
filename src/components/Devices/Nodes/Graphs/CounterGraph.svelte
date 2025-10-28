@@ -21,6 +21,7 @@
     $: effectiveStyle = style ?? $CounterGraphStyle;
 
     // Props
+    export let goBackEnabled: boolean = true;
     export let initialDate: Date;
     export let endDate: Date;
     export let data: Array<ProcessedCounterLogPoint>;
@@ -58,6 +59,7 @@
 
     // Export Functions
     export let getNewTimeSpan: (startTime: Date, endTime: Date) => void;
+    export let goBack: () => void;
 
     // Functions
     function createGraphObject(): void {
@@ -92,8 +94,6 @@
             graph.destroy();
         }
     });
-
-    $: console.log(globalMetrics);
 </script>
 
 <BaseGraph
@@ -109,10 +109,12 @@
     graphNoData={noData}
     logPoint={currentLogPoint}
     {unit}
+    {goBackEnabled}
+    {goBack}
 >
     <div slot="metrics" class="metrics-div">
         {#if globalMetrics}
-            <CounterMetricsComponent metrics={globalMetrics} {unit} />
+            <CounterMetricsComponent forceColStack={true} metrics={globalMetrics} {unit} {decimalPlaces} roundMetrics={true} />
         {/if}
     </div>
 </BaseGraph>

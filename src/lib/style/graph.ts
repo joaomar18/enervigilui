@@ -105,7 +105,7 @@ const GraphMetricStyleConfig: ComponentStyles = {
         valueRightPadding: "5px",
         valueColor: "rgba(255, 255, 255, 0.95)",
         valueWeight: "500",
-        unitMaxWidth: "35px",
+        unitMaxWidth: "50px",
         unitColor: "rgba(255, 255, 255, 0.55)",
         unitWeight: "400",
         noDataLabelColor: "rgba(255, 255, 255, 0.4)",
