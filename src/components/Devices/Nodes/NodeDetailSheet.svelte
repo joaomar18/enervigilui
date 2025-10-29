@@ -7,7 +7,7 @@
     import { LogSpanPeriod } from "$lib/types/view/nodes";
     import { getNodePhaseSection, getCommunicationID, isNumeric } from "$lib/logic/util/nodes";
     import { getNodeAdditionalInfo, getNodeLogs } from "$lib/logic/api/nodes";
-    import { getTimeSpanFromLogPeriod } from "$lib/logic/util/date";
+    import { getElegantElapsedTimeFromIsoDate, getTimeSpanFromLogPeriod } from "$lib/logic/util/date";
     import { SlidingWindow } from "$lib/logic/util/classes/SlidingWindow";
     import type { NodeTimeSpan } from "$lib/types/view/nodes";
     import type { BaseNodeAdditionalInfo, ProcessedNodeState } from "$lib/types/nodes/realtime";
@@ -85,6 +85,8 @@
     // Variables
     let state: "alarmState" | "warningState" | "okState" | "disconnectedState";
     let nodeAdditionalInfo: BaseNodeAdditionalInfo;
+    let updatedAtString: string;
+    let restartedAtString: string;
     let nodeLogs: ProcessedNodeLogs;
     let selectedHistoryTimeSpan: LogSpanPeriod = LogSpanPeriod.currentDay;
     let initialDate: Date | null = null;
@@ -125,6 +127,8 @@
             return;
         }
         ({ nodeAdditionalInfo } = await getNodeAdditionalInfo($currentDeviceID, nodeState.name, nodeState.phase));
+        updatedAtString = getElegantElapsedTimeFromIsoDate(nodeAdditionalInfo.last_update_date);
+        restartedAtString = getElegantElapsedTimeFromIsoDate(nodeAdditionalInfo.last_reset_date);
     }
 
     function processNodeStateChange(): void {
@@ -301,14 +305,14 @@
                     </div>
                     <div class="row">
                         <span class="label">{$texts.updated}</span>
-                        <InlineLoader loaded={nodeAdditionalInfo !== undefined}>
-                            <span class="value align-right">à 7 segundos</span>
+                        <InlineLoader loaded={updatedAtString !== undefined}>
+                            <span class="value align-right">{updatedAtString}</span>
                         </InlineLoader>
                     </div>
                     <div class="row">
                         <dt class="label">{$texts.restarted}</dt>
-                        <InlineLoader loaded={nodeAdditionalInfo !== undefined}>
-                            <span class="value align-right">à 13 minutos</span>
+                        <InlineLoader loaded={restartedAtString !== undefined}>
+                            <span class="value align-right">{restartedAtString}</span>
                         </InlineLoader>
                     </div>
                 </div>

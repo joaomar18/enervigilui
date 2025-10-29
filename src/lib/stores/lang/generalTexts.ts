@@ -818,7 +818,11 @@ const textsObject: TextsObject = {
     selectedPeriod: {
         PT: "Período selecionado",
         EN: "Selected period",
-    }
+    },
+    never: {
+        PT: "Nunca",
+        EN: "Never",
+    },
 };
 
 export const texts = createLangStore(textsObject);

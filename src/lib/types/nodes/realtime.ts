@@ -80,8 +80,8 @@ export interface ProcessedNodeState {
  * Additional operational information and metadata for a node.
  * Contains runtime data, alarm/warning thresholds, and communication settings.
  *
- * @property {string} [last_update_date] - ISO timestamp of the last value update
- * @property {string} [last_reset_date] - ISO timestamp of the last counter reset (for incremental nodes)
+ * @property {string | null} [last_update_date] - ISO timestamp of the last value update
+ * @property {string | null} [last_reset_date] - ISO timestamp of the last counter reset (for incremental nodes)
  * @property {number} [min_alarm_value] - Minimum threshold value that triggers alarms
  * @property {number} [max_alarm_value] - Maximum threshold value that triggers alarms
  * @property {number} [min_warning_value] - Minimum threshold value that triggers warnings
@@ -92,8 +92,8 @@ export interface ProcessedNodeState {
  * @property {number} logging_period - How often the node value is logged (in minutes)
  */
 export interface BaseNodeAdditionalInfo {
-    last_update_date?: string;
-    last_reset_date?: string;
+    last_update_date: string | null;
+    last_reset_date: string | null;
     min_alarm_value?: number;
     max_alarm_value?: number;
     min_warning_value?: number;

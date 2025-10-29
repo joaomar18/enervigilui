@@ -1,6 +1,8 @@
 import { get } from "svelte/store";
+import { texts } from "$lib/stores/lang/generalTexts";
+import { dateTexts } from "$lib/stores/lang/dateTexts";
 import { selectedLang } from "$lib/stores/lang/definition";
-import { FormattedTimeStep, type DateTimeField } from "$lib/types/date";
+import { ElapsedTime, FormattedTimeStep, type DateTimeField } from "$lib/types/date";
 import { LogSpanPeriod } from "$lib/types/view/nodes";
 
 
@@ -63,6 +65,17 @@ export function convertDateToLocalTime(date: string | null): string | null {
         minute: "2-digit",
     });
     return localTime;
+}
+
+/**
+ * Safely converts an ISO date string to a Date object with null handling.
+ * @param isoString - ISO date string or null to convert
+ * @returns Date object if conversion succeeds, null if input is null or invalid
+ */
+export function convertISOToDate(isoString: string | null): Date | null {
+    if (!isoString) return null;
+    const date = new Date(isoString);
+    return isNaN(date.getTime()) ? null : date;
 }
 
 /**
@@ -256,4 +269,111 @@ export function getElegantShortStringFromDate(date: Date, timeStep: FormattedTim
         case FormattedTimeStep._1Y:
             return date.getFullYear().toString();
     }
+}
+
+/**
+ * Categorizes elapsed time between two dates using calendar-aware calculations.
+ * Uses proper date arithmetic to handle DST changes, varying month lengths, and leap years.
+ * @param date - The past date to calculate elapsed time from
+ * @param now - The current date to compare against  
+ * @returns ElapsedTime category for determining appropriate display format
+ * @throws Error if date is later than current date
+ */
+export function getElapsedTime(date: Date, now: Date): ElapsedTime {
+    const diffMs = now.getTime() - date.getTime();
+    if (diffMs < 0) throw new Error(`Date is later than current date`);
+
+    const oneMinuteAgo = new Date(now);
+    oneMinuteAgo.setMinutes(now.getMinutes() - 1);
+
+    const oneHourAgo = new Date(now);
+    oneHourAgo.setHours(now.getHours() - 1);
+
+    const oneDayAgo = new Date(now);
+    oneDayAgo.setDate(now.getDate() - 1);
+
+    const oneMonthAgo = new Date(now);
+    oneMonthAgo.setMonth(now.getMonth() - 1);
+
+    if (date > oneMinuteAgo) {
+        return ElapsedTime.lessThan1Min;
+    }
+    else if (date > oneHourAgo) {
+        return ElapsedTime.lessThan1Hour;
+    }
+    else if (date > oneDayAgo) {
+        return ElapsedTime.lessThan1Day;
+    }
+    else if (date > oneMonthAgo) {
+        return ElapsedTime.lessThan1Month;
+    }
+
+    return ElapsedTime.moreThan1Month;
+}
+
+/**
+ * Calculates elapsed time from an ISO date string and returns localization key with variables.
+ * Provides structured data for internationalized time formatting with proper pluralization.
+ * @param isoString - ISO date string or null to calculate elapsed time from
+ * @returns Object with translation key and variables for template substitution
+ */
+export function getElegantElapsedTimeFromIsoDate(isoString: string | null): { key: string, variables: Record<string, string | number> } {
+
+    const lang = get(selectedLang);
+    const now = new Date();
+    const date = convertISOToDate(isoString);
+    let key = "";
+    let variables: Record<string, string | number> = {};
+
+    if (date === null) return { key: get(texts).never, variables };
+    let elapsedTime = getElapsedTime(date, now);
+
+    const diffMs = now.getTime() - date.getTime();
+    const totalSeconds = Math.max(1, Math.floor(diffMs / 1000));
+    const seconds = totalSeconds % 60;
+    const totalMinutes = Math.floor(totalSeconds / 60);
+    const minutes = totalMinutes % 60;
+    const totalHours = Math.floor(totalMinutes / 60);
+    const hours = totalHours % 24;
+    const days = Math.floor(totalHours / 24);
+
+    switch (elapsedTime) {
+        case ElapsedTime.lessThan1Min:
+            key = "elapsedSeconds";
+            variables["seconds"] = seconds;
+            variables["plural"] = variables["seconds"] > 1 ? "s" : "";
+            break;
+
+        case ElapsedTime.lessThan1Hour:
+            key = "elapsedMinutes";
+            variables["minutes"] = minutes;
+            variables["plural"] = variables["minutes"] > 1 ? "s" : "";
+            break;
+
+        case ElapsedTime.lessThan1Day:
+            key = "elapsedHours";
+            variables["hours"] = hours;
+            variables["minutes"] = minutes;
+            variables["hours_plural"] = variables["hours"] > 1 ? "s" : "";
+            variables["minutes_plural"] = variables["minutes"] > 1 ? "s" : "";
+            break;
+
+        case ElapsedTime.lessThan1Month:
+            key = "elapsedDays";
+            variables["days"] = days;
+            variables["hours"] = hours;
+            variables["days_plural"] = variables["days"] > 1 ? "s" : "";
+            variables["hours_plural"] = variables["hours"] > 1 ? "s" : "";
+            break;
+
+        case ElapsedTime.moreThan1Month:
+            key = "elapsedFullDate";
+            const month = date.toLocaleDateString(lang, { month: "short" });
+            const year = date.getFullYear();
+            variables["date"] = `${String(date.getDate()).padStart(2, "0")} ${month} ${year}`;
+            variables["time"] = `${String(date.getHours()).padStart(2, "0")}:${String(date.getMinutes()).padStart(2, "0")}`;
+            break;
+    }
+
+    return { key, variables };
 }

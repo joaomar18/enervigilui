@@ -24,6 +24,18 @@ export enum FormattedTimeStep {
 }
 
 /**
+ * Time range categories for formatting elapsed time displays.
+ * Used to determine appropriate precision and format for "time ago" strings.
+ */
+export enum ElapsedTime {
+    lessThan1Min = "l_1m",
+    lessThan1Hour = "l_1h",
+    lessThan1Day = "l_1d",
+    lessThan1Month = "l_1M",
+    moreThan1Month = "h_1M"
+}
+
+/**
  * Represents a complete date and time with string-formatted fields.
  * Used for form inputs where each component is handled as a separate string value.
  */
@@ -48,6 +60,10 @@ export interface DateTimeSpanValidation {
     valid: boolean;
 }
 
+/**
+ * Time step formatting functions for chart axis labels and tooltips.
+ * Maps each time step to a localized formatter based on granularity and context.
+ */
 export const timeStepFormatters: Record<FormattedTimeStep, (timestamp: number, logSpanPeriod: LogSpanPeriod) => string> = {
     [FormattedTimeStep._1m]: (timestamp: number, logSpanPeriod: LogSpanPeriod) => {
         const date = new Date(timestamp * 1000);
