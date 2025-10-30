@@ -18,6 +18,7 @@
     export let metrics: CounterMetrics;
     export let unit: string = "";
     export let decimalPlaces: number | null;
+    export let dataFetched: boolean;
     export let roundMetrics: boolean = false;
 
     // Layout / styling props
@@ -99,9 +100,9 @@
             <img class="icon" src="/img/total-value.svg" alt="Total Value" />
             <span class="label">{$texts.total}:</span>
             <div class="request-content">
-                <InlineLoader loaded={!!metrics}>
+                <InlineLoader loaded={false}>
                     <div class="loader-div">
-                        {#if metrics.value !== null}
+                        {#if "value" in metrics && metrics.value !== null}
                             <span class="value">{metrics.value}</span>
                             <span class="unit">{unit}</span>
                         {:else}

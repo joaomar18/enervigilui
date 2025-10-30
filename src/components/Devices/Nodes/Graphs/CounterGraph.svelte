@@ -55,7 +55,7 @@
         createGraphObject();
     }
 
-    $: if (graph && data && $selectedLang) {
+    $: if (graph && dataFetched && data && $selectedLang) {
         updateGraphData();
     }
 
@@ -117,8 +117,8 @@
     {goBack}
 >
     <div slot="metrics" class="metrics-div">
-        {#if globalMetrics}
-            <CounterMetricsComponent forceColStack={true} metrics={globalMetrics} {unit} {decimalPlaces} roundMetrics={true} />
+        {#if globalMetrics && dataFetched}
+            <CounterMetricsComponent forceColStack={true} metrics={globalMetrics} {unit} {decimalPlaces} {dataFetched} roundMetrics={true} />
         {/if}
     </div>
 </BaseGraph>

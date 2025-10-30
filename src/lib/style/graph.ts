@@ -99,7 +99,7 @@ const GraphMetricStyleConfig: ComponentStyles = {
         rowPaddingLeft: "0px",
         rowPaddingRight: "10px",
         rowBorderRight: "1px solid white",
-        labelWidth: "125px",
+        labelWidth: "75px",
         labelPaddingLeft: "5px",
         labelColor: "rgba(255, 255, 255, 0.55)",
         labelWeight: "400",

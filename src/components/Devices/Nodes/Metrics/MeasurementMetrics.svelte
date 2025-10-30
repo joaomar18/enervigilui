@@ -18,6 +18,7 @@
     export let metrics: MeasurementMetrics;
     export let unit: string = "";
     export let decimalPlaces: number | null;
+    export let dataFetched: boolean;
     export let roundMetrics: boolean = false;
 
     // Layout / styling props
@@ -112,9 +113,9 @@
             <img class="icon" src="/img/max-value.svg" alt="Max Value" />
             <span class="label">{$texts.maxValue}:</span>
             <div class="request-content">
-                <InlineLoader loaded={!!metrics}>
+                <InlineLoader loaded={false}>
                     <div class="loader-div">
-                        {#if metrics.max_value !== null}
+                        {#if "max_value" in metrics && metrics.max_value !== null}
                             <span class="value">{metrics.max_value}</span>
                             <span class="unit">{unit}</span>
                         {:else}
@@ -128,9 +129,9 @@
             <img class="icon" src="/img/average-value.svg" alt="Mean Value" />
             <span class="label">{$texts.averageValue}:</span>
             <div class="request-content">
-                <InlineLoader loaded={!!metrics}>
+                <InlineLoader loaded={false}>
                     <div class="loader-div">
-                        {#if metrics.average_value !== null}
+                        {#if "average_value" in metrics && metrics.average_value !== null}
                             <span class="value">{metrics.average_value}</span>
                             <span class="unit">{unit}</span>
                         {:else}
@@ -144,9 +145,9 @@
             <img class="icon" src="/img/min-value.svg" alt="Min Value" />
             <span class="label">{$texts.minValue}:</span>
             <div class="request-content">
-                <InlineLoader loaded={!!metrics}>
+                <InlineLoader loaded={false}>
                     <div class="loader-div">
-                        {#if metrics.min_value !== null}
+                        {#if "min_value" in metrics && metrics.min_value !== null}
                             <span class="value">{metrics.min_value}</span>
                             <span class="unit">{unit}</span>
                         {:else}
@@ -165,7 +166,6 @@
         container-type: inline-size;
     }
 
-    
     .container.force-col-stack {
         .content {
             flex-direction: column;

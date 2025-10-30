@@ -86,7 +86,7 @@
     // Variables
     let state: "alarmState" | "warningState" | "okState" | "disconnectedState";
     let nodeAdditionalInfo: BaseNodeAdditionalInfo;
-    let nodeLogs: ProcessedNodeLogs;
+    let nodeLogs: ProcessedNodeLogs | null = null;
     let nodeLogsFetched: boolean = false;
     let nodeLogsFirstFetch: boolean = false;
     let selectedHistoryTimeSpan: LogSpanPeriod = LogSpanPeriod.currentDay;
