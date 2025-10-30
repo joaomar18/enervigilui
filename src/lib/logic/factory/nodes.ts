@@ -15,7 +15,7 @@ import { protocolPlugins } from "$lib/stores/device/protocol";
 import { normalizeNode } from "../util/nodes";
 import { showToast } from "../view/toast";
 import { AlertType } from "$lib/stores/view/toast";
-import { getNodeRealTimeDisplayComponent, getNodeLogDisplayComponents } from "../view/nodes";
+import { getNodeRealTimeDisplayComponent, getNodeLogGraphComponent, getNodeCategory } from "../view/nodes";
 import { convertISOToTimestamp } from "../util/date";
 
 
@@ -347,8 +347,10 @@ export function processNodesState(nodesState: Record<string, NodeState>): Array<
 
     for (let [nodeName, nodeState] of Object.entries(nodesState)) {
         const processedName = removePrefix(nodeName);
-        const displayComponent = getNodeRealTimeDisplayComponent(nodeState);
-        processedNodesState.push({ ...nodeState, name: processedName, displayComponent: displayComponent } as ProcessedNodeState);
+        let category = getNodeCategory(nodeState.type, nodeState.incremental);
+        const displayComponent = getNodeRealTimeDisplayComponent(category);
+        const graphComponent = getNodeLogGraphComponent(category);
+        processedNodesState.push({ ...nodeState, name: processedName, displayComponent: displayComponent, graphComponent: graphComponent } as ProcessedNodeState);
     }
 
     return sortNodesLogically(processedNodesState) as Array<ProcessedNodeState>;
@@ -362,7 +364,8 @@ export function processNodesState(nodesState: Record<string, NodeState>): Array<
  */
 export function processNodeLogs(nodeLogs: NodeLogs): ProcessedNodeLogs {
     let processedPoints: Array<ProcessedBaseLogPoint> = [];
-    let graphComponent = getNodeLogDisplayComponents(nodeLogs);
+    let category = getNodeCategory(nodeLogs.type, nodeLogs.incremental);
+    const graphComponent = getNodeLogGraphComponent(category);
     for (let point of nodeLogs.points) {
         const { start_time: start_time_str, end_time: end_time_str, ...logData } = point;
 

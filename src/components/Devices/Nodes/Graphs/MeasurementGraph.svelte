@@ -25,6 +25,8 @@
     export let initialDate: Date;
     export let endDate: Date;
     export let data: Array<ProcessedMeasurementLogPoint>;
+    export let dataFetched: boolean;
+    export let firstFetch: boolean;
     export let timeStep: FormattedTimeStep;
     export let logSpanPeriod: LogSpanPeriod;
     export let globalMetrics: MeasurementMetrics;
@@ -115,6 +117,8 @@
     {initialDate}
     {endDate}
     graphCreated={created}
+    {dataFetched}
+    {firstFetch}
     graphNoData={noData}
     logPoint={currentLogPoint}
     {unit}

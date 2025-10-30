@@ -14,6 +14,7 @@
     import type { BaseLogPoint } from "$lib/types/nodes/logs";
     import type { GraphType } from "$lib/logic/view/graph/base";
     import { getGraphToolTipDisplayComponent } from "$lib/logic/view/graph/helpers";
+    import CircularLoader from "../../../General/CircularLoader.svelte";
 
     // Style object (from theme)
     export let style: { [property: string]: string | number } | null = null;
@@ -29,6 +30,8 @@
     export let initialDate: Date;
     export let endDate: Date;
     export let graphCreated: boolean;
+    export let dataFetched: boolean;
+    export let firstFetch: boolean;
     export let graphNoData: boolean;
     export let logPoint: BaseLogPoint | null;
     export let unit: string = "";
@@ -59,6 +62,7 @@
     export let subTextWeight: string | undefined = undefined;
     export let scrollbarTrackColor: string | undefined = undefined;
     export let scrollbarThumbColor: string | undefined = undefined;
+    export let loaderBackgroundBlur: string | undefined = undefined;
 
     $: localOverrides = {
         width,
@@ -86,6 +90,7 @@
         subTextWeight,
         scrollbarTrackColor,
         scrollbarThumbColor,
+        loaderBackgroundBlur,
     };
 
     // Merged style
@@ -93,6 +98,21 @@
 
     // Variables
     let showDateRange: boolean = false;
+    let showLoader: boolean = false;
+
+    // Reactive Statements
+    $: if (!dataFetched && !showLoader) {
+        if (firstFetch) {
+            setTimeout(() => {
+                showLoader = !dataFetched;
+            }, 500);
+        } else {
+            showLoader = true;
+        }
+    }
+    $: if (dataFetched) {
+        showLoader = false;
+    }
 
     // Export Functions
     export let goBack: () => void;
@@ -134,6 +154,7 @@
         --graph-text-weight: {mergedStyle.graphTextWeight};
         --sub-text-color: {mergedStyle.subTextColor};
         --sub-text-weight: {mergedStyle.subTextWeight};
+        --loader-background-blur: {mergedStyle.loaderBackgroundBlur};
     "
     class="graph-div-wrapper"
 >
@@ -175,28 +196,33 @@
         </div>
     </div>
     <div class="main">
-        <div class="unit-div">
-            <div class="unit-content">
-                <div class="unit-wrapper">
-                    {#if graphCreated && !graphNoData}
-                        <span class="unit-label">{unit}</span>
-                    {/if}
-                </div>
-            </div>
+        <div class="loader" class:close={!showLoader}>
+            <CircularLoader wrapperTopLeftRadius="0px" wrapperTopRightRadius="0px" wrapperBottomLeftRadius="0px" wrapperBottomRightRadius="0px" />
         </div>
-        <div class="graph-div" bind:this={graphContainer}>
-            <div class="y-axis-inner-div">
-                <div class="y-axis-inner-content">
-                    {#if graphCreated && graphNoData}
-                        <span class="no-data-label">{$texts.noDataAvailable}</span>
-                    {/if}
+        <div class="graph-main">
+            <div class="unit-div">
+                <div class="unit-content">
+                    <div class="unit-wrapper">
+                        {#if graphCreated && !graphNoData}
+                            <span class="unit-label">{unit}</span>
+                        {/if}
+                    </div>
                 </div>
             </div>
-            {#if graphType && gridElement}
-                <GraphToolTip {gridElement} {insideGraph} {cursorPos}>
-                    <svelte:component this={getGraphToolTipDisplayComponent(graphType)} {logPoint} {unit} />
-                </GraphToolTip>
-            {/if}
+            <div class="graph-div" bind:this={graphContainer}>
+                <div class="y-axis-inner-div">
+                    <div class="y-axis-inner-content">
+                        {#if graphCreated && graphNoData}
+                            <span class="no-data-label">{$texts.noDataAvailable}</span>
+                        {/if}
+                    </div>
+                </div>
+                {#if graphType && gridElement}
+                    <GraphToolTip {gridElement} {insideGraph} {cursorPos}>
+                        <svelte:component this={getGraphToolTipDisplayComponent(graphType)} {logPoint} {unit} />
+                    </GraphToolTip>
+                {/if}
+            </div>
         </div>
     </div>
 </div>
@@ -287,17 +313,44 @@
 
     /* Main content area - Horizontal scrollable container for unit label and graph */
     .main {
+        margin: 0;
+        padding: 0;
+        position: relative;
+        width: 100%;
+        height: calc(100% - var(--header-height));
+    }
+
+    /* Graph main content - Horizontal flex container with styled scrollbar for graph overflow */
+    .main .graph-main {
+        margin: 0;
+        padding: 0;
+        width: 100%;
+        height: 100%;
         display: flex;
         flex-direction: row;
         justify-content: center;
         align-items: center;
-        width: 100%;
-        height: calc(100% - var(--header-height));
         overflow-x: auto;
         overflow-y: hidden;
         scrollbar-width: thin;
         scrollbar-color: var(--scrollbar-track-color) var(--scrollbar-thumb-color);
         scrollbar-gutter: stable;
+    }
+
+    /* Loader overlay - Blurred loading state indicating data unavailability */
+    .loader {
+        position: absolute;
+        inset: 0;
+        backdrop-filter: var(--loader-background-blur);
+        -webkit-backdrop-filter: var(--loader-background-blur);
+        transition: opacity 0.3s ease-in-out;
+        z-index: 1;
+    }
+
+    /* Close Loader - Fades out and moves to background layer */
+    .loader.close {
+        opacity: 0;
+        z-index: -1;
     }
 
     /* Unit label section - Left sidebar for measurement unit display */

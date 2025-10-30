@@ -5,9 +5,9 @@
     import InlineLoader from "../../General/InlineLoader.svelte";
     import DateRangePicker from "../../General/TimeDate/DateRangePicker.svelte";
     import { LogSpanPeriod } from "$lib/types/view/nodes";
-    import { getNodePhaseSection, getCommunicationID, isNumeric } from "$lib/logic/util/nodes";
+    import { getNodePhaseSection, getCommunicationID } from "$lib/logic/util/nodes";
     import { getNodeAdditionalInfo, getNodeLogs } from "$lib/logic/api/nodes";
-    import { getElegantElapsedTimeFromIsoDate, getTimeSpanFromLogPeriod } from "$lib/logic/util/date";
+    import { getTimeSpanFromLogPeriod } from "$lib/logic/util/date";
     import { SlidingWindow } from "$lib/logic/util/classes/SlidingWindow";
     import type { NodeTimeSpan } from "$lib/types/view/nodes";
     import type { BaseNodeAdditionalInfo, ProcessedNodeState } from "$lib/types/nodes/realtime";
@@ -30,6 +30,7 @@
         CustomDatePickerButtonStyle,
         SelectedCustomDatePickerButtonStyle,
     } from "$lib/style/nodes";
+    import ElapsedDateTime from "../../General/TimeDate/ElapsedDateTime.svelte";
 
     // Props
     export let nodeState: ProcessedNodeState;
@@ -85,9 +86,9 @@
     // Variables
     let state: "alarmState" | "warningState" | "okState" | "disconnectedState";
     let nodeAdditionalInfo: BaseNodeAdditionalInfo;
-    let updatedAtString: string;
-    let restartedAtString: string;
     let nodeLogs: ProcessedNodeLogs;
+    let nodeLogsFetched: boolean = false;
+    let nodeLogsFirstFetch: boolean = false;
     let selectedHistoryTimeSpan: LogSpanPeriod = LogSpanPeriod.currentDay;
     let initialDate: Date | null = null;
     let endDate: Date | null = null;
@@ -99,13 +100,16 @@
     $: if (!showPanel) {
         selectedHistoryTimeSpan = LogSpanPeriod.currentDay; // Default Period
         currentTimeSpans.clear();
+        enableGoBack = currentTimeSpans.hasPrevious();
+        nodeLogsFirstFetch = false;
     }
 
+    // Initial Node State processing
     $: if (nodeState) {
         showCustomDatePicker = false;
         loadNodeAdditionalInfo();
-        if (isNumeric(nodeState)) {
-            processNodeStateChange();
+        if (nodeState.graphComponent) {
+            getInitialNodeLogs();
         }
     }
 
@@ -127,23 +131,15 @@
             return;
         }
         ({ nodeAdditionalInfo } = await getNodeAdditionalInfo($currentDeviceID, nodeState.name, nodeState.phase));
-        updatedAtString = getElegantElapsedTimeFromIsoDate(nodeAdditionalInfo.last_update_date);
-        restartedAtString = getElegantElapsedTimeFromIsoDate(nodeAdditionalInfo.last_reset_date);
     }
 
-    function processNodeStateChange(): void {
+    function getInitialNodeLogs(): void {
         if (!initialDate || !endDate) {
-            getInitialDateSpan(); // First Request
-        } else {
-            loadNodeLogs();
+            let { initial_date, end_date } = loadDateSpan(selectedHistoryTimeSpan);
+            setDateSpan({ initial_date, end_date });
         }
-    }
-
-    function getInitialDateSpan(): void {
-        let { initial_date, end_date } = loadDateSpan(selectedHistoryTimeSpan);
-        setDateSpan({ initial_date, end_date });
         loadNodeLogs();
-        addToCurrentTimeSpans({ initial_date, end_date, log_span_period: selectedHistoryTimeSpan } as NodeTimeSpan);
+        addToCurrentTimeSpans({ initial_date: initialDate, end_date: endDate, log_span_period: selectedHistoryTimeSpan } as NodeTimeSpan);
     }
 
     function loadDateSpan(timeSpan: LogSpanPeriod): { initial_date: Date; end_date: Date } {
@@ -192,7 +188,10 @@
         if (!$currentDeviceID || !nodeState) {
             return;
         }
+        nodeLogsFetched = false;
         ({ nodeLogs } = await getNodeLogs($currentDeviceID, nodeState.name, nodeState.phase, initialDate !== null, initialDate, endDate));
+        nodeLogsFetched = true;
+        nodeLogsFirstFetch = true;
     }
 </script>
 
@@ -305,14 +304,18 @@
                     </div>
                     <div class="row">
                         <span class="label">{$texts.updated}</span>
-                        <InlineLoader loaded={updatedAtString !== undefined}>
-                            <span class="value align-right">{updatedAtString}</span>
+                        <InlineLoader loaded={nodeAdditionalInfo !== undefined}>
+                            {#if nodeAdditionalInfo}
+                                <span class="value align-right"><ElapsedDateTime isoDateString={nodeAdditionalInfo.last_update_date} /></span>
+                            {/if}
                         </InlineLoader>
                     </div>
                     <div class="row">
                         <dt class="label">{$texts.restarted}</dt>
-                        <InlineLoader loaded={restartedAtString !== undefined}>
-                            <span class="value align-right">{restartedAtString}</span>
+                        <InlineLoader loaded={nodeAdditionalInfo !== undefined}>
+                            {#if nodeAdditionalInfo}
+                                <span class="value align-right"><ElapsedDateTime isoDateString={nodeAdditionalInfo.last_reset_date} /></span>
+                            {/if}
                         </InlineLoader>
                     </div>
                 </div>
@@ -381,7 +384,7 @@
                     </div>
                 {/if}
 
-                {#if isNumeric(nodeState)}
+                {#if nodeState && nodeState.graphComponent}
                     <div class="section-title"><h3>{$texts.history}</h3></div>
                     <div class="inner-content-div no-horizontal-padding">
                         <div class="history-btn-picker-div">
@@ -455,23 +458,23 @@
                             </div>
                         </div>
                         <div class="chart-container">
-                            {#if nodeLogs}
-                                <svelte:component
-                                    this={nodeLogs.graphComponent}
-                                    height="450px"
-                                    {initialDate}
-                                    {endDate}
-                                    data={nodeLogs.points}
-                                    timeStep={nodeLogs.time_step}
-                                    logSpanPeriod={selectedHistoryTimeSpan}
-                                    globalMetrics={nodeLogs.global_metrics}
-                                    unit={nodeLogs.unit}
-                                    decimalPlaces={nodeLogs.decimal_places}
-                                    getNewTimeSpan={(initial_date: Date, end_date: Date) => loadNodeLogsWithCustomPeriod(initial_date, end_date)}
-                                    goBackEnabled={enableGoBack}
-                                    goBack={() => setDateSpanToPrevious()}
-                                />
-                            {/if}
+                            <svelte:component
+                                this={nodeState.graphComponent}
+                                height="450px"
+                                {initialDate}
+                                {endDate}
+                                data={nodeLogs?.points}
+                                dataFetched={nodeLogsFetched}
+                                firstFetch={nodeLogsFirstFetch}
+                                timeStep={nodeLogs?.time_step}
+                                logSpanPeriod={selectedHistoryTimeSpan}
+                                globalMetrics={nodeLogs?.global_metrics}
+                                unit={nodeLogs?.unit}
+                                decimalPlaces={nodeLogs?.decimal_places}
+                                getNewTimeSpan={(initial_date: Date, end_date: Date) => loadNodeLogsWithCustomPeriod(initial_date, end_date)}
+                                goBackEnabled={enableGoBack}
+                                goBack={() => setDateSpanToPrevious()}
+                            />
                         </div>
                     </div>
                 {/if}

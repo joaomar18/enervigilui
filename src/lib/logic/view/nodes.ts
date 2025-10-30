@@ -31,14 +31,12 @@ export function getNodeCategory(nodeType: NodeType, incrementalNode: boolean): N
 }
 
 /**
- * Gets the Svelte component for displaying a node in real-time cards.
- * @param nodeState - The node state to get the display component for
- * @returns The Svelte component for rendering this node in real-time view
- * @throws Error if the component for the node's category is not implemented
+ * Retrieves the appropriate Svelte component for displaying real-time node values.
+ * @param category - The node category to get the display component for
+ * @returns Svelte component class for rendering real-time node data
+ * @throws Error if no component is mapped for the given category
  */
-export function getNodeRealTimeDisplayComponent(nodeState: NodeState | ProcessedNodeState): typeof SvelteComponent<any> {
-    let category = getNodeCategory(nodeState.type, nodeState.incremental);
-
+export function getNodeRealTimeDisplayComponent(category: NodeCategory): typeof SvelteComponent<any> {
     const component = realTimeDisplayComponentMap[category];
     if (!component) {
         throw new Error(`${category} category real time component is not implemented.`);
@@ -48,17 +46,11 @@ export function getNodeRealTimeDisplayComponent(nodeState: NodeState | Processed
 }
 
 /**
- * Gets the graph component for displaying node log data.
- * @param nodeLogs - The node logs to get display component for
- * @returns The Svelte component for log visualization
- * @throws Error if the components for the node's category are not implemented
+ * Retrieves the appropriate Svelte component for displaying node log graphs.
+ * @param category - The node category to get the graph component for
+ * @returns Svelte component class for rendering historical node data graphs, or null if not available
  */
-export function getNodeLogDisplayComponents(nodeLogs: NodeLogs): typeof SvelteComponent<any> {
-    let category = getNodeCategory(nodeLogs.type, nodeLogs.incremental);
+export function getNodeLogGraphComponent(category: NodeCategory): typeof SvelteComponent<any> | null {
     let component = logsDisplayGraphComponentMap[category];
-    if (!component) {
-        throw new Error(`${category} category graphics component is not implemented.`);
-    }
-
     return component;
 }

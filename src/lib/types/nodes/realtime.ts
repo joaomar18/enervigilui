@@ -46,6 +46,7 @@ export interface NodeState {
  *
  * @property {string} name - Display name of the node
  * @property {typeof SvelteComponent<any>} displayComponent - Svelte component for rendering this node
+ * @property {typeof SvelteComponent<any> | null} graphComponent - Svelte component for rendering the data graph. Might not be implemented in some categories
  * @property {number | string | boolean | null} value - Current measured or calculated value
  * @property {NodeType} type - Data type of the value (FLOAT, STRING, INT, BOOLEAN)
  * @property {boolean} incremental - Whether this node accumulates values over time
@@ -62,6 +63,7 @@ export interface NodeState {
 export interface ProcessedNodeState {
     name: string;
     displayComponent: typeof SvelteComponent<any>;
+    graphComponent: typeof SvelteComponent<any> | null;
     value: number | string | boolean | null;
     type: NodeType;
     incremental: boolean;

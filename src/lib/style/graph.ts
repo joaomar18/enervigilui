@@ -52,6 +52,7 @@ const BaseGraphStyleConfig: ComponentStyles = {
         subTextWeight: "400",
         scrollbarTrackColor: "#323a45",
         scrollbarThumbColor: "#1e242b",
+        loaderBackgroundBlur: "blur(8px)",
     },
 };
 

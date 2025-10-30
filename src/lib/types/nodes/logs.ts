@@ -83,7 +83,7 @@ export interface NodeLogs {
  * @property {Array<ProcessedBaseLogPoint>} points - Array of processed log data points with Unix timestamps
  * @property {FormattedTimeStep | null} time_step - Time aggregation interval used for the log data
  * @property {BaseMetrics} global_metrics - Overall statistical metrics for the entire dataset
- * @property {typeof SvelteComponent<any>} graphComponent - Svelte component for rendering the data graph
+ * @property {typeof SvelteComponent<any> | null} graphComponent - Svelte component for rendering the data graph. Might not be implemented in some categories
  */
 export interface ProcessedNodeLogs {
     unit: string;
@@ -93,7 +93,7 @@ export interface ProcessedNodeLogs {
     points: Array<ProcessedBaseLogPoint>;
     time_step: FormattedTimeStep | null;
     global_metrics: BaseMetrics;
-    graphComponent: typeof SvelteComponent<any>;
+    graphComponent: typeof SvelteComponent<any> | null;
 }
 
 /** Log point combining time range and measurement statistics. */

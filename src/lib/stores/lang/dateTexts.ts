@@ -2,6 +2,10 @@ import { createLangStore } from "$lib/stores/lang/definition";
 import type { TextsObject } from "$lib/stores/lang/definition";
 
 const dateTextsObject: TextsObject = {
+    never: {
+        PT: "nunca",
+        EN: "never",
+    },
     elapsedSeconds: {
         PT: "à {seconds} segundo{plural}",
         EN: "{seconds} second{plural} ago",

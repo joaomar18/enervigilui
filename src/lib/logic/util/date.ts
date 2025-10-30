@@ -1,6 +1,4 @@
 import { get } from "svelte/store";
-import { texts } from "$lib/stores/lang/generalTexts";
-import { dateTexts } from "$lib/stores/lang/dateTexts";
 import { selectedLang } from "$lib/stores/lang/definition";
 import { ElapsedTime, FormattedTimeStep, type DateTimeField } from "$lib/types/date";
 import { LogSpanPeriod } from "$lib/types/view/nodes";
@@ -325,7 +323,7 @@ export function getElegantElapsedTimeFromIsoDate(isoString: string | null): { ke
     let key = "";
     let variables: Record<string, string | number> = {};
 
-    if (date === null) return { key: get(texts).never, variables };
+    if (date === null) return { key: "never", variables };
     let elapsedTime = getElapsedTime(date, now);
 
     const diffMs = now.getTime() - date.getTime();
