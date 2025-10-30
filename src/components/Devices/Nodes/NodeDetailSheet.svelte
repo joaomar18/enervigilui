@@ -86,12 +86,16 @@
     // Variables
     let state: "alarmState" | "warningState" | "okState" | "disconnectedState";
     let nodeAdditionalInfo: BaseNodeAdditionalInfo;
+    let nodeAddInfoFetched: boolean = false;
+    let nodeAddInfoFirstFetch: boolean = false;
+    let nodeAddInfoLoading: boolean = false;
+    let nodeAddInfoTimeout: number | null = null;
     let nodeLogs: ProcessedNodeLogs | null = null;
     let nodeLogsFetched: boolean = false;
     let nodeLogsFirstFetch: boolean = false;
     let selectedHistoryTimeSpan: LogSpanPeriod = LogSpanPeriod.currentDay;
-    let initialDate: Date | null = null;
-    let endDate: Date | null = null;
+    let initialDate: Date;
+    let endDate: Date;
     let showCustomDatePicker: boolean = false;
     let currentTimeSpans: SlidingWindow<NodeTimeSpan> = new SlidingWindow(10);
     let enableGoBack: boolean = false;
@@ -101,6 +105,7 @@
         selectedHistoryTimeSpan = LogSpanPeriod.currentDay; // Default Period
         currentTimeSpans.clear();
         enableGoBack = currentTimeSpans.hasPrevious();
+        nodeAddInfoFirstFetch = false;
         nodeLogsFirstFetch = false;
     }
 
@@ -125,16 +130,36 @@
         }
     }
 
+    $: if (!nodeAddInfoFetched && !nodeAddInfoLoading) {
+        if (nodeAddInfoFirstFetch) {
+            nodeAddInfoTimeout = setTimeout(() => {
+                nodeAddInfoLoading = !nodeAddInfoFetched;
+            }, 500);
+        } else {
+            nodeAddInfoLoading = true;
+        }
+    }
+    $: if (nodeAddInfoFetched) {
+        if (nodeAddInfoTimeout) {
+            clearInterval(nodeAddInfoTimeout);
+            nodeAddInfoTimeout = null;
+        }
+        nodeAddInfoLoading = false;
+    }
+
     // Functions
     async function loadNodeAdditionalInfo() {
         if (!$currentDeviceID || !nodeState) {
             return;
         }
+        nodeAddInfoFetched = false;
         ({ nodeAdditionalInfo } = await getNodeAdditionalInfo($currentDeviceID, nodeState.name, nodeState.phase));
+        nodeAddInfoFetched = true;
+        nodeAddInfoFirstFetch = true;
     }
 
     function getInitialNodeLogs(): void {
-        if (!initialDate || !endDate) {
+        if (!nodeLogsFirstFetch) {
             let { initial_date, end_date } = loadDateSpan(selectedHistoryTimeSpan);
             setDateSpan({ initial_date, end_date });
         }
@@ -304,7 +329,7 @@
                     </div>
                     <div class="row">
                         <span class="label">{$texts.updated}</span>
-                        <InlineLoader loaded={nodeAdditionalInfo !== undefined}>
+                        <InlineLoader loaded={!nodeAddInfoLoading}>
                             {#if nodeAdditionalInfo}
                                 <span class="value align-right"><ElapsedDateTime isoDateString={nodeAdditionalInfo.last_update_date} /></span>
                             {/if}
@@ -312,7 +337,7 @@
                     </div>
                     <div class="row">
                         <dt class="label">{$texts.restarted}</dt>
-                        <InlineLoader loaded={nodeAdditionalInfo !== undefined}>
+                        <InlineLoader loaded={!nodeAddInfoLoading}>
                             {#if nodeAdditionalInfo}
                                 <span class="value align-right"><ElapsedDateTime isoDateString={nodeAdditionalInfo.last_reset_date} /></span>
                             {/if}
@@ -326,12 +351,14 @@
                         {#if nodeState.min_alarm_state !== undefined}
                             <div class="row">
                                 <span class="label">{$texts.lowerLimit}</span>
-                                <InlineLoader loaded={nodeAdditionalInfo?.min_alarm_value !== undefined}>
+                                <InlineLoader loaded={!nodeAddInfoLoading && nodeAdditionalInfo?.min_alarm_value !== undefined}>
                                     <span class="value with-adornment align-right">
                                         <span class="value"
                                             >{nodeAdditionalInfo?.min_alarm_value?.toFixed(nodeState.decimal_places || 0)} {nodeState.unit}</span
                                         >
-                                        <div class="dot-state-div"><div class="dot-state" data-state="dim"></div></div>
+                                        <div class="dot-state-div">
+                                            <div class="dot-state" data-state={nodeState.min_alarm_state ? "alarmState" : "dim"}></div>
+                                        </div>
                                     </span>
                                 </InlineLoader>
                             </div>
@@ -339,12 +366,14 @@
                         {#if nodeState.max_alarm_state !== undefined}
                             <div class="row">
                                 <span class="label">{$texts.upperLimit}</span>
-                                <InlineLoader loaded={nodeAdditionalInfo?.max_alarm_value !== undefined}>
+                                <InlineLoader loaded={!nodeAddInfoLoading && nodeAdditionalInfo?.max_alarm_value !== undefined}>
                                     <span class="value with-adornment align-right">
                                         <span class="value"
                                             >{nodeAdditionalInfo?.max_alarm_value?.toFixed(nodeState.decimal_places || 0)} {nodeState.unit}</span
                                         >
-                                        <div class="dot-state-div"><div class="dot-state" data-state="dim"></div></div>
+                                        <div class="dot-state-div">
+                                            <div class="dot-state" data-state={nodeState.max_alarm_state ? "alarmState" : "dim"}></div>
+                                        </div>
                                     </span>
                                 </InlineLoader>
                             </div>
@@ -352,31 +381,35 @@
                     </div>
                 {/if}
 
-                {#if nodeState.min_alarm_state !== undefined || nodeState.max_alarm_state !== undefined}
+                {#if nodeState.min_warning_state !== undefined || nodeState.max_warning_state !== undefined}
                     <div class="section-title"><h3>{$texts.warnings}</h3></div>
                     <div class="inner-content-div">
-                        {#if nodeState.min_alarm_state !== undefined}
+                        {#if nodeState.min_warning_state !== undefined}
                             <div class="row">
                                 <span class="label">{$texts.lowerLimit}</span>
-                                <InlineLoader loaded={nodeAdditionalInfo?.min_warning_value !== undefined}>
+                                <InlineLoader loaded={!nodeAddInfoLoading && nodeAdditionalInfo?.min_warning_value !== undefined}>
                                     <span class="value with-adornment align-right">
                                         <span class="value"
                                             >{nodeAdditionalInfo?.min_warning_value?.toFixed(nodeState.decimal_places || 0)} {nodeState.unit}</span
                                         >
-                                        <div class="dot-state-div"><div class="dot-state" data-state="dim"></div></div>
+                                        <div class="dot-state-div">
+                                            <div class="dot-state" data-state={nodeState.min_warning_state ? "warningState" : "dim"}></div>
+                                        </div>
                                     </span>
                                 </InlineLoader>
                             </div>
                         {/if}
-                        {#if nodeState.max_alarm_state !== undefined}
+                        {#if nodeState.max_warning_state !== undefined}
                             <div class="row">
                                 <span class="label">{$texts.upperLimit}</span>
-                                <InlineLoader loaded={nodeAdditionalInfo?.max_warning_value !== undefined}>
+                                <InlineLoader loaded={!nodeAddInfoLoading && nodeAdditionalInfo?.max_warning_value !== undefined}>
                                     <span class="value with-adornment align-right">
                                         <span class="value"
                                             >{nodeAdditionalInfo?.max_warning_value?.toFixed(nodeState.decimal_places || 0)} {nodeState.unit}</span
                                         >
-                                        <div class="dot-state-div"><div class="dot-state" data-state="dim"></div></div>
+                                        <div class="dot-state-div">
+                                            <div class="dot-state" data-state={nodeState.max_warning_state ? "warningState" : "dim"}></div>
+                                        </div>
                                     </span>
                                 </InlineLoader>
                             </div>
@@ -483,20 +516,20 @@
                 <div class="inner-content-div">
                     <div class="row">
                         <span class="label">{$texts.type}</span>
-                        <InlineLoader loaded={nodeAdditionalInfo?.type !== undefined}>
+                        <InlineLoader loaded={!nodeAddInfoLoading && nodeAdditionalInfo?.type !== undefined}>
                             <span class="value align-right">{nodeAdditionalInfo?.type}</span>
                         </InlineLoader>
                     </div>
                     <div class="row">
                         <span class="label">{$texts.protocol}</span>
-                        <InlineLoader loaded={nodeAdditionalInfo?.protocol !== undefined}>
+                        <InlineLoader loaded={!nodeAddInfoLoading && nodeAdditionalInfo?.protocol !== undefined}>
                             <span class="value align-right">{$protocolTexts[nodeAdditionalInfo?.protocol] || $pluginTexts.noProtocol}</span>
                         </InlineLoader>
                     </div>
                     <div class="row">
                         {#if nodeAdditionalInfo}
                             <span class="label">{$pluginTexts[$protocolPlugins[nodeAdditionalInfo.protocol].shortTextKey]}</span>
-                            <InlineLoader loaded={nodeAdditionalInfo?.protocol !== undefined}>
+                            <InlineLoader loaded={!nodeAddInfoLoading && nodeAdditionalInfo?.protocol !== undefined}>
                                 {#if nodeAdditionalInfo}
                                     <span class="value align-right"
                                         >{getCommunicationID(nodeAdditionalInfo.protocol, nodeAdditionalInfo) || $texts.virtual}</span
@@ -507,13 +540,13 @@
                     </div>
                     <div class="row">
                         <span class="label">{$texts.interval}</span>
-                        <InlineLoader loaded={nodeAdditionalInfo?.read_period !== undefined}>
+                        <InlineLoader loaded={!nodeAddInfoLoading && nodeAdditionalInfo?.read_period !== undefined}>
                             <span class="value align-right">{nodeAdditionalInfo?.read_period} s</span>
                         </InlineLoader>
                     </div>
                     <div class="row">
                         <span class="label">{$texts.logging}</span>
-                        <InlineLoader loaded={nodeAdditionalInfo !== undefined}>
+                        <InlineLoader loaded={!nodeAddInfoLoading}>
                             {#if nodeAdditionalInfo?.logging_period !== undefined}
                                 <span class="value align-right">{nodeAdditionalInfo?.logging_period} min.</span>
                             {:else}

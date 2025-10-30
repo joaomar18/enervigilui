@@ -154,17 +154,6 @@
                                 browseTo("/devices/general_view", { deviceId: String($currentDeviceID) });
                             }}
                         />
-                        <Link
-                            style={$SubLinkStyle}
-                            disabled={!$currentDeviceID}
-                            selected={activeSection.includes("/analytics")}
-                            buttonText={$texts.dataAnalytics}
-                            imageURL="/img/analytics.svg"
-                            disabledImageURL="/img/analytics_muted.svg"
-                            onClick={() => {
-                                browseTo("/devices/analytics", { deviceId: String($currentDeviceID) });
-                            }}
-                        />
                     </Link>
 
                     <Link
@@ -240,7 +229,7 @@
         bottom: 0;
         left: 0;
         right: 0;
-        z-index: 110;
+        z-index: 120;
         display: block;
     }
 
@@ -279,7 +268,7 @@
     /* Slide in when open */
     .container.open {
         transform: translateX(0);
-        z-index: 111;
+        z-index: 121;
     }
 
     /* Logo area at top of sidebar */

@@ -134,7 +134,7 @@
     }
 
     .left-header-div.left-panel-open {
-        z-index: 111;
+        z-index: 121;
     }
 
     /* Hidden logo slot until enabled */
@@ -211,7 +211,7 @@
 
     /* Send alerts div to front */
     .dashboard-container .content .alerts-div.prioritize {
-        z-index: 110;
+        z-index: 120;
     }
 
     /* Container: outer wrapper with padding and full height */

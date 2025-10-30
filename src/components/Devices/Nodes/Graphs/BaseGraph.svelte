@@ -15,6 +15,7 @@
     import type { GraphType } from "$lib/logic/view/graph/base";
     import { getGraphToolTipDisplayComponent } from "$lib/logic/view/graph/helpers";
     import CircularLoader from "../../../General/CircularLoader.svelte";
+    import FullScreenPanel from "../../../Dashboard/FullScreenPanel.svelte";
 
     // Style object (from theme)
     export let style: { [property: string]: string | number } | null = null;
@@ -98,12 +99,14 @@
 
     // Variables
     let showDateRange: boolean = false;
+    let showFullscreen: boolean = false;
+    let loaderTimeout: number | null = null;
     let showLoader: boolean = false;
 
     // Reactive Statements
     $: if (!dataFetched && !showLoader) {
         if (firstFetch) {
-            setTimeout(() => {
+            loaderTimeout = setTimeout(() => {
                 showLoader = !dataFetched;
             }, 500);
         } else {
@@ -111,6 +114,10 @@
         }
     }
     $: if (dataFetched) {
+        if (loaderTimeout) {
+            clearTimeout(loaderTimeout);
+            loaderTimeout = null;
+        }
         showLoader = false;
     }
 
@@ -158,6 +165,9 @@
     "
     class="graph-div-wrapper"
 >
+    {#if showFullscreen}
+        <FullScreenPanel />
+    {/if}
     <div class="header">
         <div class="header-content">
             <div class="left-actions-div">
@@ -186,7 +196,14 @@
                     </Action>
                     <DateRangeChecker bind:showToolTip={showDateRange} {initialDate} {endDate} />
                 </div>
-                <Action style={$GraphActionStyle} imageURL="/img/fullscreen.svg" onClick={() => {}} enableToolTip={true}>
+                <Action
+                    style={$GraphActionStyle}
+                    imageURL="/img/fullscreen.svg"
+                    onClick={() => {
+                        showFullscreen = true;
+                    }}
+                    enableToolTip={true}
+                >
                     <div slot="tooltip"><ToolTipText text={$texts.fullscreen} /></div>
                 </Action>
             </div>

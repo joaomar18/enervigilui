@@ -19,6 +19,7 @@
     export let unit: string = "";
     export let decimalPlaces: number | null;
     export let dataFetched: boolean;
+    export let firstFetch: boolean;
     export let roundMetrics: boolean = false;
 
     // Layout / styling props
@@ -65,12 +66,44 @@
     // Merged style
     $: mergedStyle = mergeStyle(effectiveStyle, localOverrides);
 
+    // Variables
+    let loaderTimeout: number | null = null;
+    let showLoader: boolean = false;
+
     // Reactive Statements
+    $: if (!dataFetched && !showLoader) {
+        if (firstFetch) {
+            loaderTimeout = setTimeout(() => {
+                showLoader = !dataFetched;
+            }, 500);
+        } else {
+            showLoader = true;
+        }
+    }
+    $: if (dataFetched) {
+        if (loaderTimeout) {
+            clearInterval(loaderTimeout);
+            loaderTimeout = null;
+        }
+        showLoader = false;
+    }
+
     $: if (metrics && roundMetrics && decimalPlaces !== null && decimalPlaces !== undefined) {
-        if (metrics.value !== null) metrics.value = Number(metrics.value.toFixed(decimalPlaces));
+        if ("value" in metrics && metrics.value !== null) metrics.value = Number(metrics.value.toFixed(decimalPlaces));
     }
 </script>
 
+<!--
+    CounterMetrics Component
+    
+    Displays counter-specific metrics (total value) for cumulative counter data with integrated 
+    loading states. Features icon-enhanced layout with responsive design that switches 
+    from horizontal rows to vertical stacking based on container width or force stacking. 
+    The metric row includes a descriptive icon, label, numerical value with loading spinner, 
+    and unit. Uses InlineLoader components to handle asynchronous data loading gracefully. 
+    Supports comprehensive theming through CSS custom properties for colors, spacing, and typography. 
+    Used primarily in counter graph headers to provide quick statistical overview of cumulative data.
+-->
 <div
     style="
         --icon-size: {mergedStyle.iconSize};
@@ -100,13 +133,15 @@
             <img class="icon" src="/img/total-value.svg" alt="Total Value" />
             <span class="label">{$texts.total}:</span>
             <div class="request-content">
-                <InlineLoader loaded={false}>
+                <InlineLoader loaded={!showLoader}>
                     <div class="loader-div">
-                        {#if "value" in metrics && metrics.value !== null}
-                            <span class="value">{metrics.value}</span>
-                            <span class="unit">{unit}</span>
-                        {:else}
-                            <span class="no-data-label">{$texts.noDataAvailableShort}</span>
+                        {#if "value" in metrics}
+                            {#if metrics.value !== null}
+                                <span class="value">{metrics.value}</span>
+                                <span class="unit">{unit}</span>
+                            {:else}
+                                <span class="no-data-label">{$texts.noDataAvailableShort}</span>
+                            {/if}
                         {/if}
                     </div>
                 </InlineLoader>
@@ -121,6 +156,7 @@
         container-type: inline-size;
     }
 
+    /* Force the container to display metrics on a column stack */
     .container.force-col-stack {
         .content {
             flex-direction: column;
@@ -163,7 +199,7 @@
         border-right: none;
     }
 
-    /* Metric icon - Visual indicator for min/max/average (triangle/circle symbols) */
+    /* Metric icon - Visual indicator for counter total value (total-value.svg symbol) */
     .row .icon {
         width: var(--icon-size);
         height: var(--icon-size);

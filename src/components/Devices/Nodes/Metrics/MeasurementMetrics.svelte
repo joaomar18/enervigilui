@@ -19,6 +19,7 @@
     export let unit: string = "";
     export let decimalPlaces: number | null;
     export let dataFetched: boolean;
+    export let firstFetch: boolean;
     export let roundMetrics: boolean = false;
 
     // Layout / styling props
@@ -65,11 +66,32 @@
     // Merged style
     $: mergedStyle = mergeStyle(effectiveStyle, localOverrides);
 
+    // Variables
+    let loaderTimeout: number | null = null;
+    let showLoader: boolean = false;
+
     // Reactive Statements
+    $: if (!dataFetched && !showLoader) {
+        if (firstFetch) {
+            loaderTimeout = setTimeout(() => {
+                showLoader = !dataFetched;
+            }, 500);
+        } else {
+            showLoader = true;
+        }
+    }
+    $: if (dataFetched) {
+        if (loaderTimeout) {
+            clearInterval(loaderTimeout);
+            loaderTimeout = null;
+        }
+        showLoader = false;
+    }
+
     $: if (metrics && roundMetrics && decimalPlaces !== null && decimalPlaces !== undefined) {
-        if (metrics.min_value !== null) metrics.min_value = Number(metrics.min_value.toFixed(decimalPlaces));
-        if (metrics.max_value !== null) metrics.max_value = Number(metrics.max_value.toFixed(decimalPlaces));
-        if (metrics.average_value !== null) metrics.average_value = Number(metrics.average_value.toFixed(decimalPlaces));
+        if ("min_value" in metrics && metrics.min_value !== null) metrics.min_value = Number(metrics.min_value.toFixed(decimalPlaces));
+        if ("max_value" in metrics && metrics.max_value !== null) metrics.max_value = Number(metrics.max_value.toFixed(decimalPlaces));
+        if ("average_value" in metrics && metrics.average_value !== null) metrics.average_value = Number(metrics.average_value.toFixed(decimalPlaces));
     }
 </script>
 
@@ -113,13 +135,15 @@
             <img class="icon" src="/img/max-value.svg" alt="Max Value" />
             <span class="label">{$texts.maxValue}:</span>
             <div class="request-content">
-                <InlineLoader loaded={false}>
+                <InlineLoader loaded={!showLoader}>
                     <div class="loader-div">
-                        {#if "max_value" in metrics && metrics.max_value !== null}
-                            <span class="value">{metrics.max_value}</span>
-                            <span class="unit">{unit}</span>
-                        {:else}
-                            <span class="no-data-label">{$texts.noDataAvailableShort}</span>
+                        {#if "max_value" in metrics}
+                            {#if metrics.max_value !== null}
+                                <span class="value">{metrics.max_value}</span>
+                                <span class="unit">{unit}</span>
+                            {:else}
+                                <span class="no-data-label">{$texts.noDataAvailableShort}</span>
+                            {/if}
                         {/if}
                     </div>
                 </InlineLoader>
@@ -129,13 +153,15 @@
             <img class="icon" src="/img/average-value.svg" alt="Mean Value" />
             <span class="label">{$texts.averageValue}:</span>
             <div class="request-content">
-                <InlineLoader loaded={false}>
+                <InlineLoader loaded={!showLoader}>
                     <div class="loader-div">
-                        {#if "average_value" in metrics && metrics.average_value !== null}
-                            <span class="value">{metrics.average_value}</span>
-                            <span class="unit">{unit}</span>
-                        {:else}
-                            <span class="no-data-label">{$texts.noDataAvailableShort}</span>
+                        {#if "average_value" in metrics}
+                            {#if metrics.average_value !== null}
+                                <span class="value">{metrics.average_value}</span>
+                                <span class="unit">{unit}</span>
+                            {:else}
+                                <span class="no-data-label">{$texts.noDataAvailableShort}</span>
+                            {/if}
                         {/if}
                     </div>
                 </InlineLoader>
@@ -145,13 +171,15 @@
             <img class="icon" src="/img/min-value.svg" alt="Min Value" />
             <span class="label">{$texts.minValue}:</span>
             <div class="request-content">
-                <InlineLoader loaded={false}>
+                <InlineLoader loaded={!showLoader}>
                     <div class="loader-div">
-                        {#if "min_value" in metrics && metrics.min_value !== null}
-                            <span class="value">{metrics.min_value}</span>
-                            <span class="unit">{unit}</span>
-                        {:else}
-                            <span class="no-data-label">{$texts.noDataAvailableShort}</span>
+                        {#if "min_value" in metrics}
+                            {#if "min_value" in metrics && metrics.min_value !== null}
+                                <span class="value">{metrics.min_value}</span>
+                                <span class="unit">{unit}</span>
+                            {:else}
+                                <span class="no-data-label">{$texts.noDataAvailableShort}</span>
+                            {/if}
                         {/if}
                     </div>
                 </InlineLoader>
@@ -166,6 +194,7 @@
         container-type: inline-size;
     }
 
+    /* Force the container to display metrics on a column stack */
     .container.force-col-stack {
         .content {
             flex-direction: column;

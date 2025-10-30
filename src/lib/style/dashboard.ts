@@ -20,6 +20,20 @@ const LeftPanelStyleConfig: ComponentStyles = {
 
 export const LeftPanelStyle = createStyleStore(LeftPanelStyleConfig);
 
+//////////     F U L L     S C R E E N     P A N E L     //////////
+
+const FullScreenPanelStyleConfig: ComponentStyles = {
+    dark: {
+        blurFilter: "8px",
+        background: "rgba(24, 29, 35, 0.25)",
+        paddingHorizontal: "50px",
+        paddingTop: "50px",
+        paddingBottom: "50px",
+    },
+};
+
+export const FullScreenPanelStyle = createStyleStore(FullScreenPanelStyleConfig);
+
 //////////     L I N K     //////////
 
 const LinkStyleConfig: ComponentStyles = {

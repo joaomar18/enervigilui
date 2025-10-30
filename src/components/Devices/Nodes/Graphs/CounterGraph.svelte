@@ -98,6 +98,16 @@
     });
 </script>
 
+<!--
+    CounterGraph Component
+    
+    A specialized graph component for displaying counter data with cumulative value tracking and 
+    counter-specific visualization patterns. Features uPlot integration with counter-optimized 
+    rendering, real-time cursor tracking, and interactive data drilling functionality. Handles 
+    time-series counter data processing, dynamic graph creation based on time steps, and provides 
+    counter-specific tooltip integration. Supports comprehensive styling through BaseGraph 
+    inheritance and counter-specific theming for industrial counter data visualization.
+-->
 <BaseGraph
     {gridElement}
     {graphType}
@@ -117,8 +127,8 @@
     {goBack}
 >
     <div slot="metrics" class="metrics-div">
-        {#if globalMetrics && dataFetched}
-            <CounterMetricsComponent forceColStack={true} metrics={globalMetrics} {unit} {decimalPlaces} {dataFetched} roundMetrics={true} />
+        {#if globalMetrics}
+            <CounterMetricsComponent forceColStack={true} metrics={globalMetrics} {unit} {decimalPlaces} {dataFetched} {firstFetch} roundMetrics={true} />
         {/if}
     </div>
 </BaseGraph>

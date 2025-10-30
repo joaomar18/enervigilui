@@ -2,9 +2,6 @@
     import { tick } from "svelte";
     import { onDestroy } from "svelte";
 
-    // Stores
-    import { leftPanelOpen } from "$lib/stores/view/navigation";
-
     // Styles
     import { mergeStyle } from "$lib/style/components";
     import { RightPanelSheetStyle } from "$lib/style/general";
@@ -212,7 +209,7 @@
         background: var(--mask-background-color);
         backdrop-filter: blur(var(--mask-blur-filter));
         -webkit-backdrop-filter: blur(var(--mask-blur-filter));
-        z-index: 108;
+        z-index: 104;
     }
 
     .container {
@@ -236,7 +233,7 @@
         box-shadow: var(--shadow);
         transform: translateX(100%);
         transition: transform 0.2s ease-in-out;
-        z-index: 109;
+        z-index: 105;
     }
 
     .container.open {

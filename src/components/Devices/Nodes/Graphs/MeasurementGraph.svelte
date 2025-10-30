@@ -127,7 +127,7 @@
 >
     <div slot="metrics" class="metrics-div">
         {#if globalMetrics}
-            <MeasurementMetricsComponent labelWidth="125px" metrics={globalMetrics} {unit} {decimalPlaces} {dataFetched} />
+            <MeasurementMetricsComponent labelWidth="125px" metrics={globalMetrics} {unit} {decimalPlaces} {dataFetched} {firstFetch} />
         {/if}
     </div>
 </BaseGraph>
