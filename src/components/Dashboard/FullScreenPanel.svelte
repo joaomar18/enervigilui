@@ -9,6 +9,9 @@
     export let style: { [property: string]: string | number } | null = null;
     $: effectiveStyle = style ?? $FullScreenPanelStyle;
 
+    // Props
+    export let show: boolean;
+
     // Layout / styling props
     export let blurFilter: string | undefined = undefined;
     export let background: string | undefined = undefined;
@@ -29,23 +32,44 @@
 
     // Variables
     let fullscreenContainer: HTMLDivElement;
+    let contentContainer: HTMLDivElement;
     let loaded: boolean = false;
 
     // Reactive Statements
     $: if (!loaded && fullscreenContainer) {
-        document.body.appendChild(fullscreenContainer);
-        loaded = true;
+        requestAnimationFrame(() => {
+            document.body.appendChild(fullscreenContainer);
+            window.addEventListener("click", handleClick);
+            loaded = true;
+        });
     }
 
     // Functions
+    function handleClick(event: MouseEvent): void {
+        if (fullscreenContainer && contentContainer && !contentContainer.contains(event.target as Node)) {
+            show = false;
+        }
+    }
+
     onDestroy(() => {
         if (loaded) {
             document.body.removeChild(fullscreenContainer);
+            window.removeEventListener("click", handleClick);
             loaded = false;
         }
     });
 </script>
 
+<!--
+    FullScreenPanel Component
+    
+    A reusable fullscreen overlay component that portals content to document.body, providing
+    true fullscreen display with backdrop blur effects. Features automatic DOM management with
+    lifecycle-aware mounting and cleanup, click-outside-to-close functionality, and comprehensive
+    theming support. Uses portal pattern to render outside parent stacking contexts, solving
+    z-index conflicts with high-z-index panels. Supports backdrop blur effects for modern
+    glassmorphic UI patterns with webkit compatibility.
+-->
 <div
     bind:this={fullscreenContainer}
     style="
@@ -58,10 +82,11 @@
     class="fullscreen-div"
     class:loaded
 >
-    <div class="content"></div>
+    <div bind:this={contentContainer} class="content"><slot /></div>
 </div>
 
 <style>
+    /* Fullscreen overlay container - Fixed position viewport overlay with portal rendering */
     .fullscreen-div {
         position: fixed;
         display: none;
@@ -81,12 +106,13 @@
         padding-right: var(--padding-horizontal);
     }
 
+    /* Loaded state - Displays overlay after DOM portal mount to prevent flash */
     .fullscreen-div.loaded {
         display: block;
     }
 
+    /* Content wrapper - Full viewport container for slotted content with relative positioning */
     .content {
-        background-color: red;
         width: 100%;
         height: 100%;
         position: relative;

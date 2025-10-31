@@ -14,7 +14,6 @@
     $: effectiveStyle = style ?? $GraphMetricStyle;
 
     // Props
-    export let forceColStack: boolean = false;
     export let metrics: CounterMetrics;
     export let unit: string = "";
     export let decimalPlaces: number | null;
@@ -67,10 +66,13 @@
     $: mergedStyle = mergeStyle(effectiveStyle, localOverrides);
 
     // Variables
+    let forceColStack: boolean;
     let loaderTimeout: number | null = null;
     let showLoader: boolean = false;
 
     // Reactive Statements
+    $: forceColStack = String(mergedStyle.forceCollapse) === "TRUE";
+
     $: if (!dataFetched && !showLoader) {
         if (firstFetch) {
             loaderTimeout = setTimeout(() => {
@@ -194,8 +196,14 @@
         align-items: center;
     }
 
-    /* Remove border from last row - Prevents trailing divider */
+    /* Remove left padding from the first row child */
+    .row:first-child {
+        padding-left: 0;
+    }
+
+    /* Remove border and padding right from last row - Prevents trailing divider */
     .row:last-child {
+        padding-right: 0;
         border-right: none;
     }
 

@@ -3,10 +3,7 @@ import type { SvelteComponent } from "svelte";
 import Measurement from "../../../components/Devices/Nodes/RealTimeDisplay/Measurement.svelte";
 import Counter from "../../../components/Devices/Nodes/RealTimeDisplay/Counter.svelte";
 import Text from "../../../components/Devices/Nodes/RealTimeDisplay/Text.svelte";
-import CounterGraph from "../../../components/Devices/Nodes/Graphs/CounterGraph.svelte";
-import CounterMetrics from "../../../components/Devices/Nodes/Metrics/CounterMetrics.svelte";
-import MeasurementGraph from "../../../components/Devices/Nodes/Graphs/MeasurementGraph.svelte";
-import MeasurementMetrics from "../../../components/Devices/Nodes/Metrics/MeasurementMetrics.svelte";
+import { GraphType } from "$lib/logic/view/graph/base";
 
 /** Configuration for which real-time card categories are active/visible */
 export type RealTimeCardCategoriesState = Record<NodeCategory, boolean>;
@@ -38,10 +35,10 @@ export const realTimeDisplayComponentMap: Record<NodeCategory, typeof SvelteComp
     [NodeCategory.Other]: null, // Not implemented yet
 };
 
-/** Maps node categories to their corresponding graph component for log data visualization */
-export const logsDisplayGraphComponentMap: Record<NodeCategory, typeof SvelteComponent<any> | null> = {
-    [NodeCategory.Measurements]: MeasurementGraph,
-    [NodeCategory.Counters]: CounterGraph,
+/** Maps node categories to their corresponding graph type for log data visualization */
+export const logsDisplayGraphTypeMap: Record<NodeCategory, GraphType | null> = {
+    [NodeCategory.Measurements]: GraphType.Measurement,
+    [NodeCategory.Counters]: GraphType.Counter,
     [NodeCategory.States]: null, // Not implemented yet
     [NodeCategory.Texts]: null, // Not implemented yet
     [NodeCategory.Other]: null, // Not implemented yet

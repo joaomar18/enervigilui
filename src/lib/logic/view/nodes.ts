@@ -1,7 +1,6 @@
 import { NodeCategory, NodeType } from "$lib/types/nodes/base";
-import { logsDisplayGraphComponentMap, realTimeDisplayComponentMap } from "$lib/types/view/device";
-import type { NodeState, ProcessedNodeState } from "$lib/types/nodes/realtime";
-import type { NodeLogs } from "$lib/types/nodes/logs";
+import { GraphType } from "./graph/base";
+import { logsDisplayGraphTypeMap, realTimeDisplayComponentMap } from "$lib/types/view/device";
 import type { SvelteComponent } from "svelte";
 
 /**
@@ -46,11 +45,11 @@ export function getNodeRealTimeDisplayComponent(category: NodeCategory): typeof 
 }
 
 /**
- * Retrieves the appropriate Svelte component for displaying node log graphs.
- * @param category - The node category to get the graph component for
- * @returns Svelte component class for rendering historical node data graphs, or null if not available
+ * Retrieves the appropriate graph type for displaying historical node log data.
+ * @param category - The node category to get the graph type for
+ * @returns GraphType identifier for rendering the appropriate chart visualization, or null if no graph type is mapped
  */
-export function getNodeLogGraphComponent(category: NodeCategory): typeof SvelteComponent<any> | null {
-    let component = logsDisplayGraphComponentMap[category];
+export function getNodeLogGraphType(category: NodeCategory): GraphType | null {
+    let component = logsDisplayGraphTypeMap[category];
     return component;
 }

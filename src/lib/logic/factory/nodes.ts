@@ -15,7 +15,7 @@ import { protocolPlugins } from "$lib/stores/device/protocol";
 import { normalizeNode } from "../util/nodes";
 import { showToast } from "../view/toast";
 import { AlertType } from "$lib/stores/view/toast";
-import { getNodeRealTimeDisplayComponent, getNodeLogGraphComponent, getNodeCategory } from "../view/nodes";
+import { getNodeRealTimeDisplayComponent, getNodeLogGraphType, getNodeCategory } from "../view/nodes";
 import { convertISOToTimestamp } from "../util/date";
 
 
@@ -349,8 +349,8 @@ export function processNodesState(nodesState: Record<string, NodeState>): Array<
         const processedName = removePrefix(nodeName);
         let category = getNodeCategory(nodeState.type, nodeState.incremental);
         const displayComponent = getNodeRealTimeDisplayComponent(category);
-        const graphComponent = getNodeLogGraphComponent(category);
-        processedNodesState.push({ ...nodeState, name: processedName, displayComponent: displayComponent, graphComponent: graphComponent } as ProcessedNodeState);
+        const graphType = getNodeLogGraphType(category);
+        processedNodesState.push({ ...nodeState, name: processedName, displayComponent: displayComponent, graphType: graphType } as ProcessedNodeState);
     }
 
     return sortNodesLogically(processedNodesState) as Array<ProcessedNodeState>;
@@ -365,7 +365,7 @@ export function processNodesState(nodesState: Record<string, NodeState>): Array<
 export function processNodeLogs(nodeLogs: NodeLogs): ProcessedNodeLogs {
     let processedPoints: Array<ProcessedBaseLogPoint> = [];
     let category = getNodeCategory(nodeLogs.type, nodeLogs.incremental);
-    const graphComponent = getNodeLogGraphComponent(category);
+    const graphType = getNodeLogGraphType(category);
     for (let point of nodeLogs.points) {
         const { start_time: start_time_str, end_time: end_time_str, ...logData } = point;
 
@@ -388,7 +388,7 @@ export function processNodeLogs(nodeLogs: NodeLogs): ProcessedNodeLogs {
         type: nodeLogs.type,
         incremental: nodeLogs.incremental,
         time_step: nodeLogs.time_step,
-        graphComponent: graphComponent,
+        graphType: graphType,
         points: processedPoints,
         global_metrics: nodeLogs.global_metrics,
     } as ProcessedNodeLogs;

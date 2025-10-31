@@ -1,27 +1,52 @@
 <script lang="ts">
+    import "uplot/dist/uPlot.min.css";
+    import { onDestroy } from "svelte";
+    import { BaseGraphObject, GraphType } from "$lib/logic/view/graph/base";
+    import { getGraphToolTipDisplayComponent } from "$lib/logic/view/graph/helpers";
+    import { FormattedTimeStep } from "$lib/types/date";
+    import { LogSpanPeriod } from "$lib/types/view/nodes";
+    import type {
+        BaseLogPoint,
+        BaseMetrics,
+        CounterLogPoint,
+        CounterMetrics,
+        MeasurementLogPoint,
+        MeasurementMetrics,
+        ProcessedBaseLogPoint,
+        ProcessedCounterLogPoint,
+        ProcessedMeasurementLogPoint,
+    } from "$lib/types/nodes/logs";
     import Action from "../../../General/Action.svelte";
     import ToolTipText from "../../../General/ToolTipText.svelte";
     import DateRangeChecker from "../../../General/TimeDate/DateRangeChecker.svelte";
-    import "uplot/dist/uPlot.min.css";
+    import CircularLoader from "../../../General/CircularLoader.svelte";
+    import MeasurementMetricsComponent from "../Metrics/MeasurementMetrics.svelte";
+    import CounterMetricsComponent from "../Metrics/CounterMetrics.svelte";
+    import BaseFullScreenGraph from "./BaseFullScreenGraph.svelte";
+    import GraphToolTip from "./GraphToolTip.svelte";
+    import { MeasurementGraphObject } from "$lib/logic/view/graph/measurement";
+    import { CounterGraphObject } from "$lib/logic/view/graph/counter";
 
     // Texts
+    import { selectedLang } from "$lib/stores/lang/definition";
     import { texts } from "$lib/stores/lang/generalTexts";
 
     // Styles
     import { mergeStyle } from "$lib/style/components";
-    import { BaseGraphStyle, GraphActionStyle } from "$lib/style/graph";
-    import GraphToolTip from "./GraphToolTip.svelte";
-    import type { BaseLogPoint } from "$lib/types/nodes/logs";
-    import type { GraphType } from "$lib/logic/view/graph/base";
-    import { getGraphToolTipDisplayComponent } from "$lib/logic/view/graph/helpers";
-    import CircularLoader from "../../../General/CircularLoader.svelte";
-    import FullScreenPanel from "../../../Dashboard/FullScreenPanel.svelte";
+    import { BaseGraphStyle, GraphActionStyle, GraphMetricStyle } from "$lib/style/graph";
 
     // Style object (from theme)
     export let style: { [property: string]: string | number } | null = null;
+    export let metricsStyle: { [property: string]: string | number } | null = null;
     $: effectiveStyle = style ?? $BaseGraphStyle;
+    $: effectiveMetricStyle = metricsStyle ?? $GraphMetricStyle;
 
     // Props
+    export let data: Array<ProcessedBaseLogPoint>;
+    export let timeStep: FormattedTimeStep;
+    export let logSpanPeriod: LogSpanPeriod;
+    export let fullScreen: boolean = false;
+    export let showFullScreen: boolean = false; // Used externally on Full Screen Graph
     export let goBackEnabled: boolean = true;
     export let gridElement: HTMLDivElement | null = null;
     export let graphType: GraphType;
@@ -35,7 +60,9 @@
     export let firstFetch: boolean;
     export let graphNoData: boolean;
     export let logPoint: BaseLogPoint | null;
+    export let globalMetrics: BaseMetrics;
     export let unit: string = "";
+    export let decimalPlaces: number | null = null;
 
     // Layout / styling props
     export let width: string | undefined = undefined;
@@ -53,6 +80,7 @@
     export let backgroundColor: string | undefined = undefined;
     export let borderColor: string | undefined = undefined;
     export let boxShadow: string | undefined = undefined;
+    export let graphHeight: string | undefined = undefined;
     export let graphPaddingTop: string | undefined = undefined;
     export let graphPaddingLeft: string | undefined = undefined;
     export let graphPaddingRight: string | undefined = undefined;
@@ -81,6 +109,7 @@
         backgroundColor,
         borderColor,
         boxShadow,
+        graphHeight,
         graphPaddingTop,
         graphPaddingLeft,
         graphPaddingRight,
@@ -98,8 +127,8 @@
     $: mergedStyle = mergeStyle(effectiveStyle, localOverrides);
 
     // Variables
+    let graph: any | null = null;
     let showDateRange: boolean = false;
-    let showFullscreen: boolean = false;
     let loaderTimeout: number | null = null;
     let showLoader: boolean = false;
 
@@ -121,8 +150,66 @@
         showLoader = false;
     }
 
+    $: if (graphContainer) {
+        createGraphObject();
+    }
+
+    $: if (graph && dataFetched && data && $selectedLang) {
+        updateGraphData();
+    }
+
     // Export Functions
+    export let getNewTimeSpan: (startTime: Date, endTime: Date) => void;
     export let goBack: () => void;
+
+    // Functions
+    function createGraphObject(): void {
+        if (graphType === GraphType.Measurement) {
+            graph = new MeasurementGraphObject(
+                graphContainer,
+                hoveredLogPointChange,
+                mousePositionChange,
+                gridDoubleClick,
+                data as ProcessedMeasurementLogPoint[],
+            );
+        } else if (graphType === GraphType.Counter) {
+            graph = new CounterGraphObject(
+                graphContainer,
+                hoveredLogPointChange,
+                mousePositionChange,
+                gridDoubleClick,
+                data as ProcessedCounterLogPoint[],
+            );
+        }
+    }
+
+    function hoveredLogPointChange(currentLogPoint: BaseLogPoint | null): void {
+        insideGraph = !!currentLogPoint;
+        logPoint = currentLogPoint;
+    }
+
+    function mousePositionChange(xPos: number | undefined, yPos: number | undefined): void {
+        cursorPos = { x: xPos, y: yPos };
+    }
+
+    function gridDoubleClick(startTime: Date, endTime: Date): void {
+        getNewTimeSpan(startTime, endTime);
+    }
+
+    function updateGraphData(): void {
+        graph.destroy();
+        graph.updatePoints(data, decimalPlaces, true);
+        graph.createGraph(timeStep, logSpanPeriod, mergedStyle);
+        gridElement = graph.getGridElement();
+        graphCreated = true;
+        graphNoData = !graph.hasData();
+    }
+
+    onDestroy(() => {
+        if (graph) {
+            graph.destroy();
+        }
+    });
 </script>
 
 <!--
@@ -151,6 +238,7 @@
         --background-color: {mergedStyle.backgroundColor};
         --border-color: {mergedStyle.borderColor};
         --box-shadow: {mergedStyle.boxShadow};
+        --graph-height: {mergedStyle.graphHeight};
         --graph-padding-top: {mergedStyle.graphPaddingTop};
         --graph-padding-left: {mergedStyle.graphPaddingTop};
         --graph-padding-right: {mergedStyle.graphPaddingRight};
@@ -165,8 +253,27 @@
     "
     class="graph-div-wrapper"
 >
-    {#if showFullscreen}
-        <FullScreenPanel />
+    {#if !fullScreen && showFullScreen}
+        <BaseFullScreenGraph
+            bind:show={showFullScreen}
+            {gridElement}
+            {graphType}
+            {insideGraph}
+            {cursorPos}
+            {graphContainer}
+            {initialDate}
+            {endDate}
+            {graphCreated}
+            {dataFetched}
+            {firstFetch}
+            {graphNoData}
+            {logPoint}
+            {globalMetrics}
+            {unit}
+            {decimalPlaces}
+            {goBackEnabled}
+            {goBack}
+        />
     {/if}
     <div class="header">
         <div class="header-content">
@@ -200,7 +307,7 @@
                     style={$GraphActionStyle}
                     imageURL="/img/fullscreen.svg"
                     onClick={() => {
-                        showFullscreen = true;
+                        showFullScreen = !showFullScreen;
                     }}
                     enableToolTip={true}
                 >
@@ -209,7 +316,29 @@
             </div>
         </div>
         <div class="metrics-section">
-            <slot name="metrics" />
+            {#if globalMetrics}
+                {#if graphType === GraphType.Measurement}
+                    <MeasurementMetricsComponent
+                        style={effectiveMetricStyle}
+                        labelWidth="125px"
+                        metrics={globalMetrics as MeasurementMetrics}
+                        {unit}
+                        {decimalPlaces}
+                        {dataFetched}
+                        {firstFetch}
+                    />
+                {:else if graphType === GraphType.Counter}
+                    <CounterMetricsComponent
+                        style={effectiveMetricStyle}
+                        metrics={globalMetrics as CounterMetrics}
+                        {unit}
+                        {decimalPlaces}
+                        {dataFetched}
+                        {firstFetch}
+                        roundMetrics={true}
+                    />
+                {/if}
+            {/if}
         </div>
     </div>
     <div class="main">
@@ -254,7 +383,7 @@
         padding-right: var(--padding-horizontal);
         margin: 0;
         width: var(--width);
-        height: fit-content;
+        height: var(--height);
         border-radius: var(--border-radius);
         background: var(--background-color);
         border: 1px solid var(--border-color);
@@ -334,7 +463,7 @@
         padding: 0;
         position: relative;
         width: 100%;
-        height: calc(100% - var(--header-height));
+        flex: 1;
     }
 
     /* Graph main content - Horizontal flex container with styled scrollbar for graph overflow */
@@ -373,7 +502,7 @@
     /* Unit label section - Left sidebar for measurement unit display */
     .unit-div {
         width: var(--unit-div-width);
-        height: var(--height);
+        height: var(--graph-height);
     }
 
     /* Unit content container - Sized to match graph plotting area */
@@ -419,7 +548,7 @@
         margin: 0;
         position: relative;
         width: calc(100% - var(--unit-div-width));
-        height: var(--height);
+        height: var(--graph-height);
     }
 
     /* Y-axis overlay area - Positioned over uPlot's y-axis for custom content */
@@ -428,7 +557,7 @@
         left: 0;
         top: 0;
         width: var(--y-axis-width);
-        height: calc(var(--height) - var(--graph-padding-top) - var(--graph-padding-bottom) - var(--x-axis-height));
+        height: calc(var(--graph-height) - var(--graph-padding-top) - var(--graph-padding-bottom) - var(--x-axis-height));
         padding-top: var(--graph-padding-top);
         padding-bottom: calc(var(--x-axis-height) + var(--graph-padding-bottom));
     }

@@ -24,7 +24,7 @@ export const GraphActionStyle = createStyleStore(GraphActionStyleConfig);
 const BaseGraphStyleConfig: ComponentStyles = {
     dark: {
         width: "100%",
-        height: "100%",
+        height: "fit-content",
         headerHeight: "fit-content",
         headerButtonsGap: "20px",
         xAxisHeight: "50px",
@@ -39,6 +39,7 @@ const BaseGraphStyleConfig: ComponentStyles = {
         backgroundColor: "rgba(20, 22, 28, 0.6)",
         borderColor: "rgba(255, 255, 255, 0.08)",
         boxShadow: "0 2px 4px rgba(0, 0, 0, 0.1)",
+        graphHeight: "450px",
         graphPaddingTop: "10px",
         graphPaddingLeft: "20px",
         graphPaddingRight: "20px",
@@ -57,6 +58,46 @@ const BaseGraphStyleConfig: ComponentStyles = {
 };
 
 export const BaseGraphStyle = createStyleStore(BaseGraphStyleConfig);
+
+//////////     F U L L     S C R E E N     B A S E     G R A P H     //////////
+
+const FullScreenBaseGraphStyleConfig: ComponentStyles = {
+    dark: {
+        width: "100%",
+        height: "100%",
+        headerHeight: "fit-content",
+        headerButtonsGap: "20px",
+        xAxisHeight: "50px",
+        yAxisWidth: "50px",
+        unitDivWidth: "20px",
+        unitMaxWidth: "100px",
+        yAxisTickSpacingPx: 40,
+        borderRadius: "10px",
+        paddingHorizontal: "15px",
+        paddingTop: "15px",
+        paddingBottom: "0px",
+        backgroundColor: "rgba(20, 22, 28, 0.6)",
+        borderColor: "rgba(255, 255, 255, 0.08)",
+        boxShadow: "0 2px 4px rgba(0, 0, 0, 0.1)",
+        graphHeight: "450px",
+        graphPaddingTop: "10px",
+        graphPaddingLeft: "20px",
+        graphPaddingRight: "20px",
+        graphPaddingBottom: "0px",
+        graphPeriodWidthPx: 70,
+        graphGridWidthPx: 1,
+        graphGridLineColor: "rgba(255, 255, 255, 0.06)",
+        graphTextColor: "rgba(255, 255, 255, 0.9)",
+        graphTextWeight: "500",
+        subTextColor: "rgba(255, 255, 255, 0.5)",
+        subTextWeight: "400",
+        scrollbarTrackColor: "#323a45",
+        scrollbarThumbColor: "#1e242b",
+        loaderBackgroundBlur: "blur(8px)",
+    },
+};
+
+export const FullScreenBaseGraphStyle = createStyleStore(FullScreenBaseGraphStyleConfig);
 
 //////////     M E A S U R E M E N T     G R A P H     //////////
 
@@ -93,12 +134,13 @@ export const CounterGraphStyle = createStyleStore(CounterGraphStyleConfig);
 
 const GraphMetricStyleConfig: ComponentStyles = {
     dark: {
+        forceCollapse: "TRUE",
         iconSize: "26px",
         textSize: "14px",
         rowWidth: "300px",
-        rowPaddingLeft: "0px",
-        rowPaddingRight: "10px",
-        rowBorderRight: "1px solid white",
+        rowPaddingLeft: "30px",
+        rowPaddingRight: "30px",
+        rowBorderRight: "1px solid rgba(255, 255, 255, 0.12)",
         labelWidth: "75px",
         labelPaddingLeft: "5px",
         labelColor: "rgba(255, 255, 255, 0.55)",
@@ -115,6 +157,35 @@ const GraphMetricStyleConfig: ComponentStyles = {
 };
 
 export const GraphMetricStyle = createStyleStore(GraphMetricStyleConfig);
+
+//////////     F U L L     S C R E E N     G R A P H     M E T R I C     //////////
+
+const FullScreenGraphMetricStyleConfig: ComponentStyles = {
+    dark: {
+        forceCollapse: "FALSE",
+        iconSize: "32px",
+        textSize: "1rem",
+        rowWidth: "350px",
+        rowPaddingLeft: "30px",
+        rowPaddingRight: "30px",
+        rowBorderRight: "1px solid rgba(255, 255, 255, 0.12)",
+        labelWidth: "75px",
+        labelPaddingLeft: "10px",
+        labelColor: "rgba(255, 255, 255, 0.55)",
+        labelWeight: "400",
+        valueRightPadding: "5px",
+        valueColor: "rgba(255, 255, 255, 0.95)",
+        valueWeight: "500",
+        unitMaxWidth: "50px",
+        unitColor: "rgba(255, 255, 255, 0.55)",
+        unitWeight: "400",
+        noDataLabelColor: "rgba(255, 255, 255, 0.4)",
+        noDataLabelWeight: "400",
+    },
+};
+
+export const FullScreenGraphMetricStyle = createStyleStore(FullScreenGraphMetricStyleConfig);
+
 
 
 //////////     G R A P H     T O O L     T I P     //////////

@@ -31,6 +31,7 @@
         SelectedCustomDatePickerButtonStyle,
     } from "$lib/style/nodes";
     import ElapsedDateTime from "../../General/TimeDate/ElapsedDateTime.svelte";
+    import BaseGraph from "./Graphs/BaseGraph.svelte";
 
     // Props
     export let nodeState: ProcessedNodeState;
@@ -417,7 +418,7 @@
                     </div>
                 {/if}
 
-                {#if nodeState && nodeState.graphComponent}
+                {#if nodeState && nodeState.graphType}
                     <div class="section-title"><h3>{$texts.history}</h3></div>
                     <div class="inner-content-div no-horizontal-padding">
                         <div class="history-btn-picker-div">
@@ -491,16 +492,15 @@
                             </div>
                         </div>
                         <div class="chart-container">
-                            <svelte:component
-                                this={nodeState.graphComponent}
-                                height="450px"
-                                {initialDate}
-                                {endDate}
+                            <BaseGraph
                                 data={nodeLogs?.points}
-                                dataFetched={nodeLogsFetched}
-                                firstFetch={nodeLogsFirstFetch}
                                 timeStep={nodeLogs?.time_step}
                                 logSpanPeriod={selectedHistoryTimeSpan}
+                                graphType={nodeState.graphType}
+                                {initialDate}
+                                {endDate}
+                                dataFetched={nodeLogsFetched}
+                                firstFetch={nodeLogsFirstFetch}
                                 globalMetrics={nodeLogs?.global_metrics}
                                 unit={nodeLogs?.unit}
                                 decimalPlaces={nodeLogs?.decimal_places}
