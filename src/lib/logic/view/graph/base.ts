@@ -1,6 +1,7 @@
 import uPlot from "uplot";
 import { FormattedTimeStep } from "$lib/types/date";
 import { LogSpanPeriod } from "$lib/types/view/nodes";
+import { getGraphSize } from "./helpers";
 import type { BaseLogPoint } from "$lib/types/nodes/logs";
 
 /**
@@ -52,12 +53,12 @@ export abstract class BaseGraphObject<T extends BaseLogPoint> {
     }
 
     // Abstract methods (subclasses must implement)
-    
+
     /**
      * Creates and initializes the uPlot graph with specified time parameters and styling.
      */
     abstract createGraph(timeStep: FormattedTimeStep, logSpanPeriod: LogSpanPeriod, style: { [property: string]: string | number },): void;
-    
+
     /**
      * Handles double-click events on the graph grid for interactive data drilling.
      */
@@ -82,6 +83,19 @@ export abstract class BaseGraphObject<T extends BaseLogPoint> {
      */
     getGridElement(): HTMLDivElement | null {
         return this.gridElement;
+    }
+
+    /**
+     * Resizes the graph to fit the current container dimensions.
+     * Uses uPlot's setSize method for efficient resizing without recreating the chart.
+     * @param style - Style configuration containing graph sizing parameters
+     */
+    resize(style: { [property: string]: string | number }): void {
+        if (this.graph && this.container) {
+            console.log("running resize!!!");
+            let { width, height } = getGraphSize(this.container, Number(style.graphPeriodWidthPx), this.graph.data, style);
+            this.graph.setSize({ width, height });
+        }
     }
 
     destroy(): void {

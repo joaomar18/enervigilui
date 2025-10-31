@@ -49,6 +49,7 @@ export class MeasurementGraphObject extends BaseGraphObject<MeasurementLogPoint>
     createGraph(timeStep: FormattedTimeStep, logSpanPeriod: LogSpanPeriod, style: { [property: string]: string | number },): void {
         const { alignedData } = this.convertDataToGraph(timeStep, logSpanPeriod);
         let { width, height } = getGraphSize(this.container, Number(style.graphPeriodWidthPx), alignedData, style);
+        console.log("width: ", width, "height: ", height);
 
         let opts: uPlot.Options = {
             width: width,

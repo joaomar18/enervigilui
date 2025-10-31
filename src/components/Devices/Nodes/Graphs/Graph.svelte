@@ -1,28 +1,26 @@
 <script lang="ts">
     import "uplot/dist/uPlot.min.css";
     import { onDestroy } from "svelte";
-    import { BaseGraphObject, GraphType } from "$lib/logic/view/graph/base";
+    import { GraphType } from "$lib/logic/view/graph/base";
     import { getGraphToolTipDisplayComponent } from "$lib/logic/view/graph/helpers";
     import { FormattedTimeStep } from "$lib/types/date";
     import { LogSpanPeriod } from "$lib/types/view/nodes";
     import type {
         BaseLogPoint,
         BaseMetrics,
-        CounterLogPoint,
         CounterMetrics,
-        MeasurementLogPoint,
         MeasurementMetrics,
         ProcessedBaseLogPoint,
         ProcessedCounterLogPoint,
         ProcessedMeasurementLogPoint,
     } from "$lib/types/nodes/logs";
+    import FullScreenGraph from "./FullScreenGraph.svelte";
     import Action from "../../../General/Action.svelte";
     import ToolTipText from "../../../General/ToolTipText.svelte";
     import DateRangeChecker from "../../../General/TimeDate/DateRangeChecker.svelte";
     import CircularLoader from "../../../General/CircularLoader.svelte";
     import MeasurementMetricsComponent from "../Metrics/MeasurementMetrics.svelte";
     import CounterMetricsComponent from "../Metrics/CounterMetrics.svelte";
-    import BaseFullScreenGraph from "./BaseFullScreenGraph.svelte";
     import GraphToolTip from "./GraphToolTip.svelte";
     import { MeasurementGraphObject } from "$lib/logic/view/graph/measurement";
     import { CounterGraphObject } from "$lib/logic/view/graph/counter";
@@ -33,7 +31,7 @@
 
     // Styles
     import { mergeStyle } from "$lib/style/components";
-    import { BaseGraphStyle, GraphActionStyle, GraphMetricStyle } from "$lib/style/graph";
+    import { BaseGraphStyle, CounterGraphStyle, GraphActionStyle, GraphMetricStyle, MeasurementGraphStyle } from "$lib/style/graph";
 
     // Style object (from theme)
     export let style: { [property: string]: string | number } | null = null;
@@ -42,31 +40,25 @@
     $: effectiveMetricStyle = metricsStyle ?? $GraphMetricStyle;
 
     // Props
-    export let data: Array<ProcessedBaseLogPoint>;
-    export let timeStep: FormattedTimeStep;
+    export let data: Array<ProcessedBaseLogPoint> | undefined;
+    export let timeStep: FormattedTimeStep | null | undefined;
     export let logSpanPeriod: LogSpanPeriod;
     export let fullScreen: boolean = false;
     export let showFullScreen: boolean = false; // Used externally on Full Screen Graph
-    export let goBackEnabled: boolean = true;
-    export let gridElement: HTMLDivElement | null = null;
+    export let goBackEnabled: boolean;
     export let graphType: GraphType;
-    export let insideGraph: boolean;
-    export let cursorPos: { x: number | undefined; y: number | undefined };
-    export let graphContainer: HTMLDivElement;
     export let initialDate: Date;
     export let endDate: Date;
-    export let graphCreated: boolean;
     export let dataFetched: boolean;
     export let firstFetch: boolean;
-    export let graphNoData: boolean;
-    export let logPoint: BaseLogPoint | null;
-    export let globalMetrics: BaseMetrics;
+    export let globalMetrics: BaseMetrics | undefined;
     export let unit: string = "";
     export let decimalPlaces: number | null = null;
 
     // Layout / styling props
     export let width: string | undefined = undefined;
     export let height: string | undefined = undefined;
+    export let minHeight: string | undefined = undefined;
     export let headerHeight: string | undefined = undefined;
     export let headerButtonsGap: string | undefined = undefined;
     export let xAxisHeight: string | undefined = undefined;
@@ -96,6 +88,7 @@
     $: localOverrides = {
         width,
         height,
+        minHeight,
         headerHeight,
         headerButtonsGap,
         xAxisHeight,
@@ -127,10 +120,19 @@
     $: mergedStyle = mergeStyle(effectiveStyle, localOverrides);
 
     // Variables
+
+    let graphContainer: HTMLDivElement;
+    let gridElement: HTMLDivElement | null = null;
     let graph: any | null = null;
     let showDateRange: boolean = false;
     let loaderTimeout: number | null = null;
     let showLoader: boolean = false;
+    let insideGraph: boolean = false;
+    let graphCreated: boolean = false;
+    let graphNoData: boolean = true;
+    let logPoint: BaseLogPoint | null = null;
+    let cursorPos: { x: number | undefined; y: number | undefined };
+    let resizeObserver: ResizeObserver | null = null;
 
     // Reactive Statements
     $: if (!dataFetched && !showLoader) {
@@ -150,12 +152,21 @@
         showLoader = false;
     }
 
-    $: if (graphContainer) {
+    $: if (graphType && graphContainer) {
         createGraphObject();
     }
 
     $: if (graph && dataFetched && data && $selectedLang) {
         updateGraphData();
+    }
+
+    $: if (graphContainer && graph) {
+        if (!resizeObserver) {
+            resizeObserver = new ResizeObserver(() => {
+                handleResize();
+            });
+            resizeObserver.observe(graphContainer);
+        }
     }
 
     // Export Functions
@@ -164,23 +175,29 @@
 
     // Functions
     function createGraphObject(): void {
-        if (graphType === GraphType.Measurement) {
-            graph = new MeasurementGraphObject(
-                graphContainer,
-                hoveredLogPointChange,
-                mousePositionChange,
-                gridDoubleClick,
-                data as ProcessedMeasurementLogPoint[],
-            );
-        } else if (graphType === GraphType.Counter) {
-            graph = new CounterGraphObject(
-                graphContainer,
-                hoveredLogPointChange,
-                mousePositionChange,
-                gridDoubleClick,
-                data as ProcessedCounterLogPoint[],
-            );
-        }
+        if (graph) graph.destroy();
+        requestAnimationFrame(() => {
+            mergedStyle = mergeStyle(effectiveStyle, localOverrides);
+            if (graphType === GraphType.Measurement) {
+                graph = new MeasurementGraphObject(
+                    graphContainer,
+                    hoveredLogPointChange,
+                    mousePositionChange,
+                    gridDoubleClick,
+                    data as ProcessedMeasurementLogPoint[],
+                );
+                Object.assign(mergedStyle, $MeasurementGraphStyle);
+            } else if (graphType === GraphType.Counter) {
+                graph = new CounterGraphObject(
+                    graphContainer,
+                    hoveredLogPointChange,
+                    mousePositionChange,
+                    gridDoubleClick,
+                    data as ProcessedCounterLogPoint[],
+                );
+                Object.assign(mergedStyle, $CounterGraphStyle);
+            }
+        });
     }
 
     function hoveredLogPointChange(currentLogPoint: BaseLogPoint | null): void {
@@ -205,26 +222,28 @@
         graphNoData = !graph.hasData();
     }
 
+    function handleResize(): void {
+        if (graph) {
+            graph.resize(mergedStyle);
+        }
+    }
+
     onDestroy(() => {
+        if (resizeObserver) {
+            resizeObserver.disconnect();
+            resizeObserver = null;
+        }
         if (graph) {
             graph.destroy();
         }
     });
 </script>
 
-<!--
-    BaseGraph Component
-    
-    A foundational graph component that provides common graph infrastructure and styling.
-    Features header with action buttons, date range display, graph container management, and
-    tooltip integration. Serves as the base for specialized graph components like MeasurementGraph,
-    providing consistent layout, theming, and interaction patterns. Handles graph lifecycle,
-    container binding, and provides extensible styling through comprehensive CSS custom properties.
--->
 <div
     style="
         --width: {mergedStyle.width};
         --height: {mergedStyle.height};
+        --min-height: {mergedStyle.minHeight};
         --header-height: {mergedStyle.headerHeight};
         --header-buttons-gap: {mergedStyle.headerButtonsGap};
         --x-axis-height: {mergedStyle.xAxisHeight};
@@ -251,136 +270,139 @@
         --sub-text-weight: {mergedStyle.subTextWeight};
         --loader-background-blur: {mergedStyle.loaderBackgroundBlur};
     "
-    class="graph-div-wrapper"
+    class="graph-div-container"
 >
-    {#if !fullScreen && showFullScreen}
-        <BaseFullScreenGraph
-            bind:show={showFullScreen}
-            {gridElement}
-            {graphType}
-            {insideGraph}
-            {cursorPos}
-            {graphContainer}
-            {initialDate}
-            {endDate}
-            {graphCreated}
-            {dataFetched}
-            {firstFetch}
-            {graphNoData}
-            {logPoint}
-            {globalMetrics}
-            {unit}
-            {decimalPlaces}
-            {goBackEnabled}
-            {goBack}
-        />
-    {/if}
-    <div class="header">
-        <div class="header-content">
-            <div class="left-actions-div">
-                <Action
-                    style={$GraphActionStyle}
-                    imageURL="/img/previous.svg"
-                    disabledImageURL="/img/previous-disabled.svg"
-                    onClick={() => goBack()}
-                    enableToolTip={true}
-                    disabled={!goBackEnabled}
-                >
-                    <div slot="tooltip"><ToolTipText text={$texts.goBack} /></div>
-                </Action>
-            </div>
-            <div class="actions-div">
-                <div class="date-checker-div">
-                    <Action
-                        style={$GraphActionStyle}
-                        imageURL="/img/calendar-check.svg"
-                        onClick={() => {
-                            showDateRange = !showDateRange;
-                        }}
-                        enableToolTip={true}
-                    >
-                        <div slot="tooltip"><ToolTipText text={$texts.selectedPeriod} /></div>
-                    </Action>
-                    <DateRangeChecker bind:showToolTip={showDateRange} {initialDate} {endDate} />
-                </div>
-                <Action
-                    style={$GraphActionStyle}
-                    imageURL="/img/fullscreen.svg"
-                    onClick={() => {
-                        showFullScreen = !showFullScreen;
-                    }}
-                    enableToolTip={true}
-                >
-                    <div slot="tooltip"><ToolTipText text={$texts.fullscreen} /></div>
-                </Action>
-            </div>
-        </div>
-        <div class="metrics-section">
-            {#if globalMetrics}
-                {#if graphType === GraphType.Measurement}
-                    <MeasurementMetricsComponent
-                        style={effectiveMetricStyle}
-                        labelWidth="125px"
-                        metrics={globalMetrics as MeasurementMetrics}
-                        {unit}
-                        {decimalPlaces}
-                        {dataFetched}
-                        {firstFetch}
-                    />
-                {:else if graphType === GraphType.Counter}
-                    <CounterMetricsComponent
-                        style={effectiveMetricStyle}
-                        metrics={globalMetrics as CounterMetrics}
-                        {unit}
-                        {decimalPlaces}
-                        {dataFetched}
-                        {firstFetch}
-                        roundMetrics={true}
-                    />
-                {/if}
+    <div class="graph-div-wrapper">
+        <div class="graph-div-content">
+            {#if !fullScreen && showFullScreen}
+                <FullScreenGraph
+                    {data}
+                    {timeStep}
+                    {logSpanPeriod}
+                    bind:show={showFullScreen}
+                    {graphType}
+                    {initialDate}
+                    {endDate}
+                    {dataFetched}
+                    {firstFetch}
+                    {globalMetrics}
+                    {unit}
+                    {decimalPlaces}
+                    {goBackEnabled}
+                    {goBack}
+                    {getNewTimeSpan}
+                />
             {/if}
-        </div>
-    </div>
-    <div class="main">
-        <div class="loader" class:close={!showLoader}>
-            <CircularLoader wrapperTopLeftRadius="0px" wrapperTopRightRadius="0px" wrapperBottomLeftRadius="0px" wrapperBottomRightRadius="0px" />
-        </div>
-        <div class="graph-main">
-            <div class="unit-div">
-                <div class="unit-content">
-                    <div class="unit-wrapper">
-                        {#if graphCreated && !graphNoData}
-                            <span class="unit-label">{unit}</span>
-                        {/if}
+            <div class="header">
+                <div class="header-content">
+                    <div class="left-actions-div">
+                        <Action
+                            style={$GraphActionStyle}
+                            imageURL="/img/previous.svg"
+                            disabledImageURL="/img/previous-disabled.svg"
+                            onClick={() => goBack()}
+                            enableToolTip={true}
+                            disabled={!goBackEnabled}
+                        >
+                            <div slot="tooltip"><ToolTipText text={$texts.goBack} /></div>
+                        </Action>
                     </div>
+                    <div class="right-header-div">
+                        <div class="full-screen-data-range">
+                            <DateRangeChecker fullWidth={true} {initialDate} {endDate} />
+                        </div>
+                        <div class="actions-div">
+                            <div class="date-checker-div">
+                                <Action
+                                    style={$GraphActionStyle}
+                                    imageURL="/img/calendar-check.svg"
+                                    onClick={() => {
+                                        showDateRange = !showDateRange;
+                                    }}
+                                    enableToolTip={true}
+                                >
+                                    <div slot="tooltip"><ToolTipText text={$texts.selectedPeriod} /></div>
+                                </Action>
+                                <DateRangeChecker bind:showToolTip={showDateRange} {initialDate} {endDate} />
+                            </div>
+                            <Action
+                                style={$GraphActionStyle}
+                                imageURL="/img/fullscreen.svg"
+                                onClick={() => {
+                                    showFullScreen = !showFullScreen;
+                                }}
+                                enableToolTip={true}
+                            >
+                                <div slot="tooltip"><ToolTipText text={$texts.fullscreen} /></div>
+                            </Action>
+                        </div>
+                    </div>
+                </div>
+                <div class="metrics-section">
+                    {#if globalMetrics}
+                        {#if graphType === GraphType.Measurement}
+                            <MeasurementMetricsComponent
+                                style={effectiveMetricStyle}
+                                labelWidth="125px"
+                                metrics={globalMetrics as MeasurementMetrics}
+                                {unit}
+                                {decimalPlaces}
+                                {dataFetched}
+                                {firstFetch}
+                            />
+                        {:else if graphType === GraphType.Counter}
+                            <CounterMetricsComponent
+                                style={effectiveMetricStyle}
+                                metrics={globalMetrics as CounterMetrics}
+                                {unit}
+                                {decimalPlaces}
+                                {dataFetched}
+                                {firstFetch}
+                                roundMetrics={true}
+                            />
+                        {/if}
+                    {/if}
                 </div>
             </div>
-            <div class="graph-div" bind:this={graphContainer}>
-                <div class="y-axis-inner-div">
-                    <div class="y-axis-inner-content">
-                        {#if graphCreated && graphNoData}
-                            <span class="no-data-label">{$texts.noDataAvailable}</span>
+            <div class="main">
+                <div class="loader" class:close={!showLoader}>
+                    <CircularLoader wrapperTopLeftRadius="0px" wrapperTopRightRadius="0px" wrapperBottomLeftRadius="0px" wrapperBottomRightRadius="0px" />
+                </div>
+                <div class="graph-main">
+                    <div class="unit-div">
+                        <div class="unit-content">
+                            <div class="unit-wrapper">
+                                {#if graphCreated && !graphNoData}
+                                    <span class="unit-label">{unit}</span>
+                                {/if}
+                            </div>
+                        </div>
+                    </div>
+                    <div class="graph-div" bind:this={graphContainer}>
+                        <div class="y-axis-inner-div">
+                            <div class="y-axis-inner-content">
+                                {#if graphCreated && graphNoData}
+                                    <span class="no-data-label">{$texts.noDataAvailable}</span>
+                                {/if}
+                            </div>
+                        </div>
+                        {#if graphType && gridElement}
+                            <GraphToolTip {gridElement} {insideGraph} {cursorPos}>
+                                <svelte:component this={getGraphToolTipDisplayComponent(graphType)} {logPoint} {unit} />
+                            </GraphToolTip>
                         {/if}
                     </div>
                 </div>
-                {#if graphType && gridElement}
-                    <GraphToolTip {gridElement} {insideGraph} {cursorPos}>
-                        <svelte:component this={getGraphToolTipDisplayComponent(graphType)} {logPoint} {unit} />
-                    </GraphToolTip>
-                {/if}
             </div>
         </div>
     </div>
 </div>
 
 <style>
-    /* Main graph container - Card-style wrapper with theming and vertical layout */
-    .graph-div-wrapper {
+    .graph-div-container {
         box-sizing: border-box;
         padding-top: var(--padding-top);
         padding-bottom: var(--padding-bottom);
-        padding-left: var(--padding-horizontal);
-        padding-right: var(--padding-horizontal);
         margin: 0;
         width: var(--width);
         height: var(--height);
@@ -388,10 +410,35 @@
         background: var(--background-color);
         border: 1px solid var(--border-color);
         box-shadow: var(--box-shadow);
+        container-type: inline-size;
+    }
+
+    /* Main graph container - Card-style wrapper with theming and vertical layout */
+    .graph-div-wrapper {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+        padding-left: var(--padding-horizontal);
+        padding-right: var(--padding-horizontal);
+        width: 100%;
+        height: 100%;
+        overflow-x: hidden;
+        overflow-y: auto;
+        scrollbar-width: thin;
+        scrollbar-color: var(--scrollbar-track-color) var(--scrollbar-thumb-color);
+        scrollbar-gutter: stable both-edges;
+    }
+
+    .graph-div-content {
+        margin: 0;
+        padding: 0;
+        width: 100%;
+        height: 100%;
         display: flex;
         flex-direction: column;
         justify-content: start;
         align-items: center;
+        min-height: var(--min-height);
     }
 
     /* Graph header - Container for action buttons and controls */
@@ -418,9 +465,22 @@
         align-items: center;
         flex-wrap: wrap;
     }
+    .header-content .right-header-div {
+        width: fit-content;
+        height: 100%;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .right-header-div .full-screen-data-range {
+        display: none;
+        width: fit-content;
+        height: 100%;
+    }
 
     /* Action buttons container - Right-aligned controls with configurable spacing */
-    .header-content .actions-div {
+    .right-header-div .actions-div {
         width: fit-content;
         height: 100%;
         display: flex;
@@ -440,7 +500,7 @@
     }
 
     /* Date checker container - Houses the date range display tooltip */
-    .header-content .actions-div .date-checker-div {
+    .actions-div .date-checker-div {
         margin: 0;
         padding: 0;
         position: relative;
@@ -464,6 +524,7 @@
         position: relative;
         width: 100%;
         flex: 1;
+        min-height: 0;
     }
 
     /* Graph main content - Horizontal flex container with styled scrollbar for graph overflow */
@@ -587,5 +648,15 @@
         user-select: none;
         white-space: nowrap;
         transform: translate(-50%, -50%) rotate(-90deg);
+    }
+
+    @container (min-width: 880px) {
+        .right-header-div .full-screen-data-range {
+            display: block;
+        }
+
+        .date-checker-div {
+            display: none;
+        }
     }
 </style>

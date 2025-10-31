@@ -690,12 +690,17 @@ const DateRangeCheckerStyleConfig: ComponentStyles = {
         paddingHorizontal: "20px",
         paddingTop: "20px",
         paddingBottom: "20px",
+        fsTextSize: "1rem",
         textSize: "14px",
+        labelWidth: "50px",
+        fsLabelWidth: "75px",
         labelColor: "#9CA3AF",
         labelWeight: "400",
         valueColor: "#eeee",
         valueWeight: "500",
         rowGap: "20px",
+        fsRowPaddingHorizontal: "30px",
+        fsBorderRight: "1px solid rgba(255, 255, 255, 0.12)",
     },
 };
 

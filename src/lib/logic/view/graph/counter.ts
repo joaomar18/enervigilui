@@ -210,17 +210,6 @@ export class CounterGraphObject extends BaseGraphObject<CounterLogPoint> {
         }
     }
 
-    getAverageLine(xStart: number, xEnd: number, y: number): Path2D {
-        if (!this.graph) {
-            throw new Error(`Graph is not instantiated`);
-        }
-        const line = new Path2D();
-        line.moveTo(xStart, y);
-        line.lineTo(xEnd, y);
-
-        return line;
-    }
-
     drawCanvas(u: uPlot, style: { [property: string]: string | number }): void {
         const { ctx } = u;
         ctx.save();

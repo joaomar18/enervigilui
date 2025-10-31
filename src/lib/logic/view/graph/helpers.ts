@@ -31,16 +31,32 @@ export function getGraphTimeSplits(data: AlignedData): Array<number> {
  * @returns Object with calculated width and height
  */
 export function getGraphSize(graphContainer: HTMLElement, pxPerPeriod: number, alignedData: AlignedData, style: { [property: string]: string | number }): { width: number; height: number } {
-    let width = 0;
-    let height = 0;
+    let containerWidth = 0;
+    let containerHeight = 0;
     if (graphContainer) {
         const containerRect = graphContainer.getBoundingClientRect();
-        height = containerRect.height;
+        containerHeight = containerRect.height;
+        containerWidth = containerRect.width;
     }
-    const dataWidth = (getGraphTimeSplits(alignedData).length - 1) * pxPerPeriod;
-    width = dataWidth + parseInt(String(style.yAxisWidth)) + parseInt(String(style.graphPaddingLeft)) + parseInt(String(style.graphPaddingRight));
+    const splitsNumber = (getGraphTimeSplits(alignedData).length - 1)
+    const splitsWidth = splitsNumber * pxPerPeriod;
+    const extraWidth = parseInt(String(style.yAxisWidth)) + parseInt(String(style.graphPaddingLeft)) + parseInt(String(style.graphPaddingRight));
+    let dataWidth = splitsWidth + extraWidth;
+    let finalWidth;
 
-    return { width, height };
+    if (dataWidth > containerWidth) {
+        finalWidth = dataWidth;
+    }
+    else {
+        if ((containerWidth - extraWidth) / splitsNumber > Number(style.graphPeriodWidthMaxPx)) {
+            finalWidth = splitsNumber * Number(style.graphPeriodWidthMaxPx) + extraWidth;
+        }
+        else {
+            finalWidth = containerWidth;
+        }
+    }
+
+    return { width: finalWidth, height: containerHeight };
 }
 
 /**

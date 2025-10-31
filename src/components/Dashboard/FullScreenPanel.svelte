@@ -100,10 +100,6 @@
         backdrop-filter: blur(var(--blur-filter));
         -webkit-backdrop-filter: blur(var(--blur-filter));
         background: var(--background);
-        padding-top: var(--padding-top);
-        padding-bottom: var(--padding-bottom);
-        padding-left: var(--padding-horizontal);
-        padding-right: var(--padding-horizontal);
     }
 
     /* Loaded state - Displays overlay after DOM portal mount to prevent flash */
@@ -118,5 +114,14 @@
         position: relative;
         margin: 0;
         padding: 0;
+    }
+
+    @media (min-width: 450px) {
+        .fullscreen-div {
+            padding-top: var(--padding-top);
+            padding-bottom: var(--padding-bottom);
+            padding-left: var(--padding-horizontal);
+            padding-right: var(--padding-horizontal);
+        }
     }
 </style>

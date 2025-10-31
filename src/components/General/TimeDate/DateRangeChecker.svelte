@@ -15,7 +15,8 @@
     $: effectiveStyle = style ?? $DateRangeCheckerStyle;
 
     // Props
-    export let showToolTip: boolean;
+    export let fullWidth: boolean = false;
+    export let showToolTip: boolean = true;
     export let initialDate: Date;
     export let endDate: Date;
 
@@ -23,25 +24,33 @@
     export let paddingHorizontal: string | undefined = undefined;
     export let paddingTop: string | undefined = undefined;
     export let paddingBottom: string | undefined = undefined;
+    export let fsTextSize: string | undefined = undefined;
     export let textSize: string | undefined = undefined;
     export let labelWidth: string | undefined = undefined;
+    export let fsLabelWidth: string | undefined = undefined;
     export let labelColor: string | undefined = undefined;
     export let labelWeight: string | undefined = undefined;
     export let valueColor: string | undefined = undefined;
     export let valueWeight: string | undefined = undefined;
     export let rowGap: string | undefined = undefined;
+    export let fsRowPaddingHorizontal: string | undefined = undefined;
+    export let fsBorderRight: string | undefined = undefined;
 
     $: localOverrides = {
         paddingHorizontal,
         paddingTop,
         paddingBottom,
+        fsTextSize,
         textSize,
         labelWidth,
+        fsLabelWidth,
         labelColor,
         labelWeight,
         valueColor,
         valueWeight,
         rowGap,
+        fsRowPaddingHorizontal,
+        fsBorderRight,
     };
 
     // Merged style
@@ -82,53 +91,77 @@
     });
 </script>
 
-<!--
-    DateRangeChecker Component
-    
-    A tooltip component that displays formatted date ranges with customizable styling.
-    Shows initial and end dates in an elegant format with proper internationalization support.
-    Features click-outside detection for automatic hiding and comprehensive theming through
-    CSS custom properties. Integrates seamlessly with the ToolTip system for consistent
-    positioning and z-index management across the application.
--->
-
-<ToolTip style={$ToolTipDateCheckerStyle} autoPositionContinuous={true} zIndex={198} {showToolTip}>
+{#if fullWidth}
     <div
         style="
-            --padding-horizontal: {mergedStyle.paddingHorizontal};
-            --padding-top: {mergedStyle.paddingTop};
-            --padding-bottom: {mergedStyle.paddingBottom};
-            --text-size: {mergedStyle.textSize};
-            --label-width: {mergedStyle.labelWidth};
+            --fs-text-size: {mergedStyle.fsTextSize};
+            --fs-label-width: {mergedStyle.fsLabelWidth};
             --label-color: {mergedStyle.labelColor};
             --label-weight: {mergedStyle.labelWeight};
             --value-color: {mergedStyle.valueColor};
             --value-weight: {mergedStyle.valueWeight};
-            --row-gap: {mergedStyle.rowGap};
+            --fs-row-padding-horizontal: {mergedStyle.fsRowPaddingHorizontal};
+            --fs-border-right: {mergedStyle.fsBorderRight};
         "
-        bind:this={containerDiv}
-        class="date-checker-div"
+        class="content"
+        class:full-width={fullWidth}
     >
-        <div class="content">
-            <div class="row">
-                <div class="label-div">
-                    <span class="label">{$texts.fromDate}</span>
-                </div>
-                <div class="value-div">
-                    <span class="value">{initialDateString}</span>
-                </div>
+        <div class="row">
+            <div class="label-div">
+                <span class="label">{$texts.fromDate}</span>
             </div>
-            <div class="row">
-                <div class="label-div">
-                    <span class="label">{$texts.toDate}</span>
-                </div>
-                <div class="value-div">
-                    <span class="value">{endDateString}</span>
-                </div>
+            <div class="value-div">
+                <span class="value">{initialDateString}</span>
+            </div>
+        </div>
+        <div class="row">
+            <div class="label-div">
+                <span class="label">{$texts.toDate}</span>
+            </div>
+            <div class="value-div">
+                <span class="value">{endDateString}</span>
             </div>
         </div>
     </div>
-</ToolTip>
+{:else}
+    <ToolTip style={$ToolTipDateCheckerStyle} autoPositionContinuous={true} zIndex={198} {showToolTip}>
+        <div
+            style="
+                    --padding-horizontal: {mergedStyle.paddingHorizontal};
+                    --padding-top: {mergedStyle.paddingTop};
+                    --padding-bottom: {mergedStyle.paddingBottom};
+                    --text-size: {mergedStyle.textSize};
+                    --label-width: {mergedStyle.labelWidth};
+                    --label-color: {mergedStyle.labelColor};
+                    --label-weight: {mergedStyle.labelWeight};
+                    --value-color: {mergedStyle.valueColor};
+                    --value-weight: {mergedStyle.valueWeight};
+                    --row-gap: {mergedStyle.rowGap};
+                "
+            bind:this={containerDiv}
+            class="date-checker-div"
+        >
+            <div class="content" class:full-width={fullWidth}>
+                <div class="row">
+                    <div class="label-div">
+                        <span class="label">{$texts.fromDate}</span>
+                    </div>
+                    <div class="value-div">
+                        <span class="value">{initialDateString}</span>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="label-div">
+                        <span class="label">{$texts.toDate}</span>
+                    </div>
+                    <div class="value-div">
+                        <span class="value">{endDateString}</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </ToolTip>
+{/if}
 
 <style>
     /* Main container - Full tooltip content area with configurable padding */
@@ -157,8 +190,13 @@
         gap: var(--row-gap);
     }
 
+    .content.full-width {
+        flex-direction: row;
+        gap: 0px;
+    }
+
     /* Individual date row - Horizontal layout for label and value pairs */
-    .row {
+    .content .row {
         display: flex;
         flex-direction: row;
         width: 100%;
@@ -166,8 +204,23 @@
         align-items: center;
     }
 
+    .content.full-width .row {
+        padding-left: var(--fs-row-padding-horizontal);
+        padding-right: var(--fs-row-padding-horizontal);
+        border-right: var(--fs-border-right);
+        height:100%;
+    }
+
+    .content.full-width .row:first-child {
+        padding-left: 0;
+    }
+
+    .content.full-width .row:last-child {
+        border-right: none;
+    }
+
     /* Label container - Fixed width area for "From/To" labels */
-    .label-div {
+    .content .row .label-div {
         width: var(--label-width);
         height: 100%;
         display: flex;
@@ -176,11 +229,19 @@
         align-items: center;
     }
 
+    .content.full-width .row .label-div {
+        width: var(--fs-label-width);
+    }
+
     /* Date label text - Styled "From Date" and "To Date" labels */
-    .label {
+    .content .row .label-div .label {
         font-size: var(--text-size);
         font-weight: var(--label-weight);
         color: var(--label-color);
+    }
+
+    .content.full-width .row .label-div .label {
+        font-size: var(--fs-text-size);
     }
 
     /* Value container - Flexible area for formatted date values */
@@ -194,9 +255,16 @@
     }
 
     /* Date value text - Styled formatted date strings */
-    .value {
+    .content .row .value-div .value {
         font-size: var(--text-size);
         font-weight: var(--value-weight);
         color: var(--value-color);
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .content.full-width .row .value-div .value {
+        font-size: var(--fs-text-size);
     }
 </style>

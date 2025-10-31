@@ -4,6 +4,8 @@
     import ToolTipText from "../../General/ToolTipText.svelte";
     import InlineLoader from "../../General/InlineLoader.svelte";
     import DateRangePicker from "../../General/TimeDate/DateRangePicker.svelte";
+    import Graph from "./Graphs/Graph.svelte";
+    import ElapsedDateTime from "../../General/TimeDate/ElapsedDateTime.svelte";
     import { LogSpanPeriod } from "$lib/types/view/nodes";
     import { getNodePhaseSection, getCommunicationID } from "$lib/logic/util/nodes";
     import { getNodeAdditionalInfo, getNodeLogs } from "$lib/logic/api/nodes";
@@ -30,8 +32,6 @@
         CustomDatePickerButtonStyle,
         SelectedCustomDatePickerButtonStyle,
     } from "$lib/style/nodes";
-    import ElapsedDateTime from "../../General/TimeDate/ElapsedDateTime.svelte";
-    import BaseGraph from "./Graphs/BaseGraph.svelte";
 
     // Props
     export let nodeState: ProcessedNodeState;
@@ -114,7 +114,7 @@
     $: if (nodeState) {
         showCustomDatePicker = false;
         loadNodeAdditionalInfo();
-        if (nodeState.graphComponent) {
+        if (nodeState.graphType) {
             getInitialNodeLogs();
         }
     }
@@ -492,7 +492,7 @@
                             </div>
                         </div>
                         <div class="chart-container">
-                            <BaseGraph
+                            <Graph
                                 data={nodeLogs?.points}
                                 timeStep={nodeLogs?.time_step}
                                 logSpanPeriod={selectedHistoryTimeSpan}
