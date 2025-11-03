@@ -89,7 +89,6 @@
     let selectedHistoryTimeSpan: LogSpanPeriod = LogSpanPeriod.currentDay;
     let initialDate: Date;
     let endDate: Date;
-    let showCustomDatePicker: boolean = false;
     let currentTimeSpans: SlidingWindow<NodeTimeSpan> = new SlidingWindow(10);
     let enableGoBack: boolean = false;
 
@@ -104,7 +103,6 @@
 
     // Initial Node State processing
     $: if (nodeState) {
-        showCustomDatePicker = false;
         loadNodeAdditionalInfo();
         if (nodeState.graphType) {
             getInitialNodeLogs();
@@ -197,9 +195,6 @@
         loadNodeLogs();
         addToCurrentTimeSpans({ initial_date, end_date, log_span_period: LogSpanPeriod.customDate } as NodeTimeSpan);
         selectedHistoryTimeSpan = LogSpanPeriod.customDate;
-        currentTimeSpans.add({ initial_date, end_date, log_span_period: LogSpanPeriod.customDate } as NodeTimeSpan);
-        enableGoBack = currentTimeSpans.hasPrevious();
-        if (showCustomDatePicker) showCustomDatePicker = false;
     }
 
     async function loadNodeLogs() {
@@ -712,9 +707,9 @@
     }
 
     .period-div {
-        width:100%;
-        height:fit-content;
-        display:flex;
+        width: 100%;
+        height: fit-content;
+        display: flex;
         flex-direction: row;
         justify-content: start;
         align-items: center;

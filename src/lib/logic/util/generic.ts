@@ -29,6 +29,21 @@ export function isEqual(a: Object, b: Object) {
     if (a === b) return true;
 
     if (typeof a !== "object" || typeof b !== "object" || a == null || b == null) return false;
+
+    if (a instanceof Date && b instanceof Date) {
+        return a.getTime() === b.getTime();
+    }
+
+    if (Array.isArray(a) && Array.isArray(b)) {
+        if (a.length !== b.length) return false;
+        for (let i = 0; i < a.length; i++) {
+            if (!isEqual(a[i], b[i])) return false;
+        }
+        return true;
+    }
+
+    if (a.constructor !== b.constructor) return false;
+
     const keysA = Object.keys(a);
     const keysB = Object.keys(b);
     if (keysA.length !== keysB.length) return false;
@@ -36,7 +51,7 @@ export function isEqual(a: Object, b: Object) {
     for (const key of keysA) {
         const valA = (a as Record<string, any>)[key];
         const valB = (b as Record<string, any>)[key];
-        if (!keysB.includes(key)) return false;
+        if (!(key in b)) return false;
         if (!isEqual(valA, valB)) return false;
     }
 

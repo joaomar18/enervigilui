@@ -121,7 +121,6 @@
                         <div slot="tooltip"><ToolTipText text={$texts.customPeriod} /></div>
                     </Button>
                     <DateRangePicker
-                        enableSpanChange={selectedTimeSpan === LogSpanPeriod.customDate}
                         bind:initialDate
                         bind:endDate
                         bind:showToolTip={showCustomDatePicker}
@@ -204,7 +203,6 @@
                     <div slot="tooltip"><ToolTipText text={$texts.customPeriod} /></div>
                 </Button>
                 <DateRangePicker
-                    enableSpanChange={selectedTimeSpan === LogSpanPeriod.customDate}
                     bind:initialDate
                     bind:endDate
                     bind:showToolTip={showCustomDatePicker}

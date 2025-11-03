@@ -92,7 +92,6 @@ export abstract class BaseGraphObject<T extends BaseLogPoint> {
      */
     resize(style: { [property: string]: string | number }): void {
         if (this.graph && this.container) {
-            console.log("running resize!!!");
             let { width, height } = getGraphSize(this.container, Number(style.graphPeriodWidthPx), this.graph.data, style);
             this.graph.setSize({ width, height });
         }

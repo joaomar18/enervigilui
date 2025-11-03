@@ -27,7 +27,7 @@
 
     // Props
     export let showToolTip: boolean;
-    export let enableSpanChange: boolean;
+    export let enableSpanChange: boolean = true;
     export let initialDate: Date | null;
     export let endDate: Date | null;
 
