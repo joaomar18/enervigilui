@@ -823,6 +823,10 @@ const textsObject: TextsObject = {
         PT: "Nunca",
         EN: "Never",
     },
+    periodSelection: {
+        PT: "Selecionar período",
+        EN: "Select period",
+    },
 };
 
 export const texts = createLangStore(textsObject);

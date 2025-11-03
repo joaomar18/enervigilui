@@ -108,6 +108,7 @@
         processingRequest = true;
         requestCustomPeriod(getDateFromField(startDateTime), getDateFromField(endDateTime));
         processingRequest = false;
+        showToolTip = false;
     }
 
     onDestroy(() => {

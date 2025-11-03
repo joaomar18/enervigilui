@@ -23,9 +23,11 @@
     export let globalMetrics: BaseMetrics | undefined;
     export let unit: string = "";
     export let decimalPlaces: number | null = null;
+    export let selectedTimeSpan: LogSpanPeriod;
 
     // Export Functions
     export let getNewTimeSpan: (startTime: Date, endTime: Date) => void;
+    export let getNewDefaultTimeSpan: (timeSpan: LogSpanPeriod) => void;
     export let goBack: () => void;
 </script>
 
@@ -37,17 +39,20 @@
         {timeStep}
         {logSpanPeriod}
         fullScreen={true}
+        showDatePicker={true}
         bind:showFullScreen={show}
         {graphType}
-        {initialDate}
-        {endDate}
+        bind:initialDate
+        bind:endDate
         {dataFetched}
         {firstFetch}
         {globalMetrics}
         {unit}
         {decimalPlaces}
+        bind:selectedTimeSpan
         {goBackEnabled}
         {goBack}
         {getNewTimeSpan}
+        {getNewDefaultTimeSpan}
     />
 </FullScreenPanel>

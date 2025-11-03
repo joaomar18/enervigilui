@@ -44,9 +44,12 @@
     export let imageHeight: string | undefined = undefined;
     export let imageRightPos: string | undefined = undefined;
     export let imageLeftPos: string | undefined = undefined;
+    export let showToolTipDelay: string | undefined = undefined;
 
     $: localOverrides = {
         width,
+        minWidth,
+        maxWidth,
         height,
         borderRadius,
         backgroundColor,
@@ -67,6 +70,7 @@
         imageHeight,
         imageRightPos,
         imageLeftPos,
+        showToolTipDelay,
     };
 
     // Merged style
@@ -121,8 +125,8 @@
 <button
     style="
         --width: {mergedStyle.width};
-        --min-width: {minWidth};
-        --max-width: {maxWidth};
+        --min-width: {mergedStyle.minWidth};
+        --max-width: {mergedStyle.maxWidth};
         --height: {mergedStyle.height};
         --border-radius: {mergedStyle.borderRadius};
         --background-color: {mergedStyle.backgroundColor};

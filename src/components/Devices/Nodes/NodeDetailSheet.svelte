@@ -1,9 +1,6 @@
 <script lang="ts">
     import RightPanelSheet from "../../General/RightPanelSheet.svelte";
-    import Button from "../../General/Button.svelte";
-    import ToolTipText from "../../General/ToolTipText.svelte";
     import InlineLoader from "../../General/InlineLoader.svelte";
-    import DateRangePicker from "../../General/TimeDate/DateRangePicker.svelte";
     import Graph from "./Graphs/Graph.svelte";
     import ElapsedDateTime from "../../General/TimeDate/ElapsedDateTime.svelte";
     import { LogSpanPeriod } from "$lib/types/view/nodes";
@@ -26,12 +23,8 @@
     import { pluginTexts } from "$lib/stores/lang/protocolPlugin";
 
     // Styles
-    import {
-        NodesBaseDisplayDetailStyle,
-        NodeDetailPickerButtonStyle,
-        CustomDatePickerButtonStyle,
-        SelectedCustomDatePickerButtonStyle,
-    } from "$lib/style/nodes";
+    import { NodesBaseDisplayDetailStyle } from "$lib/style/nodes";
+    import GraphPeriodSelection from "./Graphs/GraphPeriodSelection.svelte";
 
     // Props
     export let nodeState: ProcessedNodeState;
@@ -82,7 +75,6 @@
     export let contentValueSize: string | undefined = "1rem";
     export let contentValueColor: string | undefined = "rgba(255,255,255, 0.8)";
     export let contentValueWeight: string | undefined = "600";
-    export let historyButtonPickerGap: string | undefined = "10px";
 
     // Variables
     let state: "alarmState" | "warningState" | "okState" | "disconnectedState";
@@ -268,7 +260,6 @@
             --content-value-size: {contentValueSize};
             --content-value-color: {contentValueColor};
             --content-value-weight: {contentValueWeight};
-            --history-btn-picker-gap: {historyButtonPickerGap};
         "
 >
     <RightPanelSheet useMask={false} bind:showPanel>
@@ -421,75 +412,15 @@
                 {#if nodeState && nodeState.graphType}
                     <div class="section-title"><h3>{$texts.history}</h3></div>
                     <div class="inner-content-div no-horizontal-padding">
-                        <div class="history-btn-picker-div">
-                            <Button
-                                enableToolTip={true}
-                                selected={selectedHistoryTimeSpan === LogSpanPeriod.currentHour}
-                                style={$NodeDetailPickerButtonStyle}
-                                buttonText={$texts._1h}
-                                onClick={() => loadNodeLogsWithSpanPeriod(LogSpanPeriod.currentHour)}
-                            >
-                                <div slot="tooltip"><ToolTipText text={$texts.currentHour} /></div>
-                            </Button>
-                            <Button
-                                enableToolTip={true}
-                                selected={selectedHistoryTimeSpan === LogSpanPeriod.currentDay}
-                                style={$NodeDetailPickerButtonStyle}
-                                buttonText={$texts._1d}
-                                onClick={() => loadNodeLogsWithSpanPeriod(LogSpanPeriod.currentDay)}
-                            >
-                                <div slot="tooltip"><ToolTipText text={$texts.currentDay} /></div>
-                            </Button>
-                            <Button
-                                enableToolTip={true}
-                                selected={selectedHistoryTimeSpan === LogSpanPeriod.current7Days}
-                                style={$NodeDetailPickerButtonStyle}
-                                buttonText={$texts._7d}
-                                onClick={() => loadNodeLogsWithSpanPeriod(LogSpanPeriod.current7Days)}
-                            >
-                                <div slot="tooltip"><ToolTipText text={$texts.currentWeek} /></div>
-                            </Button>
-                            <Button
-                                enableToolTip={true}
-                                selected={selectedHistoryTimeSpan === LogSpanPeriod.currentMonth}
-                                style={$NodeDetailPickerButtonStyle}
-                                buttonText={$texts._1M}
-                                onClick={() => loadNodeLogsWithSpanPeriod(LogSpanPeriod.currentMonth)}
-                            >
-                                <div slot="tooltip"><ToolTipText text={$texts.currentMonth} /></div>
-                            </Button>
-                            <Button
-                                enableToolTip={true}
-                                selected={selectedHistoryTimeSpan === LogSpanPeriod.currentYear}
-                                style={$NodeDetailPickerButtonStyle}
-                                buttonText={$texts._1Y}
-                                onClick={() => loadNodeLogsWithSpanPeriod(LogSpanPeriod.currentYear)}
-                            >
-                                <div slot="tooltip"><ToolTipText text={$texts.currentYear} /></div>
-                            </Button>
-                            <div class="custom-date-div">
-                                <Button
-                                    enableToolTip={true}
-                                    selected={showCustomDatePicker}
-                                    style={selectedHistoryTimeSpan === LogSpanPeriod.customDate
-                                        ? $SelectedCustomDatePickerButtonStyle
-                                        : $CustomDatePickerButtonStyle}
-                                    buttonText=""
-                                    imageURL="/img/custom-date.svg"
-                                    onClick={() => {
-                                        showCustomDatePicker = !showCustomDatePicker;
-                                    }}
-                                >
-                                    <div slot="tooltip"><ToolTipText text={$texts.customPeriod} /></div>
-                                </Button>
-                                <DateRangePicker
-                                    enableSpanChange={selectedHistoryTimeSpan === LogSpanPeriod.customDate}
-                                    bind:initialDate
-                                    bind:endDate
-                                    bind:showToolTip={showCustomDatePicker}
-                                    requestCustomPeriod={(initial_date: Date, end_date: Date) => loadNodeLogsWithCustomPeriod(initial_date, end_date)}
-                                />
-                            </div>
+                        <div class="period-div">
+                            <GraphPeriodSelection
+                                useToolTip={false}
+                                bind:selectedTimeSpan={selectedHistoryTimeSpan}
+                                bind:initialDate
+                                bind:endDate
+                                loadNodeLogsWithCustomPeriod={(initial_date: Date, end_date: Date) => loadNodeLogsWithCustomPeriod(initial_date, end_date)}
+                                loadNodeLogsWithSpanPeriod={(timeSpan: LogSpanPeriod) => loadNodeLogsWithSpanPeriod(timeSpan)}
+                            />
                         </div>
                         <div class="chart-container">
                             <Graph
@@ -504,7 +435,9 @@
                                 globalMetrics={nodeLogs?.global_metrics}
                                 unit={nodeLogs?.unit}
                                 decimalPlaces={nodeLogs?.decimal_places}
+                                bind:selectedTimeSpan={selectedHistoryTimeSpan}
                                 getNewTimeSpan={(initial_date: Date, end_date: Date) => loadNodeLogsWithCustomPeriod(initial_date, end_date)}
+                                getNewDefaultTimeSpan={(timeSpan: LogSpanPeriod) => loadNodeLogsWithSpanPeriod(timeSpan)}
                                 goBackEnabled={enableGoBack}
                                 goBack={() => setDateSpanToPrevious()}
                             />
@@ -772,27 +705,18 @@
         block-size: var(--content-row-height);
     }
 
-    .content-div .inner-content-div .history-btn-picker-div {
-        display: flex;
-        flex-direction: row;
-        gap: var(--history-btn-picker-gap);
-        width: 100%;
-        justify-content: start;
-        align-items: center;
-        height: fit-content;
-    }
-
-    .content-div .inner-content-div .custom-date-div {
-        margin: 0;
-        padding: 0;
-        position: relative;
-        width: fit-content;
-        height: 100%;
-    }
-
     .chart-container {
         padding-top: 5px;
         width: 100%;
         height: fit-content;
+    }
+
+    .period-div {
+        width:100%;
+        height:fit-content;
+        display:flex;
+        flex-direction: row;
+        justify-content: start;
+        align-items: center;
     }
 </style>

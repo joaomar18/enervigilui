@@ -22,6 +22,7 @@
     import MeasurementMetricsComponent from "../Metrics/MeasurementMetrics.svelte";
     import CounterMetricsComponent from "../Metrics/CounterMetrics.svelte";
     import GraphToolTip from "./GraphToolTip.svelte";
+    import GraphPeriodSelection from "./GraphPeriodSelection.svelte";
     import { MeasurementGraphObject } from "$lib/logic/view/graph/measurement";
     import { CounterGraphObject } from "$lib/logic/view/graph/counter";
 
@@ -31,7 +32,7 @@
 
     // Styles
     import { mergeStyle } from "$lib/style/components";
-    import { BaseGraphStyle, CounterGraphStyle, GraphActionStyle, GraphMetricStyle, MeasurementGraphStyle } from "$lib/style/graph";
+    import { BaseGraphStyle, CounterGraphStyle, GraphActionStyle, GraphButtonStyle, GraphMetricStyle, MeasurementGraphStyle } from "$lib/style/graph";
 
     // Style object (from theme)
     export let style: { [property: string]: string | number } | null = null;
@@ -45,8 +46,10 @@
     export let logSpanPeriod: LogSpanPeriod;
     export let fullScreen: boolean = false;
     export let showFullScreen: boolean = false; // Used externally on Full Screen Graph
+    export let showDatePicker: boolean = false;
     export let goBackEnabled: boolean;
     export let graphType: GraphType;
+    export let selectedTimeSpan: LogSpanPeriod;
     export let initialDate: Date;
     export let endDate: Date;
     export let dataFetched: boolean;
@@ -171,6 +174,7 @@
 
     // Export Functions
     export let getNewTimeSpan: (startTime: Date, endTime: Date) => void;
+    export let getNewDefaultTimeSpan: (timeSpan: LogSpanPeriod) => void;
     export let goBack: () => void;
 
     // Functions
@@ -281,16 +285,18 @@
                     {logSpanPeriod}
                     bind:show={showFullScreen}
                     {graphType}
-                    {initialDate}
-                    {endDate}
+                    bind:initialDate
+                    bind:endDate
                     {dataFetched}
                     {firstFetch}
                     {globalMetrics}
                     {unit}
                     {decimalPlaces}
+                    bind:selectedTimeSpan
                     {goBackEnabled}
                     {goBack}
                     {getNewTimeSpan}
+                    {getNewDefaultTimeSpan}
                 />
             {/if}
             <div class="header">
@@ -312,6 +318,17 @@
                             <DateRangeChecker fullWidth={true} {initialDate} {endDate} />
                         </div>
                         <div class="actions-div">
+                            {#if showDatePicker}
+                                <div class="date-picker-div">
+                                    <GraphPeriodSelection
+                                        bind:selectedTimeSpan
+                                        bind:initialDate
+                                        bind:endDate
+                                        loadNodeLogsWithCustomPeriod={(initial_date: Date, end_date: Date) => getNewTimeSpan(initial_date, end_date)}
+                                        loadNodeLogsWithSpanPeriod={(timeSpan: LogSpanPeriod) => getNewDefaultTimeSpan(timeSpan)}
+                                    />
+                                </div>
+                            {/if}
                             <div class="date-checker-div">
                                 <Action
                                     style={$GraphActionStyle}

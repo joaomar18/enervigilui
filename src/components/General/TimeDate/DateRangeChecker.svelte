@@ -208,7 +208,7 @@
         padding-left: var(--fs-row-padding-horizontal);
         padding-right: var(--fs-row-padding-horizontal);
         border-right: var(--fs-border-right);
-        height:100%;
+        height: 100%;
     }
 
     .content.full-width .row:first-child {

@@ -26,6 +26,7 @@ const DefaultButtonStyleConfig: ComponentStyles = {
         imageHeight: "32px",
         imageRightPos: "auto",
         imageLeftPos: "20px",
+        showToolTipDelay: 300,
     },
 };
 
@@ -52,6 +53,7 @@ const SubDefaultButtonStyleConfig: ComponentStyles = {
         selectedFontColor: "#f5f5f5",
         fontSize: "1rem",
         fontWeight: "400",
+        showToolTipDelay: 300,
     },
 };
 
@@ -82,6 +84,7 @@ const PrimaryButtonStyleConfig: ComponentStyles = {
         imageHeight: "32px",
         imageRightPos: "auto",
         imageLeftPos: "20px",
+        showToolTipDelay: 300,
     },
 };
 
@@ -110,6 +113,7 @@ const SubPrimaryButtonStyleConfig: ComponentStyles = {
         fontWeight: "400",
         imageWidth: "20px",
         imageHeight: "20px",
+        showToolTipDelay: 300,
     },
 };
 
@@ -140,6 +144,7 @@ const DangerButtonStyleConfig: ComponentStyles = {
         imageHeight: "32px",
         imageRightPos: "auto",
         imageLeftPos: "20px",
+        showToolTipDelay: 300,
     },
 };
 
@@ -168,6 +173,7 @@ const SubDangerButtonStyleConfig: ComponentStyles = {
         fontWeight: "400",
         imageWidth: "20px",
         imageHeight: "20px",
+        showToolTipDelay: 300,
     },
 };
 
@@ -198,6 +204,7 @@ const SucessButtonStyleConfig: ComponentStyles = {
         imageHeight: "32px",
         imageRightPos: "auto",
         imageLeftPos: "20px",
+        showToolTipDelay: 300,
     },
 };
 
@@ -226,6 +233,7 @@ const SubSucessButtonStyleConfig: ComponentStyles = {
         fontWeight: "400",
         imageWidth: "20px",
         imageHeight: "20px",
+        showToolTipDelay: 300,
     },
 };
 
