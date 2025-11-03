@@ -1,7 +1,7 @@
 <script lang="ts">
     import "uplot/dist/uPlot.min.css";
     import { onDestroy } from "svelte";
-    import { GraphType } from "$lib/logic/view/graph/base";
+    import { BaseGraphObject, GraphType } from "$lib/logic/view/graph/base";
     import { getGraphToolTipDisplayComponent } from "$lib/logic/view/graph/helpers";
     import { FormattedTimeStep } from "$lib/types/date";
     import { LogSpanPeriod } from "$lib/types/view/nodes";
@@ -32,7 +32,7 @@
 
     // Styles
     import { mergeStyle } from "$lib/style/components";
-    import { BaseGraphStyle, CounterGraphStyle, GraphActionStyle, GraphButtonStyle, GraphMetricStyle, MeasurementGraphStyle } from "$lib/style/graph";
+    import { BaseGraphStyle, CounterGraphStyle, GraphActionStyle, GraphMetricStyle, MeasurementGraphStyle } from "$lib/style/graph";
 
     // Style object (from theme)
     export let style: { [property: string]: string | number } | null = null;
@@ -126,7 +126,7 @@
 
     let graphContainer: HTMLDivElement;
     let gridElement: HTMLDivElement | null = null;
-    let graph: any | null = null;
+    let graph: BaseGraphObject<BaseLogPoint> | null = null;
     let showDateRange: boolean = false;
     let loaderTimeout: number | null = null;
     let showLoader: boolean = false;
@@ -218,12 +218,14 @@
     }
 
     function updateGraphData(): void {
-        graph.destroy();
-        graph.updatePoints(data, decimalPlaces, true);
-        graph.createGraph(timeStep, logSpanPeriod, mergedStyle);
-        gridElement = graph.getGridElement();
-        graphCreated = true;
-        graphNoData = !graph.hasData();
+        if (graph) {
+            graph.destroy();
+            graph.updatePoints(data, decimalPlaces, true);
+            graph.createGraph(timeStep, logSpanPeriod, mergedStyle);
+            gridElement = graph.getGridElement();
+            graphCreated = true;
+            graphNoData = !graph.hasData();
+        }
     }
 
     function handleResize(): void {

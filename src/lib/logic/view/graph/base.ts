@@ -2,7 +2,7 @@ import uPlot from "uplot";
 import { FormattedTimeStep } from "$lib/types/date";
 import { LogSpanPeriod } from "$lib/types/view/nodes";
 import { getGraphSize } from "./helpers";
-import type { BaseLogPoint } from "$lib/types/nodes/logs";
+import type { BaseLogPoint, ProcessedBaseLogPoint } from "$lib/types/nodes/logs";
 
 /**
  * Graph visualization types for different data representations.
@@ -13,27 +13,25 @@ export enum GraphType {
 }
 
 /**
- * Abstract base class for graph objects that manage uPlot chart instances.
+ * Abstract base class for interactive uPlot graph components.
  * 
- * Provides common functionality for graph visualization including cursor tracking,
- * hover detection, callback management, and lifecycle operations. Serves as the
- * foundation for specialized graph types like MeasurementGraph.
+ * Provides core functionality for time-series data visualization including cursor tracking,
+ * hover detection, double-click navigation, and event management. Child classes implement
+ * specific rendering logic for different graph types (measurement, counter).
  * 
- * @template T - The log point type extending BaseLogPoint
+ * Features:
+ * - Mouse interaction handling with position tracking
+ * - Double-click drill-down navigation 
+ * - Hover state management with callbacks
+ * - Graph lifecycle management (creation, resizing, cleanup)
+ * - Memory-safe event listener management
  * 
- * @property {GraphType} graphType - Identifies the specific graph implementation
- * @property {HTMLElement} container - DOM element that hosts the graph
- * @property {uPlot} graph - The underlying uPlot chart instance
- * @property {HTMLDivElement} gridElement - Graph overlay element for interactions
- * @property {Array<string>} labels - Time axis labels for the current dataset
- * @property {boolean} noData - Indicates whether the graph has valid data
- * @property {number} xPos - Current mouse X position over the graph
- * @property {number} yPos - Current mouse Y position over the graph
- * @property {number} currentHoverPeriod - Index of currently hovered time period
+ * @template T The log point type extending BaseLogPoint for type-safe tooltips
  */
 export abstract class BaseGraphObject<T extends BaseLogPoint> {
     protected abstract graphType: GraphType;
     protected currentHoverPeriod: number = -1;
+    public hoveredLogPoint: T | null = null;
     protected container: HTMLElement;
     protected graph: uPlot | null = null;
     protected gridElement: HTMLDivElement | null = null;
@@ -44,6 +42,7 @@ export abstract class BaseGraphObject<T extends BaseLogPoint> {
     protected hoveredLogPointCallback: ((logPoint: T | null) => void) | null = null;
     protected mousePositionChangeCallback: ((xPos: number | undefined, yPos: number | undefined) => void) | null = null;
     protected gridDoubleClickCallback: ((startTime: Date, endTime: Date) => void) | null = null;
+    protected boundGridDoubleClickHandler: ((event: MouseEvent) => void) | null = null;
 
     constructor(container: HTMLElement, hoveredLogPointChange: ((logPoint: T | null) => void) | null, mousePositionChange: ((xPos: number | undefined, yPos: number | undefined) => void) | null, gridDoubleClick: ((startTime: Date, endTime: Date) => void) | null) {
         this.container = container;
@@ -52,17 +51,10 @@ export abstract class BaseGraphObject<T extends BaseLogPoint> {
         this.gridDoubleClickCallback = gridDoubleClick;
     }
 
-    // Abstract methods (subclasses must implement)
-
-    /**
-     * Creates and initializes the uPlot graph with specified time parameters and styling.
-     */
     abstract createGraph(timeStep: FormattedTimeStep, logSpanPeriod: LogSpanPeriod, style: { [property: string]: string | number },): void;
-
-    /**
-     * Handles double-click events on the graph grid for interactive data drilling.
-     */
-    abstract processGridDoubleClick(): void;
+    abstract drawCanvas(u: uPlot, style: { [property: string]: string | number }): void;
+    abstract pointNoData(index: number): boolean;
+    abstract getHoveredLogPoint(currentHoverPeriod: number, timeStep: FormattedTimeStep): T | null
 
     /**
      * Returns whether the graph has valid data to display.
@@ -86,9 +78,65 @@ export abstract class BaseGraphObject<T extends BaseLogPoint> {
     }
 
     /**
-     * Resizes the graph to fit the current container dimensions.
-     * Uses uPlot's setSize method for efficient resizing without recreating the chart.
-     * @param style - Style configuration containing graph sizing parameters
+     * Tracks cursor position and triggers position callbacks for tooltip handling.
+     */
+    getCursorPosition(u: uPlot): void {
+        this.xPos = u.cursor.left;
+        this.yPos = u.cursor.top;
+        if (this.mousePositionChangeCallback) {
+            this.mousePositionChangeCallback(this.xPos, this.yPos);
+        }
+    }
+
+    /**
+     * Handles double-click events for drill-down navigation to specific time periods.
+     */
+    processGridDoubleClick(points: Array<ProcessedBaseLogPoint>): void {
+        if (!points || this.currentHoverPeriod < 0 || this.currentHoverPeriod >= points.length) return;
+
+        const index = this.currentHoverPeriod;
+        const noData = this.pointNoData(index);
+        if (noData) return;
+
+        if (this.gridDoubleClickCallback) {
+            const startTime = new Date(points[index].start_time * 1000);
+            const endTime = new Date(points[index].end_time * 1000);
+            this.gridDoubleClickCallback(startTime, endTime);
+        }
+    }
+
+    /**
+     * Determines hovered time period and triggers tooltip updates with hover callbacks.
+     */
+    getHoveredPeriod(u: uPlot, timeStep: FormattedTimeStep, points: Array<ProcessedBaseLogPoint>): void {
+        if (this.xPos !== undefined && this.xPos >= 0) { // Valid Cursor position
+            const xVal = u.posToVal(this.xPos, "x");
+            const hoverPeriod = Math.floor(xVal);
+
+            if (hoverPeriod >= 0 && hoverPeriod < points.length) {
+                if (this.currentHoverPeriod !== hoverPeriod) {
+                    this.currentHoverPeriod = hoverPeriod;
+                    this.hoveredLogPoint = this.getHoveredLogPoint(this.currentHoverPeriod, timeStep);
+                    if (this.hoveredLogPointCallback) {
+                        this.hoveredLogPointCallback(this.hoveredLogPoint);
+                    }
+                    u.redraw();
+                }
+            }
+        } else { // Cursor outside Graph
+            if (this.currentHoverPeriod !== -1) {
+                this.currentHoverPeriod = -1;
+                this.hoveredLogPoint = this.getHoveredLogPoint(this.currentHoverPeriod, timeStep);
+                if (this.hoveredLogPointCallback) {
+                    this.hoveredLogPointCallback(this.hoveredLogPoint);
+                }
+                u.redraw();
+            }
+        }
+    }
+
+    /**
+     * Resizes the graph to fit container dimensions without recreating the chart.
      */
     resize(style: { [property: string]: string | number }): void {
         if (this.graph && this.container) {
@@ -99,12 +147,13 @@ export abstract class BaseGraphObject<T extends BaseLogPoint> {
 
     destroy(): void {
         if (this.graph) {
-            if (this.gridElement && this.gridDoubleClickCallback) {
-                this.gridElement.removeEventListener("dblclick", () => this.processGridDoubleClick());
+            if (this.gridElement && this.boundGridDoubleClickHandler) {
+                this.gridElement.removeEventListener("dblclick", this.boundGridDoubleClickHandler);
             }
             this.graph.destroy()
             this.graph = null;
             this.gridElement = null;
+            this.boundGridDoubleClickHandler = null;
         }
     }
 }

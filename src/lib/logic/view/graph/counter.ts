@@ -8,28 +8,46 @@ import { timeStepFormatters } from "$lib/types/date";
 import { getElegantShortStringFromDate } from "$lib/logic/util/date";
 import type { CounterLogPoint, ProcessedCounterLogPoint } from "$lib/types/nodes/logs";
 
+/**
+ * Graph object for visualizing counter/cumulative data with step-based bar rendering.
+ * 
+ * Renders counter data as horizontal bars showing cumulative values over time periods.
+ * Features custom canvas drawing for step-based visualization with hover effects and
+ * interactive tooltips for counter metrics.
+ */
 export class CounterGraphObject extends BaseGraphObject<CounterLogPoint> {
     protected graphType = GraphType.Counter;
     protected points: Array<ProcessedCounterLogPoint>;
-    public hoveredLogPoint: CounterLogPoint | null = null;
 
+    /**
+     * Initializes counter graph with container, callbacks, and initial data points.
+     */
     constructor(container: HTMLElement, hoveredLogPointChange: ((logPoint: CounterLogPoint | null) => void) | null, mousePositionChange: ((xPos: number | undefined, yPos: number | undefined) => void) | null, gridDoubleClick: ((startTime: Date, endTime: Date) => void) | null, points: Array<ProcessedCounterLogPoint>) {
         super(container, hoveredLogPointChange, mousePositionChange, gridDoubleClick);
-        this.points = points;
+        this.points = !!points ? points : [];
     }
 
+    /**
+     * Updates graph data points with optional decimal rounding while maintaining array reference.
+     */
     updatePoints(points: Array<ProcessedCounterLogPoint>, decimalPlaces: number | null, roundPoints: boolean = false): void {
         if (decimalPlaces === null || !roundPoints) {
-            this.points = points;
+            this.points.length = 0;
+            this.points.push(...points);
         }
         else {
-            this.points = points.map(point => ({
+            const roundedPoints = points.map(point => ({
                 ...point,
                 value: point.value === null ? null : Number(point.value.toFixed(decimalPlaces))
             }));
+            this.points.length = 0;
+            this.points.push(...roundedPoints);
         }
     }
 
+    /**
+     * Creates and configures the uPlot counter graph with bar visualization and event handling.
+     */
     createGraph(timeStep: FormattedTimeStep, logSpanPeriod: LogSpanPeriod, style: { [property: string]: string | number },): void {
         const { alignedData } = this.convertDataToGraph(timeStep, logSpanPeriod);
         let { width, height } = getGraphSize(this.container, Number(style.graphPeriodWidthPx), alignedData, style);
@@ -95,7 +113,7 @@ export class CounterGraphObject extends BaseGraphObject<CounterLogPoint> {
                 setCursor: [
                     (u) => {
                         this.getCursorPosition(u);
-                        this.getHoveredPeriod(u, timeStep);
+                        this.getHoveredPeriod(u, timeStep, this.points);
                     },
                 ],
                 draw: [
@@ -109,10 +127,16 @@ export class CounterGraphObject extends BaseGraphObject<CounterLogPoint> {
         this.graph = new uPlot(opts, alignedData, this.container);
         this.gridElement = this.graph.over;
         if (this.gridDoubleClickCallback) {
-            this.gridElement.addEventListener("dblclick", () => this.processGridDoubleClick());
+            this.boundGridDoubleClickHandler = (event: MouseEvent) => {
+                this.processGridDoubleClick(this.points);
+            };
+            this.gridElement.addEventListener("dblclick", this.boundGridDoubleClickHandler);
         }
     }
 
+    /**
+     * Converts counter data points into uPlot-compatible arrays with time labels.
+     */
     convertDataToGraph(timeStep: FormattedTimeStep, logSpanPeriod: LogSpanPeriod): { alignedData: AlignedData } {
         const timestampValues: Array<number> = [];
         const values: Array<number | null> = [];
@@ -149,43 +173,8 @@ export class CounterGraphObject extends BaseGraphObject<CounterLogPoint> {
     }
 
     /**
-     * Tracks cursor position over the graph and triggers position change callbacks.
+     * Creates formatted tooltip data for the hovered time period.
      */
-    getCursorPosition(u: uPlot): void {
-        this.xPos = u.cursor.left;
-        this.yPos = u.cursor.top;
-        if (this.mousePositionChangeCallback) {
-            this.mousePositionChangeCallback(this.xPos, this.yPos);
-        }
-    }
-
-    getHoveredPeriod(u: uPlot, timeStep: FormattedTimeStep): void {
-        if (this.xPos !== undefined && this.xPos >= 0) { // Valid Cursor position
-            const xVal = u.posToVal(this.xPos, "x");
-            const hoverPeriod = Math.floor(xVal);
-
-            if (hoverPeriod >= 0 && hoverPeriod < this.points.length) {
-                if (this.currentHoverPeriod !== hoverPeriod) {
-                    this.currentHoverPeriod = hoverPeriod;
-                    this.hoveredLogPoint = this.getHoveredLogPoint(this.currentHoverPeriod, timeStep);
-                    if (this.hoveredLogPointCallback) {
-                        this.hoveredLogPointCallback(this.hoveredLogPoint);
-                    }
-                    u.redraw();
-                }
-            }
-        } else { // Cursor outside Graph
-            if (this.currentHoverPeriod !== -1) {
-                this.currentHoverPeriod = -1;
-                this.hoveredLogPoint = this.getHoveredLogPoint(this.currentHoverPeriod, timeStep);
-                if (this.hoveredLogPointCallback) {
-                    this.hoveredLogPointCallback(this.hoveredLogPoint);
-                }
-                u.redraw();
-            }
-        }
-    }
-
     getHoveredLogPoint(index: number, timeStep: FormattedTimeStep): CounterLogPoint | null {
         if (!this.points || index < 0 || index >= this.points.length) return null;
 
@@ -196,20 +185,9 @@ export class CounterGraphObject extends BaseGraphObject<CounterLogPoint> {
         } as CounterLogPoint;
     }
 
-    processGridDoubleClick(): void {
-        if (!this.points || this.currentHoverPeriod < 0 || this.currentHoverPeriod >= this.points.length) return;
-
-        const index = this.currentHoverPeriod;
-        const noData = this.points[index].value === null;
-        if (noData) return;
-
-        if (this.gridDoubleClickCallback) {
-            const startTime = new Date(this.points[index].start_time * 1000);
-            const endTime = new Date(this.points[index].end_time * 1000);
-            this.gridDoubleClickCallback(startTime, endTime);
-        }
-    }
-
+    /**
+     * Renders counter bars on canvas with hover effects and custom styling.
+     */
     drawCanvas(u: uPlot, style: { [property: string]: string | number }): void {
         const { ctx } = u;
         ctx.save();
@@ -234,5 +212,13 @@ export class CounterGraphObject extends BaseGraphObject<CounterLogPoint> {
             ctx.strokeRect(x1, yMax, width, height);
         });
         ctx.restore();
+    }
+
+    /**
+     * Checks if a data point at the given index has no valid data.
+     */
+    pointNoData(index: number): boolean {
+        if (!this.points || index < 0 || index >= this.points.length) return false;
+        return this.points[index].value === null
     }
 }
