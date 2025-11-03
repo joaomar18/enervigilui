@@ -554,7 +554,7 @@
         flex-direction: row;
         justify-content: center;
         align-items: center;
-        overflow-x: auto;
+        overflow-x: scroll;
         overflow-y: hidden;
         scrollbar-width: thin;
         scrollbar-color: var(--scrollbar-track-color) var(--scrollbar-thumb-color);
