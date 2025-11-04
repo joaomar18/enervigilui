@@ -22,7 +22,7 @@ export class CounterGraphObject extends BaseGraphObject<CounterLogPoint> {
     /**
      * Initializes counter graph with container, callbacks, and initial data points.
      */
-    constructor(container: HTMLElement, hoveredLogPointChange: ((logPoint: CounterLogPoint | null) => void) | null, mousePositionChange: ((xPos: number | undefined, yPos: number | undefined) => void) | null, gridDoubleClick: ((startTime: Date, endTime: Date) => void) | null, points: Array<ProcessedCounterLogPoint>) {
+    constructor(container: HTMLElement, hoveredLogPointChange: ((logPoint: CounterLogPoint | null) => void) | null, mousePositionChange: ((xPos: number | undefined, yPos: number | undefined) => void) | null, gridDoubleClick: ((startTime: Date, endTime: Date) => void) | null, points: Array<ProcessedCounterLogPoint> | undefined) {
         super(container, hoveredLogPointChange, mousePositionChange, gridDoubleClick);
         this.points = !!points ? points : [];
     }
@@ -128,9 +128,9 @@ export class CounterGraphObject extends BaseGraphObject<CounterLogPoint> {
         this.gridElement = this.graph.over;
         if (this.gridDoubleClickCallback) {
             this.boundGridDoubleClickHandler = (event: MouseEvent) => {
-                this.processGridDoubleClick(this.points);
+                this.handleGridDoubleClickListener(this.points);
             };
-            this.gridElement.addEventListener("dblclick", this.boundGridDoubleClickHandler);
+            this.gridElement.addEventListener("click", this.boundGridDoubleClickHandler);
         }
     }
 

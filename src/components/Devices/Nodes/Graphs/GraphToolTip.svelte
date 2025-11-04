@@ -57,7 +57,7 @@
         }
         parentElement = gridElement;
     }
-    $: if (cursorPos && cursorPos.x !== undefined && cursorPos.y !== undefined) {
+    $: if (tooltipElement && cursorPos && cursorPos.x !== undefined && cursorPos.y !== undefined) {
         updatePosition();
     }
     $: if (!insideGraph) {
@@ -67,7 +67,6 @@
     // Functions
     function updatePosition(): void {
         if (!parentElement || !tooltipElement || cursorPos.x === undefined || cursorPos.y === undefined) return;
-
         const padding = parseInt(String(mergedStyle.offsetPx));
         const parentWidth = parentElement.clientWidth;
         const parentHeight = parentElement.clientHeight;

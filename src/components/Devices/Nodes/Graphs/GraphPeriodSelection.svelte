@@ -58,6 +58,17 @@
     });
 </script>
 
+<!--
+    GraphPeriodSelection Component
+    
+    A comprehensive time period selection interface for graph data filtering with predefined
+    quick-select buttons and custom date range picker capabilities. Features tooltip-based
+    and inline display modes, click-outside detection for modal behavior, and reactive
+    button selection states. Provides preset time periods (1h, 1d, 7d, 1M, 1Y) with
+    internationalized labels and tooltips, plus custom date range selection via integrated
+    DateRangePicker. Handles event delegation for window interactions and automatic cleanup.
+    Supports both compact button trigger mode and expanded inline selection interface.
+-->
 <div bind:this={containerDiv}>
     {#if useToolTip}
         <ToolTip style={$GraphPerSelStyle} maxWidth="auto" zIndex={198} showToolTip={showSelectionToolTip} autoPositionContinuous={true}>

@@ -1,11 +1,13 @@
 import uPlot from "uplot";
-import type { AlignedData } from "uplot";
+import { get } from "svelte/store";
 import { GraphType } from "./base";
-import type { SvelteComponent } from "svelte";
 import MeasurementMetrics from "../../../../components/Devices/Nodes/Metrics/MeasurementMetrics.svelte";
 import MeasurementToolTip from "../../../../components/Devices/Nodes/Graphs/MeasurementToolTip.svelte";
 import CounterMetrics from "../../../../components/Devices/Nodes/Metrics/CounterMetrics.svelte";
 import CounterToolTip from "../../../../components/Devices/Nodes/Graphs/CounterToolTip.svelte";
+import { MeasurementGraphStyle, CounterGraphStyle } from "$lib/style/graph";
+import type { AlignedData } from "uplot";
+import type { SvelteComponent } from "svelte";
 
 /**
  * Extracts period start timestamps from aligned data for x-axis splits.
@@ -123,4 +125,19 @@ export function getGraphMetricsComponent(graphType: GraphType): typeof SvelteCom
         case GraphType.Counter:
             return CounterMetrics;
     }
+}
+
+/**
+ * Returns the appropriate style configuration for the given graph type.
+ * Retrieves reactive style values from Svelte stores for graph theming.
+ * 
+ * @param graphType - The type of graph (Measurement or Counter)
+ * @returns Style object containing CSS properties and values for the graph type
+ */
+export function getGraphStyle(graphType: GraphType): { [property: string]: string | number } {
+    const styleMap = {
+        [GraphType.Measurement]: get(MeasurementGraphStyle),
+        [GraphType.Counter]: get(CounterGraphStyle),
+    };
+    return styleMap[graphType];
 }

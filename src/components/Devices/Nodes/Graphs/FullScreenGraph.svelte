@@ -31,6 +31,17 @@
     export let goBack: () => void;
 </script>
 
+<!--
+    FullScreenGraph Component
+    
+    A full-screen wrapper for the Graph component that provides an immersive data visualization
+    experience. Combines the FullScreenPanel overlay with a Graph instance configured for
+    full-screen display, featuring enhanced styling, date picker controls, and modal interaction
+    patterns. Inherits all graph functionality including interactive drill-down navigation,
+    real-time data updates, and comprehensive theming while providing a distraction-free
+    viewing mode for detailed data analysis. Handles state synchronization between the modal
+    overlay and the embedded graph component.
+-->
 <FullScreenPanel bind:show>
     <Graph
         style={$FullScreenBaseGraphStyle}

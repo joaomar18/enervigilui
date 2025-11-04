@@ -23,7 +23,7 @@ export class MeasurementGraphObject extends BaseGraphObject<MeasurementLogPoint>
     /**
      * Initializes measurement graph with container, callbacks, and initial data points.
      */
-    constructor(container: HTMLElement, hoveredLogPointChange: ((logPoint: MeasurementLogPoint | null) => void) | null, mousePositionChange: ((xPos: number | undefined, yPos: number | undefined) => void) | null, gridDoubleClick: ((startTime: Date, endTime: Date) => void) | null, points: Array<ProcessedMeasurementLogPoint>) {
+    constructor(container: HTMLElement, hoveredLogPointChange: ((logPoint: MeasurementLogPoint | null) => void) | null, mousePositionChange: ((xPos: number | undefined, yPos: number | undefined) => void) | null, gridDoubleClick: ((startTime: Date, endTime: Date) => void) | null, points: Array<ProcessedMeasurementLogPoint> | undefined) {
         super(container, hoveredLogPointChange, mousePositionChange, gridDoubleClick);
         this.points = !!points ? points : [];
     }
@@ -145,9 +145,9 @@ export class MeasurementGraphObject extends BaseGraphObject<MeasurementLogPoint>
         this.gridElement = this.graph.over;
         if (this.gridDoubleClickCallback) {
             this.boundGridDoubleClickHandler = (event: MouseEvent) => {
-                this.processGridDoubleClick(this.points);
+                this.handleGridDoubleClickListener(this.points);
             };
-            this.gridElement.addEventListener("dblclick", this.boundGridDoubleClickHandler);
+            this.gridElement.addEventListener("click", this.boundGridDoubleClickHandler);
         }
     }
 

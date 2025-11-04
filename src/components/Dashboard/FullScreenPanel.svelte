@@ -63,12 +63,12 @@
 <!--
     FullScreenPanel Component
     
-    A reusable fullscreen overlay component that portals content to document.body, providing
-    true fullscreen display with backdrop blur effects. Features automatic DOM management with
-    lifecycle-aware mounting and cleanup, click-outside-to-close functionality, and comprehensive
-    theming support. Uses portal pattern to render outside parent stacking contexts, solving
-    z-index conflicts with high-z-index panels. Supports backdrop blur effects for modern
-    glassmorphic UI patterns with webkit compatibility.
+    A modal overlay component that creates a full-viewport panel with DOM portaling capabilities.
+    Features click-outside detection for dismissal, backdrop blur effects, and responsive padding.
+    Uses DOM manipulation to mount directly to document.body for proper z-index layering above
+    all other content. Provides smooth loading transitions and automatic cleanup on component
+    destruction. Supports theming with configurable blur filters and background colors.
+    Handles event management for user interaction and accessibility patterns.
 -->
 <div
     bind:this={fullscreenContainer}
@@ -116,7 +116,8 @@
         padding: 0;
     }
 
-    @media (min-width: 450px) {
+    /* Responsive padding - Applies content padding only on larger screens for better mobile UX */
+    @media (min-width: 880px) {
         .fullscreen-div {
             padding-top: var(--padding-top);
             padding-bottom: var(--padding-bottom);

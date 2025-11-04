@@ -43,6 +43,9 @@ export abstract class BaseGraphObject<T extends BaseLogPoint> {
     protected mousePositionChangeCallback: ((xPos: number | undefined, yPos: number | undefined) => void) | null = null;
     protected gridDoubleClickCallback: ((startTime: Date, endTime: Date) => void) | null = null;
     protected boundGridDoubleClickHandler: ((event: MouseEvent) => void) | null = null;
+    protected noOfClicks: number = 0;
+    protected maxDurationBetweenClicks: number = 500;
+    protected lastClickTimeStamp: number | null = null;
 
     constructor(container: HTMLElement, hoveredLogPointChange: ((logPoint: T | null) => void) | null, mousePositionChange: ((xPos: number | undefined, yPos: number | undefined) => void) | null, gridDoubleClick: ((startTime: Date, endTime: Date) => void) | null) {
         this.container = container;
@@ -51,6 +54,7 @@ export abstract class BaseGraphObject<T extends BaseLogPoint> {
         this.gridDoubleClickCallback = gridDoubleClick;
     }
 
+    abstract updatePoints(points: Array<ProcessedBaseLogPoint>, decimalPlaces: number | null, roundPoints: boolean): void;
     abstract createGraph(timeStep: FormattedTimeStep, logSpanPeriod: LogSpanPeriod, style: { [property: string]: string | number },): void;
     abstract drawCanvas(u: uPlot, style: { [property: string]: string | number }): void;
     abstract pointNoData(index: number): boolean;
@@ -85,6 +89,31 @@ export abstract class BaseGraphObject<T extends BaseLogPoint> {
         this.yPos = u.cursor.top;
         if (this.mousePositionChangeCallback) {
             this.mousePositionChangeCallback(this.xPos, this.yPos);
+        }
+    }
+
+    /**
+     * Detects double-click events by tracking click timestamps and triggers drill-down navigation.
+     */
+    handleGridDoubleClickListener(points: Array<ProcessedBaseLogPoint>): void {
+        const currentMs = Date.now();
+        if (this.lastClickTimeStamp === null) {
+            this.lastClickTimeStamp = currentMs;
+            this.noOfClicks = 1;
+        }
+        else {
+            if (currentMs - this.lastClickTimeStamp <= this.maxDurationBetweenClicks) {
+                this.noOfClicks = 2;
+            }
+            else {
+                this.noOfClicks = 1;
+                this.lastClickTimeStamp = currentMs;
+            }
+        }
+        if (this.noOfClicks == 2) {
+            this.noOfClicks = 0;
+            this.lastClickTimeStamp = null;
+            this.processGridDoubleClick(points);
         }
     }
 
@@ -148,7 +177,7 @@ export abstract class BaseGraphObject<T extends BaseLogPoint> {
     destroy(): void {
         if (this.graph) {
             if (this.gridElement && this.boundGridDoubleClickHandler) {
-                this.gridElement.removeEventListener("dblclick", this.boundGridDoubleClickHandler);
+                this.gridElement.removeEventListener("click", this.boundGridDoubleClickHandler);
             }
             this.graph.destroy()
             this.graph = null;

@@ -2,25 +2,15 @@
     import "uplot/dist/uPlot.min.css";
     import { onDestroy } from "svelte";
     import { BaseGraphObject, GraphType } from "$lib/logic/view/graph/base";
-    import { getGraphToolTipDisplayComponent } from "$lib/logic/view/graph/helpers";
+    import { getGraphMetricsComponent, getGraphToolTipDisplayComponent, getGraphStyle } from "$lib/logic/view/graph/helpers";
     import { FormattedTimeStep } from "$lib/types/date";
     import { LogSpanPeriod } from "$lib/types/view/nodes";
-    import type {
-        BaseLogPoint,
-        BaseMetrics,
-        CounterMetrics,
-        MeasurementMetrics,
-        ProcessedBaseLogPoint,
-        ProcessedCounterLogPoint,
-        ProcessedMeasurementLogPoint,
-    } from "$lib/types/nodes/logs";
+    import type { BaseLogPoint, BaseMetrics, ProcessedBaseLogPoint, ProcessedCounterLogPoint, ProcessedMeasurementLogPoint } from "$lib/types/nodes/logs";
     import FullScreenGraph from "./FullScreenGraph.svelte";
     import Action from "../../../General/Action.svelte";
     import ToolTipText from "../../../General/ToolTipText.svelte";
     import DateRangeChecker from "../../../General/TimeDate/DateRangeChecker.svelte";
     import CircularLoader from "../../../General/CircularLoader.svelte";
-    import MeasurementMetricsComponent from "../Metrics/MeasurementMetrics.svelte";
-    import CounterMetricsComponent from "../Metrics/CounterMetrics.svelte";
     import GraphToolTip from "./GraphToolTip.svelte";
     import GraphPeriodSelection from "./GraphPeriodSelection.svelte";
     import { MeasurementGraphObject } from "$lib/logic/view/graph/measurement";
@@ -32,7 +22,7 @@
 
     // Styles
     import { mergeStyle } from "$lib/style/components";
-    import { BaseGraphStyle, CounterGraphStyle, GraphActionStyle, GraphMetricStyle, MeasurementGraphStyle } from "$lib/style/graph";
+    import { BaseGraphStyle, GraphActionStyle, GraphMetricStyle } from "$lib/style/graph";
 
     // Style object (from theme)
     export let style: { [property: string]: string | number } | null = null;
@@ -123,7 +113,6 @@
     $: mergedStyle = mergeStyle(effectiveStyle, localOverrides);
 
     // Variables
-
     let graphContainer: HTMLDivElement;
     let gridElement: HTMLDivElement | null = null;
     let graph: BaseGraphObject<BaseLogPoint> | null = null;
@@ -159,7 +148,7 @@
         createGraphObject();
     }
 
-    $: if (graph && dataFetched && data && $selectedLang) {
+    $: if (graph && dataFetched && data && timeStep && $selectedLang) {
         updateGraphData();
     }
 
@@ -178,29 +167,35 @@
     export let goBack: () => void;
 
     // Functions
+    function createGraphInstance(type: GraphType, container: HTMLDivElement, data: ProcessedBaseLogPoint[] | undefined): BaseGraphObject<any> {
+        const graphMap = {
+            [GraphType.Measurement]: () =>
+                new MeasurementGraphObject(
+                    container,
+                    hoveredLogPointChange,
+                    mousePositionChange,
+                    gridDoubleClick,
+                    data ? (data as ProcessedMeasurementLogPoint[]) : undefined,
+                ),
+            [GraphType.Counter]: () =>
+                new CounterGraphObject(
+                    container,
+                    hoveredLogPointChange,
+                    mousePositionChange,
+                    gridDoubleClick,
+                    data ? (data as ProcessedCounterLogPoint[]) : undefined,
+                ),
+        };
+
+        return graphMap[type]();
+    }
+
     function createGraphObject(): void {
         if (graph) graph.destroy();
         requestAnimationFrame(() => {
             mergedStyle = mergeStyle(effectiveStyle, localOverrides);
-            if (graphType === GraphType.Measurement) {
-                graph = new MeasurementGraphObject(
-                    graphContainer,
-                    hoveredLogPointChange,
-                    mousePositionChange,
-                    gridDoubleClick,
-                    data as ProcessedMeasurementLogPoint[],
-                );
-                Object.assign(mergedStyle, $MeasurementGraphStyle);
-            } else if (graphType === GraphType.Counter) {
-                graph = new CounterGraphObject(
-                    graphContainer,
-                    hoveredLogPointChange,
-                    mousePositionChange,
-                    gridDoubleClick,
-                    data as ProcessedCounterLogPoint[],
-                );
-                Object.assign(mergedStyle, $CounterGraphStyle);
-            }
+            graph = createGraphInstance(graphType, graphContainer, data);
+            Object.assign(mergedStyle, getGraphStyle(graphType));
         });
     }
 
@@ -218,7 +213,7 @@
     }
 
     function updateGraphData(): void {
-        if (graph) {
+        if (graph && data && timeStep) {
             graph.destroy();
             graph.updatePoints(data, decimalPlaces, true);
             graph.createGraph(timeStep, logSpanPeriod, mergedStyle);
@@ -245,6 +240,17 @@
     });
 </script>
 
+<!--
+    Graph Component
+    
+    A comprehensive interactive graph visualization component for time-series data display.
+    Features dynamic graph type switching (Measurement/Counter), real-time data updates,
+    interactive drill-down navigation via double-click, responsive design with container queries,
+    configurable metrics display, full-screen mode, date range selection, and comprehensive
+    theming support. Integrates with uPlot for high-performance rendering and provides
+    tooltip overlays, loading states, and accessibility features. Supports both measurement
+    data with min/max bands and counter/cumulative data visualization patterns.
+-->
 <div
     style="
         --width: {mergedStyle.width};
@@ -359,27 +365,17 @@
                 </div>
                 <div class="metrics-section">
                     {#if globalMetrics}
-                        {#if graphType === GraphType.Measurement}
-                            <MeasurementMetricsComponent
-                                style={effectiveMetricStyle}
-                                labelWidth="125px"
-                                metrics={globalMetrics as MeasurementMetrics}
-                                {unit}
-                                {decimalPlaces}
-                                {dataFetched}
-                                {firstFetch}
-                            />
-                        {:else if graphType === GraphType.Counter}
-                            <CounterMetricsComponent
-                                style={effectiveMetricStyle}
-                                metrics={globalMetrics as CounterMetrics}
-                                {unit}
-                                {decimalPlaces}
-                                {dataFetched}
-                                {firstFetch}
-                                roundMetrics={true}
-                            />
-                        {/if}
+                        <svelte:component
+                            this={getGraphMetricsComponent(graphType)}
+                            style={effectiveMetricStyle}
+                            labelWidth={graphType === GraphType.Measurement ? "150px" : undefined}
+                            metrics={globalMetrics}
+                            {unit}
+                            {decimalPlaces}
+                            {dataFetched}
+                            {firstFetch}
+                            roundMetrics={graphType === GraphType.Counter}
+                        />
                     {/if}
                 </div>
             </div>
@@ -418,6 +414,7 @@
 </div>
 
 <style>
+    /* Root container - Main graph component wrapper with theming and container query support */
     .graph-div-container {
         box-sizing: border-box;
         padding-top: var(--padding-top);
@@ -448,6 +445,7 @@
         scrollbar-gutter: stable both-edges;
     }
 
+    /* Content wrapper - Flex container organizing header, metrics, and graph sections */
     .graph-div-content {
         margin: 0;
         padding: 0;
@@ -484,6 +482,7 @@
         align-items: center;
         flex-wrap: wrap;
     }
+    /* Right header section - Container for date range display and action buttons */
     .header-content .right-header-div {
         width: fit-content;
         height: 100%;
@@ -492,6 +491,7 @@
         align-items: center;
     }
 
+    /* Full-screen date range - Date display shown only in wide layouts via container query */
     .right-header-div .full-screen-data-range {
         display: none;
         width: fit-content;
@@ -669,11 +669,14 @@
         transform: translate(-50%, -50%) rotate(-90deg);
     }
 
+    /* Responsive layout - Container query breakpoint for wide screen adaptations */
     @container (min-width: 880px) {
+        /* Show persistent date range in wide layouts */
         .right-header-div .full-screen-data-range {
             display: block;
         }
 
+        /* Hide tooltip-based date checker in wide layouts */
         .date-checker-div {
             display: none;
         }
