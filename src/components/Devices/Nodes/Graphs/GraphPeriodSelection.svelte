@@ -71,7 +71,14 @@
 -->
 <div bind:this={containerDiv}>
     {#if useToolTip}
-        <ToolTip style={$GraphPerSelStyle} maxWidth="auto" zIndex={198} showToolTip={showSelectionToolTip} autoPositionContinuous={true}>
+        <ToolTip
+            style={$GraphPerSelStyle}
+            maxWidth="auto"
+            zIndex={198}
+            forceShowMobile={true}
+            showToolTip={showSelectionToolTip}
+            autoPositionContinuous={true}
+        >
             <div class="period-selection-div">
                 <Button
                     enableToolTip={true}

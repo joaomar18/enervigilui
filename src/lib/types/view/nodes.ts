@@ -1,3 +1,5 @@
+import { NodeCategory } from "$lib/types/nodes/base";
+
 /** Column visibility configuration with optional width and visibility state */
 export interface ColumnVisibilityState {
     hideWidth?: number;
@@ -42,3 +44,31 @@ export interface NodeTimeSpan {
     end_date: Date;
     log_span_period: LogSpanPeriod;
 }
+
+/**
+ * Mapping configuration for metrics display in the UI, organizing metric keys by node category
+ * with their corresponding internationalization text keys and icon file references.
+ * 
+ * Structure maps NodeCategory → metric key → display configuration:
+ * - textKey: Reference to internationalization text for metric labels
+ * - imageFile: icon filename for visual metric identification
+ * 
+ * Used by getMetricsViewVariables() to transform raw metrics data into view-ready format
+ * with proper labels and icons for different node types (Measurements, Counters, etc.).
+ */
+export const metricsTextKeyMap: Record<string, Record<string, { textKey: string, imageFile: string }>> = {
+    [NodeCategory.Measurements]: {
+        "max_value": { textKey: "maxValue", imageFile: "max-value.svg" },
+        "average_value": { textKey: "averageValue", imageFile: "average-value.svg" },
+        "min_value": { textKey: "minValue", imageFile: "min-value.svg" },
+    },
+    [NodeCategory.Counters]: {
+        "value": { textKey: "total", imageFile: "total-value.svg" },
+    },
+    [NodeCategory.States]: {
+    },
+    [NodeCategory.Texts]: {
+    },
+    [NodeCategory.Other]: {
+    }
+};

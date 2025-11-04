@@ -1,6 +1,6 @@
 <script lang="ts">
     import InlineLoader from "../../../General/InlineLoader.svelte";
-    import type { CounterMetrics } from "$lib/types/nodes/logs";
+    import type { NodeCategory } from "$lib/types/nodes/base";
 
     // Texts
     import { texts } from "$lib/stores/lang/generalTexts";
@@ -14,12 +14,11 @@
     $: effectiveStyle = style ?? $GraphMetricStyle;
 
     // Props
-    export let metrics: CounterMetrics;
+    export let metricsVariables: Record<string, { textKey: string; imageFile: string; value: any }>;
     export let unit: string = "";
-    export let decimalPlaces: number | null;
     export let dataFetched: boolean;
     export let firstFetch: boolean;
-    export let roundMetrics: boolean = false;
+    export let metricsCategory: NodeCategory;
 
     // Layout / styling props
     export let iconSize: string | undefined = undefined;
@@ -66,21 +65,23 @@
     $: mergedStyle = mergeStyle(effectiveStyle, localOverrides);
 
     // Variables
-    let forceColStack: boolean;
+    let showLoader = false;
+    let forceColStack = false;
     let loaderTimeout: number | null = null;
-    let showLoader: boolean = false;
+    let prevCategory: NodeCategory;
 
     // Reactive Statements
     $: forceColStack = String(mergedStyle.forceCollapse) === "TRUE";
 
     $: if (!dataFetched && !showLoader) {
-        if (firstFetch) {
+        if (firstFetch && prevCategory === metricsCategory) {
             loaderTimeout = setTimeout(() => {
                 showLoader = !dataFetched;
             }, 500);
         } else {
             showLoader = true;
         }
+        prevCategory = metricsCategory;
     }
     $: if (dataFetched) {
         if (loaderTimeout) {
@@ -89,22 +90,18 @@
         }
         showLoader = false;
     }
-
-    $: if (metrics && roundMetrics && decimalPlaces !== null && decimalPlaces !== undefined) {
-        if ("value" in metrics && metrics.value !== null) metrics.value = Number(metrics.value.toFixed(decimalPlaces));
-    }
 </script>
 
 <!--
-    CounterMetrics Component
+    Metrics Component
     
-    Displays counter-specific metrics (total value) for cumulative counter data with integrated 
-    loading states. Features icon-enhanced layout with responsive design that switches 
-    from horizontal rows to vertical stacking based on container width or force stacking. 
-    The metric row includes a descriptive icon, label, numerical value with loading spinner, 
-    and unit. Uses InlineLoader components to handle asynchronous data loading gracefully. 
-    Supports comprehensive theming through CSS custom properties for colors, spacing, and typography. 
-    Used primarily in counter graph headers to provide quick statistical overview of cumulative data.
+    A flexible metrics display component that renders node measurement data with internationalized
+    labels, icons, and loading states. Features dynamic metric rendering based on node category
+    using metricsVariables mapping, responsive layout with container queries, and comprehensive
+    theming support. Handles loading states with delayed loaders for improved UX, provides
+    null value handling with fallback messaging, and supports both horizontal and forced
+    vertical stacking layouts. Integrates with InlineLoader for smooth loading transitions
+    and maintains consistent typography and spacing across different metric types.
 -->
 <div
     style="
@@ -131,24 +128,26 @@
     class:force-col-stack={forceColStack}
 >
     <div class="content">
-        <div class="row">
-            <img class="icon" src="/img/total-value.svg" alt="Total Value" />
-            <span class="label">{$texts.total}:</span>
-            <div class="request-content">
-                <InlineLoader loaded={!showLoader}>
-                    <div class="loader-div">
-                        {#if "value" in metrics}
-                            {#if metrics.value !== null}
-                                <span class="value">{metrics.value}</span>
-                                <span class="unit">{unit}</span>
-                            {:else}
-                                <span class="no-data-label">{$texts.noDataAvailableShort}</span>
+        {#each Object.entries(metricsVariables) as [key, metricVar] (metricVar.textKey)}
+            <div class="row">
+                <img class="icon" src={"/img/" + metricVar.imageFile} alt={metricVar.textKey} />
+                <span class="label">{$texts[metricVar.textKey]}:</span>
+                <div class="request-content">
+                    <InlineLoader loaded={!showLoader}>
+                        <div class="loader-div">
+                            {#if key in metricsVariables}
+                                {#if metricVar.value !== null}
+                                    <span class="value">{metricVar.value}</span>
+                                    <span class="unit">{unit}</span>
+                                {:else}
+                                    <span class="no-data-label">{$texts.noDataAvailableShort}</span>
+                                {/if}
                             {/if}
-                        {/if}
-                    </div>
-                </InlineLoader>
+                        </div>
+                    </InlineLoader>
+                </div>
             </div>
-        </div>
+        {/each}
     </div>
 </div>
 
@@ -207,7 +206,7 @@
         border-right: none;
     }
 
-    /* Metric icon - Visual indicator for counter total value (total-value.svg symbol) */
+    /* Metric icon - Visual indicator for metric type (varies by node category) */
     .row .icon {
         width: var(--icon-size);
         height: var(--icon-size);
@@ -254,7 +253,7 @@
         text-overflow: ellipsis;
     }
 
-    /* Metric unit - Measurement unit display (kWh, VArh, etc.) with constrained width */
+    /* Metric unit - Measurement unit display (kWh, VArh, A, etc.) with constrained width */
     .row .request-content .loader-div .unit {
         text-align: right;
         font-size: var(--text-size);

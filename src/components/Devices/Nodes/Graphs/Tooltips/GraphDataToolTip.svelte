@@ -1,5 +1,5 @@
 <script lang="ts">
-    import type { CounterLogPoint } from "$lib/types/nodes/logs";
+    import type { BaseLogPoint } from "$lib/types/nodes/logs";
 
     // Texts
     import { texts } from "$lib/stores/lang/generalTexts";
@@ -13,8 +13,8 @@
     $: effectiveStyle = style ?? $GraphDataToolTipStyle;
 
     // Props
-    export let logPoint: CounterLogPoint | null;
-    export let unit: string = "";
+    export let logPoint: BaseLogPoint | null;
+    export let dataAvailable: boolean;
 
     // Layout / styling props
     export let rowGap: string | undefined = undefined;
@@ -52,15 +52,15 @@
 </script>
 
 <!--
-    CounterToolTip Component
+    GraphDataToolTip Component
     
-    Interactive tooltip for counter graph data points displaying accumulated values and 
-    time range information. Shows the total accumulated value for counter nodes over 
-    the selected time period, along with start and end timestamps. Features null-safe 
-    rendering with fallback "No Data Available" state when counter values are missing.
-    Supports comprehensive theming through CSS custom properties and uses the shared 
-    GraphDataToolTipStyle for consistent appearance across graph tooltips. Designed 
-    specifically for counter/accumulator data visualization in time-series graphs.
+    A specialized tooltip component for displaying graph data point information with formatted
+    date ranges and conditional data availability states. Features a flexible slot-based layout
+    for custom measurement display content, automatic no-data messaging, and comprehensive
+    typography theming. Provides structured label-value pairs with overflow handling,
+    responsive text sizing, and accessibility-friendly contrast controls. Handles conditional
+    rendering based on log point availability and integrates with internationalization
+    for date range labels and status messages.
 -->
 {#if logPoint}
     <div
@@ -82,13 +82,8 @@
         class="container"
     >
         <div class="content">
-            {#if logPoint.value !== null}
-                <div class="row">
-                    <span class="label">{$texts.total}</span>
-                    <span class="value">{logPoint.value}</span>
-                    <span class="unit">{unit}</span>
-                </div>
-            {:else}
+            <slot />
+            {#if !dataAvailable}
                 <div class="row">
                     <span class="value no-data-label center">{$texts.noDataAvailableShort}</span>
                 </div>
@@ -165,18 +160,5 @@
     /* No padding modifier - Removes right padding for specific layouts */
     .value.no-padding {
         padding: 0;
-    }
-
-    /* Unit display - Right-aligned area for measurement units with ellipsis overflow */
-    .unit {
-        width: fit-content;
-        max-width: var(--unit-max-width);
-        text-align: right;
-        font-size: var(--text-size);
-        color: var(--unit-color);
-        font-weight: var(--unit-weight);
-        white-space: nowrap;
-        overflow: hidden;
-        text-overflow: ellipsis;
     }
 </style>

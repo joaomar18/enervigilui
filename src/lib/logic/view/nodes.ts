@@ -1,7 +1,9 @@
 import { NodeCategory, NodeType } from "$lib/types/nodes/base";
 import { GraphType } from "./graph/base";
 import { logsDisplayGraphTypeMap, realTimeDisplayComponentMap } from "$lib/types/view/device";
+import { metricsTextKeyMap } from "$lib/types/view/nodes";
 import type { SvelteComponent } from "svelte";
+import type { BaseMetrics } from "$lib/types/nodes/logs";
 
 /**
  * Determines the category of a node based on its type and incremental flag.
@@ -52,4 +54,23 @@ export function getNodeRealTimeDisplayComponent(category: NodeCategory): typeof 
 export function getNodeLogGraphType(category: NodeCategory): GraphType | null {
     let component = logsDisplayGraphTypeMap[category];
     return component;
+}
+
+/**
+ * Transforms metrics data into view-ready format with internationalization keys and icons.
+ * Maps raw metric values to UI display configuration using metricsTextKeyMap for the given category.
+ * 
+ * @param category - The node category to determine appropriate metric display mappings
+ * @param metrics - The metrics object containing measurement or counter values to transform
+ * @returns Record mapping metric keys to display objects with textKey for i18n labels, imageFile for icons, and metric values
+ */
+export function getMetricsViewVariables(category: NodeCategory, metrics: BaseMetrics): Record<string, { textKey: string; imageFile: string; value: any }> {
+    let output: Record<string, { textKey: string; imageFile: string; value: any }> = {};
+
+    Object.entries(metricsTextKeyMap[category]).forEach(([key, value]) => {
+        let metricValue = key in metrics ? (metrics as any)[key] : null;
+        output[key] = ({ textKey: value.textKey, imageFile: value.imageFile, value: metricValue });
+    });
+
+    return output;
 }

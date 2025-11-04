@@ -36,14 +36,14 @@ export interface BaseMetrics {
 
 /**
  * Statistical metrics for measurement data display.
+ * @property {number | null} max_value - Maximum value in the dataset
  * @property {number | null} average_value - Mean value of the dataset
  * @property {number | null} min_value - Minimum value in the dataset
- * @property {number | null} max_value - Maximum value in the dataset
  */
 export interface MeasurementMetrics extends BaseMetrics {
+    max_value: number | null;
     average_value: number | null;
     min_value: number | null;
-    max_value: number | null;
 }
 
 /**

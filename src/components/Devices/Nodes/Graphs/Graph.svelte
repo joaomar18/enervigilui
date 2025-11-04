@@ -11,7 +11,7 @@
     import ToolTipText from "../../../General/ToolTipText.svelte";
     import DateRangeChecker from "../../../General/TimeDate/DateRangeChecker.svelte";
     import CircularLoader from "../../../General/CircularLoader.svelte";
-    import GraphToolTip from "./GraphToolTip.svelte";
+    import GraphToolTip from "./Tooltips/GraphToolTip.svelte";
     import GraphPeriodSelection from "./GraphPeriodSelection.svelte";
     import { MeasurementGraphObject } from "$lib/logic/view/graph/measurement";
     import { CounterGraphObject } from "$lib/logic/view/graph/counter";
@@ -368,7 +368,6 @@
                         <svelte:component
                             this={getGraphMetricsComponent(graphType)}
                             style={effectiveMetricStyle}
-                            labelWidth={graphType === GraphType.Measurement ? "150px" : undefined}
                             metrics={globalMetrics}
                             {unit}
                             {decimalPlaces}

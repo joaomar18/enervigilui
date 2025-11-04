@@ -312,3 +312,56 @@ const CounterDisplayStyleConfig: ComponentStyles = {
 };
 
 export const CounterDisplayStyle = createStyleStore(CounterDisplayStyleConfig);
+
+//////////     N O D E     D E T A I L     S H E E T     //////////
+
+const NodeDetailSheetStyleConfig: ComponentStyles = {
+    dark: {
+        stateDimColor: "#374151",
+        stateAlarmColor: "#ef4444",
+        stateWarningColor: "#f59e0b",
+        stateOKColor: "#22c55e",
+        stateDisconnectedColor: "#6b7280",
+        titleSize: "1.25rem",
+        titleColor: "rgba(255, 255, 255, 0.8)",
+        titleWeight: "500",
+        titleItemGap: "10px",
+        titleImageWidth: "32px",
+        titleImageHeight: "32px",
+        headerRowHeigth: "25px",
+        headerStateDivWidth: "25px",
+        headerRowGap: "10px",
+        headerColGap: "10px",
+        headerLabelWidth: "100px",
+        headerLabelSize: "1rem",
+        headerLabelColor: "rgba(255, 255, 255, 0.6)",
+        headerLabelWeight: "400",
+        headerValueSize: "1rem",
+        headerValueColor: "rgba(255, 255, 255, 0.8)",
+        headerValueWeight: "600",
+        contentTitleSize: "13px",
+        contentTitleColor: "rgba(255, 255, 255, 0.4)",
+        contentTitleWeight: "500",
+        contentTitlePaddingLeft: "5px",
+        contentTitlePaddingBottom: "8px",
+        contentTitleBorderBottom: "1px solid rgba(255, 255, 255, 0.08)",
+        contentTitleSpacing: "1px",
+        contentTitleTransform: "uppercase",
+        contentInnerPaddingTop: "20px",
+        contentInnerPaddingBottom: "20px",
+        contentInnerPaddingHorizontal: "10px",
+        contentRowHeight: "25px",
+        contentStateDivWidth: "25px",
+        contentRowGap: "10px",
+        contentColGap: "10px",
+        contentLabelWidth: "100px",
+        contentLabelSize: "1rem",
+        contentLabelColor: "rgba(255,255,255, 0.6)",
+        contentLabelWeight: "400",
+        contentValueSize: "1rem",
+        contentValueColor: "rgba(255,255,255, 0.8)",
+        contentValueWeight: "600",
+    },
+};
+
+export const NodeDetailSheetStyle = createStyleStore(NodeDetailSheetStyleConfig);

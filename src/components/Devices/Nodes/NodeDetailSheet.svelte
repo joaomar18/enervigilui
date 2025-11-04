@@ -23,58 +23,114 @@
     import { pluginTexts } from "$lib/stores/lang/protocolPlugin";
 
     // Styles
+    import { mergeStyle } from "$lib/style/components";
+    import { NodeDetailSheetStyle } from "$lib/style/nodes";
     import { NodesBaseDisplayDetailStyle } from "$lib/style/nodes";
     import GraphPeriodSelection from "./Graphs/GraphPeriodSelection.svelte";
+
+    // Style object (from theme)
+    export let style: { [property: string]: string | number } | null = null;
+    $: effectiveStyle = style ?? $NodeDetailSheetStyle;
 
     // Props
     export let nodeState: ProcessedNodeState;
     export let showPanel: boolean;
 
     // Layout / styling props
-    export let stateDimColor: string | undefined = "#374151";
-    export let stateAlarmColor: string | undefined = "#ef4444";
-    export let stateWarningColor: string | undefined = "#f59e0b";
-    export let stateOKColor: string | undefined = "#22c55e";
-    export let stateDisconnectedColor: string | undefined = "#6b7280";
-    export let titleSize: string | undefined = "1.25rem";
-    export let titleColor: string | undefined = "rgba(255, 255, 255, 0.8)";
-    export let titleWeight: string | undefined = "500";
-    export let titleItemGap: string | undefined = "10px";
-    export let titleImageWidth: string | undefined = "32px";
-    export let titleImageHeight: string | undefined = "32px";
-    export let headerRowHeigth: string | undefined = "25px";
-    export let headerStateDivWidth: string | undefined = "25px";
-    export let headerRowGap: string | undefined = "10px";
-    export let headerColGap: string | undefined = "10px";
-    export let headerLabelWidth: string | undefined = "100px";
-    export let headerLabelSize: string | undefined = "1rem";
-    export let headerLabelColor: string | undefined = "rgba(255, 255, 255, 0.6)";
-    export let headerLabelWeight: string | undefined = "400";
-    export let headerValueSize: string | undefined = "1rem";
-    export let headerValueColor: string | undefined = "rgba(255, 255, 255, 0.8)";
-    export let headerValueWeight: string | undefined = "600";
-    export let contentTitleSize: string | undefined = "13px";
-    export let contentTitleColor: string | undefined = "rgba(255, 255, 255, 0.4)";
-    export let contentTitleWeight: string | undefined = "500";
-    export let contentTitlePaddingLeft: string | undefined = "5px";
-    export let contentTitlePaddingBottom: string | undefined = "8px";
-    export let contentTitleBorderBottom: string | undefined = "1px solid rgba(255, 255, 255, 0.08)";
-    export let contentTitleSpacing: string | undefined = "1px";
-    export let contentTitleTransform: string | undefined = "uppercase";
-    export let contentInnerPaddingTop: string | undefined = "20px";
-    export let contentInnerPaddingBottom: string | undefined = "20px";
-    export let contentInnerPaddingHorizontal: string | undefined = "10px";
-    export let contentRowHeight: string | undefined = "25px";
-    export let contentStateDivWidth: string | undefined = "25px";
-    export let contentRowGap: string | undefined = "10px";
-    export let contentColGap: string | undefined = "10px";
-    export let contentLabelWidth: string | undefined = "100px";
-    export let contentLabelSize: string | undefined = "1rem";
-    export let contentLabelColor: string | undefined = "rgba(255,255,255, 0.6)";
-    export let contentLabelWeight: string | undefined = "400";
-    export let contentValueSize: string | undefined = "1rem";
-    export let contentValueColor: string | undefined = "rgba(255,255,255, 0.8)";
-    export let contentValueWeight: string | undefined = "600";
+    export let stateDimColor: string | undefined = undefined;
+    export let stateAlarmColor: string | undefined = undefined;
+    export let stateWarningColor: string | undefined = undefined;
+    export let stateOKColor: string | undefined = undefined;
+    export let stateDisconnectedColor: string | undefined = undefined;
+    export let titleSize: string | undefined = undefined;
+    export let titleColor: string | undefined = undefined;
+    export let titleWeight: string | undefined = undefined;
+    export let titleItemGap: string | undefined = undefined;
+    export let titleImageWidth: string | undefined = undefined;
+    export let titleImageHeight: string | undefined = undefined;
+    export let headerRowHeigth: string | undefined = undefined;
+    export let headerStateDivWidth: string | undefined = undefined;
+    export let headerRowGap: string | undefined = undefined;
+    export let headerColGap: string | undefined = undefined;
+    export let headerLabelWidth: string | undefined = undefined;
+    export let headerLabelSize: string | undefined = undefined;
+    export let headerLabelColor: string | undefined = undefined;
+    export let headerLabelWeight: string | undefined = undefined;
+    export let headerValueSize: string | undefined = undefined;
+    export let headerValueColor: string | undefined = undefined;
+    export let headerValueWeight: string | undefined = undefined;
+    export let contentTitleSize: string | undefined = undefined;
+    export let contentTitleColor: string | undefined = undefined;
+    export let contentTitleWeight: string | undefined = undefined;
+    export let contentTitlePaddingLeft: string | undefined = undefined;
+    export let contentTitlePaddingBottom: string | undefined = undefined;
+    export let contentTitleBorderBottom: string | undefined = undefined;
+    export let contentTitleSpacing: string | undefined = undefined;
+    export let contentTitleTransform: string | undefined = undefined;
+    export let contentInnerPaddingTop: string | undefined = undefined;
+    export let contentInnerPaddingBottom: string | undefined = undefined;
+    export let contentInnerPaddingHorizontal: string | undefined = undefined;
+    export let contentRowHeight: string | undefined = undefined;
+    export let contentStateDivWidth: string | undefined = undefined;
+    export let contentRowGap: string | undefined = undefined;
+    export let contentColGap: string | undefined = undefined;
+    export let contentLabelWidth: string | undefined = undefined;
+    export let contentLabelSize: string | undefined = undefined;
+    export let contentLabelColor: string | undefined = undefined;
+    export let contentLabelWeight: string | undefined = undefined;
+    export let contentValueSize: string | undefined = undefined;
+    export let contentValueColor: string | undefined = undefined;
+    export let contentValueWeight: string | undefined = undefined;
+
+    $: localOverrides = {
+        stateDimColor,
+        stateAlarmColor,
+        stateWarningColor,
+        stateOKColor,
+        stateDisconnectedColor,
+        titleSize,
+        titleColor,
+        titleWeight,
+        titleItemGap,
+        titleImageWidth,
+        titleImageHeight,
+        headerRowHeigth,
+        headerStateDivWidth,
+        headerRowGap,
+        headerColGap,
+        headerLabelWidth,
+        headerLabelSize,
+        headerLabelColor,
+        headerLabelWeight,
+        headerValueSize,
+        headerValueColor,
+        headerValueWeight,
+        contentTitleSize,
+        contentTitleColor,
+        contentTitleWeight,
+        contentTitlePaddingLeft,
+        contentTitlePaddingBottom,
+        contentTitleBorderBottom,
+        contentTitleSpacing,
+        contentTitleTransform,
+        contentInnerPaddingTop,
+        contentInnerPaddingBottom,
+        contentInnerPaddingHorizontal,
+        contentRowHeight,
+        contentStateDivWidth,
+        contentRowGap,
+        contentColGap,
+        contentLabelWidth,
+        contentLabelSize,
+        contentLabelColor,
+        contentLabelWeight,
+        contentValueSize,
+        contentValueColor,
+        contentValueWeight,
+    };
+
+    // Merged style
+    $: mergedStyle = mergeStyle(effectiveStyle, localOverrides);
 
     // Variables
     let state: "alarmState" | "warningState" | "okState" | "disconnectedState";
@@ -208,53 +264,66 @@
     }
 </script>
 
+<!--
+    NodeDetailSheet Component
+    
+    A comprehensive right-panel component for displaying detailed node information including
+    real-time state, historical data, and interactive graph visualization. Features dynamic
+    content loading with sliding window navigation, multi-state visual indicators (alarm,
+    warning, ok, disconnected), and integrated graph controls with period selection.
+    Manages node additional info and logs fetching with loading states, provides drill-down
+    navigation through time periods with back/forward functionality, and displays structured
+    node metadata including phase sections, communication IDs, and protocol information.
+    Supports extensive theming with configurable colors, typography, and spacing for all
+    UI elements including titles, headers, content sections, and state indicators.
+-->
 <div
     class="variable-panel"
     style="
-            --title-size: {titleSize};
-            --title-color: {titleColor};
-            --title-weight: {titleWeight};
-            --title-item-gap: {titleItemGap};
-            --title-image-width: {titleImageWidth};
-            --title-image-height: {titleImageHeight};
-            --state-dim-color: {stateDimColor};
-            --state-alarm-color: {stateAlarmColor};
-            --state-warning-color: {stateWarningColor};
-            --state-ok-color: {stateOKColor};
-            --state-disconnected-color: {stateDisconnectedColor};
-            --header-row-height: {headerRowHeigth};
-            --header-state-div-width: {headerStateDivWidth};
-            --header-row-gap: {headerRowGap};
-            --header-col-gap: {headerColGap};
-            --header-label-width: {headerLabelWidth};
-            --header-label-size: {headerLabelSize};
-            --header-label-color: {headerLabelColor};
-            --header-label-weight: {headerLabelWeight};
-            --header-value-size: {headerValueSize};
-            --header-value-color: {headerValueColor};
-            --header-value-weight: {headerValueWeight};
-            --content-state-div-width: {contentStateDivWidth};
-            --content-title-size: {contentTitleSize};
-            --content-title-color: {contentTitleColor};
-            --content-title-weight: {contentTitleWeight};
-            --content-title-padding-left: {contentTitlePaddingLeft};
-            --content-title-padding-bottom: {contentTitlePaddingBottom};
-            --content-title-border-bottom: {contentTitleBorderBottom};
-            --content-title-spacing: {contentTitleSpacing};
-            --content-title-transform: {contentTitleTransform};
-            --content-inner-padding-top: {contentInnerPaddingTop};
-            --content-inner-padding-bottom: {contentInnerPaddingBottom};
-            --content-inner-padding-horizontal: {contentInnerPaddingHorizontal};
-            --content-row-height: {contentRowHeight};
-            --content-row-gap: {contentRowGap};
-            --content-col-gap: {contentColGap};
-            --content-label-width: {contentLabelWidth};
-            --content-label-size: {contentLabelSize};
-            --content-label-color: {contentLabelColor};
-            --content-label-weight: {contentLabelWeight};
-            --content-value-size: {contentValueSize};
-            --content-value-color: {contentValueColor};
-            --content-value-weight: {contentValueWeight};
+            --title-size: {mergedStyle.titleSize};
+            --title-color: {mergedStyle.titleColor};
+            --title-weight: {mergedStyle.titleWeight};
+            --title-item-gap: {mergedStyle.titleItemGap};
+            --title-image-width: {mergedStyle.titleImageWidth};
+            --title-image-height: {mergedStyle.titleImageHeight};
+            --state-dim-color: {mergedStyle.stateDimColor};
+            --state-alarm-color: {mergedStyle.stateAlarmColor};
+            --state-warning-color: {mergedStyle.stateWarningColor};
+            --state-ok-color: {mergedStyle.stateOKColor};
+            --state-disconnected-color: {mergedStyle.stateDisconnectedColor};
+            --header-row-height: {mergedStyle.headerRowHeigth};
+            --header-state-div-width: {mergedStyle.headerStateDivWidth};
+            --header-row-gap: {mergedStyle.headerRowGap};
+            --header-col-gap: {mergedStyle.headerColGap};
+            --header-label-width: {mergedStyle.headerLabelWidth};
+            --header-label-size: {mergedStyle.headerLabelSize};
+            --header-label-color: {mergedStyle.headerLabelColor};
+            --header-label-weight: {mergedStyle.headerLabelWeight};
+            --header-value-size: {mergedStyle.headerValueSize};
+            --header-value-color: {mergedStyle.headerValueColor};
+            --header-value-weight: {mergedStyle.headerValueWeight};
+            --content-state-div-width: {mergedStyle.contentStateDivWidth};
+            --content-title-size: {mergedStyle.contentTitleSize};
+            --content-title-color: {mergedStyle.contentTitleColor};
+            --content-title-weight: {mergedStyle.contentTitleWeight};
+            --content-title-padding-left: {mergedStyle.contentTitlePaddingLeft};
+            --content-title-padding-bottom: {mergedStyle.contentTitlePaddingBottom};
+            --content-title-border-bottom: {mergedStyle.contentTitleBorderBottom};
+            --content-title-spacing: {mergedStyle.contentTitleSpacing};
+            --content-title-transform: {mergedStyle.contentTitleTransform};
+            --content-inner-padding-top: {mergedStyle.contentInnerPaddingTop};
+            --content-inner-padding-bottom: {mergedStyle.contentInnerPaddingBottom};
+            --content-inner-padding-horizontal: {mergedStyle.contentInnerPaddingHorizontal};
+            --content-row-height: {mergedStyle.contentRowHeight};
+            --content-row-gap: {mergedStyle.contentRowGap};
+            --content-col-gap: {mergedStyle.contentColGap};
+            --content-label-width: {mergedStyle.contentLabelWidth};
+            --content-label-size: {mergedStyle.contentLabelSize};
+            --content-label-color: {mergedStyle.contentLabelColor};
+            --content-label-weight: {mergedStyle.contentLabelWeight};
+            --content-value-size: {mergedStyle.contentValueSize};
+            --content-value-color: {mergedStyle.contentValueColor};
+            --content-value-weight: {mergedStyle.contentValueWeight};
         "
 >
     <RightPanelSheet useMask={false} bind:showPanel>
@@ -489,6 +558,7 @@
 </div>
 
 <style>
+    /* State indicator - Circular dot showing node operational status */
     .dot-state {
         inline-size: 16px;
         block-size: 16px;
@@ -496,32 +566,39 @@
         background: var(--state-dim-color);
     }
 
+    /* Dimmed state - Default/unknown node status */
     .dot-state[data-state="dim"] {
         background: var(--state-dim-color);
     }
 
+    /* OK state - Normal operational status (green) */
     .dot-state[data-state="okState"] {
         background: var(--state-ok-color);
     }
 
+    /* Alarm state - Critical error condition (red) */
     .dot-state[data-state="alarmState"] {
         background: var(--state-alarm-color);
     }
 
+    /* Warning state - Non-critical issues (yellow/amber) */
     .dot-state[data-state="warningState"] {
         background: var(--state-warning-color);
     }
 
+    /* Disconnected state - Communication lost (gray) */
     .dot-state[data-state="disconnectedState"] {
         background: var(--state-disconnected-color);
     }
 
+    /* State indicator container - Right-aligned wrapper for status dots */
     .dot-state-div {
         display: flex;
         justify-content: end;
         align-items: center;
     }
 
+    /* Panel title section - Header area with node icon, name, and metadata */
     .title-div {
         display: flex;
         flex-direction: row;
@@ -534,11 +611,13 @@
         padding: 0;
     }
 
+    /* Panel title icon - Node status/type indicator image with configurable dimensions */
     .title-div img {
         inline-size: var(--title-image-width);
         block-size: var(--title-image-height);
     }
 
+    /* Node title text - Primary heading with node name and flexible width */
     .title-div h3 {
         flex: 1;
         min-inline-size: 0;
@@ -550,6 +629,7 @@
         line-height: var(--title-image-height);
     }
 
+    /* Data row - Horizontal layout for label-value pairs with state indicators */
     .row {
         display: flex;
         align-items: center;
@@ -559,10 +639,12 @@
         padding: 0;
     }
 
+    /* Auto-height row modifier - Allows row to expand beyond fixed height */
     .row.fit-height {
         block-size: auto;
     }
 
+    /* Row label - Left-aligned descriptive text with fixed width */
     .label {
         white-space: nowrap;
         display: inline-flex;
@@ -571,6 +653,7 @@
         block-size: 100%;
     }
 
+    /* Row value - Right-aligned data display with flexible width and adornment support */
     .value {
         flex: 1;
         text-align: right;
@@ -583,16 +666,19 @@
         gap: var(--value-adornment-gap, 0.5rem);
     }
 
+    /* Right-aligned value modifier - Forces value text to float right */
     .value.align-right {
         float: right;
     }
 
+    /* Value with adornment modifier - Flex layout for values with trailing elements like indicators */
     .value.with-adornment {
         display: inline-flex;
         justify-content: end;
         align-items: center;
     }
 
+    /* Header information section - Node metadata display area with structured rows */
     .header-div {
         display: flex;
         flex-direction: column;
@@ -603,11 +689,13 @@
         padding: 0;
     }
 
+    /* Header data row - Metadata display row with fixed height and column spacing */
     .header-div .row {
         gap: var(--header-col-gap);
         block-size: var(--header-row-height);
     }
 
+    /* Header label text - Left-aligned descriptive text with fixed width and header typography */
     .header-div .label {
         inline-size: var(--header-label-width);
         min-inline-size: var(--header-label-width);
@@ -616,29 +704,34 @@
         font-weight: var(--header-label-weight);
     }
 
+    /* Header value text - Right-aligned data display with header typography styling */
     .header-div .value {
         font-size: var(--header-value-size);
         color: var(--header-value-color);
         font-weight: var(--header-value-weight);
     }
 
+    /* Header state indicator container - Fixed-width wrapper for status dots in header */
     .header-div .dot-state-div {
         inline-size: var(--header-state-div-width);
         block-size: var(--header-row-height);
     }
 
+    /* Main content area - Container for graph and additional information sections */
     .content-div {
         inline-size: 100%;
         margin: 0;
         padding: 0;
     }
 
+    /* Section title container - Header for content sections with bottom border */
     .content-div .section-title {
         margin: 0;
         padding: 0;
         border-bottom: var(--content-title-border-bottom);
     }
 
+    /* Section title text - Uppercase heading with spacing and border treatment */
     .content-div .section-title h3 {
         margin: 0;
         padding: 0 var(--content-title-padding-left) var(--content-title-padding-bottom) var(--content-title-padding-left);
@@ -649,6 +742,7 @@
         letter-spacing: var(--content-title-spacing);
     }
 
+    /* Section content container - Padded vertical layout for section data rows */
     .inner-content-div {
         box-sizing: border-box;
         position: relative;
@@ -661,20 +755,24 @@
         gap: var(--content-row-gap);
     }
 
+    /* No horizontal padding modifier - Removes left/right padding for full-width content like graphs */
     .inner-content-div.no-horizontal-padding {
         padding-left: 0;
         padding-right: 0;
     }
 
+    /* Content data row - Information display row with fixed height and column spacing */
     .content-div .inner-content-div .row {
         gap: var(--content-col-gap);
         block-size: var(--content-row-height);
     }
 
+    /* Auto-height content row modifier - Allows content rows to expand beyond fixed height */
     .content-div .inner-content-div .row.fit-height {
         block-size: auto;
     }
 
+    /* Content label text - Left-aligned descriptive text with fixed width and content typography */
     .content-div .inner-content-div .label {
         inline-size: var(--content-label-width);
         min-inline-size: var(--content-label-width);
@@ -683,29 +781,34 @@
         font-weight: var(--content-label-weight);
     }
 
+    /* Flexible content label modifier - Removes fixed width constraint for dynamic content sizing */
     .content-div .inner-content-div .label.fit-content {
         min-inline-size: 0;
         width: fit-content;
         padding-right: 30px;
     }
 
+    /* Content value text - Right-aligned data display with content typography styling */
     .content-div .inner-content-div .value {
         font-size: var(--content-value-size);
         color: var(--content-value-color);
         font-weight: var(--content-value-weight);
     }
 
+    /* Content state indicator container - Fixed-width wrapper for status dots in content sections */
     .content-div .dot-state-div {
         inline-size: var(--content-state-div-width);
         block-size: var(--content-row-height);
     }
 
+    /* Graph visualization container - Full-width wrapper for chart components with top spacing */
     .chart-container {
         padding-top: 5px;
         width: 100%;
         height: fit-content;
     }
 
+    /* Period selection container - Horizontal layout for time range controls and navigation */
     .period-div {
         width: 100%;
         height: fit-content;
