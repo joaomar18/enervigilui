@@ -26,6 +26,29 @@ export interface ColumnVisibilityMap {
 }
 
 /**
+ * Phase filter options available for selection in the UI.
+ * Used for filtering node data by phase (L1, L2, L3) or viewing aggregated totals.
+ */
+export enum SelectablePhaseFilter {
+    L1 = "L1",
+    L2 = "L2",
+    L3 = "L3",
+    TOTAL = "Total",
+}
+
+/**
+ * Energy flow direction filter options for electrical measurement data filtering in the UI.
+ * Used to filter energy data by directional flow: forward (consumed), reverse (generated), 
+ * or total (bidirectional aggregate). Commonly applied in energy metering systems to
+ * distinguish between energy consumption and energy production/feedback to the grid.
+ */
+export enum EnergyDirectionFilter {
+    FORWARD = "Forward",
+    REVERSE = "Reverse",
+    TOTAL = "Total",
+}
+
+/**
  * Time period options for displaying node historical data and logs.
  * Used in date range selectors for filtering node data by time spans.
  */

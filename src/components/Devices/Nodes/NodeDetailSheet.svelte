@@ -3,6 +3,7 @@
     import InlineLoader from "../../General/InlineLoader.svelte";
     import Graph from "./Graphs/Graph.svelte";
     import ElapsedDateTime from "../../General/TimeDate/ElapsedDateTime.svelte";
+    import TimePeriodPicker from "../../General/Pickers/TimePeriodPicker.svelte";
     import { LogSpanPeriod } from "$lib/types/view/nodes";
     import { getNodePhaseSection, getCommunicationID } from "$lib/logic/util/nodes";
     import { getNodeAdditionalInfo, getNodeLogs } from "$lib/logic/api/nodes";
@@ -26,7 +27,6 @@
     import { mergeStyle } from "$lib/style/components";
     import { NodeDetailSheetStyle } from "$lib/style/nodes";
     import { NodesBaseDisplayDetailStyle } from "$lib/style/nodes";
-    import GraphPeriodSelection from "./Graphs/GraphPeriodSelection.svelte";
 
     // Style object (from theme)
     export let style: { [property: string]: string | number } | null = null;
@@ -477,13 +477,13 @@
                     <div class="section-title"><h3>{$texts.history}</h3></div>
                     <div class="inner-content-div no-horizontal-padding">
                         <div class="period-div">
-                            <GraphPeriodSelection
+                            <TimePeriodPicker
                                 useToolTip={false}
                                 bind:selectedTimeSpan={selectedHistoryTimeSpan}
                                 bind:initialDate
                                 bind:endDate
-                                loadNodeLogsWithCustomPeriod={(initial_date: Date, end_date: Date) => loadNodeLogsWithCustomPeriod(initial_date, end_date)}
-                                loadNodeLogsWithSpanPeriod={(timeSpan: LogSpanPeriod) => loadNodeLogsWithSpanPeriod(timeSpan)}
+                                changeSpanPeriodCustom={(initial_date: Date, end_date: Date) => loadNodeLogsWithCustomPeriod(initial_date, end_date)}
+                                changeSpanPeriod={(timeSpan: LogSpanPeriod) => loadNodeLogsWithSpanPeriod(timeSpan)}
                             />
                         </div>
                         <div class="chart-container">

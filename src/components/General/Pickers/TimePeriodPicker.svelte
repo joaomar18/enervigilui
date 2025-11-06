@@ -1,20 +1,24 @@
 <script lang="ts">
     import { onDestroy } from "svelte";
     import { LogSpanPeriod } from "$lib/types/view/nodes";
-    import Button from "../../../General/Button.svelte";
-    import ToolTip from "../../../General/ToolTip.svelte";
-    import ToolTipText from "../../../General/ToolTipText.svelte";
-    import DateRangePicker from "../../../General/TimeDate/DateRangePicker.svelte";
+    import Button from "../Button.svelte";
+    import ToolTip from "../ToolTip.svelte";
+    import ToolTipText from "../ToolTipText.svelte";
+    import DateRangePicker from "../TimeDate/DateRangePicker.svelte";
 
     // Texts
     import { texts } from "$lib/stores/lang/generalTexts";
 
     // Styles
-    import { GraphPerSelStyle } from "$lib/style/graph";
-    import { GraphButtonStyle } from "$lib/style/graph";
-    import { GraphPeriodButtonStyle } from "$lib/style/graph";
-    import { CustomDateButtonStyle } from "$lib/style/graph";
-    import { SelectedCustomDateButtonStyle } from "$lib/style/graph";
+    import { PickerToolTipStyle } from "$lib/style/general";
+    import { PickerToolTipButtonStyle } from "$lib/style/general";
+    import { PickerButtonStyle } from "$lib/style/general";
+    import { CustomDateButtonStyle } from "$lib/style/general";
+    import { SelectedCustomDateButtonStyle } from "$lib/style/general";
+
+    // Style object (from theme)
+    export let toolTipButtonStyle: { [property: string]: string | number } | null = null;
+    $: effectiveToolTipButtonStyle = toolTipButtonStyle ?? $PickerToolTipButtonStyle;
 
     // Props
     export let useToolTip: boolean = true;
@@ -41,8 +45,8 @@
     }
 
     // Export Functions
-    export let loadNodeLogsWithSpanPeriod: (timeSpan: LogSpanPeriod) => void;
-    export let loadNodeLogsWithCustomPeriod: (initial_date: Date, end_date: Date) => void;
+    export let changeSpanPeriod: (timeSpan: LogSpanPeriod) => void;
+    export let changeSpanPeriodCustom: (initial_date: Date, end_date: Date) => void;
 
     // Functions
     function handleClickOutside(event: MouseEvent): void {
@@ -59,69 +63,77 @@
 </script>
 
 <!--
-    GraphPeriodSelection Component
+    TimePeriodPicker Component
     
-    A comprehensive time period selection interface for graph data filtering with predefined
-    quick-select buttons and custom date range picker capabilities. Features tooltip-based
-    and inline display modes, click-outside detection for modal behavior, and reactive
-    button selection states. Provides preset time periods (1h, 1d, 7d, 1M, 1Y) with
-    internationalized labels and tooltips, plus custom date range selection via integrated
-    DateRangePicker. Handles event delegation for window interactions and automatic cleanup.
-    Supports both compact button trigger mode and expanded inline selection interface.
+    A versatile time period selection interface with dual presentation modes for filtering
+    temporal data ranges. Features both tooltip-based popup and inline display modes,
+    offering predefined quick-select periods (1h, 1d, 7d, 1M, 1Y) with internationalized
+    labels and comprehensive tooltips. Integrates custom date range picker with calendar
+    selection capabilities and maintains reactive state synchronization between selection
+    modes. Implements click-outside detection for modal behavior, automatic event listener
+    cleanup, and right-aligned tooltip positioning for optimal UI placement.
+    
+    The component supports both compact trigger button mode (useToolTip=true) and expanded
+    inline selection interface (useToolTip=false), handles window event delegation for
+    responsive interactions, and provides callback functions for period selection events.
+    Maintains visual selection states across all time period options and seamlessly
+    integrates DateRangePicker for custom date range functionality with proper binding
+    and state management.
 -->
 <div bind:this={containerDiv}>
     {#if useToolTip}
         <ToolTip
-            style={$GraphPerSelStyle}
+            style={$PickerToolTipStyle}
             maxWidth="auto"
             zIndex={198}
             forceShowMobile={true}
             showToolTip={showSelectionToolTip}
             autoPositionContinuous={true}
+            alignType="right"
         >
             <div class="period-selection-div">
                 <Button
                     enableToolTip={true}
-                    style={$GraphPeriodButtonStyle}
+                    style={$PickerButtonStyle}
                     selected={selectedTimeSpan === LogSpanPeriod.currentHour}
                     buttonText={$texts._1h}
-                    onClick={() => loadNodeLogsWithSpanPeriod(LogSpanPeriod.currentHour)}
+                    onClick={() => changeSpanPeriod(LogSpanPeriod.currentHour)}
                 >
                     <div slot="tooltip"><ToolTipText text={$texts.currentHour} /></div>
                 </Button>
                 <Button
                     enableToolTip={true}
-                    style={$GraphPeriodButtonStyle}
+                    style={$PickerButtonStyle}
                     selected={selectedTimeSpan === LogSpanPeriod.currentDay}
                     buttonText={$texts._1d}
-                    onClick={() => loadNodeLogsWithSpanPeriod(LogSpanPeriod.currentDay)}
+                    onClick={() => changeSpanPeriod(LogSpanPeriod.currentDay)}
                 >
                     <div slot="tooltip"><ToolTipText text={$texts.currentDay} /></div>
                 </Button>
                 <Button
                     enableToolTip={true}
-                    style={$GraphPeriodButtonStyle}
+                    style={$PickerButtonStyle}
                     selected={selectedTimeSpan === LogSpanPeriod.current7Days}
                     buttonText={$texts._7d}
-                    onClick={() => loadNodeLogsWithSpanPeriod(LogSpanPeriod.current7Days)}
+                    onClick={() => changeSpanPeriod(LogSpanPeriod.current7Days)}
                 >
                     <div slot="tooltip"><ToolTipText text={$texts.currentWeek} /></div>
                 </Button>
                 <Button
                     enableToolTip={true}
-                    style={$GraphPeriodButtonStyle}
+                    style={$PickerButtonStyle}
                     selected={selectedTimeSpan === LogSpanPeriod.currentMonth}
                     buttonText={$texts._1M}
-                    onClick={() => loadNodeLogsWithSpanPeriod(LogSpanPeriod.currentMonth)}
+                    onClick={() => changeSpanPeriod(LogSpanPeriod.currentMonth)}
                 >
                     <div slot="tooltip"><ToolTipText text={$texts.currentMonth} /></div>
                 </Button>
                 <Button
                     enableToolTip={true}
-                    style={$GraphPeriodButtonStyle}
+                    style={$PickerButtonStyle}
                     selected={selectedTimeSpan === LogSpanPeriod.currentYear}
                     buttonText={$texts._1Y}
-                    onClick={() => loadNodeLogsWithSpanPeriod(LogSpanPeriod.currentYear)}
+                    onClick={() => changeSpanPeriod(LogSpanPeriod.currentYear)}
                 >
                     <div slot="tooltip"><ToolTipText text={$texts.currentYear} /></div>
                 </Button>
@@ -142,14 +154,14 @@
                         bind:initialDate
                         bind:endDate
                         bind:showToolTip={showCustomDatePicker}
-                        requestCustomPeriod={(initial_date: Date, end_date: Date) => loadNodeLogsWithCustomPeriod(initial_date, end_date)}
+                        requestCustomPeriod={(initial_date: Date, end_date: Date) => changeSpanPeriodCustom(initial_date, end_date)}
                     />
                 </div>
             </div>
         </ToolTip>
 
         <Button
-            style={$GraphButtonStyle}
+            style={effectiveToolTipButtonStyle}
             selected={showSelectionToolTip}
             buttonText=""
             imageURL={"/img/custom-date.svg"}
@@ -164,46 +176,46 @@
         <div class="period-selection-div">
             <Button
                 enableToolTip={true}
-                style={$GraphPeriodButtonStyle}
+                style={$PickerButtonStyle}
                 selected={selectedTimeSpan === LogSpanPeriod.currentHour}
                 buttonText={$texts._1h}
-                onClick={() => loadNodeLogsWithSpanPeriod(LogSpanPeriod.currentHour)}
+                onClick={() => changeSpanPeriod(LogSpanPeriod.currentHour)}
             >
                 <div slot="tooltip"><ToolTipText text={$texts.currentHour} /></div>
             </Button>
             <Button
                 enableToolTip={true}
-                style={$GraphPeriodButtonStyle}
+                style={$PickerButtonStyle}
                 selected={selectedTimeSpan === LogSpanPeriod.currentDay}
                 buttonText={$texts._1d}
-                onClick={() => loadNodeLogsWithSpanPeriod(LogSpanPeriod.currentDay)}
+                onClick={() => changeSpanPeriod(LogSpanPeriod.currentDay)}
             >
                 <div slot="tooltip"><ToolTipText text={$texts.currentDay} /></div>
             </Button>
             <Button
                 enableToolTip={true}
-                style={$GraphPeriodButtonStyle}
+                style={$PickerButtonStyle}
                 selected={selectedTimeSpan === LogSpanPeriod.current7Days}
                 buttonText={$texts._7d}
-                onClick={() => loadNodeLogsWithSpanPeriod(LogSpanPeriod.current7Days)}
+                onClick={() => changeSpanPeriod(LogSpanPeriod.current7Days)}
             >
                 <div slot="tooltip"><ToolTipText text={$texts.currentWeek} /></div>
             </Button>
             <Button
                 enableToolTip={true}
-                style={$GraphPeriodButtonStyle}
+                style={$PickerButtonStyle}
                 selected={selectedTimeSpan === LogSpanPeriod.currentMonth}
                 buttonText={$texts._1M}
-                onClick={() => loadNodeLogsWithSpanPeriod(LogSpanPeriod.currentMonth)}
+                onClick={() => changeSpanPeriod(LogSpanPeriod.currentMonth)}
             >
                 <div slot="tooltip"><ToolTipText text={$texts.currentMonth} /></div>
             </Button>
             <Button
                 enableToolTip={true}
-                style={$GraphPeriodButtonStyle}
+                style={$PickerButtonStyle}
                 selected={selectedTimeSpan === LogSpanPeriod.currentYear}
                 buttonText={$texts._1Y}
-                onClick={() => loadNodeLogsWithSpanPeriod(LogSpanPeriod.currentYear)}
+                onClick={() => changeSpanPeriod(LogSpanPeriod.currentYear)}
             >
                 <div slot="tooltip"><ToolTipText text={$texts.currentYear} /></div>
             </Button>
@@ -224,7 +236,7 @@
                     bind:initialDate
                     bind:endDate
                     bind:showToolTip={showCustomDatePicker}
-                    requestCustomPeriod={(initial_date: Date, end_date: Date) => loadNodeLogsWithCustomPeriod(initial_date, end_date)}
+                    requestCustomPeriod={(initial_date: Date, end_date: Date) => changeSpanPeriodCustom(initial_date, end_date)}
                 />
             </div>
         </div>
@@ -232,6 +244,7 @@
 </div>
 
 <style>
+    /* Period selection container - Horizontal layout for time period buttons and custom date picker */
     .period-selection-div {
         display: flex;
         justify-content: space-between;
@@ -241,6 +254,7 @@
         height: fit-content;
     }
 
+    /* Custom date section - Wrapper for custom date button and integrated DateRangePicker component */
     .custom-date-div {
         display: flex;
         justify-content: center;

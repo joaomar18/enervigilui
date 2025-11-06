@@ -12,7 +12,7 @@
     import DateRangeChecker from "../../../General/TimeDate/DateRangeChecker.svelte";
     import CircularLoader from "../../../General/CircularLoader.svelte";
     import GraphToolTip from "./Tooltips/GraphToolTip.svelte";
-    import GraphPeriodSelection from "./GraphPeriodSelection.svelte";
+    import TimePeriodPicker from "../../../General/Pickers/TimePeriodPicker.svelte";
     import { MeasurementGraphObject } from "$lib/logic/view/graph/measurement";
     import { CounterGraphObject } from "$lib/logic/view/graph/counter";
 
@@ -328,12 +328,12 @@
                         <div class="actions-div">
                             {#if showDatePicker}
                                 <div class="date-picker-div">
-                                    <GraphPeriodSelection
+                                    <TimePeriodPicker
                                         bind:selectedTimeSpan
                                         bind:initialDate
                                         bind:endDate
-                                        loadNodeLogsWithCustomPeriod={(initial_date: Date, end_date: Date) => getNewTimeSpan(initial_date, end_date)}
-                                        loadNodeLogsWithSpanPeriod={(timeSpan: LogSpanPeriod) => getNewDefaultTimeSpan(timeSpan)}
+                                        changeSpanPeriodCustom={(initial_date: Date, end_date: Date) => getNewTimeSpan(initial_date, end_date)}
+                                        changeSpanPeriod={(timeSpan: LogSpanPeriod) => getNewDefaultTimeSpan(timeSpan)}
                                     />
                                 </div>
                             {/if}
@@ -515,6 +515,15 @@
         justify-content: start;
         align-items: center;
         gap: var(--header-buttons-gap);
+    }
+
+    /* Date picker container - Houses the time date picker tooltip */
+    .actions-div .date-picker-div {
+        margin: 0;
+        padding: 0;
+        position: relative;
+        width: fit-content;
+        height: 100%;
     }
 
     /* Date checker container - Houses the date range display tooltip */

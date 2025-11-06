@@ -468,8 +468,9 @@ const ContentCardStyleConfig: ComponentStyles = {
         titleColor: "#f5f5f5",
         titleWeight: "500",
         titlePaddingLeft: "10px",
+        titlePaddingRight: "10px",
         headerWidth: "calc(100% - 40px)",
-        headerHeight: "32px",
+        headerHeight: "40px",
         headerBorder: "1px solid rgba(255,255,255,0.1)",
         headerPaddingTop: "10px",
         headerPaddingBottom: "10px",
@@ -706,6 +707,149 @@ const DateRangeCheckerStyleConfig: ComponentStyles = {
 
 export const DateRangeCheckerStyle = createStyleStore(DateRangeCheckerStyleConfig);
 
+//////////     P I C K E R     T O O L     T I P     //////////
+
+const PickerToolTipStyleConfig: ComponentStyles = {
+    dark: {
+        width: "fit-content",
+        minWidth: "auto",
+        maxWidth: "auto",
+        height: "fit-content",
+        minHeight: "auto",
+        maxHeight: "300px",
+        offsetPx: "10px",
+        border: "1px solid rgba(255, 255, 255, 0.2)",
+        borderRadius: "10px",
+        backgroundColor: "#1a1e24",
+        paddingHorizontal: "10px",
+        paddingVertical: "10px",
+        animationTime: 200,
+    },
+};
+
+export const PickerToolTipStyle = createStyleStore(PickerToolTipStyleConfig);
+
+//////////     P I C K E R     T O O L     T I P     B U T T O N     //////////
+
+const PickerToolTipButtonStyleConfig: ComponentStyles = {
+    dark: {
+        width: "40px",
+        minWidth: "auto",
+        maxWidth: "auto",
+        height: "40px",
+        borderRadius: "20px",
+        backgroundColor: "#0d1117",
+        disabledBackgroundColor: "#0d1117",
+        selectedBackgroundColor: "rgba(255, 255, 255, 0.08)",
+        borderColor: "#30363d",
+        disabledBorderColor: "#30363d",
+        selectedBorderColor: "rgba(255, 255, 255, 0.2)",
+        hoverColor: "#010203",
+        disabledHoverColor: "#010203",
+        selectedHoverColor: "rgba(255, 255, 255, 0.12)",
+        fontColor: "#eee",
+        disabledFontColor: "#eee",
+        selectedFontColor: "#eee",
+        fontSize: "14px",
+        fontWeight: "400",
+        imageWidth: "32px",
+        imageHeight: "32px",
+        imageRightPos: "auto",
+        imageLeftPos: "auto",
+        showToolTipDelay: 300,
+    },
+};
+
+export const PickerToolTipButtonStyle = createStyleStore(PickerToolTipButtonStyleConfig);
+
+//////////     P I C K E R     B U T T O N     //////////
+
+const PickerButtonStyleConfig: ComponentStyles = {
+    dark: {
+        width: "40px",
+        minWidth: "40px",
+        maxWidth: "40px",
+        height: "40px",
+        borderRadius: "5px",
+        backgroundColor: "#0d1117",
+        disabledBackgroundColor: "#161b22",
+        selectedBackgroundColor: "#0066ff",
+        borderColor: "#30363d",
+        disabledBorderColor: "#21262d",
+        selectedBorderColor: "#30363d",
+        hoverColor: "#010203",
+        disabledHoverColor: "#070a0f",
+        selectedHoverColor: "#0052cc",
+        fontColor: "#f0f6fc",
+        disabledFontColor: "#484f58",
+        selectedFontColor: "#f0f6fc",
+        fontSize: "1rem",
+        fontWeight: "400",
+        imageWidth: "32px",
+        imageHeight: "32px",
+        showToolTipDelay: 300,
+    },
+};
+
+export const PickerButtonStyle = createStyleStore(PickerButtonStyleConfig);
+
+//////////     C U S T O M     D A T E     B U T T O N     //////////
+
+const CustomDateButtonStyleConfig: ComponentStyles = {
+    dark: {
+        width: "40px",
+        height: "40px",
+        borderRadius: "5px",
+        backgroundColor: "#0d1117",
+        disabledBackgroundColor: "#161b22",
+        selectedBackgroundColor: "#30363d",
+        borderColor: "#30363d",
+        disabledBorderColor: "#21262d",
+        selectedBorderColor: "#484f58",
+        hoverColor: "#010203",
+        disabledHoverColor: "#070a0f",
+        selectedHoverColor: "#21262d",
+        fontColor: "#f0f6fc",
+        disabledFontColor: "#484f58",
+        selectedFontColor: "#f0f6fc",
+        fontSize: "1rem",
+        fontWeight: "400",
+        imageWidth: "32px",
+        imageHeight: "32px",
+        showToolTipDelay: 300,
+    },
+};
+
+export const CustomDateButtonStyle = createStyleStore(CustomDateButtonStyleConfig);
+
+//////////     S E L E C T E D     C U S T O M     D A T E     B U T T O N     //////////
+
+const SelectedCustomDateButtonStyleConfig: ComponentStyles = {
+    dark: {
+        width: "40px",
+        height: "40px",
+        borderRadius: "5px",
+        backgroundColor: "#0066ff",
+        disabledBackgroundColor: "#161b22",
+        selectedBackgroundColor: "#0061e6",
+        borderColor: "#30363d",
+        disabledBorderColor: "#21262d",
+        selectedBorderColor: "#30363d",
+        hoverColor: "#0052cc",
+        disabledHoverColor: "#070a0f",
+        selectedHoverColor: "#004db3",
+        fontColor: "#f0f6fc",
+        disabledFontColor: "#484f58",
+        selectedFontColor: "#f0f6fc",
+        fontSize: "1rem",
+        fontWeight: "400",
+        imageWidth: "32px",
+        imageHeight: "32px",
+        showToolTipDelay: 300,
+    },
+};
+
+export const SelectedCustomDateButtonStyle = createStyleStore(SelectedCustomDateButtonStyleConfig);
 
 //////////     T E X T     C O L O R S     //////////
 

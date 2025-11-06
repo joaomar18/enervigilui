@@ -127,19 +127,52 @@ export const DeviceNotificationStyle = createStyleStore(DeviceNotificationStyleC
 
 const RealTimeCardActionStyleConfig: ComponentStyles = {
     dark: {
-        width: "32px",
-        height: "32px",
-        borderRadius: "16px",
+        width: "40px",
+        height: "40px",
+        borderRadius: "20px",
         backgroundColor: "#1b1e26",
         borderColor: "#3b4250",
         hoverColor: "#3b4250",
-        imageWidth: "20px",
-        imageHeight: "20px",
+        imageWidth: "24px",
+        imageHeight: "24px",
         showToolTipDelay: 300,
     },
 };
 
 export const RealTimeCardActionStyle = createStyleStore(RealTimeCardActionStyleConfig);
+
+//////////     D E V I C E     R E A L     T I M E     C A R D     B U T T O N     //////////
+
+const RealTimeCardPeriodButtonStyleConfig: ComponentStyles = {
+    dark: {
+        width: "40px",
+        minWidth: "auto",
+        maxWidth: "auto",
+        height: "40px",
+        borderRadius: "20px",
+        backgroundColor: "#1b1e26",
+        disabledBackgroundColor: "#1b1e26",
+        selectedBackgroundColor: "#3b4250",
+        borderColor: "#3b4250",
+        disabledBorderColor: "#3b4250",
+        selectedBorderColor: "#6b7280",
+        hoverColor: "#3b4250",
+        disabledHoverColor: "#3b4250",
+        selectedHoverColor: "#4b5563",
+        fontColor: "#eee",
+        disabledFontColor: "#eee",
+        selectedFontColor: "#eee",
+        fontSize: "14px",
+        fontWeight: "400",
+        imageWidth: "32px",
+        imageHeight: "32px",
+        imageRightPos: "auto",
+        imageLeftPos: "auto",
+        showToolTipDelay: 300,
+    },
+};
+
+export const RealTimeCardButtonStyle = createStyleStore(RealTimeCardPeriodButtonStyleConfig);
 
 //////////     D E V I C E     R E A L     T I M E     C A R D     A C T I O N     T O O L     T I P     //////////
 

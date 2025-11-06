@@ -23,6 +23,7 @@
     export let titleColor: string | undefined = undefined;
     export let titleWeight: string | undefined = undefined;
     export let titlePaddingLeft: string | undefined = undefined;
+    export let titlePaddingRight: string | undefined = undefined;
     export let headerWidth: string | undefined = undefined;
     export let headerHeight: string | undefined = undefined;
     export let headerBorder: string | undefined = undefined;
@@ -47,6 +48,7 @@
         titleColor,
         titleWeight,
         titlePaddingLeft,
+        titlePaddingRight,
         headerWidth,
         headerHeight,
         headerBorder,
@@ -78,6 +80,7 @@
         --title-color: {mergedStyle.titleColor};
         --title-weight: {mergedStyle.titleWeight};
         --title-padding-left: {mergedStyle.titlePaddingLeft};
+        --title-padding-right: {mergedStyle.titlePaddingRight};
         --header-width: {mergedStyle.headerWidth};
         --header-height: {mergedStyle.headerHeight};
         --header-border: {mergedStyle.headerBorder};
@@ -146,15 +149,21 @@
         margin: 0;
         padding: 0;
         padding-left: var(--title-padding-left);
+        padding-right: var(--title-padding-right);
         text-align: left;
         color: var(--title-color);
         font-weight: var(--title-weight);
         font-size: var(--title-size);
+        flex: 1;
+        min-width: 0;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
     }
 
     /* Header slot area: flexible container for additional header content */
     .header .slot-content {
-        flex: 1;
+        width: fit-content;
         height: 100%;
     }
 

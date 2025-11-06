@@ -1,6 +1,6 @@
 <script lang="ts">
     import { onDestroy } from "svelte";
-    import { computePosition, flip, shift, offset } from "@floating-ui/dom";
+    import { computePosition, flip, shift, offset, type Placement } from "@floating-ui/dom";
     import { fade } from "svelte/transition";
     import { hasMouseCapability } from "$lib/stores/view/navigation";
 
@@ -19,6 +19,7 @@
     export let autoPosition: boolean = true;
     export let autoPositionContinuous: boolean = false;
     export let forceShowMobile: boolean = false;
+    export let alignType: "left" | "middle" | "right" = "middle";
     export let showToolTip: boolean;
 
     // Layout / styling props
@@ -96,8 +97,15 @@
     async function updatePosition(): Promise<void> {
         if (!parentElement || !tooltipElement) return;
 
+        let placement: string;
+        if (pushToTop) {
+            placement = alignType === "left" ? "top-start" : alignType === "right" ? "top-end" : "top";
+        } else {
+            placement = alignType === "left" ? "bottom-start" : alignType === "right" ? "bottom-end" : "bottom";
+        }
+
         const { x, y } = await computePosition(parentElement, tooltipElement, {
-            placement: pushToTop ? "top" : "bottom",
+            placement: placement as Placement,
             middleware: [offset({ mainAxis: parseInt(String(mergedStyle.offsetPx)) }), flip(), shift({ padding: parseInt(String(mergedStyle.offsetPx)) })],
         });
 

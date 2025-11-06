@@ -431,6 +431,10 @@ const textsObject: TextsObject = {
         PT: "Fase L3",
         EN: "L3 Phase",
     },
+    phaseShort: {
+        PT: "L",
+        EN: "L",
+    },
     total: {
         PT: "Total",
         EN: "Total",
@@ -498,6 +502,10 @@ const textsObject: TextsObject = {
     l3: {
         PT: "L3",
         EN: "L3",
+    },
+    totalShort: {
+        PT: "T",
+        EN: "T",
     },
     singlephase: {
         PT: "Monofásico",
@@ -826,6 +834,38 @@ const textsObject: TextsObject = {
     periodSelection: {
         PT: "Selecionar período",
         EN: "Select period",
+    },
+    phaseSelection: {
+        PT: "Selecionar fase elétrica",
+        EN: "Select electrical phase",
+    },
+    forwardEnergy: {
+        PT: "Energia Direta",
+        EN: "Forward Energy",
+    },
+    forwardEnergyShort: {
+        PT: "D",
+        EN: "F",
+    },
+    reverseEnergy: {
+        PT: "Energia Inversa",
+        EN: "Reverse Energy",
+    },
+    reverseEnergyShort: {
+        PT: "R",
+        EN: "I",
+    },
+    totalEnergy: {
+        PT: "Energia Total",
+        EN: "Total Energy",
+    },
+    totalEnergyShort: {
+        PT: "T",
+        EN: "T",
+    },
+    energyDirection: {
+        PT: "Selecionar direção da energia",
+        EN: "Select energy direction",
     },
 };
 
