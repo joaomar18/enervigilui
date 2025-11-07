@@ -8,6 +8,7 @@
     // Styles
     import { mergeStyle } from "$lib/style/components";
     import { GraphMetricStyle } from "$lib/style/graph";
+    import { onDestroy, onMount } from "svelte";
 
     // Style object (from theme)
     export let style: { [property: string]: string | number } | null = null;
@@ -66,12 +67,18 @@
 
     // Variables
     let showLoader = false;
+    let colStackWidthReached = false;
     let forceColStack = false;
+    let colStack = false;
     let loaderTimeout: number | null = null;
+    let numberOfVariables: number;
     let prevCategory: NodeCategory;
+    let containerEl: HTMLDivElement;
 
     // Reactive Statements
     $: forceColStack = String(mergedStyle.forceCollapse) === "TRUE";
+    $: colStack = forceColStack || colStackWidthReached;
+    $: numberOfVariables = Object.keys(metricsVariables).length;
 
     $: if (!dataFetched && !showLoader) {
         if (firstFetch && prevCategory === metricsCategory) {
@@ -90,6 +97,21 @@
         }
         showLoader = false;
     }
+
+    // Functions
+    function handleColumnStack(): void {
+        if (containerEl && numberOfVariables) {
+            colStackWidthReached = containerEl.offsetWidth < parseInt(String(mergedStyle.rowWidth)) * numberOfVariables;
+        }
+    }
+
+    onMount(() => {
+        window.addEventListener("resize", handleColumnStack);
+    });
+
+    onDestroy(() => {
+        window.removeEventListener("resize", handleColumnStack);
+    });
 </script>
 
 <!--
@@ -123,9 +145,11 @@
         --unit-weight: {mergedStyle.unitWeight};
         --no-data-label-color: {mergedStyle.noDataLabelColor};
         --no-data-label-weight: {mergedStyle.noDataLabelWeight};
+        --number-variables: {numberOfVariables};
     "
+    bind:this={containerEl}
     class="container"
-    class:force-col-stack={forceColStack}
+    class:col-stack={colStack}
 >
     <div class="content">
         {#each Object.entries(metricsVariables) as [key, metricVar] (metricVar.textKey)}
@@ -152,13 +176,8 @@
 </div>
 
 <style>
-    /* Container query context - Enables responsive behavior based on container width */
-    .container {
-        container-type: inline-size;
-    }
-
-    /* Force the container to display metrics on a column stack */
-    .container.force-col-stack {
+    /* Display metrics on a column stack */
+    .container.col-stack {
         .content {
             flex-direction: column;
             gap: 15px;
@@ -277,19 +296,5 @@
         color: var(--no-data-label-color);
         font-weight: var(--no-data-label-weight);
         width: 100%;
-    }
-
-    /* Responsive stacking - Switch to vertical layout when container is too narrow */
-    @container (max-width: calc(var(--row-width) * 1)) {
-        .content {
-            flex-direction: column;
-            gap: 15px;
-            align-items: start;
-        }
-        .row {
-            width: 100%;
-            padding: 0;
-            border-right: none;
-        }
     }
 </style>

@@ -1,4 +1,5 @@
 <script lang="ts">
+    import { onMount, onDestroy } from "svelte";
     import { NodePhase } from "$lib/types/nodes/base";
     import { EnergyDirectionFilter, LogSpanPeriod, SelectablePhaseFilter } from "$lib/types/view/nodes";
     import { SlidingWindow } from "$lib/logic/util/classes/SlidingWindow";
@@ -18,6 +19,7 @@
     export let availablePhases: Array<NodePhase>;
 
     // Variables
+    let mobileView = false;
     let selectedEnergyDirection: EnergyDirectionFilter = EnergyDirectionFilter.TOTAL;
     let selectedElectricalPhase: SelectablePhaseFilter = SelectablePhaseFilter.TOTAL;
     let selectedTimeSpan: LogSpanPeriod = LogSpanPeriod.currentDay;
@@ -30,9 +32,21 @@
     function getNewTimeSpan(initialDate: Date, endDate: Date): void {}
 
     function getNewDefaultTimeSpan(timeSpan: LogSpanPeriod): void {}
+
+    function getMobileView(): void {
+        mobileView = !(window.innerWidth >= 450);
+    }
+
+    onMount(() => {
+        window.addEventListener("resize", getMobileView);
+    });
+
+    onDestroy(() => {
+        window.removeEventListener("resize", getMobileView);
+    });
 </script>
 
-<ContentCard titleText={$texts.energyConsumption}>
+<ContentCard titleText={mobileView ? $texts.energyConsumptionShort : $texts.energyConsumption}>
     <div class="slot-div header" slot="header">
         <div class="actions-div">
             <div class="picker-div">

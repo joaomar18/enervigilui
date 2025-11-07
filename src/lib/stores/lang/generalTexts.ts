@@ -443,9 +443,17 @@ const textsObject: TextsObject = {
         PT: "Indicadores",
         EN: "Metrics",
     },
+    metricsShort: {
+        PT: "Indic.",
+        EN: "Metr.",
+    },
     energyConsumption: {
         PT: "Consumo de Energia",
         EN: "Energy Consumption",
+    },
+    energyConsumptionShort: {
+        PT: "Consumo",
+        EN: "Consumption",
     },
     addNode: {
         PT: "Adicionar Variável",
@@ -821,7 +829,7 @@ const textsObject: TextsObject = {
     },
     fullscreen: {
         PT: "Ecrã Inteiro",
-        EN: "Full screen"
+        EN: "Full screen",
     },
     selectedPeriod: {
         PT: "Período selecionado",

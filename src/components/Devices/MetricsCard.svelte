@@ -15,11 +15,13 @@
 
     // Styles
     import { RealTimeCardActionStyle, RealTimeCardActionToolTipStyle, RealTimeCardButtonStyle } from "$lib/style/device";
+    import { onDestroy, onMount } from "svelte";
 
     // Props
     export let availablePhases: Array<NodePhase>;
 
     // Variables
+    let mobileView = false;
     let selectedElectricalPhase: SelectablePhaseFilter = SelectablePhaseFilter.TOTAL;
     let selectedTimeSpan: LogSpanPeriod = LogSpanPeriod.currentDay;
     let initialDate: Date;
@@ -31,9 +33,21 @@
     function getNewTimeSpan(initialDate: Date, endDate: Date): void {}
 
     function getNewDefaultTimeSpan(timeSpan: LogSpanPeriod): void {}
+
+    function getMobileView(): void {
+        mobileView = !(window.innerWidth >= 450);
+    }
+
+    onMount(() => {
+        window.addEventListener("resize", getMobileView);
+    });
+
+    onDestroy(() => {
+        window.removeEventListener("resize", getMobileView);
+    });
 </script>
 
-<ContentCard titleText={$texts.metrics}>
+<ContentCard titleText={mobileView ? $texts.metricsShort : $texts.metrics}>
     <div class="slot-div header" slot="header">
         <div class="actions-div">
             <Action
