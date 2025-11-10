@@ -41,6 +41,11 @@ export enum SelectablePhaseFilter {
  * Used to filter energy data by directional flow: forward (consumed), reverse (generated), 
  * or total (bidirectional aggregate). Commonly applied in energy metering systems to
  * distinguish between energy consumption and energy production/feedback to the grid.
+ * 
+ * @enum {string}
+ * @property {string} FORWARD - Forward direction (energy consumed/imported).
+ * @property {string} REVERSE - Reverse direction (energy generated/exported).
+ * @property {string} TOTAL - Total of both forward and reverse directions.
  */
 export enum EnergyDirectionFilter {
     FORWARD = "Forward",

@@ -326,17 +326,6 @@
                             <DateRangeChecker fullWidth={true} {initialDate} {endDate} />
                         </div>
                         <div class="actions-div">
-                            {#if showDatePicker}
-                                <div class="date-picker-div">
-                                    <TimePeriodPicker
-                                        bind:selectedTimeSpan
-                                        bind:initialDate
-                                        bind:endDate
-                                        changeSpanPeriodCustom={(initial_date: Date, end_date: Date) => getNewTimeSpan(initial_date, end_date)}
-                                        changeSpanPeriod={(timeSpan: LogSpanPeriod) => getNewDefaultTimeSpan(timeSpan)}
-                                    />
-                                </div>
-                            {/if}
                             <div class="date-checker-div">
                                 <Action
                                     style={$GraphActionStyle}
@@ -350,6 +339,17 @@
                                 </Action>
                                 <DateRangeChecker bind:showToolTip={showDateRange} {initialDate} {endDate} />
                             </div>
+                            {#if showDatePicker}
+                                <div class="date-picker-div">
+                                    <TimePeriodPicker
+                                        bind:selectedTimeSpan
+                                        bind:initialDate
+                                        bind:endDate
+                                        changeSpanPeriodCustom={(initial_date: Date, end_date: Date) => getNewTimeSpan(initial_date, end_date)}
+                                        changeSpanPeriod={(timeSpan: LogSpanPeriod) => getNewDefaultTimeSpan(timeSpan)}
+                                    />
+                                </div>
+                            {/if}
                             <Action
                                 style={$GraphActionStyle}
                                 imageURL="/img/fullscreen.svg"

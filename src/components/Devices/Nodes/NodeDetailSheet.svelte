@@ -262,6 +262,8 @@
         nodeLogsFetched = true;
         nodeLogsFirstFetch = true;
     }
+
+    $: console.log(nodeLogs);
 </script>
 
 <!--
