@@ -31,7 +31,7 @@
     {#if dataAvailable}
         <div class="row">
             <span class="label">{$texts.total}</span>
-            <span class="value">{logPoint?.value}</span>
+            <span class="value" class:remove-right-padding={!unit}>{logPoint?.value}</span>
             <span class="unit">{unit}</span>
         </div>
     {/if}
@@ -69,6 +69,11 @@
         white-space: nowrap;
         overflow: hidden;
         text-overflow: ellipsis;
+    }
+
+    /* Remove right padding when the unit is empty */
+    .value.remove-right-padding {
+        padding-right: 0;
     }
 
     /* Unit display - Right-aligned area for measurement units with ellipsis overflow */

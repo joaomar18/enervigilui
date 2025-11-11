@@ -34,6 +34,10 @@
 
     function getNewDefaultTimeSpan(timeSpan: LogSpanPeriod): void {}
 
+    function getNewElectricalPhase(selectedPhase: SelectablePhaseFilter): void {
+        selectedElectricalPhase = selectedPhase;
+    }
+
     function getMobileView(): void {
         mobileView = !(window.innerWidth >= 450);
     }
@@ -73,7 +77,7 @@
                     <ElectricalPhasePicker
                         toolTipButtonStyle={$RealTimeCardButtonStyle}
                         bind:selectedPhase={selectedElectricalPhase}
-                        changePhaseFilter={(selectedPhase: SelectablePhaseFilter) => {}}
+                        changePhaseFilter={(selectedPhase: SelectablePhaseFilter) => getNewElectricalPhase(selectedPhase)}
                     />
                 </div>
             {/if}

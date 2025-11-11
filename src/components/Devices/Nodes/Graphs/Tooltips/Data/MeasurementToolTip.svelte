@@ -32,17 +32,17 @@
     {#if dataAvailable}
         <div class="row">
             <span class="label">{$texts.maxValueShort}</span>
-            <span class="value">{logPoint?.max_value}</span>
+            <span class="value" class:remove-right-padding={!unit}>{logPoint?.max_value}</span>
             <span class="unit">{unit}</span>
         </div>
         <div class="row">
             <span class="label">{$texts.averageValueShort}</span>
-            <span class="value">{logPoint?.average_value}</span>
+            <span class="value" class:remove-right-padding={!unit}>{logPoint?.average_value}</span>
             <span class="unit">{unit}</span>
         </div>
         <div class="row">
             <span class="label">{$texts.minValueShort}</span>
-            <span class="value">{logPoint?.min_value}</span>
+            <span class="value" class:remove-right-padding={!unit}>{logPoint?.min_value}</span>
             <span class="unit">{unit}</span>
         </div>
     {/if}
@@ -80,6 +80,11 @@
         white-space: nowrap;
         overflow: hidden;
         text-overflow: ellipsis;
+    }
+
+    /* Remove right padding when the unit is empty */
+    .value.remove-right-padding {
+        padding-right: 0;
     }
 
     /* Unit display - Right-aligned area for measurement units with ellipsis overflow */

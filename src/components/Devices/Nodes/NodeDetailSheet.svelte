@@ -262,8 +262,6 @@
         nodeLogsFetched = true;
         nodeLogsFirstFetch = true;
     }
-
-    $: console.log(nodeLogs);
 </script>
 
 <!--
@@ -499,7 +497,7 @@
                                 dataFetched={nodeLogsFetched}
                                 firstFetch={nodeLogsFirstFetch}
                                 globalMetrics={nodeLogs?.global_metrics}
-                                unit={nodeLogs?.unit}
+                                unit={nodeLogs?.unit ?? ""}
                                 decimalPlaces={nodeLogs?.decimal_places}
                                 bind:selectedTimeSpan={selectedHistoryTimeSpan}
                                 getNewTimeSpan={(initial_date: Date, end_date: Date) => loadNodeLogsWithCustomPeriod(initial_date, end_date)}

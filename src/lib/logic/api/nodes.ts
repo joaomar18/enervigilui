@@ -7,6 +7,7 @@ import { toISOStringLocal } from "../util/date";
 import type { NodeRecord, EditableNodeRecord } from "$lib/types/nodes/config";
 import type { NodeState, ProcessedNodeState, BaseNodeAdditionalInfo } from "$lib/types/nodes/realtime";
 import type { NodeLogs, ProcessedNodeLogs } from "$lib/types/nodes/logs";
+import type { EnergyDirectionFilter, SelectablePhaseFilter } from "$lib/types/view/nodes";
 
 /**
  * Fetches and processes the configuration for all nodes of a device by its ID.
@@ -127,7 +128,7 @@ export async function getNodeLogs(
     const time_zone = Intl.DateTimeFormat().resolvedOptions().timeZone;
 
     const { sucess, data } = await callAPI({
-        endpoint: "/api/nodes//get_logs_from_node",
+        endpoint: "/api/nodes/get_logs_from_node",
         method: "GET",
         params: { device_id, node_name: processedName, formatted, start_time: start_time_str, end_time: end_time_str, time_step, time_zone },
     });
@@ -140,4 +141,36 @@ export async function getNodeLogs(
     }
 
     return { nodeLogs };
+}
+
+export async function getEnergyConsumption(
+    device_id: number,
+    phase: SelectablePhaseFilter,
+    direction: EnergyDirectionFilter,
+    formatted: boolean | null = null,
+    start_time: Date | null = null,
+    end_time: Date | null = null,
+    time_step: string | null = null
+): Promise<{ energyConsumption: any }> {
+    let energyConsumption: any;
+    let start_time_str: string | null = null;
+    let end_time_str: string | null = null;
+    start_time_str = start_time !== null ? toISOStringLocal(start_time) : null;
+    end_time_str = end_time !== null ? toISOStringLocal(end_time) : null;
+    const time_zone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+
+    const { sucess, data } = await callAPI({
+        endpoint: "/api/nodes/get_energy_consumption",
+        method: "GET",
+        params: { device_id, phase, direction, formatted, start_time: start_time_str, end_time: end_time_str, time_step, time_zone },
+    });
+
+    if (sucess) {
+        energyConsumption = data;
+
+    } else {
+        throw new Error("Get energy consumption error");
+    }
+
+    return { energyConsumption };
 }

@@ -2,12 +2,15 @@
     import { onMount, onDestroy } from "svelte";
     import { NodePhase } from "$lib/types/nodes/base";
     import { EnergyDirectionFilter, LogSpanPeriod, SelectablePhaseFilter } from "$lib/types/view/nodes";
-    import { SlidingWindow } from "$lib/logic/util/classes/SlidingWindow";
+    import { getTimeSpanFromLogPeriod } from "$lib/logic/util/date";
+    import { getEnergyConsumption } from "$lib/logic/api/nodes";
     import ContentCard from "../General/ContentCard.svelte";
     import EnergyDirectionPicker from "../General/Pickers/EnergyDirectionPicker.svelte";
     import TimePeriodPicker from "../General/Pickers/TimePeriodPicker.svelte";
     import ElectricalPhasePicker from "../General/Pickers/ElectricalPhasePicker.svelte";
-    import type { NodeTimeSpan } from "$lib/types/view/nodes";
+
+    // Stores
+    import { currentDeviceID } from "$lib/stores/device/current";
 
     // Texts
     import { texts } from "$lib/stores/lang/generalTexts";
@@ -19,19 +22,72 @@
     export let availablePhases: Array<NodePhase>;
 
     // Variables
+    let energyConsumption: any | null = null;
     let mobileView = false;
     let selectedEnergyDirection: EnergyDirectionFilter = EnergyDirectionFilter.TOTAL;
     let selectedElectricalPhase: SelectablePhaseFilter = SelectablePhaseFilter.TOTAL;
     let selectedTimeSpan: LogSpanPeriod = LogSpanPeriod.currentDay;
     let initialDate: Date;
     let endDate: Date;
-    let timeSpans: SlidingWindow<NodeTimeSpan> = new SlidingWindow(10);
-    let enableGoBack: boolean = false;
+    let energyConsumptionFetched: boolean = false;
+    let energyConsumptionFirstFetch: boolean = false;
+
+    // Reactive Statements
+    $: if (!energyConsumptionFirstFetch) {
+        getInitialEnergyConsumption();
+    }
 
     // Functions
-    function getNewTimeSpan(initialDate: Date, endDate: Date): void {}
+    function getInitialEnergyConsumption(): void {
+        let { initial_date, end_date } = getTimeSpanFromLogPeriod(selectedTimeSpan);
+        setDateSpan({ initial_date, end_date });
+        loadEnergyConsumption();
+    }
 
-    function getNewDefaultTimeSpan(timeSpan: LogSpanPeriod): void {}
+    function setDateSpan(dateSpan: { initial_date: Date; end_date: Date }): void {
+        initialDate = dateSpan.initial_date;
+        endDate = dateSpan.end_date;
+    }
+
+    function getNewTimeSpan(initial_date: Date, end_date: Date): void {
+        setDateSpan({ initial_date, end_date });
+        loadEnergyConsumption();
+        selectedTimeSpan = LogSpanPeriod.customDate;
+    }
+
+    function getNewDefaultTimeSpan(timeSpan: LogSpanPeriod): void {
+        let { initial_date, end_date } = getTimeSpanFromLogPeriod(timeSpan);
+        setDateSpan({ initial_date, end_date });
+        loadEnergyConsumption();
+        selectedTimeSpan = timeSpan;
+    }
+
+    function getNewElectricalPhase(selectedPhase: SelectablePhaseFilter): void {
+        selectedElectricalPhase = selectedPhase;
+        loadEnergyConsumption();
+    }
+
+    function getNewEnergyDirection(selectedDirection: EnergyDirectionFilter): void {
+        selectedEnergyDirection = selectedDirection;
+        loadEnergyConsumption();
+    }
+
+    async function loadEnergyConsumption() {
+        if (!$currentDeviceID) {
+            return;
+        }
+        energyConsumptionFetched = false;
+        ({ energyConsumption } = await getEnergyConsumption(
+            $currentDeviceID,
+            selectedElectricalPhase,
+            selectedEnergyDirection,
+            initialDate !== null,
+            initialDate,
+            endDate,
+        ));
+        energyConsumptionFetched = true;
+        energyConsumptionFirstFetch = true;
+    }
 
     function getMobileView(): void {
         mobileView = !(window.innerWidth >= 450);
@@ -44,6 +100,8 @@
     onDestroy(() => {
         window.removeEventListener("resize", getMobileView);
     });
+
+    $: console.log(energyConsumption);
 </script>
 
 <ContentCard titleText={mobileView ? $texts.energyConsumptionShort : $texts.energyConsumption}>
@@ -53,7 +111,7 @@
                 <EnergyDirectionPicker
                     toolTipButtonStyle={$RealTimeCardButtonStyle}
                     bind:selectedDirection={selectedEnergyDirection}
-                    changeEnergyDirection={(selectedDirection: EnergyDirectionFilter) => {}}
+                    changeEnergyDirection={(selectedDirection: EnergyDirectionFilter) => getNewEnergyDirection(selectedDirection)}
                 />
             </div>
             {#if !availablePhases.includes(NodePhase.SINGLEPHASE)}
@@ -61,7 +119,7 @@
                     <ElectricalPhasePicker
                         toolTipButtonStyle={$RealTimeCardButtonStyle}
                         bind:selectedPhase={selectedElectricalPhase}
-                        changePhaseFilter={(selectedPhase: SelectablePhaseFilter) => {}}
+                        changePhaseFilter={(selectedPhase: SelectablePhaseFilter) => getNewElectricalPhase(selectedPhase)}
                     />
                 </div>
             {/if}

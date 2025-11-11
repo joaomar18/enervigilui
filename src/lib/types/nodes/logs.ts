@@ -32,6 +32,7 @@ export interface ProcessedBaseLogPoint {
  * Base interface for all metric types providing common structure.
  */
 export interface BaseMetrics {
+    unit: string | null;
 }
 
 /**
@@ -39,11 +40,19 @@ export interface BaseMetrics {
  * @property {number | null} max_value - Maximum value in the dataset
  * @property {number | null} average_value - Mean value of the dataset
  * @property {number | null} min_value - Minimum value in the dataset
+ * @property {string | null} min_value_start_time - ISO 8601 timestamp of when the minimum value period started
+ * @property {string | null} min_value_end_time - ISO 8601 timestamp of when the minimum value period ended
+ * @property {string | null} max_value_start_time - ISO 8601 timestamp of when the maximum value period started
+ * @property {string | null} max_value_end_time - ISO 8601 timestamp of when the maximum value period ended
  */
 export interface MeasurementMetrics extends BaseMetrics {
     max_value: number | null;
     average_value: number | null;
     min_value: number | null;
+    min_value_start_time: string | null;
+    min_value_end_time: string | null;
+    max_value_start_time: string | null;
+    max_value_end_time: string | null;
 }
 
 /**
@@ -56,7 +65,7 @@ export interface CounterMetrics extends BaseMetrics {
 
 /**
  * Raw node logs with metadata and unprocessed log points from backend API.
- * @property {string} unit - Measurement unit (e.g., "V", "A", "kW")
+ * @property {string | null} unit - Measurement unit (e.g., "V", "A", "kW")
  * @property {number | null} decimal_places - Number of decimal places for value display formatting
  * @property {NodeType} type - Data type of the logged values
  * @property {boolean} incremental - Whether this node accumulates values over time
@@ -65,7 +74,7 @@ export interface CounterMetrics extends BaseMetrics {
  * @property {BaseMetrics} global_metrics - Overall statistical metrics for the entire dataset
  */
 export interface NodeLogs {
-    unit: string;
+    unit: string | null;
     decimal_places: number | null;
     type: NodeType;
     incremental: boolean;
@@ -86,7 +95,7 @@ export interface NodeLogs {
  * @property {GraphType | null} graphType - Graph visualization type identifier for rendering the appropriate chart component
  */
 export interface ProcessedNodeLogs {
-    unit: string;
+    unit: string | null;
     decimal_places: number | null;
     type: NodeType;
     incremental: boolean;
