@@ -6,7 +6,7 @@
     import { FormattedTimeStep } from "$lib/types/date";
     import { LogSpanPeriod } from "$lib/types/view/nodes";
     import type { BaseLogPoint, BaseMetrics, ProcessedBaseLogPoint, ProcessedCounterLogPoint, ProcessedMeasurementLogPoint } from "$lib/types/nodes/logs";
-    import FullScreenGraph from "./FullScreenGraph.svelte";
+    import FullScreenBaseGraph from "./FullScreenBaseGraph.svelte";
     import Action from "../../../General/Action.svelte";
     import ToolTipText from "../../../General/ToolTipText.svelte";
     import DateRangeChecker from "../../../General/TimeDate/DateRangeChecker.svelte";
@@ -46,9 +46,7 @@
     export let firstFetch: boolean;
     export let globalMetrics: BaseMetrics | undefined;
     export let unit: string = "";
-    export let secondUnit: string = "";
     export let decimalPlaces: number | null = null;
-    export let secondDecimalPlaces: number | null = null;
 
     // Layout / styling props
     export let width: string | undefined = undefined;
@@ -243,15 +241,16 @@
 </script>
 
 <!--
-    Graph Component
+    Base Graph Component
     
-    A comprehensive interactive graph visualization component for time-series data display.
-    Features dynamic graph type switching (Measurement/Counter), real-time data updates,
-    interactive drill-down navigation via double-click, responsive design with container queries,
-    configurable metrics display, full-screen mode, date range selection, and comprehensive
-    theming support. Integrates with uPlot for high-performance rendering and provides
-    tooltip overlays, loading states, and accessibility features. Supports both measurement
-    data with min/max bands and counter/cumulative data visualization patterns.
+    A foundational interactive graph visualization component for time-series data display.
+    Provides core functionality for measurement and counter data types with clean separation
+    of concerns. Features interactive drill-down navigation via double-click, responsive design
+    with container queries, configurable metrics display, full-screen mode, date range selection,
+    and comprehensive theming support. Integrates with uPlot for high-performance rendering and
+    provides tooltip overlays, loading states, and accessibility features. Designed to handle
+    single-unit measurements and counter data while maintaining simplicity and performance.
+    For specialized energy consumption visualizations, use EnergyConsumptionGraph component.
 -->
 <div
     style="
@@ -289,19 +288,19 @@
     <div class="graph-div-wrapper">
         <div class="graph-div-content">
             {#if !fullScreen && showFullScreen}
-                <FullScreenGraph
+                <FullScreenBaseGraph
                     {data}
                     {timeStep}
                     {logSpanPeriod}
                     bind:show={showFullScreen}
                     {graphType}
-                    bind:initialDate
-                    bind:endDate
                     {dataFetched}
                     {firstFetch}
                     {globalMetrics}
                     {unit}
                     {decimalPlaces}
+                    bind:initialDate
+                    bind:endDate
                     bind:selectedTimeSpan
                     {goBackEnabled}
                     {goBack}
@@ -371,6 +370,7 @@
                             this={getGraphMetricsComponent(graphType)}
                             style={effectiveMetricStyle}
                             metrics={globalMetrics}
+                            {unit}
                             {decimalPlaces}
                             {dataFetched}
                             {firstFetch}
@@ -403,7 +403,7 @@
                         </div>
                         {#if graphType && gridElement}
                             <GraphToolTip {gridElement} {insideGraph} {cursorPos}>
-                                <svelte:component this={getGraphToolTipDisplayComponent(graphType)} {logPoint} {secondUnit}/>
+                                <svelte:component this={getGraphToolTipDisplayComponent(graphType)} {unit} {logPoint} />
                             </GraphToolTip>
                         {/if}
                     </div>

@@ -1,7 +1,7 @@
 <script lang="ts">
     import RightPanelSheet from "../../General/RightPanelSheet.svelte";
     import InlineLoader from "../../General/InlineLoader.svelte";
-    import Graph from "./Graphs/Graph.svelte";
+    import BaseGraph from "./Graphs/BaseGraph.svelte";
     import ElapsedDateTime from "../../General/TimeDate/ElapsedDateTime.svelte";
     import TimePeriodPicker from "../../General/Pickers/TimePeriodPicker.svelte";
     import { LogSpanPeriod } from "$lib/types/view/nodes";
@@ -487,18 +487,18 @@
                             />
                         </div>
                         <div class="chart-container">
-                            <Graph
+                            <BaseGraph
                                 data={nodeLogs?.points}
                                 timeStep={nodeLogs?.time_step}
                                 logSpanPeriod={selectedHistoryTimeSpan}
                                 graphType={nodeState.graphType}
-                                {initialDate}
-                                {endDate}
                                 dataFetched={nodeLogsFetched}
                                 firstFetch={nodeLogsFirstFetch}
                                 globalMetrics={nodeLogs?.global_metrics}
                                 unit={nodeLogs?.unit ?? ""}
                                 decimalPlaces={nodeLogs?.decimal_places}
+                                {initialDate}
+                                {endDate}
                                 bind:selectedTimeSpan={selectedHistoryTimeSpan}
                                 getNewTimeSpan={(initial_date: Date, end_date: Date) => loadNodeLogsWithCustomPeriod(initial_date, end_date)}
                                 getNewDefaultTimeSpan={(timeSpan: LogSpanPeriod) => loadNodeLogsWithSpanPeriod(timeSpan)}

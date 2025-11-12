@@ -7,14 +7,13 @@
 
     // Props
     export let logPoint: CounterLogPoint | null;
+    export let unit: string = "";
 
     // Variables
     let dataAvailable: boolean = false;
-    let unit: string = "";
 
     // Reactive Statements
     $: dataAvailable = logPoint?.value !== null;
-    $: unit = logPoint?.unit ?? "";
 </script>
 
 <!--

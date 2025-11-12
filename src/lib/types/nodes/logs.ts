@@ -32,7 +32,6 @@ export interface ProcessedBaseLogPoint {
  * Base interface for all metric types providing common structure.
  */
 export interface BaseMetrics {
-    unit: string | null;
 }
 
 /**
@@ -59,7 +58,7 @@ export interface MeasurementMetrics extends BaseMetrics {
  * Metrics for single-value data without statistical aggregations.
  * Used for derived values, ratios, or metrics that represent a single
  * point value rather than a range with min/max/average.
- * 
+ *
  * @property {number | null} value - The single metric value
  */
 export interface SingleValueMetrics extends BaseMetrics {
@@ -74,6 +73,13 @@ export interface CounterMetrics extends BaseMetrics {
     value: number | null;
 }
 
+/**
+ * Metrics for energy consumption data display with electrical power analysis.
+ * @property {number | null} active_energy - Active energy consumption in kWh (real power consumed)
+ * @property {number | null} reactive_energy - Reactive energy consumption in kVArh (power used for magnetic fields)
+ * @property {number | null} power_factor - Power factor value (ratio of active to apparent power, typically 0-1)
+ * @property {string | null} power_factor_direction - Direction indicator for power factor (e.g., "leading", "lagging", "unity")
+ */
 export interface EnergyConsumptionMetrics extends BaseMetrics {
     active_energy: number | null;
     reactive_energy: number | null;
@@ -81,11 +87,10 @@ export interface EnergyConsumptionMetrics extends BaseMetrics {
     power_factor_direction: string | null;
 }
 
-
 /**
  * Raw node logs with metadata and unprocessed log points from backend API.
  * @property {string | null} unit - Measurement unit (e.g., "V", "A", "kW")
- * @property {number | null} decimal_places - Number of decimal places for value display formatting
+ * @property {number | null} decimal_places - Number of decimal places for value formatting
  * @property {NodeType} type - Data type of the logged values
  * @property {boolean} incremental - Whether this node accumulates values over time
  * @property {Array<BaseLogPoint>} points - Array of raw log data points with ISO timestamps
@@ -105,7 +110,7 @@ export interface NodeLogs {
 /**
  * Processed node logs with metadata, UI components, and chart-ready data points.
  * @property {string} unit - Measurement unit (e.g., "V", "A", "kW")
- * @property {number | null} decimal_places - Number of decimal places for value display formatting
+ * @property {number | null} decimal_places - Number of decimal places for value formatting
  * @property {NodeType} type - Data type of the logged values
  * @property {boolean} incremental - Whether this node accumulates values over time
  * @property {Array<ProcessedBaseLogPoint>} points - Array of processed log data points with Unix timestamps
@@ -135,5 +140,11 @@ export type CounterLogPoint = BaseLogPoint & CounterMetrics;
 
 /** Processed log point combining Unix timestamps and counter value. */
 export type ProcessedCounterLogPoint = ProcessedBaseLogPoint & CounterMetrics;
+
+/** Log point combining time range and energy consumption metrics. */
+export type EnergyConsumptionLogPoint = BaseLogPoint & EnergyConsumptionMetrics;
+
+/** Processed log point combining Unix timestamps and energy consumption metrics. */
+export type ProcessedEnergyConsumptionLogPoint = ProcessedBaseLogPoint & EnergyConsumptionMetrics;
 
 /*****     O B J E C T S     *****/

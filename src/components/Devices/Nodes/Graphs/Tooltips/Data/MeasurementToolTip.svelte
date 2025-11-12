@@ -7,14 +7,13 @@
 
     // Props
     export let logPoint: MeasurementLogPoint | null;
+    export let unit: string = "";
 
     // Variables
     let dataAvailable: boolean = false;
-    let unit: string = "";
-
+    
     // Reactive Statements
     $: dataAvailable = logPoint?.average_value !== null && logPoint?.min_value !== null && logPoint?.max_value !== null;
-    $: unit = logPoint?.unit ?? "";
 </script>
 
 <!--

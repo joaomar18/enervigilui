@@ -4,7 +4,7 @@
     import { FormattedTimeStep } from "$lib/types/date";
     import { LogSpanPeriod } from "$lib/types/view/nodes";
     import FullScreenPanel from "../../../Dashboard/FullScreenPanel.svelte";
-    import Graph from "./Graph.svelte";
+    import Graph from "./BaseGraph.svelte";
 
     // Styles
     import { FullScreenBaseGraphStyle, FullScreenGraphMetricStyle } from "$lib/style/graph";
@@ -32,15 +32,16 @@
 </script>
 
 <!--
-    FullScreenGraph Component
+    FullScreen Base Graph Component
     
-    A full-screen wrapper for the Graph component that provides an immersive data visualization
-    experience. Combines the FullScreenPanel overlay with a Graph instance configured for
+    A full-screen wrapper for the BaseGraph component that provides an immersive data visualization
+    experience. Combines the FullScreenPanel overlay with a BaseGraph instance configured for
     full-screen display, featuring enhanced styling, date picker controls, and modal interaction
-    patterns. Inherits all graph functionality including interactive drill-down navigation,
+    patterns. Inherits all base graph functionality including interactive drill-down navigation,
     real-time data updates, and comprehensive theming while providing a distraction-free
     viewing mode for detailed data analysis. Handles state synchronization between the modal
-    overlay and the embedded graph component.
+    overlay and the embedded base graph component. Designed for measurement and counter data
+    visualization in full-screen mode.
 -->
 <FullScreenPanel bind:show>
     <Graph
