@@ -46,7 +46,9 @@
     export let firstFetch: boolean;
     export let globalMetrics: BaseMetrics | undefined;
     export let unit: string = "";
+    export let secondUnit: string = "";
     export let decimalPlaces: number | null = null;
+    export let secondDecimalPlaces: number | null = null;
 
     // Layout / styling props
     export let width: string | undefined = undefined;
@@ -369,7 +371,6 @@
                             this={getGraphMetricsComponent(graphType)}
                             style={effectiveMetricStyle}
                             metrics={globalMetrics}
-                            {unit}
                             {decimalPlaces}
                             {dataFetched}
                             {firstFetch}
@@ -402,7 +403,7 @@
                         </div>
                         {#if graphType && gridElement}
                             <GraphToolTip {gridElement} {insideGraph} {cursorPos}>
-                                <svelte:component this={getGraphToolTipDisplayComponent(graphType)} {logPoint} {unit} />
+                                <svelte:component this={getGraphToolTipDisplayComponent(graphType)} {logPoint} {secondUnit}/>
                             </GraphToolTip>
                         {/if}
                     </div>

@@ -18,20 +18,20 @@ export enum PowerFactorDirection {
 }
 
 /**
- * Energy consumption data structure for electrical monitoring.
- * Captures active and reactive energy consumption along with power factor metrics.
+ * Comprehensive energy consumption data structure for electrical monitoring and analysis.
+ * Aggregates active and reactive energy consumption with power quality metrics over time periods.
  *
  * @interface EnergyConsumptionType
- * @property {NodeLogs} active_energy - Active energy consumption logs (real power, measured in kWh).
- * @property {NodeLogs} reactive_energy - Reactive energy consumption logs (imaginary power, measured in kVArh).
- * @property {number | null} power_factor - Power factor value (ratio of active to apparent power, range: 0-1).
- * @property {PowerFactorDirection | null} power_factor_direction - Direction indicator for power factor (leading/lagging/unitary).
+ * @property {NodeLogs} active_energy - Historical logs of active energy consumption (real power, measured in kWh).
+ * @property {NodeLogs} reactive_energy - Historical logs of reactive energy consumption (imaginary power, measured in kVArh).
+ * @property {NodeLogs} power_factor - Historical logs of power factor values (ratio of active to apparent power, 0-1 range).
+ * @property {NodeLogs} power_factor_direction - Historical logs of power factor direction states (leading/lagging/unitary).
  */
 export interface EnergyConsumptionType {
     active_energy: NodeLogs;
     reactive_energy: NodeLogs;
-    power_factor: number | null;
-    power_factor_direction: PowerFactorDirection | null;
+    power_factor: NodeLogs;
+    power_factor_direction: NodeLogs;
 }
 
 export interface PeakPowerType {

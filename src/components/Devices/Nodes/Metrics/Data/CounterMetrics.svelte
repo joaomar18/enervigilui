@@ -9,7 +9,6 @@
 
     // Props
     export let metrics: CounterMetrics;
-    export let unit: string = "";
     export let decimalPlaces: number | null;
     export let dataFetched: boolean;
     export let firstFetch: boolean;
@@ -17,6 +16,7 @@
 
     // Variables
     let metricsVariables: Record<string, { textKey: string; imageFile: string; value: any }>;
+    let unit: string = "";
 
     // Reactive Statements
     $: if (metrics && roundMetrics && decimalPlaces !== null && decimalPlaces !== undefined) {
@@ -26,6 +26,7 @@
     $: if (metrics) {
         metricsVariables = getMetricsViewVariables(NodeCategory.Counters, metrics);
     }
+    $: unit = metrics?.unit ?? "";
 </script>
 
 <!--

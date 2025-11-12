@@ -35,7 +35,7 @@ export abstract class BaseGraphObject<T extends BaseLogPoint> {
     protected container: HTMLElement;
     protected graph: uPlot | null = null;
     protected gridElement: HTMLDivElement | null = null;
-    protected labels: Array<string> = [];
+    protected labels: Array<string> = []; // X Axis Labels
     protected noData: boolean = true;
     protected xPos: number | undefined = undefined;
     protected yPos: number | undefined = undefined;

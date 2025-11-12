@@ -56,12 +56,31 @@ export interface MeasurementMetrics extends BaseMetrics {
 }
 
 /**
+ * Metrics for single-value data without statistical aggregations.
+ * Used for derived values, ratios, or metrics that represent a single
+ * point value rather than a range with min/max/average.
+ * 
+ * @property {number | null} value - The single metric value
+ */
+export interface SingleValueMetrics extends BaseMetrics {
+    value: number | null;
+}
+
+/**
  * Metrics for counter/accumulator data display.
  * @property {number | null} value - Current accumulated value
  */
 export interface CounterMetrics extends BaseMetrics {
     value: number | null;
 }
+
+export interface EnergyConsumptionMetrics extends BaseMetrics {
+    active_energy: number | null;
+    reactive_energy: number | null;
+    power_factor: number | null;
+    power_factor_direction: string | null;
+}
+
 
 /**
  * Raw node logs with metadata and unprocessed log points from backend API.
