@@ -8,6 +8,8 @@
     import EnergyDirectionPicker from "../General/Pickers/EnergyDirectionPicker.svelte";
     import TimePeriodPicker from "../General/Pickers/TimePeriodPicker.svelte";
     import ElectricalPhasePicker from "../General/Pickers/ElectricalPhasePicker.svelte";
+    import type { EnergyConsumptionType } from "$lib/types/device/energy";
+    import type { EnergyConsumptionMetrics, ProcessedEnergyConsumptionLogPoint } from "$lib/types/nodes/logs";
 
     // Stores
     import { currentDeviceID } from "$lib/stores/device/current";
@@ -22,7 +24,9 @@
     export let availablePhases: Array<NodePhase>;
 
     // Variables
-    let energyConsumption: any | null = null;
+    let energyLogs: EnergyConsumptionType | null = null;
+    let mergedPoints: Array<ProcessedEnergyConsumptionLogPoint>;
+    let mergedGlobalMetrics: EnergyConsumptionMetrics;
     let mobileView = false;
     let selectedEnergyDirection: EnergyDirectionFilter = EnergyDirectionFilter.TOTAL;
     let selectedElectricalPhase: SelectablePhaseFilter = SelectablePhaseFilter.TOTAL;
@@ -77,7 +81,7 @@
             return;
         }
         energyConsumptionFetched = false;
-        ({ energyConsumption } = await getEnergyConsumption(
+        ({ energyLogs, mergedPoints, mergedGlobalMetrics } = await getEnergyConsumption(
             $currentDeviceID,
             selectedElectricalPhase,
             selectedEnergyDirection,
@@ -100,8 +104,6 @@
     onDestroy(() => {
         window.removeEventListener("resize", getMobileView);
     });
-
-    $: console.log(energyConsumption);
 </script>
 
 <ContentCard titleText={mobileView ? $texts.energyConsumptionShort : $texts.energyConsumption}>

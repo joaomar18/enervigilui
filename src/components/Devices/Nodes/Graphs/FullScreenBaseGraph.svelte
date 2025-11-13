@@ -4,7 +4,7 @@
     import { FormattedTimeStep } from "$lib/types/date";
     import { LogSpanPeriod } from "$lib/types/view/nodes";
     import FullScreenPanel from "../../../Dashboard/FullScreenPanel.svelte";
-    import Graph from "./BaseGraph.svelte";
+    import BaseGraph from "./BaseGraph.svelte";
 
     // Styles
     import { FullScreenBaseGraphStyle, FullScreenGraphMetricStyle } from "$lib/style/graph";
@@ -44,7 +44,7 @@
     visualization in full-screen mode.
 -->
 <FullScreenPanel bind:show>
-    <Graph
+    <BaseGraph
         style={$FullScreenBaseGraphStyle}
         metricsStyle={$FullScreenGraphMetricStyle}
         {data}

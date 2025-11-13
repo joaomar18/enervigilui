@@ -1,12 +1,13 @@
 import { callAPI } from "$lib/logic/api/api";
-import { processInitialNodes, initNodes, processNodesState, processNodeLogs } from "../factory/nodes";
+import { processInitialNodes, initNodes, processNodesState, processNodeLogs, mergeEnergyConsumptionLogs } from "../factory/nodes";
 import { navigateTo } from "../view/navigation";
 import { NodePhase } from "$lib/types/nodes/base";
 import { addPrefix, getNodePrefix, removePrefix } from "../util/nodes";
 import { toISOStringLocal } from "../util/date";
+import type { EnergyConsumptionType } from "$lib/types/device/energy";
 import type { NodeRecord, EditableNodeRecord } from "$lib/types/nodes/config";
 import type { NodeState, ProcessedNodeState, BaseNodeAdditionalInfo } from "$lib/types/nodes/realtime";
-import type { NodeLogs, ProcessedNodeLogs } from "$lib/types/nodes/logs";
+import type { EnergyConsumptionMetrics, NodeLogs, ProcessedEnergyConsumptionLogPoint, ProcessedNodeLogs } from "$lib/types/nodes/logs";
 import type { EnergyDirectionFilter, SelectablePhaseFilter } from "$lib/types/view/nodes";
 
 /**
@@ -71,6 +72,16 @@ export async function getDeviceNodesState(id: number): Promise<{ nodesState: Rec
     return { nodesState, processedNodesState };
 }
 
+/**
+ * Fetches additional information for a specific node of a device.
+ * Processes the node name with the appropriate phase prefix before making the API call.
+ *
+ * @param device_id - The unique identifier of the device
+ * @param nodeName - The name of the node to fetch additional information for
+ * @param nodePhase - The electrical phase of the node
+ * @returns A promise resolving to an object containing the node's additional information
+ * @throws Error if the API call fails
+ */
 export async function getNodeAdditionalInfo(
     device_id: number,
     nodeName: string,
@@ -143,6 +154,21 @@ export async function getNodeLogs(
     return { nodeLogs };
 }
 
+/**
+ * Fetches and processes energy consumption data for a device across multiple metrics.
+ * Retrieves active energy, reactive energy, power factor, and power factor direction data,
+ * then merges them into unified time-aligned log points for visualization.
+ *
+ * @param device_id - The unique identifier of the device
+ * @param phase - The electrical phase filter (single-phase, three-phase total, or individual phases)
+ * @param direction - Energy direction filter (consumed, produced, or both)
+ * @param formatted - Whether to return formatted data (optional)
+ * @param start_time - Start date for the energy consumption query (optional)
+ * @param end_time - End date for the energy consumption query (optional)
+ * @param time_step - Time aggregation step for the data (optional)
+ * @returns A promise resolving to raw energy logs, merged processed points, and combined global metrics
+ * @throws Error if the API call fails
+ */
 export async function getEnergyConsumption(
     device_id: number,
     phase: SelectablePhaseFilter,
@@ -151,8 +177,10 @@ export async function getEnergyConsumption(
     start_time: Date | null = null,
     end_time: Date | null = null,
     time_step: string | null = null
-): Promise<{ energyConsumption: any }> {
-    let energyConsumption: any;
+): Promise<{ energyLogs: EnergyConsumptionType, mergedPoints: Array<ProcessedEnergyConsumptionLogPoint>, mergedGlobalMetrics: EnergyConsumptionMetrics }> {
+    let energyLogs: EnergyConsumptionType;
+    let mergedPoints: Array<ProcessedEnergyConsumptionLogPoint>;
+    let mergedGlobalMetrics: EnergyConsumptionMetrics;
     let start_time_str: string | null = null;
     let end_time_str: string | null = null;
     start_time_str = start_time !== null ? toISOStringLocal(start_time) : null;
@@ -166,11 +194,12 @@ export async function getEnergyConsumption(
     });
 
     if (sucess) {
-        energyConsumption = data;
+        energyLogs = (data as EnergyConsumptionType);
+        ({ mergedPoints, mergedGlobalMetrics } = mergeEnergyConsumptionLogs(energyLogs));
 
     } else {
         throw new Error("Get energy consumption error");
     }
 
-    return { energyConsumption };
+    return { energyLogs, mergedPoints, mergedGlobalMetrics };
 }

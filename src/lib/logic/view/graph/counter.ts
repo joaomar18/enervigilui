@@ -30,15 +30,17 @@ export class CounterGraphObject extends BaseGraphObject<CounterLogPoint> {
     /**
      * Updates graph data points with optional decimal rounding while maintaining array reference.
      */
-    updatePoints(points: Array<ProcessedCounterLogPoint>, decimalPlaces: number | null, roundPoints: boolean = false): void {
-        if (decimalPlaces === null || !roundPoints) {
+    updatePoints(points: Array<ProcessedCounterLogPoint>, roundPoints: boolean = false, config: {
+        decimalPlaces?: number | null;
+    } = { decimalPlaces: null }): void {
+        if (!config.decimalPlaces || !roundPoints) {
             this.points.length = 0;
             this.points.push(...points);
         }
         else {
             const roundedPoints = points.map(point => ({
                 ...point,
-                value: point.value === null ? null : Number(point.value.toFixed(decimalPlaces))
+                value: point.value === null ? null : config.decimalPlaces === null ? point.value : Number(point.value.toFixed(config.decimalPlaces))
             }));
             this.points.length = 0;
             this.points.push(...roundedPoints);

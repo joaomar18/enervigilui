@@ -5,7 +5,6 @@
     import { getGraphMetricsComponent, getGraphToolTipDisplayComponent, getGraphStyle } from "$lib/logic/view/graph/helpers";
     import { FormattedTimeStep } from "$lib/types/date";
     import { LogSpanPeriod } from "$lib/types/view/nodes";
-    import type { BaseLogPoint, BaseMetrics, ProcessedBaseLogPoint, ProcessedCounterLogPoint, ProcessedMeasurementLogPoint } from "$lib/types/nodes/logs";
     import FullScreenBaseGraph from "./FullScreenBaseGraph.svelte";
     import Action from "../../../General/Action.svelte";
     import ToolTipText from "../../../General/ToolTipText.svelte";
@@ -15,6 +14,7 @@
     import TimePeriodPicker from "../../../General/Pickers/TimePeriodPicker.svelte";
     import { MeasurementGraphObject } from "$lib/logic/view/graph/measurement";
     import { CounterGraphObject } from "$lib/logic/view/graph/counter";
+    import type { BaseLogPoint, BaseMetrics, ProcessedBaseLogPoint, ProcessedCounterLogPoint, ProcessedMeasurementLogPoint } from "$lib/types/nodes/logs";
 
     // Texts
     import { selectedLang } from "$lib/stores/lang/definition";
@@ -47,6 +47,9 @@
     export let globalMetrics: BaseMetrics | undefined;
     export let unit: string = "";
     export let decimalPlaces: number | null = null;
+    export let useExternalGraph: boolean = false;
+    export let externalGraph: BaseGraphObject<BaseLogPoint> | null = null;
+    export let externalGraphContainer: HTMLDivElement | null = null;
 
     // Layout / styling props
     export let width: string | undefined = undefined;
@@ -144,20 +147,27 @@
         showLoader = false;
     }
 
-    $: if (graphType && graphContainer) {
+    $: if (!useExternalGraph && graphType && graphContainer) {
         createGraphObject();
     }
 
-    $: if (graph && dataFetched && data && timeStep && $selectedLang) {
+    $: if (!useExternalGraph && graph && dataFetched && data && timeStep && $selectedLang) {
         updateGraphData();
     }
 
-    $: if (graphContainer && graph) {
+    $: if (
+        ((!useExternalGraph && graphContainer) || (useExternalGraph && externalGraphContainer)) &&
+        ((!useExternalGraph && graph) || (useExternalGraph && externalGraph))
+    ) {
         if (!resizeObserver) {
             resizeObserver = new ResizeObserver(() => {
                 handleResize();
             });
-            resizeObserver.observe(graphContainer);
+            if (!useExternalGraph) {
+                resizeObserver.observe(graphContainer);
+            } else if (externalGraphContainer) {
+                resizeObserver.observe(externalGraphContainer);
+            }
         }
     }
 
@@ -165,6 +175,19 @@
     export let getNewTimeSpan: (startTime: Date, endTime: Date) => void;
     export let getNewDefaultTimeSpan: (timeSpan: LogSpanPeriod) => void;
     export let goBack: () => void;
+
+    export function hoveredLogPointChange(currentLogPoint: BaseLogPoint | null): void {
+        insideGraph = !!currentLogPoint;
+        logPoint = currentLogPoint;
+    }
+
+    export function mousePositionChange(xPos: number | undefined, yPos: number | undefined): void {
+        cursorPos = { x: xPos, y: yPos };
+    }
+
+    export function gridDoubleClick(startTime: Date, endTime: Date): void {
+        getNewTimeSpan(startTime, endTime);
+    }
 
     // Functions
     function createGraphInstance(type: GraphType, container: HTMLDivElement, data: ProcessedBaseLogPoint[] | undefined): BaseGraphObject<any> {
@@ -185,6 +208,9 @@
                     gridDoubleClick,
                     data ? (data as ProcessedCounterLogPoint[]) : undefined,
                 ),
+            [GraphType.EnergyConsumption]: () => {
+                throw new Error(`Energy Consumption Graph needs an external implementation.`);
+            },
         };
 
         return graphMap[type]();
@@ -199,23 +225,10 @@
         });
     }
 
-    function hoveredLogPointChange(currentLogPoint: BaseLogPoint | null): void {
-        insideGraph = !!currentLogPoint;
-        logPoint = currentLogPoint;
-    }
-
-    function mousePositionChange(xPos: number | undefined, yPos: number | undefined): void {
-        cursorPos = { x: xPos, y: yPos };
-    }
-
-    function gridDoubleClick(startTime: Date, endTime: Date): void {
-        getNewTimeSpan(startTime, endTime);
-    }
-
     function updateGraphData(): void {
         if (graph && data && timeStep) {
             graph.destroy();
-            graph.updatePoints(data, decimalPlaces, true);
+            graph.updatePoints(data, true, { decimalPlaces });
             graph.createGraph(timeStep, logSpanPeriod, mergedStyle);
             gridElement = graph.getGridElement();
             graphCreated = true;
@@ -224,8 +237,10 @@
     }
 
     function handleResize(): void {
-        if (graph) {
+        if (!useExternalGraph && graph) {
             graph.resize(mergedStyle);
+        } else if (useExternalGraph && externalGraph) {
+            externalGraph.resize(mergedStyle);
         }
     }
 
@@ -288,25 +303,29 @@
     <div class="graph-div-wrapper">
         <div class="graph-div-content">
             {#if !fullScreen && showFullScreen}
-                <FullScreenBaseGraph
-                    {data}
-                    {timeStep}
-                    {logSpanPeriod}
-                    bind:show={showFullScreen}
-                    {graphType}
-                    {dataFetched}
-                    {firstFetch}
-                    {globalMetrics}
-                    {unit}
-                    {decimalPlaces}
-                    bind:initialDate
-                    bind:endDate
-                    bind:selectedTimeSpan
-                    {goBackEnabled}
-                    {goBack}
-                    {getNewTimeSpan}
-                    {getNewDefaultTimeSpan}
-                />
+                {#if !useExternalGraph}
+                    <FullScreenBaseGraph
+                        {data}
+                        {timeStep}
+                        {logSpanPeriod}
+                        bind:show={showFullScreen}
+                        {graphType}
+                        {dataFetched}
+                        {firstFetch}
+                        {globalMetrics}
+                        {unit}
+                        {decimalPlaces}
+                        bind:initialDate
+                        bind:endDate
+                        bind:selectedTimeSpan
+                        {goBackEnabled}
+                        {goBack}
+                        {getNewTimeSpan}
+                        {getNewDefaultTimeSpan}
+                    />
+                {:else}
+                    <slot name="full-screen" />
+                {/if}
             {/if}
             <div class="header">
                 <div class="header-content">
@@ -365,17 +384,21 @@
                     </div>
                 </div>
                 <div class="metrics-section">
-                    {#if globalMetrics}
-                        <svelte:component
-                            this={getGraphMetricsComponent(graphType)}
-                            style={effectiveMetricStyle}
-                            metrics={globalMetrics}
-                            {unit}
-                            {decimalPlaces}
-                            {dataFetched}
-                            {firstFetch}
-                            roundMetrics={graphType === GraphType.Counter}
-                        />
+                    {#if !useExternalGraph}
+                        {#if globalMetrics}
+                            <svelte:component
+                                this={getGraphMetricsComponent(graphType)}
+                                style={effectiveMetricStyle}
+                                metrics={globalMetrics}
+                                {unit}
+                                {decimalPlaces}
+                                {dataFetched}
+                                {firstFetch}
+                                roundMetrics={graphType === GraphType.Counter}
+                            />
+                        {/if}
+                    {:else}
+                        <slot name="metrics" />
                     {/if}
                 </div>
             </div>
@@ -384,29 +407,33 @@
                     <CircularLoader wrapperTopLeftRadius="0px" wrapperTopRightRadius="0px" wrapperBottomLeftRadius="0px" wrapperBottomRightRadius="0px" />
                 </div>
                 <div class="graph-main">
-                    <div class="unit-div">
-                        <div class="unit-content">
-                            <div class="unit-wrapper">
-                                {#if graphCreated && !graphNoData}
-                                    <span class="unit-label">{unit}</span>
-                                {/if}
+                    {#if !useExternalGraph}
+                        <div class="unit-div">
+                            <div class="unit-content">
+                                <div class="unit-wrapper">
+                                    {#if graphCreated && !graphNoData}
+                                        <span class="unit-label">{unit}</span>
+                                    {/if}
+                                </div>
                             </div>
                         </div>
-                    </div>
-                    <div class="graph-div" bind:this={graphContainer}>
-                        <div class="y-axis-inner-div">
-                            <div class="y-axis-inner-content">
-                                {#if graphCreated && graphNoData}
-                                    <span class="no-data-label">{$texts.noDataAvailable}</span>
-                                {/if}
+                        <div class="graph-div" bind:this={graphContainer}>
+                            <div class="y-axis-inner-div">
+                                <div class="y-axis-inner-content">
+                                    {#if graphCreated && graphNoData}
+                                        <span class="no-data-label">{$texts.noDataAvailable}</span>
+                                    {/if}
+                                </div>
                             </div>
+                            {#if graphType && gridElement}
+                                <GraphToolTip {gridElement} {insideGraph} {cursorPos}>
+                                    <svelte:component this={getGraphToolTipDisplayComponent(graphType)} {unit} {logPoint} />
+                                </GraphToolTip>
+                            {/if}
                         </div>
-                        {#if graphType && gridElement}
-                            <GraphToolTip {gridElement} {insideGraph} {cursorPos}>
-                                <svelte:component this={getGraphToolTipDisplayComponent(graphType)} {unit} {logPoint} />
-                            </GraphToolTip>
-                        {/if}
-                    </div>
+                    {:else}
+                        <slot name="graph" />
+                    {/if}
                 </div>
             </div>
         </div>

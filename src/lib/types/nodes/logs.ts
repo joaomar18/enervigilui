@@ -59,10 +59,10 @@ export interface MeasurementMetrics extends BaseMetrics {
  * Used for derived values, ratios, or metrics that represent a single
  * point value rather than a range with min/max/average.
  *
- * @property {number | null} value - The single metric value
+ * @property {number | string | null} value - The single metric value
  */
 export interface SingleValueMetrics extends BaseMetrics {
-    value: number | null;
+    value: number | string | null;
 }
 
 /**
@@ -140,6 +140,9 @@ export type CounterLogPoint = BaseLogPoint & CounterMetrics;
 
 /** Processed log point combining Unix timestamps and counter value. */
 export type ProcessedCounterLogPoint = ProcessedBaseLogPoint & CounterMetrics;
+
+/** Log point combining time range and single-value metric. */
+export type SingleValueLogPoint = BaseLogPoint & SingleValueMetrics;
 
 /** Log point combining time range and energy consumption metrics. */
 export type EnergyConsumptionLogPoint = BaseLogPoint & EnergyConsumptionMetrics;

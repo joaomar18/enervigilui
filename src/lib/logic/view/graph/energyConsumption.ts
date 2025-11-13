@@ -6,44 +6,51 @@ import { FormattedTimeStep } from "$lib/types/date";
 import { LogSpanPeriod } from "$lib/types/view/nodes";
 import { timeStepFormatters } from "$lib/types/date";
 import { getElegantShortStringFromDate } from "$lib/logic/util/date";
-import type { MeasurementLogPoint, ProcessedMeasurementLogPoint } from "$lib/types/nodes/logs";
+import type { EnergyConsumptionLogPoint, ProcessedEnergyConsumptionLogPoint } from "$lib/types/nodes/logs";
 
-/**
- * Graph object for visualizing measurement data with min/max bands and average lines.
- * 
- * Renders measurement data showing min-max value ranges as colored bands with average
- * value lines overlaid. Features custom canvas drawing for band visualization with
- * hover effects and comprehensive tooltip integration for measurement metrics.
- */
-export class MeasurementGraphObject extends BaseGraphObject<MeasurementLogPoint> {
-    protected graphType = GraphType.Measurement;
-    protected points: Array<ProcessedMeasurementLogPoint>;
-    public hoveredLogPoint: MeasurementLogPoint | null = null;
+export class EnergyConsumptionGraphObject extends BaseGraphObject<EnergyConsumptionLogPoint> {
+    protected noActiveEnergyData: boolean = true;
+    protected noReactiveEnergyData: boolean = true;
+    protected graphType = GraphType.EnergyConsumption;
+    protected points: Array<ProcessedEnergyConsumptionLogPoint>;
 
     /**
-     * Initializes measurement graph with container, callbacks, and initial data points.
+     * Initializes counter graph with container, callbacks, and initial data points.
      */
-    constructor(container: HTMLElement, hoveredLogPointChange: ((logPoint: MeasurementLogPoint | null) => void) | null, mousePositionChange: ((xPos: number | undefined, yPos: number | undefined) => void) | null, gridDoubleClick: ((startTime: Date, endTime: Date) => void) | null, points: Array<ProcessedMeasurementLogPoint> | undefined) {
+    constructor(container: HTMLElement, hoveredLogPointChange: ((logPoint: EnergyConsumptionLogPoint | null) => void) | null, mousePositionChange: ((xPos: number | undefined, yPos: number | undefined) => void) | null, gridDoubleClick: ((startTime: Date, endTime: Date) => void) | null, points: Array<ProcessedEnergyConsumptionLogPoint> | undefined) {
         super(container, hoveredLogPointChange, mousePositionChange, gridDoubleClick);
         this.points = !!points ? points : [];
+    }
+
+    /** Returns true if the graph contains valid active energy data points. */
+    hasActiveEnergyData(): boolean {
+        return !this.noActiveEnergyData;
+    }
+
+    /** Returns true if the graph contains valid reactive energy data points. */
+    hasReactiveEnergyData(): boolean {
+        return !this.noReactiveEnergyData;
     }
 
     /**
      * Updates graph data points with optional decimal rounding while maintaining array reference.
      */
-    updatePoints(points: Array<ProcessedMeasurementLogPoint>, roundPoints: boolean = false, config: {
-        decimalPlaces?: number | null;
-    } = { decimalPlaces: null }): void {
-        if (!config.decimalPlaces === null || !roundPoints) {
+    updatePoints(points: Array<ProcessedEnergyConsumptionLogPoint>, roundPoints: boolean = false, config: {
+        activeEnergyDecimalPlaces?: number | null;
+        reactiveEnergyDecimalPlaces?: number | null;
+        powerFactorDecimalPlaces?: number | null;
+    } = { activeEnergyDecimalPlaces: null, reactiveEnergyDecimalPlaces: null, powerFactorDecimalPlaces: null }): void {
+        if (!roundPoints) {
             this.points.length = 0;
             this.points.push(...points);
         }
         else {
             const roundedPoints = points.map(point => ({
                 ...point,
-                average_value: point.average_value === null ? null : config.decimalPlaces === null ? point.average_value : Number(point.average_value.toFixed(config.decimalPlaces)),
-                min_value: point.min_value === null ? null : config.decimalPlaces === null ? point.min_value : Number(point.min_value.toFixed(config.decimalPlaces)),
-                max_value: point.max_value === null ? null : config.decimalPlaces === null ? point.max_value : Number(point.max_value.toFixed(config.decimalPlaces)),
+                active_energy: point.active_energy === null ? null : config.activeEnergyDecimalPlaces === null ? point.active_energy : Number(point.active_energy.toFixed(config.activeEnergyDecimalPlaces)),
+                reactive_energy: point.reactive_energy === null ? null : config.reactiveEnergyDecimalPlaces === null ? point.reactive_energy : Number(point.reactive_energy.toFixed(config.reactiveEnergyDecimalPlaces)),
+                power_factor: point.power_factor === null ? null : config.powerFactorDecimalPlaces === null ? point.power_factor : Number(point.power_factor.toFixed(config.powerFactorDecimalPlaces)),
+                power_factor_direction: point.power_factor_direction,
             }));
             this.points.length = 0;
             this.points.push(...roundedPoints);
@@ -51,7 +58,7 @@ export class MeasurementGraphObject extends BaseGraphObject<MeasurementLogPoint>
     }
 
     /**
-     * Creates and configures the uPlot measurement graph with band visualization and event handling.
+     * Creates and configures the uPlot counter graph with bar visualization and event handling.
      */
     createGraph(timeStep: FormattedTimeStep, logSpanPeriod: LogSpanPeriod, style: { [property: string]: string | number },): void {
         const { alignedData } = this.convertDataToGraph(timeStep, logSpanPeriod);
@@ -75,21 +82,7 @@ export class MeasurementGraphObject extends BaseGraphObject<MeasurementLogPoint>
             series: [
                 {}, // x-axis
                 {
-                    label: "Average",
-                    stroke: "transparent",
-                    width: 0,
-                    points: { show: false },
-                },
-                {
-                    // Min values (invisible, used for band)
-                    label: "Min",
-                    stroke: "transparent",
-                    width: 0,
-                    points: { show: false },
-                },
-                {
-                    // Max values (invisible, used for band)
-                    label: "Max",
+                    label: "Total Bar",
                     stroke: "transparent",
                     width: 0,
                     points: { show: false },
@@ -154,13 +147,12 @@ export class MeasurementGraphObject extends BaseGraphObject<MeasurementLogPoint>
     }
 
     /**
-     * Converts measurement data points into uPlot-compatible arrays with time labels.
+     * Converts counter data points into uPlot-compatible arrays with time labels.
      */
     convertDataToGraph(timeStep: FormattedTimeStep, logSpanPeriod: LogSpanPeriod): { alignedData: AlignedData } {
         const timestampValues: Array<number> = [];
-        const minValues: Array<number | null> = [];
-        const maxValues: Array<number | null> = [];
-        const averageValues: Array<number | null> = [];
+        const activeValues: Array<number | null> = [];
+        const reactiveValues: Array<number | null> = [];
         this.labels = [];
         this.noData = true;
 
@@ -168,109 +160,97 @@ export class MeasurementGraphObject extends BaseGraphObject<MeasurementLogPoint>
             timestampValues.push(i);
             timestampValues.push(i + 1);
 
-            if (this.points[i].min_value !== null || this.points[i].max_value !== null || this.points[i].average_value !== null) {
-                this.noData = false;
+            if (this.points[i].active_energy !== null) {
+                this.noActiveEnergyData = false;
+            }
+            if (this.points[i].reactive_energy !== null) {
+                this.noReactiveEnergyData = false;
+            }
+            this.noData = this.noActiveEnergyData && this.noReactiveEnergyData;
+
+            if (!i) {
+                activeValues.push(0);
+                reactiveValues.push(0);
             }
 
-            minValues.push(this.points[i].min_value);
-            maxValues.push(this.points[i].max_value);
-            averageValues.push(this.points[i].average_value);
-            minValues.push(this.points[i].min_value);
-            maxValues.push(this.points[i].max_value);
-            averageValues.push(this.points[i].average_value);
+            activeValues.push(this.points[i].active_energy);
+            activeValues.push(this.points[i].active_energy);
+            reactiveValues.push(this.points[i].reactive_energy);
+            reactiveValues.push(this.points[i].reactive_energy);
 
             this.labels.push(timeStepFormatters[timeStep](this.points[i].start_time, logSpanPeriod));
 
             if (i === this.points.length - 1) {
                 timestampValues.push(i + 1);
-                minValues.push(this.points[i].min_value);
-                maxValues.push(this.points[i].max_value);
-                averageValues.push(this.points[i].average_value);
+                activeValues.push(this.points[i].active_energy);
+                reactiveValues.push(this.points[i].reactive_energy);
                 this.labels.push(timeStepFormatters[timeStep](this.points[i].end_time, logSpanPeriod));
             }
         }
 
         // Dummy data so the axis are allways properly formatted
-        if (this.noData) {
-            minValues[0] = 0;
-            maxValues[0] = 0;
-            averageValues[0] = 0;
-        }
+        if (this.noActiveEnergyData) activeValues[0] = 0;
+        if (this.noReactiveEnergyData) reactiveValues[0] = 0;
 
-        return { alignedData: [timestampValues, averageValues, minValues, maxValues] };
+        return { alignedData: [timestampValues, activeValues, reactiveValues] };
     }
 
     /**
      * Creates formatted tooltip data for the hovered time period.
      */
-    getHoveredLogPoint(index: number, timeStep: FormattedTimeStep): MeasurementLogPoint | null {
+    getHoveredLogPoint(index: number, timeStep: FormattedTimeStep): EnergyConsumptionLogPoint | null {
         if (!this.points || index < 0 || index >= this.points.length) return null;
 
         return {
             start_time: getElegantShortStringFromDate(new Date(this.points[index].start_time * 1000), timeStep),
             end_time: getElegantShortStringFromDate(new Date(this.points[index].end_time * 1000), timeStep),
-            min_value: this.points[index].min_value,
-            max_value: this.points[index].max_value,
-            average_value: this.points[index].average_value,
-        } as MeasurementLogPoint;
+            active_energy: this.points[index].active_energy,
+            reactive_energy: this.points[index].reactive_energy,
+            power_factor: this.points[index].power_factor,
+            power_factor_direction: this.points[index].power_factor_direction,
+        } as EnergyConsumptionLogPoint;
     }
 
     /**
-     * Creates a Path2D object for drawing average lines across measurement periods.
-     */
-    getAverageLine(xStart: number, xEnd: number, y: number): Path2D {
-        if (!this.graph) {
-            throw new Error(`Graph is not instantiated`);
-        }
-        const line = new Path2D();
-        line.moveTo(xStart, y);
-        line.lineTo(xEnd, y);
-
-        return line;
-    }
-
-    /**
-     * Renders measurement bands and average lines on canvas with hover effects.
+     * Renders energy bars on canvas with hover effects and custom styling.
      */
     drawCanvas(u: uPlot, style: { [property: string]: string | number }): void {
         const { ctx } = u;
         ctx.save();
         this.points.forEach((point, idx) => {
-            if (point.min_value === null || point.max_value === null || point.average_value === null) {
+            if (point.active_energy === null || point.reactive_energy === null) {
                 return;
             }
+
             const isHover = this.currentHoverPeriod === idx;
 
-            ctx.lineWidth = Number(style.bandBorderWidthPx);
+            ctx.lineWidth = Number(style.barBorderWidthPx);
             const x1 = u.valToPos(idx, "x", true);
             const x2 = u.valToPos(idx + 1, "x", true);
-            const yAverage = u.valToPos(point.average_value, "y", true);
-            const yMin = u.valToPos(point.min_value, "y", true);
-            const yMax = u.valToPos(point.max_value, "y", true);
-            const width = x2 - x1;
-            const height = yMin - yMax;
+            const yMinActive = u.valToPos(0, "y", true);
+            const yMaxActive = u.valToPos(point.active_energy || 0, "y", true);
+            const yMinReactive = u.valToPos(0, "y", true);
+            const yMaxReactive = u.valToPos(point.reactive_energy || 0, "y", true);
+            const width = (x2 - x1) / 2;
+            const heightActive = yMinActive - yMaxActive;
+            const heightReactive = yMinReactive - yMaxReactive;
 
-            // Min - Max Band
-            ctx.fillStyle = isHover ? String(style.bandHoverColor) : String(style.bandColor);
-            ctx.strokeStyle = isHover ? String(style.bandBorderHoverColor) : String(style.bandBorderColor);
-            ctx.fillRect(x1, yMax, width, height);
-            ctx.strokeRect(x1, yMax, width, height);
-
-            // Average Line
-            ctx.lineWidth = Number(style.lineWidthPx);
-            ctx.strokeStyle = isHover ? String(style.lineHoverColor) : String(style.lineColor);
-            const segmentLine = this.getAverageLine(x1, x2, yAverage);
-            ctx.stroke(segmentLine);
-
+            // Bars
+            ctx.fillStyle = isHover ? String(style.barHoverColor) : String(style.barColor);
+            ctx.strokeStyle = isHover ? String(style.barBorderHoverColor) : String(style.barBorderColor);
+            ctx.fillRect(x1, yMaxActive, width, heightActive);
+            ctx.strokeRect(x1, yMaxActive, width, heightActive);
+            ctx.fillRect(x1 + width, yMaxReactive, width, heightReactive);
+            ctx.strokeRect(x1 + width, yMaxReactive, width, heightReactive);
         });
         ctx.restore();
     }
 
     /**
-     * Checks if a data point at the given index has no valid measurement data.
+     * Checks if a data point at the given index has no valid data.
      */
     pointNoData(index: number): boolean {
         if (!this.points || index < 0 || index >= this.points.length) return false;
-        return this.points[index].average_value === null || this.points[index].min_value === null || this.points[index].max_value === null;
+        return this.points[index].active_energy === null || this.points[index].reactive_energy === null;
     }
 }

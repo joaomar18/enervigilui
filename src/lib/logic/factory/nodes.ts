@@ -1,11 +1,6 @@
 import { get } from "svelte/store";
 import { MeterType } from "$lib/types/device/base";
 import { NodeType, NodePhase, NodePrefix, nodePhaseSections } from "$lib/types/nodes/base";
-import type { DefaultNodeInfo } from "$lib/types/nodes/base";
-import type { EditableDevice, MeterOptions, NewDevice } from "$lib/types/device/base";
-import type { BaseNodeConfig, NodeRecord, EditableNodeRecord, EditableBaseNodeConfig, NodeAttributes } from "$lib/types/nodes/config";
-import type { NodeState, ProcessedNodeState } from "$lib/types/nodes/realtime";
-import type { NodeLogs, ProcessedBaseLogPoint, ProcessedNodeLogs } from "$lib/types/nodes/logs";
 import { defaultVariables } from "$lib/stores/device/variables";
 import { addPrefix, removePrefix, getNodePrefix, getCommunicationID } from "../util/nodes";
 import { sortNodesLogically } from "../handlers/nodes";
@@ -17,7 +12,12 @@ import { showToast } from "../view/toast";
 import { AlertType } from "$lib/stores/view/toast";
 import { getNodeRealTimeDisplayComponent, getNodeLogGraphType, getNodeCategory } from "../view/nodes";
 import { convertISOToTimestamp } from "../util/date";
-
+import type { DefaultNodeInfo } from "$lib/types/nodes/base";
+import type { EditableDevice, MeterOptions, NewDevice } from "$lib/types/device/base";
+import type { BaseNodeConfig, NodeRecord, EditableNodeRecord, EditableBaseNodeConfig, NodeAttributes } from "$lib/types/nodes/config";
+import type { NodeState, ProcessedNodeState } from "$lib/types/nodes/realtime";
+import type { CounterLogPoint, CounterMetrics, EnergyConsumptionMetrics, NodeLogs, ProcessedBaseLogPoint, ProcessedEnergyConsumptionLogPoint, ProcessedNodeLogs, SingleValueLogPoint, SingleValueMetrics } from "$lib/types/nodes/logs";
+import type { EnergyConsumptionType } from "$lib/types/device/energy";
 
 /**
  * Converts a BaseNodeConfig object to an EditableBaseNodeConfig for use in UI forms.
@@ -392,4 +392,59 @@ export function processNodeLogs(nodeLogs: NodeLogs): ProcessedNodeLogs {
         points: processedPoints,
         global_metrics: nodeLogs.global_metrics,
     } as ProcessedNodeLogs;
+}
+
+/**
+ * Merges separate energy consumption data streams into unified log points with Unix timestamps.
+ * Combines active energy, reactive energy, power factor, and power factor direction data into
+ * single time-aligned data points for visualization and analysis.
+ * @param energyLogs - Energy consumption data with separate streams for each metric type
+ * @returns Object containing merged log points array and combined global metrics
+ * @throws Error if the log point arrays have mismatched lengths
+ */
+export function mergeEnergyConsumptionLogs(energyLogs: EnergyConsumptionType): { mergedPoints: Array<ProcessedEnergyConsumptionLogPoint>, mergedGlobalMetrics: EnergyConsumptionMetrics } {
+    let mergedPoints: Array<ProcessedEnergyConsumptionLogPoint> = [];
+    let mergedGlobalMetrics: EnergyConsumptionMetrics;
+
+    let active_energy_points = energyLogs.active_energy.points;
+    let reactive_energy_points = energyLogs.reactive_energy.points;
+    let pf_points = energyLogs.power_factor.points;
+    let pf_direction_points = energyLogs.power_factor_direction.points;
+
+    const allLengthsEqual =
+        active_energy_points.length === reactive_energy_points.length &&
+        reactive_energy_points.length === pf_points.length &&
+        pf_points.length === pf_direction_points.length;
+
+    if (!allLengthsEqual) {
+        throw new Error("Energy consumption log points have mismatched lengths");
+    }
+
+    for (let i = 0; i < active_energy_points.length; i++) {
+        const { start_time: start_time_str, end_time: end_time_str } = active_energy_points[i];
+        let start_time = convertISOToTimestamp(start_time_str) / 1000;
+        let end_time = convertISOToTimestamp(end_time_str) / 1000;
+
+        let mergedPoint = {
+            start_time: start_time,
+            end_time: end_time,
+            active_energy: (active_energy_points[i] as CounterLogPoint).value,
+            reactive_energy: (reactive_energy_points[i] as CounterLogPoint).value,
+            power_factor: (pf_points[i] as SingleValueLogPoint).value,
+            power_factor_direction: (pf_direction_points[i] as SingleValueLogPoint).value,
+
+        } as ProcessedEnergyConsumptionLogPoint;
+
+        mergedPoints.push(mergedPoint);
+    }
+
+    mergedGlobalMetrics = {
+        active_energy: (energyLogs.active_energy.global_metrics as CounterMetrics).value,
+        reactive_energy: (energyLogs.reactive_energy.global_metrics as CounterMetrics).value,
+        power_factor: ((energyLogs.power_factor.global_metrics as SingleValueMetrics).value as number),
+        power_factor_direction: ((energyLogs.power_factor_direction.global_metrics as SingleValueMetrics).value as string),
+    }
+
+
+    return { mergedPoints, mergedGlobalMetrics };
 }

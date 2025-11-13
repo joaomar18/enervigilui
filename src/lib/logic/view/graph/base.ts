@@ -10,6 +10,7 @@ import type { BaseLogPoint, ProcessedBaseLogPoint } from "$lib/types/nodes/logs"
 export enum GraphType {
     Measurement = "Measurement",
     Counter = "Counter",
+    EnergyConsumption = "EnergyConsumption"
 }
 
 /**
@@ -54,7 +55,13 @@ export abstract class BaseGraphObject<T extends BaseLogPoint> {
         this.gridDoubleClickCallback = gridDoubleClick;
     }
 
-    abstract updatePoints(points: Array<ProcessedBaseLogPoint>, decimalPlaces: number | null, roundPoints: boolean): void;
+    abstract updatePoints(points: Array<ProcessedBaseLogPoint>, roundPoints: boolean, config: {
+        decimalPlaces?: number | null;
+        // Energy consumption specific
+        activeEnergyDecimalPlaces?: number | null;
+        reactiveEnergyDecimalPlaces?: number | null;
+        powerFactorDecimalPlaces?: number | null;
+    }): void;
     abstract createGraph(timeStep: FormattedTimeStep, logSpanPeriod: LogSpanPeriod, style: { [property: string]: string | number },): void;
     abstract drawCanvas(u: uPlot, style: { [property: string]: string | number }): void;
     abstract pointNoData(index: number): boolean;

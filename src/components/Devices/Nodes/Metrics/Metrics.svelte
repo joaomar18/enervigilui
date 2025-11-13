@@ -107,6 +107,7 @@
 
     onMount(() => {
         window.addEventListener("resize", handleColumnStack);
+        handleColumnStack();
     });
 
     onDestroy(() => {
