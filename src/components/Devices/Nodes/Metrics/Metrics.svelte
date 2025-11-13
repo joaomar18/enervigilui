@@ -98,6 +98,10 @@
         showLoader = false;
     }
 
+    $: if (containerEl) {
+        requestAnimationFrame(() => handleColumnStack());
+    }
+
     // Functions
     function handleColumnStack(): void {
         if (containerEl && numberOfVariables) {
@@ -107,7 +111,6 @@
 
     onMount(() => {
         window.addEventListener("resize", handleColumnStack);
-        handleColumnStack();
     });
 
     onDestroy(() => {

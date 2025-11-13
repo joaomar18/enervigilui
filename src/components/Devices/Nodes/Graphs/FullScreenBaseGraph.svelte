@@ -12,7 +12,6 @@
     // Props
     export let data: Array<ProcessedBaseLogPoint> | undefined;
     export let timeStep: FormattedTimeStep | null | undefined;
-    export let logSpanPeriod: LogSpanPeriod;
     export let show: boolean;
     export let goBackEnabled: boolean = true;
     export let graphType: GraphType;
@@ -49,7 +48,6 @@
         metricsStyle={$FullScreenGraphMetricStyle}
         {data}
         {timeStep}
-        {logSpanPeriod}
         fullScreen={true}
         showDatePicker={true}
         bind:showFullScreen={show}

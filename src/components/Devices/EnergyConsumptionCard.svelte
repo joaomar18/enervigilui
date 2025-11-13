@@ -8,6 +8,7 @@
     import EnergyDirectionPicker from "../General/Pickers/EnergyDirectionPicker.svelte";
     import TimePeriodPicker from "../General/Pickers/TimePeriodPicker.svelte";
     import ElectricalPhasePicker from "../General/Pickers/ElectricalPhasePicker.svelte";
+    import EnergyConsumptionGraph from "./Nodes/Graphs/EnergyConsumptionGraph.svelte";
     import type { EnergyConsumptionType } from "$lib/types/device/energy";
     import type { EnergyConsumptionMetrics, ProcessedEnergyConsumptionLogPoint } from "$lib/types/nodes/logs";
 
@@ -106,7 +107,7 @@
     });
 </script>
 
-<ContentCard titleText={mobileView ? $texts.energyConsumptionShort : $texts.energyConsumption}>
+<ContentCard contentPaddingTop="0px" contentPaddingBottom="0px" titleText={mobileView ? $texts.energyConsumptionShort : $texts.energyConsumption}>
     <div class="slot-div header" slot="header">
         <div class="actions-div">
             <div class="picker-div">
@@ -137,7 +138,27 @@
             </div>
         </div>
     </div>
-    <div class="slot-div content" slot="content"></div>
+    <div class="slot-div content" slot="content">
+        <EnergyConsumptionGraph
+            data={mergedPoints}
+            timeStep={energyLogs?.active_energy.time_step}
+            bind:selectedTimeSpan
+            bind:initialDate
+            bind:endDate
+            dataFetched={energyConsumptionFetched}
+            firstFetch={energyConsumptionFirstFetch}
+            globalMetrics={mergedGlobalMetrics}
+            activeEnergyUnit={energyLogs?.active_energy.unit ?? ""}
+            reactiveEnergyUnit={energyLogs?.reactive_energy.unit ?? ""}
+            activeEnergyDecimalPlaces={energyLogs?.active_energy.decimal_places}
+            reactiveEnergyDecimalPlaces={energyLogs?.reactive_energy.decimal_places}
+            powerFactorDecimalPlaces={energyLogs?.power_factor.decimal_places}
+            getNewTimeSpan={(initial_date: Date, end_date: Date) => getNewTimeSpan(initial_date, end_date)}
+            getNewDefaultTimeSpan={(timeSpan: LogSpanPeriod) => getNewDefaultTimeSpan(timeSpan)}
+            goBackEnabled={false}
+            goBack={() => {}}
+        />
+    </div>
 </ContentCard>
 
 <style>
@@ -171,7 +192,7 @@
         display: flex;
         flex-direction: column;
         justify-content: start;
-        align-items: center;
+        align-items: start;
         min-height: 0;
     }
 </style>

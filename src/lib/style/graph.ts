@@ -103,6 +103,49 @@ const FullScreenBaseGraphStyleConfig: ComponentStyles = {
 
 export const FullScreenBaseGraphStyle = createStyleStore(FullScreenBaseGraphStyleConfig);
 
+
+//////////     E N E R G Y     C O N S U M P T I O N     B A S E     G R A P H     //////////
+
+const EnergyConsBaseGraphStyleConfig: ComponentStyles = {
+    dark: {
+        width: "100%",
+        height: "100%",
+        minHeight: "auto",
+        headerHeight: "fit-content",
+        headerButtonsGap: "20px",
+        xAxisHeight: "30px",
+        yAxisWidth: "30px",
+        unitDivWidth: "20px",
+        unitMaxWidth: "100px",
+        yAxisTickSpacingPx: 40,
+        borderRadius: "0px",
+        paddingHorizontal: "5px",
+        paddingTop: "5px",
+        paddingBottom: "0px",
+        backgroundColor: "none",
+        borderColor: "none",
+        boxShadow: "none",
+        graphHeight: "100%",
+        graphPaddingTop: "10px",
+        graphPaddingLeft: "20px",
+        graphPaddingRight: "20px",
+        graphPaddingBottom: "0px",
+        graphPeriodWidthPx: 70,
+        graphPeriodWidthMaxPx: 70,
+        graphGridWidthPx: 1,
+        graphGridLineColor: "rgba(255, 255, 255, 0.06)",
+        graphTextColor: "rgba(255, 255, 255, 0.9)",
+        graphTextWeight: "500",
+        subTextColor: "rgba(255, 255, 255, 0.5)",
+        subTextWeight: "400",
+        scrollbarTrackColor: "#323a45",
+        scrollbarThumbColor: "#1e242b",
+        loaderBackgroundBlur: "blur(8px)",
+    },
+};
+
+export const EnergyConsBaseGraphStyle = createStyleStore(EnergyConsBaseGraphStyleConfig);
+
 //////////     M E A S U R E M E N T     G R A P H     //////////
 
 const MeasurementGraphStyleConfig: ComponentStyles = {

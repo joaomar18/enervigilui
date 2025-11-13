@@ -490,7 +490,6 @@
                             <BaseGraph
                                 data={nodeLogs?.points}
                                 timeStep={nodeLogs?.time_step}
-                                logSpanPeriod={selectedHistoryTimeSpan}
                                 graphType={nodeState.graphType}
                                 dataFetched={nodeLogsFetched}
                                 firstFetch={nodeLogsFirstFetch}

@@ -109,6 +109,8 @@ export function getGraphToolTipDisplayComponent(graphType: GraphType): typeof Sv
             return MeasurementToolTip;
         case GraphType.Counter:
             return CounterToolTip;
+        case GraphType.EnergyConsumption: // TO DO
+            return CounterToolTip;
     }
 }
 
@@ -124,6 +126,8 @@ export function getGraphMetricsComponent(graphType: GraphType): typeof SvelteCom
             return MeasurementMetrics;
         case GraphType.Counter:
             return CounterMetrics;
+        case GraphType.EnergyConsumption: // TO DO
+            return CounterMetrics;
     }
 }
 
@@ -138,6 +142,7 @@ export function getGraphStyle(graphType: GraphType): { [property: string]: strin
     const styleMap = {
         [GraphType.Measurement]: get(MeasurementGraphStyle),
         [GraphType.Counter]: get(CounterGraphStyle),
+        [GraphType.EnergyConsumption]: get(CounterGraphStyle), // TO DO
     };
     return styleMap[graphType];
 }

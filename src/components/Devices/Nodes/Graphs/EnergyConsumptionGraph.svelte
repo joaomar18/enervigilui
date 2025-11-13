@@ -1,4 +1,5 @@
 <script lang="ts">
+    import { EnergyConsumptionGraphObject } from "$lib/logic/view/graph/energyConsumption";
     import { BaseGraphObject } from "$lib/logic/view/graph/base";
     import { FormattedTimeStep } from "$lib/types/date";
     import { LogSpanPeriod } from "$lib/types/view/nodes";
@@ -7,7 +8,7 @@
     import BaseGraph from "./BaseGraph.svelte";
     import FullScreenBaseGraph from "./FullScreenBaseGraph.svelte";
     import GraphToolTip from "./Tooltips/GraphToolTip.svelte";
-    import type { EnergyConsumptionMetrics, EnergyConsumptionLogPoint, ProcessedEnergyConsumptionLogPoint } from "$lib/types/nodes/logs";
+    import type { EnergyConsumptionMetrics, EnergyConsumptionLogPoint, ProcessedEnergyConsumptionLogPoint, BaseLogPoint } from "$lib/types/nodes/logs";
 
     // Texts
     import { texts } from "$lib/stores/lang/generalTexts";
@@ -16,7 +17,7 @@
     // Styles
     import { mergeStyle } from "$lib/style/components";
     import { BaseGraphStyle, GraphMetricStyle } from "$lib/style/graph";
-    import { EnergyConsumptionGraphObject } from "$lib/logic/view/graph/energyConsumption";
+    import { EnergyConsBaseGraphStyle } from "$lib/style/graph";
 
     // Style object (from theme)
     export let style: { [property: string]: string | number } | null = null;
@@ -27,7 +28,6 @@
     // Props
     export let data: Array<ProcessedEnergyConsumptionLogPoint> | undefined;
     export let timeStep: FormattedTimeStep | null | undefined;
-    export let logSpanPeriod: LogSpanPeriod;
     export let fullScreen: boolean = false;
     export let showFullScreen: boolean = false; // Used externally on Full Screen Graph
     export let showDatePicker: boolean = false;
@@ -58,7 +58,10 @@
 
     // Reactive Statements
     $: if (graphContainer) {
-        createGraphObject();
+        requestAnimationFrame(() => {
+            createGraphObject();
+            console.log(graphContainer.getBoundingClientRect().height);
+        });
     }
 
     $: if (graph && dataFetched && data && timeStep && $selectedLang) {
@@ -70,7 +73,7 @@
         if (graph) graph.destroy();
         requestAnimationFrame(() => {
             mergedStyle = effectiveStyle;
-            new EnergyConsumptionGraphObject(
+            graph = new EnergyConsumptionGraphObject(
                 graphContainer,
                 baseGraphRef.hoveredLogPointChange,
                 baseGraphRef.mousePositionChange,
@@ -85,7 +88,7 @@
         if (graph && data && timeStep) {
             graph.destroy();
             graph.updatePoints(data, true, { activeEnergyDecimalPlaces, reactiveEnergyDecimalPlaces, powerFactorDecimalPlaces });
-            graph.createGraph(timeStep, logSpanPeriod, mergedStyle);
+            graph.createGraph(timeStep, selectedTimeSpan, mergedStyle);
             gridElement = graph.getGridElement();
             graphCreated = true;
             activeEnergyNoData = !graph.hasActiveEnergyData();
@@ -100,10 +103,10 @@
 </script>
 
 <BaseGraph
+    style={$EnergyConsBaseGraphStyle}
     bind:this={baseGraphRef}
     data={undefined}
     {timeStep}
-    {logSpanPeriod}
     bind:showFullScreen
     bind:showDatePicker
     graphType={GraphType.EnergyConsumption}
@@ -118,7 +121,8 @@
     {getNewTimeSpan}
     {getNewDefaultTimeSpan}
     useExternalGraph={true}
-    externalGraph={graph}
+    useHeader={false}
+    externalGraph={graph as BaseGraphObject<BaseLogPoint>}
     externalGraphContainer={graphContainer}
 >
     <div slot="full-screen">
@@ -126,7 +130,6 @@
             <FullScreenBaseGraph
                 {data}
                 {timeStep}
-                {logSpanPeriod}
                 bind:show={showFullScreen}
                 graphType={GraphType.EnergyConsumption}
                 {dataFetched}
@@ -143,7 +146,7 @@
         {/if}
     </div>
     <div slot="metrics"></div>
-    <div slot="graph">
+    <div slot="graph" class="graph-main">
         <div class="unit-div">
             <div class="unit-content">
                 <div class="unit-wrapper">
@@ -185,4 +188,110 @@
 </BaseGraph>
 
 <style>
+    /* Unit label section - Left sidebar for measurement unit display */
+    .unit-div {
+        width: var(--unit-div-width);
+        height: var(--graph-height);
+    }
+
+    /* Unit content container - Sized to match graph plotting area */
+    .unit-content {
+        width: 100%;
+        height: calc(100% - var(--graph-padding-top) - var(--graph-padding-bottom) - var(--x-axis-height));
+        padding-top: var(--graph-padding-top);
+        padding-bottom: calc(var(--x-axis-height) + var(--graph-padding-bottom));
+    }
+
+    /* Unit wrapper - Relative container for absolutely positioned unit label */
+    .unit-wrapper {
+        padding: 0;
+        margin: 0;
+        position: relative;
+        width: 100%;
+        height: 100%;
+    }
+
+    /* Unit label text - Vertically rotated measurement unit (e.g., "kW", "A") */
+    .unit-label {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        color: var(--sub-text-color);
+        font-weight: var(--sub-text-weight);
+        font-size: 13px;
+        letter-spacing: 0.5px;
+        text-align: center;
+        pointer-events: none;
+        user-select: none;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        min-width: 0;
+        max-width: var(--unit-max-width);
+        transform: translate(-50%, -50%) rotate(-90deg);
+    }
+
+    /* Graph main content - Horizontal flex container with styled scrollbar for graph overflow */
+    .graph-main {
+        margin: 0;
+        padding: 0;
+        width: 100%;
+        height: 100%;
+        display: flex;
+        flex-direction: row;
+        justify-content: center;
+        align-items: center;
+        overflow-x: scroll;
+        overflow-y: hidden;
+        scrollbar-width: thin;
+        scrollbar-color: var(--scrollbar-track-color) var(--scrollbar-thumb-color);
+        scrollbar-gutter: stable;
+    }
+
+    /* Graph container - Main plotting area where uPlot charts are rendered */
+    .graph-div {
+        padding: 0;
+        margin: 0;
+        position: relative;
+        width: calc(100% - var(--unit-div-width));
+        height: var(--graph-height);
+    }
+
+    /* Y-axis overlay area - Positioned over uPlot's y-axis for custom content */
+    .y-axis-inner-div {
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: var(--y-axis-width);
+        height: calc(var(--graph-height) - var(--graph-padding-top) - var(--graph-padding-bottom) - var(--x-axis-height));
+        padding-top: var(--graph-padding-top);
+        padding-bottom: calc(var(--x-axis-height) + var(--graph-padding-bottom));
+    }
+
+    /* Y-axis content wrapper - Container for y-axis overlay elements */
+    .y-axis-inner-content {
+        width: 100%;
+        height: 100%;
+        padding: 0;
+        margin: 0;
+        position: relative;
+    }
+
+    /* No-data indicator - Rotated text displayed when graph has no data */
+    .no-data-label {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        color: var(--sub-text-color);
+        font-weight: var(--sub-text-weight);
+        font-size: 13px;
+        letter-spacing: 0.5px;
+        word-spacing: 0.15em;
+        opacity: 0.7;
+        text-align: center;
+        pointer-events: none;
+        user-select: none;
+        white-space: nowrap;
+        transform: translate(-50%, -50%) rotate(-90deg);
+    }
 </style>

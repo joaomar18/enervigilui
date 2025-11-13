@@ -33,7 +33,6 @@
     // Props
     export let data: Array<ProcessedBaseLogPoint> | undefined;
     export let timeStep: FormattedTimeStep | null | undefined;
-    export let logSpanPeriod: LogSpanPeriod;
     export let fullScreen: boolean = false;
     export let showFullScreen: boolean = false; // Used externally on Full Screen Graph
     export let showDatePicker: boolean = false;
@@ -48,6 +47,7 @@
     export let unit: string = "";
     export let decimalPlaces: number | null = null;
     export let useExternalGraph: boolean = false;
+    export let useHeader: boolean = true;
     export let externalGraph: BaseGraphObject<BaseLogPoint> | null = null;
     export let externalGraphContainer: HTMLDivElement | null = null;
 
@@ -229,7 +229,7 @@
         if (graph && data && timeStep) {
             graph.destroy();
             graph.updatePoints(data, true, { decimalPlaces });
-            graph.createGraph(timeStep, logSpanPeriod, mergedStyle);
+            graph.createGraph(timeStep, selectedTimeSpan, mergedStyle);
             gridElement = graph.getGridElement();
             graphCreated = true;
             graphNoData = !graph.hasData();
@@ -307,7 +307,6 @@
                     <FullScreenBaseGraph
                         {data}
                         {timeStep}
-                        {logSpanPeriod}
                         bind:show={showFullScreen}
                         {graphType}
                         {dataFetched}
@@ -328,63 +327,65 @@
                 {/if}
             {/if}
             <div class="header">
-                <div class="header-content">
-                    <div class="left-actions-div">
-                        <Action
-                            style={$GraphActionStyle}
-                            imageURL="/img/previous.svg"
-                            disabledImageURL="/img/previous-disabled.svg"
-                            onClick={() => goBack()}
-                            enableToolTip={true}
-                            disabled={!goBackEnabled}
-                        >
-                            <div slot="tooltip"><ToolTipText text={$texts.goBack} /></div>
-                        </Action>
-                    </div>
-                    <div class="right-header-div">
-                        <div class="full-screen-data-range">
-                            <DateRangeChecker fullWidth={true} {initialDate} {endDate} />
+                {#if useHeader}
+                    <div class="header-content">
+                        <div class="left-actions-div">
+                            <Action
+                                style={$GraphActionStyle}
+                                imageURL="/img/previous.svg"
+                                disabledImageURL="/img/previous-disabled.svg"
+                                onClick={() => goBack()}
+                                enableToolTip={true}
+                                disabled={!goBackEnabled}
+                            >
+                                <div slot="tooltip"><ToolTipText text={$texts.goBack} /></div>
+                            </Action>
                         </div>
-                        <div class="actions-div">
-                            <div class="date-checker-div">
+                        <div class="right-header-div">
+                            <div class="full-screen-data-range">
+                                <DateRangeChecker fullWidth={true} {initialDate} {endDate} />
+                            </div>
+                            <div class="actions-div">
+                                <div class="date-checker-div">
+                                    <Action
+                                        style={$GraphActionStyle}
+                                        imageURL="/img/calendar-check.svg"
+                                        onClick={() => {
+                                            showDateRange = !showDateRange;
+                                        }}
+                                        enableToolTip={true}
+                                    >
+                                        <div slot="tooltip"><ToolTipText text={$texts.selectedPeriod} /></div>
+                                    </Action>
+                                    <DateRangeChecker bind:showToolTip={showDateRange} {initialDate} {endDate} />
+                                </div>
+                                {#if showDatePicker}
+                                    <div class="date-picker-div">
+                                        <TimePeriodPicker
+                                            bind:selectedTimeSpan
+                                            bind:initialDate
+                                            bind:endDate
+                                            changeSpanPeriodCustom={(initial_date: Date, end_date: Date) => getNewTimeSpan(initial_date, end_date)}
+                                            changeSpanPeriod={(timeSpan: LogSpanPeriod) => getNewDefaultTimeSpan(timeSpan)}
+                                        />
+                                    </div>
+                                {/if}
                                 <Action
                                     style={$GraphActionStyle}
-                                    imageURL="/img/calendar-check.svg"
+                                    imageURL="/img/fullscreen.svg"
                                     onClick={() => {
-                                        showDateRange = !showDateRange;
+                                        showFullScreen = !showFullScreen;
                                     }}
                                     enableToolTip={true}
                                 >
-                                    <div slot="tooltip"><ToolTipText text={$texts.selectedPeriod} /></div>
+                                    <div slot="tooltip"><ToolTipText text={$texts.fullscreen} /></div>
                                 </Action>
-                                <DateRangeChecker bind:showToolTip={showDateRange} {initialDate} {endDate} />
                             </div>
-                            {#if showDatePicker}
-                                <div class="date-picker-div">
-                                    <TimePeriodPicker
-                                        bind:selectedTimeSpan
-                                        bind:initialDate
-                                        bind:endDate
-                                        changeSpanPeriodCustom={(initial_date: Date, end_date: Date) => getNewTimeSpan(initial_date, end_date)}
-                                        changeSpanPeriod={(timeSpan: LogSpanPeriod) => getNewDefaultTimeSpan(timeSpan)}
-                                    />
-                                </div>
-                            {/if}
-                            <Action
-                                style={$GraphActionStyle}
-                                imageURL="/img/fullscreen.svg"
-                                onClick={() => {
-                                    showFullScreen = !showFullScreen;
-                                }}
-                                enableToolTip={true}
-                            >
-                                <div slot="tooltip"><ToolTipText text={$texts.fullscreen} /></div>
-                            </Action>
                         </div>
                     </div>
-                </div>
-                <div class="metrics-section">
-                    {#if !useExternalGraph}
+                {/if}
+                {#if !useExternalGraph}
+                    <div class="metrics-section">
                         {#if globalMetrics}
                             <svelte:component
                                 this={getGraphMetricsComponent(graphType)}
@@ -397,17 +398,17 @@
                                 roundMetrics={graphType === GraphType.Counter}
                             />
                         {/if}
-                    {:else}
-                        <slot name="metrics" />
-                    {/if}
-                </div>
+                    </div>
+                {:else}
+                    <slot name="metrics" />
+                {/if}
             </div>
             <div class="main">
                 <div class="loader" class:close={!showLoader}>
                     <CircularLoader wrapperTopLeftRadius="0px" wrapperTopRightRadius="0px" wrapperBottomLeftRadius="0px" wrapperBottomRightRadius="0px" />
                 </div>
-                <div class="graph-main">
-                    {#if !useExternalGraph}
+                {#if !useExternalGraph}
+                    <div class="graph-main">
                         <div class="unit-div">
                             <div class="unit-content">
                                 <div class="unit-wrapper">
@@ -431,10 +432,10 @@
                                 </GraphToolTip>
                             {/if}
                         </div>
-                    {:else}
-                        <slot name="graph" />
-                    {/if}
-                </div>
+                    </div>
+                {:else}
+                    <slot name="graph" />
+                {/if}
             </div>
         </div>
     </div>
