@@ -82,7 +82,13 @@ export class EnergyConsumptionGraphObject extends BaseGraphObject<EnergyConsumpt
             series: [
                 {}, // x-axis
                 {
-                    label: "Total Bar",
+                    label: "Active Energy Bar",
+                    stroke: "transparent",
+                    width: 0,
+                    points: { show: false },
+                },
+                {
+                    label: "Reactive Energy Bar",
                     stroke: "transparent",
                     width: 0,
                     points: { show: false },
@@ -103,7 +109,7 @@ export class EnergyConsumptionGraphObject extends BaseGraphObject<EnergyConsumpt
                     },
                 },
                 {
-                    // y-axis (values)
+                    // Active / Reactive energy y-axis (values)
                     values: (u, splits) => this.noData ? splits.map(() => "") : yAxisValuesFormatter()(u, splits),
                     size: parseInt(String(style.yAxisWidth)),
                     font: `13px ${getRootFontFamily()}`,

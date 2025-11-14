@@ -8,7 +8,8 @@
     import BaseGraph from "./BaseGraph.svelte";
     import FullScreenBaseGraph from "./FullScreenBaseGraph.svelte";
     import GraphToolTip from "./Tooltips/GraphToolTip.svelte";
-    import type { EnergyConsumptionMetrics, EnergyConsumptionLogPoint, ProcessedEnergyConsumptionLogPoint, BaseLogPoint } from "$lib/types/nodes/logs";
+    import EnergyConsToolTip from "./Tooltips/Data/EnergyConsToolTip.svelte";
+    import type { EnergyConsumptionMetrics, ProcessedEnergyConsumptionLogPoint, BaseLogPoint, EnergyConsumptionLogPoint } from "$lib/types/nodes/logs";
 
     // Texts
     import { texts } from "$lib/stores/lang/generalTexts";
@@ -48,13 +49,15 @@
     $: mergedStyle = effectiveStyle;
 
     // Variables
-    let baseGraphRef: BaseGraph;
     let graphContainer: HTMLDivElement;
     let gridElement: HTMLDivElement | null = null;
     let graph: EnergyConsumptionGraphObject | null = null;
     let graphCreated: boolean = false;
     let activeEnergyNoData: boolean = true;
     let reactiveEnergyNoData: boolean = true;
+    let insideGraph: boolean = false;
+    let logPoint: EnergyConsumptionLogPoint | null = null;
+    let cursorPos: { x: number | undefined; y: number | undefined };
 
     // Reactive Statements
     $: if (graphContainer) {
@@ -69,15 +72,28 @@
     }
 
     // Functions
+    function hoveredLogPointChange(currentLogPoint: EnergyConsumptionLogPoint | null): void {
+        insideGraph = !!currentLogPoint;
+        logPoint = currentLogPoint;
+    }
+
+    function mousePositionChange(xPos: number | undefined, yPos: number | undefined): void {
+        cursorPos = { x: xPos, y: yPos };
+    }
+
+    function gridDoubleClick(startTime: Date, endTime: Date): void {
+        getNewTimeSpan(startTime, endTime);
+    }
+
     function createGraphObject(): void {
         if (graph) graph.destroy();
         requestAnimationFrame(() => {
             mergedStyle = effectiveStyle;
             graph = new EnergyConsumptionGraphObject(
                 graphContainer,
-                baseGraphRef.hoveredLogPointChange,
-                baseGraphRef.mousePositionChange,
-                baseGraphRef.gridDoubleClick,
+                hoveredLogPointChange,
+                mousePositionChange,
+                gridDoubleClick,
                 data ? (data as ProcessedEnergyConsumptionLogPoint[]) : undefined,
             );
             Object.assign(mergedStyle, getGraphStyle(GraphType.EnergyConsumption));
@@ -104,7 +120,6 @@
 
 <BaseGraph
     style={$EnergyConsBaseGraphStyle}
-    bind:this={baseGraphRef}
     data={undefined}
     {timeStep}
     bind:showFullScreen
@@ -151,7 +166,7 @@
             <div class="unit-content">
                 <div class="unit-wrapper">
                     {#if graphCreated && !activeEnergyNoData}
-                        <span class="unit-label">{activeEnergyUnit}</span>
+                        <span class="unit-label">{activeEnergyUnit} | {reactiveEnergyUnit}</span>
                     {/if}
                 </div>
             </div>
@@ -165,24 +180,10 @@
                 </div>
             </div>
             {#if gridElement}
-                <!--<GraphToolTip {gridElement} {insideGraph} {cursorPos}></GraphToolTip>-->
+                <GraphToolTip {gridElement} {insideGraph} {cursorPos}>
+                    <EnergyConsToolTip {logPoint} {activeEnergyUnit} {reactiveEnergyUnit} />
+                </GraphToolTip>
             {/if}
-            <div class="y-axis-inner-div">
-                <div class="y-axis-inner-content">
-                    {#if graphCreated && reactiveEnergyNoData}
-                        <span class="no-data-label">{$texts.noDataAvailable}</span>
-                    {/if}
-                </div>
-            </div>
-        </div>
-        <div class="unit-div">
-            <div class="unit-content">
-                <div class="unit-wrapper">
-                    {#if graphCreated && !reactiveEnergyNoData}
-                        <span class="unit-label">{reactiveEnergyUnit}</span>
-                    {/if}
-                </div>
-            </div>
         </div>
     </div>
 </BaseGraph>

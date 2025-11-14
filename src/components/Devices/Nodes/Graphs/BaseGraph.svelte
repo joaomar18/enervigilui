@@ -122,12 +122,12 @@
     let showDateRange: boolean = false;
     let loaderTimeout: number | null = null;
     let showLoader: boolean = false;
-    let insideGraph: boolean = false;
     let graphCreated: boolean = false;
     let graphNoData: boolean = true;
+    let resizeObserver: ResizeObserver | null = null;
+    let insideGraph: boolean = false;
     let logPoint: BaseLogPoint | null = null;
     let cursorPos: { x: number | undefined; y: number | undefined };
-    let resizeObserver: ResizeObserver | null = null;
 
     // Reactive Statements
     $: if (!dataFetched && !showLoader) {
@@ -176,16 +176,16 @@
     export let getNewDefaultTimeSpan: (timeSpan: LogSpanPeriod) => void;
     export let goBack: () => void;
 
-    export function hoveredLogPointChange(currentLogPoint: BaseLogPoint | null): void {
+    function hoveredLogPointChange(currentLogPoint: BaseLogPoint | null): void {
         insideGraph = !!currentLogPoint;
         logPoint = currentLogPoint;
     }
 
-    export function mousePositionChange(xPos: number | undefined, yPos: number | undefined): void {
+    function mousePositionChange(xPos: number | undefined, yPos: number | undefined): void {
         cursorPos = { x: xPos, y: yPos };
     }
 
-    export function gridDoubleClick(startTime: Date, endTime: Date): void {
+    function gridDoubleClick(startTime: Date, endTime: Date): void {
         getNewTimeSpan(startTime, endTime);
     }
 
