@@ -139,25 +139,28 @@
         </div>
     </div>
     <div class="slot-div content" slot="content">
-        <EnergyConsumptionGraph
-            data={mergedPoints}
-            timeStep={energyLogs?.active_energy.time_step}
-            bind:selectedTimeSpan
-            bind:initialDate
-            bind:endDate
-            dataFetched={energyConsumptionFetched}
-            firstFetch={energyConsumptionFirstFetch}
-            globalMetrics={mergedGlobalMetrics}
-            activeEnergyUnit={energyLogs?.active_energy.unit ?? ""}
-            reactiveEnergyUnit={energyLogs?.reactive_energy.unit ?? ""}
-            activeEnergyDecimalPlaces={energyLogs?.active_energy.decimal_places}
-            reactiveEnergyDecimalPlaces={energyLogs?.reactive_energy.decimal_places}
-            powerFactorDecimalPlaces={energyLogs?.power_factor.decimal_places}
-            getNewTimeSpan={(initial_date: Date, end_date: Date) => getNewTimeSpan(initial_date, end_date)}
-            getNewDefaultTimeSpan={(timeSpan: LogSpanPeriod) => getNewDefaultTimeSpan(timeSpan)}
-            goBackEnabled={false}
-            goBack={() => {}}
-        />
+        <div class="graph-div">
+            <EnergyConsumptionGraph
+                data={mergedPoints}
+                timeStep={energyLogs?.active_energy.time_step}
+                bind:selectedTimeSpan
+                bind:initialDate
+                bind:endDate
+                dataFetched={energyConsumptionFetched}
+                firstFetch={energyConsumptionFirstFetch}
+                globalMetrics={mergedGlobalMetrics}
+                activeEnergyUnit={energyLogs?.active_energy.unit ?? ""}
+                reactiveEnergyUnit={energyLogs?.reactive_energy.unit ?? ""}
+                activeEnergyDecimalPlaces={energyLogs?.active_energy.decimal_places}
+                reactiveEnergyDecimalPlaces={energyLogs?.reactive_energy.decimal_places}
+                powerFactorDecimalPlaces={energyLogs?.power_factor.decimal_places}
+                getNewTimeSpan={(initial_date: Date, end_date: Date) => getNewTimeSpan(initial_date, end_date)}
+                getNewDefaultTimeSpan={(timeSpan: LogSpanPeriod) => getNewDefaultTimeSpan(timeSpan)}
+                goBackEnabled={false}
+                goBack={() => {}}
+            />
+        </div>
+        <div class="metrics-div"></div>
     </div>
 </ContentCard>
 
@@ -190,9 +193,16 @@
         margin: 0;
         padding: 0;
         display: flex;
-        flex-direction: column;
+        flex-direction: row;
         justify-content: start;
-        align-items: start;
+        align-items: center;
         min-height: 0;
+    }
+
+    .graph-div {
+        margin: 0;
+        padding: 0;
+        height: 100%;
+        width: 100%;
     }
 </style>

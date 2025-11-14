@@ -10,6 +10,7 @@
     export let logPoint: EnergyConsumptionLogPoint | null;
     export let activeEnergyUnit: string = "";
     export let reactiveEnergyUnit: string = "";
+    export let powerFactorDecimalPlaces: number | null;
 
     // Variables
     let dataAvailable: boolean = false;
@@ -32,6 +33,7 @@
             </div>
         {:else}
             <div class="row">
+                <span class="label">{$texts.activeEnergyValueShort}</span>
                 <span class="value no-data-label remove-right-padding">{$texts.noDataAvailableShort}</span>
             </div>
         {/if}
@@ -43,16 +45,18 @@
             </div>
         {:else}
             <div class="row">
+                <span class="label">{$texts.reactiveEnergyValueShort}</span>
                 <span class="value no-data-label remove-right-padding">{$texts.noDataAvailableShort}</span>
             </div>
         {/if}
         {#if logPoint?.power_factor !== null}
             <div class="row">
                 <span class="label">{$texts.powerFactorValueShort}</span>
-                <span class="value remove-right-padding">{logPoint?.power_factor}{pfDirectionStr}</span>
+                <span class="value remove-right-padding">{logPoint?.power_factor.toFixed(powerFactorDecimalPlaces ?? 0)}{pfDirectionStr}</span>
             </div>
         {:else}
             <div class="row">
+                <span class="label">{$texts.powerFactorValueShort}</span>
                 <span class="value no-data-label remove-right-padding">{$texts.noDataAvailableShort}</span>
             </div>
         {/if}

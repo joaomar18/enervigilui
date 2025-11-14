@@ -875,6 +875,18 @@ const textsObject: TextsObject = {
         PT: "Selecionar direção da energia",
         EN: "Select energy direction",
     },
+    activeEnergyValueShort: {
+        PT: "Ea",
+        EN: "Ea",
+    },
+    reactiveEnergyValueShort: {
+        PT: "Er",
+        EN: "Er",
+    },
+    powerFactorValueShort: {
+        PT: "Fp",
+        EN: "Pf",
+    },
 };
 
 export const texts = createLangStore(textsObject);

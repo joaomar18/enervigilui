@@ -16,7 +16,6 @@
     import { selectedLang } from "$lib/stores/lang/definition";
 
     // Styles
-    import { mergeStyle } from "$lib/style/components";
     import { BaseGraphStyle, GraphMetricStyle } from "$lib/style/graph";
     import { EnergyConsBaseGraphStyle } from "$lib/style/graph";
 
@@ -63,7 +62,6 @@
     $: if (graphContainer) {
         requestAnimationFrame(() => {
             createGraphObject();
-            console.log(graphContainer.getBoundingClientRect().height);
         });
     }
 
@@ -181,7 +179,7 @@
             </div>
             {#if gridElement}
                 <GraphToolTip {gridElement} {insideGraph} {cursorPos}>
-                    <EnergyConsToolTip {logPoint} {activeEnergyUnit} {reactiveEnergyUnit} />
+                    <EnergyConsToolTip {logPoint} {activeEnergyUnit} {reactiveEnergyUnit} {powerFactorDecimalPlaces} />
                 </GraphToolTip>
             {/if}
         </div>

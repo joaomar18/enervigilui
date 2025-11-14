@@ -177,6 +177,24 @@ const CounterGraphStyleConfig: ComponentStyles = {
 
 export const CounterGraphStyle = createStyleStore(CounterGraphStyleConfig);
 
+//////////     E N E R G Y     C O N S U M P T I O N     G R A P H     //////////
+
+const EnergyConsGraphStyleConfig: ComponentStyles = {
+    dark: {
+        activeEnergybarColor: "rgba(46, 204, 113, 0.20)",
+        reactiveEnergybarColor: "rgba(255, 127, 0, 0.20)",
+        barBorderWidthPx: 1,
+        activeEnergybarBorderColor: "transparent",
+        reactiveEnergybarBorderColor: "transparent",
+        activeEnergybarHoverColor: "rgba(46, 204, 113, 0.35)",
+        reactiveEnergybarHoverColor: "rgba(255, 127, 0, 0.35)",
+        activeEnergybarBorderHoverColor: "rgba(46, 204, 113, 0.45)",
+        reactiveEnergybarBorderHoverColor: "rgba(255, 127, 0, 0.45)",
+    },
+};
+
+export const EnergyConsGraphStyle = createStyleStore(EnergyConsGraphStyleConfig);
+
 //////////     G R A P H     M E T R I C     //////////
 
 const GraphMetricStyleConfig: ComponentStyles = {

@@ -5,7 +5,7 @@ import MeasurementMetrics from "../../../../components/Devices/Nodes/Metrics/Dat
 import MeasurementToolTip from "../../../../components/Devices/Nodes/Graphs/Tooltips/Data/MeasurementToolTip.svelte";
 import CounterMetrics from "../../../../components/Devices/Nodes/Metrics/Data/CounterMetrics.svelte";
 import CounterToolTip from "../../../../components/Devices/Nodes/Graphs/Tooltips/Data/CounterToolTip.svelte";
-import { MeasurementGraphStyle, CounterGraphStyle } from "$lib/style/graph";
+import { MeasurementGraphStyle, CounterGraphStyle, EnergyConsGraphStyle } from "$lib/style/graph";
 import type { AlignedData } from "uplot";
 import type { SvelteComponent } from "svelte";
 
@@ -110,7 +110,7 @@ export function getGraphToolTipDisplayComponent(graphType: GraphType): typeof Sv
         case GraphType.Counter:
             return CounterToolTip;
         case GraphType.EnergyConsumption: // TO DO
-            return CounterToolTip;
+            throw new Error(`Energy Consumption Graph needs an external implementation.`);
     }
 }
 
@@ -142,7 +142,7 @@ export function getGraphStyle(graphType: GraphType): { [property: string]: strin
     const styleMap = {
         [GraphType.Measurement]: get(MeasurementGraphStyle),
         [GraphType.Counter]: get(CounterGraphStyle),
-        [GraphType.EnergyConsumption]: get(CounterGraphStyle), // TO DO
+        [GraphType.EnergyConsumption]: get(EnergyConsGraphStyle),
     };
     return styleMap[graphType];
 }
