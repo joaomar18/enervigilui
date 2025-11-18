@@ -107,7 +107,12 @@
     });
 </script>
 
-<ContentCard contentPaddingTop="0px" contentPaddingBottom="0px" titleText={mobileView ? $texts.energyConsumptionShort : $texts.energyConsumption}>
+<ContentCard
+    contentPaddingHorizontal="0px"
+    contentPaddingTop="0px"
+    contentPaddingBottom="0px"
+    titleText={mobileView ? $texts.energyConsumptionShort : $texts.energyConsumption}
+>
     <div class="slot-div header" slot="header">
         <div class="actions-div">
             <div class="picker-div">

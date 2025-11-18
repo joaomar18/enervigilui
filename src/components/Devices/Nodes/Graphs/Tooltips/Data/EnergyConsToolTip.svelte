@@ -54,6 +54,11 @@
                 <span class="label">{$texts.powerFactorValueShort}</span>
                 <span class="value remove-right-padding">{logPoint?.power_factor.toFixed(powerFactorDecimalPlaces ?? 0)}{pfDirectionStr}</span>
             </div>
+        {:else if logPoint?.active_energy == 0 && logPoint?.reactive_energy == 0}
+            <div class="row">
+                <span class="label">{$texts.powerFactorValueShort}</span>
+                <span class="value no-data-label remove-right-padding">{$texts.notValid}</span>
+            </div>
         {:else}
             <div class="row">
                 <span class="label">{$texts.powerFactorValueShort}</span>

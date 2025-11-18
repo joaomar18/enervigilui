@@ -18,6 +18,7 @@
     // Styles
     import { BaseGraphStyle, GraphMetricStyle } from "$lib/style/graph";
     import { EnergyConsBaseGraphStyle } from "$lib/style/graph";
+    import EnergyConsMetrics from "../Metrics/Data/EnergyConsMetrics.svelte";
 
     // Style object (from theme)
     export let style: { [property: string]: string | number } | null = null;
@@ -135,6 +136,7 @@
     {getNewDefaultTimeSpan}
     useExternalGraph={true}
     useHeader={false}
+    useGraphRightArea={true}
     externalGraph={graph as BaseGraphObject<BaseLogPoint>}
     externalGraphContainer={graphContainer}
 >
@@ -182,6 +184,21 @@
                     <EnergyConsToolTip {logPoint} {activeEnergyUnit} {reactiveEnergyUnit} {powerFactorDecimalPlaces} />
                 </GraphToolTip>
             {/if}
+        </div>
+    </div>
+    <div class="desktop-right-panel" slot="graph-right-area">
+        <div class="desktop-right-panel-content">
+            <EnergyConsMetrics
+                metrics={globalMetrics}
+                roundMetrics={true}
+                {activeEnergyUnit}
+                {reactiveEnergyUnit}
+                {activeEnergyDecimalPlaces}
+                {reactiveEnergyDecimalPlaces}
+                {powerFactorDecimalPlaces}
+                {dataFetched}
+                {firstFetch}
+            />
         </div>
     </div>
 </BaseGraph>
@@ -292,5 +309,27 @@
         user-select: none;
         white-space: nowrap;
         transform: translate(-50%, -50%) rotate(-90deg);
+    }
+
+    .desktop-right-panel {
+        box-sizing: border-box;
+        width: 225px;
+        height: 100%;
+        padding-top: 10px;
+        padding-left: 10px;
+    }
+
+    .desktop-right-panel-content {
+        width: 100%;
+        height: 100%;
+        position: relative;
+        margin: 0;
+        padding: 0;
+    }
+
+    @media (max-width: 946px) {
+        .desktop-right-panel {
+            display: none;
+        }
     }
 </style>

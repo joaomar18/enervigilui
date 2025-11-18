@@ -48,6 +48,7 @@
     export let decimalPlaces: number | null = null;
     export let useExternalGraph: boolean = false;
     export let useHeader: boolean = true;
+    export let useGraphRightArea: boolean = false;
     export let externalGraph: BaseGraphObject<BaseLogPoint> | null = null;
     export let externalGraphContainer: HTMLDivElement | null = null;
 
@@ -287,7 +288,7 @@
         --box-shadow: {mergedStyle.boxShadow};
         --graph-height: {mergedStyle.graphHeight};
         --graph-padding-top: {mergedStyle.graphPaddingTop};
-        --graph-padding-left: {mergedStyle.graphPaddingTop};
+        --graph-padding-left: {mergedStyle.graphPaddingLeft};
         --graph-padding-right: {mergedStyle.graphPaddingRight};
         --graph-padding-bottom: {mergedStyle.graphPaddingBottom};
         --scrollbar-track-color: {mergedStyle.scrollbarTrackColor};
@@ -436,6 +437,9 @@
                 {:else}
                     <slot name="graph" />
                 {/if}
+                {#if useGraphRightArea}
+                    <slot name="graph-right-area" />
+                {/if}
             </div>
         </div>
     </div>
@@ -581,6 +585,10 @@
         width: 100%;
         flex: 1;
         min-height: 0;
+        display: flex;
+        flex-direction: row;
+        justify-content: space-between;
+        align-items: center;
     }
 
     /* Graph main content - Horizontal flex container with styled scrollbar for graph overflow */

@@ -103,7 +103,6 @@ const FullScreenBaseGraphStyleConfig: ComponentStyles = {
 
 export const FullScreenBaseGraphStyle = createStyleStore(FullScreenBaseGraphStyleConfig);
 
-
 //////////     E N E R G Y     C O N S U M P T I O N     B A S E     G R A P H     //////////
 
 const EnergyConsBaseGraphStyleConfig: ComponentStyles = {
@@ -119,7 +118,7 @@ const EnergyConsBaseGraphStyleConfig: ComponentStyles = {
         unitMaxWidth: "100px",
         yAxisTickSpacingPx: 40,
         borderRadius: "0px",
-        paddingHorizontal: "5px",
+        paddingHorizontal: "0px",
         paddingTop: "5px",
         paddingBottom: "0px",
         backgroundColor: "none",
@@ -250,6 +249,38 @@ const FullScreenGraphMetricStyleConfig: ComponentStyles = {
 };
 
 export const FullScreenGraphMetricStyle = createStyleStore(FullScreenGraphMetricStyleConfig);
+
+//////////     D E S K T O P     E N E R G Y     C O N S U M P T I O N     G R A P H     M E T R I C     //////////
+
+const DesktopEnergyConsMetricStyleConfig: ComponentStyles = {
+    dark: {
+        forceCollapse: "TRUE",
+        desktopView: "TRUE",
+        desktopContentPaddingTop: "5px",
+        desktopRowPaddingTop: "25px",
+        iconSize: "26px",
+        textSize: "14px",
+        rowWidth: "350px",
+        rowPaddingLeft: "30px",
+        rowPaddingRight: "30px",
+        rowBorderRight: "1px solid rgba(255, 255, 255, 0.12)",
+        rowBorderBottom: "1px solid rgba(255, 255, 255, 0.12)",
+        labelWidth: "75px",
+        labelPaddingLeft: "5px",
+        labelColor: "rgba(255, 255, 255, 0.55)",
+        labelWeight: "400",
+        valueRightPadding: "5px",
+        valueColor: "rgba(255, 255, 255, 0.95)",
+        valueWeight: "500",
+        unitMaxWidth: "50px",
+        unitColor: "rgba(255, 255, 255, 0.55)",
+        unitWeight: "400",
+        noDataLabelColor: "rgba(255, 255, 255, 0.4)",
+        noDataLabelWeight: "400",
+    },
+};
+
+export const DesktopEnergyConsMetricStyle = createStyleStore(DesktopEnergyConsMetricStyleConfig);
 
 //////////     G R A P H     T O O L     T I P     //////////
 

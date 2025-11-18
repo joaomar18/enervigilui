@@ -875,17 +875,33 @@ const textsObject: TextsObject = {
         PT: "Selecionar direção da energia",
         EN: "Select energy direction",
     },
+    activeEnergyValue: {
+        PT: "Energia Ativa",
+        EN: "Active Energy",
+    },
     activeEnergyValueShort: {
         PT: "Ea",
         EN: "Ea",
+    },
+    reactiveEnergyValue: {
+        PT: "Energia Reativa",
+        EN: "Reactive Energy",
     },
     reactiveEnergyValueShort: {
         PT: "Er",
         EN: "Er",
     },
+    powerFactorValue: {
+        PT: "Fator Potência",
+        EN: "Power Factor",
+    },
     powerFactorValueShort: {
         PT: "Fp",
         EN: "Pf",
+    },
+    invalid: {
+        PT: "Inválido",
+        EN: "Not valid",
     },
 };
 
