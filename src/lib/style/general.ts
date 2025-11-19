@@ -53,7 +53,6 @@ const ToastStyleConfig: ComponentStyles = {
 
 export const ToastStyle = createStyleStore(ToastStyleConfig);
 
-
 //////////     F O R M     A L E R T     //////////
 
 const FormAlertStyleConfig: ComponentStyles = {
@@ -383,6 +382,35 @@ const SelectorStyleConfig: ComponentStyles = {
 
 export const SelectorStyle = createStyleStore(SelectorStyleConfig);
 
+//////////     P I C K E R     S E L E C T O R     //////////
+
+const PickerSelectorStyleConfig: ComponentStyles = {
+    dark: {
+        width: "150px",
+        height: "35px",
+        borderRadius: "5px",
+        backgroundColor: "#12171e",
+        borderColor: "#30363d",
+        disabledBackgroundColor: "#12171e",
+        disabledBorderColor: "#30363d",
+        selectedColor: "#0066ff",
+        badFormatBackgroundColor: "#12171e",
+        badFormatBorderColor: "#e74c3c",
+        optionsBackgroundColor: "#0f1419",
+        optionsBorderColor: "#30363d",
+        optionsInnerBorderColor: "#30363d",
+        optionHeight: "35px",
+        fontSize: "14px",
+        letterSpacing: "0.5px",
+        wordSpacing: "1px",
+        arrowWidth: "24px",
+        arrowHeight: "24px",
+        arrowRightPos: "10px",
+    },
+};
+
+export const PickerSelectorStyle = createStyleStore(PickerSelectorStyleConfig);
+
 //////////     S E L E C T O R     B U T T O N     //////////
 
 const SelectorButtonStyleConfig: ComponentStyles = {
@@ -464,6 +492,8 @@ const ContentCardStyleConfig: ComponentStyles = {
         borderColor: "rgba(255,255,255,0.07)",
         shadow: "0 8px 16px rgba(0, 0, 0, 0.1)",
         borderRadius: "20px",
+        leftContentPaddingRight: "10px",
+        leftContentRightBorder: "none",
         titleSize: "17px",
         titleColor: "#f5f5f5",
         titleWeight: "500",
@@ -661,7 +691,6 @@ const ToolTipDateCheckerStyleConfig: ComponentStyles = {
 
 export const ToolTipDateCheckerStyle = createStyleStore(ToolTipDateCheckerStyleConfig);
 
-
 //////////     D A T E     R A N G E     P I C K E R     //////////
 
 const DateRangePickerStyleConfig: ComponentStyles = {
@@ -682,7 +711,6 @@ const DateRangePickerStyleConfig: ComponentStyles = {
 };
 
 export const DateRangePickerStyle = createStyleStore(DateRangePickerStyleConfig);
-
 
 //////////     D A T E     R A N G E     C H E C K E R     //////////
 
@@ -751,7 +779,9 @@ const PickerToolTipButtonStyleConfig: ComponentStyles = {
         disabledFontColor: "#eee",
         selectedFontColor: "#eee",
         fontSize: "14px",
+        subFontSize: "0.875rem",
         fontWeight: "400",
+        subFontWeight: "400",
         imageWidth: "32px",
         imageHeight: "32px",
         imageRightPos: "auto",
@@ -784,7 +814,9 @@ const PickerButtonStyleConfig: ComponentStyles = {
         disabledFontColor: "#484f58",
         selectedFontColor: "#f0f6fc",
         fontSize: "1rem",
+        subFontSize: "0.875rem",
         fontWeight: "400",
+        subFontWeight: "400",
         imageWidth: "32px",
         imageHeight: "32px",
         showToolTipDelay: 300,
@@ -813,7 +845,9 @@ const CustomDateButtonStyleConfig: ComponentStyles = {
         disabledFontColor: "#484f58",
         selectedFontColor: "#f0f6fc",
         fontSize: "1rem",
+        subFontSize: "0.875rem",
         fontWeight: "400",
+        subFontWeight: "400",
         imageWidth: "32px",
         imageHeight: "32px",
         showToolTipDelay: 300,
@@ -842,7 +876,9 @@ const SelectedCustomDateButtonStyleConfig: ComponentStyles = {
         disabledFontColor: "#484f58",
         selectedFontColor: "#f0f6fc",
         fontSize: "1rem",
+        subFontSize: "0.875rem",
         fontWeight: "400",
+        subFontWeight: "400",
         imageWidth: "32px",
         imageHeight: "32px",
         showToolTipDelay: 300,
@@ -851,6 +887,19 @@ const SelectedCustomDateButtonStyleConfig: ComponentStyles = {
 
 export const SelectedCustomDateButtonStyle = createStyleStore(SelectedCustomDateButtonStyleConfig);
 
+//////////     E N E R G Y     P I C K E R S     //////////
+
+const EnergyPickersStyleConfig: ComponentStyles = {
+    dark: {
+        labelSize: "14px",
+        labelWeight: "500",
+        labelColor: "#b0bec5",
+        labelHeight: "35px",
+    },
+};
+
+export const EnergyPickersStyle = createStyleStore(EnergyPickersStyleConfig);
+
 //////////     T E X T     C O L O R S     //////////
 
 const ToolTipTexStyleConfig: ComponentStyles = {
@@ -858,7 +907,7 @@ const ToolTipTexStyleConfig: ComponentStyles = {
         textColor: "#eeee",
         textWeight: "300",
         textSize: "14px",
-    }
-}
+    },
+};
 
 export const ToolTipTextStyle = createStyleStore(ToolTipTexStyleConfig);

@@ -7,12 +7,12 @@
     import { texts } from "$lib/stores/lang/generalTexts";
 
     // Styles
-    import { DesktopEnergyConsMetricStyle } from "$lib/style/graph";
+    import { EnergyConsMetricStyle } from "$lib/style/graph";
     import { onDestroy, onMount } from "svelte";
 
     // Style object (from theme)
     export let style: { [property: string]: string | number } | null = null;
-    $: effectiveStyle = style ?? $DesktopEnergyConsMetricStyle;
+    $: effectiveStyle = style ?? $EnergyConsMetricStyle;
 
     // Props
     export let metrics: EnergyConsumptionMetrics | undefined;
@@ -29,7 +29,7 @@
     let showLoader = false;
     let colStackWidthReached = false;
     let forceColStack = false;
-    let destkopView = false;
+    let desktopView = false;
     let colStack = false;
     let loaderTimeout: number | null = null;
     let numberOfVariables: number;
@@ -96,6 +96,13 @@
     });
 </script>
 
+<!--
+    EnergyConsMetrics - Energy consumption metrics display component
+    
+    Shows active energy, reactive energy, and power factor metrics with icons, labels,
+    values, and units. Supports responsive column/row layouts, desktop/mobile views,
+    loading states, and automatic rounding based on decimal precision settings.
+-->
 <div
     style="
         --desktop-content-padding-top: {effectiveStyle.desktopContentPaddingTop};
@@ -125,9 +132,9 @@
     class="container"
     class:col-stack={colStack}
 >
-    <div class="content">
-        <div class="row" class:desktop={desktopView}>
-            <div class="identifier" class:desktop={desktopView}>
+    <div class="content" class:desktop={desktopView}>
+        <div class="row">
+            <div class="identifier">
                 <img class="icon" src="/img/active-energy.svg" alt="Active energy" />
                 <span class="label">{$texts.activeEnergyValue} ({$texts.activeEnergyValueShort})</span>
             </div>
@@ -146,8 +153,8 @@
                 </InlineLoader>
             </div>
         </div>
-        <div class="row" class:desktop={desktopView}>
-            <div class="identifier" class:desktop={desktopView}>
+        <div class="row">
+            <div class="identifier">
                 <img class="icon" src="/img/reactive-energy.svg" alt="Reactive energy" />
                 <span class="label">{$texts.reactiveEnergyValue} ({$texts.reactiveEnergyValueShort})</span>
             </div>
@@ -166,8 +173,8 @@
                 </InlineLoader>
             </div>
         </div>
-        <div class="row" class:desktop={desktopView}>
-            <div class="identifier" class:desktop={desktopView}>
+        <div class="row">
+            <div class="identifier">
                 <img class="icon" src="/img/power-factor.svg" alt="Power Factor" />
                 <span class="label">{$texts.powerFactorValue} ({$texts.powerFactorValueShort})</span>
             </div>
@@ -191,12 +198,25 @@
 </div>
 
 <style>
-    /* Display metrics on a column stack */
+    /* Main container - Root wrapper for all metric rows */
+    .container {
+        margin: 0;
+        padding: 0;
+        width: 100%;
+        height: fit-content;
+    }
+
+    /* Column stack layout - Vertical stacking for narrow viewports or forced collapse */
     .container.col-stack {
         .content {
             flex-direction: column;
             align-items: start;
+            gap: 15px;
         }
+        .content.desktop {
+            gap: 0px;
+        }
+
         .row {
             width: 100%;
             padding-left: 0;
@@ -216,7 +236,7 @@
     }
 
     /* Metric row - Individual stat display with icon, label, value, and unit */
-    .row {
+    .content .row {
         box-sizing: border-box;
         margin: 0;
         width: var(--row-width);
@@ -229,7 +249,8 @@
         align-items: center;
     }
 
-    .row.desktop {
+    /* Desktop row layout - Vertical column layout with bottom borders */
+    .content.desktop .row {
         flex-direction: column;
         justify-content: start;
         align-items: center;
@@ -237,20 +258,21 @@
         padding-top: var(--desktop-row-padding-top);
     }
 
-    /* Remove left padding from the first row child */
-    .row:first-child {
+    /* Remove left and top padding from the first row child */
+    .content .row:first-child {
         padding-top: 0;
         padding-left: 0;
     }
 
     /* Remove border and padding right from last row - Prevents trailing divider */
-    .row:last-child {
+    .content .row:last-child {
         padding-right: 0;
         border-right: none;
     }
 
-    .row .identifier {
-        width: 100%;
+    /* Metric identifier section - Container for icon and label */
+    .content .row .identifier {
+        width: fit-content;
         height: fit-content;
         display: flex;
         flex-direction: row;
@@ -258,14 +280,19 @@
         align-items: center;
     }
 
+    /* Desktop identifier - Full-width identifier for desktop layout */
+    .content.desktop .row .identifier {
+        width: 100%;
+    }
+
     /* Metric icon - Visual indicator for metric type (varies by node category) */
-    .row .identifier .icon {
+    .content .row .identifier .icon {
         width: var(--icon-size);
         height: var(--icon-size);
     }
 
     /* Metric label - Descriptive text with consistent spacing and typography */
-    .row .identifier .label {
+    .content .row .identifier .label {
         text-align: left;
         padding-left: var(--label-padding-left);
         line-height: var(--icon-size);
@@ -277,23 +304,25 @@
         overflow: hidden;
     }
 
-    .row .identifier.desktop .label {
+    /* Desktop label - Auto-width label for desktop vertical layout */
+    .content.desktop .row .identifier .label {
         width: auto;
     }
 
     /* Request content wrapper - Container for value/unit with loading state support */
-    .row .request-content {
+    .content .row .request-content {
         min-width: 0;
         flex: 1;
         height: 100%;
     }
 
-    .row.desktop .request-content {
+    /* Desktop request content - Full-width content wrapper for desktop layout */
+    .content.desktop .row .request-content {
         width: 100%;
     }
 
     /* Loader content layout - Flex container for value and unit with space distribution */
-    .row .request-content .loader-div {
+    .content .row .request-content .loader-div {
         display: flex;
         flex-direction: row;
         justify-content: space-between;
@@ -301,7 +330,7 @@
     }
 
     /* Metric value - Numerical data with flexible width and ellipsis overflow */
-    .row .request-content .loader-div .value {
+    .content .row .request-content .loader-div .value {
         text-align: right;
         font-size: var(--text-size);
         padding-right: var(--value-right-padding);
@@ -315,12 +344,13 @@
         text-overflow: ellipsis;
     }
 
-    .row.desktop .request-content {
+    /* Desktop request content padding - Top padding for desktop vertical spacing */
+    .content.desktop .row .request-content {
         padding-top: var(--desktop-content-padding-top);
     }
 
     /* Metric unit - Measurement unit display (kWh, VArh, A, etc.) with constrained width */
-    .row .request-content .loader-div .unit {
+    .content .row .request-content .loader-div .unit {
         text-align: right;
         font-size: var(--text-size);
         line-height: var(--icon-size);
@@ -335,7 +365,7 @@
     }
 
     /* No-data indicator - Fallback text displayed when metric values are null */
-    .row .request-content .loader-div .no-data-label {
+    .content .row .request-content .loader-div .no-data-label {
         text-align: right;
         font-size: var(--text-size);
         line-height: var(--icon-size);

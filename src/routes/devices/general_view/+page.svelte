@@ -134,6 +134,7 @@
         }
         .grid .grid-col.span-2 {
             grid-column: auto;
+            height: 708px;
         }
     }
 </style>

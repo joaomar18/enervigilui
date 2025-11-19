@@ -17,6 +17,43 @@ const textsObjectsProtocols: TextsObject = {
     },
 };
 
+//////////     P H A S E     T E X T S     //////////
+
+const textsObjectsPhases: TextsObject = {
+    L1: {
+        PT: "L1",
+        EN: "L1",
+    },
+    L2: {
+        PT: "L2",
+        EN: "L2",
+    },
+    L3: {
+        PT: "L3",
+        EN: "L3",
+    },
+    Total: {
+        PT: "Total",
+        EN: "Total",
+    },
+};
+
+//////////     D I R E C T I O N     T E X T S     //////////
+const textsObjectsDirections: TextsObject = {
+    Forward: {
+        PT: "Direta",
+        EN: "Forward",
+    },
+    Reverse: {
+        PT: "Inversa",
+        EN: "Reverse",
+    },
+    Total: {
+        PT: "Total",
+        EN: "Total",
+    },
+};
+
 //////////     M E T E R     T Y P E     T E X T S     //////////
 
 const textsObjectsMeterTypes: TextsObject = {
@@ -128,5 +165,7 @@ export const variableNameTextsByPhase = derived([defaultVariables, selectedLang]
 });
 
 export const protocolTexts = createLangStore(textsObjectsProtocols);
+export const phaseTexts = createLangStore(textsObjectsPhases);
+export const directionTexts = createLangStore(textsObjectsDirections);
 export const meterTypeTexts = createLangStore(textsObjectsMeterTypes);
 export const variableNameTexts = createLangStore(textsObjectsVariables);

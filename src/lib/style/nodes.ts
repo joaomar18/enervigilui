@@ -26,7 +26,9 @@ const AddNodeButtonStyleConfig: ComponentStyles = {
         fontColor: "#f5f5f5",
         disabledFontColor: "#f5f5f5",
         fontSize: "0.9rem",
+        subFontSize: "0.875rem",
         fontWeight: "400",
+        subFontWeight: "400",
     },
 };
 

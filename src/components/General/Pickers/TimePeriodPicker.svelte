@@ -15,12 +15,14 @@
     import { PickerButtonStyle } from "$lib/style/general";
     import { CustomDateButtonStyle } from "$lib/style/general";
     import { SelectedCustomDateButtonStyle } from "$lib/style/general";
+    import DateRangeChecker from "../TimeDate/DateRangeChecker.svelte";
 
     // Style object (from theme)
     export let toolTipButtonStyle: { [property: string]: string | number } | null = null;
     $: effectiveToolTipButtonStyle = toolTipButtonStyle ?? $PickerToolTipButtonStyle;
 
     // Props
+    export let showSelected: boolean = false;
     export let useToolTip: boolean = true;
     export let selectedTimeSpan: LogSpanPeriod;
     export let initialDate: Date;
@@ -65,22 +67,14 @@
 <!--
     TimePeriodPicker Component
     
-    A versatile time period selection interface with dual presentation modes for filtering
-    temporal data ranges. Features both tooltip-based popup and inline display modes,
-    offering predefined quick-select periods (1h, 1d, 7d, 1M, 1Y) with internationalized
-    labels and comprehensive tooltips. Integrates custom date range picker with calendar
-    selection capabilities and maintains reactive state synchronization between selection
-    modes. Implements click-outside detection for modal behavior, automatic event listener
-    cleanup, and right-aligned tooltip positioning for optimal UI placement.
-    
-    The component supports both compact trigger button mode (useToolTip=true) and expanded
-    inline selection interface (useToolTip=false), handles window event delegation for
-    responsive interactions, and provides callback functions for period selection events.
-    Maintains visual selection states across all time period options and seamlessly
-    integrates DateRangePicker for custom date range functionality with proper binding
-    and state management.
+    A time period selection interface supporting dual presentation modes (tooltip-based 
+    popup or inline display) for filtering time-series data. Provides predefined quick-select 
+    periods (1H, 1D, 7D, 1M, 1Y) with internationalized labels and tooltips, plus custom 
+    date range selection via integrated DateRangePicker. Features click-outside dismissal, 
+    automatic event listener cleanup, reactive state synchronization, and optional display 
+    of the currently selected period range above the period buttons.
 -->
-<div bind:this={containerDiv}>
+<div style="--selected-border-bottom: {$PickerToolTipStyle.border};" class="container" bind:this={containerDiv}>
     {#if useToolTip}
         <ToolTip
             style={$PickerToolTipStyle}
@@ -91,7 +85,12 @@
             autoPositionContinuous={true}
             alignType="right"
         >
-            <div class="period-selection-div">
+            {#if showSelected}
+                <div class="selected-period-div">
+                    <DateRangeChecker {initialDate} {endDate} useToolTip={false} />
+                </div>
+            {/if}
+            <div class="period-selection-div" class:using-selected={showSelected}>
                 <Button
                     enableToolTip={true}
                     style={$PickerButtonStyle}
@@ -173,7 +172,12 @@
             <div slot="tooltip"><ToolTipText text={$texts.periodSelection} /></div>
         </Button>
     {:else}
-        <div class="period-selection-div">
+        {#if showSelected}
+            <div class="selected-period-div">
+                <DateRangeChecker {initialDate} {endDate} useToolTip={false} />
+            </div>
+        {/if}
+        <div class="period-selection-div" class:using-selected={showSelected}>
             <Button
                 enableToolTip={true}
                 style={$PickerButtonStyle}
@@ -244,6 +248,29 @@
 </div>
 
 <style>
+    /* Root container - Flex column for stacking optional selected period header and period buttons */
+    .container {
+        margin: 0;
+        padding: 0;
+        position: relative;
+        display: flex;
+        flex-direction: column;
+        justify-content: start;
+        align-items: center;
+    }
+
+    /* Selected period header - Displays current date range above period buttons with divider */
+    .selected-period-div {
+        box-sizing: border-box;
+        width: 100%;
+        height: fit-content;
+        padding-top: 5px;
+        padding-left: 5px;
+        padding-right: 5px;
+        padding-bottom: 10px;
+        border-bottom: var(--selected-border-bottom);
+    }
+
     /* Period selection container - Horizontal layout for time period buttons and custom date picker */
     .period-selection-div {
         display: flex;
@@ -252,6 +279,11 @@
         gap: 10px;
         width: fit-content;
         height: fit-content;
+    }
+
+    /* Period selection with header - Adds top spacing when selected period header is present */
+    .period-selection-div.using-selected {
+        padding-top: 10px;
     }
 
     /* Custom date section - Wrapper for custom date button and integrated DateRangePicker component */

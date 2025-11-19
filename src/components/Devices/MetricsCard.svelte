@@ -1,14 +1,11 @@
 <script lang="ts">
     import Action from "../General/Action.svelte";
     import ContentCard from "../General/ContentCard.svelte";
-    import TimePeriodPicker from "../General/Pickers/TimePeriodPicker.svelte";
     import ToolTipText from "../General/ToolTipText.svelte";
-    import ElectricalPhasePicker from "../General/Pickers/ElectricalPhasePicker.svelte";
+    import EnergyPickers from "../General/Pickers/EnergyPickers.svelte";
     import { LogSpanPeriod } from "$lib/types/view/nodes";
-    import { SlidingWindow } from "$lib/logic/util/classes/SlidingWindow";
     import { SelectablePhaseFilter } from "$lib/types/view/nodes";
     import { NodePhase } from "$lib/types/nodes/base";
-    import type { NodeTimeSpan } from "$lib/types/view/nodes";
 
     // Texts
     import { texts } from "$lib/stores/lang/generalTexts";
@@ -26,8 +23,12 @@
     let selectedTimeSpan: LogSpanPeriod = LogSpanPeriod.currentDay;
     let initialDate: Date;
     let endDate: Date;
-    let timeSpans: SlidingWindow<NodeTimeSpan> = new SlidingWindow(10);
-    let enableGoBack: boolean = false;
+    let usePhase: boolean = false;
+
+    // Reactive Statements
+    $: if (availablePhases) {
+        usePhase = !availablePhases.includes(NodePhase.SINGLEPHASE);
+    }
 
     // Functions
     function getNewTimeSpan(initialDate: Date, endDate: Date): void {}
@@ -57,6 +58,8 @@
             <Action
                 style={$RealTimeCardActionStyle}
                 toolTipStyle={$RealTimeCardActionToolTipStyle}
+                imageWidth="24px"
+                imageHeight="24px"
                 imageURL="/img/collapse-all.svg"
                 onClick={() => {}}
                 enableToolTip={true}
@@ -66,27 +69,24 @@
             <Action
                 style={$RealTimeCardActionStyle}
                 toolTipStyle={$RealTimeCardActionToolTipStyle}
+                imageWidth="24px"
+                imageHeight="24px"
                 imageURL="/img/expand-all.svg"
                 onClick={() => {}}
                 enableToolTip={true}
             >
                 <div slot="tooltip"><ToolTipText text={$texts.expandAll} /></div>
             </Action>
-            {#if !availablePhases.includes(NodePhase.SINGLEPHASE)}
-                <div class="picker-div">
-                    <ElectricalPhasePicker
-                        toolTipButtonStyle={$RealTimeCardButtonStyle}
-                        bind:selectedPhase={selectedElectricalPhase}
-                        changePhaseFilter={(selectedPhase: SelectablePhaseFilter) => getNewElectricalPhase(selectedPhase)}
-                    />
-                </div>
-            {/if}
             <div class="picker-div">
-                <TimePeriodPicker
+                <EnergyPickers
                     toolTipButtonStyle={$RealTimeCardButtonStyle}
+                    bind:selectedPhase={selectedElectricalPhase}
                     bind:selectedTimeSpan
                     bind:initialDate
                     bind:endDate
+                    {usePhase}
+                    useDirection={false}
+                    changePhase={(selectedPhase: SelectablePhaseFilter) => getNewElectricalPhase(selectedPhase)}
                     changeSpanPeriodCustom={(initial_date: Date, end_date: Date) => getNewTimeSpan(initial_date, end_date)}
                     changeSpanPeriod={(timeSpan: LogSpanPeriod) => getNewDefaultTimeSpan(timeSpan)}
                 />

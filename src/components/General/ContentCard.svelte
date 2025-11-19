@@ -9,6 +9,7 @@
 
     // Props
     export let titleText: string = "";
+    export let useLeftHeader: boolean = false;
 
     // Layout / styling props
     export let width: string | undefined = undefined;
@@ -19,6 +20,8 @@
     export let borderColor: string | undefined = undefined;
     export let shadow: string | undefined = undefined;
     export let borderRadius: string | undefined = undefined;
+    export let leftContentPaddingRight: string | undefined = undefined;
+    export let leftContentRightBorder: string | undefined = undefined;
     export let titleSize: string | undefined = undefined;
     export let titleColor: string | undefined = undefined;
     export let titleWeight: string | undefined = undefined;
@@ -44,6 +47,8 @@
         borderColor,
         shadow,
         borderRadius,
+        leftContentPaddingRight,
+        leftContentRightBorder,
         titleSize,
         titleColor,
         titleWeight,
@@ -76,6 +81,8 @@
         --border-color: {mergedStyle.borderColor};
         --border-radius: {mergedStyle.borderRadius};
         --shadow: {mergedStyle.shadow};
+        --left-content-padding-right: {mergedStyle.leftContentPaddingRight};
+        --left-content-right-border: {mergedStyle.leftContentRightBorder};
         --title-size: {mergedStyle.titleSize};
         --title-color: {mergedStyle.titleColor};
         --title-weight: {mergedStyle.titleWeight};
@@ -95,6 +102,9 @@
     class="container"
 >
     <div class="header">
+        <div class="left-slot-content" class:use={useLeftHeader}>
+            <slot name="left-header" />
+        </div>
         <h3>{titleText}</h3>
         <div class="slot-content">
             <slot name="header" />
@@ -159,6 +169,18 @@
         white-space: nowrap;
         overflow: hidden;
         text-overflow: ellipsis;
+    }
+
+    .header .left-slot-content {
+        margin: 0;
+        padding: 0;
+        width: fit-content;
+        height: 100%;
+    }
+
+    .header .left-slot-content.use {
+        border-right: var(--left-content-right-border);
+        padding-right: var(--left-content-padding-right);
     }
 
     /* Header slot area: flexible container for additional header content */

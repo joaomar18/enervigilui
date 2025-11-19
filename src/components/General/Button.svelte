@@ -11,6 +11,7 @@
     export let selected: boolean = false;
     export let processing: boolean = false;
     export let buttonText: string;
+    export let subButtonText: string = "";
     export let imageURL: string = "";
     export let enableToolTip: boolean = false;
     export let toolTipAutoPos: boolean = true;
@@ -39,7 +40,9 @@
     export let disabledFontColor: string | undefined = undefined;
     export let selectedFontColor: string | undefined = undefined;
     export let fontSize: string | undefined = undefined;
+    export let subFontSize: string | undefined = undefined;
     export let fontWeight: string | undefined = undefined;
+    export let subFontWeight: string | undefined = undefined;
     export let imageWidth: string | undefined = undefined;
     export let imageHeight: string | undefined = undefined;
     export let imageRightPos: string | undefined = undefined;
@@ -65,7 +68,9 @@
         disabledFontColor,
         selectedFontColor,
         fontSize,
+        subFontSize,
         fontWeight,
+        subFontWeight,
         imageWidth,
         imageHeight,
         imageRightPos,
@@ -142,7 +147,9 @@
         --disabled-font-color: {mergedStyle.disabledFontColor};
         --selected-font-color: {mergedStyle.selectedFontColor};
         --font-size: {mergedStyle.fontSize};
+        --sub-font-size: {mergedStyle.subFontSize};
         --font-weight: {mergedStyle.fontWeight};
+        --sub-font-weight: {mergedStyle.subFontWeight};
         --image-width: {mergedStyle.imageWidth};
         --image-height: {mergedStyle.imageHeight};
         --image-right-position: {mergedStyle.imageRightPos};
@@ -152,17 +159,24 @@
     class:align-right={mergedStyle.imageLeftPos != "auto" && imageURL && !processing}
     class:disabled={!enabled || processing}
     class:selected={enabled && selected}
-    aria-label={buttonText}
+    aria-label="{buttonText}{subButtonText}"
     on:click={handleClick}
     on:mouseenter={handleMouseEnter}
     on:mouseleave={handleMouseLeave}
 >
     {#if !processing}
-        {#if buttonText}
-            {buttonText}
+        {#if buttonText && subButtonText}
+            <div class="text">
+                <span class="main-text">{buttonText}</span>
+                <span class="sub-text">{subButtonText}</span>
+            </div>
+        {:else if buttonText}
+            <span class="main-text">{buttonText}</span>
+        {:else if subButtonText}
+            <span class="sub-text">{subButtonText}</span>
         {/if}
         {#if imageURL}
-            <img class:center={!buttonText} src={imageURL} alt={imageURL} />
+            <img class:center={!buttonText && !subButtonText} src={imageURL} alt={imageURL} />
         {/if}
     {:else}
         <svg class="loader" width={mergedStyle.imageWidth} height={mergedStyle.imageHeight} viewBox="0 0 50 50" xmlns="http://www.w3.org/2000/svg">
@@ -175,7 +189,7 @@
 </button>
 
 <style>
-    /* Main button styles: layout, typography, and transitions */
+    /* Main button - Flexible base with configurable dimensions, colors, border, and smooth transitions */
     button {
         margin: 0;
         padding: 0;
@@ -187,54 +201,80 @@
         border-radius: var(--border-radius, 0px);
         background-color: var(--background-color);
         border: 1px solid var(--border-color);
-        font-size: var(--font-size);
-        color: var(--font-color);
-        font-weight: var(--font-weight);
         cursor: pointer;
         transition: background-color 0.2s ease;
         outline: none;
         -webkit-tap-highlight-color: transparent;
     }
 
-    /* Disabled state: muted colors and no pointer */
+    /* Disabled state - Muted colors and cursor set to auto to indicate non-interactive state */
     button.disabled {
         background-color: var(--disabled-background-color);
         border: 1px solid var(--disabled-border-color);
         cursor: auto;
     }
 
+    /* Selected state - Alternate background and border colors for active/selected appearance */
     button.selected {
         background-color: var(--selected-background-color);
         border: 1px solid var(--selected-border-color);
     }
 
-    /* Icon on the left: align text left and add left padding */
+    /* Left-aligned layout - Text aligned left with padding to accommodate right-positioned icon */
     button.align-left {
         text-align: left;
         padding-left: var(--image-right-position);
     }
 
-    /* Icon on the right: align text right and add right padding */
+    /* Right-aligned layout - Text aligned right with padding to accommodate left-positioned icon */
     button.align-right {
         text-align: right;
         padding-right: var(--image-left-position);
     }
 
-    /* Hover state: change background color */
+    /* Hover state - Changes background color on mouse over for interactive feedback */
     button:hover {
         background-color: var(--hover-color);
     }
 
-    /* Disabled hover: keep disabled background */
+    /* Disabled hover state - Maintains disabled appearance on hover to reinforce non-interactive state */
     button.disabled:hover {
         background-color: var(--disabled-hover-color);
     }
 
+    /* Selected hover state - Alternate hover color for selected buttons */
     button.selected:hover {
         background-color: var(--selected-hover-color);
     }
 
-    /* Icon styles: size and vertical centering, position left or right */
+    /* Text container - Flex layout for main and sub text with baseline alignment */
+    button .text {
+        margin:0;
+        padding:0;
+        display:flex;
+        justify-content: center;
+        align-items: baseline;
+    }
+
+    /* Main button text - Primary label with configurable font size, color, and weight */
+    button .main-text {
+        padding: 0;
+        margin: 0;
+        font-size: var(--font-size);
+        color: var(--font-color);
+        font-weight: var(--font-weight);
+    }
+
+    /* Sub button text - Secondary label with smaller font size and lighter weight */
+    button .sub-text {
+        padding: 0;
+        margin: 0;
+        font-size: var(--sub-font-size);
+        color: var(--font-color);
+        font-weight: var(--sub-font-weight);
+    }
+
+    /* Button icon - Absolutely positioned image with configurable size and left/right placement */
     button img {
         width: var(--image-width);
         height: var(--image-height);
@@ -245,19 +285,19 @@
         transform: translateY(-50%);
     }
 
-    /* Center the image on the button when there is no text */
+    /* Centered icon - Centers image when no text is present for icon-only buttons */
     button img.center {
         left: 50%;
         transform: translate(-50%, -50%);
     }
 
-    /* Loading spinner: rotating animation */
+    /* Loading spinner - Rotating SVG animation shown during processing state */
     .loader {
         animation: rotate 1s linear infinite;
         transform-origin: center;
     }
 
-    /* Spinner circle path: animated stroke */
+    /* Spinner circle path - Animated stroke with dashed appearance for loading indication */
     .path {
         stroke: white;
         stroke-linecap: butt;
@@ -265,7 +305,7 @@
         stroke-dashoffset: 0;
     }
 
-    /* Keyframe animation: full 360 degree rotation */
+    /* Rotation keyframe - Continuous 360-degree rotation for loading spinner animation */
     @keyframes rotate {
         100% {
             transform: rotate(360deg);

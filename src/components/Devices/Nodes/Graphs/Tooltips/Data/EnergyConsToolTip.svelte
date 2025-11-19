@@ -23,6 +23,14 @@
     }
 </script>
 
+<!--
+    EnergyConsToolTip - Energy consumption graph hover tooltip
+    
+    Displays active energy, reactive energy, and power factor values for a specific
+    data point when hovering over the energy consumption graph. Handles null values,
+    shows directional indicators for power factor (capacitive/inductive), and displays
+    "Not valid" for zero-energy conditions.
+-->
 <GraphDataToolTip {logPoint} {dataAvailable}>
     {#if dataAvailable}
         {#if logPoint?.active_energy !== null}
@@ -69,7 +77,7 @@
 </GraphDataToolTip>
 
 <style>
-    /* Data row - Horizontal layout for label, value, and unit triplets */
+    /* Data row - Horizontal layout for label, value, and unit triplets in tooltip */
     .row {
         width: 100%;
         height: fit-content;
@@ -78,7 +86,7 @@
         align-items: center;
     }
 
-    /* Measurement label - Fixed width area for abbreviated labels (Máx, Méd, Mín) */
+    /* Measurement label - Fixed width for abbreviated metric names (Ea, Er, Fp) */
     .label {
         text-align: left;
         width: var(--label-width);
@@ -87,7 +95,7 @@
         font-weight: var(--label-weight);
     }
 
-    /* Measurement value - Flexible area for numeric data with ellipsis overflow */
+    /* Measurement value - Flexible numeric display with ellipsis for long decimals */
     .value {
         min-width: 0;
         padding: 0;
@@ -102,18 +110,18 @@
         text-overflow: ellipsis;
     }
 
-    /* No-data state modifier - Applied when measurement values are null */
+    /* No-data state modifier - Dimmed styling for null/unavailable measurements */
     .value.no-data-label {
         color: var(--no-data-label-color);
         font-weight: var(--no-data-label-weight);
     }
 
-    /* Remove right padding when the unit is empty */
+    /* Padding removal modifier - Applied when unit is empty to prevent spacing gap */
     .value.remove-right-padding {
         padding-right: 0;
     }
 
-    /* Unit display - Right-aligned area for measurement units with ellipsis overflow */
+    /* Unit display - Right-aligned measurement unit (kWh, VArh) with overflow handling */
     .unit {
         width: fit-content;
         max-width: var(--unit-max-width);

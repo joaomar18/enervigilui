@@ -11,7 +11,7 @@ export interface TextsObject {
     };
 }
 
-export const selectedLang = writable<Language>("PT"); //Current selected language: Starts with PT - Portuguese
+export const selectedLang = writable<Language>("EN"); //Current selected language: Starts with EN - English
 
 /**
  * Creates a derived store that exposes texts in the current selected language.

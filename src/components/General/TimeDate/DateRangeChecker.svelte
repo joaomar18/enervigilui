@@ -17,6 +17,7 @@
     // Props
     export let fullWidth: boolean = false;
     export let showToolTip: boolean = true;
+    export let useToolTip: boolean = true;
     export let initialDate: Date;
     export let endDate: Date;
 
@@ -91,6 +92,16 @@
     });
 </script>
 
+<!--
+    DateRangeChecker Component
+    
+    Displays a formatted date range (start and end dates) with flexible layout modes: 
+    tooltip popup, inline display, or full-width horizontal layout. Formats dates via 
+    getElegantStringFromDate utility and supports i18n labels ("From"/"To"). Features 
+    click-outside dismissal for tooltip mode, automatic event listener cleanup, and 
+    extensive theming support via CSS variables. Used in time period pickers and graph 
+    headers to show the currently selected or active date range.
+-->
 {#if fullWidth}
     <div
         style="
@@ -123,7 +134,7 @@
             </div>
         </div>
     </div>
-{:else}
+{:else if useToolTip}
     <ToolTip style={$ToolTipDateCheckerStyle} autoPositionContinuous={true} zIndex={198} {showToolTip}>
         <div
             style="
@@ -161,10 +172,44 @@
             </div>
         </div>
     </ToolTip>
+{:else}
+    <div
+        style="
+                    --text-size: {mergedStyle.textSize};
+                    --label-width: {mergedStyle.labelWidth};
+                    --label-color: {mergedStyle.labelColor};
+                    --label-weight: {mergedStyle.labelWeight};
+                    --value-color: {mergedStyle.valueColor};
+                    --value-weight: {mergedStyle.valueWeight};
+                    --row-gap: {mergedStyle.rowGap};
+                "
+        bind:this={containerDiv}
+        class="date-checker-div"
+        class:no-padding={!useToolTip}
+    >
+        <div class="content" class:full-width={fullWidth}>
+            <div class="row">
+                <div class="label-div">
+                    <span class="label">{$texts.fromDate}</span>
+                </div>
+                <div class="value-div">
+                    <span class="value">{initialDateString}</span>
+                </div>
+            </div>
+            <div class="row">
+                <div class="label-div">
+                    <span class="label">{$texts.toDate}</span>
+                </div>
+                <div class="value-div">
+                    <span class="value">{endDateString}</span>
+                </div>
+            </div>
+        </div>
+    </div>
 {/if}
 
 <style>
-    /* Main container - Full tooltip content area with configurable padding */
+    /* Main container - Wrapper for tooltip content with configurable padding and container queries */
     .date-checker-div {
         width: 100%;
         height: 100%;
@@ -176,7 +221,12 @@
         container-type: inline-size;
     }
 
-    /* Content wrapper - Flexbox container for date range rows */
+    /* Container without padding - Used when displayed inline without tooltip wrapper */
+    .date-checker-div.no-padding {
+        padding: 0;
+    }
+
+    /* Content wrapper - Flexbox container for date range rows with vertical or horizontal layout */
     .content {
         margin: 0;
         padding: 0;
@@ -190,6 +240,7 @@
         gap: var(--row-gap);
     }
 
+    /* Full-width content layout - Switches to horizontal row arrangement for wide displays */
     .content.full-width {
         flex-direction: row;
         gap: 0px;
@@ -204,6 +255,7 @@
         align-items: center;
     }
 
+    /* Full-width row styling - Adds horizontal padding and dividers between date range elements */
     .content.full-width .row {
         padding-left: var(--fs-row-padding-horizontal);
         padding-right: var(--fs-row-padding-horizontal);
@@ -211,10 +263,12 @@
         height: 100%;
     }
 
+    /* First row in full-width - Removes left padding to align with container edge */
     .content.full-width .row:first-child {
         padding-left: 0;
     }
 
+    /* Last row in full-width - Removes right border to prevent trailing divider */
     .content.full-width .row:last-child {
         border-right: none;
     }
@@ -229,6 +283,7 @@
         align-items: center;
     }
 
+    /* Full-width label container - Uses alternate width variable for wide layouts */
     .content.full-width .row .label-div {
         width: var(--fs-label-width);
     }
@@ -240,11 +295,12 @@
         color: var(--label-color);
     }
 
+    /* Full-width label text - Uses alternate font size for wide layouts */
     .content.full-width .row .label-div .label {
         font-size: var(--fs-text-size);
     }
 
-    /* Value container - Flexible area for formatted date values */
+    /* Value container - Flexible area for formatted date values with right alignment */
     .value-div {
         flex: 1;
         height: 100%;
@@ -254,7 +310,7 @@
         align-items: center;
     }
 
-    /* Date value text - Styled formatted date strings */
+    /* Date value text - Styled formatted date strings with ellipsis overflow handling */
     .content .row .value-div .value {
         font-size: var(--text-size);
         font-weight: var(--value-weight);
@@ -264,6 +320,7 @@
         text-overflow: ellipsis;
     }
 
+    /* Full-width value text - Uses alternate font size for wide layouts */
     .content.full-width .row .value-div .value {
         font-size: var(--fs-text-size);
     }

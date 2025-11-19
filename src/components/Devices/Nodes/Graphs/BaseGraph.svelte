@@ -35,6 +35,7 @@
     export let timeStep: FormattedTimeStep | null | undefined;
     export let fullScreen: boolean = false;
     export let showFullScreen: boolean = false; // Used externally on Full Screen Graph
+    export let showDateChecker: boolean = true;
     export let showDatePicker: boolean = false;
     export let goBackEnabled: boolean;
     export let graphType: GraphType;
@@ -51,6 +52,7 @@
     export let useGraphRightArea: boolean = false;
     export let externalGraph: BaseGraphObject<BaseLogPoint> | null = null;
     export let externalGraphContainer: HTMLDivElement | null = null;
+    export let baseContainerWidth: number | null = null;
 
     // Layout / styling props
     export let width: string | undefined = undefined;
@@ -116,7 +118,12 @@
     // Merged style
     $: mergedStyle = mergeStyle(effectiveStyle, localOverrides);
 
+    // Constants
+    const HIDE_FULL_WIDTH_TIME_SPAN_WIDTH = 880;
+
     // Variables
+    let baseContainer: HTMLDivElement;
+    let baseContainerListener: boolean = false;
     let graphContainer: HTMLDivElement;
     let gridElement: HTMLDivElement | null = null;
     let graph: BaseGraphObject<BaseLogPoint> | null = null;
@@ -148,6 +155,14 @@
         showLoader = false;
     }
 
+    $: if (baseContainer && !baseContainerListener) {
+        window.addEventListener("resize", getBaseContainerWidth);
+        baseContainerListener = true;
+        requestAnimationFrame(() => {
+            getBaseContainerWidth();
+        });
+    }
+
     $: if (!useExternalGraph && graphType && graphContainer) {
         createGraphObject();
     }
@@ -176,19 +191,6 @@
     export let getNewTimeSpan: (startTime: Date, endTime: Date) => void;
     export let getNewDefaultTimeSpan: (timeSpan: LogSpanPeriod) => void;
     export let goBack: () => void;
-
-    function hoveredLogPointChange(currentLogPoint: BaseLogPoint | null): void {
-        insideGraph = !!currentLogPoint;
-        logPoint = currentLogPoint;
-    }
-
-    function mousePositionChange(xPos: number | undefined, yPos: number | undefined): void {
-        cursorPos = { x: xPos, y: yPos };
-    }
-
-    function gridDoubleClick(startTime: Date, endTime: Date): void {
-        getNewTimeSpan(startTime, endTime);
-    }
 
     // Functions
     function createGraphInstance(type: GraphType, container: HTMLDivElement, data: ProcessedBaseLogPoint[] | undefined): BaseGraphObject<any> {
@@ -245,10 +247,30 @@
         }
     }
 
+    function hoveredLogPointChange(currentLogPoint: BaseLogPoint | null): void {
+        insideGraph = !!currentLogPoint;
+        logPoint = currentLogPoint;
+    }
+
+    function mousePositionChange(xPos: number | undefined, yPos: number | undefined): void {
+        cursorPos = { x: xPos, y: yPos };
+    }
+
+    function gridDoubleClick(startTime: Date, endTime: Date): void {
+        getNewTimeSpan(startTime, endTime);
+    }
+
+    function getBaseContainerWidth(): void {
+        baseContainerWidth = baseContainer.offsetWidth;
+    }
+
     onDestroy(() => {
         if (resizeObserver) {
             resizeObserver.disconnect();
             resizeObserver = null;
+        }
+        if (baseContainerListener) {
+            window.removeEventListener("resize", getBaseContainerWidth);
         }
         if (graph) {
             graph.destroy();
@@ -299,6 +321,7 @@
         --sub-text-weight: {mergedStyle.subTextWeight};
         --loader-background-blur: {mergedStyle.loaderBackgroundBlur};
     "
+    bind:this={baseContainer}
     class="graph-div-container"
 >
     <div class="graph-div-wrapper">
@@ -343,23 +366,31 @@
                             </Action>
                         </div>
                         <div class="right-header-div">
-                            <div class="full-screen-data-range">
+                            <div
+                                class="full-screen-data-range"
+                                class:show={baseContainerWidth !== null && baseContainerWidth >= HIDE_FULL_WIDTH_TIME_SPAN_WIDTH}
+                            >
                                 <DateRangeChecker fullWidth={true} {initialDate} {endDate} />
                             </div>
                             <div class="actions-div">
-                                <div class="date-checker-div">
-                                    <Action
-                                        style={$GraphActionStyle}
-                                        imageURL="/img/calendar-check.svg"
-                                        onClick={() => {
-                                            showDateRange = !showDateRange;
-                                        }}
-                                        enableToolTip={true}
+                                {#if showDateChecker}
+                                    <div
+                                        class="date-checker-div"
+                                        class:hide={baseContainerWidth !== null && baseContainerWidth >= HIDE_FULL_WIDTH_TIME_SPAN_WIDTH}
                                     >
-                                        <div slot="tooltip"><ToolTipText text={$texts.selectedPeriod} /></div>
-                                    </Action>
-                                    <DateRangeChecker bind:showToolTip={showDateRange} {initialDate} {endDate} />
-                                </div>
+                                        <Action
+                                            style={$GraphActionStyle}
+                                            imageURL="/img/calendar-check.svg"
+                                            onClick={() => {
+                                                showDateRange = !showDateRange;
+                                            }}
+                                            enableToolTip={true}
+                                        >
+                                            <div slot="tooltip"><ToolTipText text={$texts.selectedPeriod} /></div>
+                                        </Action>
+                                        <DateRangeChecker bind:showToolTip={showDateRange} {initialDate} {endDate} />
+                                    </div>
+                                {/if}
                                 {#if showDatePicker}
                                     <div class="date-picker-div">
                                         <TimePeriodPicker
@@ -370,6 +401,8 @@
                                             changeSpanPeriod={(timeSpan: LogSpanPeriod) => getNewDefaultTimeSpan(timeSpan)}
                                         />
                                     </div>
+                                {:else}
+                                    <slot name="custom-date-picker" />
                                 {/if}
                                 <Action
                                     style={$GraphActionStyle}
@@ -530,6 +563,11 @@
         height: 100%;
     }
 
+    /* Show Full-screen date range */
+    .right-header-div .full-screen-data-range.show {
+        display: block;
+    }
+
     /* Action buttons container - Right-aligned controls with configurable spacing */
     .right-header-div .actions-div {
         width: fit-content;
@@ -566,6 +604,11 @@
         position: relative;
         width: fit-content;
         height: 100%;
+    }
+
+    /* Hide Date checker container tooltip */
+    .actions-div .date-checker-div.hide {
+        display: none;
     }
 
     /* Metrics section - Container for graph metric displays below header actions */
@@ -712,18 +755,5 @@
         user-select: none;
         white-space: nowrap;
         transform: translate(-50%, -50%) rotate(-90deg);
-    }
-
-    /* Responsive layout - Container query breakpoint for wide screen adaptations */
-    @container (min-width: 880px) {
-        /* Show persistent date range in wide layouts */
-        .right-header-div .full-screen-data-range {
-            display: block;
-        }
-
-        /* Hide tooltip-based date checker in wide layouts */
-        .date-checker-div {
-            display: none;
-        }
     }
 </style>

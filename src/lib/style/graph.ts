@@ -19,6 +19,41 @@ const GraphActionStyleConfig: ComponentStyles = {
 
 export const GraphActionStyle = createStyleStore(GraphActionStyleConfig);
 
+//////////     G R A P H     B U T T O N     //////////
+
+const GraphButtonStyleConfig: ComponentStyles = {
+    dark: {
+        width: "40px",
+        minWidth: "auto",
+        maxWidth: "auto",
+        height: "40px",
+        borderRadius: "20px",
+        backgroundColor: "#0d1117",
+        disabledBackgroundColor: "#0d1117",
+        selectedBackgroundColor: "#0d1117",
+        borderColor: "#30363d",
+        disabledBorderColor: "#30363d",
+        selectedBorderColor: "#30363d",
+        hoverColor: "#010203",
+        disabledHoverColor: "#010203",
+        selectedHoverColor: "#010203",
+        fontColor: "#eee",
+        disabledFontColor: "#eee",
+        selectedFontColor: "#eee",
+        fontSize: "14px",
+        subFontSize: "0.875rem",
+        fontWeight: "400",
+        subFontWeight: "400",
+        imageWidth: "32px",
+        imageHeight: "32px",
+        imageRightPos: "auto",
+        imageLeftPos: "auto",
+        showToolTipDelay: 300,
+    },
+};
+
+export const GraphButtonStyle = createStyleStore(GraphButtonStyleConfig);
+
 //////////     B A S E     G R A P H     //////////
 
 const BaseGraphStyleConfig: ComponentStyles = {
@@ -112,8 +147,8 @@ const EnergyConsBaseGraphStyleConfig: ComponentStyles = {
         minHeight: "auto",
         headerHeight: "fit-content",
         headerButtonsGap: "20px",
-        xAxisHeight: "30px",
-        yAxisWidth: "30px",
+        xAxisHeight: "50px",
+        yAxisWidth: "50px",
         unitDivWidth: "20px",
         unitMaxWidth: "100px",
         yAxisTickSpacingPx: 40,
@@ -180,15 +215,15 @@ export const CounterGraphStyle = createStyleStore(CounterGraphStyleConfig);
 
 const EnergyConsGraphStyleConfig: ComponentStyles = {
     dark: {
-        activeEnergybarColor: "rgba(46, 204, 113, 0.20)",
-        reactiveEnergybarColor: "rgba(255, 127, 0, 0.20)",
+        activeEnergybarColor: "rgba(59, 130, 246, 0.30)",
+        reactiveEnergybarColor: "rgba(245, 158, 11, 0.30)",
         barBorderWidthPx: 1,
         activeEnergybarBorderColor: "transparent",
         reactiveEnergybarBorderColor: "transparent",
-        activeEnergybarHoverColor: "rgba(46, 204, 113, 0.35)",
-        reactiveEnergybarHoverColor: "rgba(255, 127, 0, 0.35)",
-        activeEnergybarBorderHoverColor: "rgba(46, 204, 113, 0.45)",
-        reactiveEnergybarBorderHoverColor: "rgba(255, 127, 0, 0.45)",
+        activeEnergybarHoverColor: "rgba(59, 130, 246, 0.45)",
+        reactiveEnergybarHoverColor: "rgba(245, 158, 11, 0.45)",
+        activeEnergybarBorderHoverColor: "rgba(59, 130, 246, 0.55)",
+        reactiveEnergybarBorderHoverColor: "rgba(245, 158, 11, 0.55)",
     },
 };
 
@@ -249,6 +284,70 @@ const FullScreenGraphMetricStyleConfig: ComponentStyles = {
 };
 
 export const FullScreenGraphMetricStyle = createStyleStore(FullScreenGraphMetricStyleConfig);
+
+//////////     E N E R G Y     C O N S U M P T I O N     G R A P H     M E T R I C     //////////
+
+const EnergyConsMetricStyleConfig: ComponentStyles = {
+    dark: {
+        forceCollapse: "TRUE",
+        desktopView: "FALSE",
+        desktopContentPaddingTop: "5px",
+        desktopRowPaddingTop: "25px",
+        iconSize: "26px",
+        textSize: "14px",
+        rowWidth: "350px",
+        rowPaddingLeft: "30px",
+        rowPaddingRight: "30px",
+        rowBorderRight: "1px solid rgba(255, 255, 255, 0.12)",
+        rowBorderBottom: "1px solid rgba(255, 255, 255, 0.12)",
+        labelWidth: "150px",
+        labelPaddingLeft: "5px",
+        labelColor: "rgba(255, 255, 255, 0.55)",
+        labelWeight: "400",
+        valueRightPadding: "5px",
+        valueColor: "rgba(255, 255, 255, 0.95)",
+        valueWeight: "500",
+        unitMaxWidth: "50px",
+        unitColor: "rgba(255, 255, 255, 0.55)",
+        unitWeight: "400",
+        noDataLabelColor: "rgba(255, 255, 255, 0.4)",
+        noDataLabelWeight: "400",
+    },
+};
+
+export const EnergyConsMetricStyle = createStyleStore(EnergyConsMetricStyleConfig);
+
+//////////     F U L L     S C R E E N     E N E R G Y     C O N S U M P T I O N     G R A P H     M E T R I C     //////////
+
+const FullScreenEnergyConsMetricStyleConfig: ComponentStyles = {
+    dark: {
+        forceCollapse: "FALSE",
+        desktopView: "FALSE",
+        desktopContentPaddingTop: "5px",
+        desktopRowPaddingTop: "25px",
+        iconSize: "32px",
+        textSize: "1rem",
+        rowWidth: "400px",
+        rowPaddingLeft: "30px",
+        rowPaddingRight: "30px",
+        rowBorderRight: "1px solid rgba(255, 255, 255, 0.12)",
+        rowBorderBottom: "1px solid rgba(255, 255, 255, 0.12)",
+        labelWidth: "200px",
+        labelPaddingLeft: "10px",
+        labelColor: "rgba(255, 255, 255, 0.55)",
+        labelWeight: "400",
+        valueRightPadding: "10px",
+        valueColor: "rgba(255, 255, 255, 0.95)",
+        valueWeight: "500",
+        unitMaxWidth: "50px",
+        unitColor: "rgba(255, 255, 255, 0.55)",
+        unitWeight: "400",
+        noDataLabelColor: "rgba(255, 255, 255, 0.4)",
+        noDataLabelWeight: "400",
+    },
+};
+
+export const FullScreenEnergyConsMetricStyle = createStyleStore(FullScreenEnergyConsMetricStyleConfig);
 
 //////////     D E S K T O P     E N E R G Y     C O N S U M P T I O N     G R A P H     M E T R I C     //////////
 

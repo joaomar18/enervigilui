@@ -431,6 +431,11 @@ const textsObject: TextsObject = {
         PT: "Fase L3",
         EN: "L3 Phase",
     },
+    phase: {
+        PT: "Fase",
+        EN: "Phase",
+    },
+
     phaseShort: {
         PT: "L",
         EN: "L",
@@ -855,13 +860,21 @@ const textsObject: TextsObject = {
         PT: "D",
         EN: "F",
     },
+    subForwardEnergyShort: {
+        PT: "I",
+        EN: "W",
+    },
     reverseEnergy: {
         PT: "Energia Inversa",
         EN: "Reverse Energy",
     },
     reverseEnergyShort: {
-        PT: "R",
-        EN: "I",
+        PT: "I",
+        EN: "R",
+    },
+    subReverseEnergyShort: {
+        PT: "N",
+        EN: "V",
     },
     totalEnergy: {
         PT: "Energia Total",
@@ -871,9 +884,17 @@ const textsObject: TextsObject = {
         PT: "T",
         EN: "T",
     },
+    subTotalEnergyShort: {
+        PT: "T",
+        EN: "T",
+    },
     energyDirection: {
         PT: "Selecionar direção da energia",
         EN: "Select energy direction",
+    },
+    energyDirectionShort: {
+        PT: "Direção",
+        EN: "Direction",
     },
     activeEnergyValue: {
         PT: "Energia Ativa",
@@ -902,6 +923,14 @@ const textsObject: TextsObject = {
     invalid: {
         PT: "Inválido",
         EN: "Not valid",
+    },
+    filters: {
+        PT: "Filtros",
+        EN: "Filters",
+    },
+    timePeriod: {
+        PT: "Período de Tempo",
+        EN: "Time Period",
     },
 };
 

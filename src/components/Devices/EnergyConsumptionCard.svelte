@@ -4,11 +4,11 @@
     import { EnergyDirectionFilter, LogSpanPeriod, SelectablePhaseFilter } from "$lib/types/view/nodes";
     import { getTimeSpanFromLogPeriod } from "$lib/logic/util/date";
     import { getEnergyConsumption } from "$lib/logic/api/nodes";
+    import Action from "../General/Action.svelte";
     import ContentCard from "../General/ContentCard.svelte";
-    import EnergyDirectionPicker from "../General/Pickers/EnergyDirectionPicker.svelte";
-    import TimePeriodPicker from "../General/Pickers/TimePeriodPicker.svelte";
-    import ElectricalPhasePicker from "../General/Pickers/ElectricalPhasePicker.svelte";
-    import EnergyConsumptionGraph from "./Nodes/Graphs/EnergyConsumptionGraph.svelte";
+    import EnergyConsGraph from "./Nodes/Graphs/EnergyConsGraph.svelte";
+    import ToolTipText from "../General/ToolTipText.svelte";
+    import EnergyPickers from "../General/Pickers/EnergyPickers.svelte";
     import type { EnergyConsumptionType } from "$lib/types/device/energy";
     import type { EnergyConsumptionMetrics, ProcessedEnergyConsumptionLogPoint } from "$lib/types/nodes/logs";
 
@@ -19,10 +19,13 @@
     import { texts } from "$lib/stores/lang/generalTexts";
 
     // Styles
-    import { RealTimeCardButtonStyle } from "$lib/style/device";
+    import { RealTimeCardButtonStyle, RealTimeCardActionStyle } from "$lib/style/device";
 
     // Props
     export let availablePhases: Array<NodePhase>;
+
+    // Constants
+    const EXPAND_HEIGHT_MAX_WIDTH = 946;
 
     // Variables
     let energyLogs: EnergyConsumptionType | null = null;
@@ -36,13 +39,21 @@
     let endDate: Date;
     let energyConsumptionFetched: boolean = false;
     let energyConsumptionFirstFetch: boolean = false;
+    let showGraphFullScreen: boolean = false;
+    let goBackEnabled: boolean = false;
+    let usePhase: boolean = false;
 
     // Reactive Statements
     $: if (!energyConsumptionFirstFetch) {
         getInitialEnergyConsumption();
     }
+    $: if (availablePhases) {
+        usePhase = !availablePhases.includes(NodePhase.SINGLEPHASE);
+    }
 
     // Functions
+    function goBack() {}
+
     function getInitialEnergyConsumption(): void {
         let { initial_date, end_date } = getTimeSpanFromLogPeriod(selectedTimeSpan);
         setDateSpan({ initial_date, end_date });
@@ -94,16 +105,17 @@
         energyConsumptionFirstFetch = true;
     }
 
-    function getMobileView(): void {
-        mobileView = !(window.innerWidth >= 450);
+    function handleWindowResize(): void {
+        mobileView = window.innerWidth <= EXPAND_HEIGHT_MAX_WIDTH;
     }
 
     onMount(() => {
-        window.addEventListener("resize", getMobileView);
+        window.addEventListener("resize", handleWindowResize);
+        handleWindowResize();
     });
 
     onDestroy(() => {
-        window.removeEventListener("resize", getMobileView);
+        window.removeEventListener("resize", handleWindowResize);
     });
 </script>
 
@@ -112,45 +124,62 @@
     contentPaddingTop="0px"
     contentPaddingBottom="0px"
     titleText={mobileView ? $texts.energyConsumptionShort : $texts.energyConsumption}
+    useLeftHeader={true}
 >
+    <div class="slot-div left-header" slot="left-header">
+        <Action
+            style={$RealTimeCardActionStyle}
+            imageURL="/img/previous.svg"
+            disabledImageURL="/img/previous-disabled.svg"
+            onClick={goBack}
+            enableToolTip={true}
+            disabled={!goBackEnabled}
+        >
+            <div slot="tooltip"><ToolTipText text={$texts.goBack} /></div>
+        </Action>
+    </div>
+
     <div class="slot-div header" slot="header">
         <div class="actions-div">
             <div class="picker-div">
-                <EnergyDirectionPicker
+                <EnergyPickers
                     toolTipButtonStyle={$RealTimeCardButtonStyle}
+                    bind:selectedPhase={selectedElectricalPhase}
                     bind:selectedDirection={selectedEnergyDirection}
-                    changeEnergyDirection={(selectedDirection: EnergyDirectionFilter) => getNewEnergyDirection(selectedDirection)}
-                />
-            </div>
-            {#if !availablePhases.includes(NodePhase.SINGLEPHASE)}
-                <div class="picker-div">
-                    <ElectricalPhasePicker
-                        toolTipButtonStyle={$RealTimeCardButtonStyle}
-                        bind:selectedPhase={selectedElectricalPhase}
-                        changePhaseFilter={(selectedPhase: SelectablePhaseFilter) => getNewElectricalPhase(selectedPhase)}
-                    />
-                </div>
-            {/if}
-            <div class="picker-div">
-                <TimePeriodPicker
-                    toolTipButtonStyle={$RealTimeCardButtonStyle}
                     bind:selectedTimeSpan
                     bind:initialDate
                     bind:endDate
+                    {usePhase}
+                    changePhase={(selectedPhase: SelectablePhaseFilter) => getNewElectricalPhase(selectedPhase)}
+                    changeEnergyDirection={(selectedDirection: EnergyDirectionFilter) => getNewEnergyDirection(selectedDirection)}
                     changeSpanPeriodCustom={(initial_date: Date, end_date: Date) => getNewTimeSpan(initial_date, end_date)}
                     changeSpanPeriod={(timeSpan: LogSpanPeriod) => getNewDefaultTimeSpan(timeSpan)}
                 />
             </div>
+            <Action
+                style={$RealTimeCardActionStyle}
+                imageURL="/img/fullscreen.svg"
+                onClick={() => {
+                    showGraphFullScreen = !showGraphFullScreen;
+                }}
+                enableToolTip={true}
+            >
+                <div slot="tooltip"><ToolTipText text={$texts.fullscreen} /></div>
+            </Action>
         </div>
     </div>
     <div class="slot-div content" slot="content">
         <div class="graph-div">
-            <EnergyConsumptionGraph
+            <EnergyConsGraph
                 data={mergedPoints}
                 timeStep={energyLogs?.active_energy.time_step}
                 bind:selectedTimeSpan
+                bind:selectedPhase={selectedElectricalPhase}
+                bind:selectedDirection={selectedEnergyDirection}
                 bind:initialDate
                 bind:endDate
+                bind:showFullScreen={showGraphFullScreen}
+                {usePhase}
                 dataFetched={energyConsumptionFetched}
                 firstFetch={energyConsumptionFirstFetch}
                 globalMetrics={mergedGlobalMetrics}
@@ -161,6 +190,8 @@
                 powerFactorDecimalPlaces={energyLogs?.power_factor.decimal_places}
                 getNewTimeSpan={(initial_date: Date, end_date: Date) => getNewTimeSpan(initial_date, end_date)}
                 getNewDefaultTimeSpan={(timeSpan: LogSpanPeriod) => getNewDefaultTimeSpan(timeSpan)}
+                changePhase={(selectedPhase: SelectablePhaseFilter) => getNewElectricalPhase(selectedPhase)}
+                changeEnergyDirection={(selectedDirection: EnergyDirectionFilter) => getNewEnergyDirection(selectedDirection)}
                 goBackEnabled={false}
                 goBack={() => {}}
             />

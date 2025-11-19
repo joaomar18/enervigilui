@@ -70,6 +70,8 @@
             <Action
                 style={$RealTimeCardActionStyle}
                 toolTipStyle={$RealTimeCardActionToolTipStyle}
+                imageWidth="24px"
+                imageHeight="24px"
                 imageURL="/img/collapse-all.svg"
                 onClick={() => expandAllOnPhaseCard(section.phase)}
                 enableToolTip={true}
@@ -79,6 +81,8 @@
             <Action
                 style={$RealTimeCardActionStyle}
                 toolTipStyle={$RealTimeCardActionToolTipStyle}
+                imageWidth="24px"
+                imageHeight="24px"
                 imageURL="/img/expand-all.svg"
                 onClick={() => collapseAllOnPhaseCard(section.phase)}
                 enableToolTip={true}
