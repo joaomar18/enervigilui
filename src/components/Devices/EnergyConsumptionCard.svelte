@@ -1,7 +1,8 @@
 <script lang="ts">
     import { onMount, onDestroy } from "svelte";
+    import { SlidingWindow } from "$lib/logic/util/classes/SlidingWindow";
     import { NodePhase } from "$lib/types/nodes/base";
-    import { EnergyDirectionFilter, LogSpanPeriod, SelectablePhaseFilter } from "$lib/types/view/nodes";
+    import { EnergyDirectionFilter, LogSpanPeriod, SelectablePhaseFilter, type EnergyConsumptionTimeSpan } from "$lib/types/view/nodes";
     import { getTimeSpanFromLogPeriod } from "$lib/logic/util/date";
     import { getEnergyConsumption } from "$lib/logic/api/nodes";
     import Action from "../General/Action.svelte";
@@ -40,8 +41,9 @@
     let energyConsumptionFetched: boolean = false;
     let energyConsumptionFirstFetch: boolean = false;
     let showGraphFullScreen: boolean = false;
-    let goBackEnabled: boolean = false;
     let usePhase: boolean = false;
+    let currentTimeSpans: SlidingWindow<EnergyConsumptionTimeSpan> = new SlidingWindow(10);
+    let goBackEnabled: boolean = false;
 
     // Reactive Statements
     $: if (!energyConsumptionFirstFetch) {
@@ -52,12 +54,17 @@
     }
 
     // Functions
-    function goBack() {}
-
     function getInitialEnergyConsumption(): void {
         let { initial_date, end_date } = getTimeSpanFromLogPeriod(selectedTimeSpan);
         setDateSpan({ initial_date, end_date });
         loadEnergyConsumption();
+        addToCurrentTimeSpans({
+            initial_date: initialDate,
+            end_date: endDate,
+            log_span_period: selectedTimeSpan,
+            phase: selectedElectricalPhase,
+            direction: selectedEnergyDirection,
+        } as EnergyConsumptionTimeSpan);
     }
 
     function setDateSpan(dateSpan: { initial_date: Date; end_date: Date }): void {
@@ -68,6 +75,13 @@
     function getNewTimeSpan(initial_date: Date, end_date: Date): void {
         setDateSpan({ initial_date, end_date });
         loadEnergyConsumption();
+        addToCurrentTimeSpans({
+            initial_date: initialDate,
+            end_date: endDate,
+            log_span_period: LogSpanPeriod.customDate,
+            phase: selectedElectricalPhase,
+            direction: selectedEnergyDirection,
+        } as EnergyConsumptionTimeSpan);
         selectedTimeSpan = LogSpanPeriod.customDate;
     }
 
@@ -75,17 +89,38 @@
         let { initial_date, end_date } = getTimeSpanFromLogPeriod(timeSpan);
         setDateSpan({ initial_date, end_date });
         loadEnergyConsumption();
+        addToCurrentTimeSpans({
+            initial_date: initialDate,
+            end_date: endDate,
+            log_span_period: timeSpan,
+            phase: selectedElectricalPhase,
+            direction: selectedEnergyDirection,
+        } as EnergyConsumptionTimeSpan);
         selectedTimeSpan = timeSpan;
     }
 
     function getNewElectricalPhase(selectedPhase: SelectablePhaseFilter): void {
         selectedElectricalPhase = selectedPhase;
         loadEnergyConsumption();
+        addToCurrentTimeSpans({
+            initial_date: initialDate,
+            end_date: endDate,
+            log_span_period: selectedTimeSpan,
+            phase: selectedPhase,
+            direction: selectedEnergyDirection,
+        } as EnergyConsumptionTimeSpan);
     }
 
     function getNewEnergyDirection(selectedDirection: EnergyDirectionFilter): void {
         selectedEnergyDirection = selectedDirection;
         loadEnergyConsumption();
+        addToCurrentTimeSpans({
+            initial_date: initialDate,
+            end_date: endDate,
+            log_span_period: selectedTimeSpan,
+            phase: selectedElectricalPhase,
+            direction: selectedDirection,
+        } as EnergyConsumptionTimeSpan);
     }
 
     async function loadEnergyConsumption() {
@@ -105,6 +140,23 @@
         energyConsumptionFirstFetch = true;
     }
 
+    function addToCurrentTimeSpans(timeSpan: EnergyConsumptionTimeSpan): void {
+        currentTimeSpans.add(timeSpan);
+        goBackEnabled = currentTimeSpans.hasPrevious();
+    }
+
+    function setTimeSpanToPrevious(): void {
+        let previousNodeTimeSpan = currentTimeSpans.previous();
+        if (!previousNodeTimeSpan) return;
+        setDateSpan({ initial_date: previousNodeTimeSpan.initial_date, end_date: previousNodeTimeSpan.end_date });
+        selectedTimeSpan = previousNodeTimeSpan.log_span_period;
+        selectedElectricalPhase = previousNodeTimeSpan.phase;
+        selectedEnergyDirection = previousNodeTimeSpan.direction;
+        loadEnergyConsumption();
+        currentTimeSpans.confirmPrevious();
+        goBackEnabled = currentTimeSpans.hasPrevious();
+    }
+
     function handleWindowResize(): void {
         mobileView = window.innerWidth <= EXPAND_HEIGHT_MAX_WIDTH;
     }
@@ -119,6 +171,13 @@
     });
 </script>
 
+<!--
+    EnergyConsumptionCard - Device energy consumption data card component
+    
+    Displays energy consumption graphs with integrated filter controls (phase/direction/period)
+    and navigation history via sliding window back button. Fetches and manages active/reactive
+    energy data with automatic responsive layout switching and full-screen mode support.
+-->
 <ContentCard
     contentPaddingHorizontal="0px"
     contentPaddingTop="0px"
@@ -131,7 +190,7 @@
             style={$RealTimeCardActionStyle}
             imageURL="/img/previous.svg"
             disabledImageURL="/img/previous-disabled.svg"
-            onClick={goBack}
+            onClick={setTimeSpanToPrevious}
             enableToolTip={true}
             disabled={!goBackEnabled}
         >
@@ -192,15 +251,15 @@
                 getNewDefaultTimeSpan={(timeSpan: LogSpanPeriod) => getNewDefaultTimeSpan(timeSpan)}
                 changePhase={(selectedPhase: SelectablePhaseFilter) => getNewElectricalPhase(selectedPhase)}
                 changeEnergyDirection={(selectedDirection: EnergyDirectionFilter) => getNewEnergyDirection(selectedDirection)}
-                goBackEnabled={false}
-                goBack={() => {}}
+                {goBackEnabled}
+                goBack={setTimeSpanToPrevious}
             />
         </div>
-        <div class="metrics-div"></div>
     </div>
 </ContentCard>
 
 <style>
+    /* Header slot container - Full-width wrapper for filter controls and action buttons */
     .slot-div.header {
         padding: 0;
         margin: 0;
@@ -208,6 +267,7 @@
         height: 100%;
     }
 
+    /* Actions container - Right-aligned flex layout for header buttons with consistent spacing */
     .slot-div.header .actions-div {
         display: flex;
         height: 100%;
@@ -216,12 +276,14 @@
         gap: 10px;
     }
 
+    /* Picker wrapper - Relative positioning container for energy filters tooltip */
     .picker-div {
         margin: 0;
         padding: 0;
         position: relative;
     }
 
+    /* Content slot container - Full-size flex wrapper for graph component with overflow handling */
     .slot-div.content {
         position: relative;
         width: 100%;
@@ -235,6 +297,7 @@
         min-height: 0;
     }
 
+    /* Graph container - Full-size wrapper for EnergyConsGraph component */
     .graph-div {
         margin: 0;
         padding: 0;

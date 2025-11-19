@@ -38,10 +38,10 @@ export enum SelectablePhaseFilter {
 
 /**
  * Energy flow direction filter options for electrical measurement data filtering in the UI.
- * Used to filter energy data by directional flow: forward (consumed), reverse (generated), 
+ * Used to filter energy data by directional flow: forward (consumed), reverse (generated),
  * or total (bidirectional aggregate). Commonly applied in energy metering systems to
  * distinguish between energy consumption and energy production/feedback to the grid.
- * 
+ *
  * @enum {string}
  * @property {string} FORWARD - Forward direction (energy consumed/imported).
  * @property {string} REVERSE - Reverse direction (energy generated/exported).
@@ -74,29 +74,38 @@ export interface NodeTimeSpan {
 }
 
 /**
+ * Time span configuration with phase and direction filters for energy consumption graph navigation history.
+ * Extends basic time span with electrical phase (L1/L2/L3/Total) and energy direction (Forward/Reverse/Total) filters.
+ */
+export interface EnergyConsumptionTimeSpan {
+    initial_date: Date;
+    end_date: Date;
+    log_span_period: LogSpanPeriod;
+    phase: SelectablePhaseFilter;
+    direction: EnergyDirectionFilter;
+}
+
+/**
  * Mapping configuration for metrics display in the UI, organizing metric keys by node category
  * with their corresponding internationalization text keys and icon file references.
- * 
+ *
  * Structure maps NodeCategory → metric key → display configuration:
  * - textKey: Reference to internationalization text for metric labels
  * - imageFile: icon filename for visual metric identification
- * 
+ *
  * Used by getMetricsViewVariables() to transform raw metrics data into view-ready format
  * with proper labels and icons for different node types (Measurements, Counters, etc.).
  */
-export const metricsTextKeyMap: Record<string, Record<string, { textKey: string, imageFile: string }>> = {
+export const metricsTextKeyMap: Record<string, Record<string, { textKey: string; imageFile: string }>> = {
     [NodeCategory.Measurements]: {
-        "max_value": { textKey: "maxValue", imageFile: "max-value.svg" },
-        "average_value": { textKey: "averageValue", imageFile: "average-value.svg" },
-        "min_value": { textKey: "minValue", imageFile: "min-value.svg" },
+        max_value: { textKey: "maxValue", imageFile: "max-value.svg" },
+        average_value: { textKey: "averageValue", imageFile: "average-value.svg" },
+        min_value: { textKey: "minValue", imageFile: "min-value.svg" },
     },
     [NodeCategory.Counters]: {
-        "value": { textKey: "total", imageFile: "total-value.svg" },
+        value: { textKey: "total", imageFile: "total-value.svg" },
     },
-    [NodeCategory.States]: {
-    },
-    [NodeCategory.Texts]: {
-    },
-    [NodeCategory.Other]: {
-    }
+    [NodeCategory.States]: {},
+    [NodeCategory.Texts]: {},
+    [NodeCategory.Other]: {},
 };
