@@ -16,7 +16,17 @@ import type { DefaultNodeInfo } from "$lib/types/nodes/base";
 import type { EditableDevice, MeterOptions, NewDevice } from "$lib/types/device/base";
 import type { BaseNodeConfig, NodeRecord, EditableNodeRecord, EditableBaseNodeConfig, NodeAttributes } from "$lib/types/nodes/config";
 import type { NodeState, ProcessedNodeState } from "$lib/types/nodes/realtime";
-import type { CounterLogPoint, CounterMetrics, EnergyConsumptionMetrics, NodeLogs, ProcessedBaseLogPoint, ProcessedEnergyConsumptionLogPoint, ProcessedNodeLogs, SingleValueLogPoint, SingleValueMetrics } from "$lib/types/nodes/logs";
+import type {
+    CounterLogPoint,
+    CounterMetrics,
+    EnergyConsumptionMetrics,
+    NodeLogs,
+    ProcessedBaseLogPoint,
+    ProcessedEnergyConsumptionLogPoint,
+    ProcessedNodeLogs,
+    SingleValueLogPoint,
+    SingleValueMetrics,
+} from "$lib/types/nodes/logs";
 import type { EnergyConsumptionType } from "$lib/types/device/energy";
 
 /**
@@ -372,11 +382,10 @@ export function processNodeLogs(nodeLogs: NodeLogs): ProcessedNodeLogs {
         let start_time = convertISOToTimestamp(start_time_str) / 1000;
         let end_time = convertISOToTimestamp(end_time_str) / 1000;
 
-
         let processedLog = {
             start_time: start_time,
             end_time: end_time,
-            ...logData
+            ...logData,
         } as ProcessedBaseLogPoint;
 
         processedPoints.push(processedLog);
@@ -402,7 +411,10 @@ export function processNodeLogs(nodeLogs: NodeLogs): ProcessedNodeLogs {
  * @returns Object containing merged log points array and combined global metrics
  * @throws Error if the log point arrays have mismatched lengths
  */
-export function mergeEnergyConsumptionLogs(energyLogs: EnergyConsumptionType): { mergedPoints: Array<ProcessedEnergyConsumptionLogPoint>, mergedGlobalMetrics: EnergyConsumptionMetrics } {
+export function mergeEnergyConsumptionLogs(energyLogs: EnergyConsumptionType): {
+    mergedPoints: Array<ProcessedEnergyConsumptionLogPoint>;
+    mergedGlobalMetrics: EnergyConsumptionMetrics;
+} {
     let mergedPoints: Array<ProcessedEnergyConsumptionLogPoint> = [];
     let mergedGlobalMetrics: EnergyConsumptionMetrics;
 
@@ -432,7 +444,6 @@ export function mergeEnergyConsumptionLogs(energyLogs: EnergyConsumptionType): {
             reactive_energy: (reactive_energy_points[i] as CounterLogPoint).value,
             power_factor: (pf_points[i] as SingleValueLogPoint).value,
             power_factor_direction: (pf_direction_points[i] as SingleValueLogPoint).value,
-
         } as ProcessedEnergyConsumptionLogPoint;
 
         mergedPoints.push(mergedPoint);
@@ -441,10 +452,9 @@ export function mergeEnergyConsumptionLogs(energyLogs: EnergyConsumptionType): {
     mergedGlobalMetrics = {
         active_energy: (energyLogs.active_energy.global_metrics as CounterMetrics).value,
         reactive_energy: (energyLogs.reactive_energy.global_metrics as CounterMetrics).value,
-        power_factor: ((energyLogs.power_factor.global_metrics as SingleValueMetrics).value as number),
-        power_factor_direction: ((energyLogs.power_factor_direction.global_metrics as SingleValueMetrics).value as string),
-    }
-
+        power_factor: (energyLogs.power_factor.global_metrics as SingleValueMetrics).value as number,
+        power_factor_direction: (energyLogs.power_factor_direction.global_metrics as SingleValueMetrics).value as string,
+    };
 
     return { mergedPoints, mergedGlobalMetrics };
 }

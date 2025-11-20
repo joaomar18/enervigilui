@@ -730,7 +730,7 @@ const textsObject: TextsObject = {
     },
     currentDay: {
         PT: "dia atual",
-        EN: "current hour",
+        EN: "current day",
     },
     _7d: {
         PT: "7D",

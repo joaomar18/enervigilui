@@ -8,6 +8,26 @@ import { timeStepFormatters } from "$lib/types/date";
 import { getElegantShortStringFromDate } from "$lib/logic/util/date";
 import type { EnergyConsumptionLogPoint, ProcessedEnergyConsumptionLogPoint } from "$lib/types/nodes/logs";
 
+/**
+ * Energy consumption graph visualization with side-by-side active and reactive energy bars.
+ *
+ * Extends BaseGraphObject to render dual-bar chart visualization for energy data, displaying
+ * active energy (left bar) and reactive energy (right bar) for each time period with hover
+ * interactions, power factor tooltips, and drill-down navigation.
+ *
+ * Features:
+ * - Side-by-side bar rendering for active/reactive energy comparison
+ * - Separate data validation tracking for active and reactive energy
+ * - Optional decimal rounding for energy and power factor values
+ * - Hover effects with custom styling for both bar types
+ * - Time period tooltips with power factor and direction indicators
+ * - Responsive canvas rendering with configurable styling
+ *
+ * Bar Layout:
+ * Each time period is divided into two equal-width bars positioned side-by-side,
+ * with active energy on the left and reactive energy on the right for direct
+ * visual comparison of energy consumption patterns.
+ */
 export class EnergyConsumptionGraphObject extends BaseGraphObject<EnergyConsumptionLogPoint> {
     protected noActiveEnergyData: boolean = true;
     protected noReactiveEnergyData: boolean = true;
@@ -17,7 +37,13 @@ export class EnergyConsumptionGraphObject extends BaseGraphObject<EnergyConsumpt
     /**
      * Initializes counter graph with container, callbacks, and initial data points.
      */
-    constructor(container: HTMLElement, hoveredLogPointChange: ((logPoint: EnergyConsumptionLogPoint | null) => void) | null, mousePositionChange: ((xPos: number | undefined, yPos: number | undefined) => void) | null, gridDoubleClick: ((startTime: Date, endTime: Date) => void) | null, points: Array<ProcessedEnergyConsumptionLogPoint> | undefined) {
+    constructor(
+        container: HTMLElement,
+        hoveredLogPointChange: ((logPoint: EnergyConsumptionLogPoint | null) => void) | null,
+        mousePositionChange: ((xPos: number | undefined, yPos: number | undefined) => void) | null,
+        gridDoubleClick: ((startTime: Date, endTime: Date) => void) | null,
+        points: Array<ProcessedEnergyConsumptionLogPoint> | undefined
+    ) {
         super(container, hoveredLogPointChange, mousePositionChange, gridDoubleClick);
         this.points = !!points ? points : [];
     }
@@ -35,21 +61,39 @@ export class EnergyConsumptionGraphObject extends BaseGraphObject<EnergyConsumpt
     /**
      * Updates graph data points with optional decimal rounding while maintaining array reference.
      */
-    updatePoints(points: Array<ProcessedEnergyConsumptionLogPoint>, roundPoints: boolean = false, config: {
-        activeEnergyDecimalPlaces?: number | null;
-        reactiveEnergyDecimalPlaces?: number | null;
-        powerFactorDecimalPlaces?: number | null;
-    } = { activeEnergyDecimalPlaces: null, reactiveEnergyDecimalPlaces: null, powerFactorDecimalPlaces: null }): void {
+    updatePoints(
+        points: Array<ProcessedEnergyConsumptionLogPoint>,
+        roundPoints: boolean = false,
+        config: {
+            activeEnergyDecimalPlaces?: number | null;
+            reactiveEnergyDecimalPlaces?: number | null;
+            powerFactorDecimalPlaces?: number | null;
+        } = { activeEnergyDecimalPlaces: null, reactiveEnergyDecimalPlaces: null, powerFactorDecimalPlaces: null }
+    ): void {
         if (!roundPoints) {
             this.points.length = 0;
             this.points.push(...points);
-        }
-        else {
-            const roundedPoints = points.map(point => ({
+        } else {
+            const roundedPoints = points.map((point) => ({
                 ...point,
-                active_energy: point.active_energy === null ? null : config.activeEnergyDecimalPlaces === null ? point.active_energy : Number(point.active_energy.toFixed(config.activeEnergyDecimalPlaces)),
-                reactive_energy: point.reactive_energy === null ? null : config.reactiveEnergyDecimalPlaces === null ? point.reactive_energy : Number(point.reactive_energy.toFixed(config.reactiveEnergyDecimalPlaces)),
-                power_factor: point.power_factor === null ? null : config.powerFactorDecimalPlaces === null ? point.power_factor : Number(point.power_factor.toFixed(config.powerFactorDecimalPlaces)),
+                active_energy:
+                    point.active_energy === null
+                        ? null
+                        : config.activeEnergyDecimalPlaces === null
+                        ? point.active_energy
+                        : Number(point.active_energy.toFixed(config.activeEnergyDecimalPlaces)),
+                reactive_energy:
+                    point.reactive_energy === null
+                        ? null
+                        : config.reactiveEnergyDecimalPlaces === null
+                        ? point.reactive_energy
+                        : Number(point.reactive_energy.toFixed(config.reactiveEnergyDecimalPlaces)),
+                power_factor:
+                    point.power_factor === null
+                        ? null
+                        : config.powerFactorDecimalPlaces === null
+                        ? point.power_factor
+                        : Number(point.power_factor.toFixed(config.powerFactorDecimalPlaces)),
                 power_factor_direction: point.power_factor_direction,
             }));
             this.points.length = 0;
@@ -60,14 +104,19 @@ export class EnergyConsumptionGraphObject extends BaseGraphObject<EnergyConsumpt
     /**
      * Creates and configures the uPlot counter graph with bar visualization and event handling.
      */
-    createGraph(timeStep: FormattedTimeStep, logSpanPeriod: LogSpanPeriod, style: { [property: string]: string | number },): void {
+    createGraph(timeStep: FormattedTimeStep, logSpanPeriod: LogSpanPeriod, style: { [property: string]: string | number }): void {
         const { alignedData } = this.convertDataToGraph(timeStep, logSpanPeriod);
         let { width, height } = getGraphSize(this.container, Number(style.graphPeriodWidthPx), alignedData, style);
 
         let opts: uPlot.Options = {
             width: width,
             height: height,
-            padding: [parseInt(String(style.graphPaddingTop)), parseInt(String(style.graphPaddingRight)), parseInt(String(style.graphPaddingBottom)), parseInt(String(style.graphPaddingLeft))],
+            padding: [
+                parseInt(String(style.graphPaddingTop)),
+                parseInt(String(style.graphPaddingRight)),
+                parseInt(String(style.graphPaddingBottom)),
+                parseInt(String(style.graphPaddingLeft)),
+            ],
             scales: {
                 x: {
                     time: true,
@@ -110,7 +159,7 @@ export class EnergyConsumptionGraphObject extends BaseGraphObject<EnergyConsumpt
                 },
                 {
                     // Active / Reactive energy y-axis (values)
-                    values: (u, splits) => this.noData ? splits.map(() => "") : yAxisValuesFormatter()(u, splits),
+                    values: (u, splits) => (this.noData ? splits.map(() => "") : yAxisValuesFormatter()(u, splits)),
                     size: parseInt(String(style.yAxisWidth)),
                     font: `13px ${getRootFontFamily()}`,
                     stroke: `${style.graphTextColor}`,
