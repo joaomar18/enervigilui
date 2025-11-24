@@ -4,7 +4,7 @@ import { navigateTo } from "../view/navigation";
 import { NodePhase } from "$lib/types/nodes/base";
 import { addPrefix, getNodePrefix, removePrefix } from "../util/nodes";
 import { toISOStringLocal } from "../util/date";
-import type { EnergyConsumptionType } from "$lib/types/device/energy";
+import type { EnergyConsumptionType, PeakPowerType, PhaseBalanceType } from "$lib/types/device/energy";
 import type { NodeRecord, EditableNodeRecord } from "$lib/types/nodes/config";
 import type { NodeState, ProcessedNodeState, BaseNodeAdditionalInfo } from "$lib/types/nodes/realtime";
 import type { EnergyConsumptionMetrics, NodeLogs, ProcessedEnergyConsumptionLogPoint, ProcessedNodeLogs } from "$lib/types/nodes/logs";
@@ -202,4 +202,71 @@ export async function getEnergyConsumption(
     }
 
     return { energyLogs, mergedPoints, mergedGlobalMetrics };
+}
+
+export async function mapMetricAPI(metric: string, device_id: number, phase: SelectablePhaseFilter, start_time: Date | null = null,
+    end_time: Date | null = null): Promise<any> {
+    switch (metric.toLowerCase()) {
+        case "peakpower":
+            return await getPeakPower(device_id, phase, start_time, end_time);
+        case "phasebalance":
+            return await getPhaseBalance(device_id, start_time, end_time);
+        default:
+            return null;
+    }
+}
+
+export async function getPeakPower(
+    device_id: number,
+    phase: SelectablePhaseFilter,
+    start_time: Date | null = null,
+    end_time: Date | null = null,
+): Promise<PeakPowerType> {
+    let peakPower: PeakPowerType;
+    let start_time_str: string | null = null;
+    let end_time_str: string | null = null;
+    start_time_str = start_time !== null ? toISOStringLocal(start_time) : null;
+    end_time_str = end_time !== null ? toISOStringLocal(end_time) : null;
+    const time_zone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+
+    const { sucess, data } = await callAPI({
+        endpoint: "/api/nodes/get_peak_power",
+        method: "GET",
+        params: { device_id, phase, start_time: start_time_str, end_time: end_time_str, time_zone },
+    });
+
+    if (sucess) {
+        peakPower = (data as PeakPowerType);
+    } else {
+        throw new Error("Get peak power error");
+    }
+
+    return peakPower;
+}
+
+export async function getPhaseBalance(
+    device_id: number,
+    start_time: Date | null = null,
+    end_time: Date | null = null,
+): Promise<PhaseBalanceType> {
+    let phaseBalance: PhaseBalanceType;
+    let start_time_str: string | null = null;
+    let end_time_str: string | null = null;
+    start_time_str = start_time !== null ? toISOStringLocal(start_time) : null;
+    end_time_str = end_time !== null ? toISOStringLocal(end_time) : null;
+    const time_zone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+
+    const { sucess, data } = await callAPI({
+        endpoint: "/api/nodes/get_phase_balance",
+        method: "GET",
+        params: { device_id, start_time: start_time_str, end_time: end_time_str, time_zone },
+    });
+
+    if (sucess) {
+        phaseBalance = (data as PhaseBalanceType);
+    } else {
+        throw new Error("Get phase balance error");
+    }
+
+    return phaseBalance;
 }

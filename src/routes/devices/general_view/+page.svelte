@@ -31,7 +31,11 @@
     let nodesStateByCategory: Record<NodePhase, Record<NodeCategory, Array<ProcessedNodeState>>>;
     let availablePhases: Array<NodePhase>;
     let availableCategories: Record<NodePhase, RealTimeCardCategoriesState>;
-    let expandedState = assignRealTimeCardCategoriesStateToAllPhases(initialRealTimeCardCategoriesExpandState);
+    let realTimeExpandedState = assignRealTimeCardCategoriesStateToAllPhases(initialRealTimeCardCategoriesExpandState);
+    let metricsExpandedState = {
+        peakPower: true,
+        phaseBalance: true,
+    } as Record<string, boolean>;
     let showDetailDiv = false;
     let detailedNodeState: ProcessedNodeState;
 
@@ -73,11 +77,18 @@
         <div class="grid">
             {#each nodePhaseSections.filter((section) => availablePhases.includes(section.phase)) as section (section.key)}
                 <div class="grid-col">
-                    <RealTimeCard {section} {availableCategories} {nodesStateByCategory} bind:expandedState bind:detailedNodeState bind:showDetailDiv />
+                    <RealTimeCard
+                        {section}
+                        {availableCategories}
+                        {nodesStateByCategory}
+                        bind:expandedState={realTimeExpandedState}
+                        bind:detailedNodeState
+                        bind:showDetailDiv
+                    />
                 </div>
             {/each}
             <div class="grid-col">
-                <MetricsCard {availablePhases} />
+                <MetricsCard {availablePhases} bind:expandedState={metricsExpandedState} />
             </div>
             <div class="grid-col span-2">
                 <EnergyConsumptionCard {availablePhases} />

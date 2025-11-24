@@ -932,6 +932,14 @@ const textsObject: TextsObject = {
         PT: "Período de Tempo",
         EN: "Time Period",
     },
+    peakPower: {
+        PT: "Potência Máxima",
+        EN: "Peak Power",
+    },
+    phaseBalance: {
+        PT: "Equílibrio de Fases",
+        EN: "Phase Balance",
+    },
 };
 
 export const texts = createLangStore(textsObject);

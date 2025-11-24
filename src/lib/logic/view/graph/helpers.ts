@@ -1,9 +1,9 @@
 import uPlot from "uplot";
 import { get } from "svelte/store";
 import { GraphType } from "./base";
-import MeasurementMetrics from "../../../../components/Devices/Nodes/Metrics/Data/MeasurementMetrics.svelte";
+import MeasurementMetrics from "../../../../components/Devices/Nodes/Graphs/Metrics/Data/MeasurementMetrics.svelte"
 import MeasurementToolTip from "../../../../components/Devices/Nodes/Graphs/Tooltips/Data/MeasurementToolTip.svelte";
-import CounterMetrics from "../../../../components/Devices/Nodes/Metrics/Data/CounterMetrics.svelte";
+import CounterMetrics from "../../../../components/Devices/Nodes/Graphs/Metrics/Data/CounterMetrics.svelte"
 import CounterToolTip from "../../../../components/Devices/Nodes/Graphs/Tooltips/Data/CounterToolTip.svelte";
 import { MeasurementGraphStyle, CounterGraphStyle, EnergyConsGraphStyle } from "$lib/style/graph";
 import type { AlignedData } from "uplot";

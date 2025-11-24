@@ -3,9 +3,15 @@
     import ContentCard from "../General/ContentCard.svelte";
     import ToolTipText from "../General/ToolTipText.svelte";
     import EnergyPickers from "../General/Pickers/EnergyPickers.svelte";
+    import ExpandableSection from "../General/ExpandableSection.svelte";
+    import { mapMetricAPI } from "$lib/logic/api/nodes";
+    import { getTimeSpanFromLogPeriod } from "$lib/logic/util/date";
     import { LogSpanPeriod } from "$lib/types/view/nodes";
     import { SelectablePhaseFilter } from "$lib/types/view/nodes";
     import { NodePhase } from "$lib/types/nodes/base";
+
+    // Stores
+    import { currentDeviceID } from "$lib/stores/device/current";
 
     // Texts
     import { texts } from "$lib/stores/lang/generalTexts";
@@ -13,9 +19,11 @@
     // Styles
     import { RealTimeCardActionStyle, RealTimeCardActionToolTipStyle, RealTimeCardButtonStyle } from "$lib/style/device";
     import { onDestroy, onMount } from "svelte";
+    import PeakPowerMetrics from "./Nodes/Metrics/PeakPowerMetrics.svelte";
 
     // Props
     export let availablePhases: Array<NodePhase>;
+    export let expandedState: Record<string, boolean>;
 
     // Variables
     let mobileView = false;
@@ -23,24 +31,76 @@
     let selectedTimeSpan: LogSpanPeriod = LogSpanPeriod.currentDay;
     let initialDate: Date;
     let endDate: Date;
+    let metricsFetched: boolean = false;
+    let metricsData: Record<string, any> = {};
+    let metricsFirstFetch: boolean = false;
     let usePhase: boolean = false;
 
     // Reactive Statements
+    $: if (!metricsFirstFetch) {
+        getInitialMetrics();
+    }
+
     $: if (availablePhases) {
         usePhase = !availablePhases.includes(NodePhase.SINGLEPHASE);
     }
 
     // Functions
-    function getNewTimeSpan(initialDate: Date, endDate: Date): void {}
+    function getInitialMetrics(): void {
+        let { initial_date, end_date } = getTimeSpanFromLogPeriod(selectedTimeSpan);
+        setDateSpan({ initial_date, end_date });
+        loadMetrics();
+    }
 
-    function getNewDefaultTimeSpan(timeSpan: LogSpanPeriod): void {}
+    function setDateSpan(dateSpan: { initial_date: Date; end_date: Date }): void {
+        initialDate = dateSpan.initial_date;
+        endDate = dateSpan.end_date;
+    }
+
+    function getNewTimeSpan(initial_date: Date, end_date: Date): void {
+        setDateSpan({ initial_date, end_date });
+        loadMetrics();
+        selectedTimeSpan = LogSpanPeriod.customDate;
+    }
+
+    function getNewDefaultTimeSpan(timeSpan: LogSpanPeriod): void {
+        let { initial_date, end_date } = getTimeSpanFromLogPeriod(timeSpan);
+        setDateSpan({ initial_date, end_date });
+        loadMetrics();
+        selectedTimeSpan = timeSpan;
+    }
 
     function getNewElectricalPhase(selectedPhase: SelectablePhaseFilter): void {
         selectedElectricalPhase = selectedPhase;
+        loadMetrics();
+    }
+
+    async function loadMetrics() {
+        if (!$currentDeviceID) {
+            return;
+        }
+        metricsFetched = false;
+        for (const metric of Object.keys(expandedState)) {
+            metricsData[metric] = await mapMetricAPI(metric, $currentDeviceID, selectedElectricalPhase, initialDate, endDate);
+        }
+        metricsFetched = true;
+        metricsFirstFetch = true;
     }
 
     function getMobileView(): void {
         mobileView = !(window.innerWidth >= 450);
+    }
+
+    function expandAll(): void {
+        for (const metric of Object.keys(expandedState)) {
+            expandedState[metric] = true;
+        }
+    }
+
+    function collapseAll(): void {
+        for (const metric of Object.keys(expandedState)) {
+            expandedState[metric] = false;
+        }
     }
 
     onMount(() => {
@@ -61,7 +121,7 @@
                 imageWidth="24px"
                 imageHeight="24px"
                 imageURL="/img/collapse-all.svg"
-                onClick={() => {}}
+                onClick={collapseAll}
                 enableToolTip={true}
             >
                 <div slot="tooltip"><ToolTipText text={$texts.collapseAll} /></div>
@@ -72,7 +132,7 @@
                 imageWidth="24px"
                 imageHeight="24px"
                 imageURL="/img/expand-all.svg"
-                onClick={() => {}}
+                onClick={expandAll}
                 enableToolTip={true}
             >
                 <div slot="tooltip"><ToolTipText text={$texts.expandAll} /></div>
@@ -93,7 +153,16 @@
             </div>
         </div>
     </div>
-    <div class="slot-div content" slot="content"></div>
+    <div class="slot-div content" slot="content">
+        {#if "peakPower" in expandedState}
+            <ExpandableSection titleText={$texts.peakPower} bind:contentExpanded={expandedState.peakPower}>
+                <PeakPowerMetrics metrics={metricsData.peakPower} />
+            </ExpandableSection>
+        {/if}
+        {#if usePhase && "phaseBalance" in expandedState}
+            <ExpandableSection titleText={$texts.phaseBalance} bind:contentExpanded={expandedState.phaseBalance}></ExpandableSection>
+        {/if}
+    </div>
 </ContentCard>
 
 <style>

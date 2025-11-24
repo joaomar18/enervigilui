@@ -1,5 +1,5 @@
 <script lang="ts">
-    import InlineLoader from "../../../../General/InlineLoader.svelte";
+    import InlineLoader from "../../../../../General/InlineLoader.svelte";
     import { getPowerFactorDirectionString } from "$lib/logic/util/energy";
     import type { EnergyConsumptionMetrics } from "$lib/types/nodes/logs";
 

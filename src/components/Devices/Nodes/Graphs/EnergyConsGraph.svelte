@@ -8,7 +8,7 @@
     import BaseGraph from "./BaseGraph.svelte";
     import GraphToolTip from "./Tooltips/GraphToolTip.svelte";
     import EnergyConsToolTip from "./Tooltips/Data/EnergyConsToolTip.svelte";
-    import EnergyConsMetrics from "../Metrics/Data/EnergyConsMetrics.svelte";
+    import EnergyConsMetrics from "./Metrics/Data/EnergyConsMetrics.svelte";
     import type { EnergyConsumptionMetrics, ProcessedEnergyConsumptionLogPoint, BaseLogPoint, EnergyConsumptionLogPoint } from "$lib/types/nodes/logs";
 
     // Texts

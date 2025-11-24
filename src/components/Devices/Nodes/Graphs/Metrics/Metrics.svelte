@@ -1,5 +1,5 @@
 <script lang="ts">
-    import InlineLoader from "../../../General/InlineLoader.svelte";
+    import InlineLoader from "../../../../General/InlineLoader.svelte";
     import type { NodeCategory } from "$lib/types/nodes/base";
 
     // Texts
