@@ -15,10 +15,12 @@
     // Props
     export let zIndex: number = 200; // Default z-index
     export let originalParent: HTMLElement | null = null;
+    export let portalElement: HTMLElement | null = null;
     export let pushToTop: boolean = false;
     export let autoPosition: boolean = true;
     export let autoPositionContinuous: boolean = false;
     export let forceShowMobile: boolean = false;
+    export let forceBottom: boolean = false;
     export let alignType: "left" | "middle" | "right" = "middle";
     export let showToolTip: boolean;
 
@@ -32,6 +34,7 @@
     export let offsetPx: string | undefined = undefined;
     export let border: string | undefined = undefined;
     export let borderRadius: string | undefined = undefined;
+    export let topBorderRadius: string | undefined = undefined;
     export let backgroundColor: string | undefined = undefined;
     export let paddingHorizontal: string | undefined = undefined;
     export let paddingVertical: string | undefined = undefined;
@@ -47,6 +50,7 @@
         offsetPx,
         border,
         borderRadius,
+        topBorderRadius,
         backgroundColor,
         paddingHorizontal,
         paddingVertical,
@@ -68,6 +72,9 @@
     $: enableUpdatePosition = showToolTip && tooltipElement && parentElement && autoPosition && ($hasMouseCapability || forceShowMobile);
 
     $: if (tooltipElement) {
+        if (portalElement) {
+            portalElement.appendChild(tooltipElement);
+        }
         if (originalParent) {
             parentElement = originalParent;
         } else if (tooltipElement.parentElement) {
@@ -106,7 +113,9 @@
 
         const { x, y } = await computePosition(parentElement, tooltipElement, {
             placement: placement as Placement,
-            middleware: [offset({ mainAxis: parseInt(String(mergedStyle.offsetPx)) }), flip(), shift({ padding: parseInt(String(mergedStyle.offsetPx)) })],
+            middleware: forceBottom
+                ? [offset({ mainAxis: parseInt(String(mergedStyle.offsetPx)) }), shift({ padding: parseInt(String(mergedStyle.offsetPx)) })]
+                : [offset({ mainAxis: parseInt(String(mergedStyle.offsetPx)) }), flip(), shift({ padding: parseInt(String(mergedStyle.offsetPx)) })],
         });
 
         Object.assign(tooltipElement.style, {
@@ -147,6 +156,7 @@
         --offset: {mergedStyle.offsetPx};
         --border: {mergedStyle.border};
         --border-radius: {mergedStyle.borderRadius};
+        --top-border-radius: {mergedStyle.topBorderRadius ?? mergedStyle.borderRadius};
         --background-color: {mergedStyle.backgroundColor};
         --padding-horizontal: {mergedStyle.paddingHorizontal};
         --padding-vertical: {mergedStyle.paddingVertical};
@@ -171,6 +181,8 @@
         max-height: var(--max-height);
         border: var(--border);
         border-radius: var(--border-radius);
+        border-top-left-radius: var(--top-border-radius);
+        border-top-right-radius: var(--top-border-radius);
         background-color: var(--background-color);
         padding-left: var(--padding-horizontal);
         padding-right: var(--padding-horizontal);

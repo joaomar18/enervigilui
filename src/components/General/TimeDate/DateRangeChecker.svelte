@@ -12,7 +12,9 @@
 
     // Style object (from theme)
     export let style: { [property: string]: string | number } | null = null;
+    export let toolTipStyle: { [property: string]: string | number } | null = null;
     $: effectiveStyle = style ?? $DateRangeCheckerStyle;
+    $: effectiveToolTipStyle = toolTipStyle ?? $ToolTipDateCheckerStyle;
 
     // Props
     export let fullWidth: boolean = false;
@@ -135,7 +137,7 @@
         </div>
     </div>
 {:else if useToolTip}
-    <ToolTip style={$ToolTipDateCheckerStyle} autoPositionContinuous={true} zIndex={198} {showToolTip}>
+    <ToolTip style={effectiveToolTipStyle} autoPositionContinuous={true} zIndex={198} {showToolTip}>
         <div
             style="
                     --padding-horizontal: {mergedStyle.paddingHorizontal};

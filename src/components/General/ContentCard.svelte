@@ -8,6 +8,7 @@
     $: effectiveStyle = style ?? $ContentCardStyle;
 
     // Props
+    export let cardElement: HTMLDivElement | null = null;
     export let titleText: string = "";
     export let useLeftHeader: boolean = false;
 
@@ -72,6 +73,7 @@
 
 <!-- Reusable card component: displays a title header with optional slot content and scrollable body content -->
 <div
+    bind:this={cardElement}
     style="
         --width: {mergedStyle.width};
         --height: {mergedStyle.height};
@@ -122,6 +124,7 @@
     .container {
         margin: 0;
         padding: 0;
+        position: relative;
         width: var(--width);
         height: var(--height);
         min-height: var(--min-height);

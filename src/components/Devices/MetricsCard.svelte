@@ -156,7 +156,7 @@
     <div class="slot-div content" slot="content">
         {#if "peakPower" in expandedState}
             <ExpandableSection titleText={$texts.peakPower} bind:contentExpanded={expandedState.peakPower}>
-                <PeakPowerMetrics metrics={metricsData.peakPower} />
+                <PeakPowerMetrics metrics={metricsData.peakPower} dataFetched={metricsFetched} firstFetch={metricsFirstFetch} />
             </ExpandableSection>
         {/if}
         {#if usePhase && "phaseBalance" in expandedState}

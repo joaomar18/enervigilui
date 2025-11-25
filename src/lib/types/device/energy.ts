@@ -35,41 +35,41 @@ export interface EnergyConsumptionType {
 }
 
 /**
- * Peak power metrics for a measurement interval.
- * Contains measurement metrics for active (real), reactive, and apparent power.
+ * Historical logs of peak power measurements for a measurement interval.
+ * Records peak values for active (real), reactive, and apparent power.
  *
  * @interface PeakPowerType
- * @property {MeasurementMetrics} active_power - Peak active (real) power metrics.
- * @property {MeasurementMetrics} reactive_power - Peak reactive power metrics.
- * @property {MeasurementMetrics} apparent_power - Peak apparent power metrics.
+ * @property {NodeLogs} active_power - Historical logs for peak active (real) power.
+ * @property {NodeLogs} reactive_power - Historical logs for peak reactive power.
+ * @property {NodeLogs} apparent_power - Historical logs for peak apparent power.
  */
 export interface PeakPowerType {
-    active_power: MeasurementMetrics;
-    reactive_power: MeasurementMetrics;
-    apparent_power: MeasurementMetrics;
+    active_power: NodeLogs;
+    reactive_power: NodeLogs;
+    apparent_power: NodeLogs;
 }
 
 /**
- * Phase balance metrics for three-phase systems.
- * Reports per-phase voltage and current measurement metrics and computed balance values.
+ * Historical logs of per-phase measurements and computed balance values for three-phase systems.
+ * Records per-phase voltage and current logs and overall computed balance/imbalance metrics.
  *
  * @interface PhaseBalanceType
- * @property {MeasurementMetrics} l1_voltage - Line 1 voltage measurement metrics.
- * @property {MeasurementMetrics} l2_voltage - Line 2 voltage measurement metrics.
- * @property {MeasurementMetrics} l3_voltage - Line 3 voltage measurement metrics.
- * @property {MeasurementMetrics} l1_current - Line 1 current measurement metrics.
- * @property {MeasurementMetrics} l2_current - Line 2 current measurement metrics.
- * @property {MeasurementMetrics} l3_current - Line 3 current measurement metrics.
+ * @property {NodeLogs} l1_voltage - Historical logs for line 1 voltage measurements.
+ * @property {NodeLogs} l2_voltage - Historical logs for line 2 voltage measurements.
+ * @property {NodeLogs} l3_voltage - Historical logs for line 3 voltage measurements.
+ * @property {NodeLogs} l1_current - Historical logs for line 1 current measurements.
+ * @property {NodeLogs} l2_current - Historical logs for line 2 current measurements.
+ * @property {NodeLogs} l3_current - Historical logs for line 3 current measurements.
  * @property {number|null} voltage_imbalance - Computed voltage imbalance (percent) or null if unavailable.
  * @property {number|null} current_imbalance - Computed current imbalance (percent) or null if unavailable.
  */
 export interface PhaseBalanceType {
-    l1_voltage: MeasurementMetrics;
-    l2_voltage: MeasurementMetrics;
-    l3_voltage: MeasurementMetrics;
-    l1_current: MeasurementMetrics;
-    l2_current: MeasurementMetrics;
-    l3_current: MeasurementMetrics;
+    l1_voltage: NodeLogs;
+    l2_voltage: NodeLogs;
+    l3_voltage: NodeLogs;
+    l1_current: NodeLogs;
+    l2_current: NodeLogs;
+    l3_current: NodeLogs;
     voltage_imbalance: number | null;
     current_imbalance: number | null;
 }
