@@ -47,6 +47,7 @@ export abstract class BaseGraphObject<T extends BaseLogPoint> {
     protected noOfClicks: number = 0;
     protected maxDurationBetweenClicks: number = 500;
     protected lastClickTimeStamp: number | null = null;
+    protected lastClickPeriod: number | null = null;
 
     constructor(container: HTMLElement, hoveredLogPointChange: ((logPoint: T | null) => void) | null, mousePositionChange: ((xPos: number | undefined, yPos: number | undefined) => void) | null, gridDoubleClick: ((startTime: Date, endTime: Date) => void) | null) {
         this.container = container;
@@ -107,19 +108,22 @@ export abstract class BaseGraphObject<T extends BaseLogPoint> {
         if (this.lastClickTimeStamp === null) {
             this.lastClickTimeStamp = currentMs;
             this.noOfClicks = 1;
+            this.lastClickPeriod = this.currentHoverPeriod != -1 ? this.currentHoverPeriod : null;
         }
         else {
             if (currentMs - this.lastClickTimeStamp <= this.maxDurationBetweenClicks) {
                 this.noOfClicks = 2;
             }
             else {
-                this.noOfClicks = 1;
                 this.lastClickTimeStamp = currentMs;
+                this.noOfClicks = 1;
+                this.lastClickPeriod = this.currentHoverPeriod != -1 ? this.currentHoverPeriod : null;
             }
         }
-        if (this.noOfClicks == 2) {
+        if (this.noOfClicks == 2 && this.currentHoverPeriod == this.lastClickPeriod) {
             this.noOfClicks = 0;
             this.lastClickTimeStamp = null;
+            this.lastClickPeriod = null;
             this.processGridDoubleClick(points);
         }
     }
