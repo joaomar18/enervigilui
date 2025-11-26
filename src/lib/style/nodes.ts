@@ -367,3 +367,51 @@ const NodeDetailSheetStyleConfig: ComponentStyles = {
 };
 
 export const NodeDetailSheetStyle = createStyleStore(NodeDetailSheetStyleConfig);
+
+//////////     P E A K     P O W E R     M E T R I C S     //////////
+
+const PeakPowerMetricsStyleConfig: ComponentStyles = {
+    dark: {
+        paddingTop: "5px",
+        paddingBottom: "15px",
+        paddingHorizontal: "20px",
+        rowPaddingTop: "15px",
+        rowPaddingBottom: "5px",
+        rowBorderBottom: "1px solid rgba(255, 255, 255, 0.12)",
+        rowBorderBottomHover: "1px solid rgba(255, 255, 255, 0.18)",
+        labelColor: "#D4D4D8",
+        labelWeight: "500",
+        labelSize: "1rem",
+        labelPaddingBottom: "5px",
+        labelBorderBottom: "none",
+        iconSize: "24px",
+        valuePaddingTop: "10px",
+        valuePaddingRight: "5px",
+        valueColor: "#E4E4E7",
+        valueWeight: "600",
+        valueSize: "1.0625rem",
+        valueTextSpacing: "0.25px",
+        unitMaxWidth: "150px",
+        unitColor: "#A1A1AA",
+        unitWeight: "400",
+        unitSize: "1.0625rem",
+        noDataLabelColor: "rgba(255, 255, 255, 0.4)",
+        noDataLabelWeight: "400",
+        dateMarginTop: "8px",
+        dateMarginBottom: "8px",
+        datePaddingTop: "8px",
+        datePaddingBottom: "8px",
+        datePaddingHorizontal: "10px",
+        dateLineHeight: "2.0",
+        dateBorderRadius: "8px",
+        dateBackgroundColor: "#0a0c0f",
+        dateBorder: "1px solid #3a4149",
+        dateSize: "0.875rem",
+        dateMainColor: "#E4E4E7",
+        dateSubColor: "#9CA3AF",
+        dateMainWeight: "600",
+        dateSubWeight: "400",
+    },
+};
+
+export const PeakPowerMetricsStyle = createStyleStore(PeakPowerMetricsStyleConfig);

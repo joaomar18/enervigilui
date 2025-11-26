@@ -34,7 +34,6 @@
     let realTimeExpandedState = assignRealTimeCardCategoriesStateToAllPhases(initialRealTimeCardCategoriesExpandState);
     let metricsExpandedState = {
         peakPower: true,
-        phaseBalance: true,
     } as Record<string, boolean>;
     let showDetailDiv = false;
     let detailedNodeState: ProcessedNodeState;
@@ -65,6 +64,11 @@
     });
 </script>
 
+<!--
+    Devices general view — displays device node real-time cards, metrics and energy consumption.
+    - Composes RealTimeCard, MetricsCard and EnergyConsumptionCard and manages node state polling.
+    - Provides a NodeDetailSheet for drill-down details.
+-->
 <div
     style="
         --tool-tip-text-color: {$ToolTipTextStyle.color};
@@ -99,12 +103,14 @@
 </div>
 
 <style>
+    /* Page content wrapper — sets page padding and height to keep consistent layout */
     .content {
         padding: 0;
         width: 100%;
         min-height: calc(100vh - 74px - 60px);
     }
 
+    /* Dashboard grid — 4-column responsive grid for cards; gap and max-width tuned for reasonable card sizing */
     .grid {
         margin: 0 auto;
         padding: 0;
@@ -118,6 +124,7 @@
         align-content: start;
     }
 
+    /* Column cell — each metric/graph card sits in a grid column; size constraints for visual balance */
     .grid-col {
         margin: 0;
         padding: 0;
@@ -127,10 +134,12 @@
         max-height: 800px;
     }
 
+    /* Larger column variant — spans two columns for wider content (e.g., large graph) */
     .grid .grid-col.span-2 {
         grid-column: span 2;
     }
 
+    /* Responsive breakpoint: medium screens — collapse grid from 4 -> 2 columns */
     @media (max-width: 1569px) {
         .grid {
             max-width: calc(2 * 400px + 1 * 20px);
@@ -138,6 +147,7 @@
         }
     }
 
+    /* Responsive breakpoint: small screens / mobile — stack into a single column */
     @media (max-width: 946px) {
         .grid {
             max-width: 400px;

@@ -209,13 +209,24 @@ export async function mapMetricAPI(metric: string, device_id: number, phase: Sel
     switch (metric.toLowerCase()) {
         case "peakpower":
             return await getPeakPower(device_id, phase, start_time, end_time);
-        case "phasebalance":
-            return await getPhaseBalance(device_id, start_time, end_time);
         default:
             return null;
     }
 }
 
+/**
+ * Fetches peak power measurements for a device and phase over an optional time range.
+ * Converts optional Date parameters to local ISO strings and passes them along with
+ * the device id, phase and timezone to the backend API. If start_time or end_time
+ * are omitted, the API returns peak values for its default interval.
+ *
+ * @param device_id - Device numeric identifier
+ * @param phase - Phase filter (total/single/l1/l2/l3)
+ * @param start_time - Optional start Date for the search interval (inclusive)
+ * @param end_time - Optional end Date for the search interval (inclusive)
+ * @returns Promise resolving to a PeakPowerType object containing peak values and timestamps
+ * @throws Error when the API call fails
+ */
 export async function getPeakPower(
     device_id: number,
     phase: SelectablePhaseFilter,
@@ -242,31 +253,4 @@ export async function getPeakPower(
     }
 
     return peakPower;
-}
-
-export async function getPhaseBalance(
-    device_id: number,
-    start_time: Date | null = null,
-    end_time: Date | null = null,
-): Promise<PhaseBalanceType> {
-    let phaseBalance: PhaseBalanceType;
-    let start_time_str: string | null = null;
-    let end_time_str: string | null = null;
-    start_time_str = start_time !== null ? toISOStringLocal(start_time) : null;
-    end_time_str = end_time !== null ? toISOStringLocal(end_time) : null;
-    const time_zone = Intl.DateTimeFormat().resolvedOptions().timeZone;
-
-    const { sucess, data } = await callAPI({
-        endpoint: "/api/nodes/get_phase_balance",
-        method: "GET",
-        params: { device_id, start_time: start_time_str, end_time: end_time_str, time_zone },
-    });
-
-    if (sucess) {
-        phaseBalance = (data as PhaseBalanceType);
-    } else {
-        throw new Error("Get phase balance error");
-    }
-
-    return phaseBalance;
 }

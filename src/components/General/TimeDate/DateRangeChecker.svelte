@@ -4,6 +4,7 @@
     import ToolTip from "../ToolTip.svelte";
 
     // Texts
+    import { selectedLang } from "$lib/stores/lang/definition";
     import { texts } from "$lib/stores/lang/generalTexts";
 
     // Styles
@@ -66,8 +67,8 @@
     let endDateString: string;
 
     // Reactive Statements
-    $: initialDateString = getElegantStringFromDate(initialDate);
-    $: endDateString = getElegantStringFromDate(endDate);
+    $: if ($selectedLang) initialDateString = getElegantStringFromDate(initialDate);
+    $: if ($selectedLang) endDateString = getElegantStringFromDate(endDate);
 
     $: if (!showToolTip && clickEventListenerDefined) {
         window.removeEventListener("click", handleClickOutside);

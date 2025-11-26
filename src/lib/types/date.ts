@@ -36,6 +36,26 @@ export enum ElapsedTime {
 }
 
 /**
+ * Represents a time interval with a start and an end date.
+ * Typically used to describe the inclusive period over which data was collected or aggregated.
+ */
+export interface DatePeriod {
+    initialDate: Date;
+    endDate: Date;
+}
+
+/**
+ * Represents a time interval using user-facing, formatted date/time strings.
+ * These fields contain "elegant" display-ready strings (for example: "Nov 25, 2025 — 14:00")
+ * intended for UI presentation instead of Date objects. Use when you need a readable
+ * representation to render directly in the interface.
+ */
+export interface DatePeriodString {
+    initialDate: string;
+    endDate: string;
+}
+
+/**
  * Represents a complete date and time with string-formatted fields.
  * Used for form inputs where each component is handled as a separate string value.
  */

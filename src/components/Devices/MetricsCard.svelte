@@ -112,6 +112,14 @@
     });
 </script>
 
+<!--
+    MetricsCard.svelte
+
+    Container card for device metrics. Provides controls for expanding/collapsing all metrics,
+    time / phase selection via `EnergyPickers`, and exposes metric sections such as Peak Power.
+    - Designed to host metric components (e.g., PeakPowerMetrics) inside `ExpandableSection` slots.
+    - Reacts to resize for a compact `mobileView` layout and fetches metrics via `mapMetricAPI`.
+-->
 <ContentCard titleText={mobileView ? $texts.metricsShort : $texts.metrics}>
     <div class="slot-div header" slot="header">
         <div class="actions-div">
@@ -159,13 +167,11 @@
                 <PeakPowerMetrics metrics={metricsData.peakPower} dataFetched={metricsFetched} firstFetch={metricsFirstFetch} />
             </ExpandableSection>
         {/if}
-        {#if usePhase && "phaseBalance" in expandedState}
-            <ExpandableSection titleText={$texts.phaseBalance} bind:contentExpanded={expandedState.phaseBalance}></ExpandableSection>
-        {/if}
     </div>
 </ContentCard>
 
 <style>
+    /* Header slot — contains actions and pickers aligned to the right */
     .slot-div.header {
         padding: 0;
         margin: 0;
@@ -173,6 +179,7 @@
         height: 100%;
     }
 
+    /* Action container inside header — action buttons and pickers */
     .slot-div.header .actions-div {
         display: flex;
         height: 100%;
@@ -181,12 +188,14 @@
         gap: 10px;
     }
 
+    /* Picker wrapper — positions the `EnergyPickers` control */
     .picker-div {
         margin: 0;
         padding: 0;
         position: relative;
     }
 
+    /* Content slot — holds the expandable metric sections (e.g. PeakPower) */
     .slot-div.content {
         position: relative;
         width: 100%;

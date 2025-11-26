@@ -940,6 +940,14 @@ const textsObject: TextsObject = {
         PT: "Equílibrio de Fases",
         EN: "Phase Balance",
     },
+    registeredDate: {
+        PT: "registrado entre",
+        EN: "registered between",
+    },
+    and: {
+        PT: "e",
+        EN: "and",
+    }
 };
 
 export const texts = createLangStore(textsObject);

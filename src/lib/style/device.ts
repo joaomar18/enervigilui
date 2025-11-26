@@ -197,26 +197,3 @@ const RealTimeCardActionToolTipStyleConfig: ComponentStyles = {
 };
 
 export const RealTimeCardActionToolTipStyle = createStyleStore(RealTimeCardActionToolTipStyleConfig);
-
-//////////     T O O L     T I P     D A T E     C H E C K E R     P E A K     P O W E R     //////////
-
-const ToolTipDateCheckerPeakPowerStyleConfig: ComponentStyles = {
-    dark: {
-        width: "100%",
-        minWidth: "auto",
-        maxWidth: "auto",
-        height: "fit-content",
-        minHeight: "auto",
-        maxHeight: "auto",
-        offsetPx: "0px",
-        border: "1px solid #3a4149",
-        borderRadius: "10px",
-        topBorderRadius: "0px",
-        backgroundColor: "#0a0c0f",
-        paddingHorizontal: "0px",
-        paddingVertical: "0px",
-        animationTime: 200,
-    },
-};
-
-export const ToolTipDateCheckerPeakPowerStyle = createStyleStore(ToolTipDateCheckerPeakPowerStyleConfig);
