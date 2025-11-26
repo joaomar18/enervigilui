@@ -449,8 +449,8 @@ const textsObject: TextsObject = {
         EN: "Metrics",
     },
     metricsShort: {
-        PT: "Indic.",
-        EN: "Metr.",
+        PT: "Indicadores",
+        EN: "Metrics",
     },
     energyConsumption: {
         PT: "Consumo de Energia",

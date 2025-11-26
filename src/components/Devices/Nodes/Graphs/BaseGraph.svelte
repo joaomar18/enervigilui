@@ -324,7 +324,7 @@
     bind:this={baseContainer}
     class="graph-div-container"
 >
-    <div class="graph-div-wrapper">
+    <div class="graph-div-wrapper" class:scroll-on={fullScreen}>
         <div class="graph-div-content">
             {#if !fullScreen && showFullScreen}
                 {#if !useExternalGraph}
@@ -504,6 +504,11 @@
         width: 100%;
         height: 100%;
         overflow-x: hidden;
+        overflow-y: hidden;
+    }
+
+    /* Enable vertical scrolling for fullscreen graphs */
+    .graph-div-wrapper.scroll-on {
         overflow-y: auto;
         scrollbar-width: thin;
         scrollbar-color: var(--scrollbar-track-color) var(--scrollbar-thumb-color);

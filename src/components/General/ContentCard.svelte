@@ -11,6 +11,7 @@
     export let cardElement: HTMLDivElement | null = null;
     export let titleText: string = "";
     export let useLeftHeader: boolean = false;
+    export let useScroll: boolean = true;
 
     // Layout / styling props
     export let width: string | undefined = undefined;
@@ -113,7 +114,7 @@
         </div>
     </div>
     <div class="content">
-        <div class="wrapper">
+        <div class="wrapper" class:scroll-on={useScroll}>
             <slot name="content" />
         </div>
     </div>
@@ -215,12 +216,17 @@
         width: 100%;
         height: 100%;
         min-height: 0;
-        overflow-x: hidden;
-        overflow-y: auto;
         display: flex;
         flex-direction: column;
         justify-content: start;
         align-items: center;
+        overflow-x: hidden;
+        overflow-y: hidden;
+    }
+
+    /* Enables vertical scroll on the card content */
+    .wrapper.scroll-on {
+        overflow-y: auto;
         scrollbar-width: thin;
         scrollbar-color: var(--scrollbar-thumb-color) var(--scrollbar-track-color);
         scrollbar-gutter: stable both-edges;

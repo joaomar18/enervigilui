@@ -184,6 +184,7 @@
     contentPaddingBottom="0px"
     titleText={mobileView ? $texts.energyConsumptionShort : $texts.energyConsumption}
     useLeftHeader={true}
+    useScroll={false}
 >
     <div class="slot-div left-header" slot="left-header">
         <Action
