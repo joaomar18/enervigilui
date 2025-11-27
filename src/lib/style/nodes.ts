@@ -110,9 +110,9 @@ const NodeSelectorStyleConfig: ComponentStyles = {
         selectedColor: "#14566b",
         badFormatBackgroundColor: "#1a2027",
         badFormatBorderColor: "#e74c3c",
-        optionsBackgroundColor: "#1e242b",
-        optionsBorderColor: "#323a45",
-        optionsInnerBorderColor: "#323a45",
+        optionsBackgroundColor: "#14181d",
+        optionsBorderColor: "#3f4a55",
+        optionsInnerBorderColor: "#2a323a",
         optionHeight: "40px",
         fontSize: "0.9rem",
         letterSpacing: "normal",
@@ -153,6 +153,66 @@ const NodeConfigPopupSelectorStyleConfig: ComponentStyles = {
 };
 
 export const NodeConfigPopupSelectorStyle = createStyleStore(NodeConfigPopupSelectorStyleConfig);
+
+//////////     N O D E     C O N F I G     S H E E T     I N P U T     F I E L D     //////////
+
+const NodeConfigSheetInputFieldStyleConfig: ComponentStyles = {
+    dark: {
+        width: "100%",
+        height: "40px",
+        borderRadius: "5px",
+        backgroundColor: "#14181d",
+        borderColor: "#14181d",
+        disabledBackgroundColor: "#303944",
+        disabledBorderColor: "#303944",
+        selectedBackgroundColor: "#14181d",
+        selectedBorderColor: "#2F80ED",
+        badFormatBackgroundColor: "#14181d",
+        badFormatBorderColor: "#e74c3c",
+        paddingLeft: "10px",
+        fontSize: "1rem",
+        fontColor: "#f5f5f5",
+        fontWeight: "400",
+        textAlign: "center",
+        infoTextColor: "#f5f5f5",
+        infoTextSize: "1rem",
+        infoTextWeight: "400",
+        unitTextColor: "rgb(170,170,170)",
+        placeHolderTextColor: "rgb(170,170,170)",
+        placeHolderTextWeight: "400",
+    },
+};
+
+export const NodeConfigSheetInputFieldStyle = createStyleStore(NodeConfigSheetInputFieldStyleConfig);
+
+//////////     N O D E     C O N F I G     S H E E T     S E L E C T O R     //////////
+
+const NodeConfigSheetSelectorStyleConfig: ComponentStyles = {
+    dark: {
+        width: "100%",
+        height: "40px",
+        borderRadius: "5px",
+        backgroundColor: "#14181d",
+        borderColor: "#14181d",
+        disabledBackgroundColor: "#303944",
+        disabledBorderColor: "#303944",
+        selectedColor: "#0f4757",
+        badFormatBackgroundColor: "#14181d",
+        badFormatBorderColor: "#e74c3c",
+        optionsBackgroundColor: "#181d22",
+        optionsBorderColor: "#262d35",
+        optionsInnerBorderColor: "#262d35",
+        optionHeight: "40px",
+        fontSize: "1rem",
+        letterSpacing: "normal",
+        wordSpacing: "normal",
+        arrowWidth: "24x",
+        arrowHeight: "24px",
+        arrowRightPos: "10px",
+    },
+};
+
+export const NodeConfigSheetSelectorStyle = createStyleStore(NodeConfigSheetSelectorStyleConfig);
 
 //////////     N O D E S     G R I D     //////////
 
@@ -367,6 +427,52 @@ const NodeDetailSheetStyleConfig: ComponentStyles = {
 };
 
 export const NodeDetailSheetStyle = createStyleStore(NodeDetailSheetStyleConfig);
+
+//////////     N O D E     C O N F I G     S H E E T     //////////
+
+const NodeConfigSheetStyleConfig: ComponentStyles = {
+    dark: {
+        titleSize: "1.25rem",
+        titleColor: "rgba(255, 255, 255, 0.8)",
+        titleWeight: "500",
+        titleItemGap: "10px",
+        titleImageWidth: "32px",
+        titleImageHeight: "32px",
+        headerRowHeigth: "25px",
+        headerRowGap: "15px",
+        headerColGap: "5px",
+        headerLabelWidth: "75px",
+        headerLabelSize: "1rem",
+        headerLabelColor: "rgba(255, 255, 255, 0.6)",
+        headerLabelWeight: "400",
+        headerValueSize: "1rem",
+        headerValueColor: "rgba(255, 255, 255, 0.8)",
+        headerValueWeight: "600",
+        contentTitleSize: "13px",
+        contentTitleColor: "rgba(255, 255, 255, 0.4)",
+        contentTitleWeight: "500",
+        contentTitlePaddingLeft: "5px",
+        contentTitlePaddingBottom: "8px",
+        contentTitleBorderBottom: "1px solid rgba(255, 255, 255, 0.08)",
+        contentTitleSpacing: "1px",
+        contentTitleTransform: "uppercase",
+        contentInnerPaddingTop: "0px",
+        contentInnerPaddingBottom: "20px",
+        contentInnerPaddingHorizontal: "10px",
+        contentRowHeight: "auto",
+        contentRowGap: "15px",
+        contentColGap: "10px",
+        contentLabelWidth: "100%",
+        contentLabelSize: "1rem",
+        contentLabelColor: "rgba(255,255,255, 0.6)",
+        contentLabelWeight: "400",
+        contentValueSize: "1rem",
+        contentValueColor: "rgba(255,255,255, 0.8)",
+        contentValueWeight: "600",
+    },
+};
+
+export const NodeConfigSheetStyle = createStyleStore(NodeConfigSheetStyleConfig);
 
 //////////     P E A K     P O W E R     M E T R I C S     //////////
 

@@ -107,8 +107,8 @@ const textsObjectsVariables: TextsObject = {
         EN: "Power Factor",
     },
     power_factor_direction: {
-        PT: "Direção do Fator de Potência",
-        EN: "Power Factor Direction",
+        PT: "Direção do FP",
+        EN: "PF Direction",
     },
     frequency: {
         PT: "Frequência",

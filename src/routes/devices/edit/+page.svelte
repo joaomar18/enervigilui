@@ -44,6 +44,7 @@
     // Stores
     import { loadedDone } from "$lib/stores/view/navigation";
     import { currentDeviceID } from "$lib/stores/device/current";
+    import NodeConfigSheet from "../../../components/Devices/Nodes/NodeConfigSheet.svelte";
 
     // Variables
     let showCancelWindow: boolean = false; // Show Cancelation Window (if changes were made)
@@ -223,7 +224,7 @@ Shows input forms for protocol-specific parameters and organizes device nodes fo
         </div>
         <!----------     P O P U P     W I N D O W S     ---------->
         <PopupNodeConfig
-            bind:windowOpened={showConfigNodeWindow}
+            windowOpened={false}
             onPropertyChanged={() => {
                 nodes = updateNodes(editingNode, nodes);
                 editingNode = updateEditingNode(editingNode, editingNode, nodes);
@@ -264,6 +265,17 @@ Shows input forms for protocol-specific parameters and organizes device nodes fo
             onCancelEdit={async () => {
                 await navigateTo("/devices");
             }}
+        />
+        <!----------     N O D E     C O N F I G U R A T I O N     S H E E T     ---------->
+        <NodeConfigSheet
+            bind:showPanel={showConfigNodeWindow}
+            onPropertyChanged={() => {
+                nodes = updateNodes(editingNode, nodes);
+                editingNode = updateEditingNode(editingNode, editingNode, nodes);
+            }}
+            {deviceData}
+            node={editingNode}
+            bind:nodeEditingState={editingNodeState}
         />
     {/if}
 </div>

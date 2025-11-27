@@ -764,6 +764,10 @@ const textsObject: TextsObject = {
         PT: "Detalhes da Variável",
         EN: "Variable Details",
     },
+    variableConfig: {
+        PT: "Configuração da Variável",
+        EN: "Variable Configuration",
+    },
     currentState: {
         PT: "Estado Atual",
         EN: "Current State",
@@ -947,7 +951,7 @@ const textsObject: TextsObject = {
     and: {
         PT: "e",
         EN: "and",
-    }
+    },
 };
 
 export const texts = createLangStore(textsObject);

@@ -61,6 +61,7 @@
 
     // Merged style
     $: mergedStyle = mergeStyle(effectiveStyle, localOverrides);
+    
     // Export Funcions
     export let onPropertyChanged: () => void;
 </script>
