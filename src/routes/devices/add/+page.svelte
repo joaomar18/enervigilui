@@ -12,7 +12,7 @@
     import { deviceProtocolChange } from "$lib/logic/handlers/device";
     import { updateNodes, updateEditingNode, updateNodesBySection } from "$lib/logic/handlers/nodes";
     import Selector from "../../../components/General/Selector.svelte";
-    import HintInfo from "../../../components/General/HintInfo.svelte";
+    import InfoLabel from "../../../components/General/InfoLabel.svelte";
     import EditableText from "../../../components/General/EditableText.svelte";
     import UploadImage from "../../../components/General/UploadImage.svelte";
     import Button from "../../../components/General/Button.svelte";
@@ -116,7 +116,7 @@ Shows input forms for protocol-specific parameters and organizes device nodes fo
                 </div>
 
                 <div class="device-input-div">
-                    <span>{$texts.communicationProtocol}</span>
+                    <InfoLabel labelText={$texts.communicationProtocol} toolTipText={$texts.communicationProtocolInfo} />
                     <div class="input-div">
                         <Selector
                             options={$protocolTexts}
@@ -128,11 +128,6 @@ Shows input forms for protocol-specific parameters and organizes device nodes fo
                             }}
                             scrollable={true}
                         />
-                        <div class="info-div">
-                            <HintInfo>
-                                <span class="info-text">{$texts.communicationProtocolInfo}</span>
-                            </HintInfo>
-                        </div>
                     </div>
                 </div>
                 <svelte:component this={$protocolPlugins[deviceData.protocol].ConfigComponent} bind:configuration={deviceData.communication_options} />
@@ -321,17 +316,6 @@ Shows input forms for protocol-specific parameters and organizes device nodes fo
         gap: 20px;
     }
 
-    /* Label text for device input fields */
-    .device-input-div span {
-        text-align: left;
-        color: #f5f5f5;
-        font-size: 1rem;
-        font-weight: 400;
-        margin: 0;
-        padding: 0;
-        width: 250px;
-    }
-
     /* Input field container styling */
     .input-div {
         position: relative;
@@ -341,18 +325,8 @@ Shows input forms for protocol-specific parameters and organizes device nodes fo
         gap: 10px;
         margin: 0;
         padding: 0;
-        width: fit-content;
+        width: 250px;
         height: 100%;
-    }
-
-    /* Info text styling for hints */
-    .info-div .info-text {
-        padding: 10px;
-        padding-right: 40px;
-        font-size: 1rem;
-        font-weight: 400;
-        line-height: 1.5;
-        color: white;
     }
 
     /* Action buttons container (save, cancel, delete) */

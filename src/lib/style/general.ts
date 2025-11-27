@@ -357,7 +357,7 @@ export const NotificationStyle = createStyleStore(NotificationStyleConfig);
 
 const SelectorStyleConfig: ComponentStyles = {
     dark: {
-        width: "200px",
+        width: "100%",
         height: "40px",
         borderRadius: "5px",
         backgroundColor: "#252b33",
@@ -624,6 +624,29 @@ const InlineLoaderStyleConfig: ComponentStyles = {
 };
 
 export const InlineLoaderStyle = createStyleStore(InlineLoaderStyleConfig);
+
+//////////     I N F O     L A B E L     //////////
+
+const InfoLabelStyleConfig: ComponentStyles = {
+    dark: {
+        width: "250px",
+        borderBottomPos: "-2px",
+        fontColor: "#f5f5f5",
+        fontWeight: "400",
+        fontSize: "1rem",
+        fontLineHeight: "1.5",
+        fontRightMargin: "20px",
+        helpIconSize: "24px",
+        borderBottom: "1px solid transparent",
+        hoverFontColor: "#ffffffd0",
+        hoverFontWeight: "400",
+        hoverBorderBottom: "1px solid #ffffff33",
+        transitionTime: "0.2s",
+        showToolTipDelay: 300,
+    },
+};
+
+export const InfoLabelStyle = createStyleStore(InfoLabelStyleConfig);
 
 //////////     T O O L     T I P     //////////
 
@@ -900,14 +923,28 @@ const EnergyPickersStyleConfig: ComponentStyles = {
 
 export const EnergyPickersStyle = createStyleStore(EnergyPickersStyleConfig);
 
-//////////     T E X T     C O L O R S     //////////
+//////////     T O O L     T I P     T E X T     //////////
 
 const ToolTipTexStyleConfig: ComponentStyles = {
     dark: {
         textColor: "#eeee",
         textWeight: "300",
         textSize: "14px",
+        textLineHeight: "1.0",
     },
 };
 
 export const ToolTipTextStyle = createStyleStore(ToolTipTexStyleConfig);
+
+//////////     T O O L     T I P     W R A P     T E X T     //////////
+
+const ToolTipWrapTexStyleConfig: ComponentStyles = {
+    dark: {
+        textColor: "#eeee",
+        textWeight: "300",
+        textSize: "14px",
+        textLineHeight: "1.5",
+    },
+};
+
+export const ToolTipWrapTexStyle = createStyleStore(ToolTipWrapTexStyleConfig);

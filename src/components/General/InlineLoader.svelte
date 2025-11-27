@@ -11,13 +11,13 @@
     export let loaded: boolean;
 
     // Layout / styling props
-    export let width: string | undefined = "100%";
-    export let height: string | undefined = "100%";
-    export let backgroundColor: string | undefined = "transparent";
-    export let border: string | undefined = "none";
-    export let shadow: string | undefined = "none";
-    export let waveBackground: string | undefined = "linear-gradient(120deg, transparent 0%, rgba(255, 255, 255, 0.5) 50%, transparent 100%)";
-    export let waveAnimationTime: string | undefined = "1.6s";
+    export let width: string | undefined = undefined;
+    export let height: string | undefined = undefined;
+    export let backgroundColor: string | undefined = undefined;
+    export let border: string | undefined = undefined;
+    export let shadow: string | undefined = undefined;
+    export let waveBackground: string | undefined = undefined;
+    export let waveAnimationTime: string | undefined = undefined;
 
     $: localOverrides = {
         width,
@@ -33,6 +33,16 @@
     $: mergedStyle = mergeStyle(effectiveStyle, localOverrides);
 </script>
 
+<!--
+    InlineLoader
+    - Small inline shimmer / skeleton placeholder used for narrow UI fragments.
+    - Shows an animated "wave" overlay while content is loading and reveals the default
+        slot when `loaded` is true.
+    Props: loaded, width, height, backgroundColor, border, shadow,
+                 waveBackground, waveAnimationTime (style object merging is supported).
+    Accessibility: consider toggling aria-busy on the loader and aria-hidden on content
+    when integrating this component into interactive or screen-reader sensitive flows.
+-->
 <div
     style="
         --width: {mergedStyle.width};
@@ -53,6 +63,7 @@
 </div>
 
 <style>
+    /* Container: placeholder wrapper (sizing + visuals) */
     .inline-loader-div {
         position: relative;
         overflow: hidden;
@@ -63,6 +74,7 @@
         box-shadow: var(--shadow);
     }
 
+    /* Content: slot wrapper (hidden while loading) */
     .inline-loader-div .content {
         margin: 0;
         padding: 0;
@@ -76,6 +88,7 @@
         opacity: 1;
     }
 
+    /* Wave: shimmering overlay (animated) */
     .inline-loader-div .wave {
         position: absolute;
         top: 0;
@@ -86,6 +99,7 @@
         animation: wave var(--wave-animation-time) ease-in-out infinite;
     }
 
+    /* @keyframes wave: left -> right movement */
     @keyframes wave {
         0% {
             left: -150%;
@@ -95,12 +109,14 @@
         }
     }
 
+    /* Loaded state: clear placeholder visuals and stop animation */
     .inline-loader-div.loaded {
         background-color: transparent;
         border: none;
         box-shadow: none;
     }
 
+    /* Hides the loader wave when loaded is signaled */
     .inline-loader-div.loaded .wave {
         animation: none;
         opacity: 0;

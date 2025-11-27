@@ -1,7 +1,7 @@
 <script lang="ts">
     import InputField from "../General/InputField.svelte";
-    import HintInfo from "../General/HintInfo.svelte";
     import Selector from "../General/Selector.svelte";
+    import InfoLabel from "../General/InfoLabel.svelte";
     import { validateModbusRtuPort } from "$lib/logic/validation/device/modbusRtu";
     import { READ_PERIOD_LIM, TIMEOUT_LIM } from "$lib/types/device/base";
     import { SLAVE_ID_LIM, RETRIES_NUMBER_LIM } from "$lib/types/device/modbusRtu";
@@ -60,48 +60,34 @@
     • Includes hint tooltips for each configuration parameter.
 -->
 <div class="device-input-div">
-    <span>{$texts.communicationPort}</span>
+    <InfoLabel labelText={$texts.communicationPort} toolTipText={$texts.communicationPortInfo} />
     <div class="input-div">
-        <div class="input-content-div">
-            <InputField bind:inputValue={configuration.port} inputInvalid={!validModbusRtuPort} enableInputInvalid={true} />
-        </div>
-        <div class="info-div">
-            <HintInfo>
-                <span class="info-text">{$texts.communicationPortInfo}</span>
-            </HintInfo>
-        </div>
+        <InputField bind:inputValue={configuration.port} inputInvalid={!validModbusRtuPort} enableInputInvalid={true} />
     </div>
 </div>
 
 <div class="device-input-div">
-    <span>{$texts.slaveID}</span>
+    <InfoLabel labelText={$texts.slaveID} toolTipText={$texts.slaveIDInfo} />
     <div class="input-div">
-        <div class="input-content-div">
-            <InputField
-                bind:inputValue={configuration.slave_id}
-                inputInvalid={!validModbusSlaveID}
-                enableInputInvalid={true}
-                inputType="POSITIVE_INT"
-                minValue={SLAVE_ID_LIM.MIN}
-                maxValue={SLAVE_ID_LIM.MAX}
-                limitsPassed={() => {
-                    showToast("slaveIDError", AlertType.ALERT, {
-                        minValue: SLAVE_ID_LIM.MIN,
-                        maxValue: SLAVE_ID_LIM.MAX,
-                    });
-                }}
-            />
-        </div>
-        <div class="info-div">
-            <HintInfo>
-                <span class="info-text">{$texts.slaveIDInfo}</span>
-            </HintInfo>
-        </div>
+        <InputField
+            bind:inputValue={configuration.slave_id}
+            inputInvalid={!validModbusSlaveID}
+            enableInputInvalid={true}
+            inputType="POSITIVE_INT"
+            minValue={SLAVE_ID_LIM.MIN}
+            maxValue={SLAVE_ID_LIM.MAX}
+            limitsPassed={() => {
+                showToast("slaveIDError", AlertType.ALERT, {
+                    minValue: SLAVE_ID_LIM.MIN,
+                    maxValue: SLAVE_ID_LIM.MAX,
+                });
+            }}
+        />
     </div>
 </div>
 
 <div class="device-input-div">
-    <span>{$texts.baudrate}</span>
+    <InfoLabel labelText={$texts.baudrate} toolTipText={$texts.baudrateInfo} />
     <div class="input-div">
         <Selector
             options={$baudrateTexts}
@@ -110,16 +96,11 @@
             enableInputInvalid={true}
             scrollable={true}
         />
-        <div class="info-div">
-            <HintInfo>
-                <span class="info-text">{$texts.baudrateInfo}</span>
-            </HintInfo>
-        </div>
     </div>
 </div>
 
 <div class="device-input-div">
-    <span>{$texts.parity}</span>
+    <InfoLabel labelText={$texts.parity} toolTipText={$texts.parityInfo} />
     <div class="input-div">
         <Selector
             options={$parityTexts}
@@ -128,16 +109,11 @@
             enableInputInvalid={true}
             scrollable={true}
         />
-        <div class="info-div">
-            <HintInfo>
-                <span class="info-text">{$texts.parityInfo}</span>
-            </HintInfo>
-        </div>
     </div>
 </div>
 
 <div class="device-input-div">
-    <span>{$texts.bytesize}</span>
+    <InfoLabel labelText={$texts.bytesize} toolTipText={$texts.bytesizeInfo} />
     <div class="input-div">
         <Selector
             options={$bytesizeTexts}
@@ -146,16 +122,11 @@
             enableInputInvalid={true}
             scrollable={true}
         />
-        <div class="info-div">
-            <HintInfo>
-                <span class="info-text">{$texts.bytesizeInfo}</span>
-            </HintInfo>
-        </div>
     </div>
 </div>
 
 <div class="device-input-div">
-    <span>{$texts.stopbits}</span>
+    <InfoLabel labelText={$texts.stopbits} toolTipText={$texts.stopbitsInfo} />
     <div class="input-div">
         <Selector
             options={$stopbitsTexts}
@@ -164,92 +135,66 @@
             enableInputInvalid={true}
             scrollable={true}
         />
-        <div class="info-div">
-            <HintInfo>
-                <span class="info-text">{$texts.stopbitsInfo}</span>
-            </HintInfo>
-        </div>
     </div>
 </div>
 
 <div class="device-input-div">
-    <span>{$texts.readPeriod}</span>
+    <InfoLabel labelText={$texts.readPeriod} toolTipText={$texts.readPeriodInfo} />
     <div class="input-div">
-        <div class="input-content-div">
-            <InputField
-                bind:inputValue={configuration.read_period}
-                inputInvalid={!validReadPeriod}
-                enableInputInvalid={true}
-                inputType="POSITIVE_INT"
-                inputUnit={$texts.secondsUnit}
-                minValue={READ_PERIOD_LIM.MIN}
-                maxValue={READ_PERIOD_LIM.MAX}
-                limitsPassed={() => {
-                    showToast("readPeriodError", AlertType.ALERT, {
-                        minValue: READ_PERIOD_LIM.MIN,
-                        maxValue: READ_PERIOD_LIM.MAX,
-                    });
-                }}
-            />
-        </div>
-        <div class="info-div">
-            <HintInfo>
-                <span class="info-text">{$texts.readPeriodInfo}</span>
-            </HintInfo>
-        </div>
+        <InputField
+            bind:inputValue={configuration.read_period}
+            inputInvalid={!validReadPeriod}
+            enableInputInvalid={true}
+            inputType="POSITIVE_INT"
+            inputUnit={$texts.secondsUnit}
+            minValue={READ_PERIOD_LIM.MIN}
+            maxValue={READ_PERIOD_LIM.MAX}
+            limitsPassed={() => {
+                showToast("readPeriodError", AlertType.ALERT, {
+                    minValue: READ_PERIOD_LIM.MIN,
+                    maxValue: READ_PERIOD_LIM.MAX,
+                });
+            }}
+        />
     </div>
 </div>
 <div class="device-input-div">
-    <span>{$texts.commTimeout}</span>
+    <InfoLabel labelText={$texts.commTimeout} toolTipText={$texts.commTimeoutInfo} />
     <div class="input-div">
-        <div class="input-content-div">
-            <InputField
-                bind:inputValue={configuration.timeout}
-                inputInvalid={!validTimeout}
-                enableInputInvalid={true}
-                inputType="POSITIVE_INT"
-                inputUnit={$texts.secondsUnit}
-                minValue={TIMEOUT_LIM.MIN}
-                maxValue={TIMEOUT_LIM.MAX}
-                limitsPassed={() => {
-                    showToast("commTimeoutError", AlertType.ALERT, {
-                        minValue: TIMEOUT_LIM.MIN,
-                        maxValue: TIMEOUT_LIM.MAX,
-                    });
-                }}
-            />
-        </div>
-        <div class="info-div">
-            <HintInfo>
-                <span class="info-text">{$texts.commTimeoutInfo}</span>
-            </HintInfo>
-        </div>
+        <InputField
+            bind:inputValue={configuration.timeout}
+            inputInvalid={!validTimeout}
+            enableInputInvalid={true}
+            inputType="POSITIVE_INT"
+            inputUnit={$texts.secondsUnit}
+            minValue={TIMEOUT_LIM.MIN}
+            maxValue={TIMEOUT_LIM.MAX}
+            limitsPassed={() => {
+                showToast("commTimeoutError", AlertType.ALERT, {
+                    minValue: TIMEOUT_LIM.MIN,
+                    maxValue: TIMEOUT_LIM.MAX,
+                });
+            }}
+        />
     </div>
 </div>
 <div class="device-input-div">
-    <span>{$texts.retries}</span>
+    <InfoLabel labelText={$texts.retries} toolTipText={$texts.retriesInfo} />
     <div class="input-div">
-        <div class="input-content-div">
-            <InputField
-                bind:inputValue={configuration.retries}
-                inputType="POSITIVE_INT"
-                inputInvalid={!validRetriesNumber}
-                enableInputInvalid={true}
-                minValue={RETRIES_NUMBER_LIM.MIN}
-                maxValue={RETRIES_NUMBER_LIM.MAX}
-                limitsPassed={() => {
-                    showToast("retriesError", AlertType.ALERT, {
-                        minValue: RETRIES_NUMBER_LIM.MIN,
-                        maxValue: RETRIES_NUMBER_LIM.MAX,
-                    });
-                }}
-            />
-        </div>
-        <div class="info-div">
-            <HintInfo>
-                <span class="info-text">{$texts.retriesInfo}</span>
-            </HintInfo>
-        </div>
+        <InputField
+            bind:inputValue={configuration.retries}
+            inputType="POSITIVE_INT"
+            inputInvalid={!validRetriesNumber}
+            enableInputInvalid={true}
+            minValue={RETRIES_NUMBER_LIM.MIN}
+            maxValue={RETRIES_NUMBER_LIM.MAX}
+            limitsPassed={() => {
+                showToast("retriesError", AlertType.ALERT, {
+                    minValue: RETRIES_NUMBER_LIM.MIN,
+                    maxValue: RETRIES_NUMBER_LIM.MAX,
+                });
+            }}
+        />
     </div>
 </div>
 
@@ -267,45 +212,11 @@
         gap: 20px;
     }
 
-    /* Label text for device input fields */
-    .device-input-div span {
-        text-align: left;
-        color: #f5f5f5;
-        font-size: 1rem;
-        font-weight: 400;
-        margin: 0;
-        padding: 0;
-        width: 250px;
-    }
-
     /* Input field container styling */
     .input-div {
-        position: relative;
-        display: flex;
-        flex-direction: row;
-        align-items: center;
-        gap: 10px;
-        margin: 0;
-        padding: 0;
-        width: fit-content;
-        height: 100%;
-    }
-
-    /* Content area for input fields */
-    .input-div .input-content-div {
-        width: 200px;
+        width: 250px;
         display: flex;
         justify-content: center;
         align-items: center;
-    }
-
-    /* Info text styling for hints */
-    .info-div .info-text {
-        padding: 10px;
-        padding-right: 40px;
-        font-size: 1rem;
-        font-weight: 400;
-        line-height: 1.5;
-        color: white;
     }
 </style>

@@ -9,16 +9,20 @@
 
     // Props
     export let text: string;
+    export let wrapText: boolean = false;
+    export let align: "left" | "center" | "right" = "center";
 
     //Layout / styling Props
     export let textColor: string | undefined = undefined;
     export let textWeight: string | undefined = undefined;
     export let textSize: string | undefined = undefined;
+    export let textLineHeight: string | undefined = undefined;
 
     $: localOverrides = {
         textColor,
         textWeight,
         textSize,
+        textLineHeight,
     };
 
     // Merged style
@@ -33,10 +37,13 @@
   - Centered alignment with no-wrap to maintain tooltip layout.
 -->
 <span
+    class:no-wrap={!wrapText}
     style="
         --text-color: {mergedStyle.textColor};
         --text-weight: {mergedStyle.textWeight};
         --text-size: {mergedStyle.textSize};
+        --text-line-height: {mergedStyle.textLineHeight};
+        --text-alignment: {align};
     ">{text}</span
 >
 
@@ -46,12 +53,17 @@
         color: var(--text-color);
         font-weight: var(--text-weight);
         font-size: var(--text-size);
-        text-align: center;
+        text-align: var(--text-alignment);
+        line-height: var(--text-line-height);
         padding: 0;
         margin: 0;
         display: flex;
         justify-content: center;
         align-items: center;
+    }
+
+    /* Remove text wrapping */
+    span.no-wrap {
         white-space: nowrap;
     }
 </style>

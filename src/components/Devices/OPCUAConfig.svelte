@@ -1,6 +1,6 @@
 <script lang="ts">
     import InputField from "../General/InputField.svelte";
-    import HintInfo from "../General/HintInfo.svelte";
+    import InfoLabel from "../General/InfoLabel.svelte";
     import { validateOpcUaUrl } from "$lib/logic/validation/device/opcUa";
     import { READ_PERIOD_LIM, TIMEOUT_LIM } from "$lib/types/device/base";
     import { showToast } from "$lib/logic/view/toast";
@@ -35,99 +35,64 @@
     • Includes hint tooltips for each configuration parameter.
 -->
 <div class="device-input-div">
-    <span>{$texts.networkAddress}</span>
+    <InfoLabel labelText={$texts.networkAddress} toolTipText={$texts.networkAddressInfo} />
     <div class="input-div">
-        <div class="input-content-div">
-            <InputField bind:inputValue={configuration.url} inputInvalid={!validOpcUaUrl} enableInputInvalid={true} />
-        </div>
-        <div class="info-div">
-            <HintInfo>
-                <span class="info-text">{$texts.networkAddressInfo}</span>
-            </HintInfo>
-        </div>
+        <InputField bind:inputValue={configuration.url} inputInvalid={!validOpcUaUrl} enableInputInvalid={true} />
     </div>
 </div>
 <div class="device-input-div">
-    <span>{$texts.readPeriod}</span>
+    <InfoLabel labelText={$texts.readPeriod} toolTipText={$texts.readPeriodInfo} />
     <div class="input-div">
-        <div class="input-content-div">
-            <InputField
-                bind:inputValue={configuration.read_period}
-                inputInvalid={!validReadPeriod}
-                enableInputInvalid={true}
-                inputType="POSITIVE_INT"
-                inputUnit={$texts.secondsUnit}
-                minValue={READ_PERIOD_LIM.MIN}
-                maxValue={READ_PERIOD_LIM.MAX}
-                limitsPassed={() => {
-                    showToast("readPeriodError", AlertType.ALERT, {
-                        minValue: READ_PERIOD_LIM.MIN,
-                        maxValue: READ_PERIOD_LIM.MAX,
-                    });
-                }}
-            />
-        </div>
-        <div class="info-div">
-            <HintInfo>
-                <span class="info-text">{$texts.readPeriodInfo}</span>
-            </HintInfo>
-        </div>
+        <InputField
+            bind:inputValue={configuration.read_period}
+            inputInvalid={!validReadPeriod}
+            enableInputInvalid={true}
+            inputType="POSITIVE_INT"
+            inputUnit={$texts.secondsUnit}
+            minValue={READ_PERIOD_LIM.MIN}
+            maxValue={READ_PERIOD_LIM.MAX}
+            limitsPassed={() => {
+                showToast("readPeriodError", AlertType.ALERT, {
+                    minValue: READ_PERIOD_LIM.MIN,
+                    maxValue: READ_PERIOD_LIM.MAX,
+                });
+            }}
+        />
     </div>
 </div>
 <div class="device-input-div">
-    <span>{$texts.commTimeout}</span>
+    <InfoLabel labelText={$texts.commTimeout} toolTipText={$texts.commTimeoutInfo} />
     <div class="input-div">
-        <div class="input-content-div">
-            <InputField
-                bind:inputValue={configuration.timeout}
-                inputInvalid={!validTimeout}
-                enableInputInvalid={true}
-                inputType="POSITIVE_INT"
-                inputUnit={$texts.secondsUnit}
-                minValue={TIMEOUT_LIM.MIN}
-                maxValue={TIMEOUT_LIM.MAX}
-                limitsPassed={() => {
-                    showToast("commTimeoutError", AlertType.ALERT, {
-                        minValue: TIMEOUT_LIM.MIN,
-                        maxValue: TIMEOUT_LIM.MAX,
-                    });
-                }}
-            />
-        </div>
-        <div class="info-div">
-            <HintInfo>
-                <span class="info-text">{$texts.commTimeoutInfo}</span>
-            </HintInfo>
-        </div>
+        <InputField
+            bind:inputValue={configuration.timeout}
+            inputInvalid={!validTimeout}
+            enableInputInvalid={true}
+            inputType="POSITIVE_INT"
+            inputUnit={$texts.secondsUnit}
+            minValue={TIMEOUT_LIM.MIN}
+            maxValue={TIMEOUT_LIM.MAX}
+            limitsPassed={() => {
+                showToast("commTimeoutError", AlertType.ALERT, {
+                    minValue: TIMEOUT_LIM.MIN,
+                    maxValue: TIMEOUT_LIM.MAX,
+                });
+            }}
+        />
     </div>
 </div>
 <div class="optional-div">
     <span class="optional-text">{$texts.authenticationOptional}</span>
     <form on:submit|preventDefault>
         <div class="device-input-div">
-            <span>{$texts.username}</span>
+            <InfoLabel labelText={$texts.username} toolTipText={$texts.commUsernameInfo} />
             <div class="input-div">
-                <div class="input-content-div">
-                    <InputField bind:inputValue={configuration.username} inputType="USERNAME" />
-                </div>
-                <div class="info-div">
-                    <HintInfo>
-                        <span class="info-text">{$texts.commUsernameInfo}</span>
-                    </HintInfo>
-                </div>
+                <InputField bind:inputValue={configuration.username} inputType="USERNAME" />
             </div>
         </div>
         <div class="device-input-div">
-            <span>{$texts.password}</span>
+            <InfoLabel labelText={$texts.password} toolTipText={$texts.commPasswordInfo} />
             <div class="input-div">
-                <div class="input-content-div">
-                    <InputField bind:inputValue={configuration.password} inputType="PASSWORD" />
-                </div>
-                <div class="info-div">
-                    <HintInfo>
-                        <span class="info-text">{$texts.commPasswordInfo}</span>
-                    </HintInfo>
-                </div>
+                <InputField bind:inputValue={configuration.password} inputType="PASSWORD" />
             </div>
         </div>
     </form>
@@ -147,46 +112,12 @@
         gap: 20px;
     }
 
-    /* Label text for device input fields */
-    .device-input-div span {
-        text-align: left;
-        color: #f5f5f5;
-        font-size: 1rem;
-        font-weight: 400;
-        margin: 0;
-        padding: 0;
-        width: 250px;
-    }
-
     /* Input field container styling */
     .input-div {
-        position: relative;
-        display: flex;
-        flex-direction: row;
-        align-items: center;
-        gap: 10px;
-        margin: 0;
-        padding: 0;
-        width: fit-content;
-        height: 100%;
-    }
-
-    /* Content area for input fields */
-    .input-div .input-content-div {
-        width: 200px;
+        width: 250px;
         display: flex;
         justify-content: center;
         align-items: center;
-    }
-
-    /* Info text styling for hints */
-    .info-div .info-text {
-        padding: 10px;
-        padding-right: 40px;
-        font-size: 1rem;
-        font-weight: 400;
-        line-height: 1.5;
-        color: white;
     }
 
     /* Optional authentication section styling */
