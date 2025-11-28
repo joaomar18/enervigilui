@@ -116,16 +116,14 @@
             <div class="bottom-border"></div>
         </div>
     </button>
-    <div class="info-div">
-        <ToolTip style={toolTipEffectiveStyle} {showToolTip} forceShowMobile={true}>
-            <ToolTipText style={toolTipTextEffectiveStyle} text={toolTipText} align="left" wrapText={true} />
-        </ToolTip>
-    </div>
+    <ToolTip style={toolTipEffectiveStyle} {showToolTip} forceShowMobile={true}>
+        <ToolTipText style={toolTipTextEffectiveStyle} text={toolTipText} align="left" wrapText={true} />
+    </ToolTip>
 </div>
 
 <style>
     /* Wrapper: fixed width and layout for the label + tooltip */
-    .info-div {
+    .container {
         padding: 0;
         margin: 0;
         position: relative;
@@ -148,7 +146,7 @@
 
     /* Text container: holds label text and optional icon */
     .text-div {
-        width: fit-content;
+        width: 100%;
         height: fit-content;
         margin: 0;
         padding: 0;

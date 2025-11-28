@@ -17,7 +17,7 @@
     import UploadImage from "../../../components/General/UploadImage.svelte";
     import Button from "../../../components/General/Button.svelte";
     import NodesGrid from "../../../components/Devices/Nodes/NodesGrid.svelte";
-    import PopupNodeConfig from "../../../components/Devices/Nodes/PopupNodeConfig.svelte";
+    import NodeConfigSheet from "../../../components/Devices/Nodes/NodeConfigSheet.svelte";
     import PopupAddDevice from "../../../components/Devices/PopupAddDevice.svelte";
     import MeterOptionsConfig from "../../../components/Devices/MeterOptionsConfig.svelte";
 
@@ -185,16 +185,7 @@ Shows input forms for protocol-specific parameters and organizes device nodes fo
                 />
             </div>
         </div>
-        <PopupNodeConfig
-            bind:windowOpened={showConfigNodeWindow}
-            onPropertyChanged={() => {
-                nodes = updateNodes(editingNode, nodes);
-                editingNode = updateEditingNode(editingNode, editingNode, nodes);
-            }}
-            {deviceData}
-            node={editingNode}
-            bind:nodeEditingState={editingNodeState}
-        />
+        <!----------     P O P U P     W I N D O W S     ---------->
         <PopupAddDevice
             bind:windowOpened={showAddWindow}
             processingRequest={performingAddRequest}
@@ -205,6 +196,17 @@ Shows input forms for protocol-specific parameters and organizes device nodes fo
                     performingAddRequest = false;
                 }
             }}
+        />
+        <!----------     N O D E     C O N F I G U R A T I O N     S H E E T     ---------->
+        <NodeConfigSheet
+            bind:showPanel={showConfigNodeWindow}
+            onPropertyChanged={() => {
+                nodes = updateNodes(editingNode, nodes);
+                editingNode = updateEditingNode(editingNode, editingNode, nodes);
+            }}
+            {deviceData}
+            node={editingNode}
+            bind:nodeEditingState={editingNodeState}
         />
     {/if}
 </div>

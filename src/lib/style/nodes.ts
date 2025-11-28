@@ -34,23 +34,6 @@ const AddNodeButtonStyleConfig: ComponentStyles = {
 
 export const AddNodeButtonStyle = createStyleStore(AddNodeButtonStyleConfig);
 
-//////////     N O D E     C O N F I G U R A T I O N     W I N D O W     //////////
-
-const NodeConfigWindowStyleConfig: ComponentStyles = {
-    dark: {
-        headerTextColor: "#f5f5f5",
-        headerTextWeight: "400",
-        headerSubTextColor: "rgb(147, 147, 147)",
-        headerSubFontWeight: "300",
-        textColor: "#f5f5f5",
-        textWeight: "400",
-        hintInfoTextColor: "white",
-        hintInfoTextWeight: "400",
-    },
-};
-
-export const NodeConfigWindowStyle = createStyleStore(NodeConfigWindowStyleConfig);
-
 //////////     N O D E     R O W     //////////
 
 const NodeRowStyleConfig: ComponentStyles = {
@@ -125,35 +108,6 @@ const NodeSelectorStyleConfig: ComponentStyles = {
 
 export const NodeSelectorStyle = createStyleStore(NodeSelectorStyleConfig);
 
-//////////     N O D E     C O N F I G U R A T I O N     P O P U P     S E L E C T O R     //////////
-
-const NodeConfigPopupSelectorStyleConfig: ComponentStyles = {
-    dark: {
-        width: "90%",
-        height: "40px",
-        borderRadius: "5px",
-        backgroundColor: "#1a2027",
-        borderColor: "#1a2027",
-        disabledBackgroundColor: "#42505f",
-        disabledBorderColor: "#42505f",
-        selectedColor: "#14566b",
-        badFormatBackgroundColor: "#1a2027",
-        badFormatBorderColor: "#e74c3c",
-        optionsBackgroundColor: "#1e242b",
-        optionsBorderColor: "#323a45",
-        optionsInnerBorderColor: "#323a45",
-        optionHeight: "40px",
-        fontSize: "0.9rem",
-        letterSpacing: "normal",
-        wordSpacing: "normal",
-        arrowWidth: "24x",
-        arrowHeight: "24px",
-        arrowRightPos: "10px",
-    },
-};
-
-export const NodeConfigPopupSelectorStyle = createStyleStore(NodeConfigPopupSelectorStyleConfig);
-
 //////////     N O D E     C O N F I G     S H E E T     I N P U T     F I E L D     //////////
 
 const NodeConfigSheetInputFieldStyleConfig: ComponentStyles = {
@@ -213,6 +167,29 @@ const NodeConfigSheetSelectorStyleConfig: ComponentStyles = {
 };
 
 export const NodeConfigSheetSelectorStyle = createStyleStore(NodeConfigSheetSelectorStyleConfig);
+
+//////////     N O D E     C O N F I G     S H E E T     I N F O     L A B E L     //////////
+
+const NodeConfigSheetInfoLabelStyleConfig: ComponentStyles = {
+    dark: {
+        width: "100%",
+        borderBottomPos: "-2px",
+        fontColor: "rgba(255,255,255, 0.6)",
+        fontWeight: "400",
+        fontSize: "1rem",
+        fontLineHeight: "1.5",
+        fontRightMargin: "20px",
+        helpIconSize: "24px",
+        borderBottom: "1px solid transparent",
+        hoverFontColor: "rgba(255,255,255, 0.7)",
+        hoverFontWeight: "400",
+        hoverBorderBottom: "1px solid #ffffff33",
+        transitionTime: "0.2s",
+        showToolTipDelay: 300,
+    },
+};
+
+export const NodeConfigSheetInfoLabelStyle = createStyleStore(NodeConfigSheetInfoLabelStyleConfig);
 
 //////////     N O D E S     G R I D     //////////
 
@@ -462,10 +439,6 @@ const NodeConfigSheetStyleConfig: ComponentStyles = {
         contentRowHeight: "auto",
         contentRowGap: "15px",
         contentColGap: "10px",
-        contentLabelWidth: "100%",
-        contentLabelSize: "1rem",
-        contentLabelColor: "rgba(255,255,255, 0.6)",
-        contentLabelWeight: "400",
         contentValueSize: "1rem",
         contentValueColor: "rgba(255,255,255, 0.8)",
         contentValueWeight: "600",

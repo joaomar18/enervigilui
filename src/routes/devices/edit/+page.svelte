@@ -21,7 +21,6 @@
     import Button from "../../../components/General/Button.svelte";
     import NodesGrid from "../../../components/Devices/Nodes/NodesGrid.svelte";
     import MeterOptionsConfig from "../../../components/Devices/MeterOptionsConfig.svelte";
-    import PopupNodeConfig from "../../../components/Devices/Nodes/PopupNodeConfig.svelte";
     import PopupDeleteDevice from "../../../components/Devices/PopupDeleteDevice.svelte";
     import PopupSaveDevice from "../../../components/Devices/PopupSaveDevice.svelte";
     import PopupCancelDeviceEdit from "../../../components/Devices/PopupCancelDeviceEdit.svelte";
@@ -223,16 +222,6 @@ Shows input forms for protocol-specific parameters and organizes device nodes fo
             </div>
         </div>
         <!----------     P O P U P     W I N D O W S     ---------->
-        <PopupNodeConfig
-            windowOpened={false}
-            onPropertyChanged={() => {
-                nodes = updateNodes(editingNode, nodes);
-                editingNode = updateEditingNode(editingNode, editingNode, nodes);
-            }}
-            {deviceData}
-            node={editingNode}
-            bind:nodeEditingState={editingNodeState}
-        />
         <PopupSaveDevice
             bind:windowOpened={showSaveWindow}
             processingRequest={performingSaveRequest}
