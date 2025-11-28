@@ -58,6 +58,7 @@
         padding: 0;
         margin: 0;
         display: flex;
+        white-space: pre-line;
         justify-content: center;
         align-items: center;
     }

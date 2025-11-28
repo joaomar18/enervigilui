@@ -524,17 +524,13 @@ const textsObject: TextsObject = {
         PT: "Monofásico",
         EN: "Single-phase",
     },
-    incrementalNode: {
-        PT: "Variável Incremental",
-        EN: "Incremental Variable",
+    counterNode: {
+        PT: "Contador",
+        EN: "Counter",
     },
-    positiveIncrement: {
-        PT: "Incremento Positivo",
-        EN: "Positive Increment",
-    },
-    calculateIncrement: {
-        PT: "Calcular Incremento",
-        EN: "Calculate Increment",
+    counterMode: {
+        PT: "Modo de Contagem",
+        EN: "Counter Mode",
     },
     variableInfo: {
         PT: "Selecione a variável que pretende medir ou monitorizar. Cada variável representa um tipo de dado elétrico, como tensão, corrente, potência, energia, etc.",
@@ -584,17 +580,21 @@ const textsObject: TextsObject = {
         PT: "Esta opção indica que a variável é calculada internamente pelo sistema e não está disponível para variáveis personalizadas.",
         EN: "This option indicates that the variable is calculated internally by the system and is not available for custom variables.",
     },
-    incrementalNodeInfo: {
-        PT: "Esta opção indica que a variável é incremental, acumulando o seu valor ao longo do tempo. O valor acumulado é reiniciado a cada registo. Exemplo: variáveis de energia.",
-        EN: "This option indicates that the node is incremental, accumulating its value over time. The accumulated value resets on each logging. Example: energy nodes.",
+    counterNodeInfo: {
+        PT: "Indica que a variável funciona como um contador, acumulando o valor ao longo do tempo. O valor acumulado é atualizado com base no modo selecionado. Exemplo: variáveis de energia.",
+        EN: "Indicates that the variable behaves as a counter, accumulating its value over time. The accumulated value is updated according to the selected mode. Example: energy variables.",
     },
-    positiveIncrementInfo: {
-        PT: "Quando ativado: acumulação = acumulação + novo valor. Quando desativado: acumulação = novo valor - valor inicial.",
-        EN: "If enabled: accumulation = accumulation + new value. If not: accumulation = new value - initial value.",
-    },
-    calculateIncrementInfo: {
-        PT: "Ative para calcular o incremento entre leituras. Se desativado, a variável não calcula a acumulação (será incremental, mas calculada externamente).",
-        EN: "Enable to calculate the increment between readings. If off, the variable will not calculate its own accumulation (it remains incremental, but is likely calculated externally).",
+    counterModeInfo: {
+        PT:
+            "Define como o valor da variável é calculado ao longo do tempo:\n\n" +
+            "• DIRETO — O valor recebido é utilizado diretamente, sem qualquer processamento adicional.\n" +
+            "• DELTA — O valor representa a variação desde a última leitura (incremento). O sistema soma estes incrementos para obter o total.\n" +
+            "• CUMULATIVO — O valor é cumulativo. O sistema calcula o incremento com base na diferença entre leituras consecutivas.",
+        EN:
+            "Defines how the variable's value is processed over time:\n\n" +
+            "• DIRECT — The incoming value is used as-is, with no additional processing.\n" +
+            "• DELTA — The value represents the change since the previous reading (increment). The system adds these increments to compute the total.\n" +
+            "• CUMULATIVE — The value is cumulative. The system calculates increments based on the difference between successive readings.",
     },
     enabledInfo: {
         PT: "Ative para que a variável seja gerida. Se desativada, a variável apenas existe na configuração e não é processada.",

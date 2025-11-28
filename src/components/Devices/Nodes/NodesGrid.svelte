@@ -36,6 +36,7 @@
 
     // Layout / styling props
     export let width: string | undefined = undefined;
+    export let maxWidth: string | undefined = undefined;
     export let height: string | undefined = undefined;
     export let minHeight: string | undefined = undefined;
     export let borderRadius: string | undefined = undefined;
@@ -49,6 +50,7 @@
 
     $: localOverrides = {
         width,
+        maxWidth,
         height,
         borderRadius,
         backgroundColor,
@@ -133,6 +135,7 @@ Includes multi-language headers and adapts layout to container size. -->
     bind:this={containerElement}
     style="
         --width: {mergedStyle.width};
+        --max-width: {mergedStyle.maxWidth};
         --height: {mergedStyle.height};
         --min-height: {minHeight};
         --border-radius: {mergedStyle.borderRadius};
@@ -253,6 +256,7 @@ Includes multi-language headers and adapts layout to container size. -->
     /* Main container for the nodes grid table */
     .container {
         width: var(--width);
+        max-width: var(--max-width);
         height: var(--height);
         border-radius: var(--border-radius);
         background-color: var(--background-color);

@@ -13,15 +13,15 @@ import type { NodeState, ProcessedNodeState } from "$lib/types/nodes/realtime";
 import type { RealTimeCardCategoriesState } from "$lib/types/view/device";
 
 /**
- * Checks if a node is configured as incremental (accumulating values over time).
+ * Checks if a node is configured as a counter (accumulating values over time).
  * @param node - The node to check (supports EditableNodeRecord, NodeRecord, or ProcessedNodeState).
- * @returns True if the node is incremental, false otherwise.
+ * @returns True if the node is a counter, false otherwise.
  */
-export function isIncremental(node: EditableNodeRecord | NodeRecord | ProcessedNodeState): boolean {
+export function isCounter(node: EditableNodeRecord | NodeRecord | ProcessedNodeState): boolean {
     if ("config" in node) {
-        return Boolean(node.config.incremental_node);
-    } else if ("incremental" in node) {
-        return node.incremental;
+        return Boolean(node.config.is_counter);
+    } else if ("is_counter" in node) {
+        return node.is_counter;
     } else {
         throw Error("Couldn't obtain incremental property from node.");
     }
@@ -207,8 +207,11 @@ export function addPrefix(name: string, prefix: string | NodePrefix): string {
     return prefix + name;
 }
 
-
-export function getCommunicationID(protocol: Protocol, node_object: BaseNodeConfig | EditableBaseNodeConfig | BaseNodeAdditionalInfo, no_format: boolean = false): string {
+export function getCommunicationID(
+    protocol: Protocol,
+    node_object: BaseNodeConfig | EditableBaseNodeConfig | BaseNodeAdditionalInfo,
+    no_format: boolean = false
+): string {
     let plugin = get(protocolPlugins)[protocol];
     return plugin.getCommID(node_object, no_format);
 }
@@ -230,17 +233,6 @@ export function getNodePhaseFromRecordOrState(node: EditableNodeRecord | NodeRec
 }
 
 /**
- * Extracts unique phases from an array of mixed node records and states.
- * @param nodes - Array of mixed node types (EditableNodeRecord, NodeRecord, ProcessedNodeState, or NodeState).
- * @returns Array of unique node phases found in the provided nodes.
- */
-export function getAvailablePhasesFromRecordsOrStates(nodes: Array<EditableNodeRecord | NodeRecord | ProcessedNodeState | NodeState>): Array<NodePhase> {
-    return Array.from(
-        new Set(nodes.map((node) => getNodePhaseFromRecordOrState(node)).filter((phase) => phase !== null && phase !== undefined))
-    ) as NodePhase[];
-}
-
-/**
  * Normalizes a node record by sorting its configuration properties alphabetically for consistent comparison.
  * @param node - The NodeRecord to normalize.
  * @returns Normalized NodeRecord with sorted configuration properties.
@@ -258,7 +250,7 @@ export function normalizeNode(node: NodeRecord): NodeRecord {
 /**
  * Groups processed node states by electrical phase and data category for real-time card display.
  * Creates a nested structure organizing nodes and tracks which categories have available data.
- * 
+ *
  * @param processedNodesState - Array of processed node states to categorize.
  * @returns Object containing nodes grouped by phase/category and available categories per phase.
  */
@@ -266,14 +258,15 @@ export function getNodesStateByCategory(processedNodesState: Array<ProcessedNode
     nodesStateByCategory: Record<NodePhase, Record<NodeCategory, Array<ProcessedNodeState>>>;
     availableCategories: Record<NodePhase, RealTimeCardCategoriesState>;
 } {
-    let availableCategories: Record<NodePhase, RealTimeCardCategoriesState> = assignRealTimeCardCategoriesStateToAllPhases(defaultRealTimeCardCategoriesState);
+    let availableCategories: Record<NodePhase, RealTimeCardCategoriesState> =
+        assignRealTimeCardCategoriesStateToAllPhases(defaultRealTimeCardCategoriesState);
 
     const nodesStateByCategory: Record<NodePhase, Record<NodeCategory, Array<ProcessedNodeState>>> = Object.fromEntries(
         phaseOrder.map((phase) => [phase, createEmptyRealTimeCardCategoryArrays()])
     ) as Record<NodePhase, Record<NodeCategory, Array<ProcessedNodeState>>>;
 
     for (const nodeState of processedNodesState) {
-        const category = getNodeCategory(nodeState.type, nodeState.incremental);
+        const category = getNodeCategory(nodeState.type, nodeState.is_counter);
         nodesStateByCategory[nodeState.phase][category].push(nodeState);
         availableCategories[nodeState.phase][category] = true;
     }

@@ -3,7 +3,6 @@ import { derived } from "svelte/store";
 import { NodeType, NodePhase } from "$lib/types/nodes/base";
 import type { DefaultNodeInfo } from "$lib/types/nodes/base";
 
-
 /**
  * A readable store containing predefined variable types for energy monitoring systems.
  * Includes electrical measurements like voltage, current, power, and energy variables
@@ -21,7 +20,7 @@ export const defaultVariables = readable<DefaultNodeInfo[]>([
         defaultPublished: true,
         defaultLoggingPeriod: 15,
         defaultLoggingEnabled: true,
-        isIncrementalNode: false,
+        isCounter: false,
         defaultMinAlarm: 230 * 0.9,
         defaultMaxAlarm: 230 * 1.1,
         defaultMinAlarmEnabled: true,
@@ -39,7 +38,7 @@ export const defaultVariables = readable<DefaultNodeInfo[]>([
         defaultPublished: true,
         defaultLoggingPeriod: 15,
         defaultLoggingEnabled: true,
-        isIncrementalNode: false,
+        isCounter: false,
         defaultMinAlarm: 400 * 0.9,
         defaultMaxAlarm: 400 * 1.1,
         defaultMinAlarmEnabled: true,
@@ -57,7 +56,7 @@ export const defaultVariables = readable<DefaultNodeInfo[]>([
         defaultPublished: true,
         defaultLoggingPeriod: 15,
         defaultLoggingEnabled: true,
-        isIncrementalNode: false,
+        isCounter: false,
         defaultMinAlarm: 400 * 0.9,
         defaultMaxAlarm: 400 * 1.1,
         defaultMinAlarmEnabled: true,
@@ -75,7 +74,7 @@ export const defaultVariables = readable<DefaultNodeInfo[]>([
         defaultPublished: true,
         defaultLoggingPeriod: 15,
         defaultLoggingEnabled: true,
-        isIncrementalNode: false,
+        isCounter: false,
         defaultMinAlarm: 400 * 0.9,
         defaultMaxAlarm: 400 * 1.1,
         defaultMinAlarmEnabled: true,
@@ -94,7 +93,7 @@ export const defaultVariables = readable<DefaultNodeInfo[]>([
         defaultPublished: true,
         defaultLoggingPeriod: 15,
         defaultLoggingEnabled: false,
-        isIncrementalNode: false,
+        isCounter: false,
         useByDefault: true,
     },
     {
@@ -109,7 +108,7 @@ export const defaultVariables = readable<DefaultNodeInfo[]>([
         defaultPublished: true,
         defaultLoggingPeriod: 15,
         defaultLoggingEnabled: false,
-        isIncrementalNode: false,
+        isCounter: false,
         useByDefault: true,
     },
     {
@@ -124,7 +123,7 @@ export const defaultVariables = readable<DefaultNodeInfo[]>([
         defaultPublished: true,
         defaultLoggingPeriod: 15,
         defaultLoggingEnabled: false,
-        isIncrementalNode: false,
+        isCounter: false,
         useByDefault: true,
     },
     {
@@ -139,7 +138,7 @@ export const defaultVariables = readable<DefaultNodeInfo[]>([
         defaultPublished: true,
         defaultLoggingPeriod: 15,
         defaultLoggingEnabled: false,
-        isIncrementalNode: false,
+        isCounter: false,
         useByDefault: true,
     },
     {
@@ -153,20 +152,7 @@ export const defaultVariables = readable<DefaultNodeInfo[]>([
         defaultPublished: true,
         defaultLoggingPeriod: 15,
         defaultLoggingEnabled: false,
-        isIncrementalNode: false,
-        useByDefault: true,
-    },
-    {
-        name: "power_factor_direction",
-        type: NodeType.STRING,
-        defaultUnit: "",
-        applicablePhases: [NodePhase.L1, NodePhase.L2, NodePhase.L3, NodePhase.TOTAL, NodePhase.SINGLEPHASE],
-        applicableTypes: [NodeType.STRING],
-        canBeVirtual: true,
-        defaultPublished: true,
-        defaultLoggingPeriod: 15,
-        defaultLoggingEnabled: false,
-        isIncrementalNode: false,
+        isCounter: false,
         useByDefault: true,
     },
     {
@@ -180,7 +166,7 @@ export const defaultVariables = readable<DefaultNodeInfo[]>([
         defaultPublished: true,
         defaultLoggingPeriod: 15,
         defaultLoggingEnabled: true,
-        isIncrementalNode: false,
+        isCounter: false,
         defaultMinAlarm: 50 * 0.99,
         defaultMaxAlarm: 50 * 1.01,
         defaultMinAlarmEnabled: true,
@@ -199,7 +185,7 @@ export const defaultVariables = readable<DefaultNodeInfo[]>([
         defaultPublished: true,
         defaultLoggingPeriod: 15,
         defaultLoggingEnabled: true,
-        isIncrementalNode: true,
+        isCounter: true,
         useByDefault: true,
     },
     {
@@ -214,7 +200,7 @@ export const defaultVariables = readable<DefaultNodeInfo[]>([
         defaultPublished: true,
         defaultLoggingPeriod: 15,
         defaultLoggingEnabled: true,
-        isIncrementalNode: true,
+        isCounter: true,
         useByDefault: true,
     },
     {
@@ -229,7 +215,7 @@ export const defaultVariables = readable<DefaultNodeInfo[]>([
         defaultPublished: false,
         defaultLoggingPeriod: 15,
         defaultLoggingEnabled: false,
-        isIncrementalNode: true,
+        isCounter: true,
         useByDefault: false,
     },
     {
@@ -244,7 +230,7 @@ export const defaultVariables = readable<DefaultNodeInfo[]>([
         defaultPublished: false,
         defaultLoggingPeriod: 15,
         defaultLoggingEnabled: false,
-        isIncrementalNode: true,
+        isCounter: true,
         useByDefault: false,
     },
     {
@@ -259,7 +245,7 @@ export const defaultVariables = readable<DefaultNodeInfo[]>([
         defaultPublished: false,
         defaultLoggingPeriod: 15,
         defaultLoggingEnabled: false,
-        isIncrementalNode: true,
+        isCounter: true,
         useByDefault: false,
     },
     {
@@ -274,7 +260,7 @@ export const defaultVariables = readable<DefaultNodeInfo[]>([
         defaultPublished: false,
         defaultLoggingPeriod: 15,
         defaultLoggingEnabled: false,
-        isIncrementalNode: true,
+        isCounter: true,
         useByDefault: false,
     },
 ]);

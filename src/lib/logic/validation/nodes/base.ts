@@ -1,6 +1,6 @@
 import { get } from "svelte/store";
 import { Protocol } from "$lib/types/device/base";
-import { NodeType, NodePhase } from "$lib/types/nodes/base";
+import { NodeType, NodePhase, CounterMode } from "$lib/types/nodes/base";
 import { defaultVariables, defaultVariableNames, defaultVariableUnits } from "$lib/stores/device/variables";
 import { normalizeNode, sortNodesByName } from "$lib/logic/util/nodes";
 import { protocolTexts } from "$lib/stores/lang/energyMeterTexts";
@@ -9,7 +9,6 @@ import { DECIMAL_PLACES_LIM, LOGGING_PERIOD_LIM } from "$lib/types/nodes/config"
 import { protocolPlugins } from "$lib/stores/device/protocol";
 import type { NodeRecord, EditableNodeRecord, NodeValidation } from "$lib/types/nodes/config";
 import { isEqual } from "$lib/logic/util/generic";
-
 
 /**
  * Creates and returns a new NodeValidation object with all validation properties set to false.
@@ -30,9 +29,8 @@ export function getInitialNodeValidation(): NodeValidation {
         minAlarm: false,
         maxAlarm: false,
         calculated: false,
-        incremental: false,
-        calculate_increment: false,
-        positive_incremental: false,
+        isCounter: false,
+        counterMode: false,
         isValid() {
             return (
                 this.variableName &&
@@ -44,12 +42,12 @@ export function getInitialNodeValidation(): NodeValidation {
                 this.minAlarm &&
                 this.maxAlarm &&
                 this.calculated &&
-                this.incremental
+                this.isCounter &&
+                this.counterMode
             );
         },
     };
 }
-
 
 /**
  * Validates node variable name based on custom/default status and uniqueness within the phase.
@@ -68,7 +66,6 @@ export function validateNodeName(nodeName: string, customVariable: boolean, curr
             return false;
         }
     }
-
 
     if (customVariable) {
         // For custom variables, check if name exists in default names (custom nodes can't use default names)
@@ -253,15 +250,14 @@ export function validateVirtualNode(virtual: boolean, name: string, custom: bool
 }
 
 /**
- * Validates if a node can be configured as incremental based on variable type constraints.
- * @param incremental - True if the node is configured as incremental.
+ * Validates if a node can be configured as counter based on variable type constraints.
+ * @param counter - True if the node is configured as counter.
  * @param name - Variable name to check against default variable characteristics.
  * @param custom - True if this is a custom user-defined variable.
- * @returns True if the incremental configuration is valid for the variable.
+ * @returns True if the counter configuration is valid for the variable.
  */
-export function validateIncrementalNode(incremental: boolean, name: string, custom: boolean): boolean {
+export function validateCounterNode(counter: boolean, name: string, custom: boolean): boolean {
     if (custom) {
-        // all custom nodes can or can not be incremental
         return true;
     }
 
@@ -269,10 +265,31 @@ export function validateIncrementalNode(incremental: boolean, name: string, cust
         const variables = get(defaultVariables);
         const variable = Object.values(variables).find((v) => v.name === name);
         if (variable) {
-            return incremental === variable.isIncrementalNode;
+            return counter === variable.isCounter;
         }
     }
     return false;
+}
+
+/**
+ * Validates whether a counter mode is correctly set based on the node's counter status.
+ *
+ * @param counter - True if the node is configured as a counter.
+ * @param mode - The selected counter mode (DIRECT, DELTA, CUMULATIVE) or null for non-counter nodes.
+ * @returns True if the mode selection is valid for the current counter configuration.
+ */
+export function validateCounterMode(counter: boolean, mode: CounterMode | null): boolean {
+    if (counter) {
+        if (mode !== null) {
+            return true;
+        }
+        return false;
+    } else {
+        if (mode === null) {
+            return true;
+        }
+        return false;
+    }
 }
 
 /**
@@ -293,9 +310,8 @@ export function updateNodesValidation(nodes: Array<EditableNodeRecord>, nodesByS
         node.validation.minAlarm = validateAlarm(node.config.min_alarm_value, node.config.min_alarm, node.config.type);
         node.validation.maxAlarm = validateAlarm(node.config.max_alarm_value, node.config.max_alarm, node.config.type);
         node.validation.calculated = validateVirtualNode(node.config.calculated, node.display_name, node.config.custom);
-        node.validation.incremental = validateIncrementalNode(node.config.incremental_node, node.display_name, node.config.custom);
-        node.validation.calculate_increment = true;
-        node.validation.positive_incremental = true;
+        node.validation.isCounter = validateCounterNode(node.config.is_counter, node.display_name, node.config.custom);
+        node.validation.counterMode = validateCounterMode(node.config.is_counter, node.config.counter_mode);
     }
 }
 

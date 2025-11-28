@@ -1,6 +1,5 @@
 <script lang="ts">
     import Selector from "../General/Selector.svelte";
-    import SelectorButton from "../General/SelectorButton.svelte";
     import InfoLabel from "../General/InfoLabel.svelte";
     import { getDefaultNodesList } from "$lib/logic/factory/nodes";
 
@@ -41,31 +40,6 @@
             }}
             scrollable={true}
         />
-    </div>
-</div>
-
-<div class="device-input-div">
-    <InfoLabel labelText={$texts.readEnergyFromMeter} toolTipText={$texts.readEnergyFromMeterInfo} />
-    <div class="input-div">
-        <SelectorButton bind:checked={deviceData.options.read_energy_from_meter} />
-    </div>
-</div>
-<div class="device-input-div">
-    <InfoLabel labelText={$texts.readForwardReverseEnergySeparate} toolTipText={$texts.readForwardReverseEnergySeparateInfo} />
-    <div class="input-div">
-        <SelectorButton bind:checked={deviceData.options.read_separate_forward_reverse_energy} />
-    </div>
-</div>
-<div class="device-input-div">
-    <InfoLabel labelText={$texts.negativeReactivePower} toolTipText={$texts.negativeReactivePowerInfo} />
-    <div class="input-div">
-        <SelectorButton bind:checked={deviceData.options.negative_reactive_power} />
-    </div>
-</div>
-<div class="device-input-div">
-    <InfoLabel labelText={$texts.frequencyReading} toolTipText={$texts.frequencyReadingInfo} />
-    <div class="input-div">
-        <SelectorButton bind:checked={deviceData.options.frequency_reading} />
     </div>
 </div>
 

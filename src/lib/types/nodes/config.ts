@@ -1,5 +1,6 @@
-import { NodeType, NodePhase } from "./base";
+import { NodeType, NodePhase, CounterMode } from "./base";
 import { Protocol } from "../device/base";
+import type Counter from "../../../components/Devices/Nodes/RealTimeDisplay/Counter.svelte";
 
 /*****     C O N S T A N T S     *****/
 
@@ -25,37 +26,35 @@ export interface NodeNoProtocolConfig {
  * Defines common settings and parameters used across all nodes in the system.
  *
  * @interface
- * @property {boolean | null} calculate_increment - If true, increment is calculated internally for incremental nodes (can be null for non-incremental nodes)
  * @property {boolean} calculated - True if the node value is calculated rather than obtained via communication
  * @property {boolean} custom - True if this is a custom user-defined node
  * @property {number | null} decimal_places - Number of decimal places to display for numeric values (can be null for non-numeric types)
  * @property {boolean} enabled - Whether the node is currently enabled
- * @property {boolean | null} incremental_node - True if the node value accumulates over time (can be null for non-applicable nodes)
+ * @property {boolean | null} is_counter - True if the node value is of counter type (can be null for non-applicable nodes)
+ * @property {CounterMode | null} counter_mode - Counter behavior mode for the node (null when not applicable)
  * @property {boolean} logging - Whether data logging is enabled for this node
  * @property {number} logging_period - Logging frequency in minutes
  * @property {boolean} max_alarm - Whether maximum threshold alarm is enabled
  * @property {number | null} max_alarm_value - Value that triggers maximum threshold alarm (can be null when alarm is disabled)
  * @property {boolean} min_alarm - Whether minimum threshold alarm is enabled
  * @property {number | null} min_alarm_value - Value that triggers minimum threshold alarm (can be null when alarm is disabled)
- * @property {boolean | null} positive_incremental - For incremental nodes, whether to add or subtract from initial value (can be null for non-incremental nodes)
  * @property {boolean} publish - Whether the node's value should be published to external systems or services
  * @property {NodeType} type - Data type of the node value
  * @property {string | null} unit - Measurement unit (e.g., V, A, kW, null for non numeric types)
  */
 export interface BaseNodeConfig {
-    calculate_increment: boolean | null;
     calculated: boolean;
     custom: boolean;
     decimal_places: number | null;
     enabled: boolean;
-    incremental_node: boolean | null;
+    is_counter: boolean | null;
+    counter_mode: CounterMode | null;
     logging: boolean;
     logging_period: number;
     max_alarm: boolean;
     max_alarm_value: number | null;
     min_alarm: boolean;
     min_alarm_value: number | null;
-    positive_incremental: boolean | null;
     publish: boolean;
     type: NodeType;
     unit: string | null;
@@ -66,19 +65,18 @@ export interface BaseNodeConfig {
  * All numeric fields are represented as strings to support user input and validation.
  */
 export interface EditableBaseNodeConfig {
-    calculate_increment: boolean;
     calculated: boolean;
     custom: boolean;
     decimal_places: string;
     enabled: boolean;
-    incremental_node: boolean;
+    is_counter: boolean;
+    counter_mode: CounterMode | null;
     logging: boolean;
     logging_period: string;
     max_alarm: boolean;
     max_alarm_value: string;
     min_alarm: boolean;
     min_alarm_value: string;
-    positive_incremental: boolean;
     publish: boolean;
     type: NodeType;
     unit: string;
@@ -172,7 +170,8 @@ export interface NodeRecordEditingState {
  * @property {boolean} minAlarm - True if the minimum alarm value is valid
  * @property {boolean} maxAlarm - True if the maximum alarm value is valid
  * @property {boolean} calculated - True if the calculated/virtual node configuration is valid
- * @property {boolean} incremental - True if the incremental node configuration is valid
+ * @property {boolean} isCounter - True if the incremental node configuration is valid
+ * * @property {boolean} counterMode - True if the counter mode configuration is valid
  * @method isValid - Returns true if all validation checks pass (logical AND of all other properties)
  */
 export interface NodeValidation {
@@ -187,9 +186,8 @@ export interface NodeValidation {
     minAlarm: boolean;
     maxAlarm: boolean;
     calculated: boolean;
-    incremental: boolean;
-    calculate_increment: boolean;
-    positive_incremental: boolean;
+    isCounter: boolean;
+    counterMode: boolean;
     isValid(): boolean;
 }
 
@@ -199,19 +197,18 @@ export interface NodeValidation {
  * Default editable base node configuration used for initializing new nodes in UI forms.
  */
 export const defaultBaseNodeConfig: EditableBaseNodeConfig = {
-    calculate_increment: true,
     calculated: false,
     custom: true,
     decimal_places: String(2),
     enabled: true,
-    incremental_node: false,
+    is_counter: false,
+    counter_mode: null,
     logging: false,
     logging_period: String(15),
     max_alarm: false,
     max_alarm_value: Number(0).toFixed(2),
     min_alarm: false,
     min_alarm_value: Number(0).toFixed(2),
-    positive_incremental: true,
     type: NodeType.FLOAT,
     unit: "",
     publish: true,

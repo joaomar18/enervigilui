@@ -371,6 +371,10 @@ Shows input forms for protocol-specific parameters and organizes device nodes fo
         padding-left: 0px;
         padding-right: 0px;
         box-sizing: border-box;
+        display: flex;
+        flex-direction: column;
+        justify-content: start;
+        align-items: center;
     }
 
     /* Device input row styling */

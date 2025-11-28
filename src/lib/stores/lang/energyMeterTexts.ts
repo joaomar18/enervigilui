@@ -67,6 +67,23 @@ const textsObjectsMeterTypes: TextsObject = {
     },
 };
 
+//////////     C O U N T E R     M O D E     T E X T S     //////////
+
+const textsObjectsCounterMode: TextsObject = {
+    DIRECT: {
+        PT: "DIRETO",
+        EN: "DIRECT",
+    },
+    DELTA: {
+        PT: "DELTA",
+        EN: "DELTA",
+    },
+    CUMULATIVE: {
+        PT: "CUMULATIVO",
+        EN: "CUMULATIVE",
+    },
+};
+
 //////////     V A R I A B L E     N A M E     T E X T S     //////////
 
 const textsObjectsVariables: TextsObject = {
@@ -105,10 +122,6 @@ const textsObjectsVariables: TextsObject = {
     power_factor: {
         PT: "Fator de Potência",
         EN: "Power Factor",
-    },
-    power_factor_direction: {
-        PT: "Direção do FP",
-        EN: "PF Direction",
     },
     frequency: {
         PT: "Frequência",
@@ -168,4 +181,5 @@ export const protocolTexts = createLangStore(textsObjectsProtocols);
 export const phaseTexts = createLangStore(textsObjectsPhases);
 export const directionTexts = createLangStore(textsObjectsDirections);
 export const meterTypeTexts = createLangStore(textsObjectsMeterTypes);
+export const counterModeTexts = createLangStore(textsObjectsCounterMode);
 export const variableNameTexts = createLangStore(textsObjectsVariables);

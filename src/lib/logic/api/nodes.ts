@@ -4,11 +4,12 @@ import { navigateTo } from "../view/navigation";
 import { NodePhase } from "$lib/types/nodes/base";
 import { addPrefix, getNodePrefix, removePrefix } from "../util/nodes";
 import { toISOStringLocal } from "../util/date";
-import type { EnergyConsumptionType, PeakPowerType, PhaseBalanceType } from "$lib/types/device/energy";
+import type { EnergyConsumptionType, PeakPowerType } from "$lib/types/device/energy";
 import type { NodeRecord, EditableNodeRecord } from "$lib/types/nodes/config";
 import type { NodeState, ProcessedNodeState, BaseNodeAdditionalInfo } from "$lib/types/nodes/realtime";
 import type { EnergyConsumptionMetrics, NodeLogs, ProcessedEnergyConsumptionLogPoint, ProcessedNodeLogs } from "$lib/types/nodes/logs";
 import type { EnergyDirectionFilter, SelectablePhaseFilter } from "$lib/types/view/nodes";
+import type { MeterType } from "$lib/types/device/base";
 
 /**
  * Fetches and processes the configuration for all nodes of a device by its ID.
@@ -52,8 +53,11 @@ export async function getDeviceNodesConfig(id: number): Promise<{ initialNodes: 
  * @returns A promise resolving to an object containing the raw nodes state record and processed nodes state array.
  * @throws Error if the API call fails.
  */
-export async function getDeviceNodesState(id: number): Promise<{ nodesState: Record<string, NodeState>; processedNodesState: Array<ProcessedNodeState> }> {
-    let nodesState: Record<string, NodeState>;
+export async function getDeviceNodesState(
+    id: number
+): Promise<{ meterType: MeterType; nodesState: Record<string, NodeState>; processedNodesState: Array<ProcessedNodeState> }> {
+    let meter_type: MeterType;
+    let nodes_state: Record<string, NodeState>;
     let processedNodesState: Array<ProcessedNodeState>;
     const { sucess, data } = await callAPI({
         endpoint: "/api/nodes/get_nodes_state",
@@ -63,13 +67,13 @@ export async function getDeviceNodesState(id: number): Promise<{ nodesState: Rec
     });
 
     if (sucess) {
-        nodesState = data as Record<string, NodeState>;
-        processedNodesState = processNodesState(nodesState);
+        ({ meter_type, nodes_state } = data as { meter_type: MeterType; nodes_state: Record<string, NodeState> });
+        processedNodesState = processNodesState(nodes_state);
     } else {
         throw new Error("Get device nodes state error");
     }
 
-    return { nodesState, processedNodesState };
+    return { meterType: meter_type, nodesState: nodes_state, processedNodesState };
 }
 
 /**
@@ -146,7 +150,6 @@ export async function getNodeLogs(
 
     if (sucess) {
         nodeLogs = processNodeLogs(data as NodeLogs);
-
     } else {
         throw new Error("Get Node Logs error");
     }
@@ -177,7 +180,7 @@ export async function getEnergyConsumption(
     start_time: Date | null = null,
     end_time: Date | null = null,
     time_step: string | null = null
-): Promise<{ energyLogs: EnergyConsumptionType, mergedPoints: Array<ProcessedEnergyConsumptionLogPoint>, mergedGlobalMetrics: EnergyConsumptionMetrics }> {
+): Promise<{ energyLogs: EnergyConsumptionType; mergedPoints: Array<ProcessedEnergyConsumptionLogPoint>; mergedGlobalMetrics: EnergyConsumptionMetrics }> {
     let energyLogs: EnergyConsumptionType;
     let mergedPoints: Array<ProcessedEnergyConsumptionLogPoint>;
     let mergedGlobalMetrics: EnergyConsumptionMetrics;
@@ -194,9 +197,8 @@ export async function getEnergyConsumption(
     });
 
     if (sucess) {
-        energyLogs = (data as EnergyConsumptionType);
+        energyLogs = data as EnergyConsumptionType;
         ({ mergedPoints, mergedGlobalMetrics } = mergeEnergyConsumptionLogs(energyLogs));
-
     } else {
         throw new Error("Get energy consumption error");
     }
@@ -204,8 +206,13 @@ export async function getEnergyConsumption(
     return { energyLogs, mergedPoints, mergedGlobalMetrics };
 }
 
-export async function mapMetricAPI(metric: string, device_id: number, phase: SelectablePhaseFilter, start_time: Date | null = null,
-    end_time: Date | null = null): Promise<any> {
+export async function mapMetricAPI(
+    metric: string,
+    device_id: number,
+    phase: SelectablePhaseFilter,
+    start_time: Date | null = null,
+    end_time: Date | null = null
+): Promise<any> {
     switch (metric.toLowerCase()) {
         case "peakpower":
             return await getPeakPower(device_id, phase, start_time, end_time);
@@ -231,7 +238,7 @@ export async function getPeakPower(
     device_id: number,
     phase: SelectablePhaseFilter,
     start_time: Date | null = null,
-    end_time: Date | null = null,
+    end_time: Date | null = null
 ): Promise<PeakPowerType> {
     let peakPower: PeakPowerType;
     let start_time_str: string | null = null;
@@ -247,7 +254,7 @@ export async function getPeakPower(
     });
 
     if (sucess) {
-        peakPower = (data as PeakPowerType);
+        peakPower = data as PeakPowerType;
     } else {
         throw new Error("Get peak power error");
     }

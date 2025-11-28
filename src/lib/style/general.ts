@@ -533,7 +533,7 @@ const RightPanelSheetStyleConfig: ComponentStyles = {
         titlePaddingRight: "20px",
         titlePaddingBottom: "5px",
         borderBottomTitle: "1px solid rgba(255, 255, 255, 0.1)",
-        headerPaddingHorizontal: "20px",
+        headerPaddingHorizontal: "10px",
         headerPaddingTop: "15px",
         headerPaddingBottom: "15px",
         borderBottomHeader: "1px solid rgba(255, 255, 255, 0.08)",

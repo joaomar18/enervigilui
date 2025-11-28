@@ -1,3 +1,5 @@
+import { MeterType } from "../device/base";
+
 /*****     C O N S T A N T S     *****/
 
 /*****     E N U M S     *****/
@@ -68,6 +70,21 @@ export enum NodeType {
 }
 
 /**
+ * Counter processing modes for interpreting energy or cumulative values.
+ * Defines how incoming readings should be treated by the system.
+ *
+ * @enum {string}
+ * @property {string} DIRECT - Uses the raw incoming value without delta or accumulation
+ * @property {string} DELTA - Treats each reading as a delta and accumulates it over time
+ * @property {string} CUMULATIVE - Treats readings as cumulative counters that increase over time
+ */
+export enum CounterMode {
+    DIRECT = "DIRECT",
+    DELTA = "DELTA",
+    CUMULATIVE = "CUMULATIVE",
+}
+
+/**
  * Categorizes nodes by their data type and behavior for UI organization and display.
  * Used to group nodes into logical categories in monitoring and configuration interfaces.
  */
@@ -107,7 +124,7 @@ export interface NodePhaseSection {
  * @property {boolean} defaultPublished - Default publish state for MQTT/external systems
  * @property {number} defaultLoggingPeriod - Default logging interval in minutes
  * @property {boolean} defaultLoggingEnabled - Whether logging is enabled by default
- * @property {boolean} isIncrementalNode - Whether this variable accumulates over time
+ * @property {boolean} isCounter - Whether this variable is of counter type
  * @property {number} [defaultMinAlarm] - Default minimum alarm threshold value
  * @property {number} [defaultMaxAlarm] - Default maximum alarm threshold value
  * @property {boolean} [defaultMinAlarmEnabled] - Whether minimum alarm is enabled by default
@@ -126,7 +143,7 @@ export interface DefaultNodeInfo {
     defaultPublished: boolean;
     defaultLoggingPeriod: number;
     defaultLoggingEnabled: boolean;
-    isIncrementalNode: boolean;
+    isCounter: boolean;
     defaultMinAlarm?: number;
     defaultMaxAlarm?: number;
     defaultMinAlarmEnabled?: boolean;

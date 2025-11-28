@@ -31,7 +31,7 @@ export enum MeterType {
  * Base interface for protocol-specific communication configuration objects.
  * Extend for each protocol to define its configuration shape.
  */
-export interface BaseCommunicationConfig { }
+export interface BaseCommunicationConfig {}
 
 /**
  * Base interface for editable protocol configuration objects in forms and UI.
@@ -42,22 +42,15 @@ export interface EditableBaseCommunicationConfig {
 }
 
 /**
- * Configuration interface for energy meter-specific operational options.
- * Defines boolean flags that control various measurement capabilities and
- * data acquisition behaviors of the energy monitoring device.
+ * Placeholder interface for future energy meter configuration options.
+ *
+ * This interface is intentionally empty in the current version.
+ * It will be extended when meter-specific operational settings
+ * are implemented in future releases.
  *
  * @interface MeterOptions
- * @property {boolean} frequency_reading - Enable frequency measurement capability (typically 50/60 Hz grid frequency)
- * @property {boolean} negative_reactive_power - Allow negative reactive power values for leading power factor conditions
- * @property {boolean} read_energy_from_meter - Enable energy consumption readings directly from the meter device
- * @property {boolean} read_separate_forward_reverse_energy - Read forward and reverse energy values as separate measurements
  */
-export interface MeterOptions {
-    frequency_reading: boolean;
-    negative_reactive_power: boolean;
-    read_energy_from_meter: boolean;
-    read_separate_forward_reverse_energy: boolean;
-}
+export interface MeterOptions {}
 
 /**
  * Complete device meter configuration interface.

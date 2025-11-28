@@ -1,6 +1,6 @@
 import { get } from "svelte/store";
 import { MeterType } from "$lib/types/device/base";
-import { NodeType, NodePhase, NodePrefix, nodePhaseSections } from "$lib/types/nodes/base";
+import { NodeType, NodePhase, NodePrefix, nodePhaseSections, CounterMode } from "$lib/types/nodes/base";
 import { defaultVariables } from "$lib/stores/device/variables";
 import { addPrefix, removePrefix, getNodePrefix, getCommunicationID } from "../util/nodes";
 import { sortNodesLogically } from "../handlers/nodes";
@@ -38,19 +38,18 @@ export function convertToEditableBaseNodeConfig(config: BaseNodeConfig): Editabl
     let decimal_places: string = config.decimal_places?.toString() ?? "";
     let number_decimal_places: number = parseInt(decimal_places) ?? 0;
     return {
-        calculate_increment: config.calculate_increment ?? false,
         calculated: config.calculated,
         custom: config.custom,
         decimal_places: decimal_places,
         enabled: config.enabled,
-        incremental_node: config.incremental_node ?? false,
+        is_counter: config.is_counter ?? false,
+        counter_mode: config.counter_mode,
         logging: config.logging,
         logging_period: config.logging_period.toString(),
         max_alarm: config.max_alarm,
         max_alarm_value: config.max_alarm_value?.toFixed(number_decimal_places) ?? "",
         min_alarm: config.min_alarm,
         min_alarm_value: config.min_alarm_value?.toFixed(number_decimal_places) ?? "",
-        positive_incremental: config.positive_incremental ?? false,
         publish: config.publish,
         type: config.type,
         unit: config.unit ?? "",
@@ -65,19 +64,18 @@ export function convertToEditableBaseNodeConfig(config: BaseNodeConfig): Editabl
 export function convertToBaseNodeConfig(config: EditableBaseNodeConfig): BaseNodeConfig {
     let numericType = config.type === NodeType.FLOAT || config.type === NodeType.INT;
     return {
-        calculate_increment: numericType ? config.calculate_increment : null,
         calculated: config.calculated,
         custom: config.custom,
         decimal_places: stringIsValidInteger(config.decimal_places) ? parseInt(config.decimal_places) : null,
         enabled: config.enabled,
-        incremental_node: numericType ? config.incremental_node : null,
+        is_counter: numericType ? config.is_counter : null,
+        counter_mode: config.counter_mode,
         logging: config.logging,
         logging_period: parseInt(config.logging_period),
         max_alarm: config.max_alarm,
         max_alarm_value: stringIsValidFloat(config.max_alarm_value) ? parseFloat(config.max_alarm_value) : null,
         min_alarm: config.min_alarm,
         min_alarm_value: stringIsValidFloat(config.min_alarm_value) ? parseFloat(config.min_alarm_value) : null,
-        positive_incremental: numericType ? config.positive_incremental : null,
         publish: config.publish,
         type: config.type,
         unit: numericType ? config.unit : null,
@@ -99,7 +97,7 @@ export function getEditableBaseNodeConfigFromDefaultVar(variable: DefaultNodeInf
     if (variable.type === NodeType.FLOAT || variable.type === NodeType.INT) {
         decimal_places = variable.defaultNumberOfDecimals ? variable.defaultNumberOfDecimals.toString() : "0";
 
-        if (!variable.isIncrementalNode) {
+        if (!variable.isCounter) {
             min_alarm_value = variable.defaultMinAlarm
                 ? variable.defaultMinAlarm.toFixed(parseInt(decimal_places))
                 : Number(0).toFixed(parseInt(decimal_places));
@@ -110,19 +108,18 @@ export function getEditableBaseNodeConfigFromDefaultVar(variable: DefaultNodeInf
     }
 
     return {
-        calculate_increment: variable.isIncrementalNode && !options.read_energy_from_meter,
         calculated: false,
         custom: false,
         decimal_places: decimal_places,
         enabled: true,
-        incremental_node: variable.isIncrementalNode,
+        is_counter: variable.isCounter,
+        counter_mode: variable.isCounter ? CounterMode.DIRECT : null,
         logging: variable.defaultLoggingEnabled,
         logging_period: String(variable.defaultLoggingPeriod),
         max_alarm: variable.defaultMaxAlarmEnabled ? true : false,
         max_alarm_value: max_alarm_value,
         min_alarm: variable.defaultMinAlarmEnabled !== undefined ? true : false,
         min_alarm_value: min_alarm_value,
-        positive_incremental: variable.isIncrementalNode && !options.read_energy_from_meter,
         publish: variable.defaultPublished,
         type: variable.type,
         unit: variable.defaultUnit,
@@ -138,19 +135,18 @@ export function getEditableBaseNodeConfigFromDefaultVar(variable: DefaultNodeInf
 export function processInitialBaseNodeConfig(config: BaseNodeConfig): BaseNodeConfig {
     let numericType = config.type === NodeType.FLOAT || config.type === NodeType.INT;
     return {
-        calculate_increment: numericType ? config.calculate_increment : null,
         calculated: config.calculated,
         custom: config.custom,
         decimal_places: stringIsValidInteger(String(config.decimal_places)) ? config.decimal_places : null,
         enabled: config.enabled,
-        incremental_node: numericType ? config.incremental_node : null,
+        is_counter: numericType ? config.is_counter : null,
+        counter_mode: config.counter_mode,
         logging: config.logging,
         logging_period: config.logging_period,
         max_alarm: config.max_alarm,
         max_alarm_value: stringIsValidFloat(String(config.max_alarm_value)) ? config.max_alarm_value : null,
         min_alarm: config.min_alarm,
         min_alarm_value: stringIsValidFloat(String(config.min_alarm_value)) ? config.min_alarm_value : null,
-        positive_incremental: numericType ? config.positive_incremental : null,
         publish: config.publish,
         type: config.type,
         unit: numericType ? config.unit : null,
@@ -357,7 +353,7 @@ export function processNodesState(nodesState: Record<string, NodeState>): Array<
 
     for (let [nodeName, nodeState] of Object.entries(nodesState)) {
         const processedName = removePrefix(nodeName);
-        let category = getNodeCategory(nodeState.type, nodeState.incremental);
+        let category = getNodeCategory(nodeState.type, nodeState.is_counter);
         const displayComponent = getNodeRealTimeDisplayComponent(category);
         const graphType = getNodeLogGraphType(category);
         processedNodesState.push({ ...nodeState, name: processedName, displayComponent: displayComponent, graphType: graphType } as ProcessedNodeState);
@@ -374,7 +370,7 @@ export function processNodesState(nodesState: Record<string, NodeState>): Array<
  */
 export function processNodeLogs(nodeLogs: NodeLogs): ProcessedNodeLogs {
     let processedPoints: Array<ProcessedBaseLogPoint> = [];
-    let category = getNodeCategory(nodeLogs.type, nodeLogs.incremental);
+    let category = getNodeCategory(nodeLogs.type, nodeLogs.is_counter);
     const graphType = getNodeLogGraphType(category);
     for (let point of nodeLogs.points) {
         const { start_time: start_time_str, end_time: end_time_str, ...logData } = point;
@@ -395,7 +391,7 @@ export function processNodeLogs(nodeLogs: NodeLogs): ProcessedNodeLogs {
         unit: nodeLogs.unit,
         decimal_places: nodeLogs.decimal_places,
         type: nodeLogs.type,
-        incremental: nodeLogs.incremental,
+        is_counter: nodeLogs.is_counter,
         time_step: nodeLogs.time_step,
         graphType: graphType,
         points: processedPoints,

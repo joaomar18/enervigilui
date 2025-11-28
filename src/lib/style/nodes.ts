@@ -196,6 +196,7 @@ export const NodeConfigSheetInfoLabelStyle = createStyleStore(NodeConfigSheetInf
 const NodesGridStyleConfig: ComponentStyles = {
     dark: {
         width: "100%",
+        maxWidth: "2000px",
         height: "fit-content",
         borderRadius: "10px",
         backgroundColor: "#252b33",

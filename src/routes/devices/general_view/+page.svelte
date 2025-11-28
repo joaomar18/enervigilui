@@ -7,11 +7,12 @@
     import { showToast } from "$lib/logic/view/toast";
     import { AlertType } from "$lib/stores/view/toast";
     import { nodePhaseSections } from "$lib/types/nodes/base";
-    import { getAvailablePhasesFromRecordsOrStates, getNodesStateByCategory } from "$lib/logic/util/nodes";
+    import { getNodesStateByCategory } from "$lib/logic/util/nodes";
     import { initialRealTimeCardCategoriesExpandState } from "$lib/types/view/device";
     import { assignRealTimeCardCategoriesStateToAllPhases } from "$lib/logic/view/device";
     import NodeDetailSheet from "../../../components/Devices/Nodes/NodeDetailSheet.svelte";
     import EnergyConsumptionCard from "../../../components/Devices/EnergyConsumptionCard.svelte";
+    import { meterTypeAvailablePhases } from "$lib/types/device/energy";
     import type { NodeCategory } from "$lib/types/nodes/base";
     import type { NodeState, ProcessedNodeState } from "$lib/types/nodes/realtime";
     import type { RealTimeCardCategoriesState } from "$lib/types/view/device";
@@ -24,12 +25,14 @@
     import { ToolTipTextStyle } from "$lib/style/general";
     import RealTimeCard from "../../../components/Devices/RealTimeCard.svelte";
     import MetricsCard from "../../../components/Devices/MetricsCard.svelte";
+    import type { MeterType } from "$lib/types/device/base";
 
     // Variables
     let nodesState: Record<string, NodeState>;
     let processedNodesState: Array<ProcessedNodeState>;
     let nodesStateByCategory: Record<NodePhase, Record<NodeCategory, Array<ProcessedNodeState>>>;
     let availablePhases: Array<NodePhase>;
+    let meterType: MeterType;
     let availableCategories: Record<NodePhase, RealTimeCardCategoriesState>;
     let realTimeExpandedState = assignRealTimeCardCategoriesStateToAllPhases(initialRealTimeCardCategoriesExpandState);
     let metricsExpandedState = {
@@ -39,8 +42,8 @@
     let detailedNodeState: ProcessedNodeState;
 
     // Reactive Statements
-    $: if (nodesState && processedNodesState) {
-        availablePhases = getAvailablePhasesFromRecordsOrStates(processedNodesState);
+    $: if (meterType && nodesState && processedNodesState) {
+        availablePhases = meterTypeAvailablePhases[meterType];
         ({ nodesStateByCategory, availableCategories } = getNodesStateByCategory(processedNodesState));
     }
 
@@ -49,7 +52,7 @@
         let nodesStatePoller: MethodPoller | null;
         if ($currentDeviceID) {
             nodesStatePoller = new MethodPoller(async (signal) => {
-                ({ nodesState, processedNodesState } = await getDeviceNodesState($currentDeviceID));
+                ({ meterType, nodesState, processedNodesState } = await getDeviceNodesState($currentDeviceID));
             }, 5000);
         } else {
             showToast("errorEditDeviceParams", AlertType.ALERT);

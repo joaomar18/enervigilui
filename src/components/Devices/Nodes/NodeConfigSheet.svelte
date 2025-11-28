@@ -5,7 +5,7 @@
     import Checkbox from "../../General/Checkbox.svelte";
     import InfoLabel from "../../General/InfoLabel.svelte";
     import { nodeNameChange, communicationIDChange, nodeTypeChange, customNodeChange, virtualNodeChange } from "$lib/logic/handlers/nodes";
-    import { NodeType } from "$lib/types/nodes/base";
+    import { CounterMode, NodeType } from "$lib/types/nodes/base";
     import { showToast } from "$lib/logic/view/toast";
     import { AlertType } from "$lib/stores/view/toast";
     import { DECIMAL_PLACES_LIM, LOGGING_PERIOD_LIM } from "$lib/types/nodes/config";
@@ -17,6 +17,7 @@
     // Texts
     import { texts } from "$lib/stores/lang/generalTexts";
     import { pluginTexts } from "$lib/stores/lang/protocolPlugin";
+    import { counterModeTexts } from "$lib/stores/lang/energyMeterTexts";
     import { variableNameTextsByPhase } from "$lib/stores/lang/energyMeterTexts";
 
     // Styles
@@ -481,75 +482,46 @@ incremental logic, virtual node settings, and enable/disable status. -->
                     {#if node.config.type === NodeType.FLOAT || node.config.type === NodeType.INT}
                         <div class="row">
                             <div class="label-wrapper">
-                                <InfoLabel
-                                    style={$NodeConfigSheetInfoLabelStyle}
-                                    labelText={$texts.incrementalNode}
-                                    toolTipText={$texts.incrementalNodeInfo}
-                                />
+                                <InfoLabel style={$NodeConfigSheetInfoLabelStyle} labelText={$texts.counterNode} toolTipText={$texts.counterNodeInfo} />
                             </div>
                             <span class="value shrink-width">
                                 <Checkbox
-                                    bind:checked={node.config.incremental_node}
-                                    inputInvalid={!node.validation.incremental}
+                                    bind:checked={node.config.is_counter}
+                                    inputInvalid={!node.validation.isCounter}
                                     enableInputInvalid={true}
                                     onChange={() => {
+                                        node.config.counter_mode = node.config.is_counter ? CounterMode.DIRECT : null;
                                         onPropertyChanged();
                                     }}
-                                    inputName="incremental-node"
+                                    inputName="counter-node"
                                     width="38px"
                                     height="38px"
                                 />
                             </span>
                         </div>
                     {/if}
-
-                    {#if node.config.incremental_node}
-                        <div class="row">
-                            <div class="label-wrapper">
-                                <InfoLabel
-                                    style={$NodeConfigSheetInfoLabelStyle}
-                                    labelText={$texts.positiveIncrement}
-                                    toolTipText={$texts.positiveIncrementInfo}
-                                />
+                    {#if node.config.is_counter}
+                        <div class="row col-align">
+                            <div class="label-wrapper extend-width">
+                                <InfoLabel style={$NodeConfigSheetInfoLabelStyle} labelText={$texts.counterMode} toolTipText={$texts.counterModeInfo} />
                             </div>
-                            <span class="value shrink-width">
-                                <Checkbox
-                                    bind:checked={node.config.positive_incremental}
-                                    inputInvalid={!node.validation.positive_incremental}
-                                    enableInputInvalid={true}
+                            <span class="value extend-width">
+                                <Selector
+                                    style={$NodeConfigSheetSelectorStyle}
+                                    options={$counterModeTexts}
+                                    bind:selectedOption={node.config.counter_mode}
                                     onChange={() => {
                                         onPropertyChanged();
                                     }}
-                                    inputName="positive-increment-node"
-                                    width="38px"
-                                    height="38px"
-                                />
-                            </span>
-                        </div>
-                        <div class="row">
-                            <div class="label-wrapper">
-                                <InfoLabel
-                                    style={$NodeConfigSheetInfoLabelStyle}
-                                    labelText={$texts.calculateIncrement}
-                                    toolTipText={$texts.calculateIncrementInfo}
-                                />
-                            </div>
-                            <span class="value shrink-width">
-                                <Checkbox
-                                    bind:checked={node.config.calculate_increment}
-                                    inputInvalid={!node.validation.calculate_increment}
+                                    inputInvalid={!node.validation.counterMode}
                                     enableInputInvalid={true}
-                                    onChange={() => {
-                                        onPropertyChanged();
-                                    }}
-                                    inputName="calculate-increment-node"
-                                    width="38px"
-                                    height="38px"
+                                    invertOptions={true}
+                                    scrollable={true}
+                                    width="100%"
                                 />
                             </span>
                         </div>
                     {/if}
-
                     <div class="row">
                         <div class="label-wrapper">
                             <InfoLabel style={$NodeConfigSheetInfoLabelStyle} labelText={$texts.enabled} toolTipText={$texts.enabledInfo} />

@@ -1,5 +1,5 @@
 import { get } from "svelte/store";
-import { MeterType, Protocol } from "$lib/types/device/base";
+import { Protocol } from "$lib/types/device/base";
 import { NodeType, NodePhase } from "$lib/types/nodes/base";
 import {
     getNodePhasePriority,
@@ -7,7 +7,7 @@ import {
     getNodeSubPriority,
     isDefault,
     isCustom,
-    isIncremental,
+    isCounter,
     isNumeric,
     removePrefix,
     getNodePrefix,
@@ -46,12 +46,12 @@ export function sortNodesLogically(
         if (!isCustom(a) && isCustom(b)) return -1;
 
         // Non-incremental numeric before non-incremental non-numeric
-        if (!isIncremental(a) && isNumeric(a) && !isIncremental(b) && !isNumeric(b)) return -1;
-        if (!isIncremental(a) && !isNumeric(a) && !isIncremental(b) && isNumeric(b)) return 1;
+        if (!isCounter(a) && isNumeric(a) && !isCounter(b) && !isNumeric(b)) return -1;
+        if (!isCounter(a) && !isNumeric(a) && !isCounter(b) && isNumeric(b)) return 1;
 
         // Incremental nodes after non-incremental
-        if (isIncremental(a) && !isIncremental(b)) return 1;
-        if (!isIncremental(a) && isIncremental(b)) return -1;
+        if (isCounter(a) && !isCounter(b)) return 1;
+        if (!isCounter(a) && isCounter(b)) return -1;
 
         // Grouping (power, energy, power factor)
         const groupA = getNodePriority(a.name);
@@ -64,7 +64,7 @@ export function sortNodesLogically(
         if (subA !== subB) return subA - subB;
 
         // Within incremental, apply same grouping
-        if (isIncremental(a) && isIncremental(b)) {
+        if (isCounter(a) && isCounter(b)) {
             if (groupA !== groupB) return groupA - groupB;
             if (subA !== subB) return subA - subB;
         }

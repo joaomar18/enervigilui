@@ -1,4 +1,6 @@
 import type { NodeLogs, MeasurementMetrics } from "../nodes/logs";
+import { MeterType } from "./base";
+import { NodePhase } from "../nodes/base";
 
 /**
  * Enumeration of power factor direction states in electrical systems.
@@ -73,3 +75,13 @@ export interface PhaseBalanceType {
     voltage_imbalance: number | null;
     current_imbalance: number | null;
 }
+
+/**
+ * Maps each meter type to the set of allowable electrical phases.
+ * Used to validate which phases can be assigned to nodes based on
+ * whether the device is single-phase or three-phase.
+ */
+export const meterTypeAvailablePhases = {
+    [MeterType.SINGLE_PHASE]: [NodePhase.SINGLEPHASE],
+    [MeterType.THREE_PHASE]: [NodePhase.L1, NodePhase.L2, NodePhase.L3, NodePhase.TOTAL, NodePhase.GENERAL],
+};

@@ -15,7 +15,7 @@ import { GraphType } from "$lib/logic/view/graph/base";
  *
  * @property {number | string | boolean | null} value - Current measured or calculated value
  * @property {NodeType} type - Data type of the value (FLOAT, STRING, INT, BOOLEAN)
- * @property {boolean} incremental - Whether this node accumulates values over time
+ * @property {boolean} is_counter - Whether this node is of counter type
  * @property {string} unit - Measurement unit (e.g., "V", "A", "kW")
  * @property {NodePhase} phase - Electrical phase this node belongs to
  * @property {number} [decimal_places] - Number of decimal places for display formatting
@@ -29,7 +29,7 @@ import { GraphType } from "$lib/logic/view/graph/base";
 export interface NodeState {
     value: number | string | boolean | null;
     type: NodeType;
-    incremental: boolean;
+    is_counter: boolean;
     unit: string;
     phase: NodePhase;
     decimal_places?: number;
@@ -50,7 +50,7 @@ export interface NodeState {
  * @property {GraphType | null} graphType - Graph visualization type identifier for rendering the appropriate chart component
  * @property {number | string | boolean | null} value - Current measured or calculated value
  * @property {NodeType} type - Data type of the value (FLOAT, STRING, INT, BOOLEAN)
- * @property {boolean} incremental - Whether this node accumulates values over time
+ * @property {boolean} is_counter - Whether this node is of counter type
  * @property {string} unit - Measurement unit (e.g., "V", "A", "kW")
  * @property {NodePhase} phase - Electrical phase this node belongs to
  * @property {number} [decimal_places] - Number of decimal places for display formatting
@@ -67,7 +67,7 @@ export interface ProcessedNodeState {
     graphType: GraphType | null;
     value: number | string | boolean | null;
     type: NodeType;
-    incremental: boolean;
+    is_counter: boolean;
     unit: string;
     phase: NodePhase;
     decimal_places?: number;

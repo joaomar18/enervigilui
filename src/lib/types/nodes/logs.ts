@@ -92,7 +92,7 @@ export interface EnergyConsumptionMetrics extends BaseMetrics {
  * @property {string | null} unit - Measurement unit (e.g., "V", "A", "kW")
  * @property {number | null} decimal_places - Number of decimal places for value formatting
  * @property {NodeType} type - Data type of the logged values
- * @property {boolean} incremental - Whether this node accumulates values over time
+ * @property {boolean} is_counter - Whether this node is of counter type
  * @property {Array<BaseLogPoint>} points - Array of raw log data points with ISO timestamps
  * @property {FormattedTimeStep | null} time_step - Time aggregation interval used for the log data
  * @property {BaseMetrics} global_metrics - Overall statistical metrics for the entire dataset
@@ -101,7 +101,7 @@ export interface NodeLogs {
     unit: string | null;
     decimal_places: number | null;
     type: NodeType;
-    incremental: boolean;
+    is_counter: boolean;
     points: Array<BaseLogPoint>;
     time_step: FormattedTimeStep | null;
     global_metrics: BaseMetrics;
@@ -112,7 +112,7 @@ export interface NodeLogs {
  * @property {string} unit - Measurement unit (e.g., "V", "A", "kW")
  * @property {number | null} decimal_places - Number of decimal places for value formatting
  * @property {NodeType} type - Data type of the logged values
- * @property {boolean} incremental - Whether this node accumulates values over time
+ * @property {boolean} is_counter - Whether this node is of counter type
  * @property {Array<ProcessedBaseLogPoint>} points - Array of processed log data points with Unix timestamps
  * @property {FormattedTimeStep | null} time_step - Time aggregation interval used for the log data
  * @property {BaseMetrics} global_metrics - Overall statistical metrics for the entire dataset
@@ -122,7 +122,7 @@ export interface ProcessedNodeLogs {
     unit: string | null;
     decimal_places: number | null;
     type: NodeType;
-    incremental: boolean;
+    is_counter: boolean;
     points: Array<ProcessedBaseLogPoint>;
     time_step: FormattedTimeStep | null;
     global_metrics: BaseMetrics;
