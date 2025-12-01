@@ -162,6 +162,7 @@
     .header h3 {
         margin: 0;
         padding: 0;
+        line-height: var(--header-height);
         padding-left: var(--title-padding-left);
         padding-right: var(--title-padding-right);
         text-align: left;

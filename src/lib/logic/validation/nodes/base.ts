@@ -335,6 +335,6 @@ export function getAllNodesValidation(nodes: Array<EditableNodeRecord>): boolean
  * @param newNodes - New configuration array to compare against.
  * @returns True if the arrays are equivalent after normalization and sorting.
  */
-export function areNodesEqual(initialNodes: NodeRecord[], newNodes: NodeRecord[]): boolean {
-    return isEqual(initialNodes, (sortNodesByName(newNodes) as NodeRecord[]).map(normalizeNode));
+export function areNodesEqual(initialNodes: Array<NodeRecord>, newNodes: Array<NodeRecord>): boolean {
+    return isEqual(initialNodes, newNodes.map(normalizeNode));
 }

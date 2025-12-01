@@ -1,5 +1,5 @@
 <script lang="ts">
-    import { fade } from "svelte/transition";
+    import { fade, slide } from "svelte/transition";
     import { AlertType } from "$lib/stores/view/toast";
 
     // Styles
@@ -111,6 +111,7 @@
         --border-color:{borderColor};
         --transform-y: {transformY};
     "
+    in:slide={{ duration: 150 }}
     out:fade={{ duration: 300 }}
 >
     <div class="content">

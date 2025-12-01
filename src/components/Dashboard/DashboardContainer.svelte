@@ -202,7 +202,7 @@
     /* Fixed div for alerts display */
     .dashboard-container .content .alerts-div {
         position: fixed;
-        bottom: 50px;
+        bottom: 0px;
         width: 100%;
         left: 0;
         z-index: 99;
