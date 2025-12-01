@@ -228,7 +228,7 @@
     .dashboard-container .content .container-div .content-div {
         width: 100%;
         height: 100%;
-        min-height: calc(100vh - 74 - 60px);
+        min-height: calc(100vh - 74px - 60px);
         margin: 0;
         padding: 0;
         position: relative;
@@ -238,7 +238,7 @@
     .dashboard-container .container-div .content-div .section-content-div {
         width: 100%;
         height: 100%;
-        min-height: calc(100vh - 74 - 60px);
+        min-height: calc(100vh - 74px - 60px);
         margin: 0;
         padding: 0;
         position: relative;

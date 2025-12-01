@@ -254,6 +254,10 @@ const textsObject: TextsObject = {
         PT: "Cancelar",
         EN: "Cancel",
     },
+    deviceDetails: {
+        PT: "Detalhes do Dispositivo",
+        EN: "Device Details",
+    },
     deleteDevice: {
         PT: "Eliminar o dispositivo",
         EN: "Delete device",

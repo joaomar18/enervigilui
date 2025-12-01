@@ -20,8 +20,6 @@
     export let imageContainerWidth: string | undefined = undefined;
     export let imageContainerHeight: string | undefined = undefined;
     export let imageContainerBorderRadius: string | undefined = undefined;
-    export let imageWidth: string | undefined = undefined;
-    export let imageHeight: string | undefined = undefined;
     export let strokeColor: string | undefined = undefined;
     export let strokeSelectedColor: string | undefined = undefined;
     export let shadowColor: string | undefined = undefined;
@@ -37,8 +35,6 @@
         imageContainerWidth,
         imageContainerHeight,
         imageContainerBorderRadius,
-        imageWidth,
-        imageHeight,
         strokeColor,
         strokeSelectedColor,
         shadowColor,
@@ -71,8 +67,6 @@
         --image-container-width: {mergedStyle.imageContainerWidth};
         --image-container-height: {mergedStyle.imageContainerHeight};
         --image-container-border-radius: {mergedStyle.imageContainerBorderRadius};
-        --image-width: {mergedStyle.imageWidth};
-        --image-height: {mergedStyle.imageHeight};
         --stroke-color: {mergedStyle.strokeColor};
         --stroke-selected-color: {mergedStyle.strokeSelectedColor};
         --shadow-color: {mergedStyle.shadowColor};
@@ -80,51 +74,63 @@
     "
     class="container"
 >
-    <div class="content">
-        <h3>{$texts.addDevice}</h3>
-        <div class="add-device-image-div">
-            <svg
-                xmlns="http://www.w3.org/2000/svg"
-                width={mergedStyle.imageContainerWidth}
-                height={mergedStyle.imageContainerHeight}
-                viewBox="0 0 200 200"
-            >
-                <circle cx="100" cy="100" r="100" fill="transparent" />
+    <div class="box">
+        <div class="content">
+            <h3>{$texts.addDevice}</h3>
+            <div class="add-device-image-div">
+                <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width={mergedStyle.imageContainerWidth}
+                    height={mergedStyle.imageContainerHeight}
+                    viewBox="0 0 200 200"
+                >
+                    <circle cx="100" cy="100" r="100" fill="transparent" />
 
-                <!-- Vertical bar of the plus -->
-                <line x1="100" y1="50" x2="100" y2="150" stroke-width="10" stroke-linecap="round" />
+                    <!-- Vertical bar of the plus -->
+                    <line x1="100" y1="50" x2="100" y2="150" stroke-width="10" stroke-linecap="round" />
 
-                <!-- Horizontal bar of the plus -->
-                <line x1="50" y1="100" x2="150" y2="100" stroke-width="10" stroke-linecap="round" />
-            </svg>
+                    <!-- Horizontal bar of the plus -->
+                    <line x1="50" y1="100" x2="150" y2="100" stroke-width="10" stroke-linecap="round" />
+                </svg>
+            </div>
+            <button on:click={handleClick} aria-label="Add Device Button"></button>
         </div>
-        <button on:click={handleClick} aria-label="Add Device Button"></button>
     </div>
 </div>
 
 <style>
-    /* Container: card wrapper with size, background, border and transitions */
+    /* Container: card wrapper with size */
     .container {
         width: var(--width);
         height: var(--height);
-        border-radius: var(--border-radius, 0px);
-        background-color: var(--background-color);
-        border: 1px solid var(--border-color);
-        transition:
-            transform 0.2s ease-in-out,
-            box-shadow 0.2s ease-in-out;
+        position: relative;
+        overflow: visible;
         -webkit-tap-highlight-color: transparent;
         -webkit-touch-callout: none;
         user-select: none;
         transform-origin: center;
-        backface-visibility: hidden;
-        transform: scale(1) translateZ(0);
         -webkit-font-smoothing: antialiased;
+        object-fit: cover;
     }
 
-    /* Hover: scale up and apply subtle shadow */
-    .container:hover {
-        transform: scale(1.0625) translateZ(0);
+    /* Card Box with style and scaling behaviour */
+    .box {
+        width: 100%;
+        height: 100%;
+        border-radius: var(--border-radius, 0px);
+        background-color: var(--background-color);
+        border: 1px solid var(--border-color);
+        transition: all 0.2s ease-in-out;
+        transform-origin: center center;
+        will-change: width, height;
+    }
+
+    /* Behaviour of box on hover */
+    .box:hover {
+        width: calc(1.0625 * var(--width));
+        height: calc(1.0625 * var(--height));
+        margin-left: calc((-0.03125) * var(--width));
+        margin-top: calc((-0.03125) * var(--height));
         box-shadow: 0 8px 16px var(--shadow-color);
     }
 
@@ -162,9 +168,6 @@
         width: var(--image-container-width);
         height: var(--image-container-height);
         background-color: var(--image-background-color);
-        background-repeat: no-repeat;
-        background-position: center;
-        background-size: var(--image-width) var(--image-height);
         border-radius: var(--image-container-border-radius);
     }
 

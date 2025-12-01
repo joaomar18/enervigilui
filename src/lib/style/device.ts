@@ -14,8 +14,6 @@ const AddDeviceStyleConfig: ComponentStyles = {
         imageContainerWidth: "200px",
         imageContainerHeight: "200px",
         imageContainerBorderRadius: "50%",
-        imageWidth: "auto",
-        imageHeight: "100%",
         strokeColor: "#9E9E9E",
         strokeSelectedColor: "#e0e0e0",
         shadowColor: "rgba(0, 0, 0, 0.1)",
@@ -103,6 +101,24 @@ const DeviceActionStyleConfig: ComponentStyles = {
 };
 
 export const DeviceActionStyle = createStyleStore(DeviceActionStyleConfig);
+
+//////////     D E V I C E     E X P A N D E D     A C T I O N     //////////
+
+const DeviceExpandedActionStyleConfig: ComponentStyles = {
+    dark: {
+        width: "58px",
+        height: "58px",
+        borderRadius: "50%",
+        backgroundColor: "rgba(255, 255, 255, 0.1)",
+        borderColor: "transparent",
+        hoverColor: "rgba(255, 255, 255, 0.2)",
+        imageWidth: "34px",
+        imageHeight: "34px",
+        showToolTipDelay: 300,
+    },
+};
+
+export const DeviceExpandedActionStyle = createStyleStore(DeviceExpandedActionStyleConfig);
 
 //////////     D E V I C E     N O T I F I C A T I O N     //////////
 

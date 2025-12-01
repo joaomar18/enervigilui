@@ -133,6 +133,7 @@
         transform-origin: center;
         -webkit-font-smoothing: antialiased;
         shape-rendering: geometricPrecision;
+        transition: all 0.2s;
     }
 
     /* Hover state: visual feedback on pointer-over */
@@ -177,5 +178,6 @@
     img {
         width: var(--image-width, 0px);
         height: var(--image-height, 0px);
+        transition: all 0.2s;
     }
 </style>

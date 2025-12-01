@@ -133,7 +133,7 @@
         padding: 0;
         width: 100%;
         height: calc(50vh - 74px - 5px);
-        min-height: 400px;
+        min-height: 380px;
         max-height: 800px;
     }
 

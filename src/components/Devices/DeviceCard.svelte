@@ -6,7 +6,8 @@
 
     // Styles
     import { mergeStyle } from "$lib/style/components";
-    import { DeviceCardStyle, DeviceActionStyle } from "$lib/style/device";
+    import { DeviceCardStyle, DeviceActionStyle, DeviceExpandedActionStyle } from "$lib/style/device";
+    import ToolTipText from "../General/ToolTipText.svelte";
 
     // Style object (from theme)
     export let style: { [property: string]: string | number } | null = null;
@@ -58,6 +59,7 @@
 
     // Variables
     let enterButtonSize: string;
+    let hovered: boolean = false;
     $: enterButtonSize = `${parseInt(String(mergedStyle.imageContainerWidth)) - 50}px`;
 
     // Export Funcions
@@ -107,53 +109,94 @@
     "
     class="container"
 >
-    <div class="content">
-        <h3>{deviceName}</h3>
-        <div style="background-image: {`url('${imageURL}')`};" class="device-image-div" class:image-loaded={true}>
-            <button class="device-image-mask" on:click={handleEnter} aria-label="Enter Device"></button>
-        </div>
-        <div class="actions-div">
-            <Action style={$DeviceActionStyle} imageURL="/img/info.svg" onClick={handleInfo}></Action>
-            <Action style={$DeviceActionStyle} imageURL="/img/edit.svg" onClick={handleEdit} />
-            <Action style={$DeviceActionStyle} imageURL="/img/enter.svg" onClick={handleEnter} />
-        </div>
-        <span class="id-text">ID: {String(deviceID).padStart(3, "0")}</span>
-        <div class="connection-state-div">
-            <div class:connected class="connection-status"></div>
-            {#if connected}
-                <span class="connection-text">{$texts.connected}</span>
-            {:else}
-                <span class="connection-text">{$texts.disconnected}</span>
-            {/if}
+    <div class="box">
+        <div
+            class="content"
+            role="presentation"
+            on:mouseenter={() => {
+                hovered = true;
+            }}
+            on:mouseleave={() => {
+                hovered = false;
+            }}
+        >
+            <h3>{deviceName}</h3>
+            <div class="device-image-div" class:image-loaded={true}>
+                <img src={imageURL} alt={imageURL} />
+                <button class="device-image-mask" on:click={handleEnter} aria-label="Enter Device"></button>
+            </div>
+            <div class="actions-div">
+                <Action
+                    style={hovered ? $DeviceExpandedActionStyle : $DeviceActionStyle}
+                    enableToolTip={true}
+                    imageURL="/img/info.svg"
+                    onClick={handleInfo}
+                >
+                    <div slot="tooltip"><ToolTipText text={$texts.deviceDetails} /></div>
+                </Action>
+                <Action
+                    style={hovered ? $DeviceExpandedActionStyle : $DeviceActionStyle}
+                    enableToolTip={true}
+                    imageURL="/img/edit.svg"
+                    onClick={handleEdit}
+                >
+                    <div slot="tooltip"><ToolTipText text={$texts.editConfig} /></div>
+                </Action>
+                <Action
+                    style={hovered ? $DeviceExpandedActionStyle : $DeviceActionStyle}
+                    enableToolTip={true}
+                    imageURL="/img/enter.svg"
+                    onClick={handleEnter}
+                >
+                    <div slot="tooltip"><ToolTipText text={$texts.generalView} /></div>
+                </Action>
+            </div>
+            <span class="id-text">ID: {String(deviceID).padStart(3, "0")}</span>
+            <div class="connection-state-div">
+                <div class:connected class="connection-status"></div>
+                {#if connected}
+                    <span class="connection-text">{$texts.connected}</span>
+                {:else}
+                    <span class="connection-text">{$texts.disconnected}</span>
+                {/if}
+            </div>
         </div>
     </div>
 </div>
 
 <style>
-    /* Container: card wrapper with size, bg, border and transitions */
+    /* Container: card wrapper with size */
     .container {
         width: var(--width);
         height: var(--height);
-        border-radius: var(--border-radius, 0px);
-        background-color: var(--background-color);
-        border: 1px solid var(--border-color);
-        transition:
-            transform 0.2s ease-in-out,
-            box-shadow 0.2s ease-in-out;
+        position: relative;
+        overflow: visible;
         -webkit-tap-highlight-color: transparent;
         -webkit-touch-callout: none;
         user-select: none;
         transform-origin: center;
         -webkit-font-smoothing: antialiased;
         object-fit: cover;
-        overflow: hidden;
-        contain: paint;
-        shape-rendering: geometricPrecision;
     }
 
-    /* Hover state: lift and shadow for emphasis */
-    .container:hover {
-        transform: scale(1.0625) translate3d(0, 0, 0);
+    /* Card Box with style and scaling behaviour */
+    .box {
+        width: 100%;
+        height: 100%;
+        border-radius: var(--border-radius, 0px);
+        background-color: var(--background-color);
+        border: 1px solid var(--border-color);
+        transition: all 0.2s ease-in-out;
+        transform-origin: center center;
+        will-change: width, height;
+    }
+
+    /* Behaviour of box on hover */
+    .box:hover {
+        width: calc(1.0625 * var(--width));
+        height: calc(1.0625 * var(--height));
+        margin-left: calc((-0.03125) * var(--width));
+        margin-top: calc((-0.03125) * var(--height));
         box-shadow: 0 8px 16px var(--shadow-color);
     }
 
@@ -195,16 +238,19 @@
         width: var(--image-container-width);
         height: var(--image-container-height);
         background-color: var(--image-background-color);
-        background-repeat: no-repeat;
-        background-position: center;
-        background-size: var(--image-width) var(--image-height);
         border-radius: var(--image-container-border-radius);
-        -webkit-tap-highlight-color: transparent;
         opacity: 0;
-        transition: opacity 0.2s ease-in-out;
-        transform-origin: center;
-        -webkit-font-smoothing: antialiased;
-        object-fit: cover;
+        transition: all 0.2s ease-in-out;
+        overflow: hidden;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    /* Scaling of image div on card hover */
+    .box:hover .device-image-div {
+        width: calc(1.0625 * var(--image-container-width));
+        height: calc(1.0625 * var(--image-container-height));
     }
 
     /* Image loaded state: fully visible */
@@ -220,6 +266,18 @@
     /* Ensure hover effect works with loaded images */
     .device-image-div.image-loaded:hover {
         opacity: 0.8;
+    }
+
+    /* Image styling and sizing */
+    .device-image-div img {
+        width: var(--image-width);
+        height: var(--image-height);
+        -webkit-tap-highlight-color: transparent;
+        -webkit-touch-callout: none;
+        user-select: none;
+        transform-origin: center;
+        -webkit-font-smoothing: antialiased;
+        object-fit: cover;
     }
 
     /* Overlay mask: invisible full-circle button to capture clicks */
