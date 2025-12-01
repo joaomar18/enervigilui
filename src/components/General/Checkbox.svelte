@@ -134,8 +134,6 @@
     /* Custom checkbox visual (unchecked by default) */
     .label-checkbox span {
         display: inline-block;
-        /* width: 1.5em;
-        height: 1.5em; */
         width: var(--width);
         height: var(--height);
         border: 1px solid var(--disabled-border-color);
@@ -145,6 +143,7 @@
         display: flex;
         justify-content: center;
         align-items: center;
+        transition: all 0.2s;
     }
 
     /* Checkmark SVG Icon Customization */
