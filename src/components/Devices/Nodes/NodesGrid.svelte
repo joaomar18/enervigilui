@@ -41,12 +41,14 @@
     export let minHeight: string | undefined = undefined;
     export let borderRadius: string | undefined = undefined;
     export let backgroundColor: string | undefined = undefined;
-    export let borderColor: string | undefined = undefined;
+    export let containerBorder: string | undefined = undefined;
+    export let headerBorder: string | undefined = undefined;
+    export let headerHeight: string | undefined = undefined;
     export let headerBackgroundColor: string | undefined = undefined;
     export let headerTextColor: string | undefined = undefined;
     export let subSectionBackgroundColor: string | undefined = undefined;
     export let subSectionTextColor: string | undefined = undefined;
-    export let subSectionBorderColor: string | undefined = undefined;
+    export let subSectionBorder: string | undefined = undefined;
 
     $: localOverrides = {
         width,
@@ -54,12 +56,14 @@
         height,
         borderRadius,
         backgroundColor,
-        borderColor,
+        containerBorder,
+        headerBorder,
+        headerHeight,
         headerBackgroundColor,
         headerTextColor,
         subSectionBackgroundColor,
         subSectionTextColor,
-        subSectionBorderColor,
+        subSectionBorder,
     };
 
     // Merged style
@@ -140,12 +144,14 @@ Includes multi-language headers and adapts layout to container size. -->
         --min-height: {minHeight};
         --border-radius: {mergedStyle.borderRadius};
         --background-color: {mergedStyle.backgroundColor};
-        --border-color: {mergedStyle.borderColor};
+        --container-border: {mergedStyle.containerBorder};
+        --header-border: {mergedStyle.headerBorder};
+        --header-height: {mergedStyle.headerHeight};
         --header-background-color: {mergedStyle.headerBackgroundColor};
         --header-text-color: {mergedStyle.headerTextColor};
         --sub-section-background-color: {mergedStyle.subSectionBackgroundColor};
         --sub-section-text-color: {mergedStyle.subSectionTextColor};
-        --sub-section-border-color: {mergedStyle.subSectionBorderColor};
+        --sub-section-border: {mergedStyle.subSectionBorder};
     "
     class="container"
 >
@@ -157,51 +163,51 @@ Includes multi-language headers and adapts layout to container size. -->
             <thead>
                 <tr class="header">
                     {#if columnVisibility.name.visible}
-                        <th class="max-width">{$texts.variable}</th>
+                        <th class="max-width"><span>{$texts.variable}</span></th>
                     {/if}
                     {#if columnVisibility.unit.visible}
-                        <th class="min-width">{$texts.unit}</th>
+                        <th class="min-width"><span>{$texts.unit}</span></th>
                     {/if}
                     {#if columnVisibility.communicationID.visible}
                         <th class="mid-width">
-                            {$pluginTexts[$protocolPlugins[deviceData.protocol].textKey]}
+                            <span>{$pluginTexts[$protocolPlugins[deviceData.protocol].textKey]}</span>
                         </th>
                     {/if}
                     {#if columnVisibility.type.visible}
-                        <th class="mid-width">{$texts.type}</th>
+                        <th class="mid-width"><span>{$texts.type}</span></th>
                     {/if}
                     {#if columnVisibility.logging_period.visible}
-                        <th class="mid-width">{$texts.loggingPeriod}</th>
+                        <th class="mid-width"><span>{$texts.loggingPeriod}</span></th>
                     {/if}
                     {#if columnVisibility.min_alarm.visible}
-                        <th class="mid-width">{$texts.minValue} </th>
+                        <th class="mid-width"><span>{$texts.minValue}</span></th>
                     {/if}
                     {#if columnVisibility.max_alarm.visible}
-                        <th class="mid-width">{$texts.maxValue} </th>{/if}
+                        <th class="mid-width"><span>{$texts.maxValue}</span></th>{/if}
                     {#if columnVisibility.custom.visible}
-                        <th class="min-width">{$texts.custom}</th>
+                        <th class="min-width"><span>{$texts.custom}</span></th>
                     {/if}
                     {#if columnVisibility.publish.visible}
-                        <th class="min-width">{$texts.publish}</th>
+                        <th class="min-width"><span>{$texts.publish}</span></th>
                     {/if}
                     {#if columnVisibility.virtual.visible}
-                        <th class="min-width">{$texts.virtual}</th>
+                        <th class="min-width"><span>{$texts.virtual}</span></th>
                     {/if}
                     {#if columnVisibility.logging.visible}
-                        <th class="min-width">{$texts.logging}</th>
+                        <th class="min-width"><span>{$texts.logging}</span></th>
                     {/if}
                     {#if columnVisibility.enable_min_alarm.visible}
-                        <th class="min-width">{$texts.minAlarm}</th>
+                        <th class="min-width"><span>{$texts.minAlarm}</span></th>
                     {/if}
                     {#if columnVisibility.enable_max_alarm.visible}
-                        <th class="min-width">{$texts.maxAlarm}</th>
+                        <th class="min-width"><span>{$texts.maxAlarm}</span></th>
                     {/if}
                     {#if columnVisibility.enable.visible}
-                        <th class="min-width">{$texts.enabled}</th>
+                        <th class="min-width"><span>{$texts.enabled}</span></th>
                     {/if}
                     {#if columnVisibility.actions.visible}
                         {#if currentWidth > 325}
-                            <th class="min-width">{$texts.actions}</th>
+                            <th class="min-width"><span class="no-border">{$texts.actions}</span></th>
                         {:else}
                             <th class="super-min-width"><img src="/img/more.svg" style="width:24px; height: 24px;" alt="More" /></th>
                         {/if}
@@ -260,7 +266,7 @@ Includes multi-language headers and adapts layout to container size. -->
         height: var(--height);
         border-radius: var(--border-radius);
         background-color: var(--background-color);
-        border: 1px solid var(--border-color);
+        border: var(--container-border);
     }
 
     /* Content wrapper for table and sections */
@@ -339,24 +345,36 @@ Includes multi-language headers and adapts layout to container size. -->
 
     /* Header cell styling */
     table thead th {
-        padding: 10px;
-        padding-left: 0px;
-        padding-right: 0px;
+        padding: 0;
+        margin: 0;
         box-sizing: border-box;
-        color: var(--header-text-color);
-        font-weight: 500;
-        font-size: 1rem;
-        white-space: nowrap;
-        border-right: 1px solid var(--border-color);
     }
 
     /* Rounded corners for first and last header cells */
     table thead .header th:first-child {
         border-top-left-radius: var(--border-radius);
     }
-
     table thead .header th:last-child {
         border-top-right-radius: var(--border-radius);
+    }
+
+    /* Text element inside column headers */
+    table thead .header th span {
+        display: inline-block;
+        inline-size: 100%;
+        line-height: var(--header-height);
+        padding: 0;
+        margin: 0;
+        text-align: center;
+        border-right: var(--header-border);
+        color: var(--header-text-color);
+        font-weight: 500;
+        font-size: 1rem;
+        white-space: nowrap;
+    }
+
+    /* Remove border from header cell */
+    table thead .header th span.no-border {
         border-right: none;
     }
 
@@ -398,7 +416,7 @@ Includes multi-language headers and adapts layout to container size. -->
         padding: 0;
         background-color: var(--sub-section-background-color);
         color: var(--sub-section-text-color);
-        border: 1px solid var(--sub-section-border-color);
+        border: var(--sub-section-border);
         font-size: 0.9rem;
         border-left: none;
         border-right: none;

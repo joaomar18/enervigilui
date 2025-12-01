@@ -200,12 +200,14 @@ const NodesGridStyleConfig: ComponentStyles = {
         height: "fit-content",
         borderRadius: "10px",
         backgroundColor: "#252b33",
-        borderColor: "#323a45",
+        containerBorder: "1px solid #323a45",
+        headerBorder: "1px solid #323a45",
+        headerHeight: "35px",
         headerBackgroundColor: "#1A2128",
         headerTextColor: "#f5f5f5",
         subSectionBackgroundColor: "#1f2a31",
         subSectionTextColor: "#cbd5e1",
-        subSectionBorderColor: "transparent",
+        subSectionBorder: "1px solid transparent",
     },
 };
 
