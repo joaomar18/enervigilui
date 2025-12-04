@@ -1,4 +1,4 @@
-import { MeterType } from "../device/base";
+import { Protocol } from "../device/base";
 
 /*****     C O N S T A N T S     *****/
 
@@ -104,51 +104,6 @@ export interface NodePhaseSection {
     prefix: NodePrefix;
     labelKey: string;
     filter: (phase: NodePhase) => boolean;
-}
-
-/**
- * Contains the default information for typical nodes in the energy monitoring system.
- * This interface defines all default properties and configuration settings needed to
- * configure and display typical measurement variables (e.g., voltage, current, power).
- * These defaults are used as templates when creating new nodes or resetting node configurations.
- *
- * @interface DefaultNodeInfo
- * @property {string} name - The variable name identifier (e.g., "voltage", "current", "active_power")
- * @property {NodeType} type - The default data type for this variable
- * @property {number} [defaultNumberOfDecimals] - Default number of decimal places for display
- * @property {string} defaultUnit - Default measurement unit (e.g., "V", "A", "kW")
- * @property {string[]} [availableUnits] - Array of available units for this variable
- * @property {NodePhase[]} applicablePhases - Phases where this variable can be applied
- * @property {NodeType[]} applicableTypes - Data types that this variable supports
- * @property {boolean} canBeVirtual - Whether this variable can be calculated/virtual
- * @property {boolean} defaultPublished - Default publish state for MQTT/external systems
- * @property {number} defaultLoggingPeriod - Default logging interval in minutes
- * @property {boolean} defaultLoggingEnabled - Whether logging is enabled by default
- * @property {boolean} isCounter - Whether this variable is of counter type
- * @property {number} [defaultMinAlarm] - Default minimum alarm threshold value
- * @property {number} [defaultMaxAlarm] - Default maximum alarm threshold value
- * @property {boolean} [defaultMinAlarmEnabled] - Whether minimum alarm is enabled by default
- * @property {boolean} [defaultMaxAlarmEnabled] - Whether maximum alarm is enabled by default
- * @property {boolean} useByDefault - The node is by default used
- */
-export interface DefaultNodeInfo {
-    name: string;
-    type: NodeType;
-    defaultNumberOfDecimals?: number;
-    defaultUnit: string;
-    availableUnits?: string[];
-    applicablePhases: NodePhase[];
-    applicableTypes: NodeType[];
-    canBeVirtual: boolean;
-    defaultPublished: boolean;
-    defaultLoggingPeriod: number;
-    defaultLoggingEnabled: boolean;
-    isCounter: boolean;
-    defaultMinAlarm?: number;
-    defaultMaxAlarm?: number;
-    defaultMinAlarmEnabled?: boolean;
-    defaultMaxAlarmEnabled?: boolean;
-    useByDefault: boolean;
 }
 
 /*****     T Y P E S     *****/

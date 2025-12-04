@@ -1,14 +1,12 @@
 import { get } from "svelte/store";
 import { protocolPlugins } from "$lib/stores/device/protocol";
 import { defaultVariableNames } from "$lib/stores/device/variables";
-import { Protocol } from "$lib/types/device/base";
 import { NodeCategory, NodePrefix, NodePhase, NodeType, phaseOrder, nodePhaseSections } from "$lib/types/nodes/base";
 import { defaultRealTimeCardCategoriesState } from "$lib/types/view/device";
 import { assignRealTimeCardCategoriesStateToAllPhases, createEmptyRealTimeCardCategoryArrays } from "../view/device";
 import { getNodeCategory } from "../view/nodes";
 import type { NodePhaseSection } from "$lib/types/nodes/base";
-import type { BaseNodeAdditionalInfo } from "$lib/types/nodes/realtime";
-import type { BaseNodeConfig, EditableBaseNodeConfig, NodeRecord, EditableNodeRecord } from "$lib/types/nodes/config";
+import type { BaseNodeConfig, NodeRecord, EditableNodeRecord, BaseNodeProtocolOptions } from "$lib/types/nodes/config";
 import type { NodeState, ProcessedNodeState } from "$lib/types/nodes/realtime";
 import type { RealTimeCardCategoriesState } from "$lib/types/view/device";
 
@@ -34,7 +32,8 @@ export function isCounter(node: EditableNodeRecord | NodeRecord | ProcessedNodeS
  */
 export function isNumeric(node: EditableNodeRecord | NodeRecord | ProcessedNodeState): boolean {
     if ("config" in node) {
-        return node.config.type === NodeType.FLOAT || node.config.type === NodeType.INT;
+        let plugin = get(protocolPlugins)[node.protocol];
+        return plugin.isNumeric(node.protocol_options);
     } else if ("type" in node) {
         return node.type === NodeType.FLOAT || node.type === NodeType.INT;
     } else {
@@ -207,15 +206,6 @@ export function addPrefix(name: string, prefix: string | NodePrefix): string {
     return prefix + name;
 }
 
-export function getCommunicationID(
-    protocol: Protocol,
-    node_object: BaseNodeConfig | EditableBaseNodeConfig | BaseNodeAdditionalInfo,
-    no_format: boolean = false
-): string {
-    let plugin = get(protocolPlugins)[protocol];
-    return plugin.getCommID(node_object, no_format);
-}
-
 /**
  * Extracts the electrical phase from different node object types.
  * @param node - The node object to extract phase from.
@@ -243,6 +233,7 @@ export function normalizeNode(node: NodeRecord): NodeRecord {
         name: node.name,
         protocol: node.protocol,
         config: Object.fromEntries(Object.entries(node.config).sort(([a], [b]) => a.localeCompare(b))) as BaseNodeConfig,
+        protocol_options: Object.fromEntries(Object.entries(node.protocol_options).sort(([a], [b]) => a.localeCompare(b))) as BaseNodeProtocolOptions,
         attributes: node.attributes,
     };
 }

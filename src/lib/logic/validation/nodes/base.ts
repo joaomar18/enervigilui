@@ -2,7 +2,7 @@ import { get } from "svelte/store";
 import { Protocol } from "$lib/types/device/base";
 import { NodeType, NodePhase, CounterMode } from "$lib/types/nodes/base";
 import { defaultVariables, defaultVariableNames, defaultVariableUnits } from "$lib/stores/device/variables";
-import { normalizeNode, sortNodesByName } from "$lib/logic/util/nodes";
+import { normalizeNode } from "$lib/logic/util/nodes";
 import { protocolTexts } from "$lib/stores/lang/energyMeterTexts";
 import { stringIsValidInteger, stringIsValidFloat } from "$lib/logic/util/generic";
 import { DECIMAL_PLACES_LIM, LOGGING_PERIOD_LIM } from "$lib/types/nodes/config";
@@ -21,9 +21,8 @@ export function getInitialNodeValidation(): NodeValidation {
         variableName: false,
         variableType: false,
         variableUnit: false,
-        communicationID: false,
         protocol: false,
-        type: false,
+        protocolOptions: false,
         decimalPlaces: false,
         loggingPeriod: false,
         minAlarm: false,
@@ -36,8 +35,9 @@ export function getInitialNodeValidation(): NodeValidation {
                 this.variableName &&
                 this.variableType &&
                 this.variableUnit &&
+                this.protocol &&
+                this.protocolOptions &&
                 this.decimalPlaces &&
-                this.communicationID &&
                 this.loggingPeriod &&
                 this.minAlarm &&
                 this.maxAlarm &&
@@ -112,56 +112,28 @@ export function validateNodeUnit(nodeName: string, nodeType: NodeType, nodeUnit:
 }
 
 /**
- * Validates communication ID format using the appropriate protocol plugin.
- * @param communicationID - The communication ID string to validate.
- * @param protocol - The communication protocol type.
- * @returns True if the communication ID is valid for the specified protocol.
+ * Validates whether a selected protocol is allowed for a node, based on whether
+ * the node is virtual (calculated) or physical, and the protocol supported by
+ * the device it belongs to.
+ *
+ * Physical nodes must use a protocol that:
+ *  - exists in the set of supported protocol definitions, and
+ *  - matches the device's communication protocol.
+ *
+ * Virtual (calculated) nodes must always use Protocol.NONE, as they do not
+ * communicate with external devices.
+ *
+ * @function validateNodeProtocol
+ * @param {Protocol} deviceProtocol - The protocol supported by the parent device.
+ * @param {Protocol} protocol - The protocol selected for the node.
+ * @param {boolean} virtual - Whether the node is a virtual/calculated node.
+ * @returns {boolean} True if the protocol selection is valid for the node.
  */
-export function validateCommunicationID(communicationID: string | undefined, protocol: Protocol): boolean {
-    if (!communicationID) {
-        return protocol === Protocol.NONE;
-    }
-
-    const trimmedId = communicationID.trim();
-    let plugin = get(protocolPlugins)[protocol];
-
-    return plugin.validateCommID(trimmedId);
-}
-
-/**
- * Validates node protocol based on virtual/physical status and available protocols.
- * @param protocol - The protocol to validate.
- * @param virtual - True if this is a calculated/virtual node.
- * @returns True if the protocol is valid for the node type.
- */
-export function validateNodeProtocol(protocol: Protocol, virtual: boolean): boolean {
+export function validateNodeProtocol(deviceProtocol: Protocol, protocol: Protocol, virtual: boolean): boolean {
     if (!virtual) {
-        return Object.keys(get(protocolTexts)).includes(protocol);
+        return Object.keys(get(protocolTexts)).includes(protocol) && deviceProtocol === protocol;
     } else {
         return protocol === Protocol.NONE;
-    }
-}
-
-/**
- * Validates node data type against applicable types for default variables or any type for custom variables.
- * @param type - The NodeType to validate.
- * @param name - Variable name to check against default variable constraints.
- * @param custom - True if this is a custom user-defined variable.
- * @returns True if the type is valid for the variable.
- */
-export function validateNodeType(type: NodeType, name: string, custom: boolean): boolean {
-    if (custom) {
-        return Object.values(NodeType).includes(type as NodeType);
-    } else {
-        // For default variables, check if the type is in the applicable types
-        const variables = get(defaultVariables);
-        const variable = Object.values(variables).find((v) => v.name === name);
-
-        if (variable && variable.applicableTypes) {
-            return variable.applicableTypes.includes(type);
-        }
-
-        return false;
     }
 }
 
@@ -297,18 +269,22 @@ export function validateCounterMode(counter: boolean, mode: CounterMode | null):
  * @param nodes - Array of editable nodes to validate.
  * @param nodesBySection - Nodes organized by phase for duplicate checking within each phase.
  */
-export function updateNodesValidation(nodes: Array<EditableNodeRecord>, nodesBySection: Record<NodePhase, Array<EditableNodeRecord>>): void {
+export function updateNodesValidation(
+    protocol: Protocol,
+    nodes: Array<EditableNodeRecord>,
+    nodesBySection: Record<NodePhase, Array<EditableNodeRecord>>
+): void {
+    let plugin = get(protocolPlugins)[protocol];
     for (let node of nodes) {
+        let nodeInternalType = plugin.convertTypeToGeneric(node.protocol_options);
+
         node.validation.variableName = validateNodeName(node.display_name, node.config.custom, nodesBySection[node.attributes.phase]);
-        node.validation.variableType = validateNodeUnit(node.display_name, node.config.type, node.config.unit, node.config.custom);
-        node.validation.variableUnit = validateNodeUnit(node.display_name, node.config.type, node.config.unit, node.config.custom);
-        node.validation.communicationID = validateCommunicationID(node.communication_id, node.protocol);
-        node.validation.protocol = validateNodeProtocol(node.protocol, node.config.calculated);
-        node.validation.type = validateNodeType(node.config.type, node.display_name, node.config.custom);
-        node.validation.decimalPlaces = validateDecimalPlaces(node.config.decimal_places, node.config.type);
+        node.validation.variableUnit = validateNodeUnit(node.display_name, nodeInternalType, node.config.unit, node.config.custom);
+        node.validation.protocol = validateNodeProtocol(protocol, node.protocol, node.config.calculated);
+        node.validation.protocolOptions = node.validation.decimalPlaces = validateDecimalPlaces(node.config.decimal_places, nodeInternalType);
         node.validation.loggingPeriod = validateLoggingPeriod(node.config.logging_period, node.config.logging);
-        node.validation.minAlarm = validateAlarm(node.config.min_alarm_value, node.config.min_alarm, node.config.type);
-        node.validation.maxAlarm = validateAlarm(node.config.max_alarm_value, node.config.max_alarm, node.config.type);
+        node.validation.minAlarm = validateAlarm(node.config.min_alarm_value, node.config.min_alarm, nodeInternalType);
+        node.validation.maxAlarm = validateAlarm(node.config.max_alarm_value, node.config.max_alarm, nodeInternalType);
         node.validation.calculated = validateVirtualNode(node.config.calculated, node.display_name, node.config.custom);
         node.validation.isCounter = validateCounterNode(node.config.is_counter, node.display_name, node.config.custom);
         node.validation.counterMode = validateCounterMode(node.config.is_counter, node.config.counter_mode);

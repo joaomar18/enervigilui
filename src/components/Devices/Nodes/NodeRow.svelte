@@ -4,7 +4,7 @@
     import Checkbox from "../../General/Checkbox.svelte";
     import Button from "../../General/Button.svelte";
     import ExpandableButton from "../../General/ExpandableButton.svelte";
-    import { nodeNameChange, nodeTypeChange, customNodeChange, virtualNodeChange, communicationIDChange } from "$lib/logic/handlers/nodes";
+    import { nodeNameChange, customNodeChange, virtualNodeChange } from "$lib/logic/handlers/nodes";
     import { NodeType } from "$lib/types/nodes/base";
     import { LOGGING_PERIOD_LIM } from "$lib/types/nodes/config";
     import { defaultVariableUnits } from "$lib/stores/device/variables";
@@ -58,9 +58,8 @@
     // Variables
     let nodeEditingState: NodeRecordEditingState = {
         oldVariableName: node.display_name,
-        oldVariableType: node.config.type,
+        oldProtocolOptions: { ...node.protocol_options },
         oldVariableUnit: node.config.unit,
-        oldCommunicationID: node.communication_id,
     };
 
     let rowHeight: string;
@@ -174,45 +173,6 @@ properties and action buttons for configuration and deletion. -->
                         height={rowHeight}
                     />
                 {/if}
-            </div>
-        </td>
-    {/if}
-    {#if columnVisibility.communicationID.visible}
-        <td>
-            <div class="cell-content">
-                <InputField
-                    style={$NodeInputFieldStyle}
-                    disabled={node.config.calculated}
-                    bind:inputValue={node.communication_id}
-                    onChange={() => {
-                        communicationIDChange(node);
-                        onPropertyChanged();
-                    }}
-                    inputInvalid={!node.validation.communicationID}
-                    enableInputInvalid={true}
-                    inputType="STRING"
-                    height={rowHeight}
-                />
-            </div>
-        </td>
-    {/if}
-    {#if columnVisibility.type.visible}
-        <td>
-            <div class="cell-content">
-                <Selector
-                    style={$NodeSelectorStyle}
-                    options={Object.fromEntries(Object.entries(NodeType).map(([key, value]) => [value, value]))}
-                    bind:selectedOption={node.config.type}
-                    onChange={() => {
-                        nodeTypeChange(node, nodeEditingState);
-                        onPropertyChanged();
-                    }}
-                    inputInvalid={!node.validation.variableType}
-                    enableInputInvalid={true}
-                    scrollable={true}
-                    height={rowHeight}
-                    optionHeight={rowHeight}
-                />
             </div>
         </td>
     {/if}

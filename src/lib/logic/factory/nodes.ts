@@ -1,8 +1,8 @@
 import { get } from "svelte/store";
 import { MeterType } from "$lib/types/device/base";
-import { NodeType, NodePhase, NodePrefix, nodePhaseSections, CounterMode } from "$lib/types/nodes/base";
+import { NodePhase, NodePrefix, nodePhaseSections, CounterMode } from "$lib/types/nodes/base";
 import { defaultVariables } from "$lib/stores/device/variables";
-import { addPrefix, removePrefix, getNodePrefix, getCommunicationID } from "../util/nodes";
+import { addPrefix, removePrefix, getNodePrefix, isNumeric } from "../util/nodes";
 import { sortNodesLogically } from "../handlers/nodes";
 import { getInitialNodeValidation } from "../validation/nodes/base";
 import { stringIsValidInteger, stringIsValidFloat } from "$lib/logic/util/generic";
@@ -12,9 +12,18 @@ import { showToast } from "../view/toast";
 import { AlertType } from "$lib/stores/view/toast";
 import { getNodeRealTimeDisplayComponent, getNodeLogGraphType, getNodeCategory } from "../view/nodes";
 import { convertISOToTimestamp } from "../util/date";
-import type { DefaultNodeInfo } from "$lib/types/nodes/base";
-import type { EditableDevice, MeterOptions, NewDevice } from "$lib/types/device/base";
-import type { BaseNodeConfig, NodeRecord, EditableNodeRecord, EditableBaseNodeConfig, NodeAttributes } from "$lib/types/nodes/config";
+import type { DefaultNodeInfo } from "$lib/types/nodes/default";
+import type { EditableDevice, NewDevice } from "$lib/types/device/base";
+import {
+    type BaseNodeConfig,
+    type NodeRecord,
+    type EditableNodeRecord,
+    type EditableBaseNodeConfig,
+    type NodeAttributes,
+    type EditableBaseNodeProtocolOptions,
+    type BaseNodeProtocolOptions,
+    defaultBaseNodeConfig,
+} from "$lib/types/nodes/config";
 import type { NodeState, ProcessedNodeState } from "$lib/types/nodes/realtime";
 import type {
     CounterLogPoint,
@@ -30,19 +39,24 @@ import type {
 import type { EnergyConsumptionType } from "$lib/types/device/energy";
 
 /**
- * Converts a BaseNodeConfig object to an EditableBaseNodeConfig for use in UI forms.
- * @param config - The base node configuration object.
- * @returns EditableBaseNodeConfig suitable for editing in the UI.
+ * Converts an internal BaseNodeConfig into its editable UI representation.
+ * Formats numeric fields as strings, applies decimal rounding for alarm values,
+ * and prepares configuration values for form input handling.
+ *
+ * @function convertToEditableBaseNodeConfig
+ * @param {BaseNodeConfig} config - The internal node configuration.
+ * @param {boolean} isNumeric - Whether the node represents a numeric variable.
+ * @returns {EditableBaseNodeConfig} The configuration formatted for UI editing.
  */
-export function convertToEditableBaseNodeConfig(config: BaseNodeConfig): EditableBaseNodeConfig {
-    let decimal_places: string = config.decimal_places?.toString() ?? "";
+export function convertToEditableBaseNodeConfig(config: BaseNodeConfig, isNumeric: boolean): EditableBaseNodeConfig {
+    let decimal_places: string = isNumeric && config.decimal_places !== null ? config.decimal_places.toString() : "";
     let number_decimal_places: number = parseInt(decimal_places) ?? 0;
     return {
         calculated: config.calculated,
         custom: config.custom,
         decimal_places: decimal_places,
         enabled: config.enabled,
-        is_counter: config.is_counter ?? false,
+        is_counter: isNumeric && config.is_counter !== null ? config.is_counter : false,
         counter_mode: config.counter_mode,
         logging: config.logging,
         logging_period: config.logging_period.toString(),
@@ -51,24 +65,27 @@ export function convertToEditableBaseNodeConfig(config: BaseNodeConfig): Editabl
         min_alarm: config.min_alarm,
         min_alarm_value: config.min_alarm_value?.toFixed(number_decimal_places) ?? "",
         publish: config.publish,
-        type: config.type,
         unit: config.unit ?? "",
     } as EditableBaseNodeConfig;
 }
 
 /**
- * Converts an EditableBaseNodeConfig object back to a BaseNodeConfig for API or backend use.
- * @param config - The editable node configuration object.
- * @returns BaseNodeConfig suitable for backend/API operations.
+ * Converts an editable UI configuration back into the internal BaseNodeConfig format.
+ * Parses numeric fields from strings, normalizes optional values, and removes fields
+ * not applicable for non-numeric variables.
+ *
+ * @function convertToBaseNodeConfig
+ * @param {EditableBaseNodeConfig} config - The UI-provided editable configuration.
+ * @param {boolean} isNumeric - Whether the node represents a numeric variable.
+ * @returns {BaseNodeConfig} The normalized internal configuration.
  */
-export function convertToBaseNodeConfig(config: EditableBaseNodeConfig): BaseNodeConfig {
-    let numericType = config.type === NodeType.FLOAT || config.type === NodeType.INT;
+export function convertToBaseNodeConfig(config: EditableBaseNodeConfig, isNumeric: boolean): BaseNodeConfig {
     return {
         calculated: config.calculated,
         custom: config.custom,
         decimal_places: stringIsValidInteger(config.decimal_places) ? parseInt(config.decimal_places) : null,
         enabled: config.enabled,
-        is_counter: numericType ? config.is_counter : null,
+        is_counter: isNumeric ? config.is_counter : null,
         counter_mode: config.counter_mode,
         logging: config.logging,
         logging_period: parseInt(config.logging_period),
@@ -77,8 +94,7 @@ export function convertToBaseNodeConfig(config: EditableBaseNodeConfig): BaseNod
         min_alarm: config.min_alarm,
         min_alarm_value: stringIsValidFloat(config.min_alarm_value) ? parseFloat(config.min_alarm_value) : null,
         publish: config.publish,
-        type: config.type,
-        unit: numericType ? config.unit : null,
+        unit: isNumeric ? config.unit : null,
     } as BaseNodeConfig;
 }
 
@@ -89,12 +105,12 @@ export function convertToBaseNodeConfig(config: EditableBaseNodeConfig): BaseNod
  * @param options - Meter options for the device.
  * @returns EditableBaseNodeConfig for UI editing.
  */
-export function getEditableBaseNodeConfigFromDefaultVar(variable: DefaultNodeInfo, options: MeterOptions): EditableBaseNodeConfig {
+export function getEditableBaseNodeConfigFromDefaultVar(variable: DefaultNodeInfo): EditableBaseNodeConfig {
     let decimal_places: string = "";
     let min_alarm_value: string = "";
     let max_alarm_value: string = "";
 
-    if (variable.type === NodeType.FLOAT || variable.type === NodeType.INT) {
+    if (variable.isNumeric) {
         decimal_places = variable.defaultNumberOfDecimals ? variable.defaultNumberOfDecimals.toString() : "0";
 
         if (!variable.isCounter) {
@@ -121,36 +137,8 @@ export function getEditableBaseNodeConfigFromDefaultVar(variable: DefaultNodeInf
         min_alarm: variable.defaultMinAlarmEnabled !== undefined ? true : false,
         min_alarm_value: min_alarm_value,
         publish: variable.defaultPublished,
-        type: variable.type,
         unit: variable.defaultUnit,
     } as EditableBaseNodeConfig;
-}
-
-/**
- * Processes and normalizes a BaseNodeConfig object, ensuring correct types and nulls for non-numeric fields.
- * Used to sanitize initial node config data before further conversion or use.
- * @param config - The base node configuration to process.
- * @returns A normalized BaseNodeConfig object.
- */
-export function processInitialBaseNodeConfig(config: BaseNodeConfig): BaseNodeConfig {
-    let numericType = config.type === NodeType.FLOAT || config.type === NodeType.INT;
-    return {
-        calculated: config.calculated,
-        custom: config.custom,
-        decimal_places: stringIsValidInteger(String(config.decimal_places)) ? config.decimal_places : null,
-        enabled: config.enabled,
-        is_counter: numericType ? config.is_counter : null,
-        counter_mode: config.counter_mode,
-        logging: config.logging,
-        logging_period: config.logging_period,
-        max_alarm: config.max_alarm,
-        max_alarm_value: stringIsValidFloat(String(config.max_alarm_value)) ? config.max_alarm_value : null,
-        min_alarm: config.min_alarm,
-        min_alarm_value: stringIsValidFloat(String(config.min_alarm_value)) ? config.min_alarm_value : null,
-        publish: config.publish,
-        type: config.type,
-        unit: numericType ? config.unit : null,
-    } as BaseNodeConfig;
 }
 
 /**
@@ -164,16 +152,17 @@ export function convertToEditableNodes(nodes: Array<NodeRecord>): Array<Editable
     for (const node of nodes) {
         let editableNode: EditableNodeRecord;
         let plugin = get(protocolPlugins)[node.protocol];
-        let editableConfig: EditableBaseNodeConfig = plugin.convertNodeConfigToEditable(node.config);
+        let editableConfig: EditableBaseNodeConfig = convertToEditableBaseNodeConfig(node.config, isNumeric(node));
+        let editableProtocolOptions: EditableBaseNodeProtocolOptions = plugin.convertNodeProtocolOptionsToEditable(node.protocol_options);
 
         editableNode = {
             name: node.name,
             device_id: node.device_id,
             protocol: node.protocol,
             display_name: removePrefix(node.name),
-            communication_id: getCommunicationID(node.protocol, editableConfig),
             validation: getInitialNodeValidation(),
             config: editableConfig,
+            protocol_options: editableProtocolOptions,
             attributes: node.attributes,
         };
 
@@ -193,13 +182,16 @@ export function convertToNodes(nodes: Array<EditableNodeRecord>): Array<NodeReco
 
     for (const editableNode of nodes) {
         let plugin = get(protocolPlugins)[editableNode.protocol];
-        let nodeConfig: BaseNodeConfig = plugin.convertNodeConfigToNormal(editableNode.config);
+
+        let nodeConfig: BaseNodeConfig = convertToBaseNodeConfig(editableNode.config, isNumeric(editableNode));
+        let protocolOptions: BaseNodeProtocolOptions = plugin.convertNodeProtocolOptionsToNormal(editableNode.protocol_options);
 
         const deviceNode: NodeRecord = {
             name: editableNode.name,
             device_id: editableNode.device_id,
             protocol: editableNode.protocol,
             config: nodeConfig,
+            protocol_options: protocolOptions,
             attributes: editableNode.attributes,
         };
 
@@ -215,23 +207,7 @@ export function convertToNodes(nodes: Array<EditableNodeRecord>): Array<NodeReco
  * @returns Array of processed and sorted NodeRecord objects.
  */
 export function processInitialNodes(nodes: Array<NodeRecord>): Array<NodeRecord> {
-    const deviceNodes: Array<NodeRecord> = [];
-
-    for (const node of nodes) {
-        let plugin = get(protocolPlugins)[node.protocol];
-        let nodeConfig: BaseNodeConfig = plugin.processInitialNodeConfig(node.config);
-
-        const deviceNode: NodeRecord = {
-            name: node.name,
-            device_id: node.device_id,
-            protocol: node.protocol,
-            config: nodeConfig,
-            attributes: node.attributes,
-        };
-
-        deviceNodes.push(deviceNode);
-    }
-
+    const deviceNodes: Array<NodeRecord> = nodes;
     return (sortNodesLogically(deviceNodes) as Array<NodeRecord>).map(normalizeNode);
 }
 
@@ -263,7 +239,9 @@ export function initNodes(initialNodes: Array<NodeRecord>): { sucess: boolean; e
 function createDefaultEditableDeviceNode(variable: DefaultNodeInfo, phase: NodePhase, device_data: EditableDevice | NewDevice): EditableNodeRecord {
     const full_name = getNodePrefix(phase) + variable.name;
     let plugin = get(protocolPlugins)[device_data.protocol];
-    let editableConfig = plugin.createNodeConfigFromDefaultVar(variable, device_data.options);
+
+    let editableConfig = getEditableBaseNodeConfigFromDefaultVar(variable);
+    let editableProtocolOptions = { ...variable.defaultProtocolOptions[device_data.protocol] };
     let attributes = {
         phase: phase,
     } as NodeAttributes;
@@ -273,9 +251,9 @@ function createDefaultEditableDeviceNode(variable: DefaultNodeInfo, phase: NodeP
         name: full_name,
         protocol: device_data.protocol,
         config: editableConfig,
+        protocol_options: editableProtocolOptions,
         attributes: attributes,
         display_name: variable.name,
-        communication_id: getCommunicationID(device_data.protocol, editableConfig, true),
         validation: getInitialNodeValidation(),
     };
 
@@ -324,7 +302,8 @@ export function addNode(sectionPhase: NodePhase, sectionPrefix: NodePrefix, devi
     const fullNodeName = addPrefix(nodeBaseName, sectionPrefix);
 
     let plugin = get(protocolPlugins)[device_data.protocol];
-    let newEditableConfig = plugin.createNewEditableNodeConfig();
+    let newEditableConfig = { ...defaultBaseNodeConfig };
+    let newProtocolOptions = { ...plugin.defaultNodeProtocolOptions };
     let newAttributes = {
         phase: sectionPhase,
     } as NodeAttributes;
@@ -334,9 +313,9 @@ export function addNode(sectionPhase: NodePhase, sectionPrefix: NodePrefix, devi
         name: fullNodeName,
         protocol: device_data.protocol,
         config: newEditableConfig,
+        protocol_options: newProtocolOptions,
         attributes: newAttributes,
         display_name: nodeBaseName,
-        communication_id: getCommunicationID(device_data.protocol, newEditableConfig, true),
         validation: getInitialNodeValidation(),
     };
 

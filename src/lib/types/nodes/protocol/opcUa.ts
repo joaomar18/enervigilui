@@ -1,32 +1,63 @@
-import type { BaseNodeConfig, EditableBaseNodeConfig } from "../config";
-import type { BaseNodeAdditionalInfo } from "../realtime";
+import type { BaseNodeProtocolOptions, EditableBaseNodeProtocolOptions } from "../config";
 
 /*****     C O N S T A N T S     *****/
 
 /*****     E N U M S     *****/
 
+/**
+ * Defines the supported OPC UA data types for node values.
+ *
+ * @enum
+ */
+export enum OPCUANodeType {
+    BOOL = "BOOL",
+    INT = "INT",
+    FLOAT = "FLOAT",
+    STRING = "STRING",
+}
+
 /*****     I N T E R F A C E S     *****/
 
 /**
- * OPC UA node configuration.
- * @property node_id Node identifier.
+ * Represents the configuration for an OPC UA node used for reading or writing values.
+ * Extends the base protocol options and includes the OPC UA node identifier and type.
+ *
+ * @interface
+ * @extends BaseNodeProtocolOptions
+ * @property {string} node_id - The fully qualified OPC UA NodeId (e.g., "ns=2;s=PowerMeter/Voltage").
+ * @property {OPCUANodeType} type - The OPC UA variable's underlying data type.
  */
-export interface NodeOPCUAConfig extends BaseNodeConfig {
+export interface OPCUANodeOptions extends BaseNodeProtocolOptions {
     node_id: string;
+    type: OPCUANodeType;
 }
 
 /**
- * Editable OPC UA node config for forms.
- * @property node_id Node identifier (string).
+ * Represents an editable version of OPC UA node configuration, used in UI forms or
+ * device editing workflows. Contains the same fields as `OPCUANodeOptions` but is
+ * conceptually separate for stricter typing in the UI layer.
+ *
+ * @interface
+ * @extends BaseNodeProtocolOptions
+ * @property {string} node_id - The OPC UA NodeId provided by the user.
+ * @property {OPCUANodeType} type - The selected OPC UA data type for this node.
  */
-export interface EditableNodeOPCUAConfig extends EditableBaseNodeConfig {
+export interface EditableOPCUANodeOptions extends EditableBaseNodeProtocolOptions {
     node_id: string;
-}
-
-export interface NodeOPCUAAdditionalInfo extends BaseNodeAdditionalInfo {
-    node_id: string;
+    type: OPCUANodeType;
 }
 
 /*****     T Y P E S     *****/
 
 /*****     O B J E C T S     *****/
+
+/**
+ * Default editable OPC UA configuration for newly created nodes.
+ * Uses an empty NodeId and FLOAT type as a common starting point.
+ *
+ * @constant
+ */
+export const defaultOPCUANodeOptions: EditableOPCUANodeOptions = {
+    node_id: "",
+    type: OPCUANodeType.FLOAT,
+};

@@ -1,0 +1,76 @@
+import { ModbusRTUNodeMode, ModbusRTUNodeType } from "$lib/types/nodes/protocol/modbusRtu";
+import { multiregisterTypes } from "$lib/types/nodes/protocol/modbusRtu";
+
+/**
+ * Validates a Modbus register address provided as a string.
+ * Supports both decimal (e.g., "100") and hexadecimal formats (e.g., "0x64").
+ * Ensures the converted numeric value falls within the valid Modbus address
+ * range of 0 to 65535.
+ *
+ * @function validateModbusAddress
+ * @param {string} rawAddress - The user-provided address as a string.
+ * @returns {boolean} True if the address is valid, false otherwise.
+ */
+export function validateModbusAddress(rawAddress: string): boolean {
+    let address: number;
+    if (rawAddress === "" || rawAddress == null) return false;
+
+    if (rawAddress.startsWith("0x") || rawAddress.startsWith("0X")) {
+        address = parseInt(rawAddress, 16);
+    } else {
+        address = parseInt(rawAddress, 10);
+    }
+    if (isNaN(address) || address < 0 || address > 65535) {
+        return false;
+    }
+
+    return true;
+}
+
+/**
+ * Validates whether the provided endian mode is appropriate for the given
+ * Modbus RTU data type. Multi-register types (e.g., FLOAT_32, INT_32, FLOAT_64)
+ * require a non-null endian mode to specify register ordering, while
+ * single-register types (e.g., INT_16, BOOL) must not define an endian mode.
+ *
+ * @function validateModbusEndianMode
+ * @param {ModbusRTUNodeType} type - The Modbus data type being validated.
+ * @param {ModbusRTUNodeMode | null} endianMode - The endian mode selected for the type, or null if none.
+ * @returns {boolean} True if the endian mode is valid for the specified type, false otherwise.
+ */
+export function validateModbusEndianMode(type: ModbusRTUNodeType, endianMode: ModbusRTUNodeMode | null): boolean {
+    if (endianMode) {
+        if (!multiregisterTypes.includes(type)) {
+            return false;
+        }
+    } else {
+        if (multiregisterTypes.includes(type)) {
+            return false;
+        }
+    }
+    return true;
+}
+
+/**
+ * Validates the bit index for a Modbus RTU node. Bit indexing is only allowed
+ * when the data type is BOOL, in which case the bit value must be an integer
+ * between 0 and 15. For all other data types, the bit field must be null.
+ *
+ * @function validateModbusBitIndex
+ * @param {ModbusRTUNodeType} type - The Modbus data type being validated.
+ * @param {string | null} bit - The user-provided bit index as a string or null.
+ * @returns {boolean} True if the bit value is valid for the given type, false otherwise.
+ */
+export function validateModbusBitIndex(type: ModbusRTUNodeType, bit: string | null): boolean {
+    if (type === ModbusRTUNodeType.BOOL) {
+        if (bit === null || bit === "") return false;
+        const n = Number(bit);
+        return Number.isInteger(n) && n >= 0 && n <= 15;
+    }
+
+    if (bit !== null) {
+        return false;
+    }
+
+    return true;
+}

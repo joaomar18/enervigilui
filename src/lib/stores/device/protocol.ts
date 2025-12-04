@@ -1,46 +1,49 @@
 import { writable } from "svelte/store";
 import { Protocol } from "$lib/types/device/base";
-import type { BaseCommunicationConfig, EditableBaseCommunicationConfig, MeterOptions } from "$lib/types/device/base";
+import type { BaseCommunicationConfig, EditableBaseCommunicationConfig } from "$lib/types/device/base";
 import type { DeviceOPCUAConfig, EditableDeviceOPCUAConfig } from "$lib/types/device/opcUa";
 import type { DeviceModbusRTUConfig, EditableDeviceModbusRTUConfig } from "$lib/types/device/modbusRtu";
-import type { NodeModbusRTUConfig, EditableNodeModbusRTUConfig, NodeModbusRTUAdditionalInfo } from "$lib/types/nodes/protocol/modbusRtu";
-import type { NodeOPCUAConfig, EditableNodeOPCUAConfig, NodeOPCUAAdditionalInfo } from "$lib/types/nodes/protocol/opcUa";
+import {
+    defaultModbusRTUNodeOptions,
+    type EditableModbusRTUNodeOptions,
+    ModbusRTUFunction,
+    type ModbusRTUNodeOptions,
+    ModbusRTUNodeType,
+} from "$lib/types/nodes/protocol/modbusRtu";
+import { defaultOPCUANodeOptions, type EditableOPCUANodeOptions, type OPCUANodeOptions, OPCUANodeType } from "$lib/types/nodes/protocol/opcUa";
 import type { SvelteComponent } from "svelte";
 import { defaultModbusRTUOptions } from "$lib/types/device/modbusRtu";
 import { defaultOPCUAOptions } from "$lib/types/device/opcUa";
-import { defaultBaseNodeConfig } from "$lib/types/nodes/config";
+import { defaultNoProtocolNodeOptions } from "$lib/types/nodes/config";
 import ModbusRtuConfig from "../../../components/Devices/ModbusRTUConfig.svelte";
 import OpcuaConfig from "../../../components/Devices/OPCUAConfig.svelte";
-import type { DefaultNodeInfo } from "$lib/types/nodes/base";
-import type { BaseNodeConfig, EditableBaseNodeConfig, EditableNodeRecord } from "$lib/types/nodes/config";
-import type { BaseNodeAdditionalInfo } from "$lib/types/nodes/realtime";
-import {
-    convertToBaseNodeConfig,
-    convertToEditableBaseNodeConfig,
-    processInitialBaseNodeConfig,
-    getEditableBaseNodeConfigFromDefaultVar,
-} from "$lib/logic/factory/nodes";
-import { validateModbusRegister } from "$lib/logic/validation/nodes/modbusRtu";
-import { validateOpcUaNodeId } from "$lib/logic/validation/nodes/opcUa";
+import ModbusRtuNodeConfig from "../../../components/Devices/Nodes/Protocol/ModbusRtuNodeConfig.svelte";
+import OPCUANodeConfig from "../../../components/Devices/Nodes/Protocol/OPCUANodeConfig.svelte";
+import { NodeType } from "$lib/types/nodes/base";
+import type {
+    BaseNodeProtocolOptions,
+    EditableBaseNodeProtocolOptions,
+    EditableNodeNoProtocolOptions,
+    NodeNoProtocolOptions,
+} from "$lib/types/nodes/config";
+import { validateModbusAddress, validateModbusBitIndex, validateModbusEndianMode } from "$lib/logic/validation/nodes/protocol/modbusRtu";
+import { validateOpcUaNodeId } from "$lib/logic/validation/nodes/protocol/opcUa";
 
 export interface ProtocolPlugin {
     textKey: string;
     shortTextKey: string;
     infoTextKey: string;
-    defaultCommID?: string;
     defaultOptions: EditableBaseCommunicationConfig;
+    defaultNodeProtocolOptions: EditableBaseNodeProtocolOptions;
     ConfigComponent: typeof SvelteComponent<any> | null;
+    NodeConfigComponent: typeof SvelteComponent<any> | null;
+    isNumeric: (nodeProtocolOptions: EditableBaseNodeProtocolOptions) => boolean;
+    convertTypeToGeneric: (nodeProtocolOptions: BaseNodeProtocolOptions | EditableBaseNodeProtocolOptions) => NodeType;
     convertCommOptionsToEditable: (communicationOptions: BaseCommunicationConfig) => EditableBaseCommunicationConfig;
     convertCommOptionsToNormal: (editableCommunicationOptions: EditableBaseCommunicationConfig) => BaseCommunicationConfig;
-    convertNodeConfigToEditable: (configuration: BaseNodeConfig) => EditableBaseNodeConfig;
-    convertNodeConfigToNormal: (editableConfiguration: EditableBaseNodeConfig) => BaseNodeConfig;
-    processInitialNodeConfig: (configuration: BaseNodeConfig) => BaseNodeConfig;
-    createNodeConfigFromDefaultVar: (variable: DefaultNodeInfo, options: MeterOptions) => EditableBaseNodeConfig;
-    createNewEditableNodeConfig: () => EditableBaseNodeConfig;
-    getCommID: (node_object: BaseNodeConfig | EditableBaseNodeConfig | BaseNodeAdditionalInfo, noFormat: boolean) => string;
-    validateCommID: (communicationID: string) => boolean;
-    setCommID: (node: EditableNodeRecord) => void;
-    setCommIDToDefault: (node: EditableNodeRecord) => void;
+    convertNodeProtocolOptionsToEditable: (protocolOptions: BaseNodeProtocolOptions) => EditableBaseNodeProtocolOptions;
+    convertNodeProtocolOptionsToNormal: (editableProtocolOptions: EditableBaseNodeProtocolOptions) => BaseNodeProtocolOptions;
+    validateNodeProtocolOptions: (editableProtocolOptions: EditableBaseNodeProtocolOptions) => boolean;
 }
 
 /*     N O     P R O T O C O L     P L U G I N     */
@@ -50,39 +53,35 @@ const noProtocolPlugin: ProtocolPlugin = {
     shortTextKey: "address",
     infoTextKey: "noProtocolInfo",
     defaultOptions: { valid: false },
+    defaultNodeProtocolOptions: defaultNoProtocolNodeOptions,
     ConfigComponent: null,
+    NodeConfigComponent: null,
+    isNumeric(nodeProtocolOptions) {
+        let type = (nodeProtocolOptions as EditableNodeNoProtocolOptions).type;
+        return type === NodeType.FLOAT || type === NodeType.INT;
+    },
+    convertTypeToGeneric: (nodeProtocolOptions) => {
+        return (nodeProtocolOptions as EditableNodeNoProtocolOptions).type;
+    },
     convertCommOptionsToEditable: (communicationOptions) => {
         throw new Error("Unsupported Protocol");
     },
     convertCommOptionsToNormal: (editableCommunicationOptions) => {
         throw new Error("Unsupported Protocol");
     },
-    convertNodeConfigToEditable: (configuration) => {
-        return convertToEditableBaseNodeConfig(configuration);
+    convertNodeProtocolOptionsToEditable: (nodeProtocolOptions) => {
+        return nodeProtocolOptions as EditableNodeNoProtocolOptions;
     },
-    convertNodeConfigToNormal: (editableConfiguration) => {
-        return convertToBaseNodeConfig(editableConfiguration);
+    convertNodeProtocolOptionsToNormal: (editableProtocolOptions) => {
+        return editableProtocolOptions as NodeNoProtocolOptions;
     },
-    processInitialNodeConfig: (configuration) => {
-        return processInitialBaseNodeConfig(configuration);
-    },
-    createNodeConfigFromDefaultVar(variable, options) {
-        return getEditableBaseNodeConfigFromDefaultVar(variable, options);
-    },
-    createNewEditableNodeConfig() {
-        return { ...defaultBaseNodeConfig };
-    },
-    getCommID(node_object, noFormat) {
-        return "";
-    },
-    validateCommID(communicationID) {
-        return communicationID.length === 0;
-    },
-    setCommID(node) {
-        throw new Error("Unsupported Protocol");
-    },
-    setCommIDToDefault(node) {
-        throw new Error("Unsupported Protocol");
+    validateNodeProtocolOptions(editableProtocolOptions) {
+        let protocolOptions = editableProtocolOptions as EditableNodeNoProtocolOptions;
+
+        if (!Object.values(NodeType).includes(protocolOptions.type)) {
+            return false;
+        }
+        return true;
     },
 };
 
@@ -92,9 +91,41 @@ const modbusRtuPlugin: ProtocolPlugin = {
     textKey: "modbusRegister",
     shortTextKey: "address",
     infoTextKey: "registerInfo",
-    defaultCommID: "0x",
     defaultOptions: defaultModbusRTUOptions,
+    defaultNodeProtocolOptions: defaultModbusRTUNodeOptions,
     ConfigComponent: ModbusRtuConfig,
+    NodeConfigComponent: ModbusRtuNodeConfig,
+    isNumeric(nodeProtocolOptions) {
+        let type = (nodeProtocolOptions as ModbusRTUNodeOptions).type;
+        return (
+            type === ModbusRTUNodeType.INT_16 ||
+            type === ModbusRTUNodeType.UINT_16 ||
+            type === ModbusRTUNodeType.INT_32 ||
+            type === ModbusRTUNodeType.UINT_32 ||
+            type === ModbusRTUNodeType.INT_64 ||
+            type === ModbusRTUNodeType.UINT_64 ||
+            type === ModbusRTUNodeType.FLOAT_32 ||
+            type === ModbusRTUNodeType.FLOAT_64
+        );
+    },
+    convertTypeToGeneric: (nodeProtocolOptions) => {
+        let type = (nodeProtocolOptions as ModbusRTUNodeOptions).type;
+        switch (type) {
+            case ModbusRTUNodeType.BOOL:
+                return NodeType.BOOLEAN;
+            case (ModbusRTUNodeType.INT_16,
+            ModbusRTUNodeType.INT_32,
+            ModbusRTUNodeType.INT_64,
+            ModbusRTUNodeType.UINT_16,
+            ModbusRTUNodeType.UINT_32,
+            ModbusRTUNodeType.UINT_64):
+                return NodeType.INT;
+            case (ModbusRTUNodeType.FLOAT_32, ModbusRTUNodeType.FLOAT_64):
+                return NodeType.FLOAT;
+            default:
+                throw new Error(`Unsupported Modbus RTU Node Type ${type}`);
+        }
+    },
     convertCommOptionsToEditable: (communicationOptions) => {
         let modbusCommOptions = communicationOptions as DeviceModbusRTUConfig;
         return {
@@ -124,53 +155,33 @@ const modbusRtuPlugin: ProtocolPlugin = {
             timeout: parseInt(modbusRtuEditableCommOptions.timeout),
         } as DeviceModbusRTUConfig;
     },
-    convertNodeConfigToEditable: (configuration) => {
-        let editableBaseConfig = convertToEditableBaseNodeConfig(configuration);
+
+    convertNodeProtocolOptionsToEditable: (nodeProtocolOptions) => {
+        let protocolOptions = nodeProtocolOptions as ModbusRTUNodeOptions;
         return {
-            ...editableBaseConfig,
-            register: (configuration as NodeModbusRTUConfig).register.toString(),
-        } as EditableNodeModbusRTUConfig;
+            ...protocolOptions,
+            address: String(protocolOptions.address),
+            bit: protocolOptions.bit === null ? null : String(protocolOptions.bit),
+        } as EditableModbusRTUNodeOptions;
     },
-    convertNodeConfigToNormal: (editableConfiguration) => {
-        let baseConfig = convertToBaseNodeConfig(editableConfiguration);
+    convertNodeProtocolOptionsToNormal: (editableProtocolOptions) => {
+        let protocolOptions = editableProtocolOptions as EditableModbusRTUNodeOptions;
         return {
-            ...baseConfig,
-            register: parseInt((editableConfiguration as EditableNodeModbusRTUConfig).register),
-        } as NodeModbusRTUConfig;
+            ...protocolOptions,
+            address: Number(protocolOptions.address),
+            bit: protocolOptions.bit === null ? null : Number(protocolOptions.bit),
+        } as ModbusRTUNodeOptions;
     },
-    processInitialNodeConfig: (configuration) => {
-        let baseConfig = processInitialBaseNodeConfig(configuration);
-        return {
-            ...baseConfig,
-            register: (configuration as NodeModbusRTUConfig).register,
-        } as NodeModbusRTUConfig;
-    },
-    createNodeConfigFromDefaultVar(variable, options) {
-        let editableBaseConfig = getEditableBaseNodeConfigFromDefaultVar(variable, options);
-        return {
-            ...editableBaseConfig,
-            register: this.defaultCommID,
-        } as EditableNodeModbusRTUConfig;
-    },
-    createNewEditableNodeConfig() {
-        let newEditableBaseConfig = { ...defaultBaseNodeConfig };
-        return {
-            ...newEditableBaseConfig,
-            register: this.defaultCommID,
-        } as EditableNodeModbusRTUConfig;
-    },
-    getCommID(node_object, noFormat) {
-        let register = (node_object as EditableNodeModbusRTUConfig | NodeModbusRTUConfig | NodeModbusRTUAdditionalInfo).register;
-        return noFormat ? String(register) : this.defaultCommID + Number(register).toString(16).toUpperCase().padStart(4, "0");
-    },
-    validateCommID(communicationID) {
-        return validateModbusRegister(communicationID);
-    },
-    setCommID(node) {
-        (node.config as EditableNodeModbusRTUConfig).register = String(parseInt(node.communication_id.replace("0x", ""), 16));
-    },
-    setCommIDToDefault(node) {
-        (node.config as EditableNodeModbusRTUConfig).register = this.defaultCommID ?? "";
+    validateNodeProtocolOptions(editableProtocolOptions) {
+        let protocolOptions = editableProtocolOptions as EditableModbusRTUNodeOptions;
+
+        if (!Object.values(ModbusRTUNodeType).includes(protocolOptions.type)) return false;
+        if (!Object.values(ModbusRTUFunction).includes(protocolOptions.function)) return false;
+        if (!validateModbusAddress(protocolOptions.address)) return false;
+        if (!validateModbusEndianMode(protocolOptions.type, protocolOptions.endian_mode)) return false;
+        if (!validateModbusBitIndex(protocolOptions.type, protocolOptions.bit)) return false;
+
+        return true;
     },
 };
 
@@ -180,9 +191,28 @@ const opcUaPlugin: ProtocolPlugin = {
     textKey: "opcuaID",
     shortTextKey: "opcuaID",
     infoTextKey: "nodespaceInfo",
-    defaultCommID: "ns=;i=",
     defaultOptions: defaultOPCUAOptions,
+    defaultNodeProtocolOptions: defaultOPCUANodeOptions,
     ConfigComponent: OpcuaConfig,
+    NodeConfigComponent: OPCUANodeConfig,
+    isNumeric(nodeProtocolOptions) {
+        let type = (nodeProtocolOptions as OPCUANodeOptions).type;
+        return type === OPCUANodeType.INT || type === OPCUANodeType.FLOAT;
+    },
+    convertTypeToGeneric: (nodeProtocolOptions) => {
+        let type = (nodeProtocolOptions as OPCUANodeOptions).type;
+        switch (type) {
+            case OPCUANodeType.BOOL:
+                return NodeType.BOOLEAN;
+            case OPCUANodeType.INT:
+                return NodeType.INT;
+            case OPCUANodeType.FLOAT:
+                return NodeType.FLOAT;
+            case OPCUANodeType.STRING:
+            default:
+                throw new Error(`Unsupported OPC UA Node Type ${type}`);
+        }
+    },
     convertCommOptionsToEditable(communicationOptions) {
         let opcUaCommOptions = communicationOptions as DeviceOPCUAConfig;
         return {
@@ -204,52 +234,27 @@ const opcUaPlugin: ProtocolPlugin = {
             url: opcUaEditableCommOptions.url,
         } as DeviceOPCUAConfig;
     },
-    convertNodeConfigToEditable: (configuration) => {
-        let editableBaseConfig = convertToEditableBaseNodeConfig(configuration);
+    convertNodeProtocolOptionsToEditable: (nodeProtocolOptions) => {
+        let protocolOptions = nodeProtocolOptions as OPCUANodeOptions;
         return {
-            ...editableBaseConfig,
-            node_id: (configuration as NodeOPCUAConfig).node_id,
-        } as EditableNodeOPCUAConfig;
+            ...protocolOptions,
+            node_id: String(protocolOptions.node_id),
+        } as EditableOPCUANodeOptions;
     },
-    convertNodeConfigToNormal: (editableConfiguration) => {
-        let baseConfig = convertToBaseNodeConfig(editableConfiguration);
+    convertNodeProtocolOptionsToNormal: (editableProtocolOptions) => {
+        let protocolOptions = editableProtocolOptions as EditableOPCUANodeOptions;
         return {
-            ...baseConfig,
-            node_id: (editableConfiguration as EditableNodeOPCUAConfig).node_id,
-        } as NodeOPCUAConfig;
+            ...protocolOptions,
+            node_id: String(protocolOptions.node_id),
+        } as OPCUANodeOptions;
     },
-    processInitialNodeConfig: (configuration) => {
-        let baseConfig = processInitialBaseNodeConfig(configuration);
-        return {
-            ...baseConfig,
-            node_id: (configuration as NodeOPCUAConfig).node_id,
-        } as NodeOPCUAConfig;
-    },
-    createNodeConfigFromDefaultVar(variable, options) {
-        let editableBaseConfig = getEditableBaseNodeConfigFromDefaultVar(variable, options);
-        return {
-            ...editableBaseConfig,
-            node_id: this.defaultCommID,
-        } as EditableNodeOPCUAConfig;
-    },
-    createNewEditableNodeConfig() {
-        let newEditableBaseConfig = { ...defaultBaseNodeConfig };
-        return {
-            ...newEditableBaseConfig,
-            node_id: this.defaultCommID,
-        } as EditableNodeOPCUAConfig;
-    },
-    getCommID(node_object, noFormat) {
-        return (node_object as EditableNodeOPCUAConfig | NodeOPCUAConfig | NodeOPCUAAdditionalInfo).node_id;
-    },
-    validateCommID(communicationID) {
-        return validateOpcUaNodeId(communicationID);
-    },
-    setCommID(node) {
-        (node.config as EditableNodeOPCUAConfig).node_id = node.communication_id;
-    },
-    setCommIDToDefault(node) {
-        (node.config as EditableNodeOPCUAConfig).node_id = this.defaultCommID ?? "";
+    validateNodeProtocolOptions(editableProtocolOptions) {
+        let protocolOptions = editableProtocolOptions as EditableOPCUANodeOptions;
+
+        if (!Object.values(OPCUANodeType).includes(protocolOptions.type)) return false;
+        if (!validateOpcUaNodeId(protocolOptions.node_id)) return false;
+
+        return true;
     },
 };
 

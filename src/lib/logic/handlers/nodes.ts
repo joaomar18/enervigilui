@@ -12,7 +12,6 @@ import {
     removePrefix,
     getNodePrefix,
     getNodeIndex,
-    getCommunicationID,
     getNodePhaseFromRecordOrState,
 } from "../util/nodes";
 import { defaultVariables } from "$lib/stores/device/variables";
@@ -90,45 +89,6 @@ export function nodeNameChange(node: EditableNodeRecord, phase: NodePhase): void
 }
 
 /**
- * Updates the communication ID of a node using the protocol plugin's logic.
- * @param node - The editable device node to update.
- */
-export function communicationIDChange(node: EditableNodeRecord): void {
-    if (node.protocol === Protocol.NONE) {
-        return;
-    }
-    let plugin = get(protocolPlugins)[node.protocol];
-    plugin.setCommID(node);
-}
-
-/**
- * Handles node type changes by updating unit settings and clearing type-specific fields when needed.
- * @param node - The editable node to update.
- * @param nodeState - Previous editing state to restore values when switching back.
- */
-export function nodeTypeChange(node: EditableNodeRecord, nodeState: NodeRecordEditingState): void {
-    if (!node.config.custom) {
-        if (node.config.type === NodeType.FLOAT || node.config.type === NodeType.INT) {
-            if (nodeState.oldVariableUnit) {
-                node.config.unit = nodeState.oldVariableUnit;
-            } else {
-                const currentDefaultVariables = get(defaultVariables);
-                const defaultNodeProps = Object.values(currentDefaultVariables).find((v) => v.name === node.display_name);
-                node.config.unit = defaultNodeProps?.defaultUnit || "";
-            }
-        } else if (node.config.type === NodeType.STRING || node.config.type === NodeType.BOOLEAN) {
-            nodeState.oldVariableUnit = node.config.unit;
-            node.config.decimal_places = "";
-            node.config.min_alarm_value = "";
-            node.config.max_alarm_value = "";
-            node.config.min_alarm = false;
-            node.config.max_alarm = false;
-            node.config.unit = "";
-        }
-    }
-}
-
-/**
  * Handles changes to custom status by updating node name and unit configuration.
  * @param node - The editable node to update.
  * @param nodeState - Previous editing state to store/restore values.
@@ -148,32 +108,40 @@ export function customNodeChange(node: EditableNodeRecord, nodeState: NodeRecord
 }
 
 /**
- * Handles changes to calculated/virtual status by updating communication ID and protocol settings.
- * @param node - The editable node to update.
- * @param nodeState - Previous editing state to store/restore communication ID.
- * @param selectedProtocol - The protocol to set when switching from calculated to physical node.
+ * Handles protocol changes when toggling a node between virtual (calculated)
+ * and physical modes. When a node becomes virtual, its current protocol
+ * options are saved and the protocol is forced to Protocol.NONE. When switching
+ * back to a physical node, the previously selected protocol is restored externally.
+ *
+ * @function virtualNodeChange
+ * @param {EditableNodeRecord} node - The editable node being modified.
+ * @param {NodeRecordEditingState} nodeState - Holds backup state used to restore previous settings.
+ * @param {Protocol} selectedProtocol - The protocol originally chosen for the node (used when reverting from virtual).
+ * @returns {void}
  */
 export function virtualNodeChange(node: EditableNodeRecord, nodeState: NodeRecordEditingState, selectedProtocol: Protocol): void {
-    if (node.config.calculated && node.communication_id !== undefined) {
-        nodeState.oldCommunicationID = node.communication_id;
-        node.communication_id = "";
+    if (node.config.calculated) {
+        nodeState.oldProtocolOptions = { ...node.protocol_options };
         node.protocol = Protocol.NONE;
-    } else if (!node.config.calculated && !node.communication_id) {
-        node.communication_id = nodeState.oldCommunicationID ? nodeState.oldCommunicationID : "";
+    } else {
         node.protocol = selectedProtocol;
     }
 }
 
 /**
- * Changes a node's protocol and updates its communication ID to protocol defaults.
- * @param protocol - The new protocol to assign to the node.
- * @param node - The editable node to update.
+ * Updates a node's protocol and resets its protocol-specific configuration
+ * to the default options defined by the corresponding protocol plugin.
+ * Used when a user selects a new communication protocol from the UI.
+ *
+ * @function changeNodeProtocol
+ * @param {Protocol} protocol - The newly selected protocol.
+ * @param {EditableNodeRecord} node - The node whose protocol and options are being updated.
+ * @returns {void}
  */
 export function changeNodeProtocol(protocol: Protocol, node: EditableNodeRecord): void {
     let plugin = get(protocolPlugins)[protocol];
-    plugin.setCommIDToDefault(node);
     node.protocol = protocol;
-    node.communication_id = getCommunicationID(protocol, node.config, true);
+    node.protocol_options = { ...plugin.defaultNodeProtocolOptions };
 }
 
 /**

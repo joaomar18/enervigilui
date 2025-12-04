@@ -1,6 +1,5 @@
 import { NodeType, NodePhase, CounterMode } from "./base";
 import { Protocol } from "../device/base";
-import type Counter from "../../../components/Devices/Nodes/RealTimeDisplay/Counter.svelte";
 
 /*****     C O N S T A N T S     *****/
 
@@ -10,16 +9,6 @@ export const LOGGING_PERIOD_LIM: Record<string, number> = { MIN: 1, MAX: 1440 };
 /*****     E N U M S     *****/
 
 /*****     I N T E R F A C E S     *****/
-
-/**
- * Configuration for nodes without communication protocol.
- * Used for virtual or calculated nodes that don't require external communication.
- *
- * @interface
- */
-export interface NodeNoProtocolConfig {
-    // No protocol-specific properties
-}
 
 /**
  * Base configuration shared by all node types regardless of protocol.
@@ -39,7 +28,6 @@ export interface NodeNoProtocolConfig {
  * @property {boolean} min_alarm - Whether minimum threshold alarm is enabled
  * @property {number | null} min_alarm_value - Value that triggers minimum threshold alarm (can be null when alarm is disabled)
  * @property {boolean} publish - Whether the node's value should be published to external systems or services
- * @property {NodeType} type - Data type of the node value
  * @property {string | null} unit - Measurement unit (e.g., V, A, kW, null for non numeric types)
  */
 export interface BaseNodeConfig {
@@ -56,7 +44,6 @@ export interface BaseNodeConfig {
     min_alarm: boolean;
     min_alarm_value: number | null;
     publish: boolean;
-    type: NodeType;
     unit: string | null;
 }
 
@@ -78,8 +65,45 @@ export interface EditableBaseNodeConfig {
     min_alarm: boolean;
     min_alarm_value: string;
     publish: boolean;
-    type: NodeType;
     unit: string;
+}
+
+/**
+ * Base interface for all protocol-specific node configuration options.
+ * Serves as a shared parent type that protocol option interfaces extend.
+ *
+ * @interface
+ */
+export interface BaseNodeProtocolOptions {}
+
+/**
+ * Base interface for editable protocol-specific node configuration options.
+ * Used as a shared parent type for UI-side editable protocol option interfaces.
+ *
+ * @interface
+ */
+export interface EditableBaseNodeProtocolOptions {}
+
+/**
+ * Represents a minimal node definition used when no protocol-specific
+ * configuration is needed. Specifies only the internal data type of the node.
+ *
+ * @interface
+ * @property {NodeType} type - Internal variable type (e.g., INT, BOOL, FLOAT, STRING).
+ */
+export interface NodeNoProtocolOptions {
+    type: NodeType;
+}
+
+/**
+ * Editable version of a minimal node definition used when no protocol-specific
+ * configuration is required. Contains only the editable internal data type field.
+ *
+ * @interface
+ * @property {NodeType} type - Internal variable type selected by the user (e.g., INT, BOOL, FLOAT, STRING).
+ */
+export interface EditableNodeNoProtocolOptions {
+    type: NodeType;
 }
 
 /**
@@ -95,92 +119,95 @@ export interface NodeAttributes {
 
 /**
  * Represents a complete node in a device's configuration as stored or sent to the backend.
- * Contains all information needed to identify, configure, and communicate with a node,
- * including protocol, configuration, and additional attributes such as phase.
+ * Contains all information required to identify, configure, and communicate with a node,
+ * including protocol, configuration, protocol-specific options, and additional attributes.
  *
  * @interface
- * @property {number | undefined} device_id - Unique identifier for the device this node belongs to. May be undefined for new nodes before assignment.
- * @property {string} name - Name of the node, typically includes phase prefix.
- * @property {Protocol} protocol - Communication protocol used by this node.
- * @property {BaseNodeConfig} config - Node configuration with protocol-specific options.
- * @property {DeviceNodeAttributes} attributes - Additional metadata for the node, such as phase.
+ * @property {number | undefined} device_id - Unique identifier of the device this node belongs to. Undefined for new nodes not yet saved.
+ * @property {string} name - Full name of the node, typically including phase or grouping prefixes.
+ * @property {Protocol} protocol - Communication protocol associated with this node.
+ * @property {BaseNodeConfig} config - Base node configuration shared across protocols.
+ * @property {BaseNodeProtocolOptions} protocol_options - Protocol-specific configuration options.
+ * @property {NodeAttributes} attributes - Additional metadata for the node, such as phase or visibility flags.
  */
 export interface NodeRecord {
     device_id?: number;
     name: string;
     protocol: Protocol;
     config: BaseNodeConfig;
+    protocol_options: BaseNodeProtocolOptions;
     attributes: NodeAttributes;
 }
 
 /**
- * Editable version of the device node for UI forms and user input.
- * Used to represent device node data with editable fields for user input and validation in the UI,
- * including display name, communication ID, and validation state.
+ * Editable version of a device node used in UI forms for user input and validation.
+ * Represents node data with editable fields, user-friendly naming, validation state,
+ * and protocol-specific editable configuration.
  *
  * @interface
- * @property {number | undefined} device_id - Unique identifier for the device this node belongs to. May be undefined for new nodes before assignment.
- * @property {string} name - Full node name, typically includes phase prefix.
- * @property {Protocol} protocol - Communication protocol used by this node.
- * @property {EditableBaseNodeConfig} config - Editable configuration for user input and validation.
- * @property {DeviceNodeAttributes} attributes - Additional metadata for the node, such as phase.
- * @property {string} display_name - Display name of the node (without prefix).
- * @property {string} communication_id - Protocol-specific communication identifier (e.g., register or node_id).
- * @property {NodeValidation} validation - Validation state for all editable properties of the node.
+ * @property {number | undefined} device_id - Unique identifier of the device this node belongs to. Undefined for new nodes not yet saved.
+ * @property {string} name - Full internal node name, typically including phase or grouping prefixes.
+ * @property {Protocol} protocol - Communication protocol chosen for this node.
+ * @property {EditableBaseNodeConfig} config - Editable node configuration used for UI input and validation.
+ * @property {EditableBaseNodeProtocolOptions} protocol_options - Editable protocol-specific configuration options.
+ * @property {NodeAttributes} attributes - Additional metadata for the node, such as phase or visibility flags.
+ * @property {string} display_name - User-friendly display name of the node.
+ * @property {NodeValidation} validation - Validation state of all editable fields for this node.
  */
 export interface EditableNodeRecord {
     device_id?: number;
     name: string;
     protocol: Protocol;
     config: EditableBaseNodeConfig;
+    protocol_options: BaseNodeProtocolOptions;
     attributes: NodeAttributes;
     display_name: string;
-    communication_id: string;
     validation: NodeValidation;
 }
 
 /**
  * Represents the previous state of a node's editable properties during configuration changes.
- * Used to track and restore values when editing node type, name, unit, section, or communication ID.
+ * Used to restore values when modifying name, unit, or protocol-specific options.
  *
- * @property {string} oldVariableName - The previous variable name of the node being edited
- * @property {NodeType} oldVariableType - The previous variable type of the node being edited
- * @property {string} oldVariableUnit - The previous unit value before
- * @property {string | undefined} oldCommunicationID - The previous communication ID before the edit
+ * @interface
+ * @property {string} oldVariableName - The node's previous variable name.
+ * @property {string} oldVariableUnit - The node's previous unit value.
+ * @property {EditableBaseNodeProtocolOptions | undefined} oldProtocolOptions - Previously applied protocol-specific options, if any.
  */
 export interface NodeRecordEditingState {
     oldVariableName: string;
-    oldVariableType: NodeType;
     oldVariableUnit: string;
-    oldCommunicationID: string | undefined;
+    oldProtocolOptions: EditableBaseNodeProtocolOptions | undefined;
 }
 
 /**
  * Represents the validation state for all editable properties of a node.
- * Each boolean property indicates whether the corresponding node field passes validation.
- * Used to provide real-time feedback in the UI and prevent invalid configurations from being saved.
+ * Each boolean flag indicates whether the corresponding field passes validation.
+ * Used by the UI to provide real-time feedback and to block saving invalid configurations.
  *
- * @interface
- * @property {boolean} variableName - True if the variable name is valid (follows naming rules, unique, etc.)
- * @property {boolean} variableType - True if the selected variable type is valid for the current variable
- * @property {boolean} variableUnit - True if the unit is valid for the selected variable and type
- * @property {boolean} decimalPlaces - True if the decimal places value is within valid range
- * @property {boolean} communicationID - True if the communication ID is valid for the selected protocol
- * @property {boolean} loggingPeriod - True if the logging period is within valid range
- * @property {boolean} minAlarm - True if the minimum alarm value is valid
- * @property {boolean} maxAlarm - True if the maximum alarm value is valid
- * @property {boolean} calculated - True if the calculated/virtual node configuration is valid
- * @property {boolean} isCounter - True if the incremental node configuration is valid
- * * @property {boolean} counterMode - True if the counter mode configuration is valid
- * @method isValid - Returns true if all validation checks pass (logical AND of all other properties)
+ * @interface NodeValidation
+ *
+ * @property {boolean} variableName - True if the node's display name is valid (syntax, uniqueness, etc.).
+ * @property {boolean} variableType - True if the selected internal variable type is valid for this node.
+ * @property {boolean} variableUnit - True if the selected measurement unit is valid for the node's type.
+ * @property {boolean} protocol - True if the selected communication protocol is valid for this node.
+ * @property {boolean} protocolOptions - True if the protocol-specific configuration options are valid.
+ * @property {boolean} decimalPlaces - True if the number of decimal places is within an acceptable range.
+ * @property {boolean} loggingPeriod - True if the logging interval is valid for the node.
+ * @property {boolean} minAlarm - True if the minimum alarm value (if enabled) is valid.
+ * @property {boolean} maxAlarm - True if the maximum alarm value (if enabled) is valid.
+ * @property {boolean} calculated - True if the configuration for a calculated/virtual node is valid.
+ * @property {boolean} isCounter - True if the node is correctly configured as a counter-type variable.
+ * @property {boolean} counterMode - True if the counter mode configuration (incremental, rollover, etc.) is valid.
+ *
+ * @method isValid - Returns true only if all validation flags are true.
  */
 export interface NodeValidation {
     variableName: boolean;
     variableType: boolean;
     variableUnit: boolean;
-    communicationID: boolean;
     protocol: boolean;
-    type: boolean;
+    protocolOptions: boolean;
     decimalPlaces: boolean;
     loggingPeriod: boolean;
     minAlarm: boolean;
@@ -209,7 +236,16 @@ export const defaultBaseNodeConfig: EditableBaseNodeConfig = {
     max_alarm_value: Number(0).toFixed(2),
     min_alarm: false,
     min_alarm_value: Number(0).toFixed(2),
-    type: NodeType.FLOAT,
     unit: "",
     publish: true,
+};
+
+/**
+ * Default editable configuration for nodes without protocol-specific options.
+ * Initializes the internal data type to FLOAT as a common starting value.
+ *
+ * @constant
+ */
+export const defaultNoProtocolNodeOptions: EditableNodeNoProtocolOptions = {
+    type: NodeType.FLOAT,
 };
