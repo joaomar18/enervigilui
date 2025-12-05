@@ -7,7 +7,7 @@ import { protocolTexts } from "$lib/stores/lang/energyMeterTexts";
 import { stringIsValidInteger, stringIsValidFloat } from "$lib/logic/util/generic";
 import { DECIMAL_PLACES_LIM, LOGGING_PERIOD_LIM } from "$lib/types/nodes/config";
 import { protocolPlugins } from "$lib/stores/device/protocol";
-import type { NodeRecord, EditableNodeRecord, NodeValidation } from "$lib/types/nodes/config";
+import type { NodeRecord, EditableNodeRecord, NodeValidation, EditableBaseNodeProtocolOptions } from "$lib/types/nodes/config";
 import { isEqual } from "$lib/logic/util/generic";
 
 /**
@@ -135,6 +135,36 @@ export function validateNodeProtocol(deviceProtocol: Protocol, protocol: Protoco
     } else {
         return protocol === Protocol.NONE;
     }
+}
+
+/**
+ * Validates the protocol-specific data type of a node.
+ *
+ * First checks basic protocol-level validation via the active protocol plugin.
+ * For default (non-custom) variables, also ensures that the node’s type is allowed
+ * for the variable according to `defaultVariables`. Custom variables may use any
+ * protocol-valid type.
+ *
+ * @param {EditableBaseNodeProtocolOptions} protocolOptions - Protocol-specific options containing the node’s type.
+ * @param {string} name - Variable name used to check default-variable type constraints.
+ * @param {Protocol} protocol - Protocol that defines how the type is interpreted.
+ * @param {boolean} custom - True if this is a user-defined variable.
+ * @returns {boolean} True if the type is valid for the node.
+ */
+export function validateNodeProtocolType(protocolOptions: EditableBaseNodeProtocolOptions, name: string, protocol: Protocol, custom: boolean): boolean {
+    let plugin = get(protocolPlugins)[protocol];
+    if (!plugin.validateNodeType(protocolOptions)) return false;
+    if (!custom) { // For default variables, check if the type is in the applicable types
+        const variables = get(defaultVariables);
+        const variable = Object.values(variables).find((v) => v.name === name);
+
+        if (variable && variable.applicableTypes) {
+            return variable.applicableTypes.includes(plugin.convertTypeToGeneric(protocolOptions));
+        }
+
+        return false;
+    }
+    return true;
 }
 
 /**
@@ -270,18 +300,18 @@ export function validateCounterMode(counter: boolean, mode: CounterMode | null):
  * @param nodesBySection - Nodes organized by phase for duplicate checking within each phase.
  */
 export function updateNodesValidation(
-    protocol: Protocol,
     nodes: Array<EditableNodeRecord>,
     nodesBySection: Record<NodePhase, Array<EditableNodeRecord>>
 ): void {
-    let plugin = get(protocolPlugins)[protocol];
     for (let node of nodes) {
+        let plugin = get(protocolPlugins)[node.protocol];
         let nodeInternalType = plugin.convertTypeToGeneric(node.protocol_options);
-
         node.validation.variableName = validateNodeName(node.display_name, node.config.custom, nodesBySection[node.attributes.phase]);
         node.validation.variableUnit = validateNodeUnit(node.display_name, nodeInternalType, node.config.unit, node.config.custom);
-        node.validation.protocol = validateNodeProtocol(protocol, node.protocol, node.config.calculated);
-        node.validation.protocolOptions = node.validation.decimalPlaces = validateDecimalPlaces(node.config.decimal_places, nodeInternalType);
+        node.validation.variableType = validateNodeProtocolType(node.protocol_options, node.display_name, node.protocol, node.config.custom);
+        node.validation.protocol = validateNodeProtocol(node.protocol, node.protocol, node.config.calculated);
+        node.validation.protocolOptions = plugin.validateNodeProtocolOptions(node.protocol_options);
+        node.validation.decimalPlaces = validateDecimalPlaces(node.config.decimal_places, nodeInternalType);
         node.validation.loggingPeriod = validateLoggingPeriod(node.config.logging_period, node.config.logging);
         node.validation.minAlarm = validateAlarm(node.config.min_alarm_value, node.config.min_alarm, nodeInternalType);
         node.validation.maxAlarm = validateAlarm(node.config.max_alarm_value, node.config.max_alarm, nodeInternalType);

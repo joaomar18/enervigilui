@@ -38,8 +38,11 @@ export const AddNodeButtonStyle = createStyleStore(AddNodeButtonStyleConfig);
 
 const NodeRowStyleConfig: ComponentStyles = {
     dark: {
+        leftStateNotValidBorder: "1px solid #e74c3c",
         backgroundColor: "rgba(255, 255, 255, 0.05)",
+        notValidBackgroundColor: "rgba(120, 40, 40, 0.14)",
         hoverColor: "rgba(255, 255, 255, 0.09)",
+        notValidHoverColor: "rgba(160, 50, 50, 0.20)",
         disabledBackgroundColor: "rgba(255, 255, 255, 0.22)",
         disabledHoverColor: "rgba(255, 255, 255, 0.28)",
         svgButtonsColor: "rgb(192, 192, 192)",
@@ -196,7 +199,7 @@ export const NodeConfigSheetInfoLabelStyle = createStyleStore(NodeConfigSheetInf
 const NodesGridStyleConfig: ComponentStyles = {
     dark: {
         width: "100%",
-        maxWidth: "2000px",
+        maxWidth: "1500px",
         height: "fit-content",
         borderRadius: "10px",
         backgroundColor: "#252b33",

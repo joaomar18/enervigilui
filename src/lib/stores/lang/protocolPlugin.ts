@@ -32,4 +32,24 @@ const textsObjectsPlugin: TextsObject = {
     },
 };
 
+const textsObjectsNoProtocolNodeType: TextsObject = {
+    FLOAT: {
+        PT: "FLOAT",
+        EN: "FLOAT",
+    },
+    STRING: {
+        PT: "STRING",
+        EN: "STRING",
+    },
+    INT: {
+        PT: "INT",
+        EN: "INT",
+    },
+    BOOLEAN: {
+        PT: "BOOLEAN",
+        EN: "BOOLEAN",
+    },
+};
+
 export const pluginTexts = createLangStore(textsObjectsPlugin);
+export const noProtocolNodeTypeTexts = createLangStore(textsObjectsNoProtocolNodeType);

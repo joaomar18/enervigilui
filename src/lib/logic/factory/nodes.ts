@@ -2,7 +2,7 @@ import { get } from "svelte/store";
 import { MeterType } from "$lib/types/device/base";
 import { NodePhase, NodePrefix, nodePhaseSections, CounterMode } from "$lib/types/nodes/base";
 import { defaultVariables } from "$lib/stores/device/variables";
-import { addPrefix, removePrefix, getNodePrefix, isNumeric } from "../util/nodes";
+import { addPrefix, removePrefix, getNodePrefix, isNumeric, typeIsNumeric } from "../util/nodes";
 import { sortNodesLogically } from "../handlers/nodes";
 import { getInitialNodeValidation } from "../validation/nodes/base";
 import { stringIsValidInteger, stringIsValidFloat } from "$lib/logic/util/generic";
@@ -160,6 +160,7 @@ export function convertToEditableNodes(nodes: Array<NodeRecord>): Array<Editable
             device_id: node.device_id,
             protocol: node.protocol,
             display_name: removePrefix(node.name),
+            is_numeric: isNumeric(node),
             validation: getInitialNodeValidation(),
             config: editableConfig,
             protocol_options: editableProtocolOptions,
@@ -238,7 +239,6 @@ export function initNodes(initialNodes: Array<NodeRecord>): { sucess: boolean; e
  */
 function createDefaultEditableDeviceNode(variable: DefaultNodeInfo, phase: NodePhase, device_data: EditableDevice | NewDevice): EditableNodeRecord {
     const full_name = getNodePrefix(phase) + variable.name;
-    let plugin = get(protocolPlugins)[device_data.protocol];
 
     let editableConfig = getEditableBaseNodeConfigFromDefaultVar(variable);
     let editableProtocolOptions = { ...variable.defaultProtocolOptions[device_data.protocol] };
@@ -254,6 +254,7 @@ function createDefaultEditableDeviceNode(variable: DefaultNodeInfo, phase: NodeP
         protocol_options: editableProtocolOptions,
         attributes: attributes,
         display_name: variable.name,
+        is_numeric: variable.isNumeric,
         validation: getInitialNodeValidation(),
     };
 
@@ -316,6 +317,7 @@ export function addNode(sectionPhase: NodePhase, sectionPrefix: NodePrefix, devi
         protocol_options: newProtocolOptions,
         attributes: newAttributes,
         display_name: nodeBaseName,
+        is_numeric: typeIsNumeric(plugin.convertTypeToGeneric(newProtocolOptions)),
         validation: getInitialNodeValidation(),
     };
 

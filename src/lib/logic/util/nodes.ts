@@ -42,6 +42,15 @@ export function isNumeric(node: EditableNodeRecord | NodeRecord | ProcessedNodeS
 }
 
 /**
+ * Determines whether a node type represents a numeric value.
+ * @param nodeType - The node type to evaluate.
+ * @returns True if the type is FLOAT or INT, false otherwise.
+ */
+export function typeIsNumeric(nodeType: NodeType): boolean {
+    return nodeType === NodeType.FLOAT || nodeType === NodeType.INT;
+}
+
+/**
  * Checks if a node is custom (user-defined) rather than a default system variable.
  * @param node - The node to check (supports EditableNodeRecord, NodeRecord, or ProcessedNodeState).
  * @returns True if the node is custom, false if it's a default variable.

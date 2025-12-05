@@ -81,7 +81,49 @@ const textsObjectsStopbits: TextsObject = {
     },
 };
 
+//////////     T Y P E     T E X T S     //////////
+
+const textsObjectsModbusNodeType: TextsObject = {
+    BOOL: {
+        PT: "BOOLEAN",
+        EN: "BOOLEAN",
+    },
+    INT_16: {
+        PT: "INT_16",
+        EN: "INT_16",
+    },
+    UINT_16: {
+        PT: "UINT_16",
+        EN: "UINT_16",
+    },
+    INT_32: {
+        PT: "INT_32",
+        EN: "INT_32",
+    },
+    UINT_32: {
+        PT: "UINT_32",
+        EN: "UINT_32",
+    },
+    FLOAT_32: {
+        PT: "FLOAT_32",
+        EN: "FLOAT_32",
+    },
+    INT_64: {
+        PT: "INT_64",
+        EN: "INT_64",
+    },
+    UINT_64: {
+        PT: "UINT_64",
+        EN: "UINT_64",
+    },
+    FLOAT_64: {
+        PT: "FLOAT_64",
+        EN: "FLOAT_64",
+    },
+};
+
 export const baudrateTexts = createLangStore(textsObjectsBaudrates);
 export const parityTexts = createLangStore(textsObjectsParities);
 export const bytesizeTexts = createLangStore(textsObjectsBytesizes);
 export const stopbitsTexts = createLangStore(textsObjectsStopbits);
+export const modbusNodeTypeTexts = createLangStore(textsObjectsModbusNodeType);

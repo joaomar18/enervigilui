@@ -74,7 +74,7 @@ export interface EditableBaseNodeConfig {
  *
  * @interface
  */
-export interface BaseNodeProtocolOptions {}
+export interface BaseNodeProtocolOptions { }
 
 /**
  * Base interface for editable protocol-specific node configuration options.
@@ -82,7 +82,7 @@ export interface BaseNodeProtocolOptions {}
  *
  * @interface
  */
-export interface EditableBaseNodeProtocolOptions {}
+export interface EditableBaseNodeProtocolOptions { }
 
 /**
  * Represents a minimal node definition used when no protocol-specific
@@ -152,6 +152,7 @@ export interface NodeRecord {
  * @property {EditableBaseNodeProtocolOptions} protocol_options - Editable protocol-specific configuration options.
  * @property {NodeAttributes} attributes - Additional metadata for the node, such as phase or visibility flags.
  * @property {string} display_name - User-friendly display name of the node.
+ * @property {string} is_numeric - If node is of numeric type.
  * @property {NodeValidation} validation - Validation state of all editable fields for this node.
  */
 export interface EditableNodeRecord {
@@ -159,9 +160,10 @@ export interface EditableNodeRecord {
     name: string;
     protocol: Protocol;
     config: EditableBaseNodeConfig;
-    protocol_options: BaseNodeProtocolOptions;
+    protocol_options: EditableBaseNodeProtocolOptions;
     attributes: NodeAttributes;
     display_name: string;
+    is_numeric: boolean;
     validation: NodeValidation;
 }
 

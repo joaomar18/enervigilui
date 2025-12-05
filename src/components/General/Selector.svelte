@@ -88,6 +88,8 @@
     $: {
         if (scrollable && optionsLength > maxOptions) {
             optionsHeight = String(parseFloat(String(mergedStyle.height)) * maxOptions) + "px";
+        } else {
+            optionsHeight = "fit-content";
         }
     }
     $: {

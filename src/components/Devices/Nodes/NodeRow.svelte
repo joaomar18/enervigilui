@@ -1,11 +1,11 @@
 <script lang="ts">
+    import type { Readable } from "svelte/store";
     import Selector from "../../General/Selector.svelte";
     import InputField from "../../General/InputField.svelte";
     import Checkbox from "../../General/Checkbox.svelte";
     import Button from "../../General/Button.svelte";
     import ExpandableButton from "../../General/ExpandableButton.svelte";
     import { nodeNameChange, customNodeChange, virtualNodeChange } from "$lib/logic/handlers/nodes";
-    import { NodeType } from "$lib/types/nodes/base";
     import { LOGGING_PERIOD_LIM } from "$lib/types/nodes/config";
     import { defaultVariableUnits } from "$lib/stores/device/variables";
     import { showToast } from "$lib/logic/view/toast";
@@ -25,6 +25,7 @@
     import { NodeRowStyle } from "$lib/style/nodes";
     import { SubPrimaryButtonStyle, SubDangerButtonStyle } from "$lib/style/button";
     import { NodeInputFieldStyle, NodeSelectorStyle } from "$lib/style/nodes";
+    import { protocolPlugins, type ProtocolPlugin } from "$lib/stores/device/protocol";
 
     // Style object (from theme)
     export let style: { [property: string]: string | number } | null = null;
@@ -38,15 +39,21 @@
     export let columnVisibility: ColumnVisibilityMap;
 
     // Layout / styling props
+    export let leftStateNotValidBorder: string | undefined = undefined;
     export let backgroundColor: string | undefined = undefined;
+    export let notValidBackgroundColor: string | undefined = undefined;
     export let hoverColor: string | undefined = undefined;
+    export let notValidHoverColor: string | undefined = undefined;
     export let disabledBackgroundColor: string | undefined = undefined;
     export let disabledHoverColor: string | undefined = undefined;
     export let svgButtonsColor: string | undefined = undefined;
 
     $: localOverrides = {
+        leftStateNotValidBorder,
         backgroundColor,
+        notValidBackgroundColor,
         hoverColor,
+        notValidHoverColor,
         disabledBackgroundColor,
         disabledHoverColor,
         svgButtonsColor,
@@ -58,14 +65,22 @@
     // Variables
     let nodeEditingState: NodeRecordEditingState = {
         oldVariableName: node.display_name,
-        oldProtocolOptions: { ...node.protocol_options },
         oldVariableUnit: node.config.unit,
+        oldProtocolOptions: undefined,
     };
 
     let rowHeight: string;
     let buttonSize: string;
     let buttonSvgSize: string;
     let closeExpandableButton: boolean = false;
+    let protocolPlugin: ProtocolPlugin;
+    let nodeTypeTexts: Readable<Record<string, string>>;
+    let protocolType: string;
+
+    // Reactive Statements
+    $: protocolPlugin = $protocolPlugins[node.protocol];
+    $: nodeTypeTexts = protocolPlugin.nodeTypeTexts;
+    $: protocolType = protocolPlugin.getProtocolType(node.protocol_options);
 
     // Export Funcions
     export let onPropertyChanged: () => void;
@@ -97,13 +112,17 @@ name, unit, communication ID, type, alarms, and options. Includes checkboxes for
 properties and action buttons for configuration and deletion. -->
 <tr
     style="
+        --left-state-not-valid-border: {mergedStyle.leftStateNotValidBorder};
         --background-color: {mergedStyle.backgroundColor};
+        --not-valid-background-color: {mergedStyle.notValidBackgroundColor};
         --hover-color: {mergedStyle.hoverColor};
+        --not-valid-hover-color: {mergedStyle.notValidHoverColor};
         --disabled-background-color: {mergedStyle.disabledBackgroundColor};
         --disabled-hover-color: {mergedStyle.disabledHoverColor};
         --svg-buttons-color: {mergedStyle.svgButtonsColor};
     "
     class="edit-node"
+    class:not-valid={!node.validation.isValid()}
     class:disabled={!node.config.enabled}
 >
     {#if columnVisibility.name.visible}
@@ -152,7 +171,7 @@ properties and action buttons for configuration and deletion. -->
                         onChange={() => {
                             onPropertyChanged();
                         }}
-                        disabled={node.config.type === NodeType.STRING || node.config.type === NodeType.BOOLEAN}
+                        disabled={!node.is_numeric}
                         inputInvalid={!node.validation.variableUnit}
                         enableInputInvalid={true}
                         scrollable={true}
@@ -166,13 +185,33 @@ properties and action buttons for configuration and deletion. -->
                         onChange={() => {
                             onPropertyChanged();
                         }}
-                        disabled={node.config.type === NodeType.STRING || node.config.type === NodeType.BOOLEAN}
+                        disabled={!node.is_numeric}
                         inputInvalid={!node.validation.variableUnit}
                         enableInputInvalid={true}
                         inputType="STRING"
                         height={rowHeight}
                     />
                 {/if}
+            </div>
+        </td>
+    {/if}
+    {#if columnVisibility.type.visible}
+        <td>
+            <div class="cell-content">
+                <Selector
+                    style={$NodeSelectorStyle}
+                    options={$nodeTypeTexts}
+                    bind:selectedOption={protocolType}
+                    onChange={() => {
+                        onPropertyChanged();
+                        protocolPlugin.setProtocolType(node.protocol_options, protocolType);
+                    }}
+                    inputInvalid={!node.validation.variableType}
+                    enableInputInvalid={true}
+                    scrollable={true}
+                    height={rowHeight}
+                    optionHeight={rowHeight}
+                />
             </div>
         </td>
     {/if}
@@ -203,54 +242,16 @@ properties and action buttons for configuration and deletion. -->
             </div>
         </td>
     {/if}
-    {#if columnVisibility.min_alarm.visible}
-        <td>
-            <div class="cell-content">
-                <InputField
-                    style={$NodeInputFieldStyle}
-                    disabled={(node.config.type !== NodeType.FLOAT && node.config.type !== NodeType.INT) || !node.config.min_alarm}
-                    bind:inputValue={node.config.min_alarm_value}
-                    inputInvalid={!node.validation.type}
-                    enableInputInvalid={true}
-                    onChange={() => {
-                        onPropertyChanged();
-                    }}
-                    inputType={node.config.type === NodeType.FLOAT ? "FLOAT" : "INT"}
-                    inputUnit={node.config.unit}
-                    height={rowHeight}
-                />
-            </div>
-        </td>
-    {/if}
-    {#if columnVisibility.max_alarm.visible}
-        <td>
-            <div class="cell-content">
-                <InputField
-                    style={$NodeInputFieldStyle}
-                    disabled={(node.config.type !== NodeType.FLOAT && node.config.type !== NodeType.INT) || !node.config.max_alarm}
-                    bind:inputValue={node.config.max_alarm_value}
-                    inputInvalid={!node.validation.maxAlarm}
-                    enableInputInvalid={true}
-                    onChange={() => {
-                        onPropertyChanged();
-                    }}
-                    inputType={node.config.type === NodeType.FLOAT ? "FLOAT" : "INT"}
-                    inputUnit={node.config.unit}
-                    height={rowHeight}
-                />
-            </div>
-        </td>
-    {/if}
-    {#if columnVisibility.custom.visible}
+    {#if columnVisibility.logging.visible}
         <td>
             <div class="cell-content">
                 <Checkbox
-                    bind:checked={node.config.custom}
+                    bind:checked={node.config.logging}
                     onChange={() => {
-                        customNodeChange(node, nodeEditingState, node.attributes.phase);
                         onPropertyChanged();
                     }}
-                    inputName="custom-node"
+                    inputInvalid={!node.validation.loggingPeriod}
+                    inputName="log-node"
                     width={buttonSize}
                     height={buttonSize}
                 />
@@ -290,52 +291,16 @@ properties and action buttons for configuration and deletion. -->
             </div>
         </td>
     {/if}
-    {#if columnVisibility.logging.visible}
+    {#if columnVisibility.custom.visible}
         <td>
             <div class="cell-content">
                 <Checkbox
-                    bind:checked={node.config.logging}
+                    bind:checked={node.config.custom}
                     onChange={() => {
+                        customNodeChange(node, nodeEditingState, node.attributes.phase);
                         onPropertyChanged();
                     }}
-                    inputInvalid={!node.validation.loggingPeriod}
-                    inputName="log-node"
-                    width={buttonSize}
-                    height={buttonSize}
-                />
-            </div>
-        </td>
-    {/if}
-    {#if columnVisibility.enable_min_alarm.visible}
-        <td>
-            <div class="cell-content">
-                <Checkbox
-                    disabled={node.config.type === NodeType.STRING || node.config.type === NodeType.BOOLEAN}
-                    bind:checked={node.config.min_alarm}
-                    onChange={() => {
-                        onPropertyChanged();
-                    }}
-                    inputInvalid={!node.validation.minAlarm}
-                    enableInputInvalid={true}
-                    inputName="node-min-alarm"
-                    width={buttonSize}
-                    height={buttonSize}
-                />
-            </div>
-        </td>
-    {/if}
-    {#if columnVisibility.enable_max_alarm.visible}
-        <td>
-            <div class="cell-content">
-                <Checkbox
-                    disabled={node.config.type === NodeType.STRING || node.config.type === NodeType.BOOLEAN}
-                    bind:checked={node.config.max_alarm}
-                    onChange={() => {
-                        onPropertyChanged();
-                    }}
-                    inputInvalid={!node.validation.maxAlarm}
-                    enableInputInvalid={true}
-                    inputName="node-max-alarm"
+                    inputName="custom-node"
                     width={buttonSize}
                     height={buttonSize}
                 />
@@ -368,7 +333,7 @@ properties and action buttons for configuration and deletion. -->
                             /></svg
                         >
                     </button>
-                    <button class="btn-more-options" class:not-valid={!node.validation.isValid()} aria-label="More Options" on:click={handleOnConfig}>
+                    <button class="btn-more-options" aria-label="More Options" on:click={handleOnConfig}>
                         <svg xmlns="http://www.w3.org/2000/svg" height={buttonSvgSize} viewBox="0 -960 960 960" width={buttonSvgSize}
                             ><path
                                 d="m370-80-16-128q-13-5-24.5-12T307-235l-119 50L78-375l103-78q-1-7-1-13.5v-27q0-6.5 1-13.5L78-585l110-190 119 50q11-8 23-15t24-12l16-128h220l16 128q13 5 24.5 12t22.5 15l119-50 110 190-103 78q1 7 1 13.5v27q0 6.5-2 13.5l103 78-110 190-118-50q-11 8-23 15t-24 12L590-80H370Zm70-80h79l14-106q31-8 57.5-23.5T639-327l99 41 39-68-86-65q5-14 7-29.5t2-31.5q0-16-2-31.5t-7-29.5l86-65-39-68-99 42q-22-23-48.5-38.5T533-694l-13-106h-79l-14 106q-31 8-57.5 23.5T321-633l-99-41-39 68 86 64q-5 15-7 30t-2 32q0 16 2 31t7 30l-86 65 39 68 99-42q22 23 48.5 38.5T427-266l13 106Zm42-180q58 0 99-41t41-99q0-58-41-99t-99-41q-59 0-99.5 41T342-480q0 58 40.5 99t99.5 41Zm-2-140Z"
@@ -433,6 +398,17 @@ properties and action buttons for configuration and deletion. -->
         background-color: var(--disabled-hover-color);
     }
 
+    /* Left bar and subtle tint background color on the node row to alert that the configuration is not valid */
+    tr.edit-node.not-valid {
+        border-left: var(--left-state-not-valid-border);
+        background-color: var(--not-valid-background-color);
+    }
+
+    /* Hover color for not valid state */
+    tr.edit-node.not-valid:hover {
+        background-color: var(--not-valid-hover-color);
+    }
+
     /* Table cell styling for node fields */
     tr td {
         height: 40px;
@@ -485,16 +461,6 @@ properties and action buttons for configuration and deletion. -->
     /* More options button icon color on hover */
     .btn-more-options:hover svg {
         fill: #2f80ed;
-    }
-
-    /* Make more options button red if node is not valid */
-    .btn-more-options.not-valid svg {
-        fill: #e74c3c;
-    }
-
-    /* Hover color for more options button when node is not valid */
-    .btn-more-options.not-valid:hover svg {
-        fill: #c0392b;
     }
 
     /* Expandable button div for mobile users */

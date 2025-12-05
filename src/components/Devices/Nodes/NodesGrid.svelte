@@ -5,7 +5,6 @@
     import { addNode } from "$lib/logic/factory/nodes";
     import { deleteNodeFromArray } from "$lib/logic/handlers/nodes";
     import { nodePhaseSections } from "$lib/types/nodes/base";
-    import { protocolPlugins } from "$lib/stores/device/protocol";
 
     // Stores for variable definitions
     import { MeterType } from "$lib/types/device/base";
@@ -18,7 +17,6 @@
 
     // Texts
     import { texts } from "$lib/stores/lang/generalTexts";
-    import { pluginTexts } from "$lib/stores/lang/protocolPlugin";
 
     // Styles
     import { mergeStyle } from "$lib/style/components";
@@ -76,20 +74,15 @@
 
     let columnVisibility: ColumnVisibilityMap = {
         name: { hideWidth: undefined, visible: true },
-        unit: { hideWidth: 540, visible: true },
-        type: { hideWidth: 975, visible: true },
-        communicationID: { hideWidth: 715, visible: true },
-        custom: { hideWidth: 800, visible: true },
-        publish: { hideWidth: 1230, visible: true },
-        virtual: { hideWidth: 1060, visible: true },
-        logging: { hideWidth: 1145, visible: true },
-        logging_period: { hideWidth: 1405, visible: true },
-        enable_min_alarm: { hideWidth: 1490, visible: true },
-        enable_max_alarm: { hideWidth: 1575, visible: true },
-        min_alarm: { hideWidth: 1750, visible: true },
-        max_alarm: { hideWidth: 1925, visible: true },
-        enable: { hideWidth: 455, visible: true },
         actions: { hideWidth: undefined, visible: true },
+        enable: { hideWidth: 455, visible: true },
+        unit: { hideWidth: 540, visible: true },
+        custom: { hideWidth: 625, visible: true },
+        virtual: { hideWidth: 710, visible: true },
+        type: { hideWidth: 885, visible: true },
+        logging: { hideWidth: 970, visible: true },
+        publish: { hideWidth: 1055, visible: true },
+        logging_period: { hideWidth: 1230, visible: true },
     };
 
     // Reactive Statements
@@ -168,24 +161,14 @@ Includes multi-language headers and adapts layout to container size. -->
                     {#if columnVisibility.unit.visible}
                         <th class="min-width"><span>{$texts.unit}</span></th>
                     {/if}
-                    {#if columnVisibility.communicationID.visible}
-                        <th class="mid-width">
-                            <span>{$pluginTexts[$protocolPlugins[deviceData.protocol].textKey]}</span>
-                        </th>
-                    {/if}
                     {#if columnVisibility.type.visible}
                         <th class="mid-width"><span>{$texts.type}</span></th>
                     {/if}
                     {#if columnVisibility.logging_period.visible}
                         <th class="mid-width"><span>{$texts.loggingPeriod}</span></th>
                     {/if}
-                    {#if columnVisibility.min_alarm.visible}
-                        <th class="mid-width"><span>{$texts.minValue}</span></th>
-                    {/if}
-                    {#if columnVisibility.max_alarm.visible}
-                        <th class="mid-width"><span>{$texts.maxValue}</span></th>{/if}
-                    {#if columnVisibility.custom.visible}
-                        <th class="min-width"><span>{$texts.custom}</span></th>
+                    {#if columnVisibility.logging.visible}
+                        <th class="min-width"><span>{$texts.logging}</span></th>
                     {/if}
                     {#if columnVisibility.publish.visible}
                         <th class="min-width"><span>{$texts.publish}</span></th>
@@ -193,14 +176,8 @@ Includes multi-language headers and adapts layout to container size. -->
                     {#if columnVisibility.virtual.visible}
                         <th class="min-width"><span>{$texts.virtual}</span></th>
                     {/if}
-                    {#if columnVisibility.logging.visible}
-                        <th class="min-width"><span>{$texts.logging}</span></th>
-                    {/if}
-                    {#if columnVisibility.enable_min_alarm.visible}
-                        <th class="min-width"><span>{$texts.minAlarm}</span></th>
-                    {/if}
-                    {#if columnVisibility.enable_max_alarm.visible}
-                        <th class="min-width"><span>{$texts.maxAlarm}</span></th>
+                    {#if columnVisibility.custom.visible}
+                        <th class="min-width"><span>{$texts.custom}</span></th>
                     {/if}
                     {#if columnVisibility.enable.visible}
                         <th class="min-width"><span>{$texts.enabled}</span></th>
