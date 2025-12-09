@@ -116,7 +116,7 @@
             <div class="bottom-border"></div>
         </div>
     </button>
-    <ToolTip style={toolTipEffectiveStyle} {showToolTip} forceShowMobile={true}>
+    <ToolTip style={toolTipEffectiveStyle} {showToolTip} forceShowMobile={true} maxHeight={"auto"}>
         <ToolTipText style={toolTipTextEffectiveStyle} text={toolTipText} align="left" wrapText={true} />
     </ToolTip>
 </div>

@@ -556,10 +556,6 @@ const textsObject: TextsObject = {
         PT: "Esta variável é virtual e não possui registo de comunicação ou identificador associado.",
         EN: "This variable is virtual and does not have a communication register or identifier.",
     },
-    typeInfo: {
-        PT: "Selecione o tipo de dado da variável: FLOAT (número decimal), INT (número inteiro), STRING (texto) ou BOOLEAN (verdadeiro/falso).",
-        EN: "Select the variable data type: FLOAT (decimal number), INT (integer number), STRING (text), or BOOLEAN (true/false).",
-    },
     loggingInfo: {
         PT: "Defina o período de registo (em minutos) para guardar periodicamente os dados desta variável. Ative ou desative o registo utilizando a caixa de seleção.",
         EN: "Set the logging period (in minutes) to store this variable's data periodically. Enable or disable logging using the checkbox.",
@@ -955,6 +951,50 @@ const textsObject: TextsObject = {
     and: {
         PT: "e",
         EN: "and",
+    },
+    communication: {
+        PT: "Comunicação",
+        EN: "Communication",
+    },
+    internal: {
+        PT: "Interno",
+        EN: "Internal",
+    },
+    byteOrder: {
+        PT: "Ordem dos Bytes",
+        EN: "Byte Order",
+    },
+    functionCode: {
+        PT: "Função",
+        EN: "Function",
+    },
+    functionCodeInfo: {
+        PT:
+            "Define o tipo de operação Modbus utilizada para comunicar com o dispositivo, indicando que tipo de dados são lidos:\n\n" +
+            "• READ_OUT_COILS (01) — Lê bobinas (Coils). Utilizado para estados digitais de saída, tipicamente ON/OFF.\n" +
+            "• READ_IN_COILS (02) — Lê entradas discretas. Utilizado para estados digitais de entrada.\n" +
+            "• READ_HOLD_REGS (03) — Lê registos de retenção (Holding Registers). Utilizado para valores analógicos ou parâmetros configuráveis.\n" +
+            "• READ_IN_REGS (04) — Lê registos de entrada (Input Registers). Utilizado para valores analógicos apenas de leitura.",
+        EN:
+            "Defines the Modbus operation used to communicate with the device, indicating which type of data is read:\n\n" +
+            "• READ_OUT_COILS (01) — Reads Coils. Used for digital output states, typically ON/OFF values.\n" +
+            "• READ_IN_COILS (02) — Reads Discrete Inputs. Used for digital input states.\n" +
+            "• READ_HOLD_REGS (03) — Reads Holding Registers. Used for analog values or configurable parameters.\n" +
+            "• READ_IN_REGS (04) — Reads Input Registers. Used for read-only analog values.",
+    },
+    byteOrderInfo: {
+        PT:
+            "Define a ordem dos bytes e das palavras (16 bits) utilizada para interpretar valores com mais de um registo Modbus:\n\n" +
+            "• BIG_ENDIAN — Ordem padrão Modbus. Os bytes e palavras são interpretados na ordem original.\n" +
+            "• WORD_SWAP — As palavras de 16 bits são trocadas entre si, mantendo a ordem dos bytes dentro de cada palavra.\n" +
+            "• BYTE_SWAP — Os bytes dentro de cada palavra de 16 bits são trocados, mantendo a ordem das palavras.\n" +
+            "• WORD_BYTE_SWAP — Troca simultaneamente a ordem das palavras de 16 bits e a ordem dos bytes dentro de cada palavra.",
+        EN:
+            "Defines the byte and word (16-bit) order used to interpret values spanning multiple Modbus registers:\n\n" +
+            "• BIG_ENDIAN — Standard Modbus order. Bytes and words are interpreted in their original order.\n" +
+            "• WORD_SWAP — The 16-bit words are swapped, while the byte order within each word is preserved.\n" +
+            "• BYTE_SWAP — The bytes within each 16-bit word are swapped, while the word order is preserved.\n" +
+            "• WORD_BYTE_SWAP — Both the 16-bit word order and the byte order within each word are swapped.",
     },
 };
 

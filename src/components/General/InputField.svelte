@@ -19,6 +19,7 @@
     export let placeHolderText: string = "";
     export let zeroPaddingDigits: number = 0;
     export let validateOnInput = false; // Validates Input on value change
+    export let disableAnimations = false;
 
     // Style object (from theme)
     export let style: { [property: string]: string | number } | null = null;
@@ -103,7 +104,6 @@
     // Functions
     function handleInput(event: Event): void {
         let input = (event.target as HTMLInputElement).value;
-
         if (inputType === "INT") {
             // Allow only integers
             input = input.replace(/[^0-9-]/g, ""); // Allow negative integers
@@ -112,6 +112,7 @@
         } else if (inputType === "POSITIVE_INT") {
             // Allow only positive integers
             input = input.replace(/[^0-9]/g, "");
+            console.log(input);
             input = String(Number(input));
             input = input.padStart(zeroPaddingDigits, "0");
         } else if (inputType === "FLOAT") {
@@ -143,6 +144,8 @@
         if (validateOnInput) {
             validateBounds();
         }
+
+        inputEl.value = inputValue; // Change input display value on firefox based browsers.
     }
 
     function validateBounds(): void {
@@ -233,7 +236,7 @@ Applies special styling when focused.
     "
     class="container"
 >
-    <div class="content">
+    <div class="content" class:enable-anim={!disableAnimations}>
         {#if infoText}
             <span class="info-text">
                 {infoText}
@@ -395,6 +398,10 @@ Applies special styling when focused.
         border-radius: var(--border-radius);
         background-color: var(--background-color);
         border: 1px solid var(--border-color);
+    }
+
+    /* Enable visual animations on input elements */
+    .content.enable-anim input {
         transition:
             background-color 0.2s,
             border 0.2s;

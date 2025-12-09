@@ -170,11 +170,11 @@ Includes multi-language headers and adapts layout to container size. -->
                     {#if columnVisibility.logging.visible}
                         <th class="min-width"><span>{$texts.logging}</span></th>
                     {/if}
-                    {#if columnVisibility.publish.visible}
-                        <th class="min-width"><span>{$texts.publish}</span></th>
-                    {/if}
                     {#if columnVisibility.virtual.visible}
                         <th class="min-width"><span>{$texts.virtual}</span></th>
+                    {/if}
+                    {#if columnVisibility.publish.visible}
+                        <th class="min-width"><span>{$texts.publish}</span></th>
                     {/if}
                     {#if columnVisibility.custom.visible}
                         <th class="min-width"><span>{$texts.custom}</span></th>

@@ -122,8 +122,52 @@ const textsObjectsModbusNodeType: TextsObject = {
     },
 };
 
+//////////     F U N C T I O N     T E X T S     //////////
+
+const textsObjectsModbusNodeFunction: TextsObject = {
+    READ_COILS: {
+        PT: "READ_OUT_COILS (01)",
+        EN: "READ_OUT_COILS (01)",
+    },
+    READ_DISCRETE_INPUTS: {
+        PT: "READ_IN_COILS (02)",
+        EN: "READ_IN_COILS (02)",
+    },
+    READ_HOLDING_REGISTERS: {
+        PT: "READ_HOLD_REGS (03)",
+        EN: "READ_HOLD_REGS (03)",
+    },
+    READ_INPUT_REGISTERS: {
+        PT: "READ_IN_REGS (04)",
+        EN: "READ_IN_REGS (04)",
+    },
+};
+
+//////////     E N D I A N     M O D E     T E X T S     //////////
+
+const textsObjectsModbusNodeEndianMode: TextsObject = {
+    BIG_ENDIAN: {
+        PT: "BIG_ENDIAN",
+        EN: "BIG_ENDIAN",
+    },
+    WORD_SWAP: {
+        PT: "WORD_SWAP",
+        EN: "WORD_SWAP",
+    },
+    BYTE_SWAP: {
+        PT: "BYTE_SWAP",
+        EN: "BYTE_SWAP",
+    },
+    WORD_BYTE_SWAP: {
+        PT: "WORD_BYTE_SWAP",
+        EN: "WORD_BYTE_SWAP",
+    },
+};
+
 export const baudrateTexts = createLangStore(textsObjectsBaudrates);
 export const parityTexts = createLangStore(textsObjectsParities);
 export const bytesizeTexts = createLangStore(textsObjectsBytesizes);
 export const stopbitsTexts = createLangStore(textsObjectsStopbits);
 export const modbusNodeTypeTexts = createLangStore(textsObjectsModbusNodeType);
+export const modbusNodeFunctionTexts = createLangStore(textsObjectsModbusNodeFunction);
+export const modbusNodeEndianModeTexts = createLangStore(textsObjectsModbusNodeEndianMode);

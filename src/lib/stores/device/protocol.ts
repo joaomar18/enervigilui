@@ -17,8 +17,8 @@ import { defaultOPCUAOptions } from "$lib/types/device/opcUa";
 import { defaultNoProtocolNodeOptions } from "$lib/types/nodes/config";
 import ModbusRtuConfig from "../../../components/Devices/ModbusRTUConfig.svelte";
 import OpcuaConfig from "../../../components/Devices/OPCUAConfig.svelte";
-import ModbusRtuNodeConfig from "../../../components/Devices/Nodes/Protocol/ModbusRtuNodeConfig.svelte";
-import OPCUANodeConfig from "../../../components/Devices/Nodes/Protocol/OPCUANodeConfig.svelte";
+import ModbusRtuNodeCommConfig from "../../../components/Devices/Nodes/Protocol/ModbusRtu/ModbusRtuNodeCommConfig.svelte";
+import OPCUANodeCommConfig from "../../../components/Devices/Nodes/Protocol/OpcUa/OpcUaNodeCommConfig.svelte";
 import { NodeType } from "$lib/types/nodes/base";
 import type {
     BaseNodeProtocolOptions,
@@ -34,13 +34,15 @@ import { opcUaNodeTypeTexts } from "../lang/opcUaTexts";
 
 export interface ProtocolPlugin {
     textKey: string;
+    typeTextKey: string;
+    infoTypeTextKey: string;
     shortTextKey: string;
     infoTextKey: string;
     nodeTypeTexts: Readable<Record<string, string>>;
     defaultOptions: EditableBaseCommunicationConfig;
     defaultNodeProtocolOptions: EditableBaseNodeProtocolOptions;
     ConfigComponent: typeof SvelteComponent<any> | null;
-    NodeConfigComponent: typeof SvelteComponent<any> | null;
+    NodeCommConfigComponent: typeof SvelteComponent<any> | null;
     isNumeric: (nodeProtocolOptions: BaseNodeProtocolOptions | EditableBaseNodeProtocolOptions) => boolean;
     convertTypeToGeneric: (nodeProtocolOptions: BaseNodeProtocolOptions | EditableBaseNodeProtocolOptions) => NodeType;
     setProtocolType: (nodeProtocolOptions: EditableBaseNodeProtocolOptions, type: string) => void;
@@ -57,13 +59,15 @@ export interface ProtocolPlugin {
 
 const noProtocolPlugin: ProtocolPlugin = {
     textKey: "noProtocol",
-    shortTextKey: "address",
     infoTextKey: "noProtocolInfo",
+    typeTextKey: "noProtocolType",
+    infoTypeTextKey: "noProtocolTypeInfo",
+    shortTextKey: "address",
     nodeTypeTexts: noProtocolNodeTypeTexts,
     defaultOptions: { valid: false },
     defaultNodeProtocolOptions: defaultNoProtocolNodeOptions,
     ConfigComponent: null,
-    NodeConfigComponent: null,
+    NodeCommConfigComponent: null,
     isNumeric(nodeProtocolOptions) {
         let type = (nodeProtocolOptions as NodeNoProtocolOptions).type;
         return type === NodeType.FLOAT || type === NodeType.INT;
@@ -107,14 +111,16 @@ const noProtocolPlugin: ProtocolPlugin = {
 /*     M O D B U S     R T U     P L U G I N     */
 
 const modbusRtuPlugin: ProtocolPlugin = {
-    textKey: "modbusRegister",
+    textKey: "modbusAddress",
+    infoTextKey: "modbusAddressInfo",
+    typeTextKey: "modbusType",
+    infoTypeTextKey: "modbusTypeInfo",
     shortTextKey: "address",
-    infoTextKey: "registerInfo",
     nodeTypeTexts: modbusNodeTypeTexts,
     defaultOptions: defaultModbusRTUOptions,
     defaultNodeProtocolOptions: defaultModbusRTUNodeOptions,
     ConfigComponent: ModbusRtuConfig,
-    NodeConfigComponent: ModbusRtuNodeConfig,
+    NodeCommConfigComponent: ModbusRtuNodeCommConfig,
     isNumeric(nodeProtocolOptions) {
         let type = (nodeProtocolOptions as ModbusRTUNodeOptions).type;
         return (
@@ -225,13 +231,15 @@ const modbusRtuPlugin: ProtocolPlugin = {
 
 const opcUaPlugin: ProtocolPlugin = {
     textKey: "opcuaID",
+    infoTextKey: "opcuaIDInfo",
+    typeTextKey: "opcuaType",
+    infoTypeTextKey: "opcuaTypeInfo",
     shortTextKey: "opcuaID",
-    infoTextKey: "nodespaceInfo",
     nodeTypeTexts: opcUaNodeTypeTexts,
     defaultOptions: defaultOPCUAOptions,
     defaultNodeProtocolOptions: defaultOPCUANodeOptions,
     ConfigComponent: OpcuaConfig,
-    NodeConfigComponent: OPCUANodeConfig,
+    NodeCommConfigComponent: OPCUANodeCommConfig,
     isNumeric(nodeProtocolOptions) {
         let type = (nodeProtocolOptions as OPCUANodeOptions).type;
         return type === OPCUANodeType.INT || type === OPCUANodeType.FLOAT;
@@ -246,6 +254,7 @@ const opcUaPlugin: ProtocolPlugin = {
             case OPCUANodeType.FLOAT:
                 return NodeType.FLOAT;
             case OPCUANodeType.STRING:
+                return NodeType.STRING;
             default:
                 throw new Error(`Unsupported OPC UA Node Type ${type}`);
         }

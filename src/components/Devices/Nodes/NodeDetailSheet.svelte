@@ -5,7 +5,7 @@
     import ElapsedDateTime from "../../General/TimeDate/ElapsedDateTime.svelte";
     import TimePeriodPicker from "../../General/Pickers/TimePeriodPicker.svelte";
     import { LogSpanPeriod } from "$lib/types/view/nodes";
-    import { getNodePhaseSection, getCommunicationID } from "$lib/logic/util/nodes";
+    import { getNodePhaseSection } from "$lib/logic/util/nodes";
     import { getNodeAdditionalInfo, getNodeLogs } from "$lib/logic/api/nodes";
     import { getTimeSpanFromLogPeriod } from "$lib/logic/util/date";
     import { SlidingWindow } from "$lib/logic/util/classes/SlidingWindow";
@@ -521,18 +521,6 @@
                         <InlineLoader loaded={!nodeAddInfoLoading && nodeAdditionalInfo?.protocol !== undefined}>
                             <span class="value align-right">{$protocolTexts[nodeAdditionalInfo?.protocol] || $pluginTexts.noProtocol}</span>
                         </InlineLoader>
-                    </div>
-                    <div class="row">
-                        {#if nodeAdditionalInfo}
-                            <span class="label">{$pluginTexts[$protocolPlugins[nodeAdditionalInfo.protocol].shortTextKey]}</span>
-                            <InlineLoader loaded={!nodeAddInfoLoading && nodeAdditionalInfo?.protocol !== undefined}>
-                                {#if nodeAdditionalInfo}
-                                    <span class="value align-right"
-                                        >{getCommunicationID(nodeAdditionalInfo.protocol, nodeAdditionalInfo) || $texts.virtual}</span
-                                    >
-                                {/if}
-                            </InlineLoader>
-                        {/if}
                     </div>
                     <div class="row">
                         <span class="label">{$texts.interval}</span>

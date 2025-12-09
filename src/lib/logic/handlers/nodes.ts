@@ -1,6 +1,6 @@
 import { get } from "svelte/store";
 import { Protocol } from "$lib/types/device/base";
-import { NodeType, NodePhase } from "$lib/types/nodes/base";
+import { NodePhase } from "$lib/types/nodes/base";
 import {
     getNodePhasePriority,
     getNodePriority,
@@ -137,11 +137,11 @@ export function virtualNodeChange(node: EditableNodeRecord, nodeState: NodeRecor
         node.protocol = selectedProtocol;
         if (nodeState.oldProtocolOptions) {
             node.protocol_options = nodeState.oldProtocolOptions;
-        }
-        else {
+        } else {
             node.protocol_options = { ...plugin.defaultNodeProtocolOptions };
         }
     }
+    node.is_numeric = isNumeric(node);
 }
 
 /**
@@ -158,6 +158,7 @@ export function changeNodeProtocol(protocol: Protocol, node: EditableNodeRecord)
     let plugin = get(protocolPlugins)[protocol];
     node.protocol = protocol;
     node.protocol_options = { ...plugin.defaultNodeProtocolOptions };
+    node.is_numeric = isNumeric(node);
 }
 
 /**

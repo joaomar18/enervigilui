@@ -205,6 +205,7 @@ properties and action buttons for configuration and deletion. -->
                     onChange={() => {
                         onPropertyChanged();
                         protocolPlugin.setProtocolType(node.protocol_options, protocolType);
+                        node.is_numeric = protocolPlugin.isNumeric(node.protocol_options);
                     }}
                     inputInvalid={!node.validation.variableType}
                     enableInputInvalid={true}
@@ -258,21 +259,6 @@ properties and action buttons for configuration and deletion. -->
             </div>
         </td>
     {/if}
-    {#if columnVisibility.publish.visible}
-        <td>
-            <div class="cell-content">
-                <Checkbox
-                    bind:checked={node.config.publish}
-                    onChange={() => {
-                        onPropertyChanged();
-                    }}
-                    inputName="publish-node"
-                    width={buttonSize}
-                    height={buttonSize}
-                />
-            </div>
-        </td>
-    {/if}
     {#if columnVisibility.virtual.visible}
         <td>
             <div class="cell-content">
@@ -291,6 +277,22 @@ properties and action buttons for configuration and deletion. -->
             </div>
         </td>
     {/if}
+    {#if columnVisibility.publish.visible}
+        <td>
+            <div class="cell-content">
+                <Checkbox
+                    bind:checked={node.config.publish}
+                    onChange={() => {
+                        onPropertyChanged();
+                    }}
+                    inputName="publish-node"
+                    width={buttonSize}
+                    height={buttonSize}
+                />
+            </div>
+        </td>
+    {/if}
+
     {#if columnVisibility.custom.visible}
         <td>
             <div class="cell-content">

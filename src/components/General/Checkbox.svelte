@@ -9,6 +9,7 @@
     export let inputInvalid: boolean = false;
     export let enableInputInvalid: boolean = false;
     export let inputName: string = ""; //Name of the input
+    export let disableAnimations = false; // Disable animations for the checkbox
 
     // Style object (from theme)
     export let style: { [property: string]: string | number } | null = null;
@@ -80,6 +81,7 @@
         --disabled-checkmark-color: {mergedStyle.disabledCheckMarkColor};
     "
     class:disabled
+    class:enable-anim={!disableAnimations}
 >
     <input
         type="checkbox"
@@ -143,6 +145,10 @@
         display: flex;
         justify-content: center;
         align-items: center;
+    }
+
+    /* Enable visual animations for the custom checkbox */
+    .label-checkbox.enable-anim span {
         transition: all 0.2s;
     }
 

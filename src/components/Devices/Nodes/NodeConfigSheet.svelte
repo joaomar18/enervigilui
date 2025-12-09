@@ -13,10 +13,12 @@
     import { defaultVariableUnits } from "$lib/stores/device/variables";
     import type { EditableDevice, NewDevice } from "$lib/types/device/base";
     import type { EditableNodeRecord, NodeRecordEditingState } from "$lib/types/nodes/config";
+    import type { ProtocolPlugin } from "$lib/stores/device/protocol";
 
     // Texts
     import { texts } from "$lib/stores/lang/generalTexts";
     import { pluginTexts } from "$lib/stores/lang/protocolPlugin";
+    import { noProtocolNodeTypeTexts } from "$lib/stores/lang/protocolPlugin";
     import { counterModeTexts } from "$lib/stores/lang/energyMeterTexts";
     import { variableNameTextsByPhase } from "$lib/stores/lang/energyMeterTexts";
 
@@ -68,6 +70,9 @@
     export let contentRowHeight: string | undefined = undefined;
     export let contentRowGap: string | undefined = undefined;
     export let contentColGap: string | undefined = undefined;
+    export let contentLabelSize: string | undefined = undefined;
+    export let contentLabelColor: string | undefined = undefined;
+    export let contentLabelWeight: string | undefined = undefined;
     export let contentValueSize: string | undefined = undefined;
     export let contentValueColor: string | undefined = undefined;
     export let contentValueWeight: string | undefined = undefined;
@@ -103,6 +108,9 @@
         contentRowHeight,
         contentRowGap,
         contentColGap,
+        contentLabelSize,
+        contentLabelColor,
+        contentLabelWeight,
         contentValueSize,
         contentValueColor,
         contentValueWeight,
@@ -113,6 +121,25 @@
 
     // Export Functions
     export let onPropertyChanged: () => void;
+
+    // Constants
+    const noAnimDurationTime = 200;
+
+    // Variables
+    let protocolPlugin: ProtocolPlugin;
+    let protocolType: string;
+    let disableAnimations: boolean = false;
+
+    // Reactive Statements
+    $: if (node) protocolPlugin = $protocolPlugins[node.protocol];
+    $: if (node && protocolPlugin) protocolType = protocolPlugin.getProtocolType(node.protocol_options);
+    $: if (!showPanel) {
+        disableAnimations = true;
+    } else {
+        setTimeout(() => {
+            disableAnimations = false;
+        }, noAnimDurationTime);
+    }
 </script>
 
 <!-- NodeConfigSheet Component: renders a slide-in right panel for configuring an energy meter node.
@@ -151,6 +178,9 @@ incremental logic, virtual node settings, and enable/disable status. -->
             --content-row-height: {mergedStyle.contentRowHeight};
             --content-row-gap: {mergedStyle.contentRowGap};
             --content-col-gap: {mergedStyle.contentColGap};
+            --content-label-size: {mergedStyle.contentLabelSize};
+            --content-label-color: {mergedStyle.contentLabelColor};
+            --content-label-weight: {mergedStyle.contentLabelWeight};
             --content-value-size: {mergedStyle.contentValueSize};
             --content-value-color: {mergedStyle.contentValueColor};
             --content-value-weight: {mergedStyle.contentValueWeight};
@@ -192,6 +222,7 @@ incremental logic, virtual node settings, and enable/disable status. -->
                                 enableInputInvalid={true}
                                 inputType="STRING"
                                 width="100%"
+                                {disableAnimations}
                             />
                         {/if}</span
                     >
@@ -208,8 +239,168 @@ incremental logic, virtual node settings, and enable/disable status. -->
         </section>
 
         <main slot="content" class="content-div">
-            {#if node}
+            {#if node && protocolPlugin}
+                {#if protocolPlugin.NodeCommConfigComponent}
+                    <div class="section-title"><h3>{$texts.communication}</h3></div>
+                    <div class="inner-content-div">
+                        <svelte:component
+                            this={protocolPlugin.NodeCommConfigComponent}
+                            {node}
+                            {protocolPlugin}
+                            bind:commOptions={node.protocol_options}
+                            textKey={protocolPlugin.textKey}
+                            infoTextKey={protocolPlugin.infoTextKey}
+                            typeKey={protocolPlugin.typeTextKey}
+                            infoTypeKey={protocolPlugin.infoTypeTextKey}
+                            {disableAnimations}
+                            {onPropertyChanged}
+                        />
+                    </div>
+                {:else}
+                    <div class="section-title"><h3>{$texts.internal}</h3></div>
+                    <div class="inner-content-div">
+                        <div class="row col-align">
+                            <div class="label-wrapper extend-width">
+                                <InfoLabel
+                                    style={$NodeConfigSheetInfoLabelStyle}
+                                    labelText={$pluginTexts.noProtocolType}
+                                    toolTipText={$pluginTexts.noProtocolTypeInfo}
+                                />
+                            </div>
+                            <span class="value extend-width">
+                                <Selector
+                                    style={$NodeConfigSheetSelectorStyle}
+                                    options={$noProtocolNodeTypeTexts}
+                                    bind:selectedOption={protocolType}
+                                    onChange={() => {
+                                        onPropertyChanged();
+                                        protocolPlugin.setProtocolType(node.protocol_options, protocolType);
+                                        node.is_numeric = protocolPlugin.isNumeric(node.protocol_options);
+                                    }}
+                                    inputInvalid={!node.validation.variableType}
+                                    enableInputInvalid={true}
+                                    scrollable={true}
+                                />
+                            </span>
+                        </div>
+                    </div>
+                {/if}
+                {#if node.is_numeric}
+                    <div class="section-title"><h3>{$texts.alarms}</h3></div>
+                    <div class="inner-content-div">
+                        <div class="row col-align">
+                            <div class="label-wrapper extend-width">
+                                <InfoLabel style={$NodeConfigSheetInfoLabelStyle} labelText={$texts.minValue} toolTipText={$texts.minValueInfo} />
+                            </div>
+                            <span class="value extend-width">
+                                <InputField
+                                    style={$NodeConfigSheetInputFieldStyle}
+                                    disabled={!node.is_numeric || !node.config.min_alarm}
+                                    bind:inputValue={node.config.min_alarm_value}
+                                    inputInvalid={!node.validation.minAlarm}
+                                    enableInputInvalid={true}
+                                    onChange={() => {
+                                        onPropertyChanged();
+                                    }}
+                                    inputType={protocolPlugin.convertTypeToGeneric(node.protocol_options) === NodeType.FLOAT ? "FLOAT" : "INT"}
+                                    inputUnit={node.config.unit}
+                                    width="100%"
+                                    {disableAnimations}
+                                />
+                                <Checkbox
+                                    bind:checked={node.config.min_alarm}
+                                    inputInvalid={!node.validation.minAlarm}
+                                    enableInputInvalid={true}
+                                    onChange={() => {
+                                        onPropertyChanged();
+                                    }}
+                                    inputName="node-min-alarm"
+                                    width="38px"
+                                    height="38px"
+                                    {disableAnimations}
+                                />
+                            </span>
+                        </div>
+                        <div class="row col-align">
+                            <div class="label-wrapper extend-width">
+                                <InfoLabel style={$NodeConfigSheetInfoLabelStyle} labelText={$texts.maxValue} toolTipText={$texts.maxValueInfo} />
+                            </div>
+                            <span class="value extend-width">
+                                <InputField
+                                    style={$NodeConfigSheetInputFieldStyle}
+                                    disabled={!node.is_numeric || !node.config.max_alarm}
+                                    bind:inputValue={node.config.max_alarm_value}
+                                    inputInvalid={!node.validation.maxAlarm}
+                                    enableInputInvalid={true}
+                                    onChange={() => {
+                                        onPropertyChanged();
+                                    }}
+                                    inputType={protocolPlugin.convertTypeToGeneric(node.protocol_options) === NodeType.FLOAT ? "FLOAT" : "INT"}
+                                    inputUnit={node.config.unit}
+                                    width="100%"
+                                    {disableAnimations}
+                                />
+                                <Checkbox
+                                    bind:checked={node.config.max_alarm}
+                                    inputInvalid={!node.validation.maxAlarm}
+                                    enableInputInvalid={true}
+                                    onChange={() => {
+                                        onPropertyChanged();
+                                    }}
+                                    inputName="node-max-alarm"
+                                    width="38px"
+                                    height="38px"
+                                    {disableAnimations}
+                                />
+                            </span>
+                        </div>
+                    </div>
+                    <div class="section-title"><h3>{$texts.warnings}</h3></div>
+                    <div class="inner-content-div"></div>
+                {/if}
+                <div class="section-title"><h3>{$texts.configuration}</h3></div>
                 <div class="inner-content-div">
+                    <div class="row col-align">
+                        <div class="label-wrapper extend-width">
+                            <InfoLabel style={$NodeConfigSheetInfoLabelStyle} labelText={$texts.loggingPeriod} toolTipText={$texts.loggingInfo} />
+                        </div>
+                        <span class="value extend-width">
+                            <InputField
+                                style={$NodeConfigSheetInputFieldStyle}
+                                disabled={!node.config.logging}
+                                bind:inputValue={node.config.logging_period}
+                                onChange={() => {
+                                    onPropertyChanged();
+                                }}
+                                inputInvalid={!node.validation.loggingPeriod}
+                                enableInputInvalid={true}
+                                inputType="POSITIVE_INT"
+                                minValue={LOGGING_PERIOD_LIM.MIN}
+                                maxValue={LOGGING_PERIOD_LIM.MAX}
+                                limitsPassed={() => {
+                                    showToast("loggingPeriodError", AlertType.ALERT, {
+                                        minValue: LOGGING_PERIOD_LIM.MIN,
+                                        maxValue: LOGGING_PERIOD_LIM.MAX,
+                                    });
+                                }}
+                                inputUnit="min."
+                                width="100%"
+                                {disableAnimations}
+                            />
+                            <Checkbox
+                                bind:checked={node.config.logging}
+                                onChange={() => {
+                                    onPropertyChanged();
+                                }}
+                                inputInvalid={!node.validation.loggingPeriod}
+                                enableInputInvalid={true}
+                                inputName="log-node"
+                                width="38px"
+                                height="38px"
+                                {disableAnimations}
+                            />
+                        </span>
+                    </div>
                     <div class="row col-align">
                         <div class="label-wrapper extend-width">
                             <InfoLabel style={$NodeConfigSheetInfoLabelStyle} labelText={$texts.unit} toolTipText={$texts.unitInfo} />
@@ -223,7 +414,7 @@ incremental logic, virtual node settings, and enable/disable status. -->
                                     onChange={() => {
                                         onPropertyChanged();
                                     }}
-                                    disabled={node.config.type === NodeType.STRING || node.config.type === NodeType.BOOLEAN}
+                                    disabled={!node.is_numeric}
                                     inputInvalid={!node.validation.variableUnit}
                                     enableInputInvalid={true}
                                     scrollable={true}
@@ -236,16 +427,17 @@ incremental logic, virtual node settings, and enable/disable status. -->
                                     onChange={() => {
                                         onPropertyChanged();
                                     }}
-                                    disabled={node.config.type === NodeType.STRING || node.config.type === NodeType.BOOLEAN}
+                                    disabled={!node.is_numeric}
                                     inputInvalid={!node.validation.variableUnit}
                                     enableInputInvalid={true}
                                     inputType="STRING"
                                     width="100%"
+                                    {disableAnimations}
                                 />
                             {/if}
                         </span>
                     </div>
-                    {#if node.config.type === NodeType.FLOAT}
+                    {#if protocolPlugin.convertTypeToGeneric(node.protocol_options) === NodeType.FLOAT}
                         <div class="row col-align">
                             <div class="label-wrapper extend-width">
                                 <InfoLabel
@@ -273,193 +465,11 @@ incremental logic, virtual node settings, and enable/disable status. -->
                                         });
                                     }}
                                     width="100%"
+                                    {disableAnimations}
                                 />
                             </span>
                         </div>
                     {/if}
-                    <div class="row col-align">
-                        <div class="label-wrapper extend-width">
-                            <InfoLabel
-                                style={$NodeConfigSheetInfoLabelStyle}
-                                labelText={$pluginTexts[$protocolPlugins[deviceData.protocol].textKey]}
-                                toolTipText={$pluginTexts[$protocolPlugins[deviceData.protocol].infoTextKey]}
-                            />
-                        </div>
-                        <span class="value extend-width">
-                            <InputField
-                                style={$NodeConfigSheetInputFieldStyle}
-                                disabled={node.config.calculated}
-                                bind:inputValue={node.communication_id}
-                                onChange={() => {
-                                    communicationIDChange(node);
-                                    onPropertyChanged();
-                                }}
-                                inputInvalid={!node.validation.communicationID}
-                                enableInputInvalid={true}
-                                inputType="STRING"
-                                width="100%"
-                            />
-                        </span>
-                    </div>
-                    <div class="row col-align">
-                        <div class="label-wrapper extend-width">
-                            <InfoLabel style={$NodeConfigSheetInfoLabelStyle} labelText={$texts.type} toolTipText={$texts.typeInfo} />
-                        </div>
-                        <span class="value extend-width">
-                            <Selector
-                                style={$NodeConfigSheetSelectorStyle}
-                                options={Object.fromEntries(Object.entries(NodeType).map(([key, value]) => [value, value]))}
-                                bind:selectedOption={node.config.type}
-                                onChange={() => {
-                                    nodeTypeChange(node, nodeEditingState);
-                                    onPropertyChanged();
-                                }}
-                                inputInvalid={!node.validation.variableType}
-                                enableInputInvalid={true}
-                                scrollable={true}
-                                width="100%"
-                            />
-                        </span>
-                    </div>
-
-                    <div class="row col-align">
-                        <div class="label-wrapper extend-width">
-                            <InfoLabel style={$NodeConfigSheetInfoLabelStyle} labelText={$texts.loggingPeriod} toolTipText={$texts.loggingInfo} />
-                        </div>
-                        <span class="value extend-width">
-                            <InputField
-                                style={$NodeConfigSheetInputFieldStyle}
-                                disabled={!node.config.logging}
-                                bind:inputValue={node.config.logging_period}
-                                onChange={() => {
-                                    onPropertyChanged();
-                                }}
-                                inputInvalid={!node.validation.loggingPeriod}
-                                enableInputInvalid={true}
-                                inputType="POSITIVE_INT"
-                                minValue={LOGGING_PERIOD_LIM.MIN}
-                                maxValue={LOGGING_PERIOD_LIM.MAX}
-                                limitsPassed={() => {
-                                    showToast("loggingPeriodError", AlertType.ALERT, {
-                                        minValue: LOGGING_PERIOD_LIM.MIN,
-                                        maxValue: LOGGING_PERIOD_LIM.MAX,
-                                    });
-                                }}
-                                inputUnit="min."
-                                width="100%"
-                            />
-                            <Checkbox
-                                bind:checked={node.config.logging}
-                                onChange={() => {
-                                    onPropertyChanged();
-                                }}
-                                inputInvalid={!node.validation.loggingPeriod}
-                                enableInputInvalid={true}
-                                inputName="log-node"
-                                width="38px"
-                                height="38px"
-                            />
-                        </span>
-                    </div>
-
-                    {#if node.config.type === NodeType.FLOAT || node.config.type == NodeType.INT}
-                        <div class="row col-align">
-                            <div class="label-wrapper extend-width">
-                                <InfoLabel style={$NodeConfigSheetInfoLabelStyle} labelText={$texts.minValue} toolTipText={$texts.minValueInfo} />
-                            </div>
-                            <span class="value extend-width">
-                                <InputField
-                                    style={$NodeConfigSheetInputFieldStyle}
-                                    disabled={(node.config.type !== NodeType.FLOAT && node.config.type !== NodeType.INT) || !node.config.min_alarm}
-                                    bind:inputValue={node.config.min_alarm_value}
-                                    inputInvalid={!node.validation.minAlarm}
-                                    enableInputInvalid={true}
-                                    onChange={() => {
-                                        onPropertyChanged();
-                                    }}
-                                    inputType={node.config.type}
-                                    inputUnit={node.config.unit}
-                                    width="100%"
-                                />
-                                <Checkbox
-                                    bind:checked={node.config.min_alarm}
-                                    inputInvalid={!node.validation.minAlarm}
-                                    enableInputInvalid={true}
-                                    onChange={() => {
-                                        onPropertyChanged();
-                                    }}
-                                    inputName="node-min-alarm"
-                                    width="38px"
-                                    height="38px"
-                                />
-                            </span>
-                        </div>
-
-                        <div class="row col-align">
-                            <div class="label-wrapper extend-width">
-                                <InfoLabel style={$NodeConfigSheetInfoLabelStyle} labelText={$texts.maxValue} toolTipText={$texts.maxValueInfo} />
-                            </div>
-                            <span class="value extend-width">
-                                <InputField
-                                    style={$NodeConfigSheetInputFieldStyle}
-                                    disabled={(node.config.type !== NodeType.FLOAT && node.config.type !== NodeType.INT) || !node.config.max_alarm}
-                                    bind:inputValue={node.config.max_alarm_value}
-                                    inputInvalid={!node.validation.maxAlarm}
-                                    enableInputInvalid={true}
-                                    onChange={() => {
-                                        onPropertyChanged();
-                                    }}
-                                    inputType={node.config.type}
-                                    inputUnit={node.config.unit}
-                                    width="100%"
-                                />
-                                <Checkbox
-                                    bind:checked={node.config.max_alarm}
-                                    inputInvalid={!node.validation.maxAlarm}
-                                    enableInputInvalid={true}
-                                    onChange={() => {
-                                        onPropertyChanged();
-                                    }}
-                                    inputName="node-max-alarm"
-                                    width="38px"
-                                    height="38px"
-                                />
-                            </span>
-                        </div>
-                    {/if}
-                    <div class="row">
-                        <div class="label-wrapper">
-                            <InfoLabel style={$NodeConfigSheetInfoLabelStyle} labelText={$texts.custom} toolTipText={$texts.customInfo} />
-                        </div>
-                        <span class="value shrink-width">
-                            <Checkbox
-                                bind:checked={node.config.custom}
-                                onChange={() => {
-                                    customNodeChange(node, nodeEditingState, node.attributes.phase);
-                                    onPropertyChanged();
-                                }}
-                                inputName="custom-node"
-                                width="38px"
-                                height="38px"
-                            />
-                        </span>
-                    </div>
-                    <div class="row">
-                        <div class="label-wrapper">
-                            <InfoLabel style={$NodeConfigSheetInfoLabelStyle} labelText={$texts.publish} toolTipText={$texts.publishInfo} />
-                        </div>
-                        <span class="value shrink-width">
-                            <Checkbox
-                                bind:checked={node.config.publish}
-                                onChange={() => {
-                                    onPropertyChanged();
-                                }}
-                                inputName="publish-node"
-                                width="38px"
-                                height="38px"
-                            />
-                        </span>
-                    </div>
                     <div class="row">
                         <div class="label-wrapper">
                             <InfoLabel style={$NodeConfigSheetInfoLabelStyle} labelText={$texts.virtual} toolTipText={$texts.virtualInfo} />
@@ -476,10 +486,46 @@ incremental logic, virtual node settings, and enable/disable status. -->
                                 inputName="virtual-node"
                                 width="38px"
                                 height="38px"
+                                {disableAnimations}
                             />
                         </span>
                     </div>
-                    {#if node.config.type === NodeType.FLOAT || node.config.type === NodeType.INT}
+                    <div class="row">
+                        <div class="label-wrapper">
+                            <InfoLabel style={$NodeConfigSheetInfoLabelStyle} labelText={$texts.publish} toolTipText={$texts.publishInfo} />
+                        </div>
+                        <span class="value shrink-width">
+                            <Checkbox
+                                bind:checked={node.config.publish}
+                                onChange={() => {
+                                    onPropertyChanged();
+                                }}
+                                inputName="publish-node"
+                                width="38px"
+                                height="38px"
+                                {disableAnimations}
+                            />
+                        </span>
+                    </div>
+                    <div class="row">
+                        <div class="label-wrapper">
+                            <InfoLabel style={$NodeConfigSheetInfoLabelStyle} labelText={$texts.custom} toolTipText={$texts.customInfo} />
+                        </div>
+                        <span class="value shrink-width">
+                            <Checkbox
+                                bind:checked={node.config.custom}
+                                onChange={() => {
+                                    customNodeChange(node, nodeEditingState, node.attributes.phase);
+                                    onPropertyChanged();
+                                }}
+                                inputName="custom-node"
+                                width="38px"
+                                height="38px"
+                                {disableAnimations}
+                            />
+                        </span>
+                    </div>
+                    {#if node.is_numeric}
                         <div class="row">
                             <div class="label-wrapper">
                                 <InfoLabel style={$NodeConfigSheetInfoLabelStyle} labelText={$texts.counterNode} toolTipText={$texts.counterNodeInfo} />
@@ -496,31 +542,36 @@ incremental logic, virtual node settings, and enable/disable status. -->
                                     inputName="counter-node"
                                     width="38px"
                                     height="38px"
+                                    {disableAnimations}
                                 />
                             </span>
                         </div>
-                    {/if}
-                    {#if node.config.is_counter}
-                        <div class="row col-align">
-                            <div class="label-wrapper extend-width">
-                                <InfoLabel style={$NodeConfigSheetInfoLabelStyle} labelText={$texts.counterMode} toolTipText={$texts.counterModeInfo} />
+                        {#if node.config.is_counter}
+                            <div class="row col-align">
+                                <div class="label-wrapper extend-width">
+                                    <InfoLabel
+                                        style={$NodeConfigSheetInfoLabelStyle}
+                                        labelText={$texts.counterMode}
+                                        toolTipText={$texts.counterModeInfo}
+                                    />
+                                </div>
+                                <span class="value extend-width">
+                                    <Selector
+                                        style={$NodeConfigSheetSelectorStyle}
+                                        options={$counterModeTexts}
+                                        bind:selectedOption={node.config.counter_mode}
+                                        onChange={() => {
+                                            onPropertyChanged();
+                                        }}
+                                        inputInvalid={!node.validation.counterMode}
+                                        enableInputInvalid={true}
+                                        invertOptions={true}
+                                        scrollable={true}
+                                        width="100%"
+                                    />
+                                </span>
                             </div>
-                            <span class="value extend-width">
-                                <Selector
-                                    style={$NodeConfigSheetSelectorStyle}
-                                    options={$counterModeTexts}
-                                    bind:selectedOption={node.config.counter_mode}
-                                    onChange={() => {
-                                        onPropertyChanged();
-                                    }}
-                                    inputInvalid={!node.validation.counterMode}
-                                    enableInputInvalid={true}
-                                    invertOptions={true}
-                                    scrollable={true}
-                                    width="100%"
-                                />
-                            </span>
-                        </div>
+                        {/if}
                     {/if}
                     <div class="row">
                         <div class="label-wrapper">
@@ -535,6 +586,7 @@ incremental logic, virtual node settings, and enable/disable status. -->
                                 inputName="enable-node"
                                 width="38px"
                                 height="38px"
+                                {disableAnimations}
                             />
                         </span>
                     </div>
@@ -683,6 +735,24 @@ incremental logic, virtual node settings, and enable/disable status. -->
         inline-size: 100%;
         margin: 0;
         padding: 0;
+    }
+
+    /* Section title container - Header for content sections with bottom border */
+    .content-div .section-title {
+        margin: 0;
+        padding: 0;
+        border-bottom: var(--content-title-border-bottom);
+    }
+
+    /* Section title text - Uppercase heading with spacing and border treatment */
+    .content-div .section-title h3 {
+        margin: 0;
+        padding: 0 var(--content-title-padding-left) var(--content-title-padding-bottom) var(--content-title-padding-left);
+        font-size: var(--content-title-size);
+        color: var(--content-title-color);
+        font-weight: var(--content-title-weight);
+        text-transform: var(--content-title-transform);
+        letter-spacing: var(--content-title-spacing);
     }
 
     /* Inner content wrapper: column layout with adjustable padding and spacing */
