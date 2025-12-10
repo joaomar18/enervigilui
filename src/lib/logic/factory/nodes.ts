@@ -124,18 +124,10 @@ export function getEditableBaseNodeConfigFromDefaultVar(variable: DefaultNodeInf
         decimal_places = variable.defaultNumberOfDecimals ? variable.defaultNumberOfDecimals.toString() : "0";
 
         if (!variable.isCounter) {
-            min_alarm_value = variable.defaultMinAlarm
-                ? variable.defaultMinAlarm.toFixed(parseInt(decimal_places))
-                : Number(0).toFixed(parseInt(decimal_places));
-            min_warning_value = min_alarm_value
-                ? String((Number(min_alarm_value) * (1 + 0.02)).toFixed(parseInt(decimal_places)))
-                : Number(0).toFixed(parseInt(decimal_places));
-            max_alarm_value = variable.defaultMaxAlarm
-                ? variable.defaultMaxAlarm.toFixed(parseInt(decimal_places))
-                : Number(0).toFixed(parseInt(decimal_places));
-            max_warning_value = max_alarm_value
-                ? String((Number(max_alarm_value) * (1 - 0.02)).toFixed(parseInt(decimal_places)))
-                : Number(0).toFixed(parseInt(decimal_places));
+            min_alarm_value = variable.defaultMinAlarm ? String(Number(variable.defaultMinAlarm.toFixed(parseInt(decimal_places)))) : "";
+            min_warning_value = min_alarm_value ? String(Number((Number(min_alarm_value) * (1 + 0.02)).toFixed(parseInt(decimal_places)))) : "";
+            max_alarm_value = variable.defaultMaxAlarm ? String(Number(variable.defaultMaxAlarm.toFixed(parseInt(decimal_places)))) : "";
+            max_warning_value = max_alarm_value ? String(Number((Number(max_alarm_value) * (1 + 0.02)).toFixed(parseInt(decimal_places)))) : "";
         }
     }
 
