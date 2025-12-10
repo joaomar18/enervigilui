@@ -3,7 +3,7 @@ import { MeterType } from "$lib/types/device/base";
 import { NodePhase, NodePrefix, nodePhaseSections, CounterMode } from "$lib/types/nodes/base";
 import { defaultVariables } from "$lib/stores/device/variables";
 import { addPrefix, removePrefix, getNodePrefix, isNumeric, typeIsNumeric } from "../util/nodes";
-import { sortNodesLogically } from "../handlers/nodes";
+import { sortNodesLogically } from "../handlers/nodes/base";
 import { getInitialNodeValidation } from "../validation/nodes/base";
 import { stringIsValidInteger, stringIsValidFloat } from "$lib/logic/util/generic";
 import { protocolPlugins } from "$lib/stores/device/protocol";

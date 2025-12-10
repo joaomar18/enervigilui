@@ -4,7 +4,7 @@
     import Selector from "../../General/Selector.svelte";
     import Checkbox from "../../General/Checkbox.svelte";
     import InfoLabel from "../../General/InfoLabel.svelte";
-    import { nodeNameChange, customNodeChange, virtualNodeChange } from "$lib/logic/handlers/nodes";
+    import { nodeNameChange, customNodeChange, virtualNodeChange } from "$lib/logic/handlers/nodes/base";
     import { CounterMode, NodeType } from "$lib/types/nodes/base";
     import { showToast } from "$lib/logic/view/toast";
     import { AlertType } from "$lib/stores/view/toast";

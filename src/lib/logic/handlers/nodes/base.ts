@@ -13,7 +13,7 @@ import {
     getNodePrefix,
     getNodeIndex,
     getNodePhaseFromRecordOrState,
-} from "../util/nodes";
+} from "../../util/nodes";
 import { defaultVariables } from "$lib/stores/device/variables";
 import { protocolPlugins } from "$lib/stores/device/protocol";
 import { nodePhaseSections } from "$lib/types/nodes/base";

@@ -26,7 +26,12 @@ import type {
     EditableNodeNoProtocolOptions,
     NodeNoProtocolOptions,
 } from "$lib/types/nodes/config";
-import { validateModbusAddress, validateModbusBitIndex, validateModbusEndianMode } from "$lib/logic/validation/nodes/protocol/modbusRtu";
+import {
+    validateModbusAddress,
+    validateModbusBitIndex,
+    validateModbusEndianMode,
+    validateModbusFunction,
+} from "$lib/logic/validation/nodes/protocol/modbusRtu";
 import { validateOpcUaNodeId } from "$lib/logic/validation/nodes/protocol/opcUa";
 import { noProtocolNodeTypeTexts } from "../lang/protocolPlugin";
 import { modbusNodeTypeTexts } from "../lang/modbusRtuTexts";
@@ -219,6 +224,7 @@ const modbusRtuPlugin: ProtocolPlugin = {
 
         if (!Object.values(ModbusRTUNodeType).includes(protocolOptions.type)) return false;
         if (!Object.values(ModbusRTUFunction).includes(protocolOptions.function)) return false;
+        if (!validateModbusFunction(protocolOptions.function, protocolOptions.type)) return false;
         if (!validateModbusAddress(protocolOptions.address)) return false;
         if (!validateModbusEndianMode(protocolOptions.type, protocolOptions.endian_mode)) return false;
         if (!validateModbusBitIndex(protocolOptions.type, protocolOptions.bit)) return false;

@@ -7,7 +7,7 @@
     import { updateDeviceValidation, validDeviceOperation } from "$lib/logic/validation/device/base";
     import { convertToNodes } from "$lib/logic/factory/nodes";
     import { updateNodesValidation } from "$lib/logic/validation/nodes/base";
-    import { updateNodes, updateEditingNode, updateNodesBySection } from "$lib/logic/handlers/nodes";
+    import { updateNodes, updateEditingNode, updateNodesBySection } from "$lib/logic/handlers/nodes/base";
     import { protocolPlugins } from "$lib/stores/device/protocol";
     import { showToast } from "$lib/logic/view/toast";
     import { AlertType } from "$lib/stores/view/toast";

@@ -1,5 +1,24 @@
-import { ModbusRTUNodeMode, ModbusRTUNodeType } from "$lib/types/nodes/protocol/modbusRtu";
+import { ModbusRTUNodeMode, ModbusRTUNodeType, ModbusRTUFunction } from "$lib/types/nodes/protocol/modbusRtu";
 import { multiregisterTypes } from "$lib/types/nodes/protocol/modbusRtu";
+
+/**
+ * Validates whether the specified Modbus function is compatible with the given node type.
+ *
+ * READ_COILS and READ_DISCRETE_INPUTS are only valid for boolean node types.
+ * All other function–type combinations are considered valid.
+ *
+ * @param modbus_function - The Modbus RTU function code to validate.
+ * @param type - The node's data type.
+ * @returns True if the combination is valid; otherwise, false.
+ */
+export function validateModbusFunction(modbus_function: ModbusRTUFunction, type: ModbusRTUNodeType): boolean {
+    if (modbus_function === ModbusRTUFunction.READ_COILS || modbus_function === ModbusRTUFunction.READ_DISCRETE_INPUTS) {
+        if (type !== ModbusRTUNodeType.BOOL) {
+            return false;
+        }
+    }
+    return true;
+}
 
 /**
  * Validates a Modbus register address provided as a string.

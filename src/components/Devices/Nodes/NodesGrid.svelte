@@ -3,7 +3,7 @@
     import AddNode from "./AddNode.svelte";
     import { onMount, onDestroy } from "svelte";
     import { addNode } from "$lib/logic/factory/nodes";
-    import { deleteNodeFromArray } from "$lib/logic/handlers/nodes";
+    import { deleteNodeFromArray } from "$lib/logic/handlers/nodes/base";
     import { nodePhaseSections } from "$lib/types/nodes/base";
 
     // Stores for variable definitions

@@ -5,7 +5,7 @@
     import Checkbox from "../../General/Checkbox.svelte";
     import Button from "../../General/Button.svelte";
     import ExpandableButton from "../../General/ExpandableButton.svelte";
-    import { nodeNameChange, customNodeChange, virtualNodeChange } from "$lib/logic/handlers/nodes";
+    import { nodeNameChange, customNodeChange, virtualNodeChange } from "$lib/logic/handlers/nodes/base";
     import { LOGGING_PERIOD_LIM } from "$lib/types/nodes/config";
     import { defaultVariableUnits } from "$lib/stores/device/variables";
     import { showToast } from "$lib/logic/view/toast";

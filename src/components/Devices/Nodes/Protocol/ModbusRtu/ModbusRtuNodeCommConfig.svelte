@@ -5,7 +5,13 @@
     import type { EditableNodeRecord } from "$lib/types/nodes/config";
     import type { ProtocolPlugin } from "$lib/stores/device/protocol";
     import { ModbusRTUFunction, ModbusRTUNodeMode, ModbusRTUNodeType, type EditableModbusRTUNodeOptions } from "$lib/types/nodes/protocol/modbusRtu";
-    import { validateModbusAddress, validateModbusBitIndex, validateModbusEndianMode } from "$lib/logic/validation/nodes/protocol/modbusRtu";
+    import {
+        validateModbusFunction,
+        validateModbusAddress,
+        validateModbusBitIndex,
+        validateModbusEndianMode,
+    } from "$lib/logic/validation/nodes/protocol/modbusRtu";
+    import { multiregisterTypes } from "$lib/types/nodes/protocol/modbusRtu";
 
     // Texts
     import { texts } from "$lib/stores/lang/generalTexts";
@@ -26,16 +32,16 @@
     export let disableAnimations: boolean = false;
 
     // Variables
+    let firstValidationDone: boolean = false;
     let commOptions: EditableModbusRTUNodeOptions;
-    let validOpcUaId: boolean = false;
+    let validFunction: boolean = false;
+    let validAddress: boolean = false;
+    let validBitIndex: boolean = false;
+    let validEndianMode: boolean = false;
     let enableBit: boolean = false;
+    let enableEndianMode: boolean = false;
 
     // Reactive Statements
-    $: commOptions = node?.protocol_options as EditableModbusRTUNodeOptions;
-    $: validFunction = false;
-    $: validAddress = validateModbusAddress(commOptions.address);
-    $: validBitIndex = validateModbusBitIndex(commOptions.type, commOptions.bit);
-    $: validEndianMode = validateModbusEndianMode(commOptions.type, commOptions.endian_mode);
     $: enableBit =
         commOptions.type === ModbusRTUNodeType.BOOL &&
         commOptions.function != ModbusRTUFunction.READ_COILS &&
@@ -45,14 +51,29 @@
     } else {
         commOptions.bit = "";
     }
-    $: if (!validEndianMode) {
+
+    $: enableEndianMode = multiregisterTypes.includes(commOptions.type);
+    $: if (!enableEndianMode) {
         commOptions.endian_mode = null;
     } else {
         commOptions.endian_mode = ModbusRTUNodeMode.BIG_ENDIAN;
     }
 
+    $: commOptions = node?.protocol_options as EditableModbusRTUNodeOptions;
+    $: if (node && !firstValidationDone) firstValidation();
+    $: if (!node) firstValidationDone = false;
+
     // Export Functions
     export let onPropertyChanged: () => void;
+
+    // Functions
+    function firstValidation(): void {
+        validFunction = validateModbusFunction(commOptions.function, commOptions.type);
+        validAddress = validateModbusAddress(commOptions.address);
+        validBitIndex = validateModbusBitIndex(commOptions.type, commOptions.bit);
+        validEndianMode = validateModbusEndianMode(commOptions.type, commOptions.endian_mode);
+        firstValidationDone = true;
+    }
 </script>
 
 <div class="row col-align">
@@ -65,6 +86,7 @@
             options={$modbusNodeFunctionTexts}
             bind:selectedOption={commOptions.function}
             onChange={() => {
+                validFunction = validateModbusFunction(commOptions.function, commOptions.type);
                 onPropertyChanged();
             }}
             inputInvalid={!validFunction}
@@ -89,6 +111,7 @@
             inputInvalid={!validAddress}
             enableInputInvalid={true}
             onChange={() => {
+                validAddress = validateModbusAddress(commOptions.address);
                 onPropertyChanged();
             }}
             inputType="STRING"
@@ -106,9 +129,12 @@
                 inputInvalid={!validBitIndex}
                 enableInputInvalid={true}
                 onChange={() => {
+                    validBitIndex = validateModbusBitIndex(commOptions.type, commOptions.bit);
                     onPropertyChanged();
                 }}
-                inputType="STRING"
+                minValue={0}
+                maxValue={15}
+                inputType="POSITIVE_INT"
                 width="75px"
                 disableHints={true}
                 {disableAnimations}
@@ -126,6 +152,9 @@
             options={$modbusNodeTypeTexts}
             bind:selectedOption={commOptions.type}
             onChange={() => {
+                validFunction = validateModbusFunction(commOptions.function, commOptions.type);
+                validBitIndex = validateModbusBitIndex(commOptions.type, commOptions.bit);
+                validEndianMode = validateModbusEndianMode(commOptions.type, commOptions.endian_mode);
                 onPropertyChanged();
                 protocolPlugin.setProtocolType(commOptions, commOptions.type);
                 node.is_numeric = protocolPlugin.isNumeric(node.protocol_options);
@@ -136,7 +165,7 @@
         />
     </span>
 </div>
-{#if validEndianMode && commOptions.endian_mode !== null}
+{#if enableEndianMode && commOptions.endian_mode !== null}
     <div class="row col-align">
         <div class="label-wrapper extend-width">
             <InfoLabel style={$NodeConfigSheetInfoLabelStyle} labelText={$texts.byteOrder} toolTipText={$texts.byteOrderInfo} />
@@ -147,6 +176,7 @@
                 options={$modbusNodeEndianModeTexts}
                 bind:selectedOption={commOptions.endian_mode}
                 onChange={() => {
+                    validEndianMode = validateModbusEndianMode(commOptions.type, commOptions.endian_mode);
                     onPropertyChanged();
                 }}
                 inputInvalid={!validEndianMode}

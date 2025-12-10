@@ -10,7 +10,7 @@
     import { protocolPlugins } from "$lib/stores/device/protocol";
     import { MethodRetrier } from "$lib/logic/api/retrier";
     import { deviceProtocolChange } from "$lib/logic/handlers/device";
-    import { updateNodes, updateEditingNode, updateNodesBySection } from "$lib/logic/handlers/nodes";
+    import { updateNodes, updateEditingNode, updateNodesBySection } from "$lib/logic/handlers/nodes/base";
     import Selector from "../../../components/General/Selector.svelte";
     import InfoLabel from "../../../components/General/InfoLabel.svelte";
     import EditableText from "../../../components/General/EditableText.svelte";
