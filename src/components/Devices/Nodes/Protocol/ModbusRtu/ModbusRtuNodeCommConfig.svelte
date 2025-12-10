@@ -4,7 +4,8 @@
     import Selector from "../../../../General/Selector.svelte";
     import type { EditableNodeRecord } from "$lib/types/nodes/config";
     import type { ProtocolPlugin } from "$lib/stores/device/protocol";
-    import { ModbusRTUFunction, ModbusRTUNodeMode, ModbusRTUNodeType, type EditableModbusRTUNodeOptions } from "$lib/types/nodes/protocol/modbusRtu";
+    import { modbusNodeTypeChange, modbusRTUFunctionChange } from "$lib/logic/handlers/nodes/protocol/modbusRtu";
+    import { ModbusRTUFunction, ModbusRTUNodeType } from "$lib/types/nodes/protocol/modbusRtu";
     import {
         validateModbusFunction,
         validateModbusAddress,
@@ -12,6 +13,7 @@
         validateModbusEndianMode,
     } from "$lib/logic/validation/nodes/protocol/modbusRtu";
     import { multiregisterTypes } from "$lib/types/nodes/protocol/modbusRtu";
+    import type { EditableModbusRTUNodeOptions, ModbusRTUNodeOptionsEditingState } from "$lib/types/nodes/protocol/modbusRtu";
 
     // Texts
     import { texts } from "$lib/stores/lang/generalTexts";
@@ -21,6 +23,7 @@
     // Styles
     import { NodeConfigSheetInfoLabelStyle } from "$lib/style/nodes";
     import { NodeConfigSheetInputFieldStyle, NodeConfigSheetSelectorStyle } from "$lib/style/nodes";
+    import { nodeTypeChange } from "$lib/logic/handlers/nodes/base";
 
     // Props
     export let node: EditableNodeRecord;
@@ -32,8 +35,9 @@
     export let disableAnimations: boolean = false;
 
     // Variables
-    let firstValidationDone: boolean = false;
+    let firstProcessingDone: boolean = false;
     let commOptions: EditableModbusRTUNodeOptions;
+    let previousState: ModbusRTUNodeOptionsEditingState;
     let validFunction: boolean = false;
     let validAddress: boolean = false;
     let validBitIndex: boolean = false;
@@ -44,147 +48,147 @@
     // Reactive Statements
     $: enableBit =
         commOptions.type === ModbusRTUNodeType.BOOL &&
-        commOptions.function != ModbusRTUFunction.READ_COILS &&
+        commOptions.function !== ModbusRTUFunction.READ_COILS &&
         commOptions.function !== ModbusRTUFunction.READ_DISCRETE_INPUTS;
-    $: if (!enableBit) {
-        commOptions.bit = null;
-    } else {
-        commOptions.bit = "";
-    }
-
     $: enableEndianMode = multiregisterTypes.includes(commOptions.type);
-    $: if (!enableEndianMode) {
-        commOptions.endian_mode = null;
-    } else {
-        commOptions.endian_mode = ModbusRTUNodeMode.BIG_ENDIAN;
-    }
-
     $: commOptions = node?.protocol_options as EditableModbusRTUNodeOptions;
-    $: if (node && !firstValidationDone) firstValidation();
-    $: if (!node) firstValidationDone = false;
+    $: if (commOptions && !firstProcessingDone) firstProcessing();
+    $: if (!commOptions) firstProcessingDone = false;
 
     // Export Functions
     export let onPropertyChanged: () => void;
 
     // Functions
-    function firstValidation(): void {
+    function firstProcessing(): void {
         validFunction = validateModbusFunction(commOptions.function, commOptions.type);
         validAddress = validateModbusAddress(commOptions.address);
-        validBitIndex = validateModbusBitIndex(commOptions.type, commOptions.bit);
+        validBitIndex = validateModbusBitIndex(commOptions.type, commOptions.function, commOptions.bit);
         validEndianMode = validateModbusEndianMode(commOptions.type, commOptions.endian_mode);
-        firstValidationDone = true;
+        previousState = {
+            previousType: commOptions.type,
+            previousFunction: commOptions.function,
+        };
+        firstProcessingDone = true;
     }
 </script>
 
-<div class="row col-align">
-    <div class="label-wrapper extend-width">
-        <InfoLabel style={$NodeConfigSheetInfoLabelStyle} labelText={$texts.functionCode} toolTipText={$texts.functionCodeInfo} />
-    </div>
-    <span class="value extend-width">
-        <Selector
-            style={$NodeConfigSheetSelectorStyle}
-            options={$modbusNodeFunctionTexts}
-            bind:selectedOption={commOptions.function}
-            onChange={() => {
-                validFunction = validateModbusFunction(commOptions.function, commOptions.type);
-                onPropertyChanged();
-            }}
-            inputInvalid={!validFunction}
-            enableInputInvalid={true}
-            scrollable={true}
-        />
-    </span>
-</div>
-<div class="row col-align">
-    <div class="label-wrapper extend-width">
-        <InfoLabel
-            style={$NodeConfigSheetInfoLabelStyle}
-            labelText={enableBit ? $pluginTexts.modbusAdressBit : $pluginTexts[textKey]}
-            toolTipText={enableBit ? $pluginTexts.modbusAddressBitInfo : $pluginTexts[infoTextKey]}
-        />
-    </div>
-    <span class="value extend-width">
-        <InputField
-            style={$NodeConfigSheetInputFieldStyle}
-            disabled={node.config.calculated}
-            bind:inputValue={commOptions.address}
-            inputInvalid={!validAddress}
-            enableInputInvalid={true}
-            onChange={() => {
-                validAddress = validateModbusAddress(commOptions.address);
-                onPropertyChanged();
-            }}
-            inputType="STRING"
-            width="100%"
-            disableHints={true}
-            {disableAnimations}
-        />
-
-        {#if enableBit && commOptions.bit !== null}
-            <span class="label">/</span>
-            <InputField
-                style={$NodeConfigSheetInputFieldStyle}
-                disabled={node.config.calculated}
-                bind:inputValue={commOptions.bit}
-                inputInvalid={!validBitIndex}
-                enableInputInvalid={true}
-                onChange={() => {
-                    validBitIndex = validateModbusBitIndex(commOptions.type, commOptions.bit);
-                    onPropertyChanged();
-                }}
-                minValue={0}
-                maxValue={15}
-                inputType="POSITIVE_INT"
-                width="75px"
-                disableHints={true}
-                {disableAnimations}
-            />
-        {/if}
-    </span>
-</div>
-<div class="row col-align">
-    <div class="label-wrapper extend-width">
-        <InfoLabel style={$NodeConfigSheetInfoLabelStyle} labelText={$pluginTexts[typeKey]} toolTipText={$pluginTexts[infoTypeKey]} />
-    </div>
-    <span class="value extend-width">
-        <Selector
-            style={$NodeConfigSheetSelectorStyle}
-            options={$modbusNodeTypeTexts}
-            bind:selectedOption={commOptions.type}
-            onChange={() => {
-                validFunction = validateModbusFunction(commOptions.function, commOptions.type);
-                validBitIndex = validateModbusBitIndex(commOptions.type, commOptions.bit);
-                validEndianMode = validateModbusEndianMode(commOptions.type, commOptions.endian_mode);
-                onPropertyChanged();
-                protocolPlugin.setProtocolType(commOptions, commOptions.type);
-                node.is_numeric = protocolPlugin.isNumeric(node.protocol_options);
-            }}
-            inputInvalid={!node.validation.variableType}
-            enableInputInvalid={true}
-            scrollable={true}
-        />
-    </span>
-</div>
-{#if enableEndianMode && commOptions.endian_mode !== null}
+<!-- ModbusRtuNodeCommConfig Component: configures Modbus RTU node communication parameters.
+Renders interactive fields for function code, register/coil address, bit index (for boolean types),
+and endian mode (for multi-register types). Dynamically enables/disables fields based on node type
+and function code, validates all inputs in real-time, and triggers protocol-specific handlers on changes. -->
+{#if commOptions}
     <div class="row col-align">
         <div class="label-wrapper extend-width">
-            <InfoLabel style={$NodeConfigSheetInfoLabelStyle} labelText={$texts.byteOrder} toolTipText={$texts.byteOrderInfo} />
+            <InfoLabel style={$NodeConfigSheetInfoLabelStyle} labelText={$texts.functionCode} toolTipText={$texts.functionCodeInfo} />
         </div>
         <span class="value extend-width">
             <Selector
                 style={$NodeConfigSheetSelectorStyle}
-                options={$modbusNodeEndianModeTexts}
-                bind:selectedOption={commOptions.endian_mode}
+                options={$modbusNodeFunctionTexts}
+                bind:selectedOption={commOptions.function}
                 onChange={() => {
-                    validEndianMode = validateModbusEndianMode(commOptions.type, commOptions.endian_mode);
+                    modbusRTUFunctionChange(commOptions, commOptions.type, commOptions.function, previousState);
+                    validFunction = validateModbusFunction(commOptions.function, commOptions.type);
                     onPropertyChanged();
                 }}
-                inputInvalid={!validEndianMode}
+                inputInvalid={!validFunction}
                 enableInputInvalid={true}
                 scrollable={true}
             />
         </span>
     </div>
+    <div class="row col-align">
+        <div class="label-wrapper extend-width">
+            <InfoLabel
+                style={$NodeConfigSheetInfoLabelStyle}
+                labelText={enableBit ? $pluginTexts.modbusAdressBit : $pluginTexts[textKey]}
+                toolTipText={enableBit ? $pluginTexts.modbusAddressBitInfo : $pluginTexts[infoTextKey]}
+            />
+        </div>
+        <span class="value extend-width">
+            <InputField
+                style={$NodeConfigSheetInputFieldStyle}
+                disabled={node.config.calculated}
+                bind:inputValue={commOptions.address}
+                inputInvalid={!validAddress}
+                enableInputInvalid={true}
+                onChange={() => {
+                    validAddress = validateModbusAddress(commOptions.address);
+                    onPropertyChanged();
+                }}
+                inputType="STRING"
+                width="100%"
+                disableHints={true}
+                {disableAnimations}
+            />
+
+            {#if enableBit && commOptions.bit !== null}
+                <span class="label">/</span>
+                <InputField
+                    style={$NodeConfigSheetInputFieldStyle}
+                    disabled={node.config.calculated}
+                    bind:inputValue={commOptions.bit}
+                    inputInvalid={!validBitIndex}
+                    enableInputInvalid={true}
+                    onChange={() => {
+                        validBitIndex = validateModbusBitIndex(commOptions.type, commOptions.function, commOptions.bit);
+                        onPropertyChanged();
+                    }}
+                    minValue={0}
+                    maxValue={15}
+                    inputType="POSITIVE_INT"
+                    width="75px"
+                    disableHints={true}
+                    {disableAnimations}
+                />
+            {/if}
+        </span>
+    </div>
+    <div class="row col-align">
+        <div class="label-wrapper extend-width">
+            <InfoLabel style={$NodeConfigSheetInfoLabelStyle} labelText={$pluginTexts[typeKey]} toolTipText={$pluginTexts[infoTypeKey]} />
+        </div>
+        <span class="value extend-width">
+            <Selector
+                style={$NodeConfigSheetSelectorStyle}
+                options={$modbusNodeTypeTexts}
+                bind:selectedOption={commOptions.type}
+                onChange={() => {
+                    modbusNodeTypeChange(commOptions, commOptions.type, previousState);
+                    validFunction = validateModbusFunction(commOptions.function, commOptions.type);
+                    validBitIndex = validateModbusBitIndex(commOptions.type, commOptions.function, commOptions.bit);
+                    validEndianMode = validateModbusEndianMode(commOptions.type, commOptions.endian_mode);
+                    onPropertyChanged();
+                    protocolPlugin.setProtocolType(commOptions, commOptions.type);
+                    nodeTypeChange(node);
+                }}
+                inputInvalid={!node.validation.variableType}
+                enableInputInvalid={true}
+                scrollable={true}
+            />
+        </span>
+    </div>
+    {#if enableEndianMode && commOptions.endian_mode !== null}
+        <div class="row col-align">
+            <div class="label-wrapper extend-width">
+                <InfoLabel style={$NodeConfigSheetInfoLabelStyle} labelText={$texts.byteOrder} toolTipText={$texts.byteOrderInfo} />
+            </div>
+            <span class="value extend-width">
+                <Selector
+                    style={$NodeConfigSheetSelectorStyle}
+                    options={$modbusNodeEndianModeTexts}
+                    bind:selectedOption={commOptions.endian_mode}
+                    onChange={() => {
+                        validEndianMode = validateModbusEndianMode(commOptions.type, commOptions.endian_mode);
+                        onPropertyChanged();
+                    }}
+                    inputInvalid={!validEndianMode}
+                    enableInputInvalid={true}
+                    scrollable={true}
+                />
+            </span>
+        </div>
+    {/if}
 {/if}
 
 <style>

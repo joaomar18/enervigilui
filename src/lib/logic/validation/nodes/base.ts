@@ -27,6 +27,8 @@ export function getInitialNodeValidation(): NodeValidation {
         loggingPeriod: false,
         minAlarm: false,
         maxAlarm: false,
+        minWarning: false,
+        maxWarning: false,
         calculated: false,
         isCounter: false,
         counterMode: false,
@@ -41,6 +43,8 @@ export function getInitialNodeValidation(): NodeValidation {
                 this.loggingPeriod &&
                 this.minAlarm &&
                 this.maxAlarm &&
+                this.minWarning &&
+                this.maxWarning &&
                 this.calculated &&
                 this.isCounter &&
                 this.counterMode
@@ -154,7 +158,8 @@ export function validateNodeProtocol(deviceProtocol: Protocol, protocol: Protoco
 export function validateNodeProtocolType(protocolOptions: EditableBaseNodeProtocolOptions, name: string, protocol: Protocol, custom: boolean): boolean {
     let plugin = get(protocolPlugins)[protocol];
     if (!plugin.validateNodeType(protocolOptions)) return false;
-    if (!custom) { // For default variables, check if the type is in the applicable types
+    if (!custom) {
+        // For default variables, check if the type is in the applicable types
         const variables = get(defaultVariables);
         const variable = Object.values(variables).find((v) => v.name === name);
 
@@ -205,21 +210,21 @@ export function validateLoggingPeriod(logging_period: string, logging_enabled: b
 }
 
 /**
- * Validates alarm threshold value based on node type and alarm enabled status.
- * @param alarm_value - String representation of the alarm threshold value.
- * @param alarm_enabled - True if the alarm is enabled.
+ * Validates limit threshold value based on node type and enabled status.
+ * @param alarm_value - String representation of the limit threshold value.
+ * @param alarm_enabled - True if the limit is enabled.
  * @param type - The NodeType to determine numeric validation requirements.
- * @returns True if alarm value is valid or alarm is disabled.
+ * @returns True if limit value is valid or limit is disabled.
  */
-export function validateAlarm(alarm_value: string, alarm_enabled: boolean, type: NodeType): boolean {
-    if (!alarm_enabled) {
+export function validateLimit(limit_value: string, limit_enabled: boolean, type: NodeType): boolean {
+    if (!limit_enabled) {
         return true;
     }
 
     if (type === NodeType.FLOAT) {
-        return stringIsValidFloat(alarm_value);
+        return stringIsValidFloat(limit_value);
     } else if (type === NodeType.INT) {
-        return stringIsValidInteger(alarm_value);
+        return stringIsValidInteger(limit_value);
     }
 
     return false;
@@ -299,10 +304,7 @@ export function validateCounterMode(counter: boolean, mode: CounterMode | null):
  * @param nodes - Array of editable nodes to validate.
  * @param nodesBySection - Nodes organized by phase for duplicate checking within each phase.
  */
-export function updateNodesValidation(
-    nodes: Array<EditableNodeRecord>,
-    nodesBySection: Record<NodePhase, Array<EditableNodeRecord>>
-): void {
+export function updateNodesValidation(nodes: Array<EditableNodeRecord>, nodesBySection: Record<NodePhase, Array<EditableNodeRecord>>): void {
     for (let node of nodes) {
         let plugin = get(protocolPlugins)[node.protocol];
         let nodeInternalType = plugin.convertTypeToGeneric(node.protocol_options);
@@ -313,8 +315,10 @@ export function updateNodesValidation(
         node.validation.protocolOptions = plugin.validateNodeProtocolOptions(node.protocol_options);
         node.validation.decimalPlaces = validateDecimalPlaces(node.config.decimal_places, nodeInternalType);
         node.validation.loggingPeriod = validateLoggingPeriod(node.config.logging_period, node.config.logging);
-        node.validation.minAlarm = validateAlarm(node.config.min_alarm_value, node.config.min_alarm, nodeInternalType);
-        node.validation.maxAlarm = validateAlarm(node.config.max_alarm_value, node.config.max_alarm, nodeInternalType);
+        node.validation.minAlarm = validateLimit(node.config.min_alarm_value, node.config.min_alarm, nodeInternalType);
+        node.validation.maxAlarm = validateLimit(node.config.max_alarm_value, node.config.max_alarm, nodeInternalType);
+        node.validation.minWarning = validateLimit(node.config.min_warning_value, node.config.min_warning, nodeInternalType);
+        node.validation.maxWarning = validateLimit(node.config.max_warning_value, node.config.max_warning, nodeInternalType);
         node.validation.calculated = validateVirtualNode(node.config.calculated, node.display_name, node.config.custom);
         node.validation.isCounter = validateCounterNode(node.config.is_counter, node.display_name, node.config.custom);
         node.validation.counterMode = validateCounterMode(node.config.is_counter, node.config.counter_mode);

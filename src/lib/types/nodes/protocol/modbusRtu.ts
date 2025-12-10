@@ -88,6 +88,20 @@ export interface EditableModbusRTUNodeOptions extends EditableBaseNodeProtocolOp
     bit: string | null;
 }
 
+/**
+ * Temporary editing state for Modbus RTU node options in the UI.
+ * Stores previously selected values to support validation logic
+ * and controlled transitions when changing configuration fields.
+ *
+ * @interface
+ * @property {ModbusRTUNodeType} previousType - Previously selected Modbus node data type.
+ * @property {ModbusRTUFunction} previousFunction - Previously selected Modbus RTU function.
+ */
+export interface ModbusRTUNodeOptionsEditingState {
+    previousType: ModbusRTUNodeType;
+    previousFunction: ModbusRTUFunction;
+}
+
 /*****     T Y P E S     *****/
 
 /*****     O B J E C T S     *****/

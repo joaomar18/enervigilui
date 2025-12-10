@@ -1,6 +1,6 @@
 import { get } from "svelte/store";
 import { Protocol } from "$lib/types/device/base";
-import { NodePhase } from "$lib/types/nodes/base";
+import { NodePhase, NodeType } from "$lib/types/nodes/base";
 import {
     getNodePhasePriority,
     getNodePriority,
@@ -17,7 +17,13 @@ import {
 import { defaultVariables } from "$lib/stores/device/variables";
 import { protocolPlugins } from "$lib/stores/device/protocol";
 import { nodePhaseSections } from "$lib/types/nodes/base";
-import { type NodeRecordEditingState, type EditableNodeRecord, type NodeRecord, defaultNoProtocolNodeOptions } from "$lib/types/nodes/config";
+import {
+    type NodeRecordEditingState,
+    type EditableNodeRecord,
+    type NodeRecord,
+    defaultNoProtocolNodeOptions,
+    type EditableBaseNodeProtocolOptions,
+} from "$lib/types/nodes/config";
 import type { ProcessedNodeState } from "$lib/types/nodes/realtime";
 
 /**
@@ -105,6 +111,28 @@ export function customNodeChange(node: EditableNodeRecord, nodeState: NodeRecord
         node.config.unit = nodeState.oldVariableUnit;
     }
     node.name = getNodePrefix(phase) + node.display_name;
+}
+
+/**
+ * Updates node configuration when the node type changes.
+ *
+ * Re-evaluates whether the node is numeric and clears all numeric-only
+ * settings if it is not, ensuring the node remains in a valid state.
+ *
+ * @param {EditableNodeRecord} node - The editable node being updated.
+ */
+export function nodeTypeChange(node: EditableNodeRecord): void {
+    let nodeIsNumeric = isNumeric(node);
+    if (!nodeIsNumeric) {
+        node.config.decimal_places = "";
+        node.config.logging = false;
+        node.config.min_alarm = false;
+        node.config.max_alarm = false;
+        node.config.min_alarm_value = "";
+        node.config.max_alarm_value = "";
+        node.config.unit = "";
+    }
+    node.is_numeric = nodeIsNumeric;
 }
 
 /**

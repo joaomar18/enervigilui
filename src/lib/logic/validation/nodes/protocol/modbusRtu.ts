@@ -71,17 +71,27 @@ export function validateModbusEndianMode(type: ModbusRTUNodeType, endianMode: Mo
 }
 
 /**
- * Validates the bit index for a Modbus RTU node. Bit indexing is only allowed
- * when the data type is BOOL, in which case the bit value must be an integer
- * between 0 and 15. For all other data types, the bit field must be null.
+ * Validates the bit index for a Modbus RTU node.
+ *
+ * A bit index is only permitted when:
+ * - The node data type is BOOL
+ * - The Modbus function is NOT READ_COILS or READ_DISCRETE_INPUTS
+ *
+ * In this case, the bit value must be an integer between 0 and 15.
+ * For all other type/function combinations, the bit field must be null.
  *
  * @function validateModbusBitIndex
- * @param {ModbusRTUNodeType} type - The Modbus data type being validated.
- * @param {string | null} bit - The user-provided bit index as a string or null.
- * @returns {boolean} True if the bit value is valid for the given type, false otherwise.
+ * @param {ModbusRTUNodeType} type - The Modbus node data type being validated.
+ * @param {ModbusRTUFunction} modbus_function - The Modbus RTU function in use.
+ * @param {string | null} bit - User-provided bit index as a string or null.
+ * @returns {boolean} `true` if the bit value is valid for the given configuration, `false` otherwise.
  */
-export function validateModbusBitIndex(type: ModbusRTUNodeType, bit: string | null): boolean {
-    if (type === ModbusRTUNodeType.BOOL) {
+export function validateModbusBitIndex(type: ModbusRTUNodeType, modbus_function: ModbusRTUFunction, bit: string | null): boolean {
+    if (
+        type === ModbusRTUNodeType.BOOL &&
+        modbus_function !== ModbusRTUFunction.READ_COILS &&
+        modbus_function !== ModbusRTUFunction.READ_DISCRETE_INPUTS
+    ) {
         if (bit === null || bit === "") return false;
         const n = Number(bit);
         return Number.isInteger(n) && n >= 0 && n <= 15;

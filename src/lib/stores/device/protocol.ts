@@ -227,7 +227,7 @@ const modbusRtuPlugin: ProtocolPlugin = {
         if (!validateModbusFunction(protocolOptions.function, protocolOptions.type)) return false;
         if (!validateModbusAddress(protocolOptions.address)) return false;
         if (!validateModbusEndianMode(protocolOptions.type, protocolOptions.endian_mode)) return false;
-        if (!validateModbusBitIndex(protocolOptions.type, protocolOptions.bit)) return false;
+        if (!validateModbusBitIndex(protocolOptions.type, protocolOptions.function, protocolOptions.bit)) return false;
 
         return true;
     },

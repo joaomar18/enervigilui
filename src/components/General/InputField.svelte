@@ -18,7 +18,10 @@
     export let infoText: string = "";
     export let placeHolderText: string = "";
     export let zeroPaddingDigits: number = 0;
+    export let decimalPlaces: number | null = null; // To use with float values
     export let validateOnInput = false; // Validates Input on value change
+    export let handleInputOnBlur = false; // Hanles Input only on blur
+    export let allowEmpty = false; // Allows the input field to be an empty string
     export let disableAnimations = false;
 
     // Style object (from theme)
@@ -102,50 +105,61 @@
     export let onBlur: (() => void) | undefined = undefined;
 
     // Functions
-    function handleInput(event: Event): void {
-        let input = (event.target as HTMLInputElement).value;
-        if (inputType === "INT") {
-            // Allow only integers
-            input = input.replace(/[^0-9-]/g, ""); // Allow negative integers
-            input = String(Number(input));
-            input = input.padStart(zeroPaddingDigits, "0");
-        } else if (inputType === "POSITIVE_INT") {
-            // Allow only positive integers
-            input = input.replace(/[^0-9]/g, "");
-            console.log(input);
-            input = String(Number(input));
-            input = input.padStart(zeroPaddingDigits, "0");
-        } else if (inputType === "FLOAT") {
-            // Allow only floating-point numbers
-            input = input.replace(/[^0-9.-]/g, ""); // Allow negative floats
-            // Prevent multiple dots or dashes
-            if ((input.match(/\./g) || []).length > 1 || (input.match(/-/g) || []).length > 1) {
-                input = input.slice(0, -1);
+    function onInput(): void {
+        if (!handleInputOnBlur) handleInput();
+    }
+
+    function handleInput(): void {
+        let input = inputEl.value;
+        if (!(allowEmpty && input === "")) {
+            if (inputType === "INT") {
+                // Allow only integers
+                input = input.replace(/[^0-9-]/g, ""); // Allow negative integers
+                input = String(Number(input));
+                input = input.padStart(zeroPaddingDigits, "0");
+            } else if (inputType === "POSITIVE_INT") {
+                // Allow only positive integers
+                input = input.replace(/[^0-9]/g, "");
+                input = String(Number(input));
+                input = input.padStart(zeroPaddingDigits, "0");
+            } else if (inputType === "FLOAT") {
+                // Allow only floating-point numbers
+                input = input.replace(/[^0-9.-]/g, ""); // Allow negative floats
+                // Prevent multiple dots or dashes
+                if ((input.match(/\./g) || []).length > 1 || (input.match(/-/g) || []).length > 1) {
+                    input = input.slice(0, -1);
+                }
+                if (decimalPlaces !== null) {
+                    input = Number(input).toFixed(decimalPlaces);
+                }
+                input = String(Number(input));
+                input = input.padStart(zeroPaddingDigits, "0");
+            } else if (inputType === "POSITIVE_FLOAT") {
+                // Allow only positive floating-point numbers
+                input = input.replace(/[^0-9.]/g, "").padStart(zeroPaddingDigits, "0");
+                // Prevent multiple dots
+                if ((input.match(/\./g) || []).length > 1) {
+                    input = input.slice(0, -1);
+                }
+                if (decimalPlaces !== null) {
+                    input = Number(input).toFixed(decimalPlaces);
+                }
+                input = String(Number(input));
+                input = input.padStart(zeroPaddingDigits, "0");
             }
-            input = String(Number(input));
-            input = input.padStart(zeroPaddingDigits, "0");
-        } else if (inputType === "POSITIVE_FLOAT") {
-            // Allow only positive floating-point numbers
-            input = input.replace(/[^0-9.]/g, "").padStart(zeroPaddingDigits, "0");
-            // Prevent multiple dots
-            if ((input.match(/\./g) || []).length > 1) {
-                input = input.slice(0, -1);
-            }
-            input = String(Number(input));
-            input = input.padStart(zeroPaddingDigits, "0");
         }
 
         inputValue = input;
-
-        if (onChange) {
-            onChange();
-        }
 
         if (validateOnInput) {
             validateBounds();
         }
 
         inputEl.value = inputValue; // Change input display value on firefox based browsers.
+
+        if (onChange) {
+            onChange();
+        }
     }
 
     function validateBounds(): void {
@@ -261,6 +275,9 @@ Applies special styling when focused.
                     }}
                     on:blur={() => {
                         selected = false;
+                        if (handleInputOnBlur) {
+                            handleInput();
+                        }
                         if (!validateOnInput) {
                             validateBounds();
                         }
@@ -269,7 +286,7 @@ Applies special styling when focused.
                         }
                     }}
                     bind:value={inputValue}
-                    on:input={handleInput}
+                    on:input={onInput}
                     on:keydown={handleKeydown}
                     placeholder={placeHolderText}
                     {disabled}
@@ -294,6 +311,9 @@ Applies special styling when focused.
                     }}
                     on:blur={() => {
                         selected = false;
+                        if (handleInputOnBlur) {
+                            handleInput();
+                        }
                         if (!validateOnInput) {
                             validateBounds();
                         }
@@ -302,7 +322,7 @@ Applies special styling when focused.
                         }
                     }}
                     bind:value={inputValue}
-                    on:input={handleInput}
+                    on:input={onInput}
                     on:keydown={handleKeydown}
                     placeholder={placeHolderText}
                     {disabled}
@@ -327,6 +347,9 @@ Applies special styling when focused.
                     }}
                     on:blur={() => {
                         selected = false;
+                        if (handleInputOnBlur) {
+                            handleInput();
+                        }
                         if (!validateOnInput) {
                             validateBounds();
                         }
@@ -335,7 +358,7 @@ Applies special styling when focused.
                         }
                     }}
                     bind:value={inputValue}
-                    on:input={handleInput}
+                    on:input={onInput}
                     on:keydown={handleKeydown}
                     placeholder={placeHolderText}
                     {disabled}

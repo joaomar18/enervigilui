@@ -89,7 +89,8 @@ export interface ProcessedNodeState {
  * @property {number} [max_alarm_value] - Maximum threshold value that triggers alarms
  * @property {number} [min_warning_value] - Minimum threshold value that triggers warnings
  * @property {number} [max_warning_value] - Maximum threshold value that triggers warnings
- * @property {NodeType} type - Data type of the node value
+ * @property {NodeType} type - Internal Data type of the node value
+ * @property {string} protocol_type - Protocol Type of the node value
  * @property {Protocol} protocol - Communication protocol used by this node
  * @property {number} read_period - How often the node value is read (in seconds)
  * @property {number} logging_period - How often the node value is logged (in minutes)
@@ -102,6 +103,7 @@ export interface BaseNodeAdditionalInfo {
     min_warning_value?: number;
     max_warning_value?: number;
     type: NodeType;
+    protocol_type: string;
     protocol: Protocol;
     read_period: number;
     logging_period: number;

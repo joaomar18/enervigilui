@@ -11,25 +11,30 @@ export const LOGGING_PERIOD_LIM: Record<string, number> = { MIN: 1, MAX: 1440 };
 /*****     I N T E R F A C E S     *****/
 
 /**
- * Base configuration shared by all node types regardless of protocol.
- * Defines common settings and parameters used across all nodes in the system.
+ * Base configuration shared by all node types, independent of the communication protocol.
+ * Defines common behavior, formatting, logging, publishing, and limit-handling settings applicable to every node in the system.
  *
- * @interface
- * @property {boolean} calculated - True if the node value is calculated rather than obtained via communication
- * @property {boolean} custom - True if this is a custom user-defined node
- * @property {number | null} decimal_places - Number of decimal places to display for numeric values (can be null for non-numeric types)
- * @property {boolean} enabled - Whether the node is currently enabled
- * @property {boolean | null} is_counter - True if the node value is of counter type (can be null for non-applicable nodes)
- * @property {CounterMode | null} counter_mode - Counter behavior mode for the node (null when not applicable)
- * @property {boolean} logging - Whether data logging is enabled for this node
- * @property {number} logging_period - Logging frequency in minutes
- * @property {boolean} max_alarm - Whether maximum threshold alarm is enabled
- * @property {number | null} max_alarm_value - Value that triggers maximum threshold alarm (can be null when alarm is disabled)
- * @property {boolean} min_alarm - Whether minimum threshold alarm is enabled
- * @property {number | null} min_alarm_value - Value that triggers minimum threshold alarm (can be null when alarm is disabled)
- * @property {boolean} publish - Whether the node's value should be published to external systems or services
- * @property {string | null} unit - Measurement unit (e.g., V, A, kW, null for non numeric types)
+ * @interface BaseNodeConfig
+ * @property {boolean} calculated - Indicates whether the node value is calculated internally rather than obtained via protocol communication.
+ * @property {boolean} custom - True if the node is user-defined rather than provided by the device template.
+ * @property {number | null} decimal_places - Number of decimal places used when displaying numeric values; null for non-numeric or unformatted node types.
+ * @property {boolean} enabled - Controls whether the node is active and processed by the system.
+ * @property {boolean | null} is_counter - Indicates whether the node represents a counter value; null when not applicable.
+ * @property {CounterMode | null} counter_mode - Defines the counter behavior mode; null when the node is not configured as a counter.
+ * @property {boolean} logging - Enables or disables periodic logging of the node value.
+ * @property {number} logging_period - Logging interval in minutes when logging is enabled.
+ * @property {boolean} max_alarm - Enables a maximum threshold alarm condition.
+ * @property {number | null} max_alarm_value - Threshold value that triggers the maximum alarm; null when the alarm is disabled.
+ * @property {boolean} min_alarm - Enables a minimum threshold alarm condition.
+ * @property {number | null} min_alarm_value - Threshold value that triggers the minimum alarm; null when the alarm is disabled.
+ * @property {boolean} max_warning - Enables a maximum threshold warning condition.
+ * @property {number | null} max_warning_value - Threshold value that triggers the maximum warning; null when the warning is disabled.
+ * @property {boolean} min_warning - Enables a minimum threshold warning condition.
+ * @property {number | null} min_warning_value - Threshold value that triggers the minimum warning; null when the warning is disabled.
+ * @property {boolean} publish - Controls whether the node value is published to external systems (e.g., MQTT, APIs).
+ * @property {string | null} unit - Measurement unit associated with the node value (e.g., V, A, kW); null for non-numeric or unitless values.
  */
+
 export interface BaseNodeConfig {
     calculated: boolean;
     custom: boolean;
@@ -43,6 +48,10 @@ export interface BaseNodeConfig {
     max_alarm_value: number | null;
     min_alarm: boolean;
     min_alarm_value: number | null;
+    max_warning: boolean;
+    max_warning_value: number | null;
+    min_warning: boolean;
+    min_warning_value: number | null;
     publish: boolean;
     unit: string | null;
 }
@@ -64,6 +73,10 @@ export interface EditableBaseNodeConfig {
     max_alarm_value: string;
     min_alarm: boolean;
     min_alarm_value: string;
+    max_warning: boolean;
+    max_warning_value: string;
+    min_warning: boolean;
+    min_warning_value: string;
     publish: boolean;
     unit: string;
 }
@@ -74,7 +87,7 @@ export interface EditableBaseNodeConfig {
  *
  * @interface
  */
-export interface BaseNodeProtocolOptions { }
+export interface BaseNodeProtocolOptions {}
 
 /**
  * Base interface for editable protocol-specific node configuration options.
@@ -82,7 +95,7 @@ export interface BaseNodeProtocolOptions { }
  *
  * @interface
  */
-export interface EditableBaseNodeProtocolOptions { }
+export interface EditableBaseNodeProtocolOptions {}
 
 /**
  * Represents a minimal node definition used when no protocol-specific
@@ -198,6 +211,8 @@ export interface NodeRecordEditingState {
  * @property {boolean} loggingPeriod - True if the logging interval is valid for the node.
  * @property {boolean} minAlarm - True if the minimum alarm value (if enabled) is valid.
  * @property {boolean} maxAlarm - True if the maximum alarm value (if enabled) is valid.
+ * @property {boolean} minWarning - True if the minimum warning value (if enabled) is valid.
+ * @property {boolean} maxWarning - True if the maximum warning value (if enabled) is valid.
  * @property {boolean} calculated - True if the configuration for a calculated/virtual node is valid.
  * @property {boolean} isCounter - True if the node is correctly configured as a counter-type variable.
  * @property {boolean} counterMode - True if the counter mode configuration (incremental, rollover, etc.) is valid.
@@ -214,6 +229,8 @@ export interface NodeValidation {
     loggingPeriod: boolean;
     minAlarm: boolean;
     maxAlarm: boolean;
+    minWarning: boolean;
+    maxWarning: boolean;
     calculated: boolean;
     isCounter: boolean;
     counterMode: boolean;
@@ -238,6 +255,10 @@ export const defaultBaseNodeConfig: EditableBaseNodeConfig = {
     max_alarm_value: Number(0).toFixed(2),
     min_alarm: false,
     min_alarm_value: Number(0).toFixed(2),
+    min_warning: false,
+    min_warning_value: Number(0).toFixed(2),
+    max_warning: false,
+    max_warning_value: Number(0).toFixed(2),
     unit: "",
     publish: true,
 };

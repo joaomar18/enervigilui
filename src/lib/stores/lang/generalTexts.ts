@@ -560,13 +560,21 @@ const textsObject: TextsObject = {
         PT: "Defina o período de registo (em minutos) para guardar periodicamente os dados desta variável. Ative ou desative o registo utilizando a caixa de seleção.",
         EN: "Set the logging period (in minutes) to store this variable's data periodically. Enable or disable logging using the checkbox.",
     },
-    minValueInfo: {
-        PT: "Defina o valor mínimo permitido para esta variável. O sistema irá sinalizar se o valor medido for inferior a este limite. Ative ou desative esta função utilizando a caixa de seleção.",
-        EN: "Set the minimum allowed value for this variable. The system will alert if the measured value falls below this limit. Enable or disable this function using the checkbox.",
+    minAlarmValueInfo: {
+        PT: "Defina o valor mínimo de alarme permitido para esta variável. O sistema irá sinalizar se o valor medido for inferior a este limite. Ative ou desative esta função utilizando a caixa de seleção.",
+        EN: "Set the minimum allowed alarm value for this variable. The system will alert if the measured value falls below this limit. Enable or disable this function using the checkbox.",
     },
-    maxValueInfo: {
-        PT: "Defina o valor máximo permitido para esta variável. O sistema irá sinalizar se o valor medido exceder este limite. Ative ou desative esta função utilizando a caixa de seleção.",
-        EN: "Set the maximum allowed value for this variable. The system will alert if the measured value exceeds this limit. Enable or disable this function using the checkbox.",
+    maxAlarmValueInfo: {
+        PT: "Defina o valor máximo de alarme permitido para esta variável. O sistema irá sinalizar se o valor medido exceder este limite. Ative ou desative esta função utilizando a caixa de seleção.",
+        EN: "Set the maximum allowed alarm value for this variable. The system will alert if the measured value exceeds this limit. Enable or disable this function using the checkbox.",
+    },
+    minWarningValueInfo: {
+        PT: "Defina o valor mínimo de aviso permitido para esta variável. O sistema irá sinalizar se o valor medido for inferior a este limite. Ative ou desative esta função utilizando a caixa de seleção.",
+        EN: "Set the minimum allowed warning value for this variable. The system will alert if the measured value falls below this limit. Enable or disable this function using the checkbox.",
+    },
+    maxWarningValueInfo: {
+        PT: "Defina o valor máximo de aviso permitido para esta variável. O sistema irá sinalizar se o valor medido exceder este limite. Ative ou desative esta função utilizando a caixa de seleção.",
+        EN: "Set the maximum allowed warning value for this variable. The system will alert if the measured value exceeds this limit. Enable or disable this function using the checkbox.",
     },
     customInfo: {
         PT: "Ative esta opção para definir a variável como personalizada (definida pelo utilizador) em vez de uma variável padrão do sistema.",

@@ -1,5 +1,6 @@
 <script lang="ts">
     import { validateOpcUaNodeId } from "$lib/logic/validation/nodes/protocol/opcUa";
+    import { nodeTypeChange } from "$lib/logic/handlers/nodes/base";
     import InfoLabel from "../../../../General/InfoLabel.svelte";
     import InputField from "../../../../General/InputField.svelte";
     import Selector from "../../../../General/Selector.svelte";
@@ -25,58 +26,72 @@
     export let disableAnimations: boolean = false;
 
     // Variables
+    let firstProcessingDone: boolean = false;
     let commOptions: EditableOPCUANodeOptions;
     let validOpcUaId: boolean = false;
 
     // Reactive Statements
     $: commOptions = node?.protocol_options as EditableOPCUANodeOptions;
-    $: validOpcUaId = validateOpcUaNodeId(commOptions.node_id);
+    $: if (commOptions && !firstProcessingDone) firstProcessing();
+    $: if (!commOptions) firstProcessingDone = false;
 
     // Export Functions
     export let onPropertyChanged: () => void;
+
+    // Functions
+    function firstProcessing(): void {
+        validOpcUaId = validateOpcUaNodeId(commOptions.node_id);
+        firstProcessingDone = true;
+    }
 </script>
 
-<div class="row col-align">
-    <div class="label-wrapper extend-width">
-        <InfoLabel style={$NodeConfigSheetInfoLabelStyle} labelText={$pluginTexts[textKey]} toolTipText={$pluginTexts[infoTextKey]} />
+<!-- OpcUaNodeCommConfig Component: configures OPC UA node communication parameters.
+Renders input field for OPC UA node ID and selector for data type. Validates node ID in real-time
+and triggers protocol-specific handlers when the data type changes. -->
+{#if commOptions}
+    <div class="row col-align">
+        <div class="label-wrapper extend-width">
+            <InfoLabel style={$NodeConfigSheetInfoLabelStyle} labelText={$pluginTexts[textKey]} toolTipText={$pluginTexts[infoTextKey]} />
+        </div>
+        <span class="value extend-width">
+            <InputField
+                style={$NodeConfigSheetInputFieldStyle}
+                disabled={node.config.calculated}
+                bind:inputValue={commOptions.node_id}
+                inputInvalid={!validOpcUaId}
+                enableInputInvalid={true}
+                onChange={() => {
+                    validOpcUaId = validateOpcUaNodeId(commOptions.node_id);
+                    onPropertyChanged();
+                }}
+                inputType="STRING"
+                width="100%"
+                disableHints={true}
+                {disableAnimations}
+            />
+        </span>
     </div>
-    <span class="value extend-width">
-        <InputField
-            style={$NodeConfigSheetInputFieldStyle}
-            disabled={node.config.calculated}
-            bind:inputValue={commOptions.node_id}
-            inputInvalid={!validOpcUaId}
-            enableInputInvalid={true}
-            onChange={() => {
-                onPropertyChanged();
-            }}
-            inputType="STRING"
-            width="100%"
-            disableHints={true}
-            {disableAnimations}
-        />
-    </span>
-</div>
-<div class="row col-align">
-    <div class="label-wrapper extend-width">
-        <InfoLabel style={$NodeConfigSheetInfoLabelStyle} labelText={$pluginTexts[typeKey]} toolTipText={$pluginTexts[infoTypeKey]} />
+    <div class="row col-align">
+        <div class="label-wrapper extend-width">
+            <InfoLabel style={$NodeConfigSheetInfoLabelStyle} labelText={$pluginTexts[typeKey]} toolTipText={$pluginTexts[infoTypeKey]} />
+        </div>
+        <span class="value extend-width">
+            <Selector
+                style={$NodeConfigSheetSelectorStyle}
+                options={$opcUaNodeTypeTexts}
+                bind:selectedOption={commOptions.type}
+                onChange={() => {
+                    onPropertyChanged();
+                    protocolPlugin.setProtocolType(commOptions, commOptions.type);
+                    nodeTypeChange(node);
+                }}
+                inputInvalid={!node.validation.variableType}
+                enableInputInvalid={true}
+                scrollable={true}
+            />
+        </span>
     </div>
-    <span class="value extend-width">
-        <Selector
-            style={$NodeConfigSheetSelectorStyle}
-            options={$opcUaNodeTypeTexts}
-            bind:selectedOption={commOptions.type}
-            onChange={() => {
-                onPropertyChanged();
-                protocolPlugin.setProtocolType(commOptions, commOptions.type);
-                node.is_numeric = protocolPlugin.isNumeric(node.protocol_options);
-            }}
-            inputInvalid={!node.validation.variableType}
-            enableInputInvalid={true}
-            scrollable={true}
-        />
-    </span>
-</div>
+{/if}
 
 <style>
     /* Generic row: label + value horizontal layout */

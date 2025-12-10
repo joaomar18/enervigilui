@@ -61,9 +61,13 @@ export function convertToEditableBaseNodeConfig(config: BaseNodeConfig, isNumeri
         logging: config.logging,
         logging_period: config.logging_period.toString(),
         max_alarm: config.max_alarm,
-        max_alarm_value: config.max_alarm_value?.toFixed(number_decimal_places) ?? "",
+        max_alarm_value: config.max_alarm_value !== null ? String(Number(config.max_alarm_value.toFixed(number_decimal_places))) : "",
         min_alarm: config.min_alarm,
-        min_alarm_value: config.min_alarm_value?.toFixed(number_decimal_places) ?? "",
+        min_alarm_value: config.min_alarm_value !== null ? String(Number(config.min_alarm_value.toFixed(number_decimal_places))) : "",
+        max_warning: config.max_warning,
+        max_warning_value: config.max_warning_value !== null ? String(Number(config.max_warning_value.toFixed(number_decimal_places))) : "",
+        min_warning: config.min_warning,
+        min_warning_value: config.min_warning_value !== null ? String(Number(config.min_warning_value.toFixed(number_decimal_places))) : "",
         publish: config.publish,
         unit: config.unit ?? "",
     } as EditableBaseNodeConfig;
@@ -93,6 +97,10 @@ export function convertToBaseNodeConfig(config: EditableBaseNodeConfig, isNumeri
         max_alarm_value: stringIsValidFloat(config.max_alarm_value) ? parseFloat(config.max_alarm_value) : null,
         min_alarm: config.min_alarm,
         min_alarm_value: stringIsValidFloat(config.min_alarm_value) ? parseFloat(config.min_alarm_value) : null,
+        max_warning: config.max_warning,
+        max_warning_value: stringIsValidFloat(config.max_warning_value) ? parseFloat(config.max_warning_value) : null,
+        min_warning: config.min_warning,
+        min_warning_value: stringIsValidFloat(config.min_warning_value) ? parseFloat(config.min_warning_value) : null,
         publish: config.publish,
         unit: isNumeric ? config.unit : null,
     } as BaseNodeConfig;
@@ -109,6 +117,8 @@ export function getEditableBaseNodeConfigFromDefaultVar(variable: DefaultNodeInf
     let decimal_places: string = "";
     let min_alarm_value: string = "";
     let max_alarm_value: string = "";
+    let min_warning_value: string = "";
+    let max_warning_value: string = "";
 
     if (variable.isNumeric) {
         decimal_places = variable.defaultNumberOfDecimals ? variable.defaultNumberOfDecimals.toString() : "0";
@@ -117,8 +127,14 @@ export function getEditableBaseNodeConfigFromDefaultVar(variable: DefaultNodeInf
             min_alarm_value = variable.defaultMinAlarm
                 ? variable.defaultMinAlarm.toFixed(parseInt(decimal_places))
                 : Number(0).toFixed(parseInt(decimal_places));
+            min_warning_value = min_alarm_value
+                ? String((Number(min_alarm_value) * (1 + 0.02)).toFixed(parseInt(decimal_places)))
+                : Number(0).toFixed(parseInt(decimal_places));
             max_alarm_value = variable.defaultMaxAlarm
                 ? variable.defaultMaxAlarm.toFixed(parseInt(decimal_places))
+                : Number(0).toFixed(parseInt(decimal_places));
+            max_warning_value = max_alarm_value
+                ? String((Number(max_alarm_value) * (1 - 0.02)).toFixed(parseInt(decimal_places)))
                 : Number(0).toFixed(parseInt(decimal_places));
         }
     }
@@ -136,6 +152,10 @@ export function getEditableBaseNodeConfigFromDefaultVar(variable: DefaultNodeInf
         max_alarm_value: max_alarm_value,
         min_alarm: variable.defaultMinAlarmEnabled !== undefined ? true : false,
         min_alarm_value: min_alarm_value,
+        max_warning: false,
+        max_warning_value: max_warning_value,
+        min_warning: false,
+        min_warning_value: min_warning_value,
         publish: variable.defaultPublished,
         unit: variable.defaultUnit,
     } as EditableBaseNodeConfig;

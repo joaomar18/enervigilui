@@ -15,7 +15,6 @@
 
     // Stores
     import { currentDeviceID } from "$lib/stores/device/current";
-    import { protocolPlugins } from "$lib/stores/device/protocol";
 
     // Texts
     import { texts } from "$lib/stores/lang/generalTexts";
@@ -513,7 +512,7 @@
                     <div class="row">
                         <span class="label">{$texts.type}</span>
                         <InlineLoader loaded={!nodeAddInfoLoading && nodeAdditionalInfo?.type !== undefined}>
-                            <span class="value align-right">{nodeAdditionalInfo?.type}</span>
+                            <span class="value align-right">{nodeAdditionalInfo?.protocol_type}</span>
                         </InlineLoader>
                     </div>
                     <div class="row">

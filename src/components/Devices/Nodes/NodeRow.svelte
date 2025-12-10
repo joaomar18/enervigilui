@@ -5,7 +5,7 @@
     import Checkbox from "../../General/Checkbox.svelte";
     import Button from "../../General/Button.svelte";
     import ExpandableButton from "../../General/ExpandableButton.svelte";
-    import { nodeNameChange, customNodeChange, virtualNodeChange } from "$lib/logic/handlers/nodes/base";
+    import { nodeNameChange, customNodeChange, virtualNodeChange, nodeTypeChange } from "$lib/logic/handlers/nodes/base";
     import { LOGGING_PERIOD_LIM } from "$lib/types/nodes/config";
     import { defaultVariableUnits } from "$lib/stores/device/variables";
     import { showToast } from "$lib/logic/view/toast";
@@ -205,7 +205,7 @@ properties and action buttons for configuration and deletion. -->
                     onChange={() => {
                         onPropertyChanged();
                         protocolPlugin.setProtocolType(node.protocol_options, protocolType);
-                        node.is_numeric = protocolPlugin.isNumeric(node.protocol_options);
+                        nodeTypeChange(node);
                     }}
                     inputInvalid={!node.validation.variableType}
                     enableInputInvalid={true}
@@ -221,7 +221,7 @@ properties and action buttons for configuration and deletion. -->
             <div class="cell-content">
                 <InputField
                     style={$NodeInputFieldStyle}
-                    disabled={!node.config.logging}
+                    disabled={!node.config.logging || !node.is_numeric}
                     bind:inputValue={node.config.logging_period}
                     inputInvalid={!node.validation.loggingPeriod}
                     enableInputInvalid={true}
@@ -251,6 +251,7 @@ properties and action buttons for configuration and deletion. -->
                     onChange={() => {
                         onPropertyChanged();
                     }}
+                    disabled={!node.is_numeric}
                     inputInvalid={!node.validation.loggingPeriod}
                     inputName="log-node"
                     width={buttonSize}
