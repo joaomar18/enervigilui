@@ -51,6 +51,7 @@
                     title={`${$texts.deleteDevice} ${deviceName}`}
                     minWidth="300px"
                     maxWidth="550px"
+                    disableCloseWindow={processingRequest}
                     closeWindow={() => {
                         windowOpened = false;
                     }}

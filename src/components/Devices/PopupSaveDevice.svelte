@@ -40,6 +40,7 @@
                     title={`${$texts.saveDevice}`}
                     minWidth="300px"
                     maxWidth="550px"
+                    disableCloseWindow={processingRequest}
                     closeWindow={() => {
                         windowOpened = false;
                     }}

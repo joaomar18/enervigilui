@@ -8,6 +8,7 @@
 
     // Props
     export let customTitle: boolean = false;
+    export let disableCloseWindow: boolean = false;
     export let title: string = "";
 
     // Style object (from theme)
@@ -55,7 +56,7 @@
 
     // Functions
     function handleClickOutside(event: MouseEvent): void {
-        if (containerEl && !containerEl.contains(event.target as HTMLElement)) {
+        if (!disableCloseWindow && containerEl && !containerEl.contains(event.target as HTMLElement)) {
             if (closeWindow) {
                 closeWindow();
             }
@@ -128,7 +129,7 @@
             {:else}
                 <h3 class="not-custom">{title}</h3>
             {/if}
-            <button class="close-button" on:click={closeWindow} aria-label="Close Window">
+            <button class="close-button" on:click={() => {if(!disableCloseWindow) closeWindow()}} aria-label="Close Window">
                 <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                     <line x1="6" y1="6" x2="18" y2="18" />
                     <line x1="18" y1="6" x2="6" y2="18" />
