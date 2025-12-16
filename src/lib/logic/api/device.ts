@@ -194,9 +194,9 @@ export async function addDevice(deviceData: Device, deviceImage: File | undefine
     const { sucess, data } = await callAPI({
         endpoint: "/api/device/add_device",
         method: "POST",
-        params: { deviceData, deviceNodes },
+        params: { device_data: deviceData, device_nodes: deviceNodes },
         file: deviceImage,
-        fileFieldName: "deviceImage",
+        fileFieldName: "device_image",
     });
     if (sucess) {
         await navigateTo("/devices", {});
@@ -215,9 +215,9 @@ export async function editDevice(deviceData: Device, deviceImage: File | undefin
     const { sucess, data } = await callAPI({
         endpoint: "/api/device/edit_device",
         method: "POST",
-        params: { deviceData, deviceNodes },
+        params: { device_data: deviceData, device_nodes: deviceNodes },
         file: deviceImage,
-        fileFieldName: "deviceImage",
+        fileFieldName: "device_image",
     });
     if (sucess) {
         await navigateTo("/devices", {});
