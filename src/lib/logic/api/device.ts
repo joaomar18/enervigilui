@@ -234,7 +234,7 @@ export async function deleteDevice(deviceID: number) {
     const { sucess, data } = await callAPI({
         endpoint: "/api/device/delete_device",
         method: "DELETE",
-        params: { device_id: deviceID },
+        params: { id: deviceID },
     });
     if (sucess) {
         await navigateTo("/devices", {});

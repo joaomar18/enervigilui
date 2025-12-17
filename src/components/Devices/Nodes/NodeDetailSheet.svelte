@@ -522,12 +522,6 @@
                         </InlineLoader>
                     </div>
                     <div class="row">
-                        <span class="label">{$texts.interval}</span>
-                        <InlineLoader loaded={!nodeAddInfoLoading && nodeAdditionalInfo?.read_period !== undefined}>
-                            <span class="value align-right">{nodeAdditionalInfo?.read_period} s</span>
-                        </InlineLoader>
-                    </div>
-                    <div class="row">
                         <span class="label">{$texts.logging}</span>
                         <InlineLoader loaded={!nodeAddInfoLoading}>
                             {#if nodeAdditionalInfo?.logging_period !== undefined}

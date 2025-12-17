@@ -92,7 +92,6 @@ export interface ProcessedNodeState {
  * @property {NodeType} type - Internal Data type of the node value
  * @property {string} protocol_type - Protocol Type of the node value
  * @property {Protocol} protocol - Communication protocol used by this node
- * @property {number} read_period - How often the node value is read (in seconds)
  * @property {number} logging_period - How often the node value is logged (in minutes)
  */
 export interface BaseNodeAdditionalInfo {
@@ -105,7 +104,6 @@ export interface BaseNodeAdditionalInfo {
     type: NodeType;
     protocol_type: string;
     protocol: Protocol;
-    read_period: number;
     logging_period: number;
 }
 

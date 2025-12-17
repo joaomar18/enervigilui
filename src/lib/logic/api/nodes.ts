@@ -80,14 +80,14 @@ export async function getDeviceNodesState(
  * Fetches additional information for a specific node of a device.
  * Processes the node name with the appropriate phase prefix before making the API call.
  *
- * @param device_id - The unique identifier of the device
+ * @param id - The unique identifier of the device
  * @param nodeName - The name of the node to fetch additional information for
  * @param nodePhase - The electrical phase of the node
  * @returns A promise resolving to an object containing the node's additional information
  * @throws Error if the API call fails
  */
 export async function getNodeAdditionalInfo(
-    device_id: number,
+    id: number,
     nodeName: string,
     nodePhase: NodePhase
 ): Promise<{ nodeAdditionalInfo: BaseNodeAdditionalInfo }> {
@@ -98,7 +98,7 @@ export async function getNodeAdditionalInfo(
     const { sucess, data } = await callAPI({
         endpoint: "/api/nodes/get_node_additional_info",
         method: "GET",
-        params: { device_id, node_name: processedName },
+        params: { id, node_name: processedName },
     });
 
     if (sucess) {
@@ -114,7 +114,7 @@ export async function getNodeAdditionalInfo(
  * Fetches and processes historical log data for a specific node.
  * Retrieves time-series data from the backend API and converts it to UI-ready format with Unix timestamps.
  *
- * @param device_id - The unique identifier of the device
+ * @param id - The unique identifier of the device
  * @param nodeName - The name of the node to fetch logs for
  * @param nodePhase - The electrical phase of the node
  * @param formatted - Whether to return formatted data (optional)
@@ -125,7 +125,7 @@ export async function getNodeAdditionalInfo(
  * @throws Error if the API call fails
  */
 export async function getNodeLogs(
-    device_id: number,
+    id: number,
     nodeName: string,
     nodePhase: NodePhase,
     formatted: boolean | null = null,
@@ -145,7 +145,7 @@ export async function getNodeLogs(
     const { sucess, data } = await callAPI({
         endpoint: "/api/nodes/get_logs_from_node",
         method: "GET",
-        params: { device_id, node_name: processedName, formatted, start_time: start_time_str, end_time: end_time_str, time_step, time_zone },
+        params: { id, node_name: processedName, formatted, start_time: start_time_str, end_time: end_time_str, time_step, time_zone },
     });
 
     if (sucess) {
@@ -162,7 +162,7 @@ export async function getNodeLogs(
  * Retrieves active energy, reactive energy, power factor, and power factor direction data,
  * then merges them into unified time-aligned log points for visualization.
  *
- * @param device_id - The unique identifier of the device
+ * @param id - The unique identifier of the device
  * @param phase - The electrical phase filter (single-phase, three-phase total, or individual phases)
  * @param direction - Energy direction filter (consumed, produced, or both)
  * @param formatted - Whether to return formatted data (optional)
@@ -173,7 +173,7 @@ export async function getNodeLogs(
  * @throws Error if the API call fails
  */
 export async function getEnergyConsumption(
-    device_id: number,
+    id: number,
     phase: SelectablePhaseFilter,
     direction: EnergyDirectionFilter,
     formatted: boolean | null = null,
@@ -193,7 +193,7 @@ export async function getEnergyConsumption(
     const { sucess, data } = await callAPI({
         endpoint: "/api/nodes/get_energy_consumption",
         method: "GET",
-        params: { device_id, phase, direction, formatted, start_time: start_time_str, end_time: end_time_str, time_step, time_zone },
+        params: { id, phase, direction, formatted, start_time: start_time_str, end_time: end_time_str, time_step, time_zone },
     });
 
     if (sucess) {
@@ -227,7 +227,7 @@ export async function mapMetricAPI(
  * the device id, phase and timezone to the backend API. If start_time or end_time
  * are omitted, the API returns peak values for its default interval.
  *
- * @param device_id - Device numeric identifier
+ * @param id - Device numeric identifier
  * @param phase - Phase filter (total/single/l1/l2/l3)
  * @param start_time - Optional start Date for the search interval (inclusive)
  * @param end_time - Optional end Date for the search interval (inclusive)
@@ -235,7 +235,7 @@ export async function mapMetricAPI(
  * @throws Error when the API call fails
  */
 export async function getPeakPower(
-    device_id: number,
+    id: number,
     phase: SelectablePhaseFilter,
     start_time: Date | null = null,
     end_time: Date | null = null
@@ -250,7 +250,7 @@ export async function getPeakPower(
     const { sucess, data } = await callAPI({
         endpoint: "/api/nodes/get_peak_power",
         method: "GET",
-        params: { device_id, phase, start_time: start_time_str, end_time: end_time_str, time_zone },
+        params: { id, phase, start_time: start_time_str, end_time: end_time_str, time_zone },
     });
 
     if (sucess) {
