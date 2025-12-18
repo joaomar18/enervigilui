@@ -4,17 +4,9 @@
     import Header from "../../components/Login/Header.svelte";
     import Info from "../../components/Login/Info.svelte";
     import LoginForm from "../../components/Login/LoginForm.svelte";
-    import Toast from "../../components/General/Toast.svelte";
 
     // Stores
     import { loadedDone } from "$lib/stores/view/navigation";
-
-    // Toast
-    import { displayToast, toastKey, toastType, toastVariables } from "$lib/stores/view/toast";
-    import { closeToast } from "$lib/logic/view/toast";
-
-    // Texts
-    import { alertTexts } from "$lib/stores/lang/alertTexts";
 
     // Mount function
     onMount(() => {
@@ -30,9 +22,6 @@
     <Header />
     <div class="column" id="first-col">
         <LoginForm />
-        {#if $displayToast}
-            <Toast topPos="94px" toastText={$alertTexts[$toastKey]} toastType={$toastType} toastVariables={$toastVariables} onClick={closeToast} />
-        {/if}
     </div>
     <div class="column" id="second-col">
         <Info appImageUrl="/img/smart-meter.png" />

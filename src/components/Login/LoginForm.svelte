@@ -1,6 +1,7 @@
 <script lang="ts">
     import { loginUser } from "$lib/logic/api/auth";
     import { validateUsername, validatePassword } from "$lib/logic/validation/auth";
+    import FormAlert from "../General/FormAlert.svelte";
     import LoginField from "./LoginField.svelte";
     import LoginButton from "./LoginButton.svelte";
     import ForgotPassButton from "./ForgotPassButton.svelte";
@@ -8,10 +9,15 @@
 
     // Texts
     import { texts } from "$lib/stores/lang/generalTexts";
+    import { alertTexts } from "$lib/stores/lang/alertTexts";
+
+    // Toast
+    import { displayToast, toastKey, toastType, toastVariables } from "$lib/stores/view/toast";
+    import { closeToast } from "$lib/logic/view/toast";
 
     // Styles
     import { mergeStyle } from "$lib/style/components";
-    import { LoginFormStyle } from "$lib/style/login";
+    import { LoginFormStyle, LoginFormAlertStyle } from "$lib/style/login";
 
     // Style object (from theme)
     export let style: { [property: string]: string | number } | null = null;
@@ -79,10 +85,23 @@
     "
 >
     <h3>{$texts.title}</h3>
+    {#if $displayToast}
+        <FormAlert
+            style={$LoginFormAlertStyle}
+            asToast={true}
+            animation={"slide"}
+            width="80%"
+            topPos="10px"
+            alertText={$alertTexts[$toastKey]}
+            alertType={$toastType}
+            alertVariables={$toastVariables}
+            closeButtonClick={() => closeToast()}
+        />
+    {/if}
     <form on:submit|preventDefault>
         <LoginField
             id="username"
-            paddingTop="10px"
+            paddingTop="30px"
             imageUrl="/img/user.svg"
             fieldText={$texts.username}
             type="text"
@@ -141,6 +160,7 @@
         padding: 0;
         padding-top: 30px;
         padding-bottom: 30px;
+        height: 24px;
         color: var(--title-color);
         font-weight: var(--title-weight);
         font-size: 1.5rem;

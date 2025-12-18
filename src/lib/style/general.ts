@@ -59,10 +59,12 @@ const FormAlertStyleConfig: ComponentStyles = {
     dark: {
         width: "calc(100% - 20px)",
         height: "fit-content",
+        maxHeight: "auto",
         padding: "10px",
         textSize: "15px",
         textWeight: "400",
-        textLeftPadding: "10px",
+        textLeftPadding: "5px",
+        textIndent: "-4px",
         borderRadiusRight: "5px",
         iconSize: "30px",
         alertBackgroundColor: "rgba(245, 101, 101, 0.08)",
@@ -81,6 +83,13 @@ const FormAlertStyleConfig: ComponentStyles = {
         neutralBorderLeft: "2px solid #6b7280",
         neutralIconColor: "#6b7280",
         neutralTextColor: "#9ca3af",
+        lineClamp: "auto",
+        closeButtonWidth: "32px",
+        closeButtonHeight: "32px",
+        closeButtonImageWidth: "24px",
+        closeButtonImageHeight: "24px",
+        closeButtonColor: "#9ca3af",
+        closeButtonHoverColor: "#e5e7eb"
     },
 };
 

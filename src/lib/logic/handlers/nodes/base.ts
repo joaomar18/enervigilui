@@ -22,7 +22,6 @@ import {
     type EditableNodeRecord,
     type NodeRecord,
     defaultNoProtocolNodeOptions,
-    type EditableBaseNodeProtocolOptions,
 } from "$lib/types/nodes/config";
 import type { ProcessedNodeState } from "$lib/types/nodes/realtime";
 
@@ -114,23 +113,30 @@ export function customNodeChange(node: EditableNodeRecord, nodeState: NodeRecord
 }
 
 /**
- * Updates node configuration when the node type changes.
+ * Handles updates required when a node's type changes.
  *
- * Re-evaluates whether the node is numeric and clears all numeric-only
- * settings if it is not, ensuring the node remains in a valid state.
+ * Re-evaluates whether the node is numeric and clears any configuration
+ * options that are only valid for numeric nodes. Additionally, resets
+ * decimal precision when the underlying protocol type is not a float.
  *
- * @param {EditableNodeRecord} node - The editable node being updated.
+ * This ensures the node configuration remains consistent and valid
+ * after a type change.
+ *
+ * @param {EditableNodeRecord} node - The editable node whose type has changed.
  */
 export function nodeTypeChange(node: EditableNodeRecord): void {
     let nodeIsNumeric = isNumeric(node);
+    let plugin = get(protocolPlugins)[node.protocol];
     if (!nodeIsNumeric) {
-        node.config.decimal_places = "";
         node.config.logging = false;
         node.config.min_alarm = false;
         node.config.max_alarm = false;
         node.config.min_alarm_value = "";
         node.config.max_alarm_value = "";
         node.config.unit = "";
+    }
+    if(plugin.convertTypeToGeneric(node.protocol_options) !== NodeType.FLOAT){
+        node.config.decimal_places = "";
     }
     node.is_numeric = nodeIsNumeric;
 }

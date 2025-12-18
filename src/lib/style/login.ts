@@ -28,6 +28,48 @@ const LoginFormStyleConfig: ComponentStyles = {
 
 export const LoginFormStyle = createStyleStore(LoginFormStyleConfig);
 
+//////////     L O G I N     F O R M     A L E R T     //////////
+
+const LoginFormAlertStyleConfig: ComponentStyles = {
+    dark: {
+        width: "80%",
+        height: "80px",
+        maxHeight: "80px",
+        padding: "10px",
+        textSize: "15px",
+        textWeight: "400",
+        textLeftPadding: "5px",
+        textIndent: "-4px",
+        borderRadiusRight: "5px",
+        iconSize: "30px",
+        alertBackgroundColor: "#2b1b1f",
+        alertBorderLeft: "2px solid #f56565",
+        alertIconColor: "#f56565",
+        alertTextColor: "#ff7979",
+        warningBackgroundColor: "#2a2418",
+        warningBorderLeft: "2px solid #f59e0b",
+        warningIconColor: "#f59e0b",
+        warningTextColor: "#fbbf24",
+        infoBackgroundColor: "#1e2633",
+        infoBorderLeft: "2px solid #3b82f6",
+        infoIconColor: "#3b82f6",
+        infoTextColor: "#60a5fa",
+        neutralBackgroundColor: "#1f2328",
+        neutralBorderLeft: "2px solid #6b7280",
+        neutralIconColor: "#6b7280",
+        neutralTextColor: "#9ca3af",
+        lineClamp: "2",
+        closeButtonWidth: "32px",
+        closeButtonHeight: "32px",
+        closeButtonImageWidth: "24px",
+        closeButtonImageHeight: "24px",
+        closeButtonColor: "#9ca3af",
+        closeButtonHoverColor: "#e5e7eb"
+    },
+};
+
+export const LoginFormAlertStyle = createStyleStore(LoginFormAlertStyleConfig);
+
 //////////     F O R G O T     P A S S W O R D     B U T T O N     //////////
 
 const ForgotPassButtonStyleConfig: ComponentStyles = {

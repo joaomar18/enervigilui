@@ -4,6 +4,7 @@ import { AlertType } from "$lib/stores/view/toast";
 import { navigateTo } from "../view/navigation";
 import { loadedDone } from "$lib/stores/view/navigation";
 import { convertDateToLocalTime } from "../util/date";
+import { autoLogin } from "./auth";
 
 export type CallAPIOptions = {
     endpoint: string;
@@ -169,28 +170,39 @@ export async function callAPI({
     try {
         const { status, data }: { status: number; data: any } = await makeAPIRequest(endpoint, method, params, timeout, file, fileFieldName);
         if (status !== 200) {
+            if(endpoint === "/api/auth/auto_login") return { sucess: false, data: data };
             switch (status) {
                 case -1:
                     showToast("timeout", AlertType.ALERT);
                     break;
                 case 401:
                     if (loginPage) {
-                        showToast("wrongCredentials", AlertType.ALERT, { remaining: String(data.remaining) });
+                        console.log(endpoint);
+                        if(endpoint === "/api/auth/auto_login"){
+                            break;
+                        } 
+                        const localTime = convertDateToLocalTime(data.unlocked_date);
+                        if (localTime !== null) {
+                            showToast("tooManyAttempts", AlertType.ALERT, { localTime: localTime });
+                        }
+                        else {
+                            showToast("wrongCredentials", AlertType.ALERT, { remaining: String(data.remaining_attempts) }, false);
+                        }
                     } else {
                         await navigateTo("/login", {}, true);
                     }
                     break;
                 case 429:
-                    const localTime = convertDateToLocalTime(data.unlocked);
+                    const localTime = convertDateToLocalTime(data.unlocked_date);
                     if (localTime !== null) {
-                        showToast("tooManyAttempts", AlertType.ALERT, { localTime: localTime });
+                        showToast("tooManyAttempts", AlertType.ALERT, { localTime: localTime }, false);
                     }
                     else {
                         showToast("unknownError", AlertType.ALERT);
                     }
                     break;
                 default:
-                    showToast("unknownError", AlertType.ALERT);
+                    showToast("unknownError", AlertType.ALERT, {}, false);
                     break;
             }
             return { sucess: false, data: null };
@@ -200,7 +212,7 @@ export async function callAPI({
         }
         return { sucess: true, data: data };
     } catch (e) {
-        showToast("unexpectedError", AlertType.ALERT);
+        showToast("unexpectedError", AlertType.ALERT, {}, false);
         console.error(`Error processing request: ${e}`);
         return { sucess: false, data: null };
     }

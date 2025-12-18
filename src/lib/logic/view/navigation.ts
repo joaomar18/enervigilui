@@ -3,6 +3,7 @@ import { get } from "svelte/store";
 import { browser } from "$app/environment";
 import { checkAutoLogin } from "../validation/auth";
 import { selectedLang } from "$lib/stores/lang/definition";
+import { closeToast } from "./toast";
 
 // Splash screen store
 import {
@@ -144,7 +145,7 @@ export async function navigateTo(
         timerPromise = new Promise((res) => setTimeout(res, minSplashDuration));
     }
 
-
+    closeToast(); // Closes all toasts and alerts
     await Promise.all([gotoPromise, timerPromise]);
     currentPage.set(window.location.pathname);
 

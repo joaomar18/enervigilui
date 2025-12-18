@@ -179,7 +179,7 @@ export function validateNodeProtocolType(protocolOptions: EditableBaseNodeProtoc
  * @returns True if decimal places value is valid for the node type.
  */
 export function validateDecimalPlaces(decimal_places: string, type: NodeType): boolean {
-    if (type === NodeType.FLOAT || type === NodeType.INT) {
+    if (type === NodeType.FLOAT) {
         if (
             stringIsValidInteger(decimal_places) &&
             parseInt(decimal_places) >= DECIMAL_PLACES_LIM.MIN &&

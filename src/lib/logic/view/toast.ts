@@ -2,12 +2,18 @@ import { toastTimeout, toastKey, toastVariables, toastType, displayToast } from 
 import { AlertType } from "$lib/stores/view/toast";
 
 /**
- * Shows a toast popup with a message key, type, and optional variables.
- * @param key Message key.
- * @param type Toast type.
- * @param variables Optional variables for message.
+ * Displays a toast notification with the given message key and type.
+ *
+ * If a toast is already visible, it is replaced and its auto-close timer
+ * is reset. When autoClose is enabled, the toast is automatically hidden
+ * after a short delay.
+ *
+ * @param key Localization key for the toast message.
+ * @param type Visual type of the toast (e.g. error, warning, success).
+ * @param variables Optional variables used for message interpolation.
+ * @param autoClose Whether the toast should close automatically after a delay.
  */
-export function showToast(key: string, type: AlertType, variables?: Record<string, string | number>) {
+export function showToast(key: string, type: AlertType, variables?: Record<string, string | number>, autoClose: boolean = true) {
     toastTimeout.update((old) => {
         if (old) clearTimeout(old);
         return null;
@@ -17,8 +23,10 @@ export function showToast(key: string, type: AlertType, variables?: Record<strin
     toastVariables.set(variables);
     toastType.set(type);
     displayToast.set(true);
-    const id = setTimeout(() => displayToast.set(false), 3000);
-    toastTimeout.set(id);
+    if (autoClose) {
+        const id = setTimeout(() => displayToast.set(false), 5000);
+        toastTimeout.set(id);
+    }
 }
 
 /**

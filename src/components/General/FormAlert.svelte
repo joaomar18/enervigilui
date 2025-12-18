@@ -1,5 +1,5 @@
 <script lang="ts">
-    import { fade } from "svelte/transition";
+    import { fade, slide } from "svelte/transition";
     import { AlertType } from "$lib/stores/view/toast";
 
     // Styles
@@ -11,17 +11,22 @@
     $: effectiveStyle = style ?? $FormAlertStyle;
 
     // Props
+    export let asToast: boolean = false;
+    export let topPos: string = "0px";
     export let alertText: string;
     export let alertType: AlertType;
+    export let animation: "fade" | "slide" = "fade";
     export let alertVariables: Record<string, string | number> | undefined = undefined;
 
     // Layout / styling props
     export let width: string | undefined = undefined;
     export let height: string | undefined = undefined;
+    export let maxHeight: string | undefined = undefined;
     export let padding: string | undefined = undefined;
     export let textSize: string | undefined = undefined;
     export let textWeight: string | undefined = undefined;
     export let textLeftPadding: string | undefined = undefined;
+    export let textIndent: string | undefined = undefined;
     export let borderRadiusRight: string | undefined = undefined;
     export let iconSize: string | undefined = undefined;
     export let alertBackgroundColor: string | undefined = undefined;
@@ -40,14 +45,23 @@
     export let neutralBorderLeft: string | undefined = undefined;
     export let neutralIconColor: string | undefined = undefined;
     export let neutralTextColor: string | undefined = undefined;
+    export let lineClamp: string | undefined = undefined;
+    export let closeButtonWidth: string | undefined = undefined;
+    export let closeButtonHeight: string | undefined = undefined;
+    export let closeButtonImageWidth: string | undefined = undefined;
+    export let closeButtonImageHeight: string | undefined = undefined;
+    export let closeButtonColor: string | undefined = undefined;
+    export let closeButtonHoverColor: string | undefined = undefined;
 
     $: localOverrides = {
         width,
         height,
+        maxHeight,
         padding,
         textSize,
         textWeight,
         textLeftPadding,
+        textIndent,
         borderRadiusRight,
         iconSize,
         alertBackgroundColor,
@@ -66,6 +80,13 @@
         neutralBorderLeft,
         neutralIconColor,
         neutralTextColor,
+        lineClamp,
+        closeButtonWidth,
+        closeButtonHeight,
+        closeButtonImageWidth,
+        closeButtonImageHeight,
+        closeButtonColor,
+        closeButtonHoverColor,
     };
 
     // Merged style
@@ -121,6 +142,10 @@
         iconColor = typeColors.iconColor();
         textColor = typeColors.textColor();
     }
+    $: InTransitionFn = animation === "fade" ? fade : slide;
+
+    // Export Functions
+    export let closeButtonClick: (() => void) | null = null;
 </script>
 
 <!--
@@ -132,8 +157,10 @@
 -->
 <div
     style="
+        --top-pos: {topPos};
         --width: {mergedStyle.width};
-        --heigth: {mergedStyle.height};
+        --height: {mergedStyle.height};
+        --max-height: {mergedStyle.maxHeight};
         --padding: {mergedStyle.padding};
         --text-padding: {mergedStyle.textPadding};
         --border-radius-right: {mergedStyle.borderRadiusRight};
@@ -142,37 +169,65 @@
         --left-border: {borderLeft};
         --icon-color: {iconColor};
         --text-color: {textColor};
-        --text-left-padding: {textLeftPadding};
+        --text-left-padding: {mergedStyle.textLeftPadding};
+        --text-indent: {mergedStyle.textIndent};
+        --line-clamp: {mergedStyle.lineClamp};
+        --close-button-width: {mergedStyle.closeButtonWidth};
+        --close-button-height: {mergedStyle.closeButtonHeight};
+        --close-button-color: {mergedStyle.closeButtonColor};
+        --close-button-hover-color: {mergedStyle.closeButtonHoverColor};
     "
     class="alert-div"
-    in:fade={{ duration: 300 }}
+    class:toast={asToast}
+    in:InTransitionFn={{ duration: 300 }}
+    out:fade={{ duration: 300 }}
 >
-    <svg
-        class="alert-icon"
-        xmlns="http://www.w3.org/2000/svg"
-        viewBox="0 0 24 24"
-        fill="none"
-        stroke-width="1.25"
-        stroke-linecap="round"
-        stroke-linejoin="round"
-        role="img"
-        aria-label="Error"
-    >
-        <rect x="4" y="4" width="16" height="16" rx="2" ry="2" />
-        <line x1="12" y1="8" x2="12" y2="13" />
-        <circle cx="12" cy="16.5" r="0.5" fill="currentColor" />
-    </svg>
-
-    <span class="alert-text">{message}</span>
+    <div class="content">
+        <span class="alert-text">
+            <svg
+                class="alert-icon"
+                xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke-width="1.25"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                role="img"
+                aria-label="Error"
+            >
+                <rect x="4" y="4" width="16" height="16" rx="2" ry="2" />
+                <line x1="12" y1="8" x2="12" y2="13" />
+                <circle cx="12" cy="16.5" r="0.5" fill="currentColor" />
+            </svg>{message}</span
+        >
+        {#if asToast}
+            <button class="close-button" on:click={closeButtonClick} aria-label="Close Alert">
+                <svg
+                    width={mergedStyle.closeButtonImageWidth}
+                    height={mergedStyle.closeButtonImageHeight}
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke=""
+                    stroke-width="2"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                >
+                    <line x1="6" y1="6" x2="18" y2="18" />
+                    <line x1="18" y1="6" x2="6" y2="18" />
+                </svg></button
+            >
+        {/if}
+    </div>
 </div>
 
 <style>
     /* Main alert container - block layout with background and left border accent */
     .alert-div {
+        box-sizing: border-box;
         width: var(--width);
-        height: var(--height);
-        display: block;
-        position: relative;
+        height: var(--heigth);
+        min-height: var(--height);
+        max-height: var(--max-height);
         background-color: var(--background-color);
         border-left: var(--left-border);
         border-top-right-radius: var(--border-radius-right);
@@ -180,24 +235,80 @@
         padding: var(--padding);
     }
 
+    /* Makes the alert container behave like a toast (absolute positioning) */
+    .alert-div.toast {
+        position: absolute;
+        top: var(--top-pos);
+    }
+
+    /* Relative container for the icon and text of the alert */
+    .content {
+        width: 100%;
+        height: 100%;
+        margin: 0;
+        padding: 0;
+        position: relative;
+        display: block;
+    }
+
     /* Alert icon - floated left with proper sizing and color */
-    .alert-div .alert-icon {
+    .alert-icon {
         width: var(--icon-size);
         height: var(--icon-size);
         image-rendering: crisp-edges;
-        float: left;
         stroke: var(--icon-color);
+        display: inline-block;
+        vertical-align: middle;
         margin-right: 5px;
     }
 
     /* Alert text - block display with proper text wrapping and indentation */
-    .alert-div .alert-text {
-        display: block;
+    .alert-text {
+        display: -webkit-box;
+        overflow: hidden;
+        -webkit-box-orient: vertical;
+        -webkit-line-clamp: var(--line-clamp);
+        line-clamp: var(--line-clamp);
         line-height: var(--icon-size);
         font-size: var(--text-size);
         color: var(--text-color);
         font-weight: var(--text-weight);
         padding-left: var(--text-left-padding);
+        text-indent: var(--text-indent);
         word-wrap: break-word;
+    }
+
+    .alert-div.toast .alert-text {
+        padding-right: calc(var(--close-button-width) + 10px);
+    }
+
+    /* Close button active when the alert container has toast behaviour */
+    .close-button {
+        position: absolute;
+        right: -2px;
+        top: -2px;
+        margin: 0;
+        padding: 0;
+        width: var(--close-button-width);
+        height: var(--close-button-height);
+        background-color: transparent;
+        border: none;
+        cursor: pointer;
+        outline: none;
+        -webkit-tap-highlight-color: transparent;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+
+    /* SVG icon for close button */
+    .close-button svg {
+        stroke: var(--close-button-color);
+        transition: stroke 0.2s ease;
+    }
+
+    /* Close button hover effect */
+    .close-button:hover svg {
+        stroke: var(--close-button-hover-color);
     }
 </style>
