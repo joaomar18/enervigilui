@@ -19,7 +19,7 @@ export const LOGGING_PERIOD_LIM: Record<string, number> = { MIN: 1, MAX: 1440 };
  * @property {boolean} custom - True if the node is user-defined rather than provided by the device template.
  * @property {number | null} decimal_places - Number of decimal places used when displaying numeric values; null for non-numeric or unformatted node types.
  * @property {boolean} enabled - Controls whether the node is active and processed by the system.
- * @property {boolean | null} is_counter - Indicates whether the node represents a counter value; null when not applicable.
+ * @property {boolean} is_counter - Indicates whether the node represents a counter value.
  * @property {CounterMode | null} counter_mode - Defines the counter behavior mode; null when the node is not configured as a counter.
  * @property {boolean} logging - Enables or disables periodic logging of the node value.
  * @property {number} logging_period - Logging interval in minutes when logging is enabled.
@@ -40,7 +40,7 @@ export interface BaseNodeConfig {
     custom: boolean;
     decimal_places: number | null;
     enabled: boolean;
-    is_counter: boolean | null;
+    is_counter: boolean;
     counter_mode: CounterMode | null;
     logging: boolean;
     logging_period: number;
