@@ -14,7 +14,7 @@
 
     // Texts
     import { texts } from "$lib/stores/lang/generalTexts";
-    import { alertTexts } from "$lib/stores/lang/alertTexts";
+    import { generalAlertTexts } from "$lib/stores/lang/alertTexts";
 
     // Styles
     import { mergeStyle } from "$lib/style/components";
@@ -149,7 +149,7 @@
     >
         <div class="content">
             {#if firstRequestDone && !validation?.valid}
-                <FormAlert alertText={$alertTexts[messageKey || "noKeyError"]} alertType={AlertType.ALERT} alertVariables={messageVariables} />
+                <FormAlert alertText={$generalAlertTexts[messageKey || "noKeyError"]} alertType={AlertType.ALERT} alertVariables={messageVariables} />
             {/if}
 
             <div class="field">
