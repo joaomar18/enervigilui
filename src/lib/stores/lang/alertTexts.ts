@@ -1,7 +1,10 @@
 import { createLangStore } from "$lib/stores/lang/definition";
 import type { TextsObject } from "$lib/stores/lang/definition";
 
-const alertTextsObject: TextsObject = {
+
+//////////     B A U D R A T E     T E X T S     //////////
+
+const generalAlertTextsObject: TextsObject = {
     decimalPlacesError: {
         PT: "O número de casas decimais deve estar compreendido entre {minValue} e {maxValue}.",
         EN: "The number of decimal places must be between {minValue} and {maxValue}.",
@@ -25,26 +28,6 @@ const alertTextsObject: TextsObject = {
     retriesError: {
         PT: "O número de tentativas de reenvio deve estar compreendido entre {minValue} e {maxValue}.",
         EN: "The number of retries must be between {minValue} and {maxValue}.",
-    },
-    timeout: {
-        PT: "O servidor não respondeu ao pedido.",
-        EN: "The server did not respond to the request.",
-    },
-    wrongCredentials: {
-        PT: "O nome de utilizador e/ou a palavra-passe estão incorretos. Tentativas restantes: {remaining}",
-        EN: "The username and/or password are incorrect. Remaining tries: {remaining}",
-    },
-    tooManyAttempts: {
-        PT: "O servidor bloqueou este cliente até às {localTime} devido a demasiadas tentativas inválidas.",
-        EN: "The server has blocked this client until {localTime} due to too many invalid attempts.",
-    },
-    unknownError: {
-        PT: "O servidor encontrou um erro fatal no pedido. Por favor contacte o administrador do sistema.",
-        EN: "The server encountered a fatal error in the request. Please contact your system administrator.",
-    },
-    unexpectedError: {
-        PT: "Ocorreu um erro inesperado. Por favor tente mais tarde.",
-        EN: "An unexpected error occurred. Please try again.",
     },
     invalidDeviceName: {
         PT: "O nome do dispositivo é inválido.",
@@ -104,4 +87,4 @@ const alertTextsObject: TextsObject = {
     },
 };
 
-export const alertTexts = createLangStore(alertTextsObject);
+export const generalAlertTexts = createLangStore(generalAlertTextsObject);

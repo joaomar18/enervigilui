@@ -20,6 +20,8 @@
     $: effectiveStyle = style ?? $ToastStyle;
 
     // Layout / styling props
+    export let topBorderRadius: string | undefined = undefined;
+    export let bottomBorderRadius: string | undefined = undefined;
     export let alertBackgroundColor: string | undefined = undefined;
     export let alertBorderColor: string | undefined = undefined;
     export let warningBackgroundColor: string | undefined = undefined;
@@ -31,6 +33,8 @@
     export let textColor: string | undefined = undefined;
 
     $: localOverrides = {
+        topBorderRadius,
+        bottomBorderRadius,
         alertBackgroundColor,
         alertBorderColor,
         warningBackgroundColor,
@@ -107,6 +111,8 @@
     style="
         --top-position: {topPos};
         --bottom-position: {bottomPos};
+        --top-border-radius: {mergedStyle.topBorderRadius};
+        --bottom-border-radius: {mergedStyle.bottomBorderRadius};
         --background-color: {backgroundColor};
         --border-color:{borderColor};
         --transform-y: {transformY};
@@ -135,7 +141,10 @@
         transform: translate(-50%, var(--transform-y));
         width: 90%;
         max-width: 500px;
-        border-radius: 5px;
+        border-top-left-radius: var(--top-border-radius);
+        border-top-right-radius: var(--top-border-radius);
+        border-bottom-left-radius: var(--bottom-border-radius);
+        border-bottom-right-radius: var(--bottom-border-radius);
         height: fit-content;
         min-height: 50px;
         background-color: var(--background-color);

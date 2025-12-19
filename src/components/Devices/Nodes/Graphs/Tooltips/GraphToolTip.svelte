@@ -8,7 +8,7 @@
     $: effectiveStyle = style ?? $GraphToolTipStyle;
 
     // Props
-    export let zIndex: number = 200; // Default z-index
+    export let zIndex: number = 197; // Default z-index
     export let gridElement: HTMLDivElement;
     export let cursorPos: { x: number | undefined; y: number | undefined };
     export let insideGraph: boolean;

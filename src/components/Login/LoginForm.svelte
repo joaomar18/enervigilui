@@ -9,10 +9,9 @@
 
     // Texts
     import { texts } from "$lib/stores/lang/generalTexts";
-    import { alertTexts } from "$lib/stores/lang/alertTexts";
 
     // Toast
-    import { displayToast, toastKey, toastType, toastVariables } from "$lib/stores/view/toast";
+    import { displayToast, toastTextList, toastKey, toastType, toastVariables } from "$lib/stores/view/toast";
     import { closeToast } from "$lib/logic/view/toast";
 
     // Styles
@@ -85,14 +84,14 @@
     "
 >
     <h3>{$texts.title}</h3>
-    {#if $displayToast}
+    {#if $displayToast && $toastTextList}
         <FormAlert
             style={$LoginFormAlertStyle}
             asToast={true}
             animation={"slide"}
             width="80%"
             topPos="10px"
-            alertText={$alertTexts[$toastKey]}
+            alertText={$toastTextList[$toastKey]}
             alertType={$toastType}
             alertVariables={$toastVariables}
             closeButtonClick={() => closeToast()}

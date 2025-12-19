@@ -4,7 +4,7 @@ import { AlertType } from "$lib/stores/view/toast";
 import { navigateTo } from "../view/navigation";
 import { loadedDone } from "$lib/stores/view/navigation";
 import { convertDateToLocalTime } from "../util/date";
-import { autoLogin } from "./auth";
+import { generalAlertTexts } from "$lib/stores/lang/alertTexts";
 
 export type CallAPIOptions = {
     endpoint: string;
@@ -169,8 +169,9 @@ export async function callAPI({
 }: CallAPIOptions): Promise<{ sucess: boolean; data: any }> {
     try {
         const { status, data }: { status: number; data: any } = await makeAPIRequest(endpoint, method, params, timeout, file, fileFieldName);
+        console.log("Status: ", status, "Data: ", data);
         if (status !== 200) {
-            if(endpoint === "/api/auth/auto_login") return { sucess: false, data: data };
+            if (endpoint === "/api/auth/auto_login") return { sucess: false, data: data };
             switch (status) {
                 case -1:
                     showToast("timeout", AlertType.ALERT);
@@ -178,15 +179,15 @@ export async function callAPI({
                 case 401:
                     if (loginPage) {
                         console.log(endpoint);
-                        if(endpoint === "/api/auth/auto_login"){
+                        if (endpoint === "/api/auth/auto_login") {
                             break;
-                        } 
+                        }
                         const localTime = convertDateToLocalTime(data.unlocked_date);
                         if (localTime !== null) {
                             showToast("tooManyAttempts", AlertType.ALERT, { localTime: localTime });
                         }
                         else {
-                            showToast("wrongCredentials", AlertType.ALERT, { remaining: String(data.remaining_attempts) }, false);
+                            showToast("wrongCredentials", AlertType.ALERT, { remaining: String(data.remaining_attempts) }, get(generalAlertTexts), false);
                         }
                     } else {
                         await navigateTo("/login", {}, true);
@@ -195,14 +196,14 @@ export async function callAPI({
                 case 429:
                     const localTime = convertDateToLocalTime(data.unlocked_date);
                     if (localTime !== null) {
-                        showToast("tooManyAttempts", AlertType.ALERT, { localTime: localTime }, false);
+                        showToast("tooManyAttempts", AlertType.ALERT, { localTime: localTime }, get(generalAlertTexts), false);
                     }
                     else {
                         showToast("unknownError", AlertType.ALERT);
                     }
                     break;
                 default:
-                    showToast("unknownError", AlertType.ALERT, {}, false);
+                    showToast("unknownError", AlertType.ALERT, {}, get(generalAlertTexts), false);
                     break;
             }
             return { sucess: false, data: null };
@@ -212,7 +213,7 @@ export async function callAPI({
         }
         return { sucess: true, data: data };
     } catch (e) {
-        showToast("unexpectedError", AlertType.ALERT, {}, false);
+        showToast("unexpectedError", AlertType.ALERT, {}, get(generalAlertTexts), false);
         console.error(`Error processing request: ${e}`);
         return { sucess: false, data: null };
     }

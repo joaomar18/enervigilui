@@ -14,11 +14,10 @@
 
     // Stores
     import { currentPage, leftPanelOpen, loadedDone, showSubLoader } from "$lib/stores/view/navigation";
-    import { displayToast, toastKey, toastType, toastVariables } from "$lib/stores/view/toast";
+    import { displayToast, toastTextList, toastKey, toastType, toastVariables } from "$lib/stores/view/toast";
 
     // Texts
     import { texts } from "$lib/stores/lang/generalTexts";
-    import { alertTexts } from "$lib/stores/lang/alertTexts";
     import ToolTipText from "../General/ToolTipText.svelte";
 
     // Variables
@@ -104,8 +103,14 @@
     {/if}
     <main class="content" class:open={$leftPanelOpen}>
         <div class="alerts-div" class:prioritize={$displayToast} class:sidebar-open={$leftPanelOpen}>
-            {#if $displayToast}
-                <Toast bottomPos="0px" toastText={$alertTexts[$toastKey]} toastType={$toastType} toastVariables={$toastVariables} onClick={closeToast} />
+            {#if $displayToast && $toastTextList}
+                <Toast
+                    bottomPos="0px"
+                    toastText={$toastTextList[$toastKey]}
+                    toastType={$toastType}
+                    toastVariables={$toastVariables}
+                    onClick={closeToast}
+                />
             {/if}
         </div>
         <div class="container-div">

@@ -39,6 +39,8 @@ export const SlottedActionStyle = createStyleStore(SlottedActionStyleConfig);
 
 const ToastStyleConfig: ComponentStyles = {
     dark: {
+        topBorderRadius: "10px",
+        bottomBorderRadius: "0px",
         alertBackgroundColor: "#a11f2a",
         alertBorderColor: "#b91c1c",
         warningBackgroundColor: "#f59e42",
