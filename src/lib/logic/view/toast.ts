@@ -1,8 +1,7 @@
-import { get } from "svelte/store";
-import { type Readable } from "svelte/store";
-import { toastTimeout, toastKey, toastVariables, toastTextList, toastType, displayToast } from "$lib/stores/view/toast";
+import { toastTimeout, toastKey, toastVariables, activeToastTextList, toastType, displayToast } from "$lib/stores/view/toast";
 import { AlertType } from "$lib/stores/view/toast";
-import { generalAlertTexts } from "$lib/stores/lang/alertTexts";
+import type { AlertTextList } from "$lib/stores/view/toast";
+
 
 /**
  * Displays a toast notification with the given message key and type.
@@ -16,13 +15,13 @@ import { generalAlertTexts } from "$lib/stores/lang/alertTexts";
  * @param variables Optional variables used for message interpolation.
  * @param autoClose Whether the toast should close automatically after a delay.
  */
-export function showToast(key: string, type: AlertType, variables?: Record<string, string | number>, textList: Record<string, string> = get(generalAlertTexts), autoClose: boolean = true) {
+export function showToast(key: string, type: AlertType, variables?: Record<string, string | number>, textList: AlertTextList = "general", autoClose: boolean = true) {
     toastTimeout.update((old) => {
         if (old) clearTimeout(old);
         return null;
     });
 
-    toastTextList.set(textList);
+    activeToastTextList.set(textList);
     toastKey.set(key);
     toastVariables.set(variables);
     toastType.set(type);

@@ -21,7 +21,6 @@ export async function loginUser(username: string, password: string, autoLogin: b
             password,
             auto_login: autoLogin,
         },
-        loginPage: true,
     });
     if (sucess) {
         await navigateTo("/devices", {}, true); // Navigate to the dashboard on success

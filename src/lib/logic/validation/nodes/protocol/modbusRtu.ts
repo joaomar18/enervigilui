@@ -92,6 +92,7 @@ export function validateModbusBitIndex(type: ModbusRTUNodeType, modbus_function:
         modbus_function !== ModbusRTUFunction.READ_COILS &&
         modbus_function !== ModbusRTUFunction.READ_DISCRETE_INPUTS
     ) {
+        console.log(bit);
         if (bit === null || bit === "") return false;
         const n = Number(bit);
         return Number.isInteger(n) && n >= 0 && n <= 15;

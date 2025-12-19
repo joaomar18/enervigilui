@@ -1,17 +1,16 @@
 import { get } from "svelte/store";
 import { showToast } from "../view/toast";
 import { AlertType } from "$lib/stores/view/toast";
-import { navigateTo } from "../view/navigation";
 import { loadedDone } from "$lib/stores/view/navigation";
 import { convertDateToLocalTime } from "../util/date";
-import { generalAlertTexts } from "$lib/stores/lang/alertTexts";
+import { navigateTo } from "../view/navigation";
+import type { AlertTextList } from "$lib/stores/view/toast";
 
 export type CallAPIOptions = {
     endpoint: string;
     method: "GET" | "POST" | "PUT" | "DELETE";
     params?: Record<string, any>;
     timeout?: number;
-    loginPage?: boolean;
     file?: File;
     fileFieldName?: string;
     setLoaded?: boolean;
@@ -133,7 +132,6 @@ export async function makeAPIRequest(
         };
     } catch (error) {
         clearTimeout(timeoutId);
-        console.error(error);
         return {
             status: -1,
             data: null,
@@ -151,7 +149,6 @@ export async function makeAPIRequest(
  * @param options.method - HTTP method ("GET", "POST", "PUT", "DELETE")
  * @param options.params - Request parameters (query params for GET, body for others)
  * @param options.timeout - Request timeout in milliseconds (default: 3000)
- * @param options.loginPage - Whether this is a login page request (affects error handling)
  * @param options.file - Optional file for upload requests
  * @param options.fileFieldName - Form field name for file uploads (default: "file")
  * @param options.setLoaded - Whether to set loadedDone state to true on success
@@ -162,50 +159,48 @@ export async function callAPI({
     method,
     params = {},
     timeout = 3000,
-    loginPage = false,
     file = undefined,
     fileFieldName = "file",
     setLoaded = false,
 }: CallAPIOptions): Promise<{ sucess: boolean; data: any }> {
+    const { status, data }: { status: number; data: any } = await makeAPIRequest(endpoint, method, params, timeout, file, fileFieldName);
     try {
-        const { status, data }: { status: number; data: any } = await makeAPIRequest(endpoint, method, params, timeout, file, fileFieldName);
-        console.log("Status: ", status, "Data: ", data);
+        let error_code = data?.error_code;
+        let error_section = data?.error_section;
+        let details: Record<string, string> = data;
         if (status !== 200) {
-            if (endpoint === "/api/auth/auto_login") return { sucess: false, data: data };
-            switch (status) {
-                case -1:
-                    showToast("timeout", AlertType.ALERT);
+            let authenticationError = status === 401 || status === 429;
+            if (authenticationError) { // Unauthorized acess
+                await navigateTo("/login", {}, true);
+            }
+            if (endpoint === "/api/auth/auto_login" && authenticationError) return { sucess: false, data: data };
+            if (status === -1) throw new Error(`API Request timed out.`);
+            if (!error_code) throw new Error(`Got an error id with an undefined section.`);
+            if (details?.unlocked_date !== undefined) {
+                details.unlocked_date = convertDateToLocalTime(details?.unlocked_date) as string;
+                if (details?.remaining_attempts !== undefined && details?.remaining_attempts == "0") {
+                    error_code = "BLOCKED_CLIENT"; // Set error code to blocked client in ui to show the user it is already blocked
+                }
+            }
+            let textList: AlertTextList;
+            switch (error_section) {
+                case "GLOBAL":
+                    textList = "apiGeneral";
                     break;
-                case 401:
-                    if (loginPage) {
-                        console.log(endpoint);
-                        if (endpoint === "/api/auth/auto_login") {
-                            break;
-                        }
-                        const localTime = convertDateToLocalTime(data.unlocked_date);
-                        if (localTime !== null) {
-                            showToast("tooManyAttempts", AlertType.ALERT, { localTime: localTime });
-                        }
-                        else {
-                            showToast("wrongCredentials", AlertType.ALERT, { remaining: String(data.remaining_attempts) }, get(generalAlertTexts), false);
-                        }
-                    } else {
-                        await navigateTo("/login", {}, true);
-                    }
+                case "AUTH":
+                    textList = "apiAuthorization";
                     break;
-                case 429:
-                    const localTime = convertDateToLocalTime(data.unlocked_date);
-                    if (localTime !== null) {
-                        showToast("tooManyAttempts", AlertType.ALERT, { localTime: localTime }, get(generalAlertTexts), false);
-                    }
-                    else {
-                        showToast("unknownError", AlertType.ALERT);
-                    }
+                case "DEVICE":
+                    textList = "apiDevice";
+                    break;
+                case "NODES":
+                    textList = "apiNodes";
                     break;
                 default:
-                    showToast("unknownError", AlertType.ALERT, {}, get(generalAlertTexts), false);
-                    break;
+                    throw new Error(`Got an unknown error section: ${error_section}.`)
             }
+            let autoClose = status !== 401 && status !== 429;
+            showToast(error_code, AlertType.ALERT, details, textList, autoClose);
             return { sucess: false, data: null };
         }
         if (setLoaded && !get(loadedDone)) {
@@ -213,7 +208,13 @@ export async function callAPI({
         }
         return { sucess: true, data: data };
     } catch (e) {
-        showToast("unexpectedError", AlertType.ALERT, {}, get(generalAlertTexts), false);
+        if (status === -1) {
+            showToast("timeoutError", AlertType.ALERT);
+        }
+        else {
+            showToast("unexpectedError", AlertType.ALERT, { message: String(e) }, "general");
+
+        }
         console.error(`Error processing request: ${e}`);
         return { sucess: false, data: null };
     }

@@ -6,7 +6,7 @@
     import Selector from "../../../../General/Selector.svelte";
     import type { EditableNodeRecord } from "$lib/types/nodes/config";
     import type { ProtocolPlugin } from "$lib/stores/device/protocol";
-    import type { EditableOPCUANodeOptions } from "$lib/types/nodes/protocol/opcUa";
+    import type { EditableOPCUANodeOptions, OPCUANodeType } from "$lib/types/nodes/protocol/opcUa";
 
     // Texts
     import { pluginTexts } from "$lib/stores/lang/protocolPlugin";
@@ -26,23 +26,17 @@
     export let disableAnimations: boolean = false;
 
     // Variables
-    let firstProcessingDone: boolean = false;
     let commOptions: EditableOPCUANodeOptions;
+    let nodeId: string;
+    let type: OPCUANodeType;
     let validOpcUaId: boolean = false;
 
     // Reactive Statements
     $: commOptions = node?.protocol_options as EditableOPCUANodeOptions;
-    $: if (commOptions && !firstProcessingDone) firstProcessing();
-    $: if (!commOptions) firstProcessingDone = false;
+    $: validOpcUaId = validateOpcUaNodeId(nodeId);
 
     // Export Functions
     export let onPropertyChanged: () => void;
-
-    // Functions
-    function firstProcessing(): void {
-        validOpcUaId = validateOpcUaNodeId(commOptions.node_id);
-        firstProcessingDone = true;
-    }
 </script>
 
 <!-- OpcUaNodeCommConfig Component: configures OPC UA node communication parameters.
@@ -61,8 +55,8 @@ and triggers protocol-specific handlers when the data type changes. -->
                 inputInvalid={!validOpcUaId}
                 enableInputInvalid={true}
                 onChange={() => {
-                    validOpcUaId = validateOpcUaNodeId(commOptions.node_id);
                     onPropertyChanged();
+                    nodeId = commOptions.node_id;
                 }}
                 inputType="STRING"
                 width="100%"
@@ -81,9 +75,10 @@ and triggers protocol-specific handlers when the data type changes. -->
                 options={$opcUaNodeTypeTexts}
                 bind:selectedOption={commOptions.type}
                 onChange={() => {
-                    onPropertyChanged();
                     protocolPlugin.setProtocolType(commOptions, commOptions.type);
                     nodeTypeChange(node);
+                    onPropertyChanged();
+                    type = commOptions.type;
                 }}
                 inputInvalid={!node.validation.variableType}
                 enableInputInvalid={true}

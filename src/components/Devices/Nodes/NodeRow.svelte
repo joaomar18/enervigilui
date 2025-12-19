@@ -203,9 +203,9 @@ properties and action buttons for configuration and deletion. -->
                     options={$nodeTypeTexts}
                     bind:selectedOption={protocolType}
                     onChange={() => {
-                        onPropertyChanged();
                         protocolPlugin.setProtocolType(node.protocol_options, protocolType);
                         nodeTypeChange(node);
+                        onPropertyChanged();
                     }}
                     inputInvalid={!node.validation.variableType}
                     enableInputInvalid={true}

@@ -13,7 +13,7 @@
         validateModbusEndianMode,
     } from "$lib/logic/validation/nodes/protocol/modbusRtu";
     import { multiregisterTypes } from "$lib/types/nodes/protocol/modbusRtu";
-    import type { EditableModbusRTUNodeOptions, ModbusRTUNodeOptionsEditingState } from "$lib/types/nodes/protocol/modbusRtu";
+    import type { EditableModbusRTUNodeOptions, ModbusRTUNodeMode } from "$lib/types/nodes/protocol/modbusRtu";
 
     // Texts
     import { texts } from "$lib/stores/lang/generalTexts";
@@ -37,7 +37,11 @@
     // Variables
     let firstProcessingDone: boolean = false;
     let commOptions: EditableModbusRTUNodeOptions;
-    let previousState: ModbusRTUNodeOptionsEditingState;
+    let modbusFunction: ModbusRTUFunction;
+    let type: ModbusRTUNodeType;
+    let address: string;
+    let bitIndex: string | null;
+    let endianMode: ModbusRTUNodeMode | null;
     let validFunction: boolean = false;
     let validAddress: boolean = false;
     let validBitIndex: boolean = false;
@@ -46,30 +50,19 @@
     let enableEndianMode: boolean = false;
 
     // Reactive Statements
+    $: commOptions = node?.protocol_options as EditableModbusRTUNodeOptions;
+    $: validFunction = validateModbusFunction(modbusFunction, type);
+    $: validAddress = validateModbusAddress(address);
+    $: validBitIndex = validateModbusBitIndex(type, modbusFunction, bitIndex);
+    $: validEndianMode = validateModbusEndianMode(type, endianMode);
     $: enableBit =
         commOptions.type === ModbusRTUNodeType.BOOL &&
         commOptions.function !== ModbusRTUFunction.READ_COILS &&
         commOptions.function !== ModbusRTUFunction.READ_DISCRETE_INPUTS;
     $: enableEndianMode = multiregisterTypes.includes(commOptions.type);
-    $: commOptions = node?.protocol_options as EditableModbusRTUNodeOptions;
-    $: if (commOptions && !firstProcessingDone) firstProcessing();
-    $: if (!commOptions) firstProcessingDone = false;
 
     // Export Functions
     export let onPropertyChanged: () => void;
-
-    // Functions
-    function firstProcessing(): void {
-        validFunction = validateModbusFunction(commOptions.function, commOptions.type);
-        validAddress = validateModbusAddress(commOptions.address);
-        validBitIndex = validateModbusBitIndex(commOptions.type, commOptions.function, commOptions.bit);
-        validEndianMode = validateModbusEndianMode(commOptions.type, commOptions.endian_mode);
-        previousState = {
-            previousType: commOptions.type,
-            previousFunction: commOptions.function,
-        };
-        firstProcessingDone = true;
-    }
 </script>
 
 <!-- ModbusRtuNodeCommConfig Component: configures Modbus RTU node communication parameters.
@@ -88,8 +81,8 @@ and function code, validates all inputs in real-time, and triggers protocol-spec
                 bind:selectedOption={commOptions.function}
                 onChange={() => {
                     modbusRTUFunctionChange(commOptions, commOptions.type, commOptions.function, previousState);
-                    validFunction = validateModbusFunction(commOptions.function, commOptions.type);
                     onPropertyChanged();
+                    
                 }}
                 inputInvalid={!validFunction}
                 enableInputInvalid={true}
@@ -113,7 +106,6 @@ and function code, validates all inputs in real-time, and triggers protocol-spec
                 inputInvalid={!validAddress}
                 enableInputInvalid={true}
                 onChange={() => {
-                    validAddress = validateModbusAddress(commOptions.address);
                     onPropertyChanged();
                 }}
                 inputType="STRING"
@@ -131,7 +123,6 @@ and function code, validates all inputs in real-time, and triggers protocol-spec
                     inputInvalid={!validBitIndex}
                     enableInputInvalid={true}
                     onChange={() => {
-                        validBitIndex = validateModbusBitIndex(commOptions.type, commOptions.function, commOptions.bit);
                         onPropertyChanged();
                     }}
                     minValue={0}
@@ -155,12 +146,9 @@ and function code, validates all inputs in real-time, and triggers protocol-spec
                 bind:selectedOption={commOptions.type}
                 onChange={() => {
                     modbusNodeTypeChange(commOptions, commOptions.type, previousState);
-                    validFunction = validateModbusFunction(commOptions.function, commOptions.type);
-                    validBitIndex = validateModbusBitIndex(commOptions.type, commOptions.function, commOptions.bit);
-                    validEndianMode = validateModbusEndianMode(commOptions.type, commOptions.endian_mode);
-                    onPropertyChanged();
                     protocolPlugin.setProtocolType(commOptions, commOptions.type);
                     nodeTypeChange(node);
+                    onPropertyChanged();
                 }}
                 inputInvalid={!node.validation.variableType}
                 enableInputInvalid={true}
@@ -179,7 +167,6 @@ and function code, validates all inputs in real-time, and triggers protocol-spec
                     options={$modbusNodeEndianModeTexts}
                     bind:selectedOption={commOptions.endian_mode}
                     onChange={() => {
-                        validEndianMode = validateModbusEndianMode(commOptions.type, commOptions.endian_mode);
                         onPropertyChanged();
                     }}
                     inputInvalid={!validEndianMode}
