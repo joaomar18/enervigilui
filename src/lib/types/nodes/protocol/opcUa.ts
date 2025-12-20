@@ -1,4 +1,4 @@
-import type { BaseNodeProtocolOptions, EditableBaseNodeProtocolOptions } from "../config";
+import type { BaseNodeProtocolOptions, EditableBaseNodeProtocolOptions, BaseNodeProtocolOptionsValidation } from "../config";
 
 /*****     C O N S T A N T S     *****/
 
@@ -45,6 +45,23 @@ export interface OPCUANodeOptions extends BaseNodeProtocolOptions {
 export interface EditableOPCUANodeOptions extends EditableBaseNodeProtocolOptions {
     node_id: string;
     type: OPCUANodeType;
+}
+
+/**
+ * Represents the validation state for OPC UA protocol options of a node.
+ *
+ * Used to validate the configuration of OPC UA–specific parameters
+ * required to read data from an OPC UA server.
+ *
+ * @interface OPCUANodeOptionsValidation
+ *
+ * @property {boolean} node_id - True if the configured OPC UA NodeId is valid.
+ * @property {boolean} type - True if the selected OPC UA data type is valid for the node.
+ *
+ */
+export interface OPCUANodeOptionsValidation extends BaseNodeProtocolOptionsValidation {
+    node_id: boolean;
+    type: boolean;
 }
 
 /*****     T Y P E S     *****/

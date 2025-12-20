@@ -1,4 +1,4 @@
-import type { BaseNodeProtocolOptions, EditableBaseNodeProtocolOptions } from "../config";
+import type { BaseNodeProtocolOptions, EditableBaseNodeProtocolOptions, BaseNodeProtocolOptionsValidation } from "../config";
 
 /*****     C O N S T A N T S     *****/
 
@@ -86,6 +86,29 @@ export interface EditableModbusRTUNodeOptions extends EditableBaseNodeProtocolOp
     type: ModbusRTUNodeType;
     endian_mode: ModbusRTUNodeMode | null;
     bit: string | null;
+}
+
+/**
+ * Represents the validation state for Modbus RTU protocol options of a node.
+ *
+ * Used to validate the configuration of Modbus RTU–specific parameters
+ * required to read data from a Modbus RTU device.
+ *
+ * @interface ModbusRTUNodeOptionsValidation
+ *
+ * @property {boolean} function - True if the selected Modbus function code is valid.
+ * @property {boolean} address - True if the configured Modbus register or coil address is valid.
+ * @property {boolean} type - True if the selected Modbus data type is valid for the node.
+ * @property {boolean} endian_mode - True if the selected byte/word endianness configuration is valid.
+ * @property {boolean} bit - True if the configured bit index (when applicable) is valid.
+ *
+ */
+export interface ModbusRTUNodeOptionsValidation extends BaseNodeProtocolOptionsValidation {
+    function: boolean;
+    address: boolean;
+    type: boolean;
+    endian_mode: boolean;
+    bit: boolean;
 }
 
 /*****     T Y P E S     *****/

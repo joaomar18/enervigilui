@@ -173,7 +173,7 @@ export function convertToEditableNodes(nodes: Array<NodeRecord>): Array<Editable
             protocol: node.protocol,
             display_name: removePrefix(node.name),
             is_numeric: isNumeric(node),
-            validation: getInitialNodeValidation(),
+            validation: getInitialNodeValidation(node.protocol, editableProtocolOptions),
             config: editableConfig,
             protocol_options: editableProtocolOptions,
             attributes: node.attributes,
@@ -267,7 +267,7 @@ function createDefaultEditableDeviceNode(variable: DefaultNodeInfo, phase: NodeP
         attributes: attributes,
         display_name: variable.name,
         is_numeric: variable.isNumeric,
-        validation: getInitialNodeValidation(),
+        validation: getInitialNodeValidation(device_data.protocol, editableProtocolOptions),
     };
 
     return node;
@@ -330,7 +330,7 @@ export function addNode(sectionPhase: NodePhase, sectionPrefix: NodePrefix, devi
         attributes: newAttributes,
         display_name: nodeBaseName,
         is_numeric: typeIsNumeric(plugin.convertTypeToGeneric(newProtocolOptions)),
-        validation: getInitialNodeValidation(),
+        validation: getInitialNodeValidation(device_data.protocol, newProtocolOptions),
     };
 
     return newFormattedNode;

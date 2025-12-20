@@ -1,12 +1,11 @@
 <script lang="ts">
-    import { validateOpcUaNodeId } from "$lib/logic/validation/nodes/protocol/opcUa";
     import { nodeTypeChange } from "$lib/logic/handlers/nodes/base";
     import InfoLabel from "../../../../General/InfoLabel.svelte";
     import InputField from "../../../../General/InputField.svelte";
     import Selector from "../../../../General/Selector.svelte";
     import type { EditableNodeRecord } from "$lib/types/nodes/config";
     import type { ProtocolPlugin } from "$lib/stores/device/protocol";
-    import type { EditableOPCUANodeOptions, OPCUANodeType } from "$lib/types/nodes/protocol/opcUa";
+    import type { EditableOPCUANodeOptions, OPCUANodeOptionsValidation } from "$lib/types/nodes/protocol/opcUa";
 
     // Texts
     import { pluginTexts } from "$lib/stores/lang/protocolPlugin";
@@ -27,13 +26,10 @@
 
     // Variables
     let commOptions: EditableOPCUANodeOptions;
-    let nodeId: string;
-    let type: OPCUANodeType;
-    let validOpcUaId: boolean = false;
 
     // Reactive Statements
     $: commOptions = node?.protocol_options as EditableOPCUANodeOptions;
-    $: validOpcUaId = validateOpcUaNodeId(nodeId);
+    $: validation = node?.validation.protocolOptions as OPCUANodeOptionsValidation;
 
     // Export Functions
     export let onPropertyChanged: () => void;
@@ -52,11 +48,10 @@ and triggers protocol-specific handlers when the data type changes. -->
                 style={$NodeConfigSheetInputFieldStyle}
                 disabled={node.config.calculated}
                 bind:inputValue={commOptions.node_id}
-                inputInvalid={!validOpcUaId}
+                inputInvalid={!validation.node_id}
                 enableInputInvalid={true}
                 onChange={() => {
                     onPropertyChanged();
-                    nodeId = commOptions.node_id;
                 }}
                 inputType="STRING"
                 width="100%"
@@ -78,9 +73,8 @@ and triggers protocol-specific handlers when the data type changes. -->
                     protocolPlugin.setProtocolType(commOptions, commOptions.type);
                     nodeTypeChange(node);
                     onPropertyChanged();
-                    type = commOptions.type;
                 }}
-                inputInvalid={!node.validation.variableType}
+                inputInvalid={!validation.type}
                 enableInputInvalid={true}
                 scrollable={true}
             />

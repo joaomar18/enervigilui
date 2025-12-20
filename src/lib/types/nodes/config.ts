@@ -87,7 +87,7 @@ export interface EditableBaseNodeConfig {
  *
  * @interface
  */
-export interface BaseNodeProtocolOptions {}
+export interface BaseNodeProtocolOptions { }
 
 /**
  * Base interface for editable protocol-specific node configuration options.
@@ -95,7 +95,7 @@ export interface BaseNodeProtocolOptions {}
  *
  * @interface
  */
-export interface EditableBaseNodeProtocolOptions {}
+export interface EditableBaseNodeProtocolOptions { }
 
 /**
  * Represents a minimal node definition used when no protocol-specific
@@ -197,8 +197,11 @@ export interface NodeRecordEditingState {
 
 /**
  * Represents the validation state for all editable properties of a node.
- * Each boolean flag indicates whether the corresponding field passes validation.
- * Used by the UI to provide real-time feedback and to block saving invalid configurations.
+ * Each validation field indicates whether the corresponding configuration
+ * passes validation.
+ *
+ * Used by the UI to provide real-time feedback and to block saving invalid
+ * node configurations.
  *
  * @interface NodeValidation
  *
@@ -206,25 +209,25 @@ export interface NodeRecordEditingState {
  * @property {boolean} variableType - True if the selected internal variable type is valid for this node.
  * @property {boolean} variableUnit - True if the selected measurement unit is valid for the node's type.
  * @property {boolean} protocol - True if the selected communication protocol is valid for this node.
- * @property {boolean} protocolOptions - True if the protocol-specific configuration options are valid.
+ * @property {BaseNodeProtocolOptionsValidation} protocolOptions - Validation state for protocol-specific options (or virtual node options).
  * @property {boolean} decimalPlaces - True if the number of decimal places is within an acceptable range.
  * @property {boolean} loggingPeriod - True if the logging interval is valid for the node.
  * @property {boolean} minAlarm - True if the minimum alarm value (if enabled) is valid.
  * @property {boolean} maxAlarm - True if the maximum alarm value (if enabled) is valid.
  * @property {boolean} minWarning - True if the minimum warning value (if enabled) is valid.
  * @property {boolean} maxWarning - True if the maximum warning value (if enabled) is valid.
- * @property {boolean} calculated - True if the configuration for a calculated/virtual node is valid.
+ * @property {boolean} calculated - True if the configuration for a calculated or virtual node is valid.
  * @property {boolean} isCounter - True if the node is correctly configured as a counter-type variable.
  * @property {boolean} counterMode - True if the counter mode configuration (incremental, rollover, etc.) is valid.
  *
- * @method isValid - Returns true only if all validation flags are true.
+ * @method isValid - Returns true only if all validation states are valid.
  */
 export interface NodeValidation {
     variableName: boolean;
     variableType: boolean;
     variableUnit: boolean;
     protocol: boolean;
-    protocolOptions: boolean;
+    protocolOptions: BaseNodeProtocolOptionsValidation;
     decimalPlaces: boolean;
     loggingPeriod: boolean;
     minAlarm: boolean;
@@ -235,6 +238,37 @@ export interface NodeValidation {
     isCounter: boolean;
     counterMode: boolean;
     isValid(): boolean;
+}
+
+/**
+ * Represents the validation state for protocol-specific options of a node.
+ *
+ * Provides a common validation method shared by all protocol option
+ * validation models.
+ *
+ * @interface BaseNodeProtocolOptionsValidation
+ *
+ * @method isValid - Returns true if the protocol options configuration is valid.
+ */
+export interface BaseNodeProtocolOptionsValidation {
+    isValid(): boolean;
+}
+
+/**
+ * Represents the validation state for nodes that do not use
+ * a communication protocol (virtual nodes).
+ *
+ * Used for node types whose values are calculated or derived
+ * internally and therefore do not require protocol-specific
+ * configuration options.
+ *
+ * @interface NoProtocolNodeOptionsValidation
+ *
+ * @property {boolean} type - True if the selected node type is valid.
+ *
+ */
+export interface NoProtocolNodeOptionsValidation extends BaseNodeProtocolOptionsValidation {
+    type: boolean;
 }
 
 /*****     O B J E C T S     *****/

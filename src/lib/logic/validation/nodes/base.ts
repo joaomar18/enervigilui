@@ -16,13 +16,14 @@ import { isEqual } from "$lib/logic/util/generic";
  *
  * @returns {NodeValidation} A fresh validation object with all checks set to false
  */
-export function getInitialNodeValidation(): NodeValidation {
+export function getInitialNodeValidation(protocol: Protocol, protocolOptions: EditableBaseNodeProtocolOptions): NodeValidation {
+    let plugin = get(protocolPlugins)[protocol]
     return {
         variableName: false,
         variableType: false,
         variableUnit: false,
         protocol: false,
-        protocolOptions: false,
+        protocolOptions: plugin.validateNodeProtocolOptions(protocolOptions),
         decimalPlaces: false,
         loggingPeriod: false,
         minAlarm: false,
@@ -38,7 +39,7 @@ export function getInitialNodeValidation(): NodeValidation {
                 this.variableType &&
                 this.variableUnit &&
                 this.protocol &&
-                this.protocolOptions &&
+                this.protocolOptions.isValid() &&
                 this.decimalPlaces &&
                 this.loggingPeriod &&
                 this.minAlarm &&

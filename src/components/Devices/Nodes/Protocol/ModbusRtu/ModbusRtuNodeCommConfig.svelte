@@ -6,14 +6,9 @@
     import type { ProtocolPlugin } from "$lib/stores/device/protocol";
     import { modbusNodeTypeChange, modbusRTUFunctionChange } from "$lib/logic/handlers/nodes/protocol/modbusRtu";
     import { ModbusRTUFunction, ModbusRTUNodeType } from "$lib/types/nodes/protocol/modbusRtu";
-    import {
-        validateModbusFunction,
-        validateModbusAddress,
-        validateModbusBitIndex,
-        validateModbusEndianMode,
-    } from "$lib/logic/validation/nodes/protocol/modbusRtu";
     import { multiregisterTypes } from "$lib/types/nodes/protocol/modbusRtu";
-    import type { EditableModbusRTUNodeOptions, ModbusRTUNodeMode } from "$lib/types/nodes/protocol/modbusRtu";
+    import type { EditableModbusRTUNodeOptions } from "$lib/types/nodes/protocol/modbusRtu";
+    import type { ModbusRTUNodeOptionsValidation } from "$lib/types/nodes/protocol/modbusRtu";
 
     // Texts
     import { texts } from "$lib/stores/lang/generalTexts";
@@ -35,26 +30,14 @@
     export let disableAnimations: boolean = false;
 
     // Variables
-    let firstProcessingDone: boolean = false;
     let commOptions: EditableModbusRTUNodeOptions;
-    let modbusFunction: ModbusRTUFunction;
-    let type: ModbusRTUNodeType;
-    let address: string;
-    let bitIndex: string | null;
-    let endianMode: ModbusRTUNodeMode | null;
-    let validFunction: boolean = false;
-    let validAddress: boolean = false;
-    let validBitIndex: boolean = false;
-    let validEndianMode: boolean = false;
     let enableBit: boolean = false;
     let enableEndianMode: boolean = false;
 
     // Reactive Statements
     $: commOptions = node?.protocol_options as EditableModbusRTUNodeOptions;
-    $: validFunction = validateModbusFunction(modbusFunction, type);
-    $: validAddress = validateModbusAddress(address);
-    $: validBitIndex = validateModbusBitIndex(type, modbusFunction, bitIndex);
-    $: validEndianMode = validateModbusEndianMode(type, endianMode);
+    $: validation = node?.validation.protocolOptions as ModbusRTUNodeOptionsValidation;
+
     $: enableBit =
         commOptions.type === ModbusRTUNodeType.BOOL &&
         commOptions.function !== ModbusRTUFunction.READ_COILS &&
@@ -82,9 +65,8 @@ and function code, validates all inputs in real-time, and triggers protocol-spec
                 onChange={() => {
                     modbusRTUFunctionChange(commOptions, commOptions.type, commOptions.function, previousState);
                     onPropertyChanged();
-                    
                 }}
-                inputInvalid={!validFunction}
+                inputInvalid={!validation.function}
                 enableInputInvalid={true}
                 scrollable={true}
             />
@@ -103,7 +85,7 @@ and function code, validates all inputs in real-time, and triggers protocol-spec
                 style={$NodeConfigSheetInputFieldStyle}
                 disabled={node.config.calculated}
                 bind:inputValue={commOptions.address}
-                inputInvalid={!validAddress}
+                inputInvalid={!validation.address}
                 enableInputInvalid={true}
                 onChange={() => {
                     onPropertyChanged();
@@ -120,7 +102,7 @@ and function code, validates all inputs in real-time, and triggers protocol-spec
                     style={$NodeConfigSheetInputFieldStyle}
                     disabled={node.config.calculated}
                     bind:inputValue={commOptions.bit}
-                    inputInvalid={!validBitIndex}
+                    inputInvalid={!validation.bit}
                     enableInputInvalid={true}
                     onChange={() => {
                         onPropertyChanged();
@@ -150,7 +132,7 @@ and function code, validates all inputs in real-time, and triggers protocol-spec
                     nodeTypeChange(node);
                     onPropertyChanged();
                 }}
-                inputInvalid={!node.validation.variableType}
+                inputInvalid={!validation.type}
                 enableInputInvalid={true}
                 scrollable={true}
             />
@@ -169,7 +151,7 @@ and function code, validates all inputs in real-time, and triggers protocol-spec
                     onChange={() => {
                         onPropertyChanged();
                     }}
-                    inputInvalid={!validEndianMode}
+                    inputInvalid={!validation.endian_mode}
                     enableInputInvalid={true}
                     scrollable={true}
                 />

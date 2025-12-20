@@ -8,9 +8,10 @@ import {
     type EditableModbusRTUNodeOptions,
     ModbusRTUFunction,
     type ModbusRTUNodeOptions,
+    type ModbusRTUNodeOptionsValidation,
     ModbusRTUNodeType,
 } from "$lib/types/nodes/protocol/modbusRtu";
-import { defaultOPCUANodeOptions, type EditableOPCUANodeOptions, type OPCUANodeOptions, OPCUANodeType } from "$lib/types/nodes/protocol/opcUa";
+import { defaultOPCUANodeOptions, type EditableOPCUANodeOptions, type OPCUANodeOptions, type OPCUANodeOptionsValidation, OPCUANodeType } from "$lib/types/nodes/protocol/opcUa";
 import type { SvelteComponent } from "svelte";
 import { defaultModbusRTUOptions } from "$lib/types/device/modbusRtu";
 import { defaultOPCUAOptions } from "$lib/types/device/opcUa";
@@ -22,9 +23,11 @@ import OPCUANodeCommConfig from "../../../components/Devices/Nodes/Protocol/OpcU
 import { NodeType } from "$lib/types/nodes/base";
 import type {
     BaseNodeProtocolOptions,
+    BaseNodeProtocolOptionsValidation,
     EditableBaseNodeProtocolOptions,
     EditableNodeNoProtocolOptions,
     NodeNoProtocolOptions,
+    NoProtocolNodeOptionsValidation,
 } from "$lib/types/nodes/config";
 import {
     validateModbusAddress,
@@ -57,7 +60,7 @@ export interface ProtocolPlugin {
     convertNodeProtocolOptionsToEditable: (protocolOptions: BaseNodeProtocolOptions) => EditableBaseNodeProtocolOptions;
     convertNodeProtocolOptionsToNormal: (editableProtocolOptions: EditableBaseNodeProtocolOptions) => BaseNodeProtocolOptions;
     validateNodeType: (editableProtocolOptions: EditableBaseNodeProtocolOptions) => boolean;
-    validateNodeProtocolOptions: (editableProtocolOptions: EditableBaseNodeProtocolOptions) => boolean;
+    validateNodeProtocolOptions: (editableProtocolOptions: EditableBaseNodeProtocolOptions) => BaseNodeProtocolOptionsValidation;
 }
 
 /*     N O     P R O T O C O L     P L U G I N     */
@@ -108,8 +111,14 @@ const noProtocolPlugin: ProtocolPlugin = {
     validateNodeProtocolOptions: (editableProtocolOptions) => {
         let protocolOptions = editableProtocolOptions as EditableNodeNoProtocolOptions;
 
-        if (!Object.values(NodeType).includes(protocolOptions.type)) return false;
-        return true;
+        let validType = Object.values(NodeType).includes(protocolOptions.type)
+
+        return {
+            type: validType,
+            isValid() {
+                return validType;
+            },
+        } as NoProtocolNodeOptionsValidation;
     },
 };
 
@@ -222,14 +231,22 @@ const modbusRtuPlugin: ProtocolPlugin = {
     validateNodeProtocolOptions(editableProtocolOptions) {
         let protocolOptions = editableProtocolOptions as EditableModbusRTUNodeOptions;
 
-        if (!Object.values(ModbusRTUNodeType).includes(protocolOptions.type)) return false;
-        if (!Object.values(ModbusRTUFunction).includes(protocolOptions.function)) return false;
-        if (!validateModbusFunction(protocolOptions.function, protocolOptions.type)) return false;
-        if (!validateModbusAddress(protocolOptions.address)) return false;
-        if (!validateModbusEndianMode(protocolOptions.type, protocolOptions.endian_mode)) return false;
-        if (!validateModbusBitIndex(protocolOptions.type, protocolOptions.function, protocolOptions.bit)) return false;
+        let validType = Object.values(ModbusRTUNodeType).includes(protocolOptions.type)
+        let validFunction = Object.values(ModbusRTUFunction).includes(protocolOptions.function) && validateModbusFunction(protocolOptions.function, protocolOptions.type);
+        let validAddress = validateModbusAddress(protocolOptions.address);
+        let validEndianMode = validateModbusEndianMode(protocolOptions.type, protocolOptions.endian_mode);
+        let validBit = validateModbusBitIndex(protocolOptions.type, protocolOptions.function, protocolOptions.bit);
 
-        return true;
+        return {
+            type: validType,
+            function: validFunction,
+            address: validAddress,
+            endian_mode: validEndianMode,
+            bit: validBit,
+            isValid() {
+                return validType && validFunction && validAddress && validEndianMode && validBit;
+            },
+        } as ModbusRTUNodeOptionsValidation;
     },
 };
 
@@ -316,10 +333,16 @@ const opcUaPlugin: ProtocolPlugin = {
     validateNodeProtocolOptions(editableProtocolOptions) {
         let protocolOptions = editableProtocolOptions as EditableOPCUANodeOptions;
 
-        if (!Object.values(OPCUANodeType).includes(protocolOptions.type)) return false;
-        if (!validateOpcUaNodeId(protocolOptions.node_id)) return false;
+        let validType = Object.values(OPCUANodeType).includes(protocolOptions.type)
+        let validNodeId = validateOpcUaNodeId(protocolOptions.node_id);
 
-        return true;
+        return {
+            type: validType,
+            node_id: validNodeId,
+            isValid() {
+                return validType && validNodeId;
+            },
+        } as OPCUANodeOptionsValidation;
     },
 };
 
