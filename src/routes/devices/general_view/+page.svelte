@@ -39,6 +39,8 @@
         peakPower: true,
     } as Record<string, boolean>;
     let showDetailDiv = false;
+    let detailedNodeStateName: string;
+    let detailedNodeStatePhase: NodePhase;
     let detailedNodeState: ProcessedNodeState;
 
     // Reactive Statements
@@ -46,8 +48,6 @@
         availablePhases = meterTypeAvailablePhases[meterType];
         ({ nodesStateByCategory, availableCategories } = getNodesStateByCategory(processedNodesState));
     }
-
-    $: console.log(showDetailDiv);
 
     // Functions
     onMount(() => {
@@ -92,6 +92,8 @@
                         {availableCategories}
                         {nodesStateByCategory}
                         bind:expandedState={realTimeExpandedState}
+                        bind:detailedNodeStateName
+                        bind:detailedNodeStatePhase
                         bind:detailedNodeState
                         bind:showDetailDiv
                     />

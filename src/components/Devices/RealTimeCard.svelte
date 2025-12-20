@@ -24,14 +24,11 @@
     export let nodesStateByCategory: Record<NodePhase, Record<NodeCategory, Array<ProcessedNodeState>>>;
     export let expandedState: Record<NodePhase, RealTimeCardCategoriesState>;
     export let detailedNodeState: ProcessedNodeState;
+    export let detailedNodeStateName: string;
+    export let detailedNodeStatePhase: NodePhase;
     export let showDetailDiv: boolean;
 
-    // Variables
-    let detailedNodeStateName: string;
-    let detailedNodeStatePhase: NodePhase;
-
     // Reactive Statements
-
     // Nodes are updated
     $: if (processedNodesState) {
         handleNodesChange();
