@@ -19,8 +19,20 @@ export function stringIsValidFloat(str: string): boolean {
 }
 
 /**
+ * Rounds a numeric value to the specified number of decimal places.
+ *
+ * @param value - The number to round, or `null`.
+ * @param decimals - The number of decimal places to keep.
+ * @returns The rounded value, or `null` if the input value is `null` or `undefined`.
+ */
+export function roundToDecimalPlaces(value: number | null | undefined, decimals: number): number | null {
+    if (value === null || value === undefined) return null;
+    return Number(value.toFixed(decimals));
+}
+
+/**
  * Deeply compares two values for structural equality.
- * 
+ *
  * @param a - First value to compare.
  * @param b - Second value to compare.
  * @returns `true` if both values have identical structure and content, `false` otherwise.

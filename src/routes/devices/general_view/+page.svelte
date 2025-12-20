@@ -47,6 +47,8 @@
         ({ nodesStateByCategory, availableCategories } = getNodesStateByCategory(processedNodesState));
     }
 
+    $: console.log(showDetailDiv);
+
     // Functions
     onMount(() => {
         let nodesStatePoller: MethodPoller | null;
@@ -86,6 +88,7 @@
                 <div class="grid-col">
                     <RealTimeCard
                         {section}
+                        {processedNodesState}
                         {availableCategories}
                         {nodesStateByCategory}
                         bind:expandedState={realTimeExpandedState}

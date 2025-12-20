@@ -1,4 +1,5 @@
 <script lang="ts">
+    import { roundToDecimalPlaces } from "$lib/logic/util/generic";
     import BaseDisplay from "./BaseDisplay.svelte";
     import Bar from "../../../General/Bar.svelte";
 
@@ -107,7 +108,7 @@
     >
         <div class="value-div">
             {#if !valueDisconnected}
-                <span class="value">{value?.toFixed(decimalPlaces || 0)}</span>
+                <span class="value">{roundToDecimalPlaces(value, decimalPlaces || 0)}</span>
             {/if}
         </div>
 

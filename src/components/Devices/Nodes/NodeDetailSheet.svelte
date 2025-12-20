@@ -1,4 +1,5 @@
 <script lang="ts">
+    import { roundToDecimalPlaces } from "$lib/logic/util/generic";
     import RightPanelSheet from "../../General/RightPanelSheet.svelte";
     import InlineLoader from "../../General/InlineLoader.svelte";
     import BaseGraph from "./Graphs/BaseGraph.svelte";
@@ -409,7 +410,8 @@
                                 <InlineLoader loaded={!nodeAddInfoLoading && nodeAdditionalInfo?.min_alarm_value !== undefined}>
                                     <span class="value with-adornment align-right">
                                         <span class="value"
-                                            >{nodeAdditionalInfo?.min_alarm_value?.toFixed(nodeState.decimal_places || 0)} {nodeState.unit}</span
+                                            >{roundToDecimalPlaces(nodeAdditionalInfo?.min_alarm_value, nodeState.decimal_places || 0)}
+                                            {nodeState.unit}</span
                                         >
                                         <div class="dot-state-div">
                                             <div class="dot-state" data-state={nodeState.min_alarm_state ? "alarmState" : "dim"}></div>
@@ -424,7 +426,8 @@
                                 <InlineLoader loaded={!nodeAddInfoLoading && nodeAdditionalInfo?.max_alarm_value !== undefined}>
                                     <span class="value with-adornment align-right">
                                         <span class="value"
-                                            >{nodeAdditionalInfo?.max_alarm_value?.toFixed(nodeState.decimal_places || 0)} {nodeState.unit}</span
+                                            >{roundToDecimalPlaces(nodeAdditionalInfo?.max_alarm_value, nodeState.decimal_places || 0)}
+                                            {nodeState.unit}</span
                                         >
                                         <div class="dot-state-div">
                                             <div class="dot-state" data-state={nodeState.max_alarm_state ? "alarmState" : "dim"}></div>
@@ -445,7 +448,8 @@
                                 <InlineLoader loaded={!nodeAddInfoLoading && nodeAdditionalInfo?.min_warning_value !== undefined}>
                                     <span class="value with-adornment align-right">
                                         <span class="value"
-                                            >{nodeAdditionalInfo?.min_warning_value?.toFixed(nodeState.decimal_places || 0)} {nodeState.unit}</span
+                                            >{roundToDecimalPlaces(nodeAdditionalInfo?.min_warning_value, nodeState.decimal_places || 0)}
+                                            {nodeState.unit}</span
                                         >
                                         <div class="dot-state-div">
                                             <div class="dot-state" data-state={nodeState.min_warning_state ? "warningState" : "dim"}></div>
@@ -460,7 +464,8 @@
                                 <InlineLoader loaded={!nodeAddInfoLoading && nodeAdditionalInfo?.max_warning_value !== undefined}>
                                     <span class="value with-adornment align-right">
                                         <span class="value"
-                                            >{nodeAdditionalInfo?.max_warning_value?.toFixed(nodeState.decimal_places || 0)} {nodeState.unit}</span
+                                            >{roundToDecimalPlaces(nodeAdditionalInfo?.max_warning_value, nodeState.decimal_places || 0)}
+                                            {nodeState.unit}</span
                                         >
                                         <div class="dot-state-div">
                                             <div class="dot-state" data-state={nodeState.max_warning_state ? "warningState" : "dim"}></div>

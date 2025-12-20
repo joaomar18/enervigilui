@@ -19,11 +19,23 @@
 
     // Props
     export let section: NodePhaseSection;
+    export let processedNodesState: Array<ProcessedNodeState>;
     export let availableCategories: Record<NodePhase, RealTimeCardCategoriesState>;
     export let nodesStateByCategory: Record<NodePhase, Record<NodeCategory, Array<ProcessedNodeState>>>;
     export let expandedState: Record<NodePhase, RealTimeCardCategoriesState>;
     export let detailedNodeState: ProcessedNodeState;
     export let showDetailDiv: boolean;
+
+    // Variables
+    let detailedNodeStateName: string;
+    let detailedNodeStatePhase: NodePhase;
+
+    // Reactive Statements
+
+    // Nodes are updated
+    $: if (processedNodesState) {
+        handleNodesChange();
+    }
 
     // Functions
     function expandAllOnPhaseCard(phase: NodePhase): void {
@@ -38,9 +50,28 @@
         }
     }
 
+    function getNodeState(name: string, phase: NodePhase): ProcessedNodeState | undefined {
+        return processedNodesState.find((node) => node.name === name && node.phase === phase);
+    }
+
     function openDetailDiv(nodeState: ProcessedNodeState): void {
-        showDetailDiv = true;
-        detailedNodeState = nodeState;
+        let newNodeState = getNodeState(nodeState.name, nodeState.phase);
+        if (newNodeState) {
+            detailedNodeStateName = nodeState.name;
+            detailedNodeStatePhase = nodeState.phase;
+            detailedNodeState = newNodeState;
+            showDetailDiv = true;
+        }
+    }
+
+    function handleNodesChange(): void {
+        if (!detailedNodeStateName || !detailedNodeStatePhase) return;
+        let newNodeState = getNodeState(detailedNodeStateName, detailedNodeStatePhase);
+        if (newNodeState) {
+            detailedNodeState = newNodeState;
+        } else {
+            showDetailDiv = false;
+        }
     }
 </script>
 

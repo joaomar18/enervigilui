@@ -1,4 +1,5 @@
 <script lang="ts">
+    import { roundToDecimalPlaces } from "$lib/logic/util/generic";
     import BaseDisplay from "./BaseDisplay.svelte";
 
     // Styles
@@ -11,7 +12,7 @@
     export let labelText: string;
     export let value: number | null;
     export let unitText: string;
-    export let decimalPlaces: number;
+    export let decimalPlaces: number | undefined;
 
     // Style object (from theme)
     export let style: { [property: string]: string | number } | null = null;
@@ -91,7 +92,7 @@
     >
         <div class="value-div">
             {#if !valueDisconnected}
-                <span class="value">{value?.toFixed(decimalPlaces)}</span>
+                <span class="value">{roundToDecimalPlaces(value, decimalPlaces || 0)}</span>
             {/if}
         </div>
 
