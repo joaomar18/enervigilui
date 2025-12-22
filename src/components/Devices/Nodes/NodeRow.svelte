@@ -66,7 +66,7 @@
     let nodeEditingState: NodeRecordEditingState = {
         oldVariableName: node.display_name,
         oldVariableUnit: node.config.unit,
-        oldProtocolOptions: undefined,
+        oldProtocolOptions: { ...node.protocol_options },
     };
 
     let rowHeight: string;
@@ -203,8 +203,7 @@ properties and action buttons for configuration and deletion. -->
                     options={$nodeTypeTexts}
                     bind:selectedOption={protocolType}
                     onChange={() => {
-                        protocolPlugin.setProtocolType(node.protocol_options, protocolType);
-                        nodeTypeChange(node);
+                        protocolPlugin.setProtocolType(node, protocolType, nodeEditingState);
                         onPropertyChanged();
                     }}
                     inputInvalid={!node.validation.variableType}

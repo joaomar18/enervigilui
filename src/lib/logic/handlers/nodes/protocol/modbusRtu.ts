@@ -1,35 +1,37 @@
-import { multiregisterTypes, ModbusRTUNodeMode } from "$lib/types/nodes/protocol/modbusRtu";
+import type { NodeRecordEditingState } from "$lib/types/nodes/config";
+import { multiregisterTypes, ModbusRTUNodeMode, type ModbusRTUNodeOptions } from "$lib/types/nodes/protocol/modbusRtu";
 import {
     type EditableModbusRTUNodeOptions,
-    type ModbusRTUNodeOptionsEditingState,
     ModbusRTUFunction,
     ModbusRTUNodeType,
 } from "$lib/types/nodes/protocol/modbusRtu";
 
 /**
- * Handles UI-side effects when the Modbus RTU function selection changes.
+ * Handles UI-side state updates when the Modbus RTU function selection changes.
  *
- * This function manages the validity of the `bit` field based on the
- * combination of node type and Modbus function:
+ * This function updates the validity and value of the `bit` field based on
+ * the selected Modbus function and node data type:
  * - READ_COILS and READ_DISCRETE_INPUTS do not support bit indexing
  * - Other functions may require a bit index when the node type is BOOL
  *
- * The previous function is tracked to determine whether the bit field
- * should be reset or preserved during transitions.
+ * The previously selected function is retrieved from the editing state to
+ * determine whether the `bit` field should be reset or preserved during
+ * transitions.
  *
  * @param {EditableModbusRTUNodeOptions} commOptions - Editable Modbus RTU communication options.
  * @param {ModbusRTUNodeType} type - Currently selected node data type.
  * @param {ModbusRTUFunction} modbus_function - Newly selected Modbus RTU function.
- * @param {ModbusRTUNodeOptionsEditingState} editingState - Editing state tracking previous selections.
+ * @param {NodeRecordEditingState} editingState - Stores the previous protocol options for comparison.
  */
 export function modbusRTUFunctionChange(
     commOptions: EditableModbusRTUNodeOptions,
     type: ModbusRTUNodeType,
     modbus_function: ModbusRTUFunction,
-    editingState: ModbusRTUNodeOptionsEditingState
+    editingState: NodeRecordEditingState
 ): void {
+    let previousState = editingState.oldProtocolOptions as ModbusRTUNodeOptions;
     let previousBoolFunction =
-        editingState.previousFunction === ModbusRTUFunction.READ_COILS || editingState.previousFunction === ModbusRTUFunction.READ_DISCRETE_INPUTS;
+        previousState.function === ModbusRTUFunction.READ_COILS || previousState.function === ModbusRTUFunction.READ_DISCRETE_INPUTS;
     let currentBoolFunction = modbus_function === ModbusRTUFunction.READ_COILS || modbus_function === ModbusRTUFunction.READ_DISCRETE_INPUTS;
 
     if (!currentBoolFunction && type === ModbusRTUNodeType.BOOL) {
@@ -40,46 +42,46 @@ export function modbusRTUFunctionChange(
         commOptions.bit = null;
     }
 
-    editingState.previousFunction = modbus_function;
+    previousState.function = modbus_function;
 }
 
 /**
- * Handles UI-side effects when the Modbus RTU node data type changes.
+ * Handles UI-side state updates when the Modbus RTU node data type changes.
  *
  * This function:
- * - Manages endianness when switching between single-register and multi-register types
- * - Updates the `bit` field validity when entering or leaving BOOL types
+ * - Updates endianness when switching between single-register and multi-register types
+ * - Manages the `bit` field when entering or leaving BOOL node types
  *
- * Previous type and function values are used to apply only the necessary
- * state transitions and avoid invalid configurations.
+ * Previous protocol options are retrieved from the editing state to apply
+ * only the necessary transitions and prevent invalid configurations.
  *
  * @param {EditableModbusRTUNodeOptions} commOptions - Editable Modbus RTU communication options.
  * @param {ModbusRTUNodeType} type - Newly selected node data type.
- * @param {ModbusRTUNodeOptionsEditingState} editingState - Editing state tracking previous selections.
+ * @param {NodeRecordEditingState} editingState - Stores the previous protocol options for comparison.
  */
 export function modbusNodeTypeChange(
     commOptions: EditableModbusRTUNodeOptions,
     type: ModbusRTUNodeType,
-    editingState: ModbusRTUNodeOptionsEditingState
+    editingState: NodeRecordEditingState
 ): void {
-    if (!multiregisterTypes.includes(editingState.previousType) && multiregisterTypes.includes(type)) {
+
+    let previousState = editingState.oldProtocolOptions as ModbusRTUNodeOptions;
+
+    if (!multiregisterTypes.includes(previousState.type) && multiregisterTypes.includes(type)) {
         // Multi-register type change
         commOptions.endian_mode = ModbusRTUNodeMode.BIG_ENDIAN;
-    } else if (multiregisterTypes.includes(editingState.previousType) && !multiregisterTypes.includes(type)) {
+    } else if (multiregisterTypes.includes(previousState.type) && !multiregisterTypes.includes(type)) {
         // Change to non Multi-register type
         commOptions.endian_mode = null;
     }
 
-    let currentBoolFunction =
-        editingState.previousFunction === ModbusRTUFunction.READ_COILS || editingState.previousFunction === ModbusRTUFunction.READ_DISCRETE_INPUTS;
+    let currentBoolFunction = previousState.function === ModbusRTUFunction.READ_COILS || previousState.function === ModbusRTUFunction.READ_DISCRETE_INPUTS;
 
     if (!currentBoolFunction && type === ModbusRTUNodeType.BOOL) {
-        if (editingState.previousType !== ModbusRTUNodeType.BOOL) {
+        if (previousState.type !== ModbusRTUNodeType.BOOL) {
             commOptions.bit = "";
         }
     } else {
         commOptions.bit = null;
     }
-
-    editingState.previousType = type;
 }

@@ -124,7 +124,7 @@ export function customNodeChange(node: EditableNodeRecord, nodeState: NodeRecord
  *
  * @param {EditableNodeRecord} node - The editable node whose type has changed.
  */
-export function nodeTypeChange(node: EditableNodeRecord): void {
+export function nodeTypeChange(node: EditableNodeRecord, nodeState: NodeRecordEditingState): void {
     let nodeIsNumeric = isNumeric(node);
     let plugin = get(protocolPlugins)[node.protocol];
     if (!nodeIsNumeric) {
@@ -135,26 +135,30 @@ export function nodeTypeChange(node: EditableNodeRecord): void {
         node.config.max_alarm_value = "";
         node.config.unit = "";
     }
-    if(plugin.convertTypeToGeneric(node.protocol_options) !== NodeType.FLOAT){
+    if (plugin.convertTypeToGeneric(node.protocol_options) !== NodeType.FLOAT) {
         node.config.decimal_places = "";
     }
+    nodeState.oldProtocolOptions = { ...node.protocol_options };
     node.is_numeric = nodeIsNumeric;
 }
 
 /**
- * Handles transitions between virtual (calculated) and physical node modes.
- * When a node becomes virtual, its current protocol options are saved, the
- * protocol is switched to Protocol.NONE, and the node’s type is preserved by
- * converting it to the generic type understood by the no-protocol plugin.
+ * Handles transitions between physical and virtual (calculated) node modes.
  *
- * When reverting back to a physical node, the previously stored protocol
- * options are restored if available; otherwise the protocol’s default options
- * are applied.
+ * When a node is set to virtual, its protocol is switched to `Protocol.NONE`,
+ * protocol-specific options are replaced with default no-protocol options,
+ * and the node type is converted to a generic type understood by the
+ * no-protocol plugin.
+ *
+ * When reverting to a physical node, the previously selected protocol is
+ * restored and its default protocol options are applied.
+ *
+ * The node's numeric state is recalculated after the transition.
  *
  * @function virtualNodeChange
  * @param {EditableNodeRecord} node - The node being updated.
- * @param {NodeRecordEditingState} nodeState - Stores protocol options for restoring after virtual mode.
- * @param {Protocol} selectedProtocol - The protocol to restore when the node is no longer virtual.
+ * @param {NodeRecordEditingState} nodeState - Editing state used during protocol type conversion.
+ * @param {Protocol} selectedProtocol - The protocol to restore when leaving virtual mode.
  * @returns {void}
  */
 export function virtualNodeChange(node: EditableNodeRecord, nodeState: NodeRecordEditingState, selectedProtocol: Protocol): void {
@@ -162,18 +166,12 @@ export function virtualNodeChange(node: EditableNodeRecord, nodeState: NodeRecor
     if (node.config.calculated) {
         let noProtocolPlugin = get(protocolPlugins)[Protocol.NONE];
         let newType = plugin.convertTypeToGeneric(node.protocol_options);
-
-        nodeState.oldProtocolOptions = { ...node.protocol_options };
         node.protocol = Protocol.NONE;
         node.protocol_options = { ...defaultNoProtocolNodeOptions };
-        noProtocolPlugin.setProtocolType(node.protocol_options, newType);
+        noProtocolPlugin.setProtocolType(node, newType, nodeState);
     } else {
         node.protocol = selectedProtocol;
-        if (nodeState.oldProtocolOptions) {
-            node.protocol_options = nodeState.oldProtocolOptions;
-        } else {
-            node.protocol_options = { ...plugin.defaultNodeProtocolOptions };
-        }
+        node.protocol_options = { ...plugin.defaultNodeProtocolOptions };
     }
     node.is_numeric = isNumeric(node);
 }

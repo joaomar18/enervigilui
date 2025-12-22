@@ -2,9 +2,9 @@
     import InfoLabel from "../../../../General/InfoLabel.svelte";
     import InputField from "../../../../General/InputField.svelte";
     import Selector from "../../../../General/Selector.svelte";
-    import type { EditableNodeRecord } from "$lib/types/nodes/config";
+    import type { EditableNodeRecord, NodeRecordEditingState } from "$lib/types/nodes/config";
     import type { ProtocolPlugin } from "$lib/stores/device/protocol";
-    import { modbusNodeTypeChange, modbusRTUFunctionChange } from "$lib/logic/handlers/nodes/protocol/modbusRtu";
+    import { modbusRTUFunctionChange } from "$lib/logic/handlers/nodes/protocol/modbusRtu";
     import { ModbusRTUFunction, ModbusRTUNodeType } from "$lib/types/nodes/protocol/modbusRtu";
     import { multiregisterTypes } from "$lib/types/nodes/protocol/modbusRtu";
     import type { EditableModbusRTUNodeOptions } from "$lib/types/nodes/protocol/modbusRtu";
@@ -18,10 +18,10 @@
     // Styles
     import { NodeConfigSheetInfoLabelStyle } from "$lib/style/nodes";
     import { NodeConfigSheetInputFieldStyle, NodeConfigSheetSelectorStyle } from "$lib/style/nodes";
-    import { nodeTypeChange } from "$lib/logic/handlers/nodes/base";
 
     // Props
     export let node: EditableNodeRecord;
+    export let nodeEditingState: NodeRecordEditingState;
     export let protocolPlugin: ProtocolPlugin;
     export let textKey: string;
     export let infoTextKey: string;
@@ -63,7 +63,7 @@ and function code, validates all inputs in real-time, and triggers protocol-spec
                 options={$modbusNodeFunctionTexts}
                 bind:selectedOption={commOptions.function}
                 onChange={() => {
-                    modbusRTUFunctionChange(commOptions, commOptions.type, commOptions.function, previousState);
+                    modbusRTUFunctionChange(commOptions, commOptions.type, commOptions.function, nodeEditingState);
                     onPropertyChanged();
                 }}
                 inputInvalid={!validation.function}
@@ -127,12 +127,10 @@ and function code, validates all inputs in real-time, and triggers protocol-spec
                 options={$modbusNodeTypeTexts}
                 bind:selectedOption={commOptions.type}
                 onChange={() => {
-                    modbusNodeTypeChange(commOptions, commOptions.type, previousState);
-                    protocolPlugin.setProtocolType(commOptions, commOptions.type);
-                    nodeTypeChange(node);
+                    protocolPlugin.setProtocolType(node, commOptions.type, nodeEditingState);
                     onPropertyChanged();
                 }}
-                inputInvalid={!validation.type}
+                inputInvalid={!node.validation.variableType}
                 enableInputInvalid={true}
                 scrollable={true}
             />

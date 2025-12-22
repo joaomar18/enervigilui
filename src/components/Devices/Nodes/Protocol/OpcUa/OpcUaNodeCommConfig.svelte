@@ -1,9 +1,8 @@
 <script lang="ts">
-    import { nodeTypeChange } from "$lib/logic/handlers/nodes/base";
     import InfoLabel from "../../../../General/InfoLabel.svelte";
     import InputField from "../../../../General/InputField.svelte";
     import Selector from "../../../../General/Selector.svelte";
-    import type { EditableNodeRecord } from "$lib/types/nodes/config";
+    import type { EditableNodeRecord, NodeRecordEditingState } from "$lib/types/nodes/config";
     import type { ProtocolPlugin } from "$lib/stores/device/protocol";
     import type { EditableOPCUANodeOptions, OPCUANodeOptionsValidation } from "$lib/types/nodes/protocol/opcUa";
 
@@ -17,6 +16,7 @@
 
     // Props
     export let node: EditableNodeRecord;
+    export let nodeEditingState: NodeRecordEditingState;
     export let protocolPlugin: ProtocolPlugin;
     export let textKey: string;
     export let infoTextKey: string;
@@ -70,11 +70,10 @@ and triggers protocol-specific handlers when the data type changes. -->
                 options={$opcUaNodeTypeTexts}
                 bind:selectedOption={commOptions.type}
                 onChange={() => {
-                    protocolPlugin.setProtocolType(commOptions, commOptions.type);
-                    nodeTypeChange(node);
+                    protocolPlugin.setProtocolType(node, commOptions.type, nodeEditingState);
                     onPropertyChanged();
                 }}
-                inputInvalid={!validation.type}
+                inputInvalid={!node.validation.variableType}
                 enableInputInvalid={true}
                 scrollable={true}
             />

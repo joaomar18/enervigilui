@@ -26,7 +26,9 @@ import type {
     BaseNodeProtocolOptionsValidation,
     EditableBaseNodeProtocolOptions,
     EditableNodeNoProtocolOptions,
+    EditableNodeRecord,
     NodeNoProtocolOptions,
+    NodeRecordEditingState,
     NoProtocolNodeOptionsValidation,
 } from "$lib/types/nodes/config";
 import {
@@ -39,6 +41,8 @@ import { validateOpcUaNodeId } from "$lib/logic/validation/nodes/protocol/opcUa"
 import { noProtocolNodeTypeTexts } from "../lang/protocolPlugin";
 import { modbusNodeTypeTexts } from "../lang/modbusRtuTexts";
 import { opcUaNodeTypeTexts } from "../lang/opcUaTexts";
+import { nodeTypeChange } from "$lib/logic/handlers/nodes/base";
+import { modbusNodeTypeChange } from "$lib/logic/handlers/nodes/protocol/modbusRtu";
 
 export interface ProtocolPlugin {
     textKey: string;
@@ -53,7 +57,7 @@ export interface ProtocolPlugin {
     NodeCommConfigComponent: typeof SvelteComponent<any> | null;
     isNumeric: (nodeProtocolOptions: BaseNodeProtocolOptions | EditableBaseNodeProtocolOptions) => boolean;
     convertTypeToGeneric: (nodeProtocolOptions: BaseNodeProtocolOptions | EditableBaseNodeProtocolOptions) => NodeType;
-    setProtocolType: (nodeProtocolOptions: EditableBaseNodeProtocolOptions, type: string) => void;
+    setProtocolType: (node: EditableNodeRecord, type: string, nodeState: NodeRecordEditingState) => void;
     getProtocolType: (nodeProtocolOptions: BaseNodeProtocolOptions | EditableBaseNodeProtocolOptions) => string;
     convertCommOptionsToEditable: (communicationOptions: BaseCommunicationConfig) => EditableBaseCommunicationConfig;
     convertCommOptionsToNormal: (editableCommunicationOptions: EditableBaseCommunicationConfig) => BaseCommunicationConfig;
@@ -83,9 +87,10 @@ const noProtocolPlugin: ProtocolPlugin = {
     convertTypeToGeneric: (nodeProtocolOptions) => {
         return (nodeProtocolOptions as NodeNoProtocolOptions).type;
     },
-    setProtocolType: (nodeProtocolOptions, type: string) => {
-        let protocolOptions = nodeProtocolOptions as EditableNodeNoProtocolOptions;
+    setProtocolType: (node, type, nodeState) => {
+        let protocolOptions = node.protocol_options as EditableNodeNoProtocolOptions;
         protocolOptions.type = type as NodeType;
+        nodeTypeChange(node, nodeState);
     },
     getProtocolType: (nodeProtocolOptions) => {
         return (nodeProtocolOptions as NodeNoProtocolOptions).type;
@@ -169,9 +174,11 @@ const modbusRtuPlugin: ProtocolPlugin = {
                 throw new Error(`Unsupported Modbus RTU Node Type ${type}`);
         }
     },
-    setProtocolType: (nodeProtocolOptions, type: string) => {
-        let protocolOptions = nodeProtocolOptions as EditableModbusRTUNodeOptions;
+    setProtocolType: (node, type, nodeState) => {
+        let protocolOptions = node.protocol_options as EditableModbusRTUNodeOptions;
         protocolOptions.type = type as ModbusRTUNodeType;
+        modbusNodeTypeChange(protocolOptions, protocolOptions.type, nodeState);
+        nodeTypeChange(node, nodeState);
     },
     getProtocolType: (nodeProtocolOptions) => {
         return (nodeProtocolOptions as ModbusRTUNodeOptions).type;
@@ -282,9 +289,10 @@ const opcUaPlugin: ProtocolPlugin = {
                 throw new Error(`Unsupported OPC UA Node Type ${type}`);
         }
     },
-    setProtocolType: (nodeProtocolOptions, type: string) => {
-        let protocolOptions = nodeProtocolOptions as EditableOPCUANodeOptions;
+    setProtocolType: (node, type: string, nodeState) => {
+        let protocolOptions = node.protocol_options as EditableOPCUANodeOptions;
         protocolOptions.type = type as OPCUANodeType;
+        nodeTypeChange(node, nodeState);
     },
     getProtocolType: (nodeProtocolOptions) => {
         return (nodeProtocolOptions as OPCUANodeOptions).type;

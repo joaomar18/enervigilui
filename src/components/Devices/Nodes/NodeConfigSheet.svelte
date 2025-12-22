@@ -248,6 +248,7 @@ incremental logic, virtual node settings, and enable/disable status. -->
                         <svelte:component
                             this={protocolPlugin.NodeCommConfigComponent}
                             {node}
+                            bind:nodeEditingState
                             {protocolPlugin}
                             bind:commOptions={node.protocol_options}
                             textKey={protocolPlugin.textKey}
@@ -275,9 +276,8 @@ incremental logic, virtual node settings, and enable/disable status. -->
                                     options={$noProtocolNodeTypeTexts}
                                     bind:selectedOption={protocolType}
                                     onChange={() => {
+                                        protocolPlugin.setProtocolType(node, protocolType, nodeEditingState);
                                         onPropertyChanged();
-                                        protocolPlugin.setProtocolType(node.protocol_options, protocolType);
-                                        nodeTypeChange(node);
                                     }}
                                     inputInvalid={!node.validation.variableType}
                                     enableInputInvalid={true}
