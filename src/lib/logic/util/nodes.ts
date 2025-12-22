@@ -9,6 +9,8 @@ import type { NodePhaseSection } from "$lib/types/nodes/base";
 import type { BaseNodeConfig, NodeRecord, EditableNodeRecord, BaseNodeProtocolOptions } from "$lib/types/nodes/config";
 import type { NodeState, ProcessedNodeState } from "$lib/types/nodes/realtime";
 import type { RealTimeCardCategoriesState } from "$lib/types/view/device";
+import type { ProcessedBaseLogPoint } from "$lib/types/nodes/logs";
+import { isEqual } from "./generic";
 
 /**
  * Checks if a node is configured as a counter (accumulating values over time).
@@ -272,4 +274,18 @@ export function getNodesStateByCategory(processedNodesState: Array<ProcessedNode
     }
 
     return { nodesStateByCategory, availableCategories };
+}
+
+export function checkLogsAreDifferent(newLogs: Array<ProcessedBaseLogPoint> | undefined, oldLogs: Array<ProcessedBaseLogPoint> | undefined): boolean {
+    if (!newLogs) return false;
+    if (!oldLogs) return true;
+    if (newLogs.length !== oldLogs.length) return true;
+    for (let i = 0; i < newLogs.length; i++) {
+        const newPoint = newLogs[i];
+        const oldPoint = oldLogs[i];
+        if (!isEqual(newPoint, oldPoint)) return true;
+    }
+
+    // No differences found
+    return false;
 }

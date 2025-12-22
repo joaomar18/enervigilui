@@ -20,6 +20,7 @@
     export let dataFetched: boolean;
     export let firstFetch: boolean;
     export let metricsCategory: NodeCategory;
+    export let previousCategory: NodeCategory | undefined;
 
     // Layout / styling props
     export let iconSize: string | undefined = undefined;
@@ -72,7 +73,6 @@
     let colStack = false;
     let loaderTimeout: number | null = null;
     let numberOfVariables: number;
-    let prevCategory: NodeCategory;
     let containerEl: HTMLDivElement;
 
     // Reactive Statements
@@ -81,14 +81,14 @@
     $: numberOfVariables = Object.keys(metricsVariables).length;
 
     $: if (!dataFetched && !showLoader) {
-        if (firstFetch && prevCategory === metricsCategory) {
+        if (firstFetch && previousCategory === metricsCategory) {
             loaderTimeout = setTimeout(() => {
                 showLoader = !dataFetched;
             }, 500);
         } else {
             showLoader = true;
         }
-        prevCategory = metricsCategory;
+        previousCategory = metricsCategory;
     }
     $: if (dataFetched) {
         if (loaderTimeout) {

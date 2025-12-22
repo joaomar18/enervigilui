@@ -27,6 +27,7 @@
     import { mergeStyle } from "$lib/style/components";
     import { NodeDetailSheetStyle } from "$lib/style/nodes";
     import { NodesBaseDisplayDetailStyle } from "$lib/style/nodes";
+    import type { NodeCategory } from "$lib/types/nodes/base";
 
     // Style object (from theme)
     export let style: { [property: string]: string | number } | null = null;
@@ -147,6 +148,7 @@
     let endDate: Date;
     let currentTimeSpans: SlidingWindow<NodeTimeSpan> = new SlidingWindow(10);
     let enableGoBack: boolean = false;
+    let previousGraphCategory: NodeCategory | undefined = undefined;
 
     // Reactive Statements
     $: if (!showPanel) {
@@ -161,7 +163,7 @@
     $: if (nodeState) {
         loadNodeAdditionalInfo();
         if (nodeState.graphType) {
-            getInitialNodeLogs();
+            updateNodeLogs();
         }
     }
 
@@ -205,7 +207,7 @@
         nodeAddInfoFirstFetch = true;
     }
 
-    function getInitialNodeLogs(): void {
+    function updateNodeLogs(): void {
         if (!nodeLogsFirstFetch) {
             let { initial_date, end_date } = loadDateSpan(selectedHistoryTimeSpan);
             setDateSpan({ initial_date, end_date });
@@ -503,6 +505,7 @@
                                 {initialDate}
                                 {endDate}
                                 bind:selectedTimeSpan={selectedHistoryTimeSpan}
+                                bind:previousGraphCategory
                                 getNewTimeSpan={(initial_date: Date, end_date: Date) => loadNodeLogsWithCustomPeriod(initial_date, end_date)}
                                 getNewDefaultTimeSpan={(timeSpan: LogSpanPeriod) => loadNodeLogsWithSpanPeriod(timeSpan)}
                                 goBackEnabled={enableGoBack}

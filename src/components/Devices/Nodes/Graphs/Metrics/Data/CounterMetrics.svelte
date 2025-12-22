@@ -9,6 +9,7 @@
 
     // Props
     export let metrics: CounterMetrics;
+    export let previousCategory: NodeCategory | undefined;
     export let unit: string = "";
     export let decimalPlaces: number | null;
     export let dataFetched: boolean;
@@ -39,4 +40,4 @@
     integration with internationalization and theming. Provides consistent counter data
     presentation for energy meters, usage trackers, and other cumulative measurements.
 -->
-<Metrics {style} {dataFetched} {firstFetch} {metricsVariables} {unit} metricsCategory={NodeCategory.Counters}></Metrics>
+<Metrics {style} {dataFetched} {firstFetch} {metricsVariables} {unit} metricsCategory={NodeCategory.Counters} bind:previousCategory></Metrics>

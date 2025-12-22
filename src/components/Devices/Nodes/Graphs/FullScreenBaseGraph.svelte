@@ -5,6 +5,7 @@
     import { LogSpanPeriod } from "$lib/types/view/nodes";
     import FullScreenPanel from "../../../Dashboard/FullScreenPanel.svelte";
     import BaseGraph from "./BaseGraph.svelte";
+    import type { NodeCategory } from "$lib/types/nodes/base";
 
     // Styles
     import { FullScreenBaseGraphStyle, FullScreenGraphMetricStyle } from "$lib/style/graph";
@@ -20,6 +21,7 @@
     export let dataFetched: boolean;
     export let firstFetch: boolean;
     export let globalMetrics: BaseMetrics | undefined;
+    export let previousGraphCategory: NodeCategory | undefined;
     export let unit: string = "";
     export let decimalPlaces: number | null = null;
     export let selectedTimeSpan: LogSpanPeriod;
@@ -60,6 +62,7 @@
         {unit}
         {decimalPlaces}
         bind:selectedTimeSpan
+        bind:previousGraphCategory
         {goBackEnabled}
         {goBack}
         {getNewTimeSpan}

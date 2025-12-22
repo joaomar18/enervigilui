@@ -9,6 +9,7 @@
 
     // Props
     export let metrics: MeasurementMetrics;
+    export let previousCategory: NodeCategory | undefined;
     export let unit: string = "";
     export let decimalPlaces: number | null;
     export let dataFetched: boolean;
@@ -41,4 +42,4 @@
     getMetricsViewVariables for seamless integration with internationalization and theming.
     Provides consistent measurement data presentation across the application.
 -->
-<Metrics {style} labelWidth="150px" {dataFetched} {firstFetch} {metricsVariables} {unit} metricsCategory={NodeCategory.Measurements}></Metrics>
+<Metrics {style} labelWidth="150px" {dataFetched} {firstFetch} {metricsVariables} {unit} metricsCategory={NodeCategory.Measurements} bind:previousCategory></Metrics>

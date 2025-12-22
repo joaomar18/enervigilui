@@ -8,6 +8,7 @@
 
     // Styles
     import { FullScreenBaseGraphStyle, FullScreenEnergyConsMetricStyle, GraphButtonStyle } from "$lib/style/graph";
+    import type { NodeCategory } from "$lib/types/nodes/base";
 
     // Props
     export let data: Array<ProcessedEnergyConsumptionLogPoint> | undefined;
@@ -19,6 +20,7 @@
     export let dataFetched: boolean;
     export let firstFetch: boolean;
     export let globalMetrics: EnergyConsumptionMetrics | undefined;
+    export let previousGraphCategory: NodeCategory | undefined;
     export let activeEnergyUnit: string = "";
     export let reactiveEnergyUnit: string = "";
     export let activeEnergyDecimalPlaces: number | null = null;
@@ -73,6 +75,7 @@
         bind:initialDate
         bind:endDate
         bind:baseContainerWidth
+        bind:previousGraphCategory
         {dataFetched}
         {firstFetch}
         {globalMetrics}

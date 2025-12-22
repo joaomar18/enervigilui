@@ -136,7 +136,7 @@ export async function navigateTo(
     loadedDone.set(false);
     setSubLoaderTrigger(showSubLoaderTime);
     setSearchQuery(targetRoute, searchQuery);
-    currentDeviceID.set(Number(deviceID) || undefined);
+    if (deviceID) currentDeviceID.set(Number(deviceID));
 
     let gotoPromise = goto(target);
     let timerPromise = Promise.resolve();

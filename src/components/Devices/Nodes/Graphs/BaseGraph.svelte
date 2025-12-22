@@ -23,6 +23,8 @@
     // Styles
     import { mergeStyle } from "$lib/style/components";
     import { BaseGraphStyle, GraphActionStyle, GraphMetricStyle } from "$lib/style/graph";
+    import { checkLogsAreDifferent } from "$lib/logic/util/nodes";
+    import type { NodeCategory } from "$lib/types/nodes/base";
 
     // Style object (from theme)
     export let style: { [property: string]: string | number } | null = null;
@@ -45,6 +47,7 @@
     export let dataFetched: boolean;
     export let firstFetch: boolean;
     export let globalMetrics: BaseMetrics | undefined;
+    export let previousGraphCategory: NodeCategory | undefined;
     export let unit: string = "";
     export let decimalPlaces: number | null = null;
     export let useExternalGraph: boolean = false;
@@ -122,6 +125,7 @@
     const HIDE_FULL_WIDTH_TIME_SPAN_WIDTH = 880;
 
     // Variables
+    let currentData: Array<ProcessedBaseLogPoint> | undefined;
     let baseContainer: HTMLDivElement;
     let baseContainerListener: boolean = false;
     let graphContainer: HTMLDivElement;
@@ -154,6 +158,7 @@
         }
         showLoader = false;
     }
+    $: if (checkLogsAreDifferent(data, currentData)) currentData = data;
 
     $: if (baseContainer && !baseContainerListener) {
         window.addEventListener("resize", getBaseContainerWidth);
@@ -167,7 +172,7 @@
         createGraphObject();
     }
 
-    $: if (!useExternalGraph && graph && dataFetched && data && timeStep && $selectedLang) {
+    $: if (!useExternalGraph && graph && currentData && timeStep && $selectedLang) {
         updateGraphData();
     }
 
@@ -201,7 +206,7 @@
                     hoveredLogPointChange,
                     mousePositionChange,
                     gridDoubleClick,
-                    data ? (data as ProcessedMeasurementLogPoint[]) : undefined,
+                    currentData ? (currentData as ProcessedMeasurementLogPoint[]) : undefined,
                 ),
             [GraphType.Counter]: () =>
                 new CounterGraphObject(
@@ -209,7 +214,7 @@
                     hoveredLogPointChange,
                     mousePositionChange,
                     gridDoubleClick,
-                    data ? (data as ProcessedCounterLogPoint[]) : undefined,
+                    currentData ? (currentData as ProcessedCounterLogPoint[]) : undefined,
                 ),
             [GraphType.EnergyConsumption]: () => {
                 throw new Error(`Energy Consumption Graph needs an external implementation.`);
@@ -223,15 +228,15 @@
         if (graph) graph.destroy();
         requestAnimationFrame(() => {
             mergedStyle = mergeStyle(effectiveStyle, localOverrides);
-            graph = createGraphInstance(graphType, graphContainer, data);
+            graph = createGraphInstance(graphType, graphContainer, currentData);
             Object.assign(mergedStyle, getGraphStyle(graphType));
         });
     }
 
     function updateGraphData(): void {
-        if (graph && data && timeStep) {
+        if (graph && currentData && timeStep) {
             graph.destroy();
-            graph.updatePoints(data, true, { decimalPlaces });
+            graph.updatePoints(currentData, true, { decimalPlaces });
             graph.createGraph(timeStep, selectedTimeSpan, mergedStyle);
             gridElement = graph.getGridElement();
             graphCreated = true;
@@ -341,6 +346,7 @@
                         bind:initialDate
                         bind:endDate
                         bind:selectedTimeSpan
+                        bind:previousGraphCategory
                         {goBackEnabled}
                         {goBack}
                         {getNewTimeSpan}
@@ -425,6 +431,7 @@
                                 this={getGraphMetricsComponent(graphType)}
                                 style={effectiveMetricStyle}
                                 metrics={globalMetrics}
+                                bind:previousCategory={previousGraphCategory}
                                 {unit}
                                 {decimalPlaces}
                                 {dataFetched}
