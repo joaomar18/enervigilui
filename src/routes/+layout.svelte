@@ -1,4 +1,5 @@
 <script lang="ts">
+    import { afterNavigate } from "$app/navigation";
     import { onMount } from "svelte";
     import { initLayout } from "$lib/logic/view/navigation";
     import { isAuthenticationPage, isDashboardPage } from "$lib/logic/view/navigation";
@@ -13,6 +14,11 @@
     onMount(async () => {
         setInitialLeftPanelState();
         await initLayout();
+    });
+
+    afterNavigate(async ({ to }) => {
+        if (!to) return;
+        //await initLayout();
     });
 </script>
 
