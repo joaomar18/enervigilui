@@ -1,7 +1,7 @@
 <script lang="ts">
     import { onMount, onDestroy } from "svelte";
     import { SlidingWindow } from "$lib/logic/util/classes/SlidingWindow";
-    import { NodePhase } from "$lib/types/nodes/base";
+    import { NodeCategory, NodePhase } from "$lib/types/nodes/base";
     import { EnergyDirectionFilter, LogSpanPeriod, SelectablePhaseFilter, type EnergyConsumptionTimeSpan } from "$lib/types/view/nodes";
     import { getTimeSpanFromLogPeriod } from "$lib/logic/util/date";
     import { getEnergyConsumption } from "$lib/logic/api/nodes";

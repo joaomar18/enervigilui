@@ -47,7 +47,7 @@
     export let dataFetched: boolean;
     export let firstFetch: boolean;
     export let globalMetrics: BaseMetrics | undefined;
-    export let previousGraphCategory: NodeCategory | undefined;
+    export let previousGraphCategory: NodeCategory | undefined = undefined;
     export let unit: string = "";
     export let decimalPlaces: number | null = null;
     export let useExternalGraph: boolean = false;
@@ -158,7 +158,6 @@
         }
         showLoader = false;
     }
-    $: if (checkLogsAreDifferent(data, currentData)) currentData = data;
 
     $: if (baseContainer && !baseContainerListener) {
         window.addEventListener("resize", getBaseContainerWidth);
@@ -171,6 +170,8 @@
     $: if (!useExternalGraph && graphType && graphContainer) {
         createGraphObject();
     }
+
+    $: if (checkLogsAreDifferent(data, currentData)) currentData = data;
 
     $: if (!useExternalGraph && graph && currentData && timeStep && $selectedLang) {
         updateGraphData();
@@ -206,7 +207,7 @@
                     hoveredLogPointChange,
                     mousePositionChange,
                     gridDoubleClick,
-                    currentData ? (currentData as ProcessedMeasurementLogPoint[]) : undefined,
+                    data ? (data as ProcessedMeasurementLogPoint[]) : undefined,
                 ),
             [GraphType.Counter]: () =>
                 new CounterGraphObject(
@@ -214,7 +215,7 @@
                     hoveredLogPointChange,
                     mousePositionChange,
                     gridDoubleClick,
-                    currentData ? (currentData as ProcessedCounterLogPoint[]) : undefined,
+                    data ? (data as ProcessedCounterLogPoint[]) : undefined,
                 ),
             [GraphType.EnergyConsumption]: () => {
                 throw new Error(`Energy Consumption Graph needs an external implementation.`);
@@ -436,7 +437,7 @@
                                 {decimalPlaces}
                                 {dataFetched}
                                 {firstFetch}
-                                roundMetrics={graphType === GraphType.Counter}
+                                roundMetrics={true}
                             />
                         {/if}
                     </div>

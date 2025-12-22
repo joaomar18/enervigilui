@@ -7,6 +7,7 @@ import { LogSpanPeriod } from "$lib/types/view/nodes";
 import { timeStepFormatters } from "$lib/types/date";
 import { getElegantShortStringFromDate } from "$lib/logic/util/date";
 import type { CounterLogPoint, ProcessedCounterLogPoint } from "$lib/types/nodes/logs";
+import { roundToDecimalPlaces } from "$lib/logic/util/generic";
 
 /**
  * Graph object for visualizing counter/cumulative data with step-based bar rendering.
@@ -31,17 +32,19 @@ export class CounterGraphObject extends BaseGraphObject<CounterLogPoint> {
      * Updates graph data points with optional decimal rounding while maintaining array reference.
      */
     updatePoints(points: Array<ProcessedCounterLogPoint>, roundPoints: boolean = false, config: {
-        decimalPlaces?: number | null;
+        decimalPlaces?: number | undefined | null;
     } = { decimalPlaces: null }): void {
-        if (!config.decimalPlaces || !roundPoints) {
+
+        if (!roundPoints) {
             this.points.length = 0;
             this.points.push(...points);
         }
         else {
             const roundedPoints = points.map(point => ({
                 ...point,
-                value: point.value === null ? null : config.decimalPlaces === null ? point.value : Number(point.value.toFixed(config.decimalPlaces))
+                value: roundToDecimalPlaces(point.value, config.decimalPlaces || 0)
             }));
+
             this.points.length = 0;
             this.points.push(...roundedPoints);
         }

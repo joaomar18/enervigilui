@@ -1,4 +1,5 @@
 <script lang="ts">
+    import { roundToDecimalPlaces } from "$lib/logic/util/generic";
     import GraphDataToolTip from "../GraphDataToolTip.svelte";
     import { getPowerFactorDirectionString } from "$lib/logic/util/energy";
     import type { EnergyConsumptionLogPoint } from "$lib/types/nodes/logs";
@@ -10,7 +11,6 @@
     export let logPoint: EnergyConsumptionLogPoint | null;
     export let activeEnergyUnit: string = "";
     export let reactiveEnergyUnit: string = "";
-    export let powerFactorDecimalPlaces: number | null;
 
     // Variables
     let dataAvailable: boolean = false;
@@ -60,7 +60,7 @@
         {#if logPoint?.power_factor !== null}
             <div class="row">
                 <span class="label">{$texts.powerFactorValueShort}</span>
-                <span class="value remove-right-padding">{logPoint?.power_factor.toFixed(powerFactorDecimalPlaces ?? 0)}{pfDirectionStr}</span>
+                <span class="value remove-right-padding">{logPoint?.power_factor}{pfDirectionStr}</span>
             </div>
         {:else if logPoint?.active_energy == 0 && logPoint?.reactive_energy == 0}
             <div class="row">

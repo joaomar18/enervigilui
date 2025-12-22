@@ -57,11 +57,11 @@ export abstract class BaseGraphObject<T extends BaseLogPoint> {
     }
 
     abstract updatePoints(points: Array<ProcessedBaseLogPoint>, roundPoints: boolean, config: {
-        decimalPlaces?: number | null;
+        decimalPlaces?: number | undefined | null;
         // Energy consumption specific
-        activeEnergyDecimalPlaces?: number | null;
-        reactiveEnergyDecimalPlaces?: number | null;
-        powerFactorDecimalPlaces?: number | null;
+        activeEnergyDecimalPlaces?: number | undefined | null;
+        reactiveEnergyDecimalPlaces?: number | undefined | null;
+        powerFactorDecimalPlaces?: number | undefined | null;
     }): void;
     abstract createGraph(timeStep: FormattedTimeStep, logSpanPeriod: LogSpanPeriod, style: { [property: string]: string | number },): void;
     abstract drawCanvas(u: uPlot, style: { [property: string]: string | number }): void;

@@ -1,4 +1,5 @@
 <script lang="ts">
+    import { roundToDecimalPlaces } from "$lib/logic/util/generic";
     import Metrics from "../Metrics.svelte";
     import { getMetricsViewVariables } from "$lib/logic/view/nodes";
     import { NodeCategory } from "$lib/types/nodes/base";
@@ -20,10 +21,10 @@
     let metricsVariables: Record<string, { textKey: string; imageFile: string; value: any }>;
 
     // Reactive Statements
-    $: if (metrics && roundMetrics && decimalPlaces !== null && decimalPlaces !== undefined) {
-        if ("min_value" in metrics && metrics.min_value !== null) metrics.min_value = Number(metrics.min_value.toFixed(decimalPlaces));
-        if ("max_value" in metrics && metrics.max_value !== null) metrics.max_value = Number(metrics.max_value.toFixed(decimalPlaces));
-        if ("average_value" in metrics && metrics.average_value !== null) metrics.average_value = Number(metrics.average_value.toFixed(decimalPlaces));
+    $: if (metrics && roundMetrics) {
+        if ("min_value" in metrics) metrics.min_value = roundToDecimalPlaces(metrics.min_value, decimalPlaces || 0);
+        if ("max_value" in metrics) metrics.max_value = roundToDecimalPlaces(metrics.max_value, decimalPlaces || 0);
+        if ("average_value" in metrics) metrics.average_value = roundToDecimalPlaces(metrics.average_value, decimalPlaces || 0);
     }
 
     $: if (metrics) {
@@ -42,4 +43,5 @@
     getMetricsViewVariables for seamless integration with internationalization and theming.
     Provides consistent measurement data presentation across the application.
 -->
-<Metrics {style} labelWidth="150px" {dataFetched} {firstFetch} {metricsVariables} {unit} metricsCategory={NodeCategory.Measurements} bind:previousCategory></Metrics>
+<Metrics {style} labelWidth="150px" {dataFetched} {firstFetch} {metricsVariables} {unit} metricsCategory={NodeCategory.Measurements} bind:previousCategory
+></Metrics>

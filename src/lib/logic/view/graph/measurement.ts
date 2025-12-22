@@ -7,6 +7,7 @@ import { LogSpanPeriod } from "$lib/types/view/nodes";
 import { timeStepFormatters } from "$lib/types/date";
 import { getElegantShortStringFromDate } from "$lib/logic/util/date";
 import type { MeasurementLogPoint, ProcessedMeasurementLogPoint } from "$lib/types/nodes/logs";
+import { roundToDecimalPlaces } from "$lib/logic/util/generic";
 
 /**
  * Graph object for visualizing measurement data with min/max bands and average lines.
@@ -32,18 +33,18 @@ export class MeasurementGraphObject extends BaseGraphObject<MeasurementLogPoint>
      * Updates graph data points with optional decimal rounding while maintaining array reference.
      */
     updatePoints(points: Array<ProcessedMeasurementLogPoint>, roundPoints: boolean = false, config: {
-        decimalPlaces?: number | null;
+        decimalPlaces?: number | undefined | null;
     } = { decimalPlaces: null }): void {
-        if (!config.decimalPlaces === null || !roundPoints) {
+        if (!roundPoints) {
             this.points.length = 0;
             this.points.push(...points);
         }
         else {
             const roundedPoints = points.map(point => ({
                 ...point,
-                average_value: point.average_value === null ? null : config.decimalPlaces === null ? point.average_value : Number(point.average_value.toFixed(config.decimalPlaces)),
-                min_value: point.min_value === null ? null : config.decimalPlaces === null ? point.min_value : Number(point.min_value.toFixed(config.decimalPlaces)),
-                max_value: point.max_value === null ? null : config.decimalPlaces === null ? point.max_value : Number(point.max_value.toFixed(config.decimalPlaces)),
+                average_value: roundToDecimalPlaces(point.average_value, config.decimalPlaces || 0),
+                min_value: roundToDecimalPlaces(point.min_value, config.decimalPlaces || 0),
+                max_value: roundToDecimalPlaces(point.max_value, config.decimalPlaces || 0),
             }));
             this.points.length = 0;
             this.points.push(...roundedPoints);

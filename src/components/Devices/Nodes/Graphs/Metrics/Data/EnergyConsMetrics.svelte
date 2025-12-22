@@ -9,6 +9,7 @@
     // Styles
     import { EnergyConsMetricStyle } from "$lib/style/graph";
     import { onDestroy, onMount } from "svelte";
+    import { roundToDecimalPlaces } from "$lib/logic/util/generic";
 
     // Style object (from theme)
     export let style: { [property: string]: string | number } | null = null;
@@ -43,16 +44,9 @@
     $: numberOfVariables = 3;
 
     $: if (metrics && roundMetrics) {
-        if ("active_energy" in metrics && metrics.active_energy !== null)
-            !!activeEnergyDecimalPlaces
-                ? (metrics.active_energy = Number(metrics.active_energy.toFixed(activeEnergyDecimalPlaces)))
-                : metrics.active_energy;
-        if ("reactive_energy" in metrics && metrics.reactive_energy !== null)
-            !!reactiveEnergyDecimalPlaces
-                ? (metrics.reactive_energy = Number(metrics.reactive_energy.toFixed(reactiveEnergyDecimalPlaces)))
-                : metrics.reactive_energy;
-        if ("power_factor" in metrics && metrics.power_factor !== null)
-            !!powerFactorDecimalPlaces ? (metrics.power_factor = Number(metrics.power_factor.toFixed(powerFactorDecimalPlaces))) : metrics.power_factor;
+        if ("active_energy" in metrics) metrics.active_energy = roundToDecimalPlaces(metrics.active_energy, activeEnergyDecimalPlaces || 0);
+        if ("reactive_energy" in metrics) metrics.reactive_energy = roundToDecimalPlaces(metrics.reactive_energy, reactiveEnergyDecimalPlaces || 0);
+        if ("power_factor" in metrics) metrics.power_factor = roundToDecimalPlaces(metrics.power_factor, powerFactorDecimalPlaces || 0);
     }
 
     $: if (metrics?.power_factor_direction) {

@@ -72,6 +72,7 @@
         background-color: var(--background-color);
         border: var(--border);
         box-shadow: var(--shadow);
+        transition: all 0.2s;
     }
 
     /* Content: slot wrapper (hidden while loading) */

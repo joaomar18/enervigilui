@@ -7,6 +7,7 @@ import { LogSpanPeriod } from "$lib/types/view/nodes";
 import { timeStepFormatters } from "$lib/types/date";
 import { getElegantShortStringFromDate } from "$lib/logic/util/date";
 import type { EnergyConsumptionLogPoint, ProcessedEnergyConsumptionLogPoint } from "$lib/types/nodes/logs";
+import { roundToDecimalPlaces } from "$lib/logic/util/generic";
 
 /**
  * Energy consumption graph visualization with side-by-side active and reactive energy bars.
@@ -65,9 +66,9 @@ export class EnergyConsumptionGraphObject extends BaseGraphObject<EnergyConsumpt
         points: Array<ProcessedEnergyConsumptionLogPoint>,
         roundPoints: boolean = false,
         config: {
-            activeEnergyDecimalPlaces?: number | null;
-            reactiveEnergyDecimalPlaces?: number | null;
-            powerFactorDecimalPlaces?: number | null;
+            activeEnergyDecimalPlaces?: number | undefined | null;
+            reactiveEnergyDecimalPlaces?: number | undefined | null;
+            powerFactorDecimalPlaces?: number | undefined | null;
         } = { activeEnergyDecimalPlaces: null, reactiveEnergyDecimalPlaces: null, powerFactorDecimalPlaces: null }
     ): void {
         if (!roundPoints) {
@@ -76,24 +77,9 @@ export class EnergyConsumptionGraphObject extends BaseGraphObject<EnergyConsumpt
         } else {
             const roundedPoints = points.map((point) => ({
                 ...point,
-                active_energy:
-                    point.active_energy === null
-                        ? null
-                        : config.activeEnergyDecimalPlaces === null
-                        ? point.active_energy
-                        : Number(point.active_energy.toFixed(config.activeEnergyDecimalPlaces)),
-                reactive_energy:
-                    point.reactive_energy === null
-                        ? null
-                        : config.reactiveEnergyDecimalPlaces === null
-                        ? point.reactive_energy
-                        : Number(point.reactive_energy.toFixed(config.reactiveEnergyDecimalPlaces)),
-                power_factor:
-                    point.power_factor === null
-                        ? null
-                        : config.powerFactorDecimalPlaces === null
-                        ? point.power_factor
-                        : Number(point.power_factor.toFixed(config.powerFactorDecimalPlaces)),
+                active_energy: roundToDecimalPlaces(point.active_energy, config.activeEnergyDecimalPlaces || 0),
+                reactive_energy: roundToDecimalPlaces(point.reactive_energy, config.reactiveEnergyDecimalPlaces || 0),
+                power_factor: roundToDecimalPlaces(point.power_factor, config.powerFactorDecimalPlaces || 0),
                 power_factor_direction: point.power_factor_direction,
             }));
             this.points.length = 0;

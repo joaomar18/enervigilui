@@ -10,7 +10,6 @@
     import EnergyConsToolTip from "./Tooltips/Data/EnergyConsToolTip.svelte";
     import EnergyConsMetrics from "./Metrics/Data/EnergyConsMetrics.svelte";
     import type { EnergyConsumptionMetrics, ProcessedEnergyConsumptionLogPoint, BaseLogPoint, EnergyConsumptionLogPoint } from "$lib/types/nodes/logs";
-    import type { NodeCategory } from "$lib/types/nodes/base";
 
     // Texts
     import { texts } from "$lib/stores/lang/generalTexts";
@@ -43,7 +42,6 @@
     export let dataFetched: boolean;
     export let firstFetch: boolean;
     export let globalMetrics: EnergyConsumptionMetrics | undefined;
-    export let previousGraphCategory: NodeCategory | undefined;
     export let activeEnergyUnit: string = "";
     export let reactiveEnergyUnit: string = "";
     export let activeEnergyDecimalPlaces: number | null = null;
@@ -151,7 +149,6 @@
     {firstFetch}
     {globalMetrics}
     bind:selectedTimeSpan
-    bind:previousGraphCategory
     {goBackEnabled}
     {goBack}
     {getNewTimeSpan}
@@ -176,7 +173,6 @@
                 bind:selectedPhase
                 bind:selectedDirection
                 bind:selectedTimeSpan
-                bind:previousGraphCategory
                 {usePhase}
                 {activeEnergyUnit}
                 {reactiveEnergyUnit}
@@ -229,7 +225,7 @@
             </div>
             {#if gridElement}
                 <GraphToolTip {gridElement} {insideGraph} {cursorPos}>
-                    <EnergyConsToolTip {logPoint} {activeEnergyUnit} {reactiveEnergyUnit} {powerFactorDecimalPlaces} />
+                    <EnergyConsToolTip {logPoint} {activeEnergyUnit} {reactiveEnergyUnit} />
                 </GraphToolTip>
             {/if}
         </div>

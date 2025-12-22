@@ -1,4 +1,5 @@
 <script lang="ts">
+    import { roundToDecimalPlaces } from "$lib/logic/util/generic";
     import Metrics from "../Metrics.svelte";
     import { getMetricsViewVariables } from "$lib/logic/view/nodes";
     import { NodeCategory } from "$lib/types/nodes/base";
@@ -20,8 +21,8 @@
     let metricsVariables: Record<string, { textKey: string; imageFile: string; value: any }>;
 
     // Reactive Statements
-    $: if (metrics && roundMetrics && decimalPlaces !== null && decimalPlaces !== undefined) {
-        if ("value" in metrics && metrics.value !== null) metrics.value = Number(metrics.value.toFixed(decimalPlaces));
+    $: if (metrics && roundMetrics) {
+        if ("value" in metrics) metrics.value = roundToDecimalPlaces(metrics.value, decimalPlaces || 0);
     }
 
     $: if (metrics) {
