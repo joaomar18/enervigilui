@@ -1,4 +1,5 @@
 <script lang="ts">
+    import { get } from "svelte/store";
     import { onMount } from "svelte";
     import { beforeNavigate, afterNavigate } from "$app/navigation";
     import { initializeClientLayout, resolveNavigationRedirect, navigateTo } from "$lib/logic/view/navigation";
@@ -10,7 +11,7 @@
     import DashboardContainer from "../components/Dashboard/DashboardContainer.svelte";
 
     // Authorization stores
-    import { currentPage, splashDone } from "$lib/stores/view/navigation";
+    import { currentPage, splashDone, userAuthenticated } from "$lib/stores/view/navigation";
 
     // On Mount Function
     onMount(async () => {
@@ -20,7 +21,7 @@
 
     beforeNavigate(({ to, cancel }) => {
         if (!to) return;
-        let result = resolveNavigationRedirect(to.url);
+        let result = resolveNavigationRedirect(to.url, get(userAuthenticated));
         if (result.shouldRedirect) {
             cancel();
             navigateTo(result.redirectTarget, {}, false, true);

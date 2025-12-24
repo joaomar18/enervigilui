@@ -1,5 +1,4 @@
 import { goto } from "$app/navigation";
-import { replaceState } from "$app/navigation";
 import { get } from "svelte/store";
 import { autoLogin } from "../api/auth";
 import { selectedLang } from "$lib/stores/lang/definition";
@@ -16,7 +15,6 @@ import {
     subLoaderTimer,
     resetSubLoaderSubscription,
     hasMouseCapability,
-    userAuthenticated,
 } from "../../stores/view/navigation";
 
 /**
@@ -162,20 +160,21 @@ export async function navigateTo(
 }
 
 /**
- * Evaluates client-side navigation rules to determine whether the current
- * URL should be redirected to a canonical route.
+ * Resolves client-side navigation rules and determines whether the given URL
+ * should be redirected to a canonical application route.
  *
- * This function implements UI-only navigation constraints (auth prediction
- * and route normalization) and returns a redirect decision without performing
- * the navigation itself.
+ * This function is the authoritative navigation policy for the client UI.
+ * It enforces authentication flow and route invariants entirely on the
+ * client, without relying on server-side guards or redirects.
  *
- * It is non-authoritative and exists solely to prevent unnecessary SPA
- * navigations that would be rejected by server-side guards.
+ * No navigation is performed here; callers are responsible for applying
+ * the returned redirect decision.
  *
- * @param url - Target URL being evaluated for navigation.
- * @returns An object indicating whether a redirect is needed and the target route.
+ * @param url - URL being evaluated for client-side navigation.
+ * @param authenticated - Current client-known authentication state.
+ * @returns An object indicating whether a redirect is required and the target route.
  */
-export function resolveNavigationRedirect(url: URL): { shouldRedirect: boolean, redirectTarget: string } {
+export function resolveNavigationRedirect(url: URL, authenticated: boolean): { shouldRedirect: boolean, redirectTarget: string } {
 
     const DEVICE_SCOPED_PAGES = new Set(["general_view", "edit"]);
 
@@ -185,11 +184,11 @@ export function resolveNavigationRedirect(url: URL): { shouldRedirect: boolean, 
 
     let redirectTarget: string = "";
 
-    if (!get(userAuthenticated) && url.pathname !== "/login") {
+    if (!authenticated && url.pathname !== "/login") {
         redirectTarget = "/login";
     }
 
-    if (get(userAuthenticated) && (url.pathname === "/login" || url.pathname === "/")) {
+    if (authenticated && (url.pathname === "/login" || url.pathname === "/")) {
         redirectTarget = "/devices";
     }
 
@@ -201,39 +200,25 @@ export function resolveNavigationRedirect(url: URL): { shouldRedirect: boolean, 
             redirectTarget = "/devices";
         }
     }
-
     return { shouldRedirect: Boolean(redirectTarget), redirectTarget };
-
 }
 
 /**
- * Synchronizes client-side UI state with the resolved router URL.
+ * Synchronizes client-side UI state with the current router URL.
  *
- * Updates page-related stores (current page, device context, search state)
- * and normalizes the browser URL when a server redirect occurred during
- * SPA navigation.
+ * Updates page-related stores (current page, device context, and search state)
+ * after navigation and ensures internal UI state remains consistent with the
+ * active client-side route.
  *
- * For authentication routes, only global query parameters (e.g. `lang`)
- * are preserved to keep URLs canonical.
+ * This function performs no navigation or access control and assumes routing
+ * decisions have already been resolved by client-side navigation logic.
  *
- * @param url - Final URL resolved by the router after navigation.
+ * @param url - Current URL active in the client router.
  */
 export async function syncUIState(url: URL): Promise<void> {
     currentDeviceID.set(getDeviceID());
     updateSearchQuery(url);
     currentPage.set(url.pathname);
-    // Client was redirected
-    if (window.location.pathname !== url.pathname) {
-        let search = window.location.search;
-        if (url.pathname === "/login") {
-            const params = new URLSearchParams();
-            const lang = new URLSearchParams(window.location.search).get('lang');
-            if (lang) params.set('lang', lang);
-            search = params.toString() ? `?${params.toString()}` : '';
-        }
-        const newUrl = url.pathname + search + window.location.hash;
-        replaceState(newUrl, {});
-    }
 }
 
 
@@ -333,13 +318,16 @@ export function checkClientHasMouse() {
 }
 
 /**
- * Initializes client-side layout state during application startup.
+ * Initializes client-side application layout and resolves initial navigation state.
  *
- * Performs UI-related setup such as input capability detection, splash screen timing,
- * dashboard loader initialization, and a non-authoritative session validation request.
+ * Performs UI bootstrap tasks such as input capability detection, splash screen
+ * timing, dashboard loader initialization, and an initial backend session check.
  *
- * This function does NOT perform routing decisions or redirects.
- * Final access control and navigation are enforced elsewhere (e.g. server-side guards).
+ * After initialization, client-side navigation rules are evaluated and a
+ * canonical route is enforced if required.
+ *
+ * This function is responsible only for UI initialization and initial client-side
+ * navigation normalization; backend APIs remain authoritative for access control.
  *
  * @param minSplashDuration - Minimum time (ms) the splash screen should remain visible.
  * @param showSubLoaderTime - Delay (ms) before showing the sub-loader if initialization is slow.
@@ -351,5 +339,10 @@ export async function initializeClientLayout(minSplashDuration: number = 300, sh
     const minTimePromise = new Promise((res) => setTimeout(res, minSplashDuration));
     resetDashboardLoader(showSubLoaderTime);
     const [authResult] = await Promise.all([checkAutoLoginPromise, minTimePromise]);
+    const url = new URL(window.location.href);
+    let result = resolveNavigationRedirect(url, authResult.sucess);
+    if (result.shouldRedirect) {
+        navigateTo(result.redirectTarget, {}, false, true);
+    }
     splashDone.set(true);
 }
