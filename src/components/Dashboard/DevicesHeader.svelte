@@ -1,6 +1,7 @@
 <script lang="ts">
     import { fade } from "svelte/transition";
     import { onMount } from "svelte";
+    import { getDeviceID } from "$lib/logic/view/navigation";
     import { logoutUser } from "$lib/logic/api/auth";
     import { getDeviceInfoWithImage } from "$lib/logic/api/device";
     import { MethodRetrier } from "$lib/logic/api/retrier";
@@ -14,18 +15,16 @@
     // Texts
     import { texts } from "$lib/stores/lang/generalTexts";
 
-    //  Stores
-    import { currentDeviceID } from "$lib/stores/device/current";
-
     // Variables
     let deviceInfo: DeviceInfo;
     let deviceImageUrl: string;
 
     onMount(() => {
+        let deviceId = getDeviceID();
         let deviceDataRetrier: MethodRetrier | null = null;
-        if ($currentDeviceID) {
+        if (deviceId) {
             deviceDataRetrier = new MethodRetrier(async (signal) => {
-                ({ deviceInfo, deviceImageUrl } = await getDeviceInfoWithImage($currentDeviceID));
+                ({ deviceInfo, deviceImageUrl } = await getDeviceInfoWithImage(deviceId));
             }, 3000);
         }
 

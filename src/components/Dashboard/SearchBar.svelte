@@ -1,8 +1,4 @@
 <script lang="ts">
-    import { onMount } from "svelte";
-    import { browser } from "$app/environment";
-    import { replaceState } from "$app/navigation";
-
     // Styles
     import { mergeStyle } from "$lib/style/components";
     import { SearchBarStyle } from "$lib/style/dashboard";
@@ -82,20 +78,8 @@
     export let onClick: () => void;
 
     // Functions
-    function changeSearchQuery(searchQuery: string): void {
-        searchString = searchQuery;
-
-        if (!browser) return;
-
-        const params = new URLSearchParams(window.location.search);
-        params.set("searchQuery", searchQuery);
-        const newUrl = `${window.location.pathname}?${params.toString()}`;
-
-        replaceState(newUrl, {});
-    }
-
     function handleChange() {
-        changeSearchQuery(inputValue);
+        searchString = inputValue;
         if (onClick) {
             onClick();
         }
@@ -108,10 +92,6 @@
             inputElement.blur();
         }
     }
-
-    onMount(() => {
-        inputValue = searchString;
-    });
 
     function handleMouseEnter(): void {
         if (enableToolTip) {

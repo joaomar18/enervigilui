@@ -30,7 +30,7 @@
     import { SucessButtonStyle } from "$lib/style/button";
 
     // Navigation
-    import { navigateTo } from "$lib/logic/view/navigation";
+    import { navigateTo, resetDashboardLoader } from "$lib/logic/view/navigation";
 
     // Texts
     import { texts } from "$lib/stores/lang/generalTexts";
@@ -70,6 +70,7 @@
 
     // Mount function
     onMount(() => {
+        resetDashboardLoader();
         let defaultImageRetrier: MethodRetrier | null = new MethodRetrier(async (signal) => {
             if (!deviceData) {
                 deviceData = createNewDevice(defaultDeviceOptions.protocol, defaultDeviceOptions.type, defaultDeviceOptions.options);

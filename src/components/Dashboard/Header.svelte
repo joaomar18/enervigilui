@@ -12,8 +12,7 @@
     import { texts } from "$lib/stores/lang/generalTexts";
 
     // Stores
-    import { searchQuery } from "$lib/stores/view/navigation";
-    import { leftPanelOpen } from "$lib/stores/view/navigation";
+    import { leftPanelOpen, searchQuery } from "$lib/stores/view/navigation";
 
     // Props
     export let headerEl: HTMLDivElement;

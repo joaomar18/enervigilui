@@ -1,7 +1,8 @@
 <script lang="ts">
+    import { getDeviceID } from "$lib/logic/view/navigation";
     import { onMount, onDestroy } from "svelte";
     import { SlidingWindow } from "$lib/logic/util/classes/SlidingWindow";
-    import { NodeCategory, NodePhase } from "$lib/types/nodes/base";
+    import { NodePhase } from "$lib/types/nodes/base";
     import { EnergyDirectionFilter, LogSpanPeriod, SelectablePhaseFilter, type EnergyConsumptionTimeSpan } from "$lib/types/view/nodes";
     import { getTimeSpanFromLogPeriod } from "$lib/logic/util/date";
     import { getEnergyConsumption } from "$lib/logic/api/nodes";
@@ -12,9 +13,6 @@
     import EnergyPickers from "../General/Pickers/EnergyPickers.svelte";
     import type { EnergyConsumptionType } from "$lib/types/device/energy";
     import type { EnergyConsumptionMetrics, ProcessedEnergyConsumptionLogPoint } from "$lib/types/nodes/logs";
-
-    // Stores
-    import { currentDeviceID } from "$lib/stores/device/current";
 
     // Texts
     import { texts } from "$lib/stores/lang/generalTexts";
@@ -124,12 +122,13 @@
     }
 
     async function loadEnergyConsumption() {
-        if (!$currentDeviceID) {
+        let deviceId = getDeviceID();
+        if (!deviceId) {
             return;
         }
         energyConsumptionFetched = false;
         ({ energyLogs, mergedPoints, mergedGlobalMetrics } = await getEnergyConsumption(
-            $currentDeviceID,
+            deviceId,
             selectedElectricalPhase,
             selectedEnergyDirection,
             initialDate !== null,

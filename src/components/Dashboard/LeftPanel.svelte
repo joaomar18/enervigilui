@@ -1,4 +1,5 @@
 <script lang="ts">
+    import { getDeviceID } from "$lib/logic/view/navigation";
     import { isDeviceViewPage, navigateTo } from "$lib/logic/view/navigation";
     import { isDeviceSubPage } from "$lib/logic/view/navigation";
 
@@ -8,7 +9,6 @@
 
     // Texts
     import { texts } from "$lib/stores/lang/generalTexts";
-    import { currentDeviceID } from "$lib/stores/device/current";
 
     // Styles
     import { mergeStyle } from "$lib/style/components";
@@ -17,6 +17,7 @@
 
     // Stores
     import { currentPage } from "$lib/stores/view/navigation";
+    import { currentDeviceID } from "$lib/stores/device/current";
 
     // Style object (from theme)
     export let style: { [property: string]: string | number } | null = null;
@@ -140,7 +141,7 @@
                             imageURL="/img/edit_pencil.svg"
                             disabledImageURL="/img/edit_pencil_muted.svg"
                             onClick={() => {
-                                browseTo("/devices/edit", { deviceId: String($currentDeviceID) });
+                                browseTo("/devices/edit", { deviceId: String(getDeviceID()) });
                             }}
                         />
                         <Link
@@ -151,7 +152,7 @@
                             imageURL="/img/general_view.svg"
                             disabledImageURL="/img/general_view_muted.svg"
                             onClick={() => {
-                                browseTo("/devices/general_view", { deviceId: String($currentDeviceID) });
+                                browseTo("/devices/general_view", { deviceId: String(getDeviceID()) });
                             }}
                         />
                     </Link>

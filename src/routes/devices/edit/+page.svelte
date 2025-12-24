@@ -34,7 +34,7 @@
     import { PrimaryButtonStyle, DangerButtonStyle } from "$lib/style/button";
 
     // Navigation
-    import { navigateTo } from "$lib/logic/view/navigation";
+    import { getDeviceID, navigateTo, resetDashboardLoader } from "$lib/logic/view/navigation";
 
     // Texts
     import { texts } from "$lib/stores/lang/generalTexts";
@@ -42,7 +42,6 @@
 
     // Stores
     import { loadedDone } from "$lib/stores/view/navigation";
-    import { currentDeviceID } from "$lib/stores/device/current";
     import NodeConfigSheet from "../../../components/Devices/Nodes/NodeConfigSheet.svelte";
 
     // Variables
@@ -81,16 +80,17 @@
 
     // Mount function
     onMount(() => {
-        const params = new URLSearchParams(window.location.search);
+        resetDashboardLoader();
+        let deviceId = getDeviceID();
         let deviceDataRetrier: MethodRetrier | null;
         let nodesConfigRetrier: MethodRetrier | null;
 
-        if ($currentDeviceID) {
+        if (deviceId) {
             deviceDataRetrier = new MethodRetrier(async (signal) => {
-                ({ initialDeviceData, deviceData } = await getDeviceWithImage(Number($currentDeviceID)));
+                ({ initialDeviceData, deviceData } = await getDeviceWithImage(deviceId));
             }, 3000);
             nodesConfigRetrier = new MethodRetrier(async (signal) => {
-                ({ initialNodes, nodes } = await getDeviceNodesConfig(Number($currentDeviceID)));
+                ({ initialNodes, nodes } = await getDeviceNodesConfig(deviceId));
                 setTimeout(() => {
                     nodesInit = true;
                 }, 100); // Small timeout to give a bit of time for the page to load before the nodes

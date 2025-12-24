@@ -1,4 +1,5 @@
 <script lang="ts">
+    import { getDeviceID } from "$lib/logic/view/navigation";
     import { roundToDecimalPlaces } from "$lib/logic/util/generic";
     import RightPanelSheet from "../../General/RightPanelSheet.svelte";
     import InlineLoader from "../../General/InlineLoader.svelte";
@@ -14,9 +15,6 @@
     import type { BaseNodeAdditionalInfo, ProcessedNodeState } from "$lib/types/nodes/realtime";
     import type { ProcessedNodeLogs } from "$lib/types/nodes/logs";
 
-    // Stores
-    import { currentDeviceID } from "$lib/stores/device/current";
-
     // Texts
     import { texts } from "$lib/stores/lang/generalTexts";
     import { variableNameTextsByPhase } from "$lib/stores/lang/energyMeterTexts";
@@ -28,6 +26,7 @@
     import { NodeDetailSheetStyle } from "$lib/style/nodes";
     import { NodesBaseDisplayDetailStyle } from "$lib/style/nodes";
     import type { NodeCategory } from "$lib/types/nodes/base";
+    import { dev } from "$app/environment";
 
     // Style object (from theme)
     export let style: { [property: string]: string | number } | null = null;
@@ -198,11 +197,12 @@
 
     // Functions
     async function loadNodeAdditionalInfo() {
-        if (!$currentDeviceID || !nodeState) {
+        let deviceId = getDeviceID();
+        if (!deviceId || !nodeState) {
             return;
         }
         nodeAddInfoFetched = false;
-        ({ nodeAdditionalInfo } = await getNodeAdditionalInfo($currentDeviceID, nodeState.name, nodeState.phase));
+        ({ nodeAdditionalInfo } = await getNodeAdditionalInfo(deviceId, nodeState.name, nodeState.phase));
         nodeAddInfoFetched = true;
         nodeAddInfoFirstFetch = true;
     }
@@ -256,11 +256,12 @@
     }
 
     async function loadNodeLogs() {
-        if (!$currentDeviceID || !nodeState) {
+        let deviceId = getDeviceID();
+        if (!deviceId || !nodeState) {
             return;
         }
         nodeLogsFetched = false;
-        ({ nodeLogs } = await getNodeLogs($currentDeviceID, nodeState.name, nodeState.phase, initialDate !== null, initialDate, endDate));
+        ({ nodeLogs } = await getNodeLogs(deviceId, nodeState.name, nodeState.phase, initialDate !== null, initialDate, endDate));
         nodeLogsFetched = true;
         nodeLogsFirstFetch = true;
     }

@@ -1,4 +1,5 @@
 <script lang="ts">
+    import { getDeviceID } from "$lib/logic/view/navigation";
     import Action from "../General/Action.svelte";
     import ContentCard from "../General/ContentCard.svelte";
     import ToolTipText from "../General/ToolTipText.svelte";
@@ -9,9 +10,6 @@
     import { LogSpanPeriod } from "$lib/types/view/nodes";
     import { SelectablePhaseFilter } from "$lib/types/view/nodes";
     import { NodePhase } from "$lib/types/nodes/base";
-
-    // Stores
-    import { currentDeviceID } from "$lib/stores/device/current";
 
     // Texts
     import { texts } from "$lib/stores/lang/generalTexts";
@@ -76,12 +74,13 @@
     }
 
     async function loadMetrics() {
-        if (!$currentDeviceID) {
+        let deviceId = getDeviceID();
+        if (!deviceId) {
             return;
         }
         metricsFetched = false;
         for (const metric of Object.keys(expandedState)) {
-            metricsData[metric] = await mapMetricAPI(metric, $currentDeviceID, selectedElectricalPhase, initialDate, endDate);
+            metricsData[metric] = await mapMetricAPI(metric, deviceId, selectedElectricalPhase, initialDate, endDate);
         }
         metricsFetched = true;
         metricsFirstFetch = true;

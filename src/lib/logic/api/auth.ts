@@ -1,6 +1,7 @@
 import { callAPI } from "$lib/logic/api/api";
 import { navigateTo } from "../view/navigation";
 import { validateUsername, validatePassword } from "../validation/auth";
+import { userAuthenticated } from "$lib/stores/view/navigation";
 
 /**
  * Authenticates user with username and password credentials.
@@ -22,45 +23,30 @@ export async function loginUser(username: string, password: string, autoLogin: b
             auto_login: autoLogin,
         },
     });
+    userAuthenticated.set(sucess);
     if (sucess) {
-        await navigateTo("/devices", {}, true); // Navigate to the dashboard on success
+        await navigateTo("/devices", {}, true, true); // Navigate to the dashboard on success
     }
 }
 
 /**
- * Attempts automatic login and determines appropriate navigation target.
- * Checks if user has valid session and returns redirect information based on current page context.
+ * Attempts to refresh or validate the current authentication session with the backend.
  *
- * @param basePage - Current base page path (e.g., "/", "/login", "/devices").
- * @param isSubpage - Whether the current page is a subpage of the base.
- * @returns Object with redirect status and target URL for navigation.
+ * This function does NOT make routing or authorization decisions.
+ * It only reports whether a valid authenticated session exists after contacting the server.
+ *
+ * Intended for client-side UX initialization (e.g. auto-login checks, UI state),
+ * while final access control and redirects remain enforced by server-side guards.
+ *
+ * @returns Object indicating whether the session is authenticated.
  */
-export async function autoLogin(basePage: string, isSubpage: boolean): Promise<{ shouldRedirect: boolean; redirectTarget: string }> {
+export async function autoLogin(): Promise<{ sucess: boolean }> {
     const { sucess, data } = await callAPI({
         endpoint: "/api/auth/auto_login",
         method: "POST",
     });
-    let shouldRedirect = false;
-    let redirectTarget = "";
-    if (sucess) {
-        // Authenticated
-        if (basePage === "/" || basePage === "/login") {
-            shouldRedirect = true;
-            redirectTarget = "/devices";
-        }
-        // User is in a subpage, redirect to main page
-        else if (isSubpage) {
-            shouldRedirect = true;
-            redirectTarget = basePage;
-        }
-    } else {
-        // Unauthenticated or failed
-        if (basePage !== "/login") {
-            shouldRedirect = true;
-            redirectTarget = "/login";
-        }
-    }
-    return { shouldRedirect, redirectTarget };
+    userAuthenticated.set(sucess);
+    return { sucess };
 }
 
 /**
@@ -73,6 +59,7 @@ export async function logoutUser() {
         method: "POST",
     });
     if (sucess) {
-        await navigateTo("/login", {}, true);
+        userAuthenticated.set(false);
+        await navigateTo("/login", {}, true, true);
     }
 }

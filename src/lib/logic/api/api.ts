@@ -4,6 +4,7 @@ import { AlertType } from "$lib/stores/view/toast";
 import { loadedDone } from "$lib/stores/view/navigation";
 import { convertDateToLocalTime } from "../util/date";
 import { navigateTo } from "../view/navigation";
+import { userAuthenticated } from "$lib/stores/view/navigation";
 import type { AlertTextList } from "$lib/stores/view/toast";
 
 export type CallAPIOptions = {
@@ -14,56 +15,27 @@ export type CallAPIOptions = {
     file?: File;
     fileFieldName?: string;
     setLoaded?: boolean;
+    fetchFn?: typeof fetch;
 };
 
 /**
- * Makes an HTTP request to the specified API endpoint with the given parameters.
+ * Low-level HTTP utility for performing API requests with timeout control
+ * and optional file upload support.
  *
- * @param endpoint - The API endpoint to send the request to (e.g., "/api/resource").
- * @param method - The HTTP method to use for the request (e.g., "GET", "POST", "PUT", "DELETE").
- *   Only these methods are supported; an error will be thrown for unsupported methods.
- * @param params - An object containing the parameters to include in the request.
- *   - For GET requests, the parameters are appended to the URL as query parameters.
- *   - For non-GET requests without files, the parameters are included in the request body as JSON.
- *   - For non-GET requests with files, the parameters are included in FormData along with the file.
- * @param timeout - The maximum time in milliseconds to wait for a server response
- *   before aborting the request. Defaults to 3000ms (3 seconds).
- * @param file - Optional file to upload. When provided, the request will be sent as FormData
- *   instead of JSON, and the file will be included in the form data.
- * @param fileFieldName - The field name for the file in the FormData. Defaults to "file".
- *   This allows the server to identify the file with the expected field name.
- * @returns A promise that resolves to an object containing:
- *   - `status`: HTTP status code from the server response, or -1 if the request failed/timed out.
- *   - `data`: The data returned by the server, or null if the request failed.
+ * Builds and executes a fetch request using query parameters, JSON bodies,
+ * or multipart form data depending on the HTTP method and provided inputs.
+ * The fetch implementation can be injected to support framework-specific
+ * environments (e.g. SvelteKit SSR).
  *
- * @throws An error if the HTTP method is unsupported or if the request fails.
- *
- * @example
- * // Example GET request with query parameters
- * const { status, data } = await makeAPIRequest("/api/resource", "GET", { id: 123 });
- *
- * @example
- * // Example POST request with a JSON body
- * const { status, data } = await makeAPIRequest("/api/resource", "POST", { name: "John", age: 30 });
- *
- * @example
- * // Example file upload with additional parameters
- * const fileInput = document.querySelector('input[type="file"]') as HTMLInputElement;
- * const file = fileInput.files?.[0];
- * if (file) {
- *   const { status, data } = await makeAPIRequest(
- *     "/api/devices/123/image",
- *     "POST",
- *     { deviceId: 123, description: "Device photo" },
- *     10000,
- *     file,
- *     "deviceImage"
- *   );
- * }
- *
- * @example
- * // Example with a custom timeout
- * const { status, data } = await makeAPIRequest("/api/resource", "GET", {}, 5000); // 5-second timeout
+ * @param endpoint - API endpoint path (e.g. "/api/resource")
+ * @param method - HTTP method ("GET", "POST", "PUT", "DELETE")
+ * @param params - Request parameters (query params for GET, body otherwise)
+ * @param timeout - Request timeout in milliseconds (default: 3000)
+ * @param file - Optional file for multipart upload requests
+ * @param fileFieldName - Form field name for the uploaded file
+ * @param fetchFn - Fetch implementation to use (defaults to global fetch)
+ * @returns Promise resolving to the HTTP status code and parsed response data,
+ *          or status -1 with null data if the request fails or times out.
  */
 export async function makeAPIRequest(
     endpoint: string,
@@ -71,7 +43,8 @@ export async function makeAPIRequest(
     params: Record<string, any> = {},
     timeout: number = 3000,
     file?: File,
-    fileFieldName: string = "file"
+    fileFieldName: string = "file",
+    fetchFn: typeof fetch = fetch,
 ): Promise<{ status: number; data: any }> {
     const controller = new AbortController();
     const signal = controller.signal;
@@ -122,7 +95,7 @@ export async function makeAPIRequest(
             }
         }
 
-        const response = await fetch(url, options);
+        const response = await fetchFn(url, options);
         const data = await response.json();
         clearTimeout(timeoutId); // cancel timeout if response arrives in time
 
@@ -140,19 +113,24 @@ export async function makeAPIRequest(
 }
 
 /**
- * High-level API wrapper that handles HTTP requests with automatic error handling and user feedback.
+ * Centralized API request wrapper that executes HTTP calls and applies
+ * consistent application-level handling for authentication, errors,
+ * user notifications, and global loading state.
  *
- * Provides centralized error handling, toast notifications, authentication redirects, and loading state management.
+ * Interprets backend error responses, triggers redirects on authentication
+ * failures, displays localized toast messages, and forwards successful
+ * responses to the caller.
  *
- * @param options - Configuration object for the API call
- * @param options.endpoint - API endpoint path (e.g., "/api/devices")
+ * @param options - API call configuration
+ * @param options.endpoint - API endpoint path (e.g. "/api/devices")
  * @param options.method - HTTP method ("GET", "POST", "PUT", "DELETE")
- * @param options.params - Request parameters (query params for GET, body for others)
- * @param options.timeout - Request timeout in milliseconds (default: 3000)
- * @param options.file - Optional file for upload requests
- * @param options.fileFieldName - Form field name for file uploads (default: "file")
- * @param options.setLoaded - Whether to set loadedDone state to true on success
- * @returns Promise with success status and response data
+ * @param options.params - Request parameters (query params for GET, body otherwise)
+ * @param options.timeout - Request timeout in milliseconds
+ * @param options.file - Optional file for multipart upload requests
+ * @param options.fileFieldName - Form field name for file uploads
+ * @param options.setLoaded - Whether to update the global loaded state on success
+ * @param options.fetchFn - Fetch implementation to use (defaults to global fetch)
+ * @returns Promise indicating success status and response payload
  */
 export async function callAPI({
     endpoint,
@@ -162,8 +140,9 @@ export async function callAPI({
     file = undefined,
     fileFieldName = "file",
     setLoaded = false,
+    fetchFn = fetch,
 }: CallAPIOptions): Promise<{ sucess: boolean; data: any }> {
-    const { status, data }: { status: number; data: any } = await makeAPIRequest(endpoint, method, params, timeout, file, fileFieldName);
+    const { status, data }: { status: number; data: any } = await makeAPIRequest(endpoint, method, params, timeout, file, fileFieldName, fetchFn);
     try {
         let error_code = data?.error_code;
         let error_section = data?.error_section;
@@ -171,7 +150,8 @@ export async function callAPI({
         if (status !== 200) {
             let authenticationError = status === 401 || status === 429;
             if (authenticationError) { // Unauthorized acess
-                await navigateTo("/login", {}, true);
+                userAuthenticated.set(false);
+                await navigateTo("/login", {}, true, true);
             }
             if (endpoint === "/api/auth/auto_login" && authenticationError) return { sucess: false, data: data };
             if (status === -1) throw new Error(`API Request timed out.`);

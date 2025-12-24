@@ -1,42 +1,38 @@
 import { goto } from "$app/navigation";
+import { replaceState } from "$app/navigation";
 import { get } from "svelte/store";
-import { browser } from "$app/environment";
-import { checkAutoLogin } from "../validation/auth";
+import { autoLogin } from "../api/auth";
 import { selectedLang } from "$lib/stores/lang/definition";
-import { closeToast } from "./toast";
+import { currentDeviceID } from "$lib/stores/device/current";
 
 // Splash screen store
 import {
+    searchQuery,
     currentPage,
     splashDone,
     loadedDone,
     showSubLoader,
     leftPanelOpen,
-    searchQuery,
     subLoaderTimer,
     resetSubLoaderSubscription,
     hasMouseCapability,
+    userAuthenticated,
 } from "../../stores/view/navigation";
 
-// Current device store
-import { currentDeviceID } from "$lib/stores/device/current";
-
 /**
- * Prepares navigation URLs and extracts navigation-related parameters.
+ * Builds a navigation URL and derives route paths for comparison.
  *
- * Constructs the full target URL with query parameters, appending all extra parameters except 'lang',
- * and then appends the language code as the final 'lang' query parameter.
- * Also extracts the target route, current route, search query, and device ID from the parameters.
+ * Constructs the target URL by appending query parameters from `extraParams`
+ * (excluding any existing `lang`) and then appending the provided language
+ * code as the final `lang` query parameter.
  *
- * @param url - The base URL or route to navigate to (without query parameters).
- * @param lang - Language code to append as the final 'lang' query parameter.
- * @param extraParams - Additional key/value pairs to include in the query string (excluding 'lang').
- * @returns [target, targetRoute, currentRoute, searchQuery, deviceID]
- *   - target: Complete target URL with query params.
+ * @param url - Target route path to navigate to (without query parameters).
+ * @param lang - Language code to append as the `lang` query parameter.
+ * @param extraParams - Additional query parameters to include (excluding `lang`).
+ * @returns A tuple containing:
+ *   - target: Full navigation URL with query parameters.
  *   - targetRoute: Target route path.
  *   - currentRoute: Current route path.
- *   - searchQuery: Extracted search query string.
- *   - deviceID: Extracted device ID string (if present).
  */
 function getNavigationReady(url: string, lang: string, extraParams: Record<string, string> = {}): Array<string> {
     const params = new URLSearchParams();
@@ -48,10 +44,8 @@ function getNavigationReady(url: string, lang: string, extraParams: Record<strin
     const target = `${url}?${params.toString()}`;
     const targetRoute = url;
     const currentRoute = window.location.pathname;
-    const searchQuery = params.get("searchQuery") ?? "";
-    const deviceID = params.get("deviceId") ?? "";
 
-    return [target, targetRoute, currentRoute, searchQuery, deviceID];
+    return [target, targetRoute, currentRoute];
 }
 
 /**
@@ -109,54 +103,139 @@ function setSubLoaderTrigger(showSubLoaderTime: number) {
 }
 
 /**
- * Navigates to a new URL with optional query parameters, splash screen, and loading states.
+ * Resets the dashboard loading state before starting a new operation.
  *
- * @param url - The target URL or route to navigate to.
+ * Marks the dashboard as not loaded and arms a delayed sub-loader trigger
+ * if loading takes longer than the specified threshold.
+ *
+ * @param showSubLoaderTime - Delay (ms) before showing the sub-loader.
+ */
+export function resetDashboardLoader(showSubLoaderTime: number = 600): void {
+    resetSubLoaderTrigger();
+    loadedDone.set(false);
+    setSubLoaderTrigger(showSubLoaderTime);
+}
+
+/**
+ * Performs client-side navigation to a target route with optional query parameters,
+ * splash screen handling, and history replacement.
+ *
+ * This helper wraps SvelteKit navigation to provide:
+ * - URL construction with language and extra query parameters
+ * - Optional splash screen with minimum display duration
+ * - Optional history replacement for state transitions (e.g. login/logout),
+ *   preventing invalid routes from remaining in browser history
+ *
+ * @param url - Target route or URL to navigate to.
  * @param extraParams - Additional query parameters to append to the URL.
- * @param splashScreen - Whether to show splash screen during navigation.
- * @param minSplashDuration - Minimum duration (ms) to display splash screen.
- * @param showSubLoaderTime - Time (ms) before showing sub-loader if navigation takes too long.
- * @returns Promise that resolves when navigation and splash screen (if enabled) complete.
+ * @param splashScreen - Whether to display a splash screen during navigation.
+ * @param replaceState - Whether to replace the current history entry instead of pushing a new one.
+ * @param minSplashDuration - Minimum time (ms) the splash screen must remain visible.
+ * @returns Promise that resolves once navigation and splash screen handling are complete.
  */
 export async function navigateTo(
     url: string,
     extraParams: Record<string, string> = {},
     splashScreen: boolean = false,
+    replaceState: boolean = false,
     minSplashDuration: number = 300,
-    showSubLoaderTime: number = 600
 ): Promise<void> {
-    let [target, targetRoute, currentRoute, searchQuery, deviceID] = getNavigationReady(url, get(selectedLang), extraParams);
+    let [target, targetRoute, currentRoute] = getNavigationReady(url, get(selectedLang), extraParams);
 
     // Already in Intended URL
     if (targetRoute === currentRoute) {
         return;
     }
 
-    resetSubLoaderTrigger();
-    loadedDone.set(false);
-    setSubLoaderTrigger(showSubLoaderTime);
-    setSearchQuery(targetRoute, searchQuery);
-    if (deviceID) currentDeviceID.set(Number(deviceID));
-
-    let gotoPromise = goto(target);
+    let gotoPromise = goto(target, { replaceState: replaceState });
     let timerPromise = Promise.resolve();
     if (splashScreen) {
         splashDone.set(false);
         timerPromise = new Promise((res) => setTimeout(res, minSplashDuration));
     }
 
-    closeToast(); // Closes all toasts and alerts
     await Promise.all([gotoPromise, timerPromise]);
-    currentPage.set(window.location.pathname);
-
-    if (!window.matchMedia("(min-width: 880px)").matches) {
-        leftPanelOpen.set(false);
-    }
 
     if (splashScreen) {
         splashDone.set(true);
     }
 }
+
+/**
+ * Evaluates client-side navigation rules to determine whether the current
+ * URL should be redirected to a canonical route.
+ *
+ * This function implements UI-only navigation constraints (auth prediction
+ * and route normalization) and returns a redirect decision without performing
+ * the navigation itself.
+ *
+ * It is non-authoritative and exists solely to prevent unnecessary SPA
+ * navigations that would be rejected by server-side guards.
+ *
+ * @param url - Target URL being evaluated for navigation.
+ * @returns An object indicating whether a redirect is needed and the target route.
+ */
+export function resolveNavigationRedirect(url: URL): { shouldRedirect: boolean, redirectTarget: string } {
+
+    const DEVICE_SCOPED_PAGES = new Set(["general_view", "edit"]);
+
+    const segments = url.pathname.split("/").filter(Boolean);
+    const base = segments.length > 0 ? `/${segments[0]}` : "/";
+    const subpage = segments[1] ?? null;
+
+    let redirectTarget: string = "";
+
+    if (!get(userAuthenticated) && url.pathname !== "/login") {
+        redirectTarget = "/login";
+    }
+
+    if (get(userAuthenticated) && (url.pathname === "/login" || url.pathname === "/")) {
+        redirectTarget = "/devices";
+    }
+
+    // Enforce required device context for device-scoped subpages
+    if (base === "/devices" && subpage && DEVICE_SCOPED_PAGES.has(subpage)) {
+        const deviceId = url.searchParams.get("deviceId");
+
+        if (!deviceId) {
+            redirectTarget = "/devices";
+        }
+    }
+
+    return { shouldRedirect: Boolean(redirectTarget), redirectTarget };
+
+}
+
+/**
+ * Synchronizes client-side UI state with the resolved router URL.
+ *
+ * Updates page-related stores (current page, device context, search state)
+ * and normalizes the browser URL when a server redirect occurred during
+ * SPA navigation.
+ *
+ * For authentication routes, only global query parameters (e.g. `lang`)
+ * are preserved to keep URLs canonical.
+ *
+ * @param url - Final URL resolved by the router after navigation.
+ */
+export async function syncUIState(url: URL): Promise<void> {
+    currentDeviceID.set(getDeviceID());
+    updateSearchQuery(url);
+    currentPage.set(url.pathname);
+    // Client was redirected
+    if (window.location.pathname !== url.pathname) {
+        let search = window.location.search;
+        if (url.pathname === "/login") {
+            const params = new URLSearchParams();
+            const lang = new URLSearchParams(window.location.search).get('lang');
+            if (lang) params.set('lang', lang);
+            search = params.toString() ? `?${params.toString()}` : '';
+        }
+        const newUrl = url.pathname + search + window.location.hash;
+        replaceState(newUrl, {});
+    }
+}
+
 
 /**
  * Checks if the current page is an authentication page.
@@ -196,21 +275,6 @@ export function isDeviceSubPage(currentPage: string): boolean {
  */
 export function isDeviceViewPage(currentPage: string): boolean {
     return currentPage.startsWith("/devices/") && !currentPage.startsWith("/devices/add") && !currentPage.startsWith("/devices/edit");
-
-}
-
-/**
- * Updates document body scroll behavior based on content loading state.
- * @param contentLoaded - True to enable scrolling, false to disable.
- */
-export function updateScrollingState(contentLoaded: boolean): void {
-    if (browser) {
-        if (contentLoaded) {
-            document.body.style.overflow = "auto";
-        } else {
-            document.body.style.overflow = "hidden";
-        }
-    }
 }
 
 /**
@@ -222,31 +286,40 @@ export function setInitialLeftPanelState() {
 }
 
 /**
- * Sets the search query state based on the target route.
+ * Reads the current device ID from the URL query parameters.
  *
- * Clears the search query for all routes except "/devices" where it preserves the search string.
- * This ensures search functionality is only active on the devices page.
+ * The URL is treated as the sole source of truth. This function should be used
+ * whenever a device identifier is required on the client side.
  *
- * @param targetRoute - The route being navigated to.
- * @param searchString - The search query string to set (only used for "/devices" route).
+ * @returns The numeric device ID if present and valid, or `null` otherwise.
  */
-export function setSearchQuery(targetRoute: string, searchString: string) {
-    if (targetRoute !== "/devices") {
+export function getDeviceID() {
+    const path = window.location.pathname;
+    const params = new URLSearchParams(window.location.search);
+    const deviceIdURL = params.get("deviceId");
+    let deviceId: number | null = Number(deviceIdURL);
+    if (isNaN(deviceId) || !deviceId) deviceId = null;
+    return deviceId;
+}
+
+/**
+ * Synchronizes the UI search state with the provided URL.
+ *
+ * Reads the `searchQuery` parameter from the given URL and updates the
+ * `searchQuery` store for UI purposes only. The store is cleared when the
+ * current route is not `/devices`. The URL remains the sole source of truth.
+ *
+ * @param url - The current URL used as the source of truth for the search state.
+ */
+export function updateSearchQuery(url: URL) {
+    const path = url.pathname
+    const params = url.searchParams;
+    const searchString = params.get("searchQuery") ?? "";
+    if (path !== "/devices") {
         searchQuery.set("");
     } else {
         searchQuery.set(searchString);
     }
-}
-
-/**
- * Extracts search query from current URL and updates the search state.
- * Reads 'searchQuery' parameter from URL and applies it via setSearchQuery.
- */
-export async function getSearchQuery() {
-    const path = window.location.pathname;
-    const params = new URLSearchParams(window.location.search);
-    const searchQuery = params.get("searchQuery") ?? "";
-    setSearchQuery(path, searchQuery);
 }
 
 /**
@@ -260,29 +333,23 @@ export function checkClientHasMouse() {
 }
 
 /**
- * Initializes the application layout with authentication, search state, and navigation setup.
- * Handles splash screen timing, auto-login checks, and redirects if necessary.
- * 
- * @param minSplashDuration - Minimum time (ms) to display splash screen.
- * @param showSubLoaderTime - Time (ms) before showing sub-loader if initialization takes too long.
+ * Initializes client-side layout state during application startup.
+ *
+ * Performs UI-related setup such as input capability detection, splash screen timing,
+ * dashboard loader initialization, and a non-authoritative session validation request.
+ *
+ * This function does NOT perform routing decisions or redirects.
+ * Final access control and navigation are enforced elsewhere (e.g. server-side guards).
+ *
+ * @param minSplashDuration - Minimum time (ms) the splash screen should remain visible.
+ * @param showSubLoaderTime - Delay (ms) before showing the sub-loader if initialization is slow.
  */
-export async function initLayout(minSplashDuration: number = 300, showSubLoaderTime: number = 600) {
+export async function initializeClientLayout(minSplashDuration: number = 300, showSubLoaderTime: number = 600) {
 
     checkClientHasMouse();
-    const checkAutoLoginPromise = checkAutoLogin();
-    const getSearchQueryPromise = getSearchQuery();
+    const checkAutoLoginPromise = autoLogin();
     const minTimePromise = new Promise((res) => setTimeout(res, minSplashDuration));
-
-    resetSubLoaderTrigger();
-    const [authResult] = await Promise.all([checkAutoLoginPromise, getSearchQueryPromise, minTimePromise]);
-    setSubLoaderTrigger(showSubLoaderTime);
-
-    if (authResult.shouldRedirect && authResult.redirectTarget) {
-        await navigateTo(authResult.redirectTarget);
-    }
-    else {
-        currentPage.set(window.location.pathname);
-    }
-
+    resetDashboardLoader(showSubLoaderTime);
+    const [authResult] = await Promise.all([checkAutoLoginPromise, minTimePromise]);
     splashDone.set(true);
 }

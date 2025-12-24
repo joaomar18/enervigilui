@@ -1,24 +1,37 @@
 <script lang="ts">
-    import { afterNavigate } from "$app/navigation";
     import { onMount } from "svelte";
-    import { initLayout } from "$lib/logic/view/navigation";
+    import { beforeNavigate, afterNavigate } from "$app/navigation";
+    import { initializeClientLayout, resolveNavigationRedirect, navigateTo } from "$lib/logic/view/navigation";
     import { isAuthenticationPage, isDashboardPage } from "$lib/logic/view/navigation";
+    import { closeToast } from "$lib/logic/view/toast";
     import { setInitialLeftPanelState } from "$lib/logic/view/navigation";
+    import { syncUIState } from "$lib/logic/view/navigation";
     import SplashLoader from "../components/Dashboard/SplashLoader.svelte";
+    import DashboardContainer from "../components/Dashboard/DashboardContainer.svelte";
 
     // Authorization stores
     import { currentPage, splashDone } from "$lib/stores/view/navigation";
-    import DashboardContainer from "../components/Dashboard/DashboardContainer.svelte";
 
     // On Mount Function
     onMount(async () => {
         setInitialLeftPanelState();
-        await initLayout();
+        await initializeClientLayout();
     });
 
-    afterNavigate(async ({ to }) => {
+    beforeNavigate(({ to, cancel }) => {
         if (!to) return;
-        //await initLayout();
+        let result = resolveNavigationRedirect(to.url);
+        if (result.shouldRedirect) {
+            cancel();
+            navigateTo(result.redirectTarget, {}, false, true);
+            return;
+        }
+    });
+
+    afterNavigate(({ to }) => {
+        if (!to) return;
+        closeToast();
+        syncUIState(to.url);
     });
 </script>
 

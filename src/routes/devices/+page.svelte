@@ -3,7 +3,7 @@
     import { onMount } from "svelte";
     import DeviceCard from "../../components/Devices/DeviceCard.svelte";
     import AddDevice from "../../components/Devices/AddDevice.svelte";
-    import { navigateTo } from "$lib/logic/view/navigation";
+    import { navigateTo, resetDashboardLoader } from "$lib/logic/view/navigation";
     import { getAllDevices, getAllDevicesWithImage } from "$lib/logic/api/device";
     import { filterDevices } from "$lib/logic/util/device";
     import { MethodPoller } from "$lib/logic/api/poller";
@@ -42,6 +42,7 @@
 
     // Mount function to poll devices status
     onMount(() => {
+        resetDashboardLoader();
         let devicesPoller: MethodPoller | null = null;
         let devicesWithImagesPoller: MethodPoller | null = new MethodPoller(async (signal) => {
             ({ devices, devicesImages } = await getAllDevicesWithImage());

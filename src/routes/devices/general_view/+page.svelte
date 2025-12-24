@@ -1,4 +1,5 @@
 <script lang="ts">
+    import { getDeviceID, resetDashboardLoader } from "$lib/logic/view/navigation";
     import { fade } from "svelte/transition";
     import { onMount } from "svelte";
     import { MethodPoller } from "$lib/logic/api/poller";
@@ -16,16 +17,15 @@
     import type { NodeCategory } from "$lib/types/nodes/base";
     import type { NodeState, ProcessedNodeState } from "$lib/types/nodes/realtime";
     import type { RealTimeCardCategoriesState } from "$lib/types/view/device";
+    import type { MeterType } from "$lib/types/device/base";
+    import RealTimeCard from "../../../components/Devices/RealTimeCard.svelte";
+    import MetricsCard from "../../../components/Devices/MetricsCard.svelte";
 
     // Stores
     import { loadedDone } from "$lib/stores/view/navigation";
-    import { currentDeviceID } from "$lib/stores/device/current";
 
     // Styles
     import { ToolTipTextStyle } from "$lib/style/general";
-    import RealTimeCard from "../../../components/Devices/RealTimeCard.svelte";
-    import MetricsCard from "../../../components/Devices/MetricsCard.svelte";
-    import type { MeterType } from "$lib/types/device/base";
 
     // Variables
     let nodesState: Record<string, NodeState>;
@@ -51,10 +51,12 @@
 
     // Functions
     onMount(() => {
+        resetDashboardLoader();
+        let deviceId = getDeviceID();
         let nodesStatePoller: MethodPoller | null;
-        if ($currentDeviceID) {
+        if (deviceId) {
             nodesStatePoller = new MethodPoller(async (signal) => {
-                ({ meterType, nodesState, processedNodesState } = await getDeviceNodesState($currentDeviceID));
+                ({ meterType, nodesState, processedNodesState } = await getDeviceNodesState(deviceId));
             }, 5000);
         } else {
             showToast("errorEditDeviceParams", AlertType.ALERT);

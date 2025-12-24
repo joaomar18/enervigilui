@@ -9,3 +9,4 @@ export const searchQuery = writable<string>(""); // Query to filter devices
 export const resetSubLoaderSubscription = writable<(() => void) | null>(null); //Subscription to reset sub loader
 export const subLoaderTimer = writable<ReturnType<typeof setTimeout> | null>(null); // Timeout to set sub loader in case of delay
 export const hasMouseCapability = writable<boolean>(false);
+export const userAuthenticated = writable<boolean>(false); /** UI-only auth hint (non-authoritative). */
