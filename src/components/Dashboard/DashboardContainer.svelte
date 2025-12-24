@@ -13,7 +13,8 @@
     import CircularLoaderFullScreen from "../General/CircularLoaderFullScreen.svelte";
 
     // Style
-    
+    import { DashboardContainerStyle } from "$lib/style/dashboard";
+    $: effectiveStyle = $DashboardContainerStyle;
 
     // Stores
     import { currentPage, leftPanelOpen, loadedDone, showSubLoader } from "$lib/stores/view/navigation";
@@ -76,7 +77,14 @@
     • Responsive design with sidebar that auto-opens on desktop and collapses on mobile.
     • Handles loading states with spinner overlay until content is ready.
 -->
-<div class="dashboard-container" in:fade={{ duration: 300 }}>
+<div
+    style="
+        --scrollbar-track-color: {effectiveStyle.scrollbarTrackColor};
+        --scrollbar-thumb-color: {effectiveStyle.scrollbarThumbColor};
+    "
+    class="dashboard-container"
+    in:fade={{ duration: 300 }}
+>
     <LeftPanel bind:leftPanelOpen={$leftPanelOpen} activeSection={$currentPage} />
     <div class="left-header-div" bind:this={leftHeaderEl} class:left-panel-open={$leftPanelOpen}>
         <div class="menu-button-div" class:close={mobileSearchOpen}>
@@ -208,8 +216,9 @@
         transition: padding-left 0.2s ease-in-out;
         overflow-y: auto;
         overflow-x: auto;
-        scrollbar-width: thin;
+        scrollbar-width: auto;
         scrollbar-gutter: stable both-edges;
+        scrollbar-color: var(--scrollbar-track-color) var(--scrollbar-thumb-color);
     }
 
     /* Fixed div for alerts display */

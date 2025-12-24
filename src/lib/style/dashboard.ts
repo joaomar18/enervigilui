@@ -1,6 +1,17 @@
 import type { ComponentStyles } from "./components";
 import { createStyleStore } from "./components";
 
+//////////     D A S H B O A R D     C O N T A I N E R     //////////
+
+const DashboardContainerStyleConfig: ComponentStyles = {
+    dark: {
+        scrollbarTrackColor: "#242a32",
+        scrollbarThumbColor: "#12161b",
+    },
+};
+
+export const DashboardContainerStyle = createStyleStore(DashboardContainerStyleConfig);
+
 //////////     L E F T     P A N E L     //////////
 
 const LeftPanelStyleConfig: ComponentStyles = {
