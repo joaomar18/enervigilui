@@ -9,6 +9,7 @@
     import Logout from "./Logout.svelte";
     import DeviceInfoHeader from "../Devices/DeviceInfoHeader.svelte";
     import MobileDeviceInfoHeader from "../Devices/MobileDeviceInfoHeader.svelte";
+    import InlineLoader from "../General/InlineLoader.svelte";
     import ToolTipText from "../General/ToolTipText.svelte";
 
     // Texts
@@ -44,11 +45,15 @@
 <div class="header-div">
     <div class="main-header-div">
         <div class="center-div">
-            <div class="desktop-device-info-div">
-                <DeviceInfoHeader {deviceInfo} {deviceImageUrl} />
-            </div>
-            <div class="mobile-device-info-div">
-                <MobileDeviceInfoHeader {deviceInfo} />
+            <div class="center-content-div">
+                <InlineLoader loaded={!!deviceInfo}>
+                    <div class="desktop-device-info-div">
+                        <DeviceInfoHeader {deviceInfo} {deviceImageUrl} />
+                    </div>
+                    <div class="mobile-device-info-div">
+                        <MobileDeviceInfoHeader {deviceInfo} />
+                    </div>
+                </InlineLoader>
             </div>
         </div>
         <div class="right-div">
@@ -104,6 +109,15 @@
         padding: 0;
         padding-left: 20px;
         padding-right: 20px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    /* Centered device info content section */
+    .center-content-div {
+        width:fit-content;
+        height:100%;
     }
 
     /* Right section: notifications and logout */
