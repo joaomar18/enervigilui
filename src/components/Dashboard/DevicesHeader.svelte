@@ -1,5 +1,4 @@
 <script lang="ts">
-    import { fade } from "svelte/transition";
     import { onMount } from "svelte";
     import { getDeviceID } from "$lib/logic/view/navigation";
     import { logoutUser } from "$lib/logic/api/auth";
@@ -42,7 +41,7 @@
     Uses DeviceInfoHeader and MobileDeviceInfoHeader for responsive device display.
     Notification and logout actions are always visible on the right.
 -->
-<div class="header-div" in:fade={{ duration: 300 }}>
+<div class="header-div">
     <div class="main-header-div">
         <div class="center-div">
             <div class="desktop-device-info-div">

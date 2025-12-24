@@ -309,7 +309,7 @@ Includes multi-language headers and adapts layout to container size. -->
     /* Sticky table header for scrolling */
     table thead {
         position: sticky;
-        top: 74px;
+        top: 0px;
         z-index: 1;
     }
 

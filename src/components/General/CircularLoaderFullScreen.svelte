@@ -14,14 +14,12 @@
     // Layout / styling props
     export let width: string | undefined = undefined;
     export let height: string | undefined = undefined;
-    export let wrapperTopPos: string | undefined = undefined;
     export let border: string | undefined = undefined;
     export let loaderColor: string | undefined = undefined;
 
     $: localOverrides = {
         width,
         height,
-        wrapperTopPos,
         border,
         loaderColor,
     };
@@ -39,7 +37,6 @@
     style="
         --width: {mergedStyle.width};
         --height: {mergedStyle.height};
-        --wrapper-top-position: {mergedStyle.wrapperTopPos};
         --border: {mergedStyle.border};
         --loader-color: {mergedStyle.loaderColor};
     "
@@ -57,10 +54,10 @@
         inset: 0;
         margin: 0;
         padding: 0;
-        top: var(--wrapper-top-position);
+        top: -94px;
         box-sizing: border-box;
         width: 100%;
-        height: calc(100vh);
+        height: 100vh;
     }
 
     /* Wrapper for centering spinner and background */
@@ -104,6 +101,13 @@
     @keyframes content-spin {
         to {
             transform: rotate(360deg);
+        }
+    }
+
+    /* Fix top position on container */
+    @media (min-width: 470px) {
+        .loader-div {
+            top: -104px;
         }
     }
 </style>

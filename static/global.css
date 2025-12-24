@@ -120,6 +120,10 @@ body {
     -webkit-font-smoothing: antialiased;
 }
 
+body.dashboard {
+    overflow: hidden;
+}
+
 a {
     color: rgb(0, 100, 200);
     text-decoration: none;

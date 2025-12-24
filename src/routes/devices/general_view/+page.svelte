@@ -155,6 +155,9 @@
             max-width: calc(2 * 400px + 1 * 20px);
             grid-template-columns: repeat(2, minmax(300px, 1fr));
         }
+        .grid .grid-col {
+            min-height: 450px;
+        }
     }
 
     /* Responsive breakpoint: small screens / mobile — stack into a single column */

@@ -1,5 +1,4 @@
 <script lang="ts">
-    import { fade } from "svelte/transition";
     import { navigateTo } from "$lib/logic/view/navigation";
     import { logoutUser } from "$lib/logic/api/auth";
     import Action from "../General/Action.svelte";
@@ -27,7 +26,7 @@
     • Mobile responsive: Search bar expands to full width on mobile when activated.
     • Handles click-outside events to close mobile search automatically.
 -->
-<div class="header-div" bind:this={headerEl} in:fade={{ duration: 300 }}>
+<div class="header-div" bind:this={headerEl}>
     <div class="main-header-div" class:collapse={mobileSearchOpen}>
         <div class="center-div" class:open={mobileSearchOpen}>
             <SearchBar

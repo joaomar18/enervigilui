@@ -12,6 +12,9 @@
     import Action from "../General/Action.svelte";
     import CircularLoaderFullScreen from "../General/CircularLoaderFullScreen.svelte";
 
+    // Style
+    
+
     // Stores
     import { currentPage, leftPanelOpen, loadedDone, showSubLoader } from "$lib/stores/view/navigation";
     import { displayToast, toastKey, toastType, toastVariables } from "$lib/stores/view/toast";
@@ -53,6 +56,7 @@
             }
         };
         desktopMatch.onchange = closeMobileSearchOnDesktop;
+        document.body.classList.add("dashboard");
 
         //Clean-up logic
         return () => {
@@ -60,6 +64,7 @@
             if (clickEventListenerDefined) {
                 window.removeEventListener("click", handleClickOutside);
             }
+            document.body.classList.remove("dashboard");
         };
     });
 </script>
@@ -186,8 +191,7 @@
         margin: 0;
         padding: 0;
         width: 100%;
-        min-width: 350px;
-        min-height: calc(100vh - 74px);
+        height: 100vh;
         display: flex;
         flex-direction: column;
         justify-content: start;
@@ -201,8 +205,11 @@
         padding-left: 0px;
         width: 100%;
         height: 100%;
-        min-height: calc(100vh - 74px);
         transition: padding-left 0.2s ease-in-out;
+        overflow-y: auto;
+        overflow-x: auto;
+        scrollbar-width: thin;
+        scrollbar-gutter: stable both-edges;
     }
 
     /* Fixed div for alerts display */
@@ -225,16 +232,16 @@
         box-sizing: border-box;
         margin: 0;
         padding: 20px;
-        height: 100%;
-        min-height: calc(100vh - 74px);
         width: 100%;
+        height: fit-content;
+        min-width: 350px;
+        min-height: calc(100vh - 74px);
     }
 
     /* Content div */
     .dashboard-container .content .container-div .content-div {
         width: 100%;
-        height: 100%;
-        min-height: calc(100vh - 74px - 60px);
+        height: fit-content;
         margin: 0;
         padding: 0;
         position: relative;
@@ -243,8 +250,7 @@
     /* Section Content div to nest the content of specific pages */
     .dashboard-container .container-div .content-div .section-content-div {
         width: 100%;
-        height: 100%;
-        min-height: calc(100vh - 74px - 60px);
+        height: fit-content;
         margin: 0;
         padding: 0;
         position: relative;

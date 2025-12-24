@@ -483,7 +483,6 @@ const CircularLoaderFullScreenStyleConfig: ComponentStyles = {
     dark: {
         width: "128px",
         height: "128px",
-        wrapperTopPos: "-104px",
         border: "4px solid rgba(255, 255, 255, 0.2)",
         loaderColor: "#fff",
     },
