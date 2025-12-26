@@ -158,7 +158,7 @@
     }
 
     // Initial Node State processing
-    $: if (nodeState) {
+    $: if (nodeState && showPanel) {
         loadNodeAdditionalInfo();
         if (nodeState.graphType) {
             updateNodeLogs();
