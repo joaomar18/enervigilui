@@ -21,6 +21,7 @@
     export let firstFetch: boolean;
     export let metricsCategory: NodeCategory;
     export let previousCategory: NodeCategory | undefined;
+    export let metricsTimeoutMs: number = 1000;
 
     // Layout / styling props
     export let iconSize: string | undefined = undefined;
@@ -84,7 +85,7 @@
         if (firstFetch && previousCategory === metricsCategory) {
             loaderTimeout = setTimeout(() => {
                 showLoader = !dataFetched;
-            }, 500);
+            }, metricsTimeoutMs);
         } else {
             showLoader = true;
         }

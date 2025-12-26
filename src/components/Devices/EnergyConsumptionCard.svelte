@@ -25,6 +25,7 @@
 
     // Constants
     const EXPAND_HEIGHT_MAX_WIDTH = 946;
+    const API_REQUEST_TIMEOUT_MS = 60 * 1000; // 1 minute
 
     // Variables
     let energyLogs: EnergyConsumptionType | null = null;
@@ -42,6 +43,7 @@
     let usePhase: boolean = false;
     let currentTimeSpans: SlidingWindow<EnergyConsumptionTimeSpan> = new SlidingWindow(10);
     let goBackEnabled: boolean = false;
+    let nextRequestTimeout: ReturnType<typeof setTimeout> | null = null;
 
     // Reactive Statements
     $: if (!energyConsumptionFirstFetch) {
@@ -134,14 +136,15 @@
             initialDate !== null,
             initialDate,
             endDate,
-        ).call({ timeout: 5000 });
+        ).call({ timeout: API_REQUEST_TIMEOUT_MS });
         if (result !== null) {
             energyLogs = result.energyLogs;
             mergedPoints = result.mergedPoints;
             mergedGlobalMetrics = result.mergedGlobalMetrics;
+            energyConsumptionFetched = true;
         }
-        energyConsumptionFetched = true;
         energyConsumptionFirstFetch = true;
+        scheduleNextRequest();
     }
 
     function addToCurrentTimeSpans(timeSpan: EnergyConsumptionTimeSpan): void {
@@ -163,6 +166,14 @@
 
     function handleWindowResize(): void {
         mobileView = window.innerWidth <= EXPAND_HEIGHT_MAX_WIDTH;
+    }
+
+    function scheduleNextRequest(): void {
+        if (nextRequestTimeout !== null) {
+            clearTimeout(nextRequestTimeout);
+            nextRequestTimeout = null;
+        }
+        nextRequestTimeout = setTimeout(() => loadEnergyConsumption(), API_REQUEST_TIMEOUT_MS);
     }
 
     onMount(() => {

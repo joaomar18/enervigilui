@@ -25,6 +25,7 @@
     export let powerFactorDecimalPlaces: number | null = null;
     export let dataFetched: boolean;
     export let firstFetch: boolean;
+    export let metricsTimeoutMs: number = 1000;
 
     // Variables
     let showLoader = false;
@@ -57,7 +58,7 @@
         if (firstFetch) {
             loaderTimeout = setTimeout(() => {
                 showLoader = !dataFetched;
-            }, 500);
+            }, metricsTimeoutMs);
         } else {
             showLoader = true;
         }

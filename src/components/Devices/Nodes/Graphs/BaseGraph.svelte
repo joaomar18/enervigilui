@@ -56,6 +56,7 @@
     export let externalGraph: BaseGraphObject<BaseLogPoint> | null = null;
     export let externalGraphContainer: HTMLDivElement | null = null;
     export let baseContainerWidth: number | null = null;
+    export let graphLoaderTimeoutMs: number = 1000;
 
     // Layout / styling props
     export let width: string | undefined = undefined;
@@ -146,7 +147,7 @@
         if (firstFetch) {
             loaderTimeout = setTimeout(() => {
                 showLoader = !dataFetched;
-            }, 500);
+            }, graphLoaderTimeoutMs);
         } else {
             showLoader = true;
         }

@@ -23,6 +23,9 @@
     export let availablePhases: Array<NodePhase>;
     export let expandedState: Record<string, boolean>;
 
+    // Constants
+    const API_REQUEST_TIMEOUT_MS = 60 * 1000; // 1 minute
+
     // Variables
     let mobileView = false;
     let selectedElectricalPhase: SelectablePhaseFilter = SelectablePhaseFilter.TOTAL;
@@ -33,6 +36,7 @@
     let metricsData: Record<string, any> = {};
     let metricsFirstFetch: boolean = false;
     let usePhase: boolean = false;
+    let nextRequestTimeout: ReturnType<typeof setTimeout> | null = null;
 
     // Reactive Statements
     $: if (!metricsFirstFetch) {
@@ -81,10 +85,13 @@
         metricsFetched = false;
         for (const metric of Object.keys(expandedState)) {
             let result = await mapMetricsAPI(metric, deviceId, selectedElectricalPhase, initialDate, endDate);
-            if (result !== null) metricsData[metric] = result;
+            if (result !== null) {
+                metricsData[metric] = result;
+                metricsFetched = true;
+            }
         }
-        metricsFetched = true;
         metricsFirstFetch = true;
+        scheduleNextRequest();
     }
 
     function getMobileView(): void {
@@ -101,6 +108,14 @@
         for (const metric of Object.keys(expandedState)) {
             expandedState[metric] = false;
         }
+    }
+
+    function scheduleNextRequest(): void {
+        if (nextRequestTimeout !== null) {
+            clearTimeout(nextRequestTimeout);
+            nextRequestTimeout = null;
+        }
+        nextRequestTimeout = setTimeout(() => loadMetrics(), API_REQUEST_TIMEOUT_MS);
     }
 
     onMount(() => {
