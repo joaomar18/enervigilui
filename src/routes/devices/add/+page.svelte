@@ -71,7 +71,7 @@
     // Mount function
     onMount(() => {
         resetDashboardLoader();
-        let defaultImageRetrier: APIRetrier<string> | null = new APIRetrier(
+        let defaultImageRetrier: APIRetrier<string | null> | null = new APIRetrier(
             getDefaultImageAPI(),
             (result) => {
                 if (!deviceData) {
@@ -81,7 +81,7 @@
                         nodesInit = true;
                     }, 100); // Small timeout to give a bit of time for the page to load before the nodes
                 }
-                deviceData.current_image_url = result;
+                if (result !== null) deviceData.current_image_url = result;
             },
             5000,
         );

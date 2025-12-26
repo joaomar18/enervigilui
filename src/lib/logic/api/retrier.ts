@@ -94,7 +94,7 @@ export class APIRetrier<T> {
         try {
             let result = await this.#api.call({ timeout: this.#currentInterval, signal: this.#controller.signal });
             this.#callback(result);
-            sucess = true;
+            sucess = result !== null;
         } catch (e) {
             if ((e as any)?.name !== "AbortError") {
                 console.error("Error in API Retrier: ", e);

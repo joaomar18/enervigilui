@@ -21,11 +21,12 @@
 
     onMount(() => {
         let deviceId = getDeviceID();
-        let deviceDataRetrier: APIRetrier<{ deviceInfo: DeviceInfo; deviceImageUrl: string }> | null = null;
+        let deviceDataRetrier: APIRetrier<{ deviceInfo: DeviceInfo; deviceImageUrl: string } | null> | null = null;
         if (deviceId) {
             deviceDataRetrier = new APIRetrier(
                 getDeviceInfoWithImageAPI(deviceId),
                 (result) => {
+                    if (result === null) return;
                     deviceInfo = result.deviceInfo;
                     deviceImageUrl = result.deviceImageUrl;
                 },
@@ -99,7 +100,7 @@
         margin-left: 46px;
         width: 100%;
         min-width: 0;
-        height:100%;
+        height: 100%;
         position: relative;
         display: flex;
         align-items: center;
@@ -110,7 +111,7 @@
     /* Centered device info section */
     .center-div {
         flex: 1;
-        height:100%;
+        height: 100%;
         min-width: 0;
         margin: 0;
         padding: 0;

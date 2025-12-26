@@ -116,7 +116,7 @@
                 <div class="section-links-div">
                     <Link
                         selected={activeSection.includes("/devices")}
-                        showExpandArrow={true}
+                        showExpandArrow={devicesSubSection}
                         triggerExpand={devicesSubSection}
                         buttonText={$texts.devices}
                         imageURL="/img/devices.svg"

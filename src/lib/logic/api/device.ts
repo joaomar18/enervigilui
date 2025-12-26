@@ -1,4 +1,4 @@
-import { callAPI } from "$lib/logic/api/api";
+import { APICaller } from "$lib/logic/api/api";
 import type { APIDescriptor } from "$lib/logic/api/api";
 import type { Device, EditableDevice, DeviceHistory, DeviceInfo } from "$lib/types/device/base";
 import type { NodeRecord } from "$lib/types/nodes/config";
@@ -7,18 +7,17 @@ import { processDeviceHistory } from "../handlers/device";
 import { navigateTo } from "../view/navigation";
 
 /**
- * Retrieves all devices objects from the server with their state and configuration.
- * Processes device data without including images for faster loading.
+ * Retrieves all devices with their initial state and configuration.
+ * Device images are excluded to reduce payload size and improve load time.
  *
- * @returns Object containing array of processed device data.
- * @throws Error if the API request fails.
+ * @returns Object containing an array of processed devices, or null on failure.
  */
-export function getAllDevicesAPI(): APIDescriptor<{ devices: Array<Device> }> {
+export function getAllDevicesAPI(): APIDescriptor<{ devices: Array<Device> } | null> {
     return {
         async call({ signal, timeout } = {}) {
             let devices: Array<Device>;
 
-            const { sucess, data } = await callAPI({
+            const { sucess, data } = await APICaller.callAPI({
                 endpoint: "/api/device/get_all_devices",
                 method: "GET",
                 setLoaded: true,
@@ -32,7 +31,7 @@ export function getAllDevicesAPI(): APIDescriptor<{ devices: Array<Device> }> {
                     return deviceData;
                 }) as Array<Device>;
             } else {
-                throw new Error("Get all devices data error.");
+                return null;
             }
 
             return { devices };
@@ -41,19 +40,18 @@ export function getAllDevicesAPI(): APIDescriptor<{ devices: Array<Device> }> {
 }
 
 /**
- * Retrieves all devices objects from the server.
- * Processes device data and converts base64 images to data URLs.
+ * Retrieves all devices including their associated images.
+ * Converts base64 image data into data URLs mapped by device ID.
  *
- * @returns Object containing processed devices array and device images mapped by ID.
- * @throws Error if the API request fails.
+ * @returns Object containing processed devices and a map of device images, or null on failure.
  */
-export function getAllDevicesWithImageAPI(): APIDescriptor<{ devices: Array<Device>; devicesImages: Record<number, string> }> {
+export function getAllDevicesWithImageAPI(): APIDescriptor<{ devices: Array<Device>; devicesImages: Record<number, string> } | null> {
     return {
         async call({ signal, timeout } = {}) {
             let devices: Array<Device>;
             let devicesImages: Record<number, string> = {};
 
-            const { sucess, data } = await callAPI({
+            const { sucess, data } = await APICaller.callAPI({
                 endpoint: "/api/device/get_all_devices_with_image",
                 method: "GET",
                 setLoaded: true,
@@ -68,7 +66,7 @@ export function getAllDevicesWithImageAPI(): APIDescriptor<{ devices: Array<Devi
                     return deviceData;
                 }) as Array<Device>;
             } else {
-                throw new Error("Get all devices data with images error.");
+                return null;
             }
 
             return { devices, devicesImages };
@@ -77,18 +75,17 @@ export function getAllDevicesWithImageAPI(): APIDescriptor<{ devices: Array<Devi
 }
 
 /**
- * Retrieves a specific device object with state and configuration data.
- * Returns only the initial device data without image information.
+ * Retrieves a single device with its initial configuration and state.
+ * Image data is excluded.
  *
- * @param id - The unique identifier of the device to retrieve.
- * @returns Object containing the initial device data.
- * @throws Error if the API request fails.
+ * @param id - Device identifier.
+ * @returns Object containing initial device data, or null on failure.
  */
-export function getDeviceAPI(id: number): APIDescriptor<{ initialDeviceData: Device }> {
+export function getDeviceAPI(id: number): APIDescriptor<{ initialDeviceData: Device } | null> {
     return {
         async call({ signal, timeout } = {}) {
             let initialDeviceData: Device;
-            const { sucess, data } = await callAPI({
+            const { sucess, data } = await APICaller.callAPI({
                 endpoint: "/api/device/get_device",
                 method: "GET",
                 params: { id },
@@ -100,7 +97,7 @@ export function getDeviceAPI(id: number): APIDescriptor<{ initialDeviceData: Dev
                 const { ...requestDeviceData } = data as Device;
                 initialDeviceData = processInitialDevice(requestDeviceData as Device);
             } else {
-                throw new Error("Get device data error.");
+                return null;
             }
 
             return { initialDeviceData };
@@ -109,20 +106,18 @@ export function getDeviceAPI(id: number): APIDescriptor<{ initialDeviceData: Dev
 }
 
 /**
- * Retrieves detailed device information including processed historical data.
- * Returns device metadata along with its associated history.
+ * Retrieves detailed device metadata along with processed historical data.
  *
- * @param id - The unique identifier of the device to retrieve information for.
- * @returns Object containing the device information and processed history.
- * @throws Error if the API request fails.
+ * @param id - Device identifier.
+ * @returns Object containing device information and history, or null on failure.
  */
-export function getDeviceInfoAPI(id: number): APIDescriptor<{ deviceInfo: DeviceInfo }> {
+export function getDeviceInfoAPI(id: number): APIDescriptor<{ deviceInfo: DeviceInfo } | null> {
     return {
         async call({ signal, timeout } = {}) {
             let deviceInfo: DeviceInfo;
             let deviceHistory: DeviceHistory;
 
-            const { sucess, data } = await callAPI({
+            const { sucess, data } = await APICaller.callAPI({
                 endpoint: "/api/device/get_device_info",
                 method: "GET",
                 params: { id },
@@ -135,7 +130,7 @@ export function getDeviceInfoAPI(id: number): APIDescriptor<{ deviceInfo: Device
                 deviceInfo = requestDeviceInfo as DeviceInfo;
                 deviceInfo.history = processDeviceHistory(deviceHistory);
             } else {
-                throw new Error("Get device information and history error.");
+                return null;
             }
             return { deviceInfo };
         }
@@ -143,19 +138,17 @@ export function getDeviceInfoAPI(id: number): APIDescriptor<{ deviceInfo: Device
 }
 
 /**
- * Retrieves a specific device object with state and configuration data.
- * Returns both the initial device data and an editable version for modifications.
+ * Retrieves a device including its image and editable configuration data.
  *
- * @param id - The unique identifier of the device to retrieve.
- * @returns Object containing initial device data and editable device configuration.
- * @throws Error if the API request fails.
+ * @param id - Device identifier.
+ * @returns Object containing initial and editable device data, or null on failure.
  */
-export function getDeviceWithImageAPI(id: number): APIDescriptor<{ initialDeviceData: Device; deviceData: EditableDevice }> {
+export function getDeviceWithImageAPI(id: number): APIDescriptor<{ initialDeviceData: Device; deviceData: EditableDevice } | null> {
     return {
         async call({ signal, timeout } = {}) {
             let initialDeviceData: Device;
             let deviceData: EditableDevice;
-            const { sucess, data } = await callAPI({
+            const { sucess, data } = await APICaller.callAPI({
                 endpoint: "/api/device/get_device_with_image",
                 method: "GET",
                 params: { id },
@@ -168,7 +161,7 @@ export function getDeviceWithImageAPI(id: number): APIDescriptor<{ initialDevice
                 initialDeviceData = processInitialDevice(requestDeviceData as Device);
                 deviceData = convertToEditableDevice(initialDeviceData, deviceImage);
             } else {
-                throw new Error("Get device data with image error.");
+                return null;
             }
 
             return { initialDeviceData, deviceData };
@@ -177,21 +170,19 @@ export function getDeviceWithImageAPI(id: number): APIDescriptor<{ initialDevice
 }
 
 /**
- * Retrieves detailed information and historical data for a specific device.
- * Returns the device metadata along with its processed history data.
+ * Retrieves detailed device information including image and processed history.
  *
- * @param id - The unique identifier of the device to retrieve information for.
- * @returns Object containing the device information and processed history.
- * @throws Error if the API request fails.
+ * @param id - Device identifier.
+ * @returns Object containing device info and image URL, or null on failure.
  */
-export function getDeviceInfoWithImageAPI(id: number): APIDescriptor<{ deviceInfo: DeviceInfo; deviceImageUrl: string }> {
+export function getDeviceInfoWithImageAPI(id: number): APIDescriptor<{ deviceInfo: DeviceInfo; deviceImageUrl: string } | null> {
     return {
         async call({ signal, timeout } = {}) {
             let deviceInfo: DeviceInfo;
             let deviceHistory: DeviceHistory;
             let deviceImageUrl: string;
 
-            const { sucess, data } = await callAPI({
+            const { sucess, data } = await APICaller.callAPI({
                 endpoint: "/api/device/get_device_info_with_image",
                 method: "GET",
                 params: { id },
@@ -205,7 +196,7 @@ export function getDeviceInfoWithImageAPI(id: number): APIDescriptor<{ deviceInf
                 deviceInfo.history = processDeviceHistory(deviceHistory);
                 deviceImageUrl = `data:${requestDeviceImage["type"]};base64,${requestDeviceImage["data"]}`;
             } else {
-                throw new Error("Get device information and history with image error.");
+                return null;
             }
             return { deviceInfo, deviceImageUrl };
         }
@@ -213,17 +204,16 @@ export function getDeviceInfoWithImageAPI(id: number): APIDescriptor<{ deviceInf
 }
 
 /**
- * Retrieves the default device image from the server.
- * Converts base64 image data to a data URL for display.
+ * Retrieves the system default device image.
+ * Converts the image data into a display-ready data URL.
  *
- * @returns Data URL string of the default device image.
- * @throws Error if the API request fails.
+ * @returns Default device image URL, or null on failure.
  */
-export function getDefaultImageAPI(): APIDescriptor<string> {
+export function getDefaultImageAPI(): APIDescriptor<string | null> {
     return {
         async call({ signal, timeout } = {}) {
             let imageData: Record<string, string>;
-            const { sucess, data } = await callAPI({
+            const { sucess, data } = await APICaller.callAPI({
                 endpoint: "/api/device/get_default_image",
                 method: "GET",
                 setLoaded: true,
@@ -233,7 +223,7 @@ export function getDefaultImageAPI(): APIDescriptor<string> {
             if (sucess) {
                 imageData = data as Record<string, string>;
             } else {
-                throw new Error("Get default device image error.");
+                return null;
             }
             return `data:${imageData["type"]};base64,${imageData["data"]}`;
         }
@@ -251,7 +241,7 @@ export function getDefaultImageAPI(): APIDescriptor<string> {
 export function addDeviceAPI(deviceData: Device, deviceImage: File | undefined, deviceNodes: Array<NodeRecord>): APIDescriptor<void> {
     return {
         async call({ signal, timeout } = {}) {
-            const { sucess, data } = await callAPI({
+            const { sucess, data } = await APICaller.callAPI({
                 endpoint: "/api/device/add_device",
                 method: "POST",
                 params: { device_data: deviceData, device_nodes: deviceNodes },
@@ -278,7 +268,7 @@ export function addDeviceAPI(deviceData: Device, deviceImage: File | undefined, 
 export function editDeviceAPI(deviceData: Device, deviceImage: File | undefined, deviceNodes: Array<NodeRecord>): APIDescriptor<void> {
     return {
         async call({ signal, timeout } = {}) {
-            const { sucess, data } = await callAPI({
+            const { sucess, data } = await APICaller.callAPI({
                 endpoint: "/api/device/edit_device",
                 method: "POST",
                 params: { device_data: deviceData, device_nodes: deviceNodes },
@@ -303,7 +293,7 @@ export function editDeviceAPI(deviceData: Device, deviceImage: File | undefined,
 export function deleteDeviceAPI(deviceID: number): APIDescriptor<void> {
     return {
         async call({ signal, timeout } = {}) {
-            const { sucess, data } = await callAPI({
+            const { sucess, data } = await APICaller.callAPI({
                 endpoint: "/api/device/delete_device",
                 method: "DELETE",
                 params: { id: deviceID },

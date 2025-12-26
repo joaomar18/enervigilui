@@ -1,4 +1,4 @@
-import { callAPI } from "$lib/logic/api/api";
+import { APICaller } from "$lib/logic/api/api";
 import { navigateTo } from "../view/navigation";
 import { validateUsername, validatePassword } from "../validation/auth";
 import { userAuthenticated } from "$lib/stores/view/navigation";
@@ -17,7 +17,7 @@ export function loginUserAPI(username: string, password: string, autoLogin: bool
         async call({ signal, timeout } = {}) {
             const validInputs: boolean = validateUsername(username) && validatePassword(password);
             if (!validInputs) return;
-            const { sucess, data } = await callAPI({
+            const { sucess, data } = await APICaller.callAPI({
                 endpoint: "/api/auth/login",
                 method: "POST",
                 params: {
@@ -51,7 +51,7 @@ export function loginUserAPI(username: string, password: string, autoLogin: bool
 export function autoLoginAPI(): APIDescriptor<{ sucess: boolean }> {
     return {
         async call({ signal, timeout } = {}) {
-            const { sucess } = await callAPI({
+            const { sucess } = await APICaller.callAPI({
                 endpoint: "/api/auth/auto_login",
                 method: "POST",
                 signal,
@@ -70,7 +70,7 @@ export function autoLoginAPI(): APIDescriptor<{ sucess: boolean }> {
 export function logoutUserAPI(): APIDescriptor<void> {
     return {
         async call({ signal, timeout } = {}) {
-            const { sucess, data } = await callAPI({
+            const { sucess, data } = await APICaller.callAPI({
                 endpoint: "/api/auth/logout",
                 method: "POST",
                 signal,

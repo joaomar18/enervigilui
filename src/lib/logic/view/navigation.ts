@@ -3,6 +3,8 @@ import { get } from "svelte/store";
 import { autoLoginAPI } from "../api/auth";
 import { selectedLang } from "$lib/stores/lang/definition";
 import { currentDeviceID } from "$lib/stores/device/current";
+import { closeToast, showToast } from "./toast";
+import { AlertType } from "$lib/stores/view/toast";
 
 // Splash screen store
 import {
@@ -15,6 +17,8 @@ import {
     subLoaderTimer,
     resetSubLoaderSubscription,
     hasMouseCapability,
+    uiSynchronized,
+    latestAPIMessage,
 } from "../../stores/view/navigation";
 
 /**
@@ -206,21 +210,32 @@ export function resolveNavigationRedirect(url: URL, authenticated: boolean): { s
 /**
  * Synchronizes client-side UI state with the current router URL.
  *
- * Updates page-related stores (current page, device context, and search state)
- * after navigation and ensures internal UI state remains consistent with the
- * active client-side route.
+ * Re-applies pending API messages after navigation, updates page-level
+ * stores (current page, device context, and search query), and ensures
+ * UI state remains consistent with the active client-side route.
  *
- * This function performs no navigation or access control and assumes routing
- * decisions have already been resolved by client-side navigation logic.
+ * Intended to be called after navigation has completed. This function
+ * performs no routing or access control logic.
  *
- * @param url - Current URL active in the client router.
+ * @param url - The current URL active in the client router.
  */
 export async function syncUIState(url: URL): Promise<void> {
+    uiSynchronized.set(false);
+
+    const message = get(latestAPIMessage);
+    if (message !== null) {
+        showToast(message.code, AlertType.ALERT, message.details, message.textList, message.autoClose);
+    } else {
+        closeToast();
+    }
+
+    latestAPIMessage.set(null);
     currentDeviceID.set(getDeviceID());
     updateSearchQuery(url);
     currentPage.set(url.pathname);
-}
 
+    uiSynchronized.set(true);
+}
 
 /**
  * Checks if the current page is an authentication page.

@@ -127,14 +127,19 @@
             return;
         }
         energyConsumptionFetched = false;
-        ({ energyLogs, mergedPoints, mergedGlobalMetrics } = await getEnergyConsumptionAPI(
+        let result = await getEnergyConsumptionAPI(
             deviceId,
             selectedElectricalPhase,
             selectedEnergyDirection,
             initialDate !== null,
             initialDate,
             endDate,
-        ).call({ timeout: 5000 }));
+        ).call({ timeout: 5000 });
+        if (result !== null) {
+            energyLogs = result.energyLogs;
+            mergedPoints = result.mergedPoints;
+            mergedGlobalMetrics = result.mergedGlobalMetrics;
+        }
         energyConsumptionFetched = true;
         energyConsumptionFirstFetch = true;
     }

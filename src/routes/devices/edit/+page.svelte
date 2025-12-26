@@ -82,13 +82,14 @@
     onMount(() => {
         resetDashboardLoader();
         let deviceId = getDeviceID();
-        let deviceDataRetrier: APIRetrier<{ initialDeviceData: Device; deviceData: EditableDevice }> | null;
-        let nodesConfigRetrier: APIRetrier<{ initialNodes: Array<NodeRecord>; nodes: Array<EditableNodeRecord> }> | null;
+        let deviceDataRetrier: APIRetrier<{ initialDeviceData: Device; deviceData: EditableDevice } | null> | null;
+        let nodesConfigRetrier: APIRetrier<{ initialNodes: Array<NodeRecord>; nodes: Array<EditableNodeRecord> } | null> | null;
 
         if (deviceId) {
             deviceDataRetrier = new APIRetrier(
                 getDeviceWithImageAPI(deviceId),
                 (result) => {
+                    if (result === null) return;
                     initialDeviceData = result.initialDeviceData;
                     deviceData = result.deviceData;
                 },
@@ -97,6 +98,7 @@
             nodesConfigRetrier = new APIRetrier(
                 getDeviceNodesConfigAPI(deviceId),
                 (result) => {
+                    if (result === null) return;
                     initialNodes = result.initialNodes;
                     nodes = result.nodes;
                     setTimeout(() => {

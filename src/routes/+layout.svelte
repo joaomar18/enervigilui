@@ -31,7 +31,6 @@
 
     afterNavigate(({ to }) => {
         if (!to) return;
-        closeToast();
         syncUIState(to.url);
     });
 </script>

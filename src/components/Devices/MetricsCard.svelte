@@ -80,7 +80,8 @@
         }
         metricsFetched = false;
         for (const metric of Object.keys(expandedState)) {
-            metricsData[metric] = await mapMetricsAPI(metric, deviceId, selectedElectricalPhase, initialDate, endDate);
+            let result = await mapMetricsAPI(metric, deviceId, selectedElectricalPhase, initialDate, endDate);
+            if (result !== null) metricsData[metric] = result;
         }
         metricsFetched = true;
         metricsFirstFetch = true;

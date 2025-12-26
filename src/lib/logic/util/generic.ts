@@ -31,6 +31,17 @@ export function roundToDecimalPlaces(value: number | null | undefined, decimals:
 }
 
 /**
+ * Returns a new record with the specified keys removed.
+ *
+ * @param source - Original key-value record
+ * @param keysToRemove - List of keys to exclude
+ * @returns A new record without the specified keys
+ */
+export function removeKeysFromRecord(source: Record<string, string>, keysToRemove: Array<string>): Record<string, string> {
+    return Object.fromEntries(Object.entries(source).filter(([key]) => !keysToRemove.includes(key)));
+}
+
+/**
  * Deeply compares two values for structural equality.
  *
  * @param a - First value to compare.

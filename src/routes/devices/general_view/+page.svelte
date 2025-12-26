@@ -57,12 +57,13 @@
             meterType: MeterType;
             nodesState: Record<string, NodeState>;
             processedNodesState: Array<ProcessedNodeState>;
-        }> | null;
+        } | null> | null;
 
         if (deviceId) {
             nodesStatePoller = new APIPoller(
                 getDeviceNodesStateAPI(deviceId),
                 (result) => {
+                    if (result === null) return;
                     meterType = result.meterType;
                     nodesState = result.nodesState;
                     processedNodesState = result.processedNodesState;

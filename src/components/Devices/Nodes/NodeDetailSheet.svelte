@@ -201,7 +201,8 @@
             return;
         }
         nodeAddInfoFetched = false;
-        ({ nodeAdditionalInfo } = await getNodeAdditionalInfoAPI(deviceId, nodeState.name, nodeState.phase).call({ timeout: 5000 }));
+        let result = await getNodeAdditionalInfoAPI(deviceId, nodeState.name, nodeState.phase).call({ timeout: 5000 });
+        if (result !== null) nodeAdditionalInfo = result.nodeAdditionalInfo;
         nodeAddInfoFetched = true;
         nodeAddInfoFirstFetch = true;
     }
@@ -260,9 +261,8 @@
             return;
         }
         nodeLogsFetched = false;
-        ({ nodeLogs } = await getNodeLogsAPI(deviceId, nodeState.name, nodeState.phase, initialDate !== null, initialDate, endDate).call({
-            timeout: 5000,
-        }));
+        let result = await getNodeLogsAPI(deviceId, nodeState.name, nodeState.phase, initialDate !== null, initialDate, endDate).call({ timeout: 5000 });
+        if (result !== null) nodeLogs = result.nodeLogs;
         nodeLogsFetched = true;
         nodeLogsFirstFetch = true;
     }

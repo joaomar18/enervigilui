@@ -43,11 +43,12 @@
     // Mount function to poll devices status
     onMount(() => {
         resetDashboardLoader();
-        let devicesPoller: APIPoller<{ devices: Array<Device> }> | null = null;
+        let devicesPoller: APIPoller<{ devices: Array<Device> } | null> | null = null;
 
-        let devicesWithImagesPoller: APIPoller<{ devices: Array<Device>; devicesImages: Record<number, string> }> | null = new APIPoller(
+        let devicesWithImagesPoller: APIPoller<{ devices: Array<Device>; devicesImages: Record<number, string> } | null> | null = new APIPoller(
             getAllDevicesWithImageAPI(),
             (result) => {
+                if (result === null) return;
                 devices = result.devices;
                 devicesImages = result.devicesImages;
 
@@ -56,6 +57,7 @@
                 devicesPoller = new APIPoller(
                     getAllDevicesAPI(),
                     (result) => {
+                        if (result === null) return;
                         devices = result.devices;
                     },
                     5000,

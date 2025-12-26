@@ -52,11 +52,10 @@ export function convertDateToLocalDate(date: string | null): string | null {
 
 /**
  * Converts a date string to a localized time string based on the selected language.
- * @param date - ISO date string or undefined.
- * @returns Localized time string (e.g., "14:30") or null if input is undefined.
+ * @param date - ISO date string.
+ * @returns Localized time string (e.g., "14:30").
  */
-export function convertDateToLocalTime(date: string | undefined): string | null {
-    if (date === undefined) return null;
+export function convertDateToLocalTime(date: string): string {
     let newDate = new Date(date);
     const localTime = newDate.toLocaleTimeString(get(selectedLang) === "PT" ? "pt-PT" : "en-US", {
         hour: "2-digit",
