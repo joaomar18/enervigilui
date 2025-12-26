@@ -275,7 +275,8 @@ export class APICaller {
             return { sucess: false, data: null };
         }
         finally {
-            APICaller.#inFlight.delete(endpoint);
+            const current = APICaller.#inFlight.get(endpoint);
+            if (current === abortController) APICaller.#inFlight.delete(endpoint);
         }
     }
 

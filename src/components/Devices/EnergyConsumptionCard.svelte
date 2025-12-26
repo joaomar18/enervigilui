@@ -183,6 +183,10 @@
 
     onDestroy(() => {
         window.removeEventListener("resize", handleWindowResize);
+        if (nextRequestTimeout !== null) {
+            clearTimeout(nextRequestTimeout);
+            nextRequestTimeout = null;
+        }
     });
 </script>
 

@@ -124,6 +124,10 @@
 
     onDestroy(() => {
         window.removeEventListener("resize", getMobileView);
+        if (nextRequestTimeout !== null) {
+            clearTimeout(nextRequestTimeout);
+            nextRequestTimeout = null;
+        }
     });
 </script>
 
