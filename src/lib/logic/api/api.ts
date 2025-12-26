@@ -352,12 +352,12 @@ export class APICaller {
      */
     private static getAPIMessageCode(apiResult: APIResult): { code: string, details: Record<string, string>, textList: AlertTextList, autoClose: boolean } {
 
-        if (apiResult.kind === "aborted") return { code: "timeoutError", details: {}, textList: "general", autoClose: false };
-        if (apiResult.kind === "exception") return { code: "unexpectedError", details: { message: apiResult.message }, textList: "general", autoClose: false };
+        if (apiResult.kind === "aborted") return { code: "timeoutError", details: {}, textList: "general", autoClose: true };
+        if (apiResult.kind === "exception") return { code: "unexpectedError", details: { message: apiResult.message }, textList: "general", autoClose: true };
         let errorCode: string | undefined = apiResult.data?.error_code;
         let errorSection: string | undefined = apiResult.data?.error_section;
         let details = removeKeysFromRecord(apiResult.data, ["error_code", "error_section"]);
-        if (!errorCode) return { code: "unexpectedError", details: { message: "Got an undefined error code." }, textList: "general", autoClose: false };
+        if (!errorCode) return { code: "unexpectedError", details: { message: "Got an undefined error code." }, textList: "general", autoClose: true };
         if (details?.unlocked_date != undefined) {
             details.unlocked_date = convertDateToLocalTime(details?.unlocked_date);
             if (details?.remaining_attempts != undefined && details?.remaining_attempts == "0") {
@@ -379,7 +379,7 @@ export class APICaller {
                 textList = "apiNodes";
                 break;
             default:
-                return { code: "unexpectedError", details: { message: "Got an unknown error section." }, textList: "general", autoClose: false };
+                return { code: "unexpectedError", details: { message: "Got an unknown error section." }, textList: "general", autoClose: true };
         }
         let autoClose = apiResult.status !== 401 && apiResult.status !== 429;
         return { code: errorCode, details, textList, autoClose };
