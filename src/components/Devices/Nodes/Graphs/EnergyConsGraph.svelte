@@ -3,6 +3,7 @@
     import { BaseGraphObject } from "$lib/logic/view/graph/base";
     import { FormattedTimeStep } from "$lib/types/date";
     import { LogSpanPeriod, SelectablePhaseFilter, EnergyDirectionFilter } from "$lib/types/view/nodes";
+    import { checkLogsAreDifferent } from "$lib/logic/util/nodes";
     import { GraphType } from "$lib/logic/view/graph/base";
     import { getGraphStyle } from "$lib/logic/view/graph/helpers";
     import BaseGraph from "./BaseGraph.svelte";
@@ -56,6 +57,7 @@
     $: mergedStyle = effectiveStyle;
 
     // Variables
+    let currentData: Array<ProcessedEnergyConsumptionLogPoint> | undefined;
     let graphContainer: HTMLDivElement;
     let gridElement: HTMLDivElement | null = null;
     let graph: EnergyConsumptionGraphObject | null = null;
@@ -73,7 +75,9 @@
         });
     }
 
-    $: if (graph && dataFetched && data && timeStep && $selectedLang) {
+    $: if (checkLogsAreDifferent(data, currentData)) currentData = data;
+
+    $: if (graph && currentData && timeStep && $selectedLang) {
         updateGraphData();
     }
 
@@ -100,16 +104,16 @@
                 hoveredLogPointChange,
                 mousePositionChange,
                 gridDoubleClick,
-                data ? (data as ProcessedEnergyConsumptionLogPoint[]) : undefined,
+                currentData ? (currentData as ProcessedEnergyConsumptionLogPoint[]) : undefined,
             );
             Object.assign(mergedStyle, getGraphStyle(GraphType.EnergyConsumption));
         });
     }
 
     function updateGraphData(): void {
-        if (graph && data && timeStep) {
+        if (graph && currentData && timeStep) {
             graph.destroy();
-            graph.updatePoints(data, true, { activeEnergyDecimalPlaces, reactiveEnergyDecimalPlaces, powerFactorDecimalPlaces });
+            graph.updatePoints(currentData, true, { activeEnergyDecimalPlaces, reactiveEnergyDecimalPlaces, powerFactorDecimalPlaces });
             graph.createGraph(timeStep, selectedTimeSpan, mergedStyle);
             gridElement = graph.getGridElement();
             graphCreated = true;
