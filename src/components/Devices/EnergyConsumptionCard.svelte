@@ -5,7 +5,7 @@
     import { NodePhase } from "$lib/types/nodes/base";
     import { EnergyDirectionFilter, LogSpanPeriod, SelectablePhaseFilter, type EnergyConsumptionTimeSpan } from "$lib/types/view/nodes";
     import { getTimeSpanFromLogPeriod } from "$lib/logic/util/date";
-    import { getEnergyConsumption } from "$lib/logic/api/nodes";
+    import { getEnergyConsumptionAPI } from "$lib/logic/api/nodes";
     import Action from "../General/Action.svelte";
     import ContentCard from "../General/ContentCard.svelte";
     import EnergyConsGraph from "./Nodes/Graphs/EnergyConsGraph.svelte";
@@ -127,14 +127,14 @@
             return;
         }
         energyConsumptionFetched = false;
-        ({ energyLogs, mergedPoints, mergedGlobalMetrics } = await getEnergyConsumption(
+        ({ energyLogs, mergedPoints, mergedGlobalMetrics } = await getEnergyConsumptionAPI(
             deviceId,
             selectedElectricalPhase,
             selectedEnergyDirection,
             initialDate !== null,
             initialDate,
             endDate,
-        ));
+        ).call({ timeout: 5000 }));
         energyConsumptionFetched = true;
         energyConsumptionFirstFetch = true;
     }

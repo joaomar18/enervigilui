@@ -2,6 +2,7 @@ import { callAPI } from "$lib/logic/api/api";
 import { navigateTo } from "../view/navigation";
 import { validateUsername, validatePassword } from "../validation/auth";
 import { userAuthenticated } from "$lib/stores/view/navigation";
+import type { APIDescriptor } from "$lib/logic/api/api";
 
 /**
  * Authenticates user with username and password credentials.
@@ -11,21 +12,28 @@ import { userAuthenticated } from "$lib/stores/view/navigation";
  * @param password - User's password for authentication.
  * @param autoLogin - Whether to enable automatic login for future sessions.
  */
-export async function loginUser(username: string, password: string, autoLogin: boolean) {
-    const validInputs: boolean = validateUsername(username) && validatePassword(password);
-    if (!validInputs) return;
-    const { sucess, data } = await callAPI({
-        endpoint: "/api/auth/login",
-        method: "POST",
-        params: {
-            username,
-            password,
-            auto_login: autoLogin,
-        },
-    });
-    userAuthenticated.set(sucess);
-    if (sucess) {
-        await navigateTo("/devices", {}, true, true); // Navigate to the dashboard on success
+export function loginUserAPI(username: string, password: string, autoLogin: boolean): APIDescriptor<void> {
+    return {
+        async call({ signal, timeout } = {}) {
+            const validInputs: boolean = validateUsername(username) && validatePassword(password);
+            if (!validInputs) return;
+            const { sucess, data } = await callAPI({
+                endpoint: "/api/auth/login",
+                method: "POST",
+                params: {
+                    username,
+                    password,
+                    auto_login: autoLogin,
+                },
+                signal,
+                timeout,
+            });
+            userAuthenticated.set(sucess);
+            if (sucess) {
+                await navigateTo("/devices", {}, true, true); // Navigate to the dashboard on success
+            }
+
+        }
     }
 }
 
@@ -40,26 +48,38 @@ export async function loginUser(username: string, password: string, autoLogin: b
  *
  * @returns Object indicating whether the session is authenticated.
  */
-export async function autoLogin(): Promise<{ sucess: boolean }> {
-    const { sucess, data } = await callAPI({
-        endpoint: "/api/auth/auto_login",
-        method: "POST",
-    });
-    userAuthenticated.set(sucess);
-    return { sucess };
+export function autoLoginAPI(): APIDescriptor<{ sucess: boolean }> {
+    return {
+        async call({ signal, timeout } = {}) {
+            const { sucess } = await callAPI({
+                endpoint: "/api/auth/auto_login",
+                method: "POST",
+                signal,
+                timeout
+            });
+            userAuthenticated.set(sucess);
+            return { sucess };
+        }
+    };
 }
 
 /**
  * Logs out the current user and redirects to login page.
  * Sends logout request to server and navigates to login on success.
  */
-export async function logoutUser() {
-    const { sucess, data } = await callAPI({
-        endpoint: "/api/auth/logout",
-        method: "POST",
-    });
-    if (sucess) {
-        userAuthenticated.set(false);
-        await navigateTo("/login", {}, true, true);
+export function logoutUserAPI(): APIDescriptor<void> {
+    return {
+        async call({ signal, timeout } = {}) {
+            const { sucess, data } = await callAPI({
+                endpoint: "/api/auth/logout",
+                method: "POST",
+                signal,
+                timeout,
+            });
+            if (sucess) {
+                userAuthenticated.set(false);
+                await navigateTo("/login", {}, true, true);
+            }
+        }
     }
 }

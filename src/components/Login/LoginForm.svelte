@@ -1,5 +1,5 @@
 <script lang="ts">
-    import { loginUser } from "$lib/logic/api/auth";
+    import { loginUserAPI } from "$lib/logic/api/auth";
     import { validateUsername, validatePassword } from "$lib/logic/validation/auth";
     import FormAlert from "../General/FormAlert.svelte";
     import LoginField from "./LoginField.svelte";
@@ -61,7 +61,7 @@
     async function login(): Promise<void> {
         loginAttempt = true;
         loginProcessing = true;
-        await loginUser(username, password, autoLogin);
+        await loginUserAPI(username, password, autoLogin).call({ timeout: 5000 });
         loginProcessing = false;
     }
 

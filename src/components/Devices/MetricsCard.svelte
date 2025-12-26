@@ -5,7 +5,7 @@
     import ToolTipText from "../General/ToolTipText.svelte";
     import EnergyPickers from "../General/Pickers/EnergyPickers.svelte";
     import ExpandableSection from "../General/ExpandableSection.svelte";
-    import { mapMetricAPI } from "$lib/logic/api/nodes";
+    import { mapMetricsAPI } from "$lib/logic/api/nodes";
     import { getTimeSpanFromLogPeriod } from "$lib/logic/util/date";
     import { LogSpanPeriod } from "$lib/types/view/nodes";
     import { SelectablePhaseFilter } from "$lib/types/view/nodes";
@@ -80,7 +80,7 @@
         }
         metricsFetched = false;
         for (const metric of Object.keys(expandedState)) {
-            metricsData[metric] = await mapMetricAPI(metric, deviceId, selectedElectricalPhase, initialDate, endDate);
+            metricsData[metric] = await mapMetricsAPI(metric, deviceId, selectedElectricalPhase, initialDate, endDate);
         }
         metricsFetched = true;
         metricsFirstFetch = true;

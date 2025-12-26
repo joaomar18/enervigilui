@@ -2,9 +2,9 @@
     import { getDeviceID, resetDashboardLoader } from "$lib/logic/view/navigation";
     import { fade } from "svelte/transition";
     import { onMount } from "svelte";
-    import { MethodPoller } from "$lib/logic/api/poller";
+    import { APIPoller } from "$lib/logic/api/poller";
     import { NodePhase } from "$lib/types/nodes/base";
-    import { getDeviceNodesState } from "$lib/logic/api/nodes";
+    import { getDeviceNodesStateAPI } from "$lib/logic/api/nodes";
     import { showToast } from "$lib/logic/view/toast";
     import { AlertType } from "$lib/stores/view/toast";
     import { nodePhaseSections } from "$lib/types/nodes/base";
@@ -53,11 +53,22 @@
     onMount(() => {
         resetDashboardLoader();
         let deviceId = getDeviceID();
-        let nodesStatePoller: MethodPoller | null;
+        let nodesStatePoller: APIPoller<{
+            meterType: MeterType;
+            nodesState: Record<string, NodeState>;
+            processedNodesState: Array<ProcessedNodeState>;
+        }> | null;
+
         if (deviceId) {
-            nodesStatePoller = new MethodPoller(async (signal) => {
-                ({ meterType, nodesState, processedNodesState } = await getDeviceNodesState(deviceId));
-            }, 5000);
+            nodesStatePoller = new APIPoller(
+                getDeviceNodesStateAPI(deviceId),
+                (result) => {
+                    meterType = result.meterType;
+                    nodesState = result.nodesState;
+                    processedNodesState = result.processedNodesState;
+                },
+                5000,
+            );
         } else {
             showToast("errorEditDeviceParams", AlertType.ALERT);
             loadedDone.set(true);

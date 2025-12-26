@@ -4,9 +4,9 @@
     import DeviceCard from "../../components/Devices/DeviceCard.svelte";
     import AddDevice from "../../components/Devices/AddDevice.svelte";
     import { navigateTo, resetDashboardLoader } from "$lib/logic/view/navigation";
-    import { getAllDevices, getAllDevicesWithImage } from "$lib/logic/api/device";
+    import { getAllDevicesAPI, getAllDevicesWithImageAPI } from "$lib/logic/api/device";
     import { filterDevices } from "$lib/logic/util/device";
-    import { MethodPoller } from "$lib/logic/api/poller";
+    import { APIPoller } from "$lib/logic/api/poller";
 
     // Stores
     import { searchQuery } from "$lib/stores/view/navigation";
@@ -43,21 +43,27 @@
     // Mount function to poll devices status
     onMount(() => {
         resetDashboardLoader();
-        let devicesPoller: MethodPoller | null = null;
-        let devicesWithImagesPoller: MethodPoller | null = new MethodPoller(async (signal) => {
-            ({ devices, devicesImages } = await getAllDevicesWithImage());
+        let devicesPoller: APIPoller<{ devices: Array<Device> }> | null = null;
 
-            // Stop images polling and start devices polling
-            devicesWithImagesPoller?.stop();
-            devicesWithImagesPoller = null;
-            devicesPoller = new MethodPoller(
-                async (signal) => {
-                    ({ devices } = await getAllDevices());
-                },
-                3000,
-                false,
-            );
-        }, 3000);
+        let devicesWithImagesPoller: APIPoller<{ devices: Array<Device>; devicesImages: Record<number, string> }> | null = new APIPoller(
+            getAllDevicesWithImageAPI(),
+            (result) => {
+                devices = result.devices;
+                devicesImages = result.devicesImages;
+
+                devicesWithImagesPoller?.stop();
+                devicesWithImagesPoller = null;
+                devicesPoller = new APIPoller(
+                    getAllDevicesAPI(),
+                    (result) => {
+                        devices = result.devices;
+                    },
+                    5000,
+                    false,
+                );
+            },
+            5000,
+        );
 
         //Clean-up logic
         return () => {

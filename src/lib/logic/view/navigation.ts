@@ -1,6 +1,6 @@
 import { goto } from "$app/navigation";
 import { get } from "svelte/store";
-import { autoLogin } from "../api/auth";
+import { autoLoginAPI } from "../api/auth";
 import { selectedLang } from "$lib/stores/lang/definition";
 import { currentDeviceID } from "$lib/stores/device/current";
 
@@ -335,7 +335,7 @@ export function checkClientHasMouse() {
 export async function initializeClientLayout(minSplashDuration: number = 300, showSubLoaderTime: number = 600) {
 
     checkClientHasMouse();
-    const checkAutoLoginPromise = autoLogin();
+    const checkAutoLoginPromise = autoLoginAPI().call({ timeout: 5000 });
     const minTimePromise = new Promise((res) => setTimeout(res, minSplashDuration));
     resetDashboardLoader(showSubLoaderTime);
     const [authResult] = await Promise.all([checkAutoLoginPromise, minTimePromise]);

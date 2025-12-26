@@ -1,6 +1,6 @@
 <script lang="ts">
     import { navigateTo } from "$lib/logic/view/navigation";
-    import { logoutUser } from "$lib/logic/api/auth";
+    import { logoutUserAPI } from "$lib/logic/api/auth";
     import Action from "../General/Action.svelte";
     import SearchBar from "./SearchBar.svelte";
     import Notification from "../General/Notification.svelte";
@@ -58,7 +58,7 @@
                 imageUrl="/img/logout.svg"
                 enableToolTip={true}
                 onClick={async () => {
-                    await logoutUser();
+                    await logoutUserAPI().call({ timeout: 5000 });
                 }}
             >
                 <div slot="tooltip"><ToolTipText text={$texts.logout} /></div>

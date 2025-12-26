@@ -1,5 +1,7 @@
+import type { APIDescriptor } from "./api";
+
 /**
- * A retry utility that executes a method with exponential backoff until success or maximum interval reached.
+ * A retry utility that executes an API with exponential backoff until success or maximum interval reached.
  *
  * Key features:
  * - Exponential backoff with configurable factor and maximum interval
@@ -9,8 +11,9 @@
  * - Resource cleanup and lifecycle management
  * - Dynamic interval adjustment during runtime
  */
-export class MethodRetrier {
-    #fn: (signal?: AbortSignal) => Promise<void> | void;
+export class APIRetrier<T> {
+    #api: APIDescriptor<T> | null = null;
+    #callback: (result: T) => void;
     #interval: number;
     #backoffFactor: number;
     #maxIntervalMs: number;
@@ -18,16 +21,18 @@ export class MethodRetrier {
     #inFlight: boolean;
     #destroyed: boolean;
     #timer: ReturnType<typeof setTimeout> | null;
-    #abort: AbortController | null = null;
+    #controller: AbortController | null = null;
 
     constructor(
-        method_call: (signal?: AbortSignal) => Promise<void> | void,
+        api: APIDescriptor<T>,
+        callback: (result: T) => void,
         interval: number,
         backoffFactor: number = 1.3,
         maxIntervalMs: number = 30000,
         immediate: boolean = true
     ) {
-        this.#fn = method_call;
+        this.#api = api;
+        this.#callback = callback;
         this.#interval = interval;
         this.#backoffFactor = backoffFactor;
         this.#maxIntervalMs = maxIntervalMs;
@@ -35,7 +40,7 @@ export class MethodRetrier {
         this.#inFlight = false;
         this.#destroyed = false;
         this.#timer = null;
-        this.#abort = null;
+        this.#controller = null;
         this.start(immediate);
     }
 
@@ -47,7 +52,7 @@ export class MethodRetrier {
      */
     start(immediate: boolean = true) {
         if (this.#destroyed) {
-            throw new Error("Method Retrier is destroyed");
+            throw new Error("API Retrier is destroyed");
         }
         this.stop(false); // Clear previous timers without destroying
         immediate ? this.#run() : this.#schedule();
@@ -63,12 +68,12 @@ export class MethodRetrier {
             clearTimeout(this.#timer);
         }
         this.#timer = null;
-        this.#abort?.abort();
-        this.#abort = null;
+        this.#controller?.abort();
+        this.#controller = null;
 
         if (destroy) {
             this.#destroyed = true;
-            this.#fn = (() => {}) as any;
+            this.#api = null;
         }
     }
 
@@ -78,26 +83,24 @@ export class MethodRetrier {
     async #run() {
         let sucess = false;
 
-        if (this.#destroyed) {
-            return;
-        }
-        if (this.#inFlight) {
-            this.#schedule();
+        if (this.#destroyed || !this.#api || this.#inFlight) {
             return;
         }
 
         this.#inFlight = true;
-        this.#abort = new AbortController();
+        this.#controller = new AbortController();
+        if (!this.#currentInterval) this.#currentInterval = this.#interval;
 
         try {
-            await this.#fn(this.#abort.signal);
+            let result = await this.#api.call({ timeout: this.#currentInterval, signal: this.#controller.signal });
+            this.#callback(result);
             sucess = true;
         } catch (e) {
             if ((e as any)?.name !== "AbortError") {
-                console.error("Error in Method Retrier: ", e);
+                console.error("Error in API Retrier: ", e);
             }
         } finally {
-            this.#abort = null;
+            this.#controller = null;
             this.#inFlight = false;
             sucess ? this.stop() : this.#schedule();
         }
@@ -132,7 +135,7 @@ export class MethodRetrier {
      */
     setInterval(ms: number) {
         if (this.#destroyed) {
-            throw new Error("Method Retrier is destroyed");
+            throw new Error("API Retrier is destroyed");
         }
         this.#interval = ms;
         this.#currentInterval = 0;

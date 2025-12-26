@@ -1,6 +1,6 @@
 import { callAPI } from "$lib/logic/api/api";
+import type { APIDescriptor } from "$lib/logic/api/api";
 import { processInitialNodes, initNodes, processNodesState, processNodeLogs, mergeEnergyConsumptionLogs } from "../factory/nodes";
-import { navigateTo } from "../view/navigation";
 import { NodePhase } from "$lib/types/nodes/base";
 import { addPrefix, getNodePrefix, removePrefix } from "../util/nodes";
 import { toISOStringLocal } from "../util/date";
@@ -20,29 +20,33 @@ import type { MeterType } from "$lib/types/device/base";
  * @returns A promise resolving to an object containing the initial DeviceNode array and the processed EditableDeviceNode array.
  * @throws Error if the API call fails.
  */
-export async function getDeviceNodesConfig(id: number): Promise<{ initialNodes: Array<NodeRecord>; nodes: Array<EditableNodeRecord> }> {
-    let initialNodes: Array<NodeRecord> = [];
-    let nodes: Array<EditableNodeRecord> = [];
-    const { sucess, data } = await callAPI({
-        endpoint: "/api/nodes/get_nodes_config",
-        method: "GET",
-        params: { id },
-    });
+export function getDeviceNodesConfigAPI(id: number): APIDescriptor<{ initialNodes: Array<NodeRecord>; nodes: Array<EditableNodeRecord> }> {
+    return {
+        async call({ signal, timeout } = {}) {
+            let initialNodes: Array<NodeRecord> = [];
+            let nodes: Array<EditableNodeRecord> = [];
+            const { sucess, data } = await callAPI({
+                endpoint: "/api/nodes/get_nodes_config",
+                method: "GET",
+                params: { id },
+                signal,
+                timeout,
+            });
 
-    if (sucess) {
-        let requestDeviceNodes: Record<string, NodeRecord> = data;
-        initialNodes = processInitialNodes(Object.values(requestDeviceNodes) as Array<NodeRecord>);
-        const { sucess, editableNodes } = initNodes(initialNodes);
-        if (sucess) {
-            nodes = editableNodes;
-        } else {
-            await navigateTo("/devices");
+            if (sucess) {
+                let requestDeviceNodes: Record<string, NodeRecord> = data;
+                initialNodes = processInitialNodes(Object.values(requestDeviceNodes) as Array<NodeRecord>);
+                const { sucess, editableNodes } = initNodes(initialNodes);
+                if (sucess) {
+                    nodes = editableNodes;
+                }
+            } else {
+                throw new Error("Get device nodes configuration error.");
+            }
+
+            return { initialNodes, nodes };
         }
-    } else {
-        throw new Error("Get device nodes config error");
-    }
-
-    return { initialNodes, nodes };
+    };
 }
 
 /**
@@ -53,27 +57,33 @@ export async function getDeviceNodesConfig(id: number): Promise<{ initialNodes: 
  * @returns A promise resolving to an object containing the raw nodes state record and processed nodes state array.
  * @throws Error if the API call fails.
  */
-export async function getDeviceNodesState(
+export function getDeviceNodesStateAPI(
     id: number
-): Promise<{ meterType: MeterType; nodesState: Record<string, NodeState>; processedNodesState: Array<ProcessedNodeState> }> {
-    let meter_type: MeterType;
-    let nodes_state: Record<string, NodeState>;
-    let processedNodesState: Array<ProcessedNodeState>;
-    const { sucess, data } = await callAPI({
-        endpoint: "/api/nodes/get_nodes_state",
-        method: "GET",
-        params: { id },
-        setLoaded: true,
-    });
+): APIDescriptor<{ meterType: MeterType; nodesState: Record<string, NodeState>; processedNodesState: Array<ProcessedNodeState> }> {
+    return {
+        async call({ signal, timeout } = {}) {
+            let meter_type: MeterType;
+            let nodes_state: Record<string, NodeState>;
+            let processedNodesState: Array<ProcessedNodeState>;
+            const { sucess, data } = await callAPI({
+                endpoint: "/api/nodes/get_nodes_state",
+                method: "GET",
+                params: { id },
+                setLoaded: true,
+                signal,
+                timeout,
+            });
 
-    if (sucess) {
-        ({ meter_type, nodes_state } = data as { meter_type: MeterType; nodes_state: Record<string, NodeState> });
-        processedNodesState = processNodesState(nodes_state);
-    } else {
-        throw new Error("Get device nodes state error");
-    }
+            if (sucess) {
+                ({ meter_type, nodes_state } = data as { meter_type: MeterType; nodes_state: Record<string, NodeState> });
+                processedNodesState = processNodesState(nodes_state);
+            } else {
+                throw new Error("Get device nodes real time state error.");
+            }
 
-    return { meterType: meter_type, nodesState: nodes_state, processedNodesState };
+            return { meterType: meter_type, nodesState: nodes_state, processedNodesState };
+        }
+    };
 }
 
 /**
@@ -86,28 +96,34 @@ export async function getDeviceNodesState(
  * @returns A promise resolving to an object containing the node's additional information
  * @throws Error if the API call fails
  */
-export async function getNodeAdditionalInfo(
+export function getNodeAdditionalInfoAPI(
     id: number,
     nodeName: string,
     nodePhase: NodePhase
-): Promise<{ nodeAdditionalInfo: BaseNodeAdditionalInfo }> {
-    let nodeAdditionalInfo: BaseNodeAdditionalInfo;
-    const prefix = getNodePrefix(nodePhase);
-    const processedName = addPrefix(removePrefix(nodeName), prefix);
+): APIDescriptor<{ nodeAdditionalInfo: BaseNodeAdditionalInfo }> {
+    return {
+        async call({ signal, timeout } = {}) {
+            let nodeAdditionalInfo: BaseNodeAdditionalInfo;
+            const prefix = getNodePrefix(nodePhase);
+            const processedName = addPrefix(removePrefix(nodeName), prefix);
 
-    const { sucess, data } = await callAPI({
-        endpoint: "/api/nodes/get_node_additional_info",
-        method: "GET",
-        params: { id, node_name: processedName },
-    });
+            const { sucess, data } = await callAPI({
+                endpoint: "/api/nodes/get_node_additional_info",
+                method: "GET",
+                params: { id, node_name: processedName },
+                signal,
+                timeout,
+            });
 
-    if (sucess) {
-        nodeAdditionalInfo = data as BaseNodeAdditionalInfo;
-    } else {
-        throw new Error("Get node additional info error");
-    }
+            if (sucess) {
+                nodeAdditionalInfo = data as BaseNodeAdditionalInfo;
+            } else {
+                throw new Error("Get node additional information error.");
+            }
 
-    return { nodeAdditionalInfo };
+            return { nodeAdditionalInfo };
+        }
+    };
 }
 
 /**
@@ -124,7 +140,7 @@ export async function getNodeAdditionalInfo(
  * @returns A promise resolving to processed node logs with UI components and Unix timestamps
  * @throws Error if the API call fails
  */
-export async function getNodeLogs(
+export function getNodeLogsAPI(
     id: number,
     nodeName: string,
     nodePhase: NodePhase,
@@ -132,29 +148,35 @@ export async function getNodeLogs(
     start_time: Date | null = null,
     end_time: Date | null = null,
     time_step: string | null = null
-): Promise<{ nodeLogs: ProcessedNodeLogs }> {
-    let nodeLogs: ProcessedNodeLogs;
-    const prefix = getNodePrefix(nodePhase);
-    const processedName = addPrefix(removePrefix(nodeName), prefix);
-    let start_time_str: string | null = null;
-    let end_time_str: string | null = null;
-    start_time_str = start_time !== null ? toISOStringLocal(start_time) : null;
-    end_time_str = end_time !== null ? toISOStringLocal(end_time) : null;
-    const time_zone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+): APIDescriptor<{ nodeLogs: ProcessedNodeLogs }> {
+    return {
+        async call({ signal, timeout } = {}) {
+            let nodeLogs: ProcessedNodeLogs;
+            const prefix = getNodePrefix(nodePhase);
+            const processedName = addPrefix(removePrefix(nodeName), prefix);
+            let start_time_str: string | null = null;
+            let end_time_str: string | null = null;
+            start_time_str = start_time !== null ? toISOStringLocal(start_time) : null;
+            end_time_str = end_time !== null ? toISOStringLocal(end_time) : null;
+            const time_zone = Intl.DateTimeFormat().resolvedOptions().timeZone;
 
-    const { sucess, data } = await callAPI({
-        endpoint: "/api/nodes/get_logs_from_node",
-        method: "GET",
-        params: { id, node_name: processedName, formatted, start_time: start_time_str, end_time: end_time_str, time_step, time_zone },
-    });
+            const { sucess, data } = await callAPI({
+                endpoint: "/api/nodes/get_logs_from_node",
+                method: "GET",
+                params: { id, node_name: processedName, formatted, start_time: start_time_str, end_time: end_time_str, time_step, time_zone },
+                signal,
+                timeout,
+            });
 
-    if (sucess) {
-        nodeLogs = processNodeLogs(data as NodeLogs);
-    } else {
-        throw new Error("Get Node Logs error");
-    }
+            if (sucess) {
+                nodeLogs = processNodeLogs(data as NodeLogs);
+            } else {
+                throw new Error("Get Node historical logs error.");
+            }
 
-    return { nodeLogs };
+            return { nodeLogs };
+        }
+    };
 }
 
 /**
@@ -172,7 +194,7 @@ export async function getNodeLogs(
  * @returns A promise resolving to raw energy logs, merged processed points, and combined global metrics
  * @throws Error if the API call fails
  */
-export async function getEnergyConsumption(
+export function getEnergyConsumptionAPI(
     id: number,
     phase: SelectablePhaseFilter,
     direction: EnergyDirectionFilter,
@@ -180,33 +202,39 @@ export async function getEnergyConsumption(
     start_time: Date | null = null,
     end_time: Date | null = null,
     time_step: string | null = null
-): Promise<{ energyLogs: EnergyConsumptionType; mergedPoints: Array<ProcessedEnergyConsumptionLogPoint>; mergedGlobalMetrics: EnergyConsumptionMetrics }> {
-    let energyLogs: EnergyConsumptionType;
-    let mergedPoints: Array<ProcessedEnergyConsumptionLogPoint>;
-    let mergedGlobalMetrics: EnergyConsumptionMetrics;
-    let start_time_str: string | null = null;
-    let end_time_str: string | null = null;
-    start_time_str = start_time !== null ? toISOStringLocal(start_time) : null;
-    end_time_str = end_time !== null ? toISOStringLocal(end_time) : null;
-    const time_zone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+): APIDescriptor<{ energyLogs: EnergyConsumptionType; mergedPoints: Array<ProcessedEnergyConsumptionLogPoint>; mergedGlobalMetrics: EnergyConsumptionMetrics }> {
+    return {
+        async call({ signal, timeout } = {}) {
+            let energyLogs: EnergyConsumptionType;
+            let mergedPoints: Array<ProcessedEnergyConsumptionLogPoint>;
+            let mergedGlobalMetrics: EnergyConsumptionMetrics;
+            let start_time_str: string | null = null;
+            let end_time_str: string | null = null;
+            start_time_str = start_time !== null ? toISOStringLocal(start_time) : null;
+            end_time_str = end_time !== null ? toISOStringLocal(end_time) : null;
+            const time_zone = Intl.DateTimeFormat().resolvedOptions().timeZone;
 
-    const { sucess, data } = await callAPI({
-        endpoint: "/api/nodes/get_energy_consumption",
-        method: "GET",
-        params: { id, phase, direction, formatted, start_time: start_time_str, end_time: end_time_str, time_step, time_zone },
-    });
+            const { sucess, data } = await callAPI({
+                endpoint: "/api/nodes/get_energy_consumption",
+                method: "GET",
+                params: { id, phase, direction, formatted, start_time: start_time_str, end_time: end_time_str, time_step, time_zone },
+                signal,
+                timeout,
+            });
 
-    if (sucess) {
-        energyLogs = data as EnergyConsumptionType;
-        ({ mergedPoints, mergedGlobalMetrics } = mergeEnergyConsumptionLogs(energyLogs));
-    } else {
-        throw new Error("Get energy consumption error");
-    }
+            if (sucess) {
+                energyLogs = data as EnergyConsumptionType;
+                ({ mergedPoints, mergedGlobalMetrics } = mergeEnergyConsumptionLogs(energyLogs));
+            } else {
+                throw new Error("Get device energy consumption error.");
+            }
 
-    return { energyLogs, mergedPoints, mergedGlobalMetrics };
+            return { energyLogs, mergedPoints, mergedGlobalMetrics };
+        }
+    };
 }
 
-export async function mapMetricAPI(
+export async function mapMetricsAPI(
     metric: string,
     device_id: number,
     phase: SelectablePhaseFilter,
@@ -215,7 +243,7 @@ export async function mapMetricAPI(
 ): Promise<any> {
     switch (metric.toLowerCase()) {
         case "peakpower":
-            return await getPeakPower(device_id, phase, start_time, end_time);
+            return await getPeakPowerAPI(device_id, phase, start_time, end_time).call({ timeout: 5000 });
         default:
             return null;
     }
@@ -234,30 +262,36 @@ export async function mapMetricAPI(
  * @returns Promise resolving to a PeakPowerType object containing peak values and timestamps
  * @throws Error when the API call fails
  */
-export async function getPeakPower(
+export function getPeakPowerAPI(
     id: number,
     phase: SelectablePhaseFilter,
     start_time: Date | null = null,
     end_time: Date | null = null
-): Promise<PeakPowerType> {
-    let peakPower: PeakPowerType;
-    let start_time_str: string | null = null;
-    let end_time_str: string | null = null;
-    start_time_str = start_time !== null ? toISOStringLocal(start_time) : null;
-    end_time_str = end_time !== null ? toISOStringLocal(end_time) : null;
-    const time_zone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+): APIDescriptor<PeakPowerType> {
+    return {
+        async call({ signal, timeout } = {}) {
+            let peakPower: PeakPowerType;
+            let start_time_str: string | null = null;
+            let end_time_str: string | null = null;
+            start_time_str = start_time !== null ? toISOStringLocal(start_time) : null;
+            end_time_str = end_time !== null ? toISOStringLocal(end_time) : null;
+            const time_zone = Intl.DateTimeFormat().resolvedOptions().timeZone;
 
-    const { sucess, data } = await callAPI({
-        endpoint: "/api/nodes/get_peak_power",
-        method: "GET",
-        params: { id, phase, start_time: start_time_str, end_time: end_time_str, time_zone },
-    });
+            const { sucess, data } = await callAPI({
+                endpoint: "/api/nodes/get_peak_power",
+                method: "GET",
+                params: { id, phase, start_time: start_time_str, end_time: end_time_str, time_zone },
+                signal,
+                timeout,
+            });
 
-    if (sucess) {
-        peakPower = data as PeakPowerType;
-    } else {
-        throw new Error("Get peak power error");
-    }
+            if (sucess) {
+                peakPower = data as PeakPowerType;
+            } else {
+                throw new Error("Get device peak power error.");
+            }
 
-    return peakPower;
+            return peakPower;
+        }
+    };
 }

@@ -1,8 +1,8 @@
 <script lang="ts">
     import { fade } from "svelte/transition";
     import { onMount } from "svelte";
-    import { getDeviceWithImage, editDevice, deleteDevice } from "$lib/logic/api/device";
-    import { getDeviceNodesConfig } from "$lib/logic/api/nodes";
+    import { getDeviceWithImageAPI, editDeviceAPI, deleteDeviceAPI } from "$lib/logic/api/device";
+    import { getDeviceNodesConfigAPI } from "$lib/logic/api/nodes";
     import { convertToDevice } from "$lib/logic/factory/device";
     import { updateDeviceValidation, validDeviceOperation } from "$lib/logic/validation/device/base";
     import { convertToNodes } from "$lib/logic/factory/nodes";
@@ -11,7 +11,7 @@
     import { protocolPlugins } from "$lib/stores/device/protocol";
     import { showToast } from "$lib/logic/view/toast";
     import { AlertType } from "$lib/stores/view/toast";
-    import { MethodRetrier } from "$lib/logic/api/retrier";
+    import { APIRetrier } from "$lib/logic/api/retrier";
     import { deviceProtocolChange } from "$lib/logic/handlers/device";
     import { noChangesToDevice } from "$lib/logic/util/device";
     import Selector from "../../../components/General/Selector.svelte";
@@ -82,19 +82,29 @@
     onMount(() => {
         resetDashboardLoader();
         let deviceId = getDeviceID();
-        let deviceDataRetrier: MethodRetrier | null;
-        let nodesConfigRetrier: MethodRetrier | null;
+        let deviceDataRetrier: APIRetrier<{ initialDeviceData: Device; deviceData: EditableDevice }> | null;
+        let nodesConfigRetrier: APIRetrier<{ initialNodes: Array<NodeRecord>; nodes: Array<EditableNodeRecord> }> | null;
 
         if (deviceId) {
-            deviceDataRetrier = new MethodRetrier(async (signal) => {
-                ({ initialDeviceData, deviceData } = await getDeviceWithImage(deviceId));
-            }, 3000);
-            nodesConfigRetrier = new MethodRetrier(async (signal) => {
-                ({ initialNodes, nodes } = await getDeviceNodesConfig(deviceId));
-                setTimeout(() => {
-                    nodesInit = true;
-                }, 100); // Small timeout to give a bit of time for the page to load before the nodes
-            }, 3000);
+            deviceDataRetrier = new APIRetrier(
+                getDeviceWithImageAPI(deviceId),
+                (result) => {
+                    initialDeviceData = result.initialDeviceData;
+                    deviceData = result.deviceData;
+                },
+                5000,
+            );
+            nodesConfigRetrier = new APIRetrier(
+                getDeviceNodesConfigAPI(deviceId),
+                (result) => {
+                    initialNodes = result.initialNodes;
+                    nodes = result.nodes;
+                    setTimeout(() => {
+                        nodesInit = true;
+                    }, 100); // Small timeout to give a bit of time for the page to load before the nodes
+                },
+                5000,
+            );
         } else {
             showToast("errorEditDeviceParams", AlertType.ALERT);
             loadedDone.set(true);
@@ -232,7 +242,7 @@ Shows input forms for protocol-specific parameters and organizes device nodes fo
                         return;
                     }
                     performingSaveRequest = true;
-                    await editDevice(convertToDevice(deviceData), deviceData.device_image, convertToNodes(nodes));
+                    await editDeviceAPI(convertToDevice(deviceData), deviceData.device_image, convertToNodes(nodes)).call({ timeout: 5000 });
                     performingSaveRequest = false;
                 }
             }}
@@ -244,7 +254,7 @@ Shows input forms for protocol-specific parameters and organizes device nodes fo
             onDelete={async () => {
                 if (contentInit) {
                     performingDeleteRequest = true;
-                    await deleteDevice(deviceData.id);
+                    await deleteDeviceAPI(deviceData.id).call({ timeout: 5000 });
                     performingDeleteRequest = false;
                 }
             }}

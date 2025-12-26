@@ -1,14 +1,14 @@
 <script lang="ts">
     import { fade } from "svelte/transition";
     import { onMount } from "svelte";
-    import { getDefaultImage, addDevice } from "$lib/logic/api/device";
+    import { getDefaultImageAPI, addDeviceAPI } from "$lib/logic/api/device";
     import { createNewDevice, convertToDevice } from "$lib/logic/factory/device";
     import { convertToNodes, getDefaultNodesList } from "$lib/logic/factory/nodes";
     import { updateDeviceValidation, validDeviceOperation } from "$lib/logic/validation/device/base";
     import { updateNodesValidation } from "$lib/logic/validation/nodes/base";
     import { defaultDeviceOptions } from "$lib/types/device/base";
     import { protocolPlugins } from "$lib/stores/device/protocol";
-    import { MethodRetrier } from "$lib/logic/api/retrier";
+    import { APIRetrier } from "$lib/logic/api/retrier";
     import { deviceProtocolChange } from "$lib/logic/handlers/device";
     import { updateNodes, updateEditingNode, updateNodesBySection } from "$lib/logic/handlers/nodes/base";
     import Selector from "../../../components/General/Selector.svelte";
@@ -71,17 +71,20 @@
     // Mount function
     onMount(() => {
         resetDashboardLoader();
-        let defaultImageRetrier: MethodRetrier | null = new MethodRetrier(async (signal) => {
-            if (!deviceData) {
-                deviceData = createNewDevice(defaultDeviceOptions.protocol, defaultDeviceOptions.type, defaultDeviceOptions.options);
-            }
-            deviceData.current_image_url = await getDefaultImage();
-        }, 3000);
-
-        nodes = getDefaultNodesList(deviceData);
-        setTimeout(() => {
-            nodesInit = true;
-        }, 100); // Small timeout to give a bit of time for the page to load before the nodes
+        let defaultImageRetrier: APIRetrier<string> | null = new APIRetrier(
+            getDefaultImageAPI(),
+            (result) => {
+                if (!deviceData) {
+                    deviceData = createNewDevice(defaultDeviceOptions.protocol, defaultDeviceOptions.type, defaultDeviceOptions.options);
+                    nodes = getDefaultNodesList(deviceData);
+                    setTimeout(() => {
+                        nodesInit = true;
+                    }, 100); // Small timeout to give a bit of time for the page to load before the nodes
+                }
+                deviceData.current_image_url = result;
+            },
+            5000,
+        );
 
         //Clean-up logic
         return () => {
@@ -193,7 +196,7 @@ Shows input forms for protocol-specific parameters and organizes device nodes fo
             onAdd={async () => {
                 if (contentInit) {
                     performingAddRequest = true;
-                    await addDevice(convertToDevice(deviceData), deviceData.device_image, convertToNodes(nodes));
+                    await addDeviceAPI(convertToDevice(deviceData), deviceData.device_image, convertToNodes(nodes)).call({ timeout: 5000 });
                     performingAddRequest = false;
                 }
             }}

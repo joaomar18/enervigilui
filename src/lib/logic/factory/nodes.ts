@@ -236,7 +236,6 @@ export function initNodes(initialNodes: Array<NodeRecord>): { sucess: boolean; e
         editableNodes = convertToEditableNodes(initialNodes);
         sucess = true;
     } catch (e) {
-        console.error(`Could not initialize the nodes configuration: ${e}`);
         showToast("initNodesError", AlertType.ALERT, { error: String(e) });
     }
     return { sucess, editableNodes };

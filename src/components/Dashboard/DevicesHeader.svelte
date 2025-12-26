@@ -1,9 +1,9 @@
 <script lang="ts">
     import { onMount } from "svelte";
     import { getDeviceID } from "$lib/logic/view/navigation";
-    import { logoutUser } from "$lib/logic/api/auth";
-    import { getDeviceInfoWithImage } from "$lib/logic/api/device";
-    import { MethodRetrier } from "$lib/logic/api/retrier";
+    import { logoutUserAPI } from "$lib/logic/api/auth";
+    import { getDeviceInfoWithImageAPI } from "$lib/logic/api/device";
+    import { APIRetrier } from "$lib/logic/api/retrier";
     import type { DeviceInfo } from "$lib/types/device/base";
     import Notification from "../General/Notification.svelte";
     import Logout from "./Logout.svelte";
@@ -21,11 +21,16 @@
 
     onMount(() => {
         let deviceId = getDeviceID();
-        let deviceDataRetrier: MethodRetrier | null = null;
+        let deviceDataRetrier: APIRetrier<{ deviceInfo: DeviceInfo; deviceImageUrl: string }> | null = null;
         if (deviceId) {
-            deviceDataRetrier = new MethodRetrier(async (signal) => {
-                ({ deviceInfo, deviceImageUrl } = await getDeviceInfoWithImage(deviceId));
-            }, 3000);
+            deviceDataRetrier = new APIRetrier(
+                getDeviceInfoWithImageAPI(deviceId),
+                (result) => {
+                    deviceInfo = result.deviceInfo;
+                    deviceImageUrl = result.deviceImageUrl;
+                },
+                5000,
+            );
         }
 
         //Clean-up logic
@@ -63,7 +68,7 @@
                 imageUrl="/img/logout.svg"
                 enableToolTip={true}
                 onClick={async () => {
-                    await logoutUser();
+                    await logoutUserAPI().call({ timeout: 5000 });
                 }}
             >
                 <div slot="tooltip"><ToolTipText text={$texts.logout} /></div>
@@ -94,6 +99,7 @@
         margin-left: 46px;
         width: 100%;
         min-width: 0;
+        height:100%;
         position: relative;
         display: flex;
         align-items: center;
@@ -104,6 +110,7 @@
     /* Centered device info section */
     .center-div {
         flex: 1;
+        height:100%;
         min-width: 0;
         margin: 0;
         padding: 0;
@@ -116,8 +123,9 @@
 
     /* Centered device info content section */
     .center-content-div {
-        width:fit-content;
-        height:100%;
+        width: 100%;
+        max-width: 375px;
+        height: 40px;
     }
 
     /* Right section: notifications and logout */

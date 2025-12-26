@@ -8,7 +8,7 @@
     import TimePeriodPicker from "../../General/Pickers/TimePeriodPicker.svelte";
     import { LogSpanPeriod } from "$lib/types/view/nodes";
     import { getNodePhaseSection } from "$lib/logic/util/nodes";
-    import { getNodeAdditionalInfo, getNodeLogs } from "$lib/logic/api/nodes";
+    import { getNodeAdditionalInfoAPI, getNodeLogsAPI } from "$lib/logic/api/nodes";
     import { getTimeSpanFromLogPeriod } from "$lib/logic/util/date";
     import { SlidingWindow } from "$lib/logic/util/classes/SlidingWindow";
     import type { NodeTimeSpan } from "$lib/types/view/nodes";
@@ -26,7 +26,6 @@
     import { NodeDetailSheetStyle } from "$lib/style/nodes";
     import { NodesBaseDisplayDetailStyle } from "$lib/style/nodes";
     import type { NodeCategory } from "$lib/types/nodes/base";
-    import { dev } from "$app/environment";
 
     // Style object (from theme)
     export let style: { [property: string]: string | number } | null = null;
@@ -202,7 +201,7 @@
             return;
         }
         nodeAddInfoFetched = false;
-        ({ nodeAdditionalInfo } = await getNodeAdditionalInfo(deviceId, nodeState.name, nodeState.phase));
+        ({ nodeAdditionalInfo } = await getNodeAdditionalInfoAPI(deviceId, nodeState.name, nodeState.phase).call({ timeout: 5000 }));
         nodeAddInfoFetched = true;
         nodeAddInfoFirstFetch = true;
     }
@@ -261,7 +260,9 @@
             return;
         }
         nodeLogsFetched = false;
-        ({ nodeLogs } = await getNodeLogs(deviceId, nodeState.name, nodeState.phase, initialDate !== null, initialDate, endDate));
+        ({ nodeLogs } = await getNodeLogsAPI(deviceId, nodeState.name, nodeState.phase, initialDate !== null, initialDate, endDate).call({
+            timeout: 5000,
+        }));
         nodeLogsFetched = true;
         nodeLogsFirstFetch = true;
     }

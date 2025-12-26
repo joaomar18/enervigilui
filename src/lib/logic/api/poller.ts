@@ -1,5 +1,7 @@
+import type { APIDescriptor } from "./api";
+
 /**
- * A polling utility that repeatedly executes a method at specified intervals.
+ * A polling utility that repeatedly executes an API at specified intervals.
  *
  * Features:
  * - Prevents overlapping executions with in-flight tracking
@@ -8,21 +10,23 @@
  * - Allows dynamic interval adjustment
  * - Proper resource cleanup and destruction
  */
-export class MethodPoller {
-    #fn: (signal?: AbortSignal) => Promise<void> | void;
+export class APIPoller<T> {
+    #api: APIDescriptor<T> | null = null;
+    #callback: (result: T) => void;
     #interval: number;
     #inFlight: boolean;
     #destroyed: boolean;
     #timer: ReturnType<typeof setTimeout> | null;
-    #abort: AbortController | null = null;
+    #controller: AbortController | null = null;
 
-    constructor(method_call: (signal?: AbortSignal) => Promise<void> | void, interval: number, immediate: boolean = true) {
-        this.#fn = method_call;
+    constructor(api: APIDescriptor<T>, callback: (result: T) => void, interval: number, immediate: boolean = true) {
+        this.#api = api;
+        this.#callback = callback;
         this.#interval = interval;
         this.#inFlight = false;
         this.#destroyed = false;
         this.#timer = null;
-        this.#abort = null;
+        this.#controller = null;
         this.start(immediate);
     }
 
@@ -32,7 +36,7 @@ export class MethodPoller {
      */
     start(immediate: boolean = true) {
         if (this.#destroyed) {
-            throw new Error("Method Poller is destroyed");
+            throw new Error("API Poller is destroyed");
         }
         this.stop(false); // Clear previous timers without destroying
         immediate ? this.#run() : this.#schedule();
@@ -47,12 +51,12 @@ export class MethodPoller {
             clearTimeout(this.#timer);
         }
         this.#timer = null;
-        this.#abort?.abort();
-        this.#abort = null;
+        this.#controller?.abort();
+        this.#controller = null;
 
         if (destroy) {
             this.#destroyed = true;
-            this.#fn = (() => {}) as any;
+            this.#api = null;
         }
     }
 
@@ -61,25 +65,22 @@ export class MethodPoller {
      * Prevents overlapping executions and reschedules the next run.
      */
     async #run() {
-        if (this.#destroyed) {
-            return;
-        }
-        if (this.#inFlight) {
-            this.#schedule();
+        if (this.#destroyed || !this.#api || this.#inFlight) {
             return;
         }
 
         this.#inFlight = true;
-        this.#abort = new AbortController();
+        this.#controller = new AbortController();
 
         try {
-            await this.#fn(this.#abort.signal);
+            let result = await this.#api.call({ timeout: this.#interval, signal: this.#controller.signal });
+            this.#callback(result);
         } catch (e) {
             if ((e as any)?.name !== "AbortError") {
-                console.error("Error in Method Poller: ", e);
+                console.error("Error in API Poller: ", e);
             }
         } finally {
-            this.#abort = null;
+            this.#controller = null;
             this.#inFlight = false;
             this.#schedule();
         }
@@ -101,7 +102,7 @@ export class MethodPoller {
      */
     setInterval(ms: number) {
         if (this.#destroyed) {
-            throw new Error("Method Poller is destroyed");
+            throw new Error("API Poller is destroyed");
         }
         this.#interval = ms;
         if (this.#timer) {
