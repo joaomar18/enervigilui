@@ -20,6 +20,7 @@
     export let value: number | null;
     export let unitText: string;
     export let decimalPlaces: number | undefined;
+    export let minClickTimeMs: number | undefined = undefined; // Filter time for the button click
 
     // Style object (from theme)
     export let style: { [property: string]: string | number } | null = null;
@@ -86,6 +87,7 @@
     alarmState={minAlarmState || maxAlarmState}
     warningState={minWarningState || maxWarningState}
     {valueDisconnected}
+    {minClickTimeMs}
     {onClick}
 >
     <div

@@ -30,6 +30,7 @@
     export let enableSpanChange: boolean = true;
     export let initialDate: Date | null;
     export let endDate: Date | null;
+    export let minClickTimeMs: number | undefined = undefined; // Filter time for the button click
 
     // Layout / styling props
     export let paddingHorizontal: string | undefined = undefined;
@@ -73,6 +74,7 @@
     let messageVariables: Record<string, string | number>;
     let firstRequestDone: boolean = false;
     let processingRequest: boolean = false;
+    let minClickTimeout: ReturnType<typeof setTimeout> | null = null;
 
     // Reactive Statements
     $: if (!showToolTip && clickEventListenerDefined) {
@@ -102,19 +104,33 @@
 
     function handleConfirm(): void {
         firstRequestDone = true;
-        if (!validation || !validation.valid) {
+        if (!validation || !validation.valid || minClickTimeout !== null) {
             return;
         }
         processingRequest = true;
         requestCustomPeriod(getDateFromField(startDateTime), getDateFromField(endDateTime));
         processingRequest = false;
+        if (minClickTimeMs != undefined) setClickTimeout();
         showToolTip = false;
+    }
+
+    function resetClickTimeout(): void {
+        if (minClickTimeout !== null) {
+            clearTimeout(minClickTimeout);
+            minClickTimeout = null;
+        }
+    }
+
+    function setClickTimeout(): void {
+        resetClickTimeout();
+        if (minClickTimeMs != undefined) minClickTimeout = setTimeout(() => resetClickTimeout(), minClickTimeMs);
     }
 
     onDestroy(() => {
         if (clickEventListenerDefined) {
             window.removeEventListener("click", handleClickOutside);
         }
+        resetClickTimeout();
     });
 </script>
 

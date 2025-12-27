@@ -27,6 +27,7 @@
     export let selectedTimeSpan: LogSpanPeriod;
     export let initialDate: Date;
     export let endDate: Date;
+    export let minClickTimeMs: number = 500; // Filter time for the button click
 
     // Variables
     let containerDiv: HTMLDivElement;
@@ -97,6 +98,7 @@
                     selected={selectedTimeSpan === LogSpanPeriod.currentHour}
                     buttonText={$texts._1h}
                     onClick={() => changeSpanPeriod(LogSpanPeriod.currentHour)}
+                    {minClickTimeMs}
                 >
                     <div slot="tooltip"><ToolTipText text={$texts.currentHour} /></div>
                 </Button>
@@ -106,6 +108,7 @@
                     selected={selectedTimeSpan === LogSpanPeriod.currentDay}
                     buttonText={$texts._1d}
                     onClick={() => changeSpanPeriod(LogSpanPeriod.currentDay)}
+                    {minClickTimeMs}
                 >
                     <div slot="tooltip"><ToolTipText text={$texts.currentDay} /></div>
                 </Button>
@@ -115,6 +118,7 @@
                     selected={selectedTimeSpan === LogSpanPeriod.current7Days}
                     buttonText={$texts._7d}
                     onClick={() => changeSpanPeriod(LogSpanPeriod.current7Days)}
+                    {minClickTimeMs}
                 >
                     <div slot="tooltip"><ToolTipText text={$texts.currentWeek} /></div>
                 </Button>
@@ -124,6 +128,7 @@
                     selected={selectedTimeSpan === LogSpanPeriod.currentMonth}
                     buttonText={$texts._1M}
                     onClick={() => changeSpanPeriod(LogSpanPeriod.currentMonth)}
+                    {minClickTimeMs}
                 >
                     <div slot="tooltip"><ToolTipText text={$texts.currentMonth} /></div>
                 </Button>
@@ -133,6 +138,7 @@
                     selected={selectedTimeSpan === LogSpanPeriod.currentYear}
                     buttonText={$texts._1Y}
                     onClick={() => changeSpanPeriod(LogSpanPeriod.currentYear)}
+                    {minClickTimeMs}
                 >
                     <div slot="tooltip"><ToolTipText text={$texts.currentYear} /></div>
                 </Button>
@@ -154,6 +160,7 @@
                         bind:endDate
                         bind:showToolTip={showCustomDatePicker}
                         requestCustomPeriod={(initial_date: Date, end_date: Date) => changeSpanPeriodCustom(initial_date, end_date)}
+                        {minClickTimeMs}
                     />
                 </div>
             </div>
@@ -184,6 +191,7 @@
                 selected={selectedTimeSpan === LogSpanPeriod.currentHour}
                 buttonText={$texts._1h}
                 onClick={() => changeSpanPeriod(LogSpanPeriod.currentHour)}
+                {minClickTimeMs}
             >
                 <div slot="tooltip"><ToolTipText text={$texts.currentHour} /></div>
             </Button>
@@ -193,6 +201,7 @@
                 selected={selectedTimeSpan === LogSpanPeriod.currentDay}
                 buttonText={$texts._1d}
                 onClick={() => changeSpanPeriod(LogSpanPeriod.currentDay)}
+                {minClickTimeMs}
             >
                 <div slot="tooltip"><ToolTipText text={$texts.currentDay} /></div>
             </Button>
@@ -202,6 +211,7 @@
                 selected={selectedTimeSpan === LogSpanPeriod.current7Days}
                 buttonText={$texts._7d}
                 onClick={() => changeSpanPeriod(LogSpanPeriod.current7Days)}
+                {minClickTimeMs}
             >
                 <div slot="tooltip"><ToolTipText text={$texts.currentWeek} /></div>
             </Button>
@@ -211,6 +221,7 @@
                 selected={selectedTimeSpan === LogSpanPeriod.currentMonth}
                 buttonText={$texts._1M}
                 onClick={() => changeSpanPeriod(LogSpanPeriod.currentMonth)}
+                {minClickTimeMs}
             >
                 <div slot="tooltip"><ToolTipText text={$texts.currentMonth} /></div>
             </Button>
@@ -220,6 +231,7 @@
                 selected={selectedTimeSpan === LogSpanPeriod.currentYear}
                 buttonText={$texts._1Y}
                 onClick={() => changeSpanPeriod(LogSpanPeriod.currentYear)}
+                {minClickTimeMs}
             >
                 <div slot="tooltip"><ToolTipText text={$texts.currentYear} /></div>
             </Button>
@@ -241,6 +253,7 @@
                     bind:endDate
                     bind:showToolTip={showCustomDatePicker}
                     requestCustomPeriod={(initial_date: Date, end_date: Date) => changeSpanPeriodCustom(initial_date, end_date)}
+                    {minClickTimeMs}
                 />
             </div>
         </div>

@@ -1,4 +1,5 @@
 <script lang="ts">
+    import { onDestroy } from "svelte";
     import ToolTip from "./ToolTip.svelte";
 
     // Styles
@@ -15,6 +16,7 @@
     export let imageURL: string = "";
     export let enableToolTip: boolean = false;
     export let toolTipAutoPos: boolean = true;
+    export let minClickTimeMs: number | undefined = undefined; // Filter time for the button click
 
     // Style object (from theme)
     export let style: { [property: string]: string | number } | null = null;
@@ -85,6 +87,7 @@
     let showToolTip: boolean = false;
     let showToolTipTimeout: ReturnType<typeof setTimeout> | null = null;
     let showToolTipDelayNumber: number;
+    let minClickTimeout: ReturnType<typeof setTimeout> | null = null;
 
     // Reactive Statements
     $: showToolTipDelayNumber = parseInt(String(mergedStyle.showToolTipDelay));
@@ -94,9 +97,22 @@
 
     // Functions
     function handleClick(): void {
-        if (onClick && enabled && !processing) {
+        if (onClick && enabled && !processing && minClickTimeout === null) {
             onClick();
+            if (minClickTimeMs != undefined) setClickTimeout();
         }
+    }
+
+    function resetClickTimeout(): void {
+        if (minClickTimeout !== null) {
+            clearTimeout(minClickTimeout);
+            minClickTimeout = null;
+        }
+    }
+
+    function setClickTimeout(): void {
+        resetClickTimeout();
+        if (minClickTimeMs != undefined) minClickTimeout = setTimeout(() => resetClickTimeout(), minClickTimeMs);
     }
 
     function handleMouseEnter(): void {
@@ -116,6 +132,10 @@
             showToolTip = false;
         }
     }
+
+    onDestroy(() => {
+        resetClickTimeout();
+    });
 </script>
 
 <!--
@@ -249,9 +269,9 @@
 
     /* Text container - Flex layout for main and sub text with baseline alignment */
     button .text {
-        margin:0;
-        padding:0;
-        display:flex;
+        margin: 0;
+        padding: 0;
+        display: flex;
         justify-content: center;
         align-items: baseline;
     }

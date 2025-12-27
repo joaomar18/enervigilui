@@ -35,6 +35,7 @@
     export let useDirection: boolean = true;
     export let useTimeSpan: boolean = true;
     export let showCurrentTimeSpan: boolean = true;
+    export let minClickTimeMs: number = 500; // Filter time for the button click
 
     // Layout / styling props
     export let labelSize: string | undefined = undefined;
@@ -155,6 +156,7 @@
                         bind:endDate
                         changeSpanPeriod={(timeSpan: LogSpanPeriod) => changeSpanPeriod(timeSpan)}
                         changeSpanPeriodCustom={(initial_date: Date, end_date: Date) => changeSpanPeriodCustom(initial_date, end_date)}
+                        {minClickTimeMs}
                     />
                 </div>
             {/if}

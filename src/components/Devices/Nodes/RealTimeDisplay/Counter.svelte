@@ -13,6 +13,7 @@
     export let value: number | null;
     export let unitText: string;
     export let decimalPlaces: number | undefined;
+    export let minClickTimeMs: number | undefined = undefined; // Filter time for the button click
 
     // Style object (from theme)
     export let style: { [property: string]: string | number } | null = null;
@@ -71,7 +72,7 @@
     and accumulative measurements. Extends BaseDisplay for consistent styling and
     interaction patterns while providing counter-specific formatting and visualization.
 -->
-<BaseDisplay style={baseDisplayStyle} {disableLabel} {disableClick} {labelText} {valueDisconnected} {onClick}>
+<BaseDisplay style={baseDisplayStyle} {disableLabel} {disableClick} {labelText} {valueDisconnected} {minClickTimeMs} {onClick}>
     <div
         style="
             --value-text-size: {mergedStyle.valueTextSize};

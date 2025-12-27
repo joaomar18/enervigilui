@@ -10,6 +10,7 @@
     export let disableClick: boolean = false;
     export let labelText: string;
     export let value: string | null;
+    export let minClickTimeMs: number | undefined = undefined; // Filter time for the button click
 
     // Style object (from theme)
     export let style: { [property: string]: string | number } | null = null;
@@ -54,7 +55,7 @@
     configuration strings. Extends BaseDisplay for consistent styling and interaction
     patterns while providing text-specific formatting and visualization.
 -->
-<BaseDisplay style={baseDisplayStyle} {disableLabel} {disableClick} {labelText} {valueDisconnected} {onClick}>
+<BaseDisplay style={baseDisplayStyle} {disableLabel} {disableClick} {labelText} {valueDisconnected} {minClickTimeMs} {onClick}>
     <div
         style="
             --value-text-size: {mergedStyle.valueTextSize};

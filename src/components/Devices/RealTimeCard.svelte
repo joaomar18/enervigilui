@@ -143,6 +143,7 @@
                                 unitText={nodeState.unit}
                                 decimalPlaces={nodeState.decimal_places}
                                 onClick={() => openDetailDiv(nodeState)}
+                                minClickTimeMs={500}
                             />
                         {/each}
                     </div>

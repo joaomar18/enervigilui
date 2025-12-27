@@ -2,6 +2,7 @@
     // Styles
     import { mergeStyle } from "$lib/style/components";
     import { NodesBaseDisplayStyle } from "$lib/style/nodes";
+    import { onDestroy } from "svelte";
 
     // Style object (from theme)
     export let style: { [property: string]: string | number } | null = null;
@@ -14,6 +15,7 @@
     export let alarmState: boolean = false;
     export let warningState: boolean = false;
     export let valueDisconnected: boolean;
+    export let minClickTimeMs: number | undefined = undefined; // Filter time for the button click
 
     // Layout / styling props
     export let width: string | undefined = undefined;
@@ -91,15 +93,36 @@
     // Merged style
     $: mergedStyle = mergeStyle(effectiveStyle, localOverrides);
 
+    // Variables
+    let minClickTimeout: ReturnType<typeof setTimeout> | null = null;
+
     // Click Export Function
     export let onClick: (() => void) | null = null;
 
     // Functions
     function handleClick(): void {
-        if (onClick && !disableClick) {
+        if (onClick && !disableClick && minClickTimeout === null) {
+            console.log("handling click", "TImeout: ", minClickTimeMs);
             onClick();
+            if (minClickTimeMs != undefined) setClickTimeout();
         }
     }
+
+    function resetClickTimeout(): void {
+        if (minClickTimeout !== null) {
+            clearTimeout(minClickTimeout);
+            minClickTimeout = null;
+        }
+    }
+
+    function setClickTimeout(): void {
+        resetClickTimeout();
+        if (minClickTimeMs != undefined) minClickTimeout = setTimeout(() => resetClickTimeout(), minClickTimeMs);
+    }
+
+    onDestroy(() => {
+        resetClickTimeout();
+    });
 </script>
 
 <!--
