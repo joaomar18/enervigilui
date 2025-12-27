@@ -80,7 +80,6 @@
     $: forceColStack = String(mergedStyle.forceCollapse) === "TRUE";
     $: colStack = forceColStack || colStackWidthReached;
     $: numberOfVariables = Object.keys(metricsVariables).length;
-
     $: if (!dataFetched && !showLoader) {
         if (firstFetch && previousCategory === metricsCategory) {
             loaderTimeout = setTimeout(() => {
@@ -89,7 +88,6 @@
         } else {
             showLoader = true;
         }
-        previousCategory = metricsCategory;
     }
     $: if (dataFetched) {
         if (loaderTimeout) {
@@ -97,8 +95,8 @@
             loaderTimeout = null;
         }
         showLoader = false;
+        previousCategory = metricsCategory;
     }
-
     $: if (containerEl) {
         requestAnimationFrame(() => handleColumnStack());
     }
