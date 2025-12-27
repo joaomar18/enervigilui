@@ -102,7 +102,6 @@
     // Functions
     function handleClick(): void {
         if (onClick && !disableClick && minClickTimeout === null) {
-            console.log("handling click", "TImeout: ", minClickTimeMs);
             onClick();
             if (minClickTimeMs != undefined) setClickTimeout();
         }
