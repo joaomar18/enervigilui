@@ -49,11 +49,7 @@ export type CallAPIOptions = {
  * @property {number} [call.options.timeout] - Optional execution timeout in milliseconds
  */
 export interface APIDescriptor<T> {
-    call(
-        options?: {
-            signal?: AbortSignal;
-            timeout?: number;
-        }): Promise<T>
+    call(options?: { signal?: AbortSignal; timeout?: number }): Promise<T>;
 }
 
 /**
@@ -76,22 +72,27 @@ type APIResult =
 /**
  * Centralized HTTP API orchestration layer.
  *
- * Provides a unified interface for executing backend API requests with
- * consistent application-level behavior, including request deduplication,
- * cooperative cancellation, timeout handling, authentication redirects,
- * error normalization, and user notification dispatch.
+ * Serves as the single entry point for all backend HTTP requests, enforcing
+ * consistent application-level behavior across the UI.
  *
- * The class tracks in-flight requests per endpoint to ensure only the most
- * recent request remains active, automatically aborting superseded ones.
- * It also coordinates UI-side effects such as global loading state updates
- * and deferred toast notifications during navigation transitions.
+ * Handles request execution, in-flight request deduplication by endpoint and
+ * payload, cooperative cancellation, and optional timeout enforcement.
+ * Identical in-flight requests are reused; superseded requests with different
+ * payloads are aborted to avoid race conditions.
  *
- * This class is intended to be the single entry point for all HTTP-based
- * backend communication in the application.
+ * Integrates application policy by handling authentication failures via
+ * state reset and navigation redirects, normalizing API errors into
+ * UI-ready messages, and dispatching toast notifications (immediately or
+ * deferred until UI synchronization).
+ *
+ * Optionally updates global UI state (e.g. initial load completion) on
+ * successful requests when requested by the caller.
  */
 export class APICaller {
-
-    static #inFlight: Map<string, AbortController> = new Map<string, AbortController>();
+    static #inFlight: Map<string, { controller: AbortController; promise: Promise<{ sucess: boolean; data: any }>; content: string }> = new Map<
+        string,
+        { controller: AbortController; promise: Promise<{ sucess: boolean; data: any }>; content: string }
+    >();
 
     /**
      * Low-level HTTP utility for performing API requests with unified timeout
@@ -129,7 +130,7 @@ export class APICaller {
         timeout?: number,
         file?: File,
         fileFieldName: string = "file",
-        fetchFn: typeof fetch = fetch,
+        fetchFn: typeof fetch = fetch
     ): Promise<APIResult> {
         const controller = new AbortController();
         const { signal } = controller;
@@ -137,8 +138,7 @@ export class APICaller {
 
         if (externalSignal.aborted) {
             controller.abort();
-        }
-        else {
+        } else {
             externalSignal.addEventListener("abort", () => controller.abort(), { once: true });
         }
 
@@ -148,8 +148,7 @@ export class APICaller {
             timeoutId = setTimeout(() => {
                 abortReason = AbortReason.TIMEOUT;
                 controller.abort();
-            },
-                timeout);
+            }, timeout);
         }
         try {
             if (method !== "GET" && method !== "POST" && method !== "PUT" && method !== "DELETE") {
@@ -207,23 +206,27 @@ export class APICaller {
                 clearTimeout(timeoutId); // cancel timeout if error occurs
                 timeoutId = null;
             }
-            if ((error as any)?.name === "AbortError") return { kind: "aborted", abortReason }
+            if ((error as any)?.name === "AbortError") return { kind: "aborted", abortReason };
             return { kind: "exception", message: String(error) };
         }
     }
 
     /**
-     * Executes an API request with centralized application-level handling.
+     * Executes a backend API request with centralized UI-side handling and
+     * in-flight request deduplication.
      *
-     * Wraps a low-level HTTP request with standardized behavior for request
-     * deduplication, cooperative cancellation, authentication redirects,
-     * error normalization, toast notification dispatch, and optional global
+     * Requests are coordinated per endpoint using an internal in-flight map.
+     * The current request payload is serialized and passed to the in-flight
+     * coordinator. If an equivalent request is already in progress for the same
+     * endpoint, this method awaits and returns the existing promise (no new network
+     * call is issued). Otherwise, it creates a new AbortController, starts a new
+     * request via `processAPIRequest`, stores the controller/promise/payload as the
+     * current in-flight entry for the endpoint, and returns the new result.
+     *
+     * The underlying request processing applies consistent application behavior:
+     * authentication redirect handling, error normalization, toast notification
+     * dispatch (immediate or deferred until UI synchronization), and optional global
      * loading-state updates.
-     *
-     * In-flight requests are tracked per endpoint to ensure only the latest
-     * request remains active, with previous ones aborted when replaced.
-     * UI notifications are either displayed immediately or deferred until
-     * UI synchronization completes.
      *
      * @param options - API call configuration
      * @param options.endpoint - Backend API endpoint path
@@ -236,8 +239,10 @@ export class APICaller {
      * @param options.signal - Optional AbortSignal for lifecycle cancellation
      * @param options.fetchFn - Fetch implementation override (defaults to global fetch)
      *
-     * @returns Promise resolving to a success flag and response payload on success,
-     *          or a failure flag with null data on error or early termination.
+     * @returns Promise resolving to `{ sucess: true, data }` on HTTP success, or
+     *          `{ sucess: false, data: null }` when the request fails, is handled
+     *          as an application-level error, or is intentionally skipped due to
+     *          in-flight deduplication.
      */
     static async callAPI({
         endpoint,
@@ -250,54 +255,114 @@ export class APICaller {
         signal,
         fetchFn = fetch,
     }: CallAPIOptions): Promise<{ sucess: boolean; data: any }> {
+        const payload = JSON.stringify(params);
+        const requestData = APICaller.handleInFlightRequests(endpoint, payload, signal);
+        if (!requestData.promise) {
+            // Make a new api request
+            const requestPromise = this.processAPIRequest(
+                { endpoint, method, params, timeout, file, fileFieldName, setLoaded, signal, fetchFn },
+                requestData.controller
+            );
+            APICaller.#inFlight.set(endpoint, { controller: requestData.controller, promise: requestPromise, content: payload });
+            return await requestPromise;
+        } else {
+            // Wait for the on going api request
+            return await requestData.promise;
+        }
+    }
 
-        const abortController = APICaller.handleInFlightRequests(endpoint, signal);
-        const apiResult = await APICaller.makeAPIRequest(endpoint, method, params, abortController.signal, timeout, file, fileFieldName, fetchFn);
+    /**
+     * Executes a prepared API request and applies centralized result handling.
+     *
+     * Invokes the low-level HTTP request using the provided AbortController,
+     * then normalizes the result into application-level behavior, including
+     * authentication redirects, error mapping, toast notification dispatch,
+     * and optional global loading-state updates.
+     *
+     * Ensures in-flight request tracking is cleaned up when execution completes,
+     * regardless of success, failure, or cancellation.
+     *
+     * @param apiOptions - Fully resolved API call configuration
+     * @param abortController - AbortController governing the request lifecycle
+     * @returns Promise resolving to a success flag and response payload, or null data on failure
+     */
+    private static async processAPIRequest(apiOptions: CallAPIOptions, abortController: AbortController): Promise<{ sucess: boolean; data: any }> {
         try {
+            const apiResult = await APICaller.makeAPIRequest(
+                apiOptions.endpoint,
+                apiOptions.method,
+                apiOptions.params,
+                abortController.signal,
+                apiOptions.timeout,
+                apiOptions.file,
+                apiOptions.fileFieldName,
+                apiOptions.fetchFn
+            );
             if (apiResult.kind === "sucess") {
-                if (setLoaded && !get(loadedDone)) loadedDone.set(true); // Set loaded done
+                if (apiOptions.setLoaded && !get(loadedDone)) loadedDone.set(true); // Set loaded done
                 return { sucess: true, data: apiResult.data };
-            }
-            else { // Process Error
+            } else {
+                // Process Error
                 const redirectedToLogin = await APICaller.redirectToLogin(apiResult);
-                if (APICaller.returnEarly(apiResult, endpoint, redirectedToLogin)) return { sucess: false, data: null };
+                if (APICaller.returnEarly(apiResult, apiOptions.endpoint, redirectedToLogin)) return { sucess: false, data: null };
                 let errorMessage = APICaller.getAPIMessageCode(apiResult);
                 if (get(uiSynchronized)) {
                     showToast(errorMessage.code, AlertType.ALERT, errorMessage.details, errorMessage.textList, errorMessage.autoClose);
-                }
-                else {
+                } else {
                     latestAPIMessage.set(errorMessage);
                 }
                 return { sucess: false, data: null };
             }
         } catch (e) {
-            console.error(`Error calling API ${endpoint}: ${e}`);
+            console.error(`Error calling API ${apiOptions.endpoint}: ${e}`);
             return { sucess: false, data: null };
-        }
-        finally {
-            const current = APICaller.#inFlight.get(endpoint);
-            if (current === abortController) APICaller.#inFlight.delete(endpoint);
+        } finally {
+            const current = APICaller.#inFlight.get(apiOptions.endpoint)?.controller;
+            if (current === abortController) APICaller.#inFlight.delete(apiOptions.endpoint);
         }
     }
 
     /**
-     * Manages in-flight requests for a given endpoint.
+     * Coordinates and deduplicates in-flight API requests per endpoint.
      *
-     * Aborts any previous request associated with the same endpoint, creates a new
-     * AbortController for the current request, and links it to an optional external
-     * AbortSignal so caller-initiated aborts are propagated.
+     * Compares the serialized request payload against any existing in-flight
+     * request for the same endpoint. If the payload is identical, the existing
+     * AbortController and promise are reused and no new request should be issued.
+     * If the payload differs, the previous request is aborted and a new controller
+     * is created for the incoming request.
      *
-     * @param endpoint - Unique key used to identify and replace in-flight requests
-     * @param signal - Optional external AbortSignal to chain cancellation from the caller
-     * @returns AbortController controlling the lifetime of the new request
+     * Optionally chains an external AbortSignal so caller-initiated cancellation
+     * propagates to the managed request lifecycle.
+     *
+     * @param endpoint - API endpoint used as the request identity key
+     * @param content - Serialized request payload used to detect equivalent requests
+     * @param signal - Optional external AbortSignal for lifecycle cancellation
+     * @returns Object containing the AbortController and optional reused promise.
      */
-    private static handleInFlightRequests(endpoint: string, signal?: AbortSignal): AbortController {
+    private static handleInFlightRequests(
+        endpoint: string,
+        content: string,
+        signal?: AbortSignal
+    ): { controller: AbortController; promise?: Promise<{ sucess: boolean; data: any }> } {
         const prevRequest = APICaller.#inFlight.get(endpoint);
-        if (prevRequest) prevRequest.abort();
-        const controller = new AbortController();
-        signal?.addEventListener("abort", () => controller.abort());
-        APICaller.#inFlight.set(endpoint, controller);
-        return controller;
+        if (prevRequest) {
+            if (prevRequest.content === content) {
+                // return the previous request data without changes
+                return { controller: prevRequest.controller, promise: prevRequest.promise };
+            } else {
+                // abort previous request if the new payload (content) is different
+                prevRequest.controller.abort();
+                const controller = new AbortController();
+                signal?.addEventListener("abort", () => controller.abort());
+                // return new abort controller without promise since the previous promise is cancelled
+                return { controller: controller, promise: undefined };
+            }
+        } else {
+            const controller = new AbortController();
+            signal?.addEventListener("abort", () => controller.abort());
+            // return new abort controller without promise since there is no previous request
+            return { controller: controller, promise: undefined };
+        }
     }
 
     /**
@@ -312,7 +377,8 @@ export class APICaller {
      */
     private static async redirectToLogin(apiResult: APIResult): Promise<boolean> {
         let authenticationError = apiResult.kind === "error" && (apiResult.status === 401 || apiResult.status === 429);
-        if (authenticationError) { // Unauthorized acess
+        if (authenticationError) {
+            // Unauthorized acess
             userAuthenticated.set(false);
             await navigateTo("/login", {}, true, true);
             return true;
@@ -351,10 +417,15 @@ export class APICaller {
      * @param apiResult - Result returned by an API request
      * @returns Structured error message data for toast/alert display
      */
-    private static getAPIMessageCode(apiResult: APIResult): { code: string, details: Record<string, string>, textList: AlertTextList, autoClose: boolean } {
-
+    private static getAPIMessageCode(apiResult: APIResult): {
+        code: string;
+        details: Record<string, string>;
+        textList: AlertTextList;
+        autoClose: boolean;
+    } {
         if (apiResult.kind === "aborted") return { code: "timeoutError", details: {}, textList: "general", autoClose: true };
-        if (apiResult.kind === "exception") return { code: "unexpectedError", details: { message: apiResult.message }, textList: "general", autoClose: true };
+        if (apiResult.kind === "exception")
+            return { code: "unexpectedError", details: { message: apiResult.message }, textList: "general", autoClose: true };
         let errorCode: string | undefined = apiResult.data?.error_code;
         let errorSection: string | undefined = apiResult.data?.error_section;
         let details = removeKeysFromRecord(apiResult.data, ["error_code", "error_section"]);
