@@ -47,7 +47,7 @@ export function getDeviceNodesConfigAPI(id: number): APIDescriptor<{ initialNode
             }
 
             return { initialNodes, nodes };
-        }
+        },
     };
 }
 
@@ -77,7 +77,6 @@ export function getDeviceNodesStateAPI(
                 signal,
                 timeout,
             });
-
             if (sucess) {
                 ({ meter_type, nodes_state } = data as { meter_type: MeterType; nodes_state: Record<string, NodeState> });
                 processedNodesState = processNodesState(nodes_state);
@@ -86,7 +85,7 @@ export function getDeviceNodesStateAPI(
             }
 
             return { meterType: meter_type, nodesState: nodes_state, processedNodesState };
-        }
+        },
     };
 }
 
@@ -128,7 +127,7 @@ export function getNodeAdditionalInfoAPI(
             }
 
             return { nodeAdditionalInfo };
-        }
+        },
     };
 }
 
@@ -183,7 +182,7 @@ export function getNodeLogsAPI(
             }
 
             return { nodeLogs };
-        }
+        },
     };
 }
 
@@ -212,7 +211,11 @@ export function getEnergyConsumptionAPI(
     start_time: Date | null = null,
     end_time: Date | null = null,
     time_step: string | null = null
-): APIDescriptor<{ energyLogs: EnergyConsumptionType; mergedPoints: Array<ProcessedEnergyConsumptionLogPoint>; mergedGlobalMetrics: EnergyConsumptionMetrics } | null> {
+): APIDescriptor<{
+    energyLogs: EnergyConsumptionType;
+    mergedPoints: Array<ProcessedEnergyConsumptionLogPoint>;
+    mergedGlobalMetrics: EnergyConsumptionMetrics;
+} | null> {
     return {
         async call({ signal, timeout } = {}) {
             let energyLogs: EnergyConsumptionType;
@@ -240,7 +243,7 @@ export function getEnergyConsumptionAPI(
             }
 
             return { energyLogs, mergedPoints, mergedGlobalMetrics };
-        }
+        },
     };
 }
 
@@ -299,6 +302,6 @@ export function getPeakPowerAPI(
             }
 
             return peakPower;
-        }
+        },
     };
 }

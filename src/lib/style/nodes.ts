@@ -235,8 +235,8 @@ const NodesBaseDisplayStyleConfig: ComponentStyles = {
         displayHoverBorder: "1px solid #6B7280",
         displayDisconnectedBorder: "1px solid #52525B",
         displayDisconnectedHoverBorder: "1px solid #6B7280",
-        displayBackgroundColor: "rgba(82, 82, 91, 0.16)",
-        displayHoverBackgroundColor: "rgba(82, 82, 91, 0.24)",
+        displayBackgroundColor: "rgba(107, 114, 128, 0.15)",
+        displayHoverBackgroundColor: "rgba(107, 114, 128, 0.22)",
         displayDisconnectedBackgroundColor: "rgba(107, 114, 128, 0.15)",
         displayDisconnectedHoverBackgroundColor: "rgba(107, 114, 128, 0.22)",
         displayHoverShadow: "0 1px 4px rgba(0, 0, 0, 0.25)",
@@ -278,8 +278,8 @@ const NodesBaseDisplayDetailStyleConfig: ComponentStyles = {
         displayHoverBorder: "1px solid #6B7280",
         displayDisconnectedBorder: "1px solid #52525B",
         displayDisconnectedHoverBorder: "1px solid #6B7280",
-        displayBackgroundColor: "rgba(82, 82, 91, 0.1)",
-        displayHoverBackgroundColor: "rgba(82, 82, 91, 0.18)",
+        displayBackgroundColor: "rgba(107, 114, 128, 0.15)",
+        displayHoverBackgroundColor: "rgba(107, 114, 128, 0.22)",
         displayDisconnectedBackgroundColor: "rgba(107, 114, 128, 0.15)",
         displayDisconnectedHoverBackgroundColor: "rgba(107, 114, 128, 0.22)",
         displayHoverShadow: "0 1px 4px rgba(0, 0, 0, 0.25)",
@@ -336,6 +336,20 @@ const TextDisplayStyleConfig: ComponentStyles = {
 };
 
 export const TextDisplayStyle = createStyleStore(TextDisplayStyleConfig);
+
+//////////     S T A T E     D I S P L A Y     //////////
+
+const StateDisplayStyleConfig: ComponentStyles = {
+    dark: {
+        valueTextSize: "1.0625rem",
+        falseValueTextColor: "#9CA3AF",
+        trueValueTextColor: "#E4E4E7",
+        valueTextSpacing: "0.25px",
+        valueTextWeight: "600",
+    },
+};
+
+export const StateDisplayStyle = createStyleStore(StateDisplayStyleConfig);
 
 //////////     C O U N T E R     D I S P L A Y     //////////
 

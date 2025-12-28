@@ -66,7 +66,7 @@ export enum NodeType {
     FLOAT = "FLOAT",
     STRING = "STRING",
     INT = "INT",
-    BOOLEAN = "BOOLEAN",
+    BOOL = "BOOL",
 }
 
 /**

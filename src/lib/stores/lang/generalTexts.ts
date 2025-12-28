@@ -696,6 +696,10 @@ const textsObject: TextsObject = {
         PT: "Contadores",
         EN: "Counters",
     },
+    states: {
+        PT: "Estados",
+        EN: "States",
+    },
     texts: {
         PT: "Textos",
         EN: "Texts",

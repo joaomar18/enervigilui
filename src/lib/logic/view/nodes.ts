@@ -7,20 +7,19 @@ import type { BaseMetrics } from "$lib/types/nodes/logs";
 
 /**
  * Determines the category of a node based on its type and incremental flag.
- * @param nodeType - The data type of the node (FLOAT, INT, BOOLEAN, STRING)
+ * @param nodeType - The data type of the node (FLOAT, INT, BOOL, STRING)
  * @param counterNode - Whether the node is of counter type
  * @returns The appropriate node category for UI organization
  */
 export function getNodeCategory(nodeType: NodeType, counterNode: boolean): NodeCategory {
     let category: NodeCategory;
-
     if (nodeType === NodeType.FLOAT || nodeType === NodeType.INT) {
         if (counterNode) {
             category = NodeCategory.Counters;
         } else {
             category = NodeCategory.Measurements;
         }
-    } else if (nodeType === NodeType.BOOLEAN) {
+    } else if (nodeType === NodeType.BOOL) {
         category = NodeCategory.States;
     } else if (nodeType === NodeType.STRING) {
         category = NodeCategory.Texts;

@@ -157,7 +157,7 @@ const modbusRtuPlugin: ProtocolPlugin = {
         let type = (nodeProtocolOptions as ModbusRTUNodeOptions).type;
         switch (type) {
             case ModbusRTUNodeType.BOOL:
-                return NodeType.BOOLEAN;
+                return NodeType.BOOL;
 
             case ModbusRTUNodeType.INT_16:
             case ModbusRTUNodeType.INT_32:
@@ -278,7 +278,7 @@ const opcUaPlugin: ProtocolPlugin = {
         let type = (nodeProtocolOptions as OPCUANodeOptions).type;
         switch (type) {
             case OPCUANodeType.BOOL:
-                return NodeType.BOOLEAN;
+                return NodeType.BOOL;
             case OPCUANodeType.INT:
                 return NodeType.INT;
             case OPCUANodeType.FLOAT:

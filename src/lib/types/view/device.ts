@@ -2,6 +2,7 @@ import { NodeCategory } from "../nodes/base";
 import type { SvelteComponent } from "svelte";
 import Measurement from "../../../components/Devices/Nodes/RealTimeDisplay/Measurement.svelte";
 import Counter from "../../../components/Devices/Nodes/RealTimeDisplay/Counter.svelte";
+import State from "../../../components/Devices/Nodes/RealTimeDisplay/State.svelte";
 import Text from "../../../components/Devices/Nodes/RealTimeDisplay/Text.svelte";
 import { GraphType } from "$lib/logic/view/graph/base";
 
@@ -30,7 +31,7 @@ export const initialRealTimeCardCategoriesExpandState = {
 export const realTimeDisplayComponentMap: Record<NodeCategory, typeof SvelteComponent<any> | null> = {
     [NodeCategory.Measurements]: Measurement,
     [NodeCategory.Counters]: Counter,
-    [NodeCategory.States]: null, // Not implemented yet
+    [NodeCategory.States]: State,
     [NodeCategory.Texts]: Text,
     [NodeCategory.Other]: null, // Not implemented yet
 };
