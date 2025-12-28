@@ -17,7 +17,7 @@ import { isEqual } from "$lib/logic/util/generic";
  * @returns {NodeValidation} A fresh validation object with all checks set to false
  */
 export function getInitialNodeValidation(protocol: Protocol, protocolOptions: EditableBaseNodeProtocolOptions): NodeValidation {
-    let plugin = get(protocolPlugins)[protocol]
+    let plugin = get(protocolPlugins)[protocol];
     return {
         variableName: false,
         variableType: false,
@@ -102,7 +102,7 @@ export function validateNodeName(nodeName: string, customVariable: boolean, curr
  */
 export function validateNodeUnit(nodeName: string, nodeType: NodeType, nodeUnit: string, customVariable: boolean): boolean {
     if (customVariable) {
-        if (nodeType === NodeType.STRING || nodeType === NodeType.BOOLEAN) {
+        if (nodeType === NodeType.STRING || nodeType === NodeType.BOOL) {
             return !(nodeUnit && nodeUnit.trim().length > 0);
         } else {
             return Boolean(nodeUnit && nodeUnit.trim().length > 0);
