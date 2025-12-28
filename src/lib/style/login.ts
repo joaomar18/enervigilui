@@ -70,19 +70,6 @@ const LoginFormAlertStyleConfig: ComponentStyles = {
 
 export const LoginFormAlertStyle = createStyleStore(LoginFormAlertStyleConfig);
 
-//////////     F O R G O T     P A S S W O R D     B U T T O N     //////////
-
-const ForgotPassButtonStyleConfig: ComponentStyles = {
-    dark: {
-        paddingTop: "20px",
-        paddingBottom: "30px",
-        textColor: "rgb(216,216,216)",
-        hoverTextColor: "rgb(51,151,210)",
-    },
-};
-
-export const ForgotPassButtonStyle = createStyleStore(ForgotPassButtonStyleConfig);
-
 //////////     L O G I N     F I E L D     //////////
 
 const LoginFieldStyleConfig: ComponentStyles = {

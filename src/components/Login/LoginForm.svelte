@@ -4,7 +4,6 @@
     import FormAlert from "../General/FormAlert.svelte";
     import LoginField from "./LoginField.svelte";
     import LoginButton from "./LoginButton.svelte";
-    import ForgotPassButton from "./ForgotPassButton.svelte";
     import Checkbox from "../General/Checkbox.svelte";
 
     // Texts
@@ -129,7 +128,6 @@
         <span class="keep-logged-in-text">{$texts.keepSessionLogged}</span>
     </div>
     <LoginButton processing={loginProcessing} paddingTop="30px" onClick={login} />
-    <ForgotPassButton onClick={forgotPassword} />
 </div>
 
 <style>
@@ -140,7 +138,7 @@
         margin: 0;
         padding: 0;
         width: 100%;
-        height: 500px;
+        height: 475px;
         background-color: var(--background-color);
         min-width: 260px;
         display: flex;
