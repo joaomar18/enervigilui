@@ -144,7 +144,7 @@
     Integrates FormAlert for user feedback and provides seamless date-time field management.
 -->
 
-<ToolTip style={$ToolTipDatePickerStyle} autoPositionContinuous={true} zIndex={198} {showToolTip} alignType="right">
+<ToolTip style={$ToolTipDatePickerStyle} autoPositionContinuous={true} zIndex={198} {showToolTip} forceShowMobile={true} alignType="right">
     <div
         style="
             --padding-horizontal: {mergedStyle.paddingHorizontal};

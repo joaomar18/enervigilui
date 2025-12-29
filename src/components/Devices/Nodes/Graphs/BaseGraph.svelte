@@ -133,7 +133,7 @@
     let gridElement: HTMLDivElement | null = null;
     let graph: BaseGraphObject<BaseLogPoint> | null = null;
     let showDateRange: boolean = false;
-    let loaderTimeout: number | null = null;
+    let loaderTimeout: ReturnType<typeof setTimeout> | null = null;
     let showLoader: boolean = false;
     let graphCreated: boolean = false;
     let graphNoData: boolean = true;

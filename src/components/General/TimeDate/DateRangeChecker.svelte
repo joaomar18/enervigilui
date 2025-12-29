@@ -138,7 +138,7 @@
         </div>
     </div>
 {:else if useToolTip}
-    <ToolTip style={effectiveToolTipStyle} autoPositionContinuous={true} zIndex={198} {showToolTip}>
+    <ToolTip style={effectiveToolTipStyle} autoPositionContinuous={true} zIndex={198} {showToolTip} forceShowMobile={true}>
         <div
             style="
                     --padding-horizontal: {mergedStyle.paddingHorizontal};
