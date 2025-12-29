@@ -6,7 +6,8 @@
     import LoginForm from "../../components/Login/LoginForm.svelte";
 
     // Stores
-    import { loadedDone } from "$lib/stores/view/navigation";
+    import { loadedDone, userConfigSetup } from "$lib/stores/view/navigation";
+    import PopupUserConfig from "../../components/Login/PopupUserConfig.svelte";
 
     // Mount function
     onMount(() => {
@@ -20,11 +21,14 @@
 -->
 <div class="container" in:fade={{ duration: 300 }}>
     <Header />
-    <div class="column" id="first-col">
-        <LoginForm />
-    </div>
-    <div class="column" id="second-col">
-        <Info appImageUrl="/img/smart-meter.png" />
+    <div class="content">
+        <div class="column" id="first-col">
+            <LoginForm />
+        </div>
+        <div class="column" id="second-col">
+            <Info appImageUrl="/img/smart-meter.png" />
+        </div>
+        <PopupUserConfig windowOpened={$userConfigSetup} />
     </div>
 </div>
 
@@ -38,6 +42,14 @@
         height: 100vh;
         min-width: 350px;
         min-height: 600px;
+    }
+
+    .content {
+        position: relative;
+        margin: 0;
+        padding: 0;
+        width: 100%;
+        height: calc(100% - 74px);
         display: grid;
         grid-template-columns: 1fr;
         align-items: center;
@@ -54,7 +66,6 @@
         display: flex;
         justify-content: center;
         align-items: center;
-        padding-top: 74px;
         box-sizing: border-box;
     }
 
@@ -72,9 +83,9 @@
     /* On desktop: show both columns */
     @media (min-width: 1280px) {
         .column {
-            width: 50vw;
+            width: 100%;
         }
-        .container {
+        .content {
             grid-template-columns: 1fr 1fr;
         }
         #second-col {

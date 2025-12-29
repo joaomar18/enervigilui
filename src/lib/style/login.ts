@@ -14,6 +14,21 @@ const HeaderStyleConfig: ComponentStyles = {
 
 export const HeaderStyle = createStyleStore(HeaderStyleConfig);
 
+//////////     P O P U P     U S E R     C O N F I G U R A T I O N     //////////
+
+const PopupUserConfigStyleConfig: ComponentStyles = {
+    dark: {
+        backgroundColor: "rgb(28, 28, 30)",
+        border: "1px solid rgb(60, 60, 65)",
+        shadow: "0 12px 32px rgba(0, 0, 0, 0.55)",
+        borderRadius: "10px",
+        titleColor: "rgb(255,255,255)",
+        titleWeight: "400",
+    },
+};
+
+export const PopupUserConfigStyle = createStyleStore(PopupUserConfigStyleConfig);
+
 //////////     L O G I N     F O R M     //////////
 
 const LoginFormStyleConfig: ComponentStyles = {
@@ -64,7 +79,7 @@ const LoginFormAlertStyleConfig: ComponentStyles = {
         closeButtonImageWidth: "24px",
         closeButtonImageHeight: "24px",
         closeButtonColor: "#9ca3af",
-        closeButtonHoverColor: "#e5e7eb"
+        closeButtonHoverColor: "#e5e7eb",
     },
 };
 
@@ -107,6 +122,39 @@ const LoginHintInfoStyleConfig: ComponentStyles = {
 
 export const LoginHintInfoStyle = createStyleStore(LoginHintInfoStyleConfig);
 
+//////////     I N I T I A L     S E T U P     B U T T O N     //////////
+
+const InitialSetupButtonStyleConfig: ComponentStyles = {
+    dark: {
+        width: "200px",
+        height: "55px",
+        borderRadius: "5px",
+        backgroundColor: "rgb(0, 158, 96)",
+        disabledBackgroundColor: "rgb(127,127,127)",
+        selectedBackgroundColor: "rgb(0, 158, 96)",
+        borderColor: "none",
+        disabledBorderColor: "none",
+        selectedBorderColor: "none",
+        hoverColor: "rgb(0, 143, 57)",
+        disabledHoverColor: "rgb(127,127,127)",
+        selectedHoverColor: "rgb(0, 143, 57)",
+        fontColor: "#f5f5f5",
+        disabledFontColor: "#f5f5f5",
+        selectedFontColor: "#f5f5f5",
+        fontSize: "1.25rem",
+        subFontSize: "0.875rem",
+        fontWeight: "500",
+        subFontWeight: "400",
+        imageWidth: "24px",
+        imageHeight: "24px",
+        imageRightPos: "auto",
+        imageLeftPos: "auto",
+        showToolTipDelay: 300,
+    },
+};
+
+export const InitialSetupButtonStyle = createStyleStore(InitialSetupButtonStyleConfig);
+
 //////////     L O G I N     B U T T O N     //////////
 
 const LoginButtonStyleConfig: ComponentStyles = {
@@ -118,7 +166,7 @@ const LoginButtonStyleConfig: ComponentStyles = {
         backgroundColor: "rgb(0, 158, 96)",
         processingBackgroundColor: "rgb(127,127,127)",
         hoverColor: "rgb(0, 143, 57)",
-        textColor: "rgb(255,255,255)",
+        textColor: "#f5f5f5",
         loaderWidth: "24",
         loaderHeight: "24",
         loaderColor: "rgb(255,255,255)",

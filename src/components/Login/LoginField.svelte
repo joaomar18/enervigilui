@@ -1,4 +1,5 @@
 <script lang="ts">
+    import { slide } from "svelte/transition";
     import HintInfo from "../General/HintInfo.svelte";
 
     // Styles
@@ -15,6 +16,7 @@
     export let hintText: string;
     export let incorrect: boolean;
     export let incorrectText: string;
+    export let pushIncorrectTextBottom: boolean = false;
     export let type: string = "text"; // Input type (default is text)
     export let value: string = "";
     export let fieldText: string; //Visible text of the field
@@ -126,18 +128,31 @@
                         alt={showPassword ? "show" : "hide"}
                         style="width:{mergedStyle.imageWidth}; heigh:{mergedStyle.imageHeight};"
                     />
-                    <button class="show-hide-btn" on:click={togglePassword} aria-label="Show Password"></button>
+                    <button class="show-hide-btn" on:click={togglePassword} aria-label="Show Password" tabindex="-1"></button>
                 </div>
             </div>
         {/if}
         {#if incorrect}
-            <div class="warning-div">
-                <HintInfo labelText={incorrectText} style={$LoginHintInfoStyle}>
-                    <span class="warning-text">{hintText}</span>
-                </HintInfo>
-            </div>
+            {#if !pushIncorrectTextBottom}
+                <div class="warning-div">
+                    <HintInfo labelText={incorrectText} style={$LoginHintInfoStyle}>
+                        <span class="warning-text">{hintText}</span>
+                    </HintInfo>
+                </div>
+            {:else}
+                <div class="warning-div">
+                    <HintInfo labelText={""} style={$LoginHintInfoStyle}>
+                        <span class="warning-text">{hintText}</span>
+                    </HintInfo>
+                </div>
+            {/if}
         {/if}
     </div>
+    {#if incorrect && pushIncorrectTextBottom}
+        <div in:slide={{ duration: 300 }} out:slide={{ duration: 300 }} class="incorrect-text-bottom">
+            <HintInfo enableHint={false} labelText={incorrectText} style={$LoginHintInfoStyle} />
+        </div>
+    {/if}
 </div>
 
 <style>
@@ -173,8 +188,8 @@
     .field-image {
         margin: 0;
         padding: 0;
-        width: var(--image-width, "0px");
-        height: var(--image-height, "0px");
+        width: var(--image-width);
+        height: var(--image-height);
         top: 50%;
         left: calc((50px - var(--image-width)) / 2);
         transform: translateY(-50%);
@@ -244,6 +259,12 @@
         top: -10px;
         right: 0px;
         transform: translateY(-100%);
+    }
+
+    /* Container to show error text on bottom of field */
+    .incorrect-text-bottom {
+        width: 100%;
+        padding-top: 10px;
     }
 
     /* Error container text styling */

@@ -1,8 +1,10 @@
 import { APICaller } from "$lib/logic/api/api";
 import { navigateTo } from "../view/navigation";
-import { validateUsername, validatePassword } from "../validation/auth";
-import { userAuthenticated } from "$lib/stores/view/navigation";
+import { validateUsername, validatePassword, passwordMatch } from "../validation/auth";
+import { userAuthenticated, userConfigSetup } from "$lib/stores/view/navigation";
 import type { APIDescriptor } from "$lib/logic/api/api";
+import { showToast } from "../view/toast";
+import { AlertType } from "$lib/stores/view/toast";
 
 /**
  * Authenticates user with username and password credentials.
@@ -32,34 +34,76 @@ export function loginUserAPI(username: string, password: string, autoLogin: bool
             if (sucess) {
                 await navigateTo("/devices", {}, true, true); // Navigate to the dashboard on success
             }
-
-        }
-    }
+        },
+    };
 }
 
 /**
- * Attempts to refresh or validate the current authentication session with the backend.
+ * Creates an API descriptor to perform the initial user configuration.
  *
- * This function does NOT make routing or authorization decisions.
- * It only reports whether a valid authenticated session exists after contacting the server.
+ * This function validates the provided username and passwords locally before
+ * sending a request to the backend. If validation fails, the API call is not
+ * executed. On successful user creation, the initial setup state is cleared.
  *
- * Intended for client-side UX initialization (e.g. auto-login checks, UI state),
- * while final access control and redirects remain enforced by server-side guards.
+ * @param username - Desired username for the initial account
+ * @param password - Password for the account
+ * @param confirm_password - Password confirmation (must match `password`)
+ * @returns An APIDescriptor that executes the user creation request
+ */
+export function createUserConfigAPI(username: string, password: string, confirm_password: string): APIDescriptor<void> {
+    return {
+        async call({ signal, timeout } = {}) {
+            const validInputs: boolean = validateUsername(username) && validatePassword(password) && passwordMatch(password, confirm_password);
+            if (!validInputs) return;
+            const { sucess, data } = await APICaller.callAPI({
+                endpoint: "/api/auth/create_login",
+                method: "POST",
+                params: {
+                    username,
+                    password,
+                    confirm_password,
+                },
+                signal,
+                timeout,
+            });
+            if (sucess) {
+                userConfigSetup.set(false);
+                showToast("USER_CONFIG_SUCESS", AlertType.INFO, {}, "apiAuthorization");
+            }
+        },
+    };
+}
+
+/**
+ * Checks the current authentication session state with the backend.
  *
- * @returns Object indicating whether the session is authenticated.
+ * Sends a request to the server to determine whether a valid authenticated
+ * session exists. This function does not perform navigation, redirects, or
+ * authorization decisions; it only reflects the session status returned by
+ * the backend and updates client-side authentication state accordingly.
+ *
+ * If the backend reports that no user configuration exists, the client is
+ * flagged to enter the initial setup flow.
+ *
+ * Intended for client-side initialization logic such as auto-login checks
+ * and UI state restoration. Final access control and routing remain enforced
+ * by server-side guards.
+ *
+ * @returns Object indicating whether the current session is authenticated.
  */
 export function autoLoginAPI(): APIDescriptor<{ sucess: boolean }> {
     return {
         async call({ signal, timeout } = {}) {
-            const { sucess } = await APICaller.callAPI({
+            const { sucess, data } = await APICaller.callAPI({
                 endpoint: "/api/auth/auto_login",
                 method: "POST",
                 signal,
-                timeout
+                timeout,
             });
+            if (data?.error_code === "USER_CONFIG_NOT_FOUND") userConfigSetup.set(true);
             userAuthenticated.set(sucess);
             return { sucess };
-        }
+        },
     };
 }
 
@@ -80,6 +124,6 @@ export function logoutUserAPI(): APIDescriptor<void> {
                 userAuthenticated.set(false);
                 await navigateTo("/login", {}, true, true);
             }
-        }
-    }
+        },
+    };
 }

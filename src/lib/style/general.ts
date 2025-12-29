@@ -334,6 +334,7 @@ const ModalWindowStyleConfig: ComponentStyles = {
         width: "80%",
         height: "fit-content",
         borderRadius: "10px",
+        contentPadding: "20px",
         backgroundColor: "#14161c",
         borderColor: "#2a2e3a",
         titleSize: "1rem",

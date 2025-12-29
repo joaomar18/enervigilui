@@ -8,6 +8,7 @@
 
     // Props
     export let customTitle: boolean = false;
+    export let disableHeader: boolean = false;
     export let disableCloseWindow: boolean = false;
     export let title: string = "";
 
@@ -22,6 +23,7 @@
     export let height: string | undefined = undefined;
     export let maxHeight: string | undefined = undefined;
     export let borderRadius: string | undefined = undefined;
+    export let contentPadding: string | undefined = undefined;
     export let backgroundColor: string | undefined = undefined;
     export let borderColor: string | undefined = undefined;
     export let titleSize: string | undefined = undefined;
@@ -32,6 +34,7 @@
         width,
         height,
         borderRadius,
+        contentPadding,
         backgroundColor,
         borderColor,
         titleSize,
@@ -113,6 +116,7 @@
         --height: {mergedStyle.height};
         --max-height: {procMaxHeight};
         --border-radius: {mergedStyle.borderRadius};
+        --content-padding: {mergedStyle.contentPadding};
         --background-color: {mergedStyle.backgroundColor};
         --border-color: {mergedStyle.borderColor};
         --title-size: {mergedStyle.titleSize};
@@ -123,19 +127,27 @@
     bind:this={containerEl}
 >
     <div class="content">
-        <div class="header-div">
-            {#if customTitle}
-                <slot name="header"></slot>
-            {:else}
-                <h3 class="not-custom">{title}</h3>
-            {/if}
-            <button class="close-button" on:click={() => {if(!disableCloseWindow) closeWindow()}} aria-label="Close Window">
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <line x1="6" y1="6" x2="18" y2="18" />
-                    <line x1="18" y1="6" x2="6" y2="18" />
-                </svg></button
-            >
-        </div>
+        {#if !disableHeader}
+            <div class="header-div">
+                {#if customTitle}
+                    <slot name="header"></slot>
+                {:else}
+                    <h3 class="not-custom">{title}</h3>
+                {/if}
+                <button
+                    class="close-button"
+                    on:click={() => {
+                        if (!disableCloseWindow) closeWindow();
+                    }}
+                    aria-label="Close Window"
+                >
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <line x1="6" y1="6" x2="18" y2="18" />
+                        <line x1="18" y1="6" x2="6" y2="18" />
+                    </svg></button
+                >
+            </div>
+        {/if}
         <div class="content-div">
             <slot />
         </div>
@@ -231,7 +243,7 @@
         width: 100%;
         box-sizing: border-box;
         flex: 1 1 auto;
-        padding: 20px;
+        padding: var(--content-padding);
         display: flex;
         flex-direction: column;
         justify-content: flex-start;

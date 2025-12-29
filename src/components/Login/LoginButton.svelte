@@ -110,6 +110,7 @@
         align-items: center;
         margin: 0;
         padding: 0;
+        font-weight: 500;
         font-size: 1.25rem;
         cursor: pointer;
         outline: none;

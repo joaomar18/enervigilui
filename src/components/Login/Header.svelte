@@ -114,14 +114,14 @@
 <style>
     /* Main header container fixed at the top */
     .header-div {
-        position: absolute;
+        position: sticky;
         width: 100%;
         min-width: 320px;
         height: 74px;
         top: 0px;
         left: 0px;
         background-color: var(--background-color);
-        z-index: 2;
+        z-index: 3;
     }
 
     /* Content wrapper with centered layout */

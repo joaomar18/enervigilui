@@ -63,10 +63,6 @@
         await loginUserAPI(username, password, autoLogin).call({ timeout: 5000 });
         loginProcessing = false;
     }
-
-    function forgotPassword(): void {
-        // Placeholder for future implementation
-    }
 </script>
 
 <!-- 

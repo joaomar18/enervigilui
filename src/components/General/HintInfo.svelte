@@ -7,6 +7,7 @@
 
     // Props
     export let openInverted: boolean = false;
+    export let enableHint: boolean = true;
     export let labelText: string = "";
 
     // Style object (from theme)
@@ -92,25 +93,26 @@
 -->
 <div class="info-div">
     <span style="--info-text-color:{mergedStyle.textColor}" class="info-text">{labelText}</span>
-    <div
-        bind:this={hintDiv}
-        class="hint-div"
-        style="
+    {#if enableHint}
+        <div
+            bind:this={hintDiv}
+            class="hint-div"
+            style="
             --hint-width: {mergedStyle.hintWidth};
             --hint-height: {mergedStyle.hintHeight};
             --hint-background-color: {mergedStyle.hintBackgroundColor};
             --hint-border-color: {mergedStyle.hintBorderColor};
             --hint-border-radius: {mergedStyle.hintBorderRadius};
         "
-        class:open={hintOpened}
-        class:inverted={openInverted}
-    >
-        <slot />
-    </div>
-    <button on:click={toogleHint} bind:this={buttonEl} aria-label="Show Hint" class:hint-opened={hintOpened}>
-        <div
-            class="hint-button"
-            style="
+            class:open={hintOpened}
+            class:inverted={openInverted}
+        >
+            <slot />
+        </div>
+        <button on:click={toogleHint} bind:this={buttonEl} aria-label="Show Hint" class:hint-opened={hintOpened}>
+            <div
+                class="hint-button"
+                style="
                 --open-background-color:{mergedStyle.openBackgroundColor};
                 --open-hover-background-color:{mergedStyle.openHoverBackgroundColor};
                 --open-stroke-color:{mergedStyle.openStrokeColor};
@@ -121,26 +123,27 @@
                 --close-stroke-color:{mergedStyle.closeStrokeColor};
                 --close-hover-stroke-color:{mergedStyle.closeHoverStrokeColor};
             "
-        >
-            <div class="info-button-div" class:hide={hintOpened}>
-                <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none">
-                    <circle class="info-circle" cx="12" cy="12" r="10" stroke-width="1.5" />
+            >
+                <div class="info-button-div" class:hide={hintOpened}>
+                    <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none">
+                        <circle class="info-circle" cx="12" cy="12" r="10" stroke-width="1.5" />
 
-                    <circle class="i-dot" cx="12" cy="8" r="0.9" />
+                        <circle class="i-dot" cx="12" cy="8" r="0.9" />
 
-                    <line class="i-line" x1="12" y1="11" x2="12" y2="16.5" stroke-width="1.5" stroke-linecap="round" />
-                </svg>
+                        <line class="i-line" x1="12" y1="11" x2="12" y2="16.5" stroke-width="1.5" stroke-linecap="round" />
+                    </svg>
+                </div>
+                <div class="close-button-div" class:hide={!hintOpened}>
+                    <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none">
+                        <circle class="close-circle" cx="12" cy="12" r="10" stroke-width="1.5" />
+
+                        <line class="close-line" x1="9" y1="9" x2="15" y2="15" stroke-width="1.5" stroke-linecap="round" />
+                        <line class="close-line" x1="15" y1="9" x2="9" y2="15" stroke-width="1.5" stroke-linecap="round" />
+                    </svg>
+                </div>
             </div>
-            <div class="close-button-div" class:hide={!hintOpened}>
-                <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none">
-                    <circle class="close-circle" cx="12" cy="12" r="10" stroke-width="1.5" />
-
-                    <line class="close-line" x1="9" y1="9" x2="15" y2="15" stroke-width="1.5" stroke-linecap="round" />
-                    <line class="close-line" x1="15" y1="9" x2="9" y2="15" stroke-width="1.5" stroke-linecap="round" />
-                </svg>
-            </div>
-        </div>
-    </button>
+        </button>
+    {/if}
 </div>
 
 <style>

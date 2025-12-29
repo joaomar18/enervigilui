@@ -10,6 +10,10 @@ const textsObject: TextsObject = {
         PT: "Bem-vindo",
         EN: "Welcome",
     },
+    initialSetup: {
+        PT: "Configuração inicial",
+        EN: "Initial setup"
+    },
     selectLanguage: {
         PT: "Selecione o seu idioma:",
         EN: "Select your language:",
@@ -38,9 +42,9 @@ const textsObject: TextsObject = {
         PT: "Palavra-passe",
         EN: "Password",
     },
-    forgotPassword: {
-        PT: "Esqueci-me da palavra-passe",
-        EN: "Forgot my password",
+    confirmPassword: {
+        PT: "Repita a palavra-passe",
+        EN: "Repeat password",
     },
     login: {
         PT: "Entrar",
@@ -69,6 +73,14 @@ const textsObject: TextsObject = {
     passwordInfo: {
         PT: "A palavra-passe deve conter pelo menos 5 caracteres sem espaços.",
         EN: "The password must contain at least 5 characters without spaces.",
+    },
+    passwordNoMatch: {
+        PT: "As palavras-passe não coincidem.",
+        EN: "Passwords do not match.",
+    },
+    passwordConfirmInfo: {
+        PT: "Repita a palavra-passe para confirmação.",
+        EN: "Repeat the password for confirmation.",
     },
     keepSessionLogged: {
         PT: "Manter sessão iniciada",

@@ -304,14 +304,15 @@ export class APICaller {
             } else {
                 // Process Error
                 const redirectedToLogin = await APICaller.redirectToLogin(apiResult);
-                if (APICaller.returnEarly(apiResult, apiOptions.endpoint, redirectedToLogin)) return { sucess: false, data: null };
+                if (APICaller.returnEarly(apiResult, apiOptions.endpoint, redirectedToLogin))
+                    return { sucess: false, data: apiResult.kind == "error" ? apiResult.data : null };
                 let errorMessage = APICaller.getAPIMessageCode(apiResult);
                 if (get(uiSynchronized)) {
                     showToast(errorMessage.code, AlertType.ALERT, errorMessage.details, errorMessage.textList, errorMessage.autoClose);
                 } else {
                     latestAPIMessage.set(errorMessage);
                 }
-                return { sucess: false, data: null };
+                return { sucess: false, data: apiResult.kind == "error" ? apiResult.data : null };
             }
         } catch (e) {
             console.error(`Error calling API ${apiOptions.endpoint}: ${e}`);
@@ -366,17 +367,22 @@ export class APICaller {
     }
 
     /**
-     * Handles authentication-related API failures by redirecting the user to the login page.
+     * Handles authentication-related API failures by resetting authentication
+     * state and redirecting the user to the login page.
      *
-     * Inspects an APIResult and, if it represents an authentication error
-     * (e.g. unauthorized or rate-limited access), clears the authenticated state
-     * and performs a navigation redirect to the login view.
+     * Inspects an APIResult and determines whether it represents an authentication
+     * or access-related error, such as unauthorized access (401), rate limiting
+     * (429), or a missing user configuration error. When such a condition is
+     * detected, the authenticated state is cleared and the user is redirected
+     * to the login view.
      *
      * @param apiResult - Result returned by an API request
-     * @returns True if a redirect to the login page was performed, false otherwise
+     * @returns True if an authentication error was detected and a redirect to the
+     *          login page was performed; false otherwise.
      */
     private static async redirectToLogin(apiResult: APIResult): Promise<boolean> {
-        let authenticationError = apiResult.kind === "error" && (apiResult.status === 401 || apiResult.status === 429);
+        let authenticationError =
+            apiResult.kind === "error" && (apiResult.status === 401 || apiResult.status === 429 || apiResult.data?.error_code === "USER_CONFIG_NOT_FOUND");
         if (authenticationError) {
             // Unauthorized acess
             userAuthenticated.set(false);

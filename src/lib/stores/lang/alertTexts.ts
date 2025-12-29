@@ -86,7 +86,7 @@ const generalAlertTextsObject: TextsObject = {
     },
     noKeyError: {
         PT: "Erro desconhecido.",
-        EN: "Unknown error."
+        EN: "Unknown error.",
     },
     unexpectedError: {
         PT: "Erro inesperado: {message}",
@@ -116,7 +116,7 @@ const apiGeneralAlertTextsObject: TextsObject = {
     INTERNAL_SERVER_ERROR: {
         PT: "Erro interno do sistema: {message}",
         EN: "Internal system error: {message}",
-    }
+    },
 };
 
 //////////     A P I     A U T H O R I Z A T I O N     A L E R T     T E X T S     //////////
@@ -185,8 +185,12 @@ const apiAuthorizationAlertTextsObject: TextsObject = {
     BLOCKED_CLIENT: {
         PT: "Acesso temporariamente bloqueado por motivos de segurança. Tente novamente às {unlocked_date}.",
         EN: "Access temporarily blocked for security reasons. Try again at {unlocked_date}.",
-    }
-}
+    },
+    USER_CONFIG_SUCESS: {
+        PT: "Configuração criada com sucesso.",
+        EN: "Configuration created successfully.",
+    },
+};
 
 //////////     A P I     D E V I C E     A L E R T     T E X T S     //////////
 
@@ -279,7 +283,7 @@ const apiDeviceAlertTextsObject: TextsObject = {
         PT: "Dispositivo não encontrado.",
         EN: "Device not found.",
     },
-}
+};
 
 //////////     A P I     N O D E S     A L E R T     T E X T S     //////////
 
@@ -368,7 +372,7 @@ const apiNodesAlertTextsObject: TextsObject = {
         PT: "Falha ao eliminar todos os registos históricos da variável.",
         EN: "Failed to delete all historical data of the variable.",
     },
-}
+};
 
 export const generalAlertTexts = createLangStore(generalAlertTextsObject);
 export const apiGeneralAlertTexts = createLangStore(apiGeneralAlertTextsObject);
@@ -376,10 +380,7 @@ export const apiAuthorizationAlertTexts = createLangStore(apiAuthorizationAlertT
 export const apiDeviceAlertTexts = createLangStore(apiDeviceAlertTextsObject);
 export const apiNodesAlertTexts = createLangStore(apiNodesAlertTextsObject);
 
-const alertTextStores: Record<
-    AlertTextList,
-    Readable<Record<string, string>>
-> = {
+const alertTextStores: Record<AlertTextList, Readable<Record<string, string>>> = {
     general: generalAlertTexts,
     apiGeneral: apiGeneralAlertTexts,
     apiAuthorization: apiAuthorizationAlertTexts,
@@ -387,11 +388,8 @@ const alertTextStores: Record<
     apiNodes: apiNodesAlertTexts,
 };
 
-export const activeAlertTexts: Readable<Record<string, string>> = derived(
-    activeToastTextList,
-    ($group, set) => {
-        const store = alertTextStores[$group];
-        const unsubscribe = store.subscribe(set);
-        return unsubscribe;
-    }
-);
+export const activeAlertTexts: Readable<Record<string, string>> = derived(activeToastTextList, ($group, set) => {
+    const store = alertTextStores[$group];
+    const unsubscribe = store.subscribe(set);
+    return unsubscribe;
+});
