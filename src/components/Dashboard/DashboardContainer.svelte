@@ -57,7 +57,6 @@
             }
         };
         desktopMatch.onchange = closeMobileSearchOnDesktop;
-        document.body.classList.add("dashboard");
 
         //Clean-up logic
         return () => {
@@ -65,7 +64,6 @@
             if (clickEventListenerDefined) {
                 window.removeEventListener("click", handleClickOutside);
             }
-            document.body.classList.remove("dashboard");
         };
     });
 </script>
