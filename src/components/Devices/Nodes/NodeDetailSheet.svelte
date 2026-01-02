@@ -395,7 +395,7 @@
                         <span class="label">{$texts.updated}</span>
                         <InlineLoader loaded={!nodeAddInfoLoading}>
                             {#if nodeAdditionalInfo}
-                                <span class="value align-right"><ElapsedDateTime isoDateString={nodeAdditionalInfo.last_update_date} /></span>
+                                <span class="value align-right"><ElapsedDateTime dateFetched={nodeAddInfoFetched} isoDateString={nodeAdditionalInfo.last_update_date} /></span>
                             {/if}
                         </InlineLoader>
                     </div>
@@ -403,7 +403,7 @@
                         <dt class="label">{$texts.restarted}</dt>
                         <InlineLoader loaded={!nodeAddInfoLoading}>
                             {#if nodeAdditionalInfo}
-                                <span class="value align-right"><ElapsedDateTime isoDateString={nodeAdditionalInfo.last_reset_date} /></span>
+                                <span class="value align-right"><ElapsedDateTime dateFetched={nodeAddInfoFetched} isoDateString={nodeAdditionalInfo.last_reset_date} /></span>
                             {/if}
                         </InlineLoader>
                     </div>
