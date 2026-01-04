@@ -6,7 +6,7 @@ import { addPrefix, getNodePrefix, removePrefix } from "../util/nodes";
 import { toISOStringLocal } from "../util/date";
 import type { EnergyConsumptionType, PeakPowerType } from "$lib/types/device/energy";
 import type { NodeRecord, EditableNodeRecord } from "$lib/types/nodes/config";
-import type { NodeState, ProcessedNodeState, BaseNodeAdditionalInfo } from "$lib/types/nodes/realtime";
+import type { NodeState, ProcessedNodeState, BaseNodeExtendedInfo } from "$lib/types/nodes/realtime";
 import type { EnergyConsumptionMetrics, NodeLogs, ProcessedEnergyConsumptionLogPoint, ProcessedNodeLogs } from "$lib/types/nodes/logs";
 import type { EnergyDirectionFilter, SelectablePhaseFilter } from "$lib/types/view/nodes";
 import type { MeterType } from "$lib/types/device/base";
@@ -101,19 +101,19 @@ export function getDeviceNodesStateAPI(
  * @returns Object containing the node additional information,
  *          or null if the request fails.
  */
-export function getNodeAdditionalInfoAPI(
+export function getNodeExtendedInfoAPI(
     id: number,
     nodeName: string,
     nodePhase: NodePhase
-): APIDescriptor<{ nodeAdditionalInfo: BaseNodeAdditionalInfo } | null> {
+): APIDescriptor<{ nodeAdditionalInfo: BaseNodeExtendedInfo } | null> {
     return {
         async call({ signal, timeout } = {}) {
-            let nodeAdditionalInfo: BaseNodeAdditionalInfo;
+            let nodeAdditionalInfo: BaseNodeExtendedInfo;
             const prefix = getNodePrefix(nodePhase);
             const processedName = addPrefix(removePrefix(nodeName), prefix);
 
             const { sucess, data } = await APICaller.callAPI({
-                endpoint: "/api/nodes/get_node_additional_info",
+                endpoint: "/api/nodes/get_node_extended_info",
                 method: "GET",
                 params: { id, node_name: processedName },
                 signal,
@@ -121,7 +121,7 @@ export function getNodeAdditionalInfoAPI(
             });
 
             if (sucess) {
-                nodeAdditionalInfo = data as BaseNodeAdditionalInfo;
+                nodeAdditionalInfo = data as BaseNodeExtendedInfo;
             } else {
                 return null;
             }

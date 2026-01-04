@@ -1,5 +1,4 @@
 <script lang="ts">
-    import type { DeviceInfo } from "$lib/types/device/base";
     import SlottedAction from "../General/SlottedAction.svelte";
 
     // Texts
@@ -14,7 +13,8 @@
     $: effectiveStyle = style ?? $MobileDeviceInfoHeaderStyle;
 
     // Props
-    export let deviceInfo: DeviceInfo;
+    export let dataFetched: boolean;
+    export let deviceId: number;
 
     // Layout / styling props
     export let mainTextColor: string | undefined = undefined;
@@ -43,7 +43,7 @@
 
 <!-- Mobile device info header: shows device icon, name, and ID in a clickable row for mobile layouts
 Uses SlottedAction for consistent button-like behavior -->
-{#if deviceInfo}
+{#if dataFetched}
     <SlottedAction width="100%" onClick={() => {}}>
         <div
             style="
@@ -63,7 +63,7 @@ Uses SlottedAction for consistent button-like behavior -->
                     <img src="/img/current-device.svg" alt="Current device" />
                     <span>{$texts.device}</span>
                 </div>
-                <span class="sub-text">ID: {String(deviceInfo?.id).padStart(3, "0")}</span>
+                <span class="sub-text">ID: {String(deviceId).padStart(3, "0")}</span>
             </div>
             <img class="arrow" src="/img/down-arrow.svg" alt="down-arrow" />
         </div>

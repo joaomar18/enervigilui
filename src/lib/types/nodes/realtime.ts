@@ -80,7 +80,7 @@ export interface ProcessedNodeState {
 }
 
 /**
- * Additional operational information and metadata for a node.
+ * Extended operational information and metadata for a node.
  * Contains runtime data, alarm/warning thresholds, and communication settings.
  *
  * @property {string | null} [last_update_date] - ISO timestamp of the last value update
@@ -94,7 +94,7 @@ export interface ProcessedNodeState {
  * @property {Protocol} protocol - Communication protocol used by this node
  * @property {number} logging_period - How often the node value is logged (in minutes)
  */
-export interface BaseNodeAdditionalInfo {
+export interface BaseNodeExtendedInfo {
     last_update_date: string | null;
     last_reset_date: string | null;
     min_alarm_value?: number;

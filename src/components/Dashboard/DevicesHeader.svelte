@@ -2,9 +2,8 @@
     import { onMount } from "svelte";
     import { getDeviceID } from "$lib/logic/view/navigation";
     import { logoutUserAPI } from "$lib/logic/api/auth";
-    import { getDeviceInfoWithImageAPI } from "$lib/logic/api/device";
+    import { getDeviceIdentificationWithImageAPI } from "$lib/logic/api/device";
     import { APIRetrier } from "$lib/logic/api/retrier";
-    import type { DeviceInfo } from "$lib/types/device/base";
     import Notification from "../General/Notification.svelte";
     import Logout from "./Logout.svelte";
     import DeviceInfoHeader from "../Devices/DeviceInfoHeader.svelte";
@@ -16,19 +15,23 @@
     import { texts } from "$lib/stores/lang/generalTexts";
 
     // Variables
-    let deviceInfo: DeviceInfo;
+    let deviceId: number;
+    let deviceName: string;
     let deviceImageUrl: string;
+    let dataFetched: boolean = false;
 
     onMount(() => {
-        let deviceId = getDeviceID();
-        let deviceDataRetrier: APIRetrier<{ deviceInfo: DeviceInfo; deviceImageUrl: string } | null> | null = null;
-        if (deviceId) {
+        let deviceIdRequest = getDeviceID();
+        let deviceDataRetrier: APIRetrier<{ deviceId: number; deviceName: string; deviceImageUrl: string } | null> | null = null;
+        if (deviceIdRequest) {
             deviceDataRetrier = new APIRetrier(
-                getDeviceInfoWithImageAPI(deviceId),
+                getDeviceIdentificationWithImageAPI(deviceIdRequest),
                 (result) => {
                     if (result === null) return;
-                    deviceInfo = result.deviceInfo;
+                    deviceId = result.deviceId;
+                    deviceName = result.deviceName;
                     deviceImageUrl = result.deviceImageUrl;
+                    dataFetched = true;
                 },
                 5000,
             );
@@ -52,12 +55,12 @@
     <div class="main-header-div">
         <div class="center-div">
             <div class="center-content-div">
-                <InlineLoader loaded={!!deviceInfo}>
+                <InlineLoader loaded={!!deviceName && !!deviceId}>
                     <div class="desktop-device-info-div">
-                        <DeviceInfoHeader {deviceInfo} {deviceImageUrl} />
+                        <DeviceInfoHeader {dataFetched} {deviceId} {deviceName} {deviceImageUrl} />
                     </div>
                     <div class="mobile-device-info-div">
-                        <MobileDeviceInfoHeader {deviceInfo} />
+                        <MobileDeviceInfoHeader {dataFetched} {deviceId} />
                     </div>
                 </InlineLoader>
             </div>

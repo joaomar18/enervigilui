@@ -1,9 +1,8 @@
 import { APICaller } from "$lib/logic/api/api";
 import type { APIDescriptor } from "$lib/logic/api/api";
-import type { Device, EditableDevice, DeviceHistory, DeviceInfo } from "$lib/types/device/base";
+import type { Device, EditableDevice, ExtendedDeviceInfo } from "$lib/types/device/base";
 import type { NodeRecord } from "$lib/types/nodes/config";
 import { processInitialDevice, convertToEditableDevice } from "../factory/device";
-import { processDeviceHistory } from "../handlers/device";
 import { navigateTo } from "../view/navigation";
 
 /**
@@ -35,7 +34,7 @@ export function getAllDevicesAPI(): APIDescriptor<{ devices: Array<Device> } | n
             }
 
             return { devices };
-        }
+        },
     };
 }
 
@@ -70,7 +69,7 @@ export function getAllDevicesWithImageAPI(): APIDescriptor<{ devices: Array<Devi
             }
 
             return { devices, devicesImages };
-        }
+        },
     };
 }
 
@@ -101,7 +100,7 @@ export function getDeviceAPI(id: number): APIDescriptor<{ initialDeviceData: Dev
             }
 
             return { initialDeviceData };
-        }
+        },
     };
 }
 
@@ -111,14 +110,13 @@ export function getDeviceAPI(id: number): APIDescriptor<{ initialDeviceData: Dev
  * @param id - Device identifier.
  * @returns Object containing device information and history, or null on failure.
  */
-export function getDeviceInfoAPI(id: number): APIDescriptor<{ deviceInfo: DeviceInfo } | null> {
+export function getDeviceExtendedInfoAPI(id: number): APIDescriptor<{ deviceInfo: ExtendedDeviceInfo } | null> {
     return {
         async call({ signal, timeout } = {}) {
-            let deviceInfo: DeviceInfo;
-            let deviceHistory: DeviceHistory;
+            let deviceInfo: ExtendedDeviceInfo;
 
             const { sucess, data } = await APICaller.callAPI({
-                endpoint: "/api/device/get_device_info",
+                endpoint: "/api/device/get_device_extended_info",
                 method: "GET",
                 params: { id },
                 signal,
@@ -126,14 +124,43 @@ export function getDeviceInfoAPI(id: number): APIDescriptor<{ deviceInfo: Device
             });
             if (sucess) {
                 const { ...requestDeviceInfo } = data;
-                deviceHistory = requestDeviceInfo.history as DeviceHistory;
-                deviceInfo = requestDeviceInfo as DeviceInfo;
-                deviceInfo.history = processDeviceHistory(deviceHistory);
+                deviceInfo = requestDeviceInfo as ExtendedDeviceInfo;
             } else {
                 return null;
             }
             return { deviceInfo };
-        }
+        },
+    };
+}
+
+/**
+ * Retrieves the identification of a device.
+ *
+ * @param id - Device identifier.
+ * @returns Object containing device info and image URL, or null on failure.
+ */
+export function getDeviceIdentificationAPI(id: number): APIDescriptor<{ deviceId: number; deviceName: string } | null> {
+    return {
+        async call({ signal, timeout } = {}) {
+            let deviceId: number;
+            let deviceName: string;
+
+            const { sucess, data } = await APICaller.callAPI({
+                endpoint: "/api/device/get_device_identification_with_image",
+                method: "GET",
+                params: { id },
+                signal,
+                timeout,
+            });
+            if (sucess) {
+                const { ...requestDeviceIdentication } = data;
+                deviceId = requestDeviceIdentication?.id as number;
+                deviceName = requestDeviceIdentication?.name as string;
+            } else {
+                return null;
+            }
+            return { deviceId, deviceName };
+        },
     };
 }
 
@@ -165,7 +192,7 @@ export function getDeviceWithImageAPI(id: number): APIDescriptor<{ initialDevice
             }
 
             return { initialDeviceData, deviceData };
-        }
+        },
     };
 }
 
@@ -175,31 +202,63 @@ export function getDeviceWithImageAPI(id: number): APIDescriptor<{ initialDevice
  * @param id - Device identifier.
  * @returns Object containing device info and image URL, or null on failure.
  */
-export function getDeviceInfoWithImageAPI(id: number): APIDescriptor<{ deviceInfo: DeviceInfo; deviceImageUrl: string } | null> {
+export function getDeviceExtendedInfoWithImageAPI(id: number): APIDescriptor<{ deviceInfo: ExtendedDeviceInfo; deviceImageUrl: string } | null> {
     return {
         async call({ signal, timeout } = {}) {
-            let deviceInfo: DeviceInfo;
-            let deviceHistory: DeviceHistory;
+            let deviceInfo: ExtendedDeviceInfo;
             let deviceImageUrl: string;
 
             const { sucess, data } = await APICaller.callAPI({
-                endpoint: "/api/device/get_device_info_with_image",
+                endpoint: "/api/device/get_device_extended_info_with_image",
                 method: "GET",
                 params: { id },
                 signal,
                 timeout,
             });
             if (sucess) {
-                const { image: requestDeviceImage, ...requestDeviceInfo } = data as DeviceInfo & { image: Record<string, string> };
-                deviceHistory = requestDeviceInfo.history as DeviceHistory;
-                deviceInfo = requestDeviceInfo as DeviceInfo;
-                deviceInfo.history = processDeviceHistory(deviceHistory);
+                const { image: requestDeviceImage, ...requestDeviceInfo } = data as ExtendedDeviceInfo & { image: Record<string, string> };
+                deviceInfo = requestDeviceInfo as ExtendedDeviceInfo;
                 deviceImageUrl = `data:${requestDeviceImage["type"]};base64,${requestDeviceImage["data"]}`;
             } else {
                 return null;
             }
             return { deviceInfo, deviceImageUrl };
-        }
+        },
+    };
+}
+
+/**
+ * Retrieves the identification of a device including image.
+ *
+ * @param id - Device identifier.
+ * @returns Object containing device info and image URL, or null on failure.
+ */
+export function getDeviceIdentificationWithImageAPI(id: number): APIDescriptor<{ deviceId: number; deviceName: string; deviceImageUrl: string } | null> {
+    return {
+        async call({ signal, timeout } = {}) {
+            let deviceImageUrl: string;
+            let deviceId: number;
+            let deviceName: string;
+
+            const { sucess, data } = await APICaller.callAPI({
+                endpoint: "/api/device/get_device_identification_with_image",
+                method: "GET",
+                params: { id },
+                signal,
+                timeout,
+            });
+            if (sucess) {
+                const { image: requestDeviceImage, ...requestDeviceIdentication } = data as Record<string, string | number> & {
+                    image: Record<string, string>;
+                };
+                deviceId = requestDeviceIdentication?.id as number;
+                deviceName = requestDeviceIdentication?.name as string;
+                deviceImageUrl = `data:${requestDeviceImage["type"]};base64,${requestDeviceImage["data"]}`;
+            } else {
+                return null;
+            }
+            return { deviceId, deviceName, deviceImageUrl };
+        },
     };
 }
 
@@ -226,7 +285,7 @@ export function getDefaultImageAPI(): APIDescriptor<string | null> {
                 return null;
             }
             return `data:${imageData["type"]};base64,${imageData["data"]}`;
-        }
+        },
     };
 }
 
@@ -253,7 +312,7 @@ export function addDeviceAPI(deviceData: Device, deviceImage: File | undefined, 
             if (sucess) {
                 await navigateTo("/devices", {});
             }
-        }
+        },
     };
 }
 
@@ -280,7 +339,7 @@ export function editDeviceAPI(deviceData: Device, deviceImage: File | undefined,
             if (sucess) {
                 await navigateTo("/devices", {});
             }
-        }
+        },
     };
 }
 
@@ -303,6 +362,6 @@ export function deleteDeviceAPI(deviceID: number): APIDescriptor<void> {
             if (sucess) {
                 await navigateTo("/devices", {});
             }
-        }
+        },
     };
 }

@@ -1,5 +1,4 @@
 <script lang="ts">
-    import type { DeviceInfo } from "$lib/types/device/base";
     import Action from "../General/Action.svelte";
     import ToolTipText from "../General/ToolTipText.svelte";
 
@@ -15,7 +14,9 @@
     import { texts } from "$lib/stores/lang/generalTexts";
 
     // Props
-    export let deviceInfo: DeviceInfo;
+    export let dataFetched: boolean;
+    export let deviceId: number;
+    export let deviceName: string;
     export let deviceImageUrl: string;
 
     // Layout / styling props
@@ -53,7 +54,7 @@
     Device info header: displays the main device information at the top of the device view page.
     Includes the device image, device name, and device ID, all styled in a horizontal row.
 -->
-{#if deviceInfo}
+{#if dataFetched}
     <div
         class="info-div"
         style="
@@ -73,8 +74,8 @@
         <div class="section">
             <div style="background-image: {`url('${deviceImageUrl}')`};" class="device-image-div" class:image-loaded={Boolean(deviceImageUrl)}></div>
             <div class="inner-section device-identification">
-                <span class="device-name">{deviceInfo.name}</span>
-                <span class="sub-text">ID: {String(deviceInfo.id).padStart(3, "0")}</span>
+                <span class="device-name">{deviceName}</span>
+                <span class="sub-text">ID: {String(deviceId).padStart(3, "0")}</span>
             </div>
         </div>
         <div class="expand-more-div">

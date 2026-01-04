@@ -8,11 +8,11 @@
     import TimePeriodPicker from "../../General/Pickers/TimePeriodPicker.svelte";
     import { LogSpanPeriod } from "$lib/types/view/nodes";
     import { getNodePhaseSection } from "$lib/logic/util/nodes";
-    import { getNodeAdditionalInfoAPI, getNodeLogsAPI } from "$lib/logic/api/nodes";
+    import { getNodeExtendedInfoAPI, getNodeLogsAPI } from "$lib/logic/api/nodes";
     import { getTimeSpanFromLogPeriod } from "$lib/logic/util/date";
     import { SlidingWindow } from "$lib/logic/util/classes/SlidingWindow";
     import type { NodeTimeSpan } from "$lib/types/view/nodes";
-    import type { BaseNodeAdditionalInfo, ProcessedNodeState } from "$lib/types/nodes/realtime";
+    import type { BaseNodeExtendedInfo, ProcessedNodeState } from "$lib/types/nodes/realtime";
     import type { ProcessedNodeLogs } from "$lib/types/nodes/logs";
 
     // Texts
@@ -133,11 +133,11 @@
 
     // Variables
     let state: "alarmState" | "warningState" | "okState" | "disconnectedState";
-    let nodeAdditionalInfo: BaseNodeAdditionalInfo;
-    let nodeAddInfoFetched: boolean = false;
-    let nodeAddInfoFirstFetch: boolean = false;
-    let nodeAddInfoLoading: boolean = false;
-    let nodeAddInfoTimeout: number | null = null;
+    let nodeExtendedInfo: BaseNodeExtendedInfo;
+    let nodeExtendedInfoFetched: boolean = false;
+    let nodeExtendedInfoFirstFetch: boolean = false;
+    let nodeExtendedInfoLoading: boolean = false;
+    let nodeExtendedInfoTimeout: ReturnType<typeof setTimeout> | null = null;
     let nodeLogs: ProcessedNodeLogs | null = null;
     let nodeLogsFetched: boolean = false;
     let nodeLogsFirstFetch: boolean = false;
@@ -153,7 +153,7 @@
         selectedHistoryTimeSpan = LogSpanPeriod.currentDay; // Default Period
         currentTimeSpans.clear();
         enableGoBack = currentTimeSpans.hasPrevious();
-        nodeAddInfoFirstFetch = false;
+        nodeExtendedInfoFirstFetch = false;
         nodeLogsFirstFetch = false;
     }
 
@@ -177,21 +177,21 @@
         }
     }
 
-    $: if (!nodeAddInfoFetched && !nodeAddInfoLoading) {
-        if (nodeAddInfoFirstFetch) {
-            nodeAddInfoTimeout = setTimeout(() => {
-                nodeAddInfoLoading = !nodeAddInfoFetched;
+    $: if (!nodeExtendedInfoFetched && !nodeExtendedInfoLoading) {
+        if (nodeExtendedInfoFirstFetch) {
+            nodeExtendedInfoTimeout = setTimeout(() => {
+                nodeExtendedInfoLoading = !nodeExtendedInfoFetched;
             }, 500);
         } else {
-            nodeAddInfoLoading = true;
+            nodeExtendedInfoLoading = true;
         }
     }
-    $: if (nodeAddInfoFetched) {
-        if (nodeAddInfoTimeout) {
-            clearInterval(nodeAddInfoTimeout);
-            nodeAddInfoTimeout = null;
+    $: if (nodeExtendedInfoFetched) {
+        if (nodeExtendedInfoTimeout) {
+            clearInterval(nodeExtendedInfoTimeout);
+            nodeExtendedInfoTimeout = null;
         }
-        nodeAddInfoLoading = false;
+        nodeExtendedInfoLoading = false;
     }
 
     // Functions
@@ -200,13 +200,13 @@
         if (!deviceId || !nodeState) {
             return;
         }
-        nodeAddInfoFetched = false;
-        let result = await getNodeAdditionalInfoAPI(deviceId, nodeState.name, nodeState.phase).call({ timeout: 5000 });
+        nodeExtendedInfoFetched = false;
+        let result = await getNodeExtendedInfoAPI(deviceId, nodeState.name, nodeState.phase).call({ timeout: 5000 });
         if (result !== null) {
-            nodeAdditionalInfo = result.nodeAdditionalInfo;
-            nodeAddInfoFetched = true;
+            nodeExtendedInfo = result.nodeAdditionalInfo;
+            nodeExtendedInfoFetched = true;
+            nodeExtendedInfoFirstFetch = true;
         }
-        nodeAddInfoFirstFetch = true;
     }
 
     function updateNodeLogs(): void {
@@ -267,8 +267,8 @@
         if (result !== null) {
             nodeLogs = result.nodeLogs;
             nodeLogsFetched = true;
+            nodeLogsFirstFetch = true;
         }
-        nodeLogsFirstFetch = true;
     }
 </script>
 
@@ -336,7 +336,7 @@
 >
     <RightPanelSheet useMask={false} bind:showPanel>
         <header slot="title" class="title-div">
-            <img src="/img/variable.svg" alt="Estado da variável" />
+            <img src="/img/details.svg" alt="Variable State" />
             <h3>{$texts.variableDetails}</h3>
         </header>
 
@@ -393,17 +393,17 @@
                     </div>
                     <div class="row">
                         <span class="label">{$texts.updated}</span>
-                        <InlineLoader loaded={!nodeAddInfoLoading}>
-                            {#if nodeAdditionalInfo}
-                                <span class="value align-right"><ElapsedDateTime dateFetched={nodeAddInfoFetched} isoDateString={nodeAdditionalInfo.last_update_date} /></span>
+                        <InlineLoader loaded={!nodeExtendedInfoLoading}>
+                            {#if nodeExtendedInfo}
+                                <span class="value align-right"><ElapsedDateTime dateFetched={nodeExtendedInfoFetched} isoDateString={nodeExtendedInfo.last_update_date} /></span>
                             {/if}
                         </InlineLoader>
                     </div>
                     <div class="row">
                         <dt class="label">{$texts.restarted}</dt>
-                        <InlineLoader loaded={!nodeAddInfoLoading}>
-                            {#if nodeAdditionalInfo}
-                                <span class="value align-right"><ElapsedDateTime dateFetched={nodeAddInfoFetched} isoDateString={nodeAdditionalInfo.last_reset_date} /></span>
+                        <InlineLoader loaded={!nodeExtendedInfoLoading}>
+                            {#if nodeExtendedInfo}
+                                <span class="value align-right"><ElapsedDateTime dateFetched={nodeExtendedInfoFetched} isoDateString={nodeExtendedInfo.last_reset_date} /></span>
                             {/if}
                         </InlineLoader>
                     </div>
@@ -415,10 +415,10 @@
                         {#if nodeState.min_alarm_state !== undefined}
                             <div class="row">
                                 <span class="label">{$texts.lowerLimit}</span>
-                                <InlineLoader loaded={!nodeAddInfoLoading && nodeAdditionalInfo?.min_alarm_value !== undefined}>
+                                <InlineLoader loaded={!nodeExtendedInfoLoading && nodeExtendedInfo?.min_alarm_value !== undefined}>
                                     <span class="value with-adornment align-right">
                                         <span class="value"
-                                            >{roundToDecimalPlaces(nodeAdditionalInfo?.min_alarm_value, nodeState.decimal_places || 0)}
+                                            >{roundToDecimalPlaces(nodeExtendedInfo?.min_alarm_value, nodeState.decimal_places || 0)}
                                             {nodeState.unit}</span
                                         >
                                         <div class="dot-state-div">
@@ -431,10 +431,10 @@
                         {#if nodeState.max_alarm_state !== undefined}
                             <div class="row">
                                 <span class="label">{$texts.upperLimit}</span>
-                                <InlineLoader loaded={!nodeAddInfoLoading && nodeAdditionalInfo?.max_alarm_value !== undefined}>
+                                <InlineLoader loaded={!nodeExtendedInfoLoading && nodeExtendedInfo?.max_alarm_value !== undefined}>
                                     <span class="value with-adornment align-right">
                                         <span class="value"
-                                            >{roundToDecimalPlaces(nodeAdditionalInfo?.max_alarm_value, nodeState.decimal_places || 0)}
+                                            >{roundToDecimalPlaces(nodeExtendedInfo?.max_alarm_value, nodeState.decimal_places || 0)}
                                             {nodeState.unit}</span
                                         >
                                         <div class="dot-state-div">
@@ -453,10 +453,10 @@
                         {#if nodeState.min_warning_state !== undefined}
                             <div class="row">
                                 <span class="label">{$texts.lowerLimit}</span>
-                                <InlineLoader loaded={!nodeAddInfoLoading && nodeAdditionalInfo?.min_warning_value !== undefined}>
+                                <InlineLoader loaded={!nodeExtendedInfoLoading && nodeExtendedInfo?.min_warning_value !== undefined}>
                                     <span class="value with-adornment align-right">
                                         <span class="value"
-                                            >{roundToDecimalPlaces(nodeAdditionalInfo?.min_warning_value, nodeState.decimal_places || 0)}
+                                            >{roundToDecimalPlaces(nodeExtendedInfo?.min_warning_value, nodeState.decimal_places || 0)}
                                             {nodeState.unit}</span
                                         >
                                         <div class="dot-state-div">
@@ -469,10 +469,10 @@
                         {#if nodeState.max_warning_state !== undefined}
                             <div class="row">
                                 <span class="label">{$texts.upperLimit}</span>
-                                <InlineLoader loaded={!nodeAddInfoLoading && nodeAdditionalInfo?.max_warning_value !== undefined}>
+                                <InlineLoader loaded={!nodeExtendedInfoLoading && nodeExtendedInfo?.max_warning_value !== undefined}>
                                     <span class="value with-adornment align-right">
                                         <span class="value"
-                                            >{roundToDecimalPlaces(nodeAdditionalInfo?.max_warning_value, nodeState.decimal_places || 0)}
+                                            >{roundToDecimalPlaces(nodeExtendedInfo?.max_warning_value, nodeState.decimal_places || 0)}
                                             {nodeState.unit}</span
                                         >
                                         <div class="dot-state-div">
@@ -525,21 +525,21 @@
                 <div class="inner-content-div">
                     <div class="row">
                         <span class="label">{$texts.type}</span>
-                        <InlineLoader loaded={!nodeAddInfoLoading && nodeAdditionalInfo?.type !== undefined}>
-                            <span class="value align-right">{nodeAdditionalInfo?.protocol_type}</span>
+                        <InlineLoader loaded={!nodeExtendedInfoLoading && nodeExtendedInfo?.type !== undefined}>
+                            <span class="value align-right">{nodeExtendedInfo?.protocol_type}</span>
                         </InlineLoader>
                     </div>
                     <div class="row">
                         <span class="label">{$texts.protocol}</span>
-                        <InlineLoader loaded={!nodeAddInfoLoading && nodeAdditionalInfo?.protocol !== undefined}>
-                            <span class="value align-right">{$protocolTexts[nodeAdditionalInfo?.protocol] || $pluginTexts.noProtocol}</span>
+                        <InlineLoader loaded={!nodeExtendedInfoLoading && nodeExtendedInfo?.protocol !== undefined}>
+                            <span class="value align-right">{$protocolTexts[nodeExtendedInfo?.protocol] || $pluginTexts.noProtocol}</span>
                         </InlineLoader>
                     </div>
                     <div class="row">
                         <span class="label">{$texts.logging}</span>
-                        <InlineLoader loaded={!nodeAddInfoLoading}>
-                            {#if nodeAdditionalInfo?.logging_period !== undefined}
-                                <span class="value align-right">{nodeAdditionalInfo?.logging_period} min.</span>
+                        <InlineLoader loaded={!nodeExtendedInfoLoading}>
+                            {#if nodeExtendedInfo?.logging_period !== undefined}
+                                <span class="value align-right">{nodeExtendedInfo?.logging_period} min.</span>
                             {:else}
                                 <span class="value align-right">{$texts.disabled}</span>
                             {/if}

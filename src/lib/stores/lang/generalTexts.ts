@@ -12,7 +12,7 @@ const textsObject: TextsObject = {
     },
     initialSetup: {
         PT: "Configuração inicial",
-        EN: "Initial setup"
+        EN: "Initial setup",
     },
     selectLanguage: {
         PT: "Selecione o seu idioma:",
@@ -29,6 +29,10 @@ const textsObject: TextsObject = {
     disabled: {
         PT: "Desabilitado",
         EN: "Disabled",
+    },
+    created: {
+        PT: "Criado",
+        EN: "Created",
     },
     name: {
         PT: "Nome",
@@ -668,6 +672,10 @@ const textsObject: TextsObject = {
         PT: "Configuração",
         EN: "Configuration",
     },
+    connectivity: {
+        PT: "Conectividade",
+        EN: "Connectivity",
+    },
     editDeviceConfig: {
         PT: "Editar configuração do dispositivo",
         EN: "Edit device configuration",
@@ -695,6 +703,14 @@ const textsObject: TextsObject = {
     lastUpdate: {
         PT: "Última atualização",
         EN: "Last update",
+    },
+    lastSeen: {
+        PT: "Visto em",
+        EN: "Last seen",
+    },
+    okNodes: {
+        PT: "Nós OK",
+        EN: "OK Nodes",
     },
     variables: {
         PT: "Variáveis",
@@ -840,6 +856,10 @@ const textsObject: TextsObject = {
         PT: "OK",
         EN: "OK",
     },
+    connectedState: {
+        PT: "conectado",
+        EN: "connected",
+    },
     disconnectedState: {
         PT: "desconectado",
         EN: "disconnected",
@@ -867,6 +887,10 @@ const textsObject: TextsObject = {
     selectedPeriod: {
         PT: "Período selecionado",
         EN: "Selected period",
+    },
+    now: {
+        PT: "agora",
+        EN: "now",
     },
     never: {
         PT: "Nunca",

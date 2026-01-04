@@ -13,10 +13,13 @@
 
     //Types
     import type { Device } from "$lib/types/device/base";
+    import DeviceDetailSheet from "../../components/Devices/DeviceDetailSheet.svelte";
 
     // Variables
     let devices: Array<Device>;
     let devicesImages: Record<number, string> = {};
+    let showDetailDeviceWindow: boolean = false;
+    let currentDetailDevice: Device;
 
     // Sorted devices
     $: sortedDevices = filterDevices(devices, $searchQuery);
@@ -90,12 +93,15 @@
             imageURL={devicesImages[device.id]}
             onEdit={() => editDevice(device.id)}
             onInfo={() => {
-                /* ... */
+                currentDetailDevice = device;
+                showDetailDeviceWindow = true;
             }}
             onEnter={() => enterDevice(device.id)}
         />
     {/each}
     <AddDevice onClick={() => addDevice()} />
+    <!----------     N O D E     C O N F I G U R A T I O N     S H E E T     ---------->
+    <DeviceDetailSheet bind:showPanel={showDetailDeviceWindow} deviceObject={currentDetailDevice} />
 </div>
 
 <style>

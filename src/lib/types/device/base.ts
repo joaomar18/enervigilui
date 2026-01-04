@@ -156,39 +156,34 @@ export interface DeviceValidation {
 }
 
 /**
- * Represents the connection and update history of a device.
- * Tracks when the device was connected or disconnected, and when it was created or last updated.
+ * Extended device information for status and health overview.
+ * Includes connection state, alarm indicators, device type, and lifecycle timestamps.
  *
- * @interface DeviceHistory
- * @property {string | null} connection_on_datetime - Timestamp when the device was last connected (ISO string or null)
- * @property {string | null} connection_off_datetime - Timestamp when the device was last disconnected (ISO string or null)
- * @property {string | null} created_at - Timestamp when the device was created (ISO string or null)
- * @property {string | null} updated_at - Timestamp when the device was last updated (ISO string or null)
+ * @interface ExtendedDeviceInfo
+ * @property {Protocol} protocol - Communication protocol used by the device
+ * @property {boolean} connected - Current connection state
+ * @property {boolean} alarm - Indicates whether any enabled node is in an alarm state
+ * @property {boolean} warning - Indicates whether any enabled node is in a warning state
+ * @property {MeterType} type - Meter type
+ * @property {string | null} last_seen - Timestamp of the last disconnection or connection event (ISO string)
+ * @property {string | null} created_at - Device creation timestamp (ISO string)
+ * @property {string | null} updated_at - Last configuration update timestamp (ISO string)
+ * @property {string | null} enabled_nodes - Number of enabled nodes in the device
+ * @property {string | null} ok_nodes - Number of healthy nodes in the device
+ * @property {number | undefined} read_period - Read period of the device (if not applicable is undefined)
  */
-export interface DeviceHistory {
-    connection_on_datetime: string | null;
-    connection_off_datetime: string | null;
-    created_at: string | null;
-    updated_at: string | null;
-}
-
-/**
- * Basic information about a meter for display or summary purposes.
- * Includes identification, protocol, connection status, image, and history.
- *
- * @interface DeviceInfo
- * @property {number} id - Unique numeric identifier for the device
- * @property {string} name - Human-readable name/label for the device
- * @property {Protocol} protocol - Communication protocol used by this device
- * @property {boolean} connected - Current connection status of the device
- * @property {DeviceHistory | null} history - Connection and update history for the device
- */
-export interface DeviceInfo {
-    id: number;
-    name: string;
+export interface ExtendedDeviceInfo {
     protocol: Protocol;
     connected: boolean;
-    history: DeviceHistory | null;
+    alarm: boolean;
+    warning: boolean;
+    type: MeterType;
+    last_seen: string | null;
+    created_at: string | null;
+    updated_at: string | null;
+    enabled_nodes: number;
+    ok_nodes: number;
+    read_period?: number;
 }
 
 /*****     T Y P E S     *****/
