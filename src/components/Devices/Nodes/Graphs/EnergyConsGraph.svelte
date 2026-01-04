@@ -228,7 +228,7 @@
                 </div>
             </div>
             {#if gridElement}
-                <GraphToolTip {gridElement} {insideGraph} {cursorPos}>
+                <GraphToolTip zIndex={103} {gridElement} {insideGraph} {cursorPos}>
                     <EnergyConsToolTip {logPoint} {activeEnergyUnit} {reactiveEnergyUnit} />
                 </GraphToolTip>
             {/if}

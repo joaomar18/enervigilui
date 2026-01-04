@@ -3,7 +3,7 @@
     import InlineLoader from "../General/InlineLoader.svelte";
     import ElapsedDateTime from "../General/TimeDate/ElapsedDateTime.svelte";
     import { getDeviceExtendedInfoAPI } from "$lib/logic/api/device";
-    import type { Device, ExtendedDeviceInfo } from "$lib/types/device/base";
+    import type { DeviceStatus, ExtendedDeviceInfo } from "$lib/types/device/base";
 
     // Texts
     import { texts } from "$lib/stores/lang/generalTexts";
@@ -18,7 +18,8 @@
     $: effectiveStyle = style ?? $DeviceDetailSheetStyle;
 
     // Props
-    export let deviceObject: Device;
+    export let deviceImage: string;
+    export let deviceStatus: DeviceStatus;
     export let showPanel: boolean;
 
     // Layout / styling props
@@ -44,6 +45,9 @@
     export let headerValueSize: string | undefined = undefined;
     export let headerValueColor: string | undefined = undefined;
     export let headerValueWeight: string | undefined = undefined;
+    export let headerSubValueSize: string | undefined = undefined;
+    export let headerSubValueColor: string | undefined = undefined;
+    export let headerSubValueWeight: string | undefined = undefined;
     export let contentTitleSize: string | undefined = undefined;
     export let contentTitleColor: string | undefined = undefined;
     export let contentTitleWeight: string | undefined = undefined;
@@ -66,6 +70,12 @@
     export let contentValueSize: string | undefined = undefined;
     export let contentValueColor: string | undefined = undefined;
     export let contentValueWeight: string | undefined = undefined;
+    export let imageBackgroundColor: string | undefined = undefined;
+    export let imageContainerWidth: string | undefined = undefined;
+    export let imageContainerHeight: string | undefined = undefined;
+    export let imageContainerBorderRadius: string | undefined = undefined;
+    export let imageWidth: string | undefined = undefined;
+    export let imageHeight: string | undefined = undefined;
 
     $: localOverrides = {
         stateDimColor,
@@ -90,6 +100,9 @@
         headerValueSize,
         headerValueColor,
         headerValueWeight,
+        headerSubValueSize,
+        headerSubValueColor,
+        headerSubValueWeight,
         contentTitleSize,
         contentTitleColor,
         contentTitleWeight,
@@ -112,6 +125,12 @@
         contentValueSize,
         contentValueColor,
         contentValueWeight,
+        imageBackgroundColor,
+        imageContainerWidth,
+        imageContainerHeight,
+        imageContainerBorderRadius,
+        imageWidth,
+        imageHeight,
     };
 
     // Merged style
@@ -119,6 +138,7 @@
 
     // Variables
     let state: "alarmState" | "warningState" | "connectedState" | "disconnectedState";
+    let nodesNumberState: "alarmState" | "warningState" | "connectedState" | "disconnectedState";
     let deviceExtendedInfo: ExtendedDeviceInfo;
     let deviceExtendedInfoFetched: boolean = false;
     let deviceExtendedInfoFirstFetch: boolean = false;
@@ -127,12 +147,12 @@
 
     // Reactive Statements
     $: if (!showPanel) {
-        deviceExtendedInfoFetched = false;
         deviceExtendedInfoFirstFetch = false;
     }
 
     // Initial Node State processing
-    $: if (deviceObject && showPanel) {
+    $: if (deviceStatus && showPanel) {
+        resolveState(deviceStatus);
         loadDeviceExtendedInfo();
     }
 
@@ -155,32 +175,61 @@
 
     // Functions
     async function loadDeviceExtendedInfo() {
-        if (!deviceObject || !deviceObject.id) {
+        if (!deviceStatus) {
             return;
         }
         deviceExtendedInfoFetched = false;
-        let result = await getDeviceExtendedInfoAPI(deviceObject.id).call({ timeout: 5000 });
+        let result = await getDeviceExtendedInfoAPI(deviceStatus.id).call({ timeout: 5000 });
         if (result !== null) {
             deviceExtendedInfo = result.deviceInfo;
-            resolveState(deviceExtendedInfo);
+            resolveNodesNumberState(deviceExtendedInfo);
             deviceExtendedInfoFetched = true;
             deviceExtendedInfoFirstFetch = true;
         }
     }
 
-    function resolveState(info: ExtendedDeviceInfo) {
-        if (info.alarm) {
+    function resolveState(status: DeviceStatus) {
+        if (status.alarm) {
             state = "alarmState";
-        } else if (info.warning) {
+        } else if (status.warning) {
             state = "warningState";
-        } else if (info.connected) {
+        } else if (status.connected) {
             state = "connectedState";
         } else {
             state = "disconnectedState";
         }
     }
+
+    function resolveNodesNumberState(info: ExtendedDeviceInfo) {
+        if (!info.connected) {
+            nodesNumberState = "disconnectedState";
+        } else if (info.ok_nodes == 0 && info.enabled_nodes > 0) {
+            nodesNumberState = "alarmState";
+        } else if (info.ok_nodes != info.enabled_nodes) {
+            nodesNumberState = "warningState";
+        } else nodesNumberState = "connectedState";
+    }
 </script>
 
+<!--
+    DeviceDetailSheet Component
+
+    A right-panel sheet component for presenting detailed device-level information,
+    combining configuration, connectivity, and operational state in a compact and
+    non-redundant layout. The component fetches and displays extended device metadata
+    on demand, including protocol and type information, lifecycle timestamps, derived
+    connection state, last-seen activity, node health aggregation, and read period.
+
+    It derives visual state indicators (connected, warning, alarm, disconnected) from
+    aggregated device and node status, and provides clear separation between static
+    configuration data and dynamic connectivity information. The component manages
+    asynchronous data loading with inline loaders and delayed loading indicators to
+    ensure a smooth user experience.
+
+    Supports extensive theming and layout customization through configurable style
+    properties, allowing full control over typography, spacing, colors, and visual
+    state indicators to ensure visual consistency across different deployments.
+-->
 <div
     class="variable-panel"
     style="
@@ -206,6 +255,9 @@
             --header-value-size: {mergedStyle.headerValueSize};
             --header-value-color: {mergedStyle.headerValueColor};
             --header-value-weight: {mergedStyle.headerValueWeight};
+            --header-sub-value-size: {mergedStyle.headerSubValueSize};
+            --header-sub-value-color: {mergedStyle.headerSubValueColor};
+            --header-sub-value-weight: {mergedStyle.headerSubValueWeight};
             --content-state-div-width: {mergedStyle.contentStateDivWidth};
             --content-title-size: {mergedStyle.contentTitleSize};
             --content-title-color: {mergedStyle.contentTitleColor};
@@ -228,38 +280,39 @@
             --content-value-size: {mergedStyle.contentValueSize};
             --content-value-color: {mergedStyle.contentValueColor};
             --content-value-weight: {mergedStyle.contentValueWeight};
+            --image-background-color: {mergedStyle.imageBackgroundColor};
+            --image-container-width: {mergedStyle.imageContainerWidth};
+            --image-container-height: {mergedStyle.imageContainerHeight};
+            --image-container-border-radius: {mergedStyle.imageContainerBorderRadius};
+            --image-width: {mergedStyle.imageWidth};
+            --image-height: {mergedStyle.imageHeight};
         "
 >
     <RightPanelSheet useMask={false} bind:showPanel>
         <header slot="title" class="title-div">
-            <img src="/img/details.svg" alt="Device State" />
+            <img src="/img/device-details.svg" alt="Device State" />
             <h3>{$texts.deviceDetails}</h3>
         </header>
 
         <section slot="header" class="header-div" aria-labelledby="hdr-title">
-            {#if deviceObject}
-                <div class="row">
-                    <span class="label">{$texts.name}</span>
-                    <span class="value">{deviceObject.name}</span>
+            {#if deviceStatus && deviceImage}
+                <div class="device-identification-div">
+                    <span class="device-name-text">{deviceStatus.name}</span>
+                    <span class="device-id-text">ID: {String(deviceStatus.id).padStart(3, "0")}</span>
+                    <div class="device-image-div" class:image-loaded={true}>
+                        <img src={deviceImage} alt={deviceImage} />
+                    </div>
                 </div>
                 <div class="row">
-                    <span class="label">ID</span>
-                    <span class="value">{deviceObject.id}</span>
+                    <span class="label">{$texts.state}</span>
+                    <span class="value with-adornment align-right">
+                        <span class="value">{$texts[state]}</span>
+                        <div class="dot-state-div">
+                            <div class="dot-state" data-state={state}></div>
+                        </div>
+                    </span>
                 </div>
             {/if}
-            <div class="row">
-                <span class="label">{$texts.state}</span>
-                <InlineLoader loaded={!deviceExtendedInfoLoading}>
-                    {#if deviceExtendedInfo}
-                        <span class="value with-adornment align-right">
-                            <span class="value">{$texts[state]}</span>
-                            <div class="dot-state-div">
-                                <div class="dot-state" data-state={state}></div>
-                            </div>
-                        </span>
-                    {/if}
-                </InlineLoader>
-            </div>
         </section>
         <main slot="content" class="content-div">
             <div class="section-title"><h3>{$texts.configuration}</h3></div>
@@ -322,12 +375,21 @@
                     <InlineLoader loaded={!deviceExtendedInfoLoading}>
                         {#if deviceExtendedInfo}
                             <span class="value align-right">
-                                <span class="state-text" class:alarm={deviceExtendedInfo.ok_nodes < deviceExtendedInfo.enabled_nodes}>{deviceExtendedInfo.ok_nodes}</span
-                                ><span>/</span><span>{deviceExtendedInfo.enabled_nodes}</span>
+                                <span class="state-text" data-state={nodesNumberState}>{deviceExtendedInfo.ok_nodes}</span><span>/</span><span
+                                    >{deviceExtendedInfo.enabled_nodes}</span
+                                >
                             </span>
                         {/if}
                     </InlineLoader>
                 </div>
+                <InlineLoader loaded={!deviceExtendedInfoLoading}>
+                    {#if !deviceExtendedInfoLoading || deviceExtendedInfo?.read_period != undefined}
+                        <div class="row">
+                            <span class="label">{$texts.readPeriod}</span>
+                            <span class="value align-right">{deviceExtendedInfo?.read_period} s</span>
+                        </div>
+                    {/if}
+                </InlineLoader>
             </div>
         </main>
     </RightPanelSheet>
@@ -342,7 +404,7 @@
         background: var(--state-dim-color);
     }
 
-    /* Dimmed state - Default/unknown node status */
+    /* Dimmed state - Default/unknown device status */
     .dot-state[data-state="dim"] {
         background: var(--state-dim-color);
     }
@@ -374,14 +436,29 @@
         align-items: center;
     }
 
-    /* State text - Normal color (green) for state texts */
-    span.state-text{
+    /* State text - Default/unknown node status */
+    span.state-text[data-state="dim"] {
+        color: var(--state-dim-color);
+    }
+
+    /* State text - Connected operational status (green) */
+    span.state-text[data-state="connectedState"] {
         color: var(--state-connected-color);
     }
 
-    /* State text - Alarm color for values in alarm */
-    span.state-text.alarm {
+    /* State text - Critical error condition (red) */
+    span.state-text[data-state="alarmState"] {
         color: var(--state-alarm-color);
+    }
+
+    /* State text - Non-critical issues (yellow/amber) */
+    span.state-text[data-state="warningState"] {
+        color: var(--state-warning-color);
+    }
+
+    /* State text - Communication lost (gray) */
+    span.state-text[data-state="disconnectedState"] {
+        color: var(--state-disconnected-color);
     }
 
     /* Panel title section - Header area with node icon, name, and metadata */
@@ -556,5 +633,75 @@
         font-size: var(--content-value-size);
         color: var(--content-value-color);
         font-weight: var(--content-value-weight);
+    }
+
+    /* Device identification div with device name, id and image */
+    .device-identification-div {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 10px;
+        width: 100%;
+        height: fit-content;
+        padding-bottom: 10px;
+    }
+
+    /* Image div: placeholder with bg image */
+    .device-image-div {
+        position: relative;
+        padding: 0;
+        margin: 0;
+        margin-top: 10px;
+        width: var(--image-container-width);
+        height: var(--image-container-height);
+        background-color: var(--image-background-color);
+        border-radius: var(--image-container-border-radius);
+        opacity: 0;
+        transition: all 0.2s ease-in-out;
+        overflow: hidden;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    /* Image loaded state: fully visible */
+    .device-image-div.image-loaded {
+        opacity: 1;
+    }
+
+    /* Image styling and sizing */
+    .device-image-div img {
+        width: var(--image-width);
+        height: var(--image-height);
+        -webkit-tap-highlight-color: transparent;
+        -webkit-touch-callout: none;
+        user-select: none;
+        transform-origin: center;
+        -webkit-font-smoothing: antialiased;
+        object-fit: cover;
+    }
+
+    /* Device name text */
+    .device-name-text {
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        text-align: center;
+        width: 100%;
+        font-size: var(--header-value-size);
+        color: var(--header-value-color);
+        font-weight: var(--header-value-weight);
+    }
+
+    /* Devie id text */
+    .device-id-text {
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        text-align: center;
+        width: 100%;
+        font-size: var(--header-sub-value-size);
+        color: var(--header-sub-value-color);
+        font-weight: var(--header-sub-value-weight);
     }
 </style>

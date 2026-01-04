@@ -88,7 +88,7 @@
         padding: 0;
         position: sticky;
         top: 50%;
-        transform: translateY(calc(-50% + 37px));
+        transform: translateY(-50%);
         display: flex;
         justify-content: center;
         align-items: center;

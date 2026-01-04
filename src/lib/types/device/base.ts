@@ -78,6 +78,27 @@ export interface Device {
 }
 
 /**
+ * Represents the status of a device in the energy monitoring system.
+ * Provides information about the device's connection state, alarm status,
+ * and warning indicators. This interface is used for monitoring and
+ * displaying the current state of devices in the system.
+ *
+ * @interface DeviceStatus
+ * @property {number} id - Unique numeric identifier for the device
+ * @property {string} name - Human-readable name/label for the device
+ * @property {boolean} connected - Indicates whether the device is currently connected
+ * @property {boolean} alarm - True if the device is in an alarm state
+ * @property {boolean} warning - True if the device is in a warning state
+ */
+export interface DeviceStatus {
+    id: number;
+    name: string;
+    connected: boolean;
+    alarm: boolean;
+    warning: boolean;
+}
+
+/**
  * Editable device meter configuration interface.
  * This interface mirrors DeviceMeter but uses EditableCommunicationOptions to support
  * form input handling where communication parameters are entered as strings. Used primarily

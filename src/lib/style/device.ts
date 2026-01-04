@@ -27,6 +27,11 @@ export const AddDeviceStyle = createStyleStore(AddDeviceStyleConfig);
 
 const DeviceCardStyleConfig: ComponentStyles = {
     dark: {
+        stateDimColor: "#374151",
+        stateAlarmColor: "#ef4444",
+        stateWarningColor: "#f59e0b",
+        stateConnectedColor: "#22c55e",
+        stateDisconnectedColor: "#6b7280",
         width: "300px",
         height: "400px",
         borderRadius: "20px",
@@ -227,8 +232,8 @@ const DeviceDetailSheetStyleConfig: ComponentStyles = {
         titleColor: "rgba(255, 255, 255, 0.8)",
         titleWeight: "500",
         titleItemGap: "10px",
-        titleImageWidth: "32px",
-        titleImageHeight: "32px",
+        titleImageWidth: "36px",
+        titleImageHeight: "36px",
         headerRowHeigth: "25px",
         headerStateDivWidth: "25px",
         headerRowGap: "10px",
@@ -240,6 +245,9 @@ const DeviceDetailSheetStyleConfig: ComponentStyles = {
         headerValueSize: "1rem",
         headerValueColor: "rgba(255, 255, 255, 0.8)",
         headerValueWeight: "600",
+        headerSubValueSize: "0.9rem",
+        headerSubValueColor: "rgb(170, 170, 170)",
+        headerSubValueWeight: "300",
         contentTitleSize: "13px",
         contentTitleColor: "rgba(255, 255, 255, 0.4)",
         contentTitleWeight: "500",
@@ -262,6 +270,12 @@ const DeviceDetailSheetStyleConfig: ComponentStyles = {
         contentValueSize: "1rem",
         contentValueColor: "rgba(255,255,255, 0.8)",
         contentValueWeight: "600",
+        imageBackgroundColor: "rgba(255, 255, 255, 0.1)",
+        imageContainerWidth: "200px",
+        imageContainerHeight: "200px",
+        imageContainerBorderRadius: "50%",
+        imageWidth: "auto",
+        imageHeight: "100%",
     },
 };
 

@@ -1,74 +1,73 @@
 import { APICaller } from "$lib/logic/api/api";
 import type { APIDescriptor } from "$lib/logic/api/api";
-import type { Device, EditableDevice, ExtendedDeviceInfo } from "$lib/types/device/base";
+import type { Device, DeviceStatus, EditableDevice, ExtendedDeviceInfo } from "$lib/types/device/base";
 import type { NodeRecord } from "$lib/types/nodes/config";
 import { processInitialDevice, convertToEditableDevice } from "../factory/device";
 import { navigateTo } from "../view/navigation";
 
 /**
- * Retrieves all devices with their initial state and configuration.
+ * Retrieves all devices status.
  * Device images are excluded to reduce payload size and improve load time.
  *
- * @returns Object containing an array of processed devices, or null on failure.
+ * @returns Object containing a record of processed devices status, or null on failure.
  */
-export function getAllDevicesAPI(): APIDescriptor<{ devices: Array<Device> } | null> {
+export function getAllDevicesStatusAPI(): APIDescriptor<{ devicesStatus: Record<number, DeviceStatus> } | null> {
     return {
         async call({ signal, timeout } = {}) {
-            let devices: Array<Device>;
+            let devicesStatus: Record<number, DeviceStatus> = {};
 
             const { sucess, data } = await APICaller.callAPI({
-                endpoint: "/api/device/get_all_devices",
+                endpoint: "/api/device/get_all_devices_status",
                 method: "GET",
                 setLoaded: true,
                 signal,
                 timeout,
             });
             if (sucess) {
-                devices = data.map((data: Device & { image: Record<string, string> }) => {
-                    const { ...requestDeviceData } = data as Device;
-                    let deviceData: Device = processInitialDevice(requestDeviceData as Device);
-                    return deviceData;
-                }) as Array<Device>;
+                for (let deviceStatus of data as Array<DeviceStatus>) {
+                    devicesStatus[deviceStatus.id] = deviceStatus;
+                }
             } else {
                 return null;
             }
-
-            return { devices };
+            return { devicesStatus };
         },
     };
 }
 
 /**
- * Retrieves all devices including their associated images.
+ * Retrieves all devices status including their associated images.
  * Converts base64 image data into data URLs mapped by device ID.
  *
- * @returns Object containing processed devices and a map of device images, or null on failure.
+ * @returns Object containing processed devices status and a map of device images, or null on failure.
  */
-export function getAllDevicesWithImageAPI(): APIDescriptor<{ devices: Array<Device>; devicesImages: Record<number, string> } | null> {
+export function getAllDevicesStatusWithImageAPI(): APIDescriptor<{
+    devicesStatus: Record<number, DeviceStatus>;
+    devicesImages: Record<number, string>;
+} | null> {
     return {
         async call({ signal, timeout } = {}) {
-            let devices: Array<Device>;
+            let devicesStatus: Record<number, DeviceStatus> = {};
             let devicesImages: Record<number, string> = {};
 
             const { sucess, data } = await APICaller.callAPI({
-                endpoint: "/api/device/get_all_devices_with_image",
+                endpoint: "/api/device/get_all_devices_status_with_image",
                 method: "GET",
                 setLoaded: true,
                 signal,
                 timeout,
             });
             if (sucess) {
-                devices = data.map((data: Device & { image: Record<string, string> }) => {
-                    const { image: deviceImage, ...requestDeviceData } = data as Device & { image: Record<string, string> };
-                    let deviceData: Device = processInitialDevice(requestDeviceData as Device);
-                    devicesImages[deviceData.id] = `data:${deviceImage["type"]};base64,${deviceImage["data"]}`;
-                    return deviceData;
-                }) as Array<Device>;
+                for (let deviceData of data as Array<DeviceStatus & { image: Record<string, string> }>) {
+                    const { image: deviceImage, ...requestDeviceStatus } = deviceData as DeviceStatus & { image: Record<string, string> };
+                    devicesStatus[requestDeviceStatus.id] = requestDeviceStatus;
+                    devicesImages[requestDeviceStatus.id] = `data:${deviceImage["type"]};base64,${deviceImage["data"]}`;
+                }
             } else {
                 return null;
             }
 
-            return { devices, devicesImages };
+            return { devicesStatus, devicesImages };
         },
     };
 }

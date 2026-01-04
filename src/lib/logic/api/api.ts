@@ -143,7 +143,7 @@ export class APICaller {
         }
 
         // Automatically abort the request after `timeout` milliseconds if a timeout is given.
-        let timeoutId: number | null = null;
+        let timeoutId: ReturnType<typeof setTimeout> | null = null;
         if (timeout !== undefined) {
             timeoutId = setTimeout(() => {
                 abortReason = AbortReason.TIMEOUT;

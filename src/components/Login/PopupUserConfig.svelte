@@ -73,6 +73,13 @@
     }
 </script>
 
+<!--
+PopupUserConfig
+
+Initial setup modal for creating the first user.
+Handles username/password input, validation, and submission,
+with inline errors and toast-based feedback.
+-->
 {#if windowOpened}
     <div
         style="

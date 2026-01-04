@@ -336,7 +336,7 @@
 >
     <RightPanelSheet useMask={false} bind:showPanel>
         <header slot="title" class="title-div">
-            <img src="/img/details.svg" alt="Variable State" />
+            <img src="/img/variable-details.svg" alt="Variable State" />
             <h3>{$texts.variableDetails}</h3>
         </header>
 

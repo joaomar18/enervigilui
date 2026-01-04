@@ -4,25 +4,34 @@
     import DeviceCard from "../../components/Devices/DeviceCard.svelte";
     import AddDevice from "../../components/Devices/AddDevice.svelte";
     import { navigateTo, resetDashboardLoader } from "$lib/logic/view/navigation";
-    import { getAllDevicesAPI, getAllDevicesWithImageAPI } from "$lib/logic/api/device";
-    import { filterDevices } from "$lib/logic/util/device";
+    import { getAllDevicesStatusAPI, getAllDevicesStatusWithImageAPI } from "$lib/logic/api/device";
+    import { filterDevicesStatus } from "$lib/logic/util/device";
     import { APIPoller } from "$lib/logic/api/poller";
 
     // Stores
     import { searchQuery } from "$lib/stores/view/navigation";
 
     //Types
-    import type { Device } from "$lib/types/device/base";
+    import type { DeviceStatus } from "$lib/types/device/base";
     import DeviceDetailSheet from "../../components/Devices/DeviceDetailSheet.svelte";
 
     // Variables
-    let devices: Array<Device>;
+    let devicesStatus: Record<number, DeviceStatus>;
+    let sortedDevices: Array<DeviceStatus> = [];
     let devicesImages: Record<number, string> = {};
     let showDetailDeviceWindow: boolean = false;
-    let currentDetailDevice: Device;
+    let detailDeviceId: number | undefined = undefined;
+    let detailDeviceImage: string;
+    let detailDeviceStatus: DeviceStatus;
 
     // Sorted devices
-    $: sortedDevices = filterDevices(devices, $searchQuery);
+    $: if (devicesStatus) {
+        if (detailDeviceId) {
+            detailDeviceStatus = devicesStatus[detailDeviceId];
+            detailDeviceImage = devicesImages[detailDeviceId];
+        }
+        sortedDevices = filterDevicesStatus(devicesStatus, $searchQuery);
+    }
 
     // Go to edit device page
     async function editDevice(deviceId: number): Promise<void> {
@@ -46,22 +55,24 @@
     // Mount function to poll devices status
     onMount(() => {
         resetDashboardLoader();
-        let devicesPoller: APIPoller<{ devices: Array<Device> } | null> | null = null;
+        let devicesStatusPoller: APIPoller<{ devicesStatus: Record<number, DeviceStatus> } | null> | null = null;
 
-        let devicesWithImagesPoller: APIPoller<{ devices: Array<Device>; devicesImages: Record<number, string> } | null> | null = new APIPoller(
-            getAllDevicesWithImageAPI(),
+        let devicesStatusWithImagesPoller: APIPoller<{
+            devicesStatus: Record<number, DeviceStatus>;
+            devicesImages: Record<number, string>;
+        } | null> | null = new APIPoller(
+            getAllDevicesStatusWithImageAPI(),
             (result) => {
                 if (result === null) return;
-                devices = result.devices;
+                devicesStatus = result.devicesStatus;
                 devicesImages = result.devicesImages;
-
-                devicesWithImagesPoller?.stop();
-                devicesWithImagesPoller = null;
-                devicesPoller = new APIPoller(
-                    getAllDevicesAPI(),
+                devicesStatusWithImagesPoller?.stop();
+                devicesStatusWithImagesPoller = null;
+                devicesStatusPoller = new APIPoller(
+                    getAllDevicesStatusAPI(),
                     (result) => {
                         if (result === null) return;
-                        devices = result.devices;
+                        devicesStatus = result.devicesStatus;
                     },
                     5000,
                     false,
@@ -72,10 +83,10 @@
 
         //Clean-up logic
         return () => {
-            devicesPoller?.stop();
-            devicesWithImagesPoller?.stop();
-            devicesPoller = null;
-            devicesWithImagesPoller = null;
+            devicesStatusPoller?.stop();
+            devicesStatusWithImagesPoller?.stop();
+            devicesStatusPoller = null;
+            devicesStatusWithImagesPoller = null;
         };
     });
 </script>
@@ -90,10 +101,14 @@
             deviceID={device.id}
             deviceName={device.name}
             connected={device.connected}
+            alarm={device.alarm}
+            warning={device.warning}
             imageURL={devicesImages[device.id]}
             onEdit={() => editDevice(device.id)}
             onInfo={() => {
-                currentDetailDevice = device;
+                detailDeviceId = device.id;
+                detailDeviceStatus = devicesStatus[device.id];
+                detailDeviceImage = devicesImages[device.id];
                 showDetailDeviceWindow = true;
             }}
             onEnter={() => enterDevice(device.id)}
@@ -101,7 +116,7 @@
     {/each}
     <AddDevice onClick={() => addDevice()} />
     <!----------     N O D E     C O N F I G U R A T I O N     S H E E T     ---------->
-    <DeviceDetailSheet bind:showPanel={showDetailDeviceWindow} deviceObject={currentDetailDevice} />
+    <DeviceDetailSheet bind:showPanel={showDetailDeviceWindow} deviceStatus={detailDeviceStatus} deviceImage={detailDeviceImage} />
 </div>
 
 <style>

@@ -1,4 +1,4 @@
-import type { Device, EditableDevice, NewDevice } from "$lib/types/device/base";
+import type { Device, DeviceStatus, EditableDevice, NewDevice } from "$lib/types/device/base";
 import type { NodeRecord, EditableNodeRecord } from "$lib/types/nodes/config";
 import type { DeviceOPCUAConfig } from "$lib/types/device/opcUa";
 import type { DeviceModbusRTUConfig } from "$lib/types/device/modbusRtu";
@@ -8,13 +8,13 @@ import { convertToDevice } from "../factory/device";
 import { convertToNodes } from "../factory/nodes";
 
 /**
- * Filters devices by name or ID based on a search query with smart matching logic.
+ * Filters devices status by name or ID based on a search query with smart matching logic.
  * @param devices - Array of devices to filter.
  * @param searchQuery - Search string to match against device names and IDs.
  * @returns Filtered and sorted array of devices matching the search criteria.
  */
-export function filterDevices(devices: Array<Device>, searchQuery: string): Array<Device> {
-    let filteredDevices: Array<Device> = Array.isArray(devices) ? [...devices].sort((a, b) => a.id - b.id) : [];
+export function filterDevicesStatus(devicesStatus: Record<number, DeviceStatus>, searchQuery: string): Array<DeviceStatus> {
+    let filteredDevices: Array<DeviceStatus> = Object.values(devicesStatus).sort((a, b) => a.id - b.id);
 
     if (!searchQuery || searchQuery.trim() === "") {
         return filteredDevices;

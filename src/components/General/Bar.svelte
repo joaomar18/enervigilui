@@ -95,6 +95,13 @@
     }
 </script>
 
+<!--
+Bar
+
+Visual bar indicator for a numeric value within a configurable range.
+Displays a scaled fill percentage and an optional arrow, with support
+for warning and alarm states on both minimum and maximum thresholds.
+-->
 <div
     style="
         --width: {mergedStyle.width};
@@ -215,16 +222,16 @@
     }
 
     /* Alarm state colors for arrow */
-    .content.min-alarm .arrow {
-        border-top-color: var(--arrow-min-alarm-color);
-    }
     .content.min-warning .arrow {
         border-top-color: var(--arrow-min-warning-color);
     }
-    .content.max-alarm .arrow {
-        border-top-color: var(--arrow-max-alarm-color);
-    }
     .content.max-warning .arrow {
         border-top-color: var(--arrow-max-warning-color);
+    }
+    .content.min-alarm .arrow {
+        border-top-color: var(--arrow-min-alarm-color);
+    }
+    .content.max-alarm .arrow {
+        border-top-color: var(--arrow-max-alarm-color);
     }
 </style>

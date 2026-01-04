@@ -17,9 +17,16 @@
     export let deviceID: number;
     export let deviceName: string;
     export let connected: boolean;
+    export let alarm: boolean;
+    export let warning: boolean;
     export let imageURL: string;
 
     // Layout / styling props
+    export let stateDimColor: string | undefined = undefined;
+    export let stateAlarmColor: string | undefined = undefined;
+    export let stateWarningColor: string | undefined = undefined;
+    export let stateConnectedColor: string | undefined = undefined;
+    export let stateDisconnectedColor: string | undefined = undefined;
     export let width: string | undefined = undefined;
     export let height: string | undefined = undefined;
     export let borderRadius: string | undefined = undefined;
@@ -37,6 +44,11 @@
     export let titleColor: string | undefined = undefined;
 
     $: localOverrides = {
+        stateDimColor,
+        stateAlarmColor,
+        stateWarningColor,
+        stateConnectedColor,
+        stateDisconnectedColor,
         width,
         height,
         borderRadius,
@@ -58,8 +70,12 @@
     $: mergedStyle = mergeStyle(effectiveStyle, localOverrides);
 
     // Variables
+    let state: "alarmState" | "warningState" | "connectedState" | "disconnectedState";
     let enterButtonSize: string;
     let hovered: boolean = false;
+
+    // Reactive Statements
+    $: resolveState(connected, alarm, warning);
     $: enterButtonSize = `${parseInt(String(mergedStyle.imageContainerWidth)) - 50}px`;
 
     // Export Funcions
@@ -68,6 +84,18 @@
     export let onEnter: () => void;
 
     // Functions
+    function resolveState(connected: boolean, alarm: boolean, warning: boolean) {
+        if (alarm) {
+            state = "alarmState";
+        } else if (warning) {
+            state = "warningState";
+        } else if (connected) {
+            state = "connectedState";
+        } else {
+            state = "disconnectedState";
+        }
+    }
+
     function handleEdit(): void {
         if (onEdit) {
             onEdit();
@@ -90,6 +118,11 @@
 <!-- Device Card: displays a device’s name, image, action buttons, ID and connection status -->
 <div
     style="
+        --state-dim-color: {mergedStyle.stateDimColor};
+        --state-alarm-color: {mergedStyle.stateAlarmColor};
+        --state-warning-color: {mergedStyle.stateWarningColor};
+        --state-connected-color: {mergedStyle.stateConnectedColor};
+        --state-disconnected-color: {mergedStyle.stateDisconnectedColor};
         --width: {mergedStyle.width};
         --height: {mergedStyle.height};
         --border-radius: {mergedStyle.borderRadius};
@@ -153,12 +186,8 @@
             </div>
             <span class="id-text">ID: {String(deviceID).padStart(3, "0")}</span>
             <div class="connection-state-div">
-                <div class:connected class="connection-status"></div>
-                {#if connected}
-                    <span class="connection-text">{$texts.connected}</span>
-                {:else}
-                    <span class="connection-text">{$texts.disconnected}</span>
-                {/if}
+                <div class="connection-status" data-state={state}></div>
+                <span class="connection-text">{$texts[state]}</span>
             </div>
         </div>
     </div>
@@ -346,12 +375,31 @@
         width: 16px;
         height: 16px;
         border-radius: 8px;
-        background-color: #f44336;
     }
 
-    /* Status dot when connected */
-    .connection-state-div .connection-status.connected {
-        background-color: #4caf50;
+    /* Dimmed state - Default/unknown device status */
+    .connection-state-div .connection-status[data-state="dim"] {
+        background: var(--state-dim-color);
+    }
+
+    /* Connected state - Connected operational status (green) */
+    .connection-state-div .connection-status[data-state="connectedState"] {
+        background: var(--state-connected-color);
+    }
+
+    /* Alarm state - Critical error condition (red) */
+    .connection-state-div .connection-status[data-state="alarmState"] {
+        background: var(--state-alarm-color);
+    }
+
+    /* Warning state - Non-critical issues (yellow/amber) */
+    .connection-state-div .connection-status[data-state="warningState"] {
+        background: var(--state-warning-color);
+    }
+
+    /* Disconnected state - Communication lost (gray) */
+    .connection-state-div .connection-status[data-state="disconnectedState"] {
+        background: var(--state-disconnected-color);
     }
 
     /* Connection text: subtle label next to dot */
