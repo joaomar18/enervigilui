@@ -1,8 +1,8 @@
 <script lang="ts">
     import { fade } from "svelte/transition";
     import { onMount } from "svelte";
-    import DeviceCard from "../../components/Devices/DeviceCard.svelte";
-    import AddDevice from "../../components/Devices/AddDevice.svelte";
+    import DeviceCard from "../../../components/Devices/DeviceCard.svelte";
+    import AddDevice from "../../../components/Devices/AddDevice.svelte";
     import { navigateTo, resetDashboardLoader } from "$lib/logic/view/navigation";
     import { getAllDevicesStatusAPI, getAllDevicesStatusWithImageAPI } from "$lib/logic/api/device";
     import { filterDevicesStatus } from "$lib/logic/util/device";
@@ -13,7 +13,7 @@
 
     //Types
     import type { DeviceStatus } from "$lib/types/device/base";
-    import DeviceDetailSheet from "../../components/Devices/DeviceDetailSheet.svelte";
+    import DeviceDetailSheet from "../../../components/Devices/DeviceDetailSheet.svelte";
 
     // Variables
     let devicesStatus: Record<number, DeviceStatus>;
@@ -42,7 +42,7 @@
 
     // Go to device main configured page (right now enters general view)
     async function enterDevice(deviceId: number): Promise<void> {
-        await navigateTo("devices/general_view", {
+        await navigateTo("/devices/general_view", {
             deviceId: String(deviceId),
         });
     }

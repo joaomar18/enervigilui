@@ -12,8 +12,10 @@
     //Props
     export let disabled: boolean = false;
     export let selected: boolean = false;
-    export let showExpandArrow: boolean = false;
-    export let triggerExpand: boolean = false;
+    export let mainLink: boolean = false;
+    export let lastLink: boolean = false;
+    export let expanded: boolean = false;
+    export let enableExpand: boolean = true;
     export let buttonText: string = "";
     export let imageURL: string = "";
     export let disabledImageURL: string = "";
@@ -34,12 +36,8 @@
     export let hoverColor: string | undefined = undefined;
     export let selectedColor: string | undefined = undefined;
     export let selectedHoverColor: string | undefined = undefined;
-    export let borderBottomColor: string | undefined = undefined;
-    export let arrowBackgroundColor: string | undefined = undefined;
-    export let arrowHoverColor: string | undefined = undefined;
-    export let arrowSelectedColor: string | undefined = undefined;
-    export let arrowSelectedHoverColor: string | undefined = undefined;
-    export let arrowLeftBorderColor: string | undefined = undefined;
+    export let expandedColor: string | undefined = undefined;
+    export let expandedHoverColor: string | undefined = undefined;
     export let subContentBorderColor: string | undefined = undefined;
 
     $: localOverrides = {
@@ -58,34 +56,17 @@
         hoverColor,
         selectedColor,
         selectedHoverColor,
-        borderBottomColor,
-        arrowBackgroundColor,
-        arrowHoverColor,
-        arrowSelectedColor,
-        arrowSelectedHoverColor,
-        arrowLeftBorderColor,
+        expandedColor,
+        expandedHoverColor,
         subContentBorderColor,
     };
 
     // Merged style
     $: mergedStyle = mergeStyle(effectiveStyle, localOverrides);
 
-    // Variables
-    let isOpen: boolean = false;
-    let triggerExpandSet: boolean = false;
-
-    // Reactive Statements
-    $: if (!showExpandArrow) isOpen = false;
-
-    $: if (triggerExpand && !triggerExpandSet) {
-        isOpen = true;
-        triggerExpandSet = true;
-    }
-
-    $: if (!triggerExpand) triggerExpandSet = false;
-
     // Click Export Funcion
-    export let onClick: () => void;
+    export let onClick: (() => void) | null = null;
+    export let onToogleExpand: (() => void) | null = null;
 
     // Functions
     function handleClick(): void {
@@ -94,8 +75,11 @@
         }
     }
 
-    function toogleIsOpen(): void {
-        isOpen = !isOpen;
+    function handleToogleExpand(): void {
+        if (!enableExpand) return;
+        if (onToogleExpand) {
+            onToogleExpand();
+        }
     }
 </script>
 
@@ -112,6 +96,8 @@
         --hover-color: {mergedStyle.hoverColor};
         --selected-color: {mergedStyle.selectedColor};
         --selected-hover-color: {mergedStyle.selectedHoverColor};
+        --expanded-color: {mergedStyle.expandedColor};
+        --expanded-hover-color: {mergedStyle.expandedHoverColor};
         --image-container-width: {mergedStyle.imageContainerWidth};
         --image-width: {mergedStyle.imageWidth};
         --image-height: {mergedStyle.imageHeight};
@@ -119,12 +105,6 @@
         --arrow-image-width: {mergedStyle.arrowImageWidth};
         --arrow-image-height: {mergedStyle.arrowImageHeight};
         --padding-left-text: {mergedStyle.paddingLeftText};
-        --border-bottom-color: {mergedStyle.borderBottomColor};
-        --arrow-background-color: {mergedStyle.arrowBackgroundColor};
-        --arrow-hover-color: {mergedStyle.arrowHoverColor};
-        --arrow-selected-color: {mergedStyle.arrowSelectedColor};
-        --arrow-selected-hover-color: {mergedStyle.arrowSelectedHoverColor};
-        --arrow-left-border-color: {mergedStyle.arrowLeftBorderColor};
         --sub-content-border-color: {mergedStyle.subContentBorderColor};
         --font-size: {mergedStyle.fontSize};
         --text-color: {mergedStyle.textColor};
@@ -133,7 +113,14 @@
 >
     <div class="content">
         <div class="main-content">
-            <div class="main-link-div" class:enabled={!disabled} class:selected class:no-right-side-border={showExpandArrow}>
+            <div
+                class="main-link-div"
+                class:enabled={!disabled}
+                class:expanded={!selected && expanded}
+                class:selected
+                class:sub-link={!mainLink}
+                class:last-link={lastLink}
+            >
                 {#if imageURL}
                     <div class="image-div">
                         <img src={!disabled ? imageURL : disabledImageURL} alt={!disabled ? imageURL : disabledImageURL} />
@@ -142,17 +129,15 @@
                 <div class="text-div">
                     <span class:disabled>{buttonText}</span>
                 </div>
-                <button on:click={handleClick} aria-label="Link button" class:enabled={!disabled}></button>
+                {#if mainLink}
+                    <div class="arrow-div" class:selected>
+                        <img class="arrow" src={expanded ? "/img/up-arrow.svg" : "/img/down-arrow.svg"} alt={expanded ? "up-arrow" : "down-arrow"} />
+                    </div>
+                {/if}
+                <button on:click={mainLink ? handleToogleExpand : handleClick} aria-label="Link button" class:enabled={!disabled}></button>
             </div>
-            {#if showExpandArrow}
-                <div class="arrow-div" class:selected>
-                    <div class="line"></div>
-                    <img class="arrow" src={isOpen ? "/img/up-arrow.svg" : "/img/down-arrow.svg"} alt={isOpen ? "up-arrow" : "down-arrow"} />
-                    <button on:click={toogleIsOpen} aria-label="Toogle sub content button" class:enabled={!disabled}></button>
-                </div>
-            {/if}
         </div>
-        {#if isOpen}
+        {#if expanded}
             <div class="sub-content" in:slide={{ duration: 200 }} out:slide={{ duration: 200 }}>
                 <slot />
             </div>
@@ -218,10 +203,16 @@
         transition: background 0.2s;
     }
 
-    /* Remove right border radius if arrow present */
-    .main-link-div.no-right-side-border {
-        border-top-right-radius: 0px;
-        border-bottom-right-radius: 0px;
+    /* Remove border radius from sub links */
+    .main-link-div.sub-link {
+        border-radius: 0px;
+    }
+
+    /* Add bottom border radius to last sub link */
+    .main-link-div.sub-link.last-link {
+        border-radius: 0px;
+        border-bottom-left-radius: 4px;
+        border-bottom-right-radius: 4px;
     }
 
     /* Hover and selected states */
@@ -233,6 +224,12 @@
     }
     .main-link-div.enabled.selected:hover {
         background-color: var(--selected-hover-color);
+    }
+    .main-link-div.enabled.expanded {
+        background-color: var(--expanded-color);
+    }
+    .main-link-div.enabled.expanded:hover {
+        background-color: var(--expanded-hover-color);
     }
 
     /* Icon container */
@@ -270,23 +267,6 @@
         background-color: var(--arrow-background-color);
         transition: background 0.2s;
     }
-    .arrow-div:hover {
-        background-color: var(--arrow-hover-color);
-    }
-    .arrow-div.selected {
-        background-color: var(--arrow-selected-color);
-    }
-    .arrow-div.selected:hover {
-        background-color: var(--arrow-selected-hover-color);
-    }
-
-    /* Vertical line between link and arrow */
-    .arrow-div .line {
-        position: absolute;
-        left: 0;
-        border-left: 1px solid var(--arrow-left-border-color);
-        height: 36px;
-    }
 
     /* Sub-content slot for expandable links */
     .sub-content {
@@ -312,7 +292,6 @@
         width: max-content;
         margin: 0;
         padding-left: var(--padding-left-text);
-        border-bottom: 1px solid var(--border-bottom-color);
         color: var(--text-color);
         font-size: var(--font-size);
         font-weight: 400;

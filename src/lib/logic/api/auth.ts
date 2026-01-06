@@ -32,7 +32,7 @@ export function loginUserAPI(username: string, password: string, autoLogin: bool
             });
             userAuthenticated.set(sucess);
             if (sucess) {
-                await navigateTo("/devices", {}, true, true); // Navigate to the dashboard on success
+                await navigateTo("/devices/dashboard", {}, true, true); // Navigate to the dashboard on success
             }
         },
     };

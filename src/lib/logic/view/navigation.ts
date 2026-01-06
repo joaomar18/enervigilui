@@ -193,7 +193,7 @@ export function resolveNavigationRedirect(url: URL, authenticated: boolean): { s
     }
 
     if (authenticated && (url.pathname === "/login" || url.pathname === "/")) {
-        redirectTarget = "/devices";
+        redirectTarget = "/devices/dashboard";
     }
 
     // Enforce required device context for device-scoped subpages
@@ -201,7 +201,7 @@ export function resolveNavigationRedirect(url: URL, authenticated: boolean): { s
         const deviceId = url.searchParams.get("deviceId");
 
         if (!deviceId) {
-            redirectTarget = "/devices";
+            redirectTarget = "/devices/dashboard";
         }
     }
     return { shouldRedirect: Boolean(redirectTarget), redirectTarget };
@@ -271,10 +271,10 @@ export function isDeviceSubPage(currentPage: string): boolean {
  * Checks if the current page is a device view page (a specific device, not add or edit).
  *
  * @param currentPage - The current page path to check.
- * @returns True if the path starts with "/devices/" and is not "/devices/add" or "/devices/edit".
+ * @returns True if the path starts with "/devices/" and is general_view page.
  */
 export function isDeviceViewPage(currentPage: string): boolean {
-    return currentPage.startsWith("/devices/") && !currentPage.startsWith("/devices/add") && !currentPage.startsWith("/devices/edit");
+    return currentPage.startsWith("/devices/") && currentPage.includes("general_view");
 }
 
 /**

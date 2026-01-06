@@ -114,6 +114,10 @@ const textsObject: TextsObject = {
         PT: "Dispositivo",
         EN: "Device",
     },
+    dashboard: {
+        PT: "Painel de Controlo",
+        EN: "Dashboard",
+    },
     general: {
         PT: "Geral",
         EN: "General",

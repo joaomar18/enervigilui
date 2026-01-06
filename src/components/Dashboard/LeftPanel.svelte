@@ -2,7 +2,7 @@
     import { getDeviceID } from "$lib/logic/view/navigation";
     import { isDeviceViewPage, navigateTo } from "$lib/logic/view/navigation";
     import { isDeviceSubPage } from "$lib/logic/view/navigation";
-
+    import { LeftPanelSection } from "$lib/types/view/navigation";
     import Link from "./Link.svelte";
     import LangSelector from "../General/LangSelector.svelte";
     import Logo from "../General/Logo.svelte";
@@ -58,10 +58,12 @@
     // Variables
     let devicesSubSection: boolean = false;
     let devicesViewPage: boolean = false;
+    let expandedSection: LeftPanelSection | undefined;
 
     // Reactive Statements
     $: devicesSubSection = isDeviceSubPage($currentPage);
     $: devicesViewPage = isDeviceViewPage($currentPage);
+    $: expandedSection = updateExpandedSection($currentPage);
 
     // Functions
     async function browseTo(path: string, params: Record<string, string> = {}) {
@@ -70,6 +72,21 @@
 
     function closePanel(): void {
         leftPanelOpen = false;
+    }
+
+    function updateExpandedSection(currentPage: string): LeftPanelSection | undefined {
+        for (let section of Object.values(LeftPanelSection)) {
+            if (currentPage.includes(section)) return section;
+        }
+        return undefined;
+    }
+
+    function expandSection(section: LeftPanelSection): void {
+        if (expandedSection === section) {
+            expandedSection = undefined;
+            return;
+        }
+        expandedSection = section;
     }
 </script>
 
@@ -116,17 +133,24 @@
                 <div class="section-links-div">
                     <Link
                         selected={activeSection.includes("/devices")}
-                        showExpandArrow={devicesSubSection}
-                        triggerExpand={devicesSubSection}
+                        mainLink={true}
+                        expanded={expandedSection === LeftPanelSection.DEVICES}
                         buttonText={$texts.devices}
                         imageURL="/img/devices.svg"
-                        onClick={() => {
-                            browseTo("/devices");
-                        }}
+                        onToogleExpand={() => expandSection(LeftPanelSection.DEVICES)}
                     >
                         <Link
                             style={$SubLinkStyle}
-                            selected={activeSection.includes("/add")}
+                            selected={activeSection.includes("/devices/dashboard")}
+                            buttonText={$texts.dashboard}
+                            imageURL="/img/dashboard.svg"
+                            onClick={() => {
+                                browseTo("/devices/dashboard");
+                            }}
+                        />
+                        <Link
+                            style={$SubLinkStyle}
+                            selected={activeSection.includes("/devices/add")}
                             buttonText={$texts.addNew}
                             imageURL="/img/plus-simple.svg"
                             onClick={() => {
@@ -136,7 +160,7 @@
                         <Link
                             style={$SubLinkStyle}
                             disabled={!$currentDeviceID}
-                            selected={activeSection.includes("/edit")}
+                            selected={activeSection.includes("/devices/edit")}
                             buttonText={$texts.editConfig}
                             imageURL="/img/edit_pencil.svg"
                             disabledImageURL="/img/edit_pencil_muted.svg"
@@ -146,8 +170,9 @@
                         />
                         <Link
                             style={$SubLinkStyle}
+                            lastLink={true}
                             disabled={!$currentDeviceID}
-                            selected={activeSection.includes("/general")}
+                            selected={activeSection.includes("/devices/general_view")}
                             buttonText={$texts.generalView}
                             imageURL="/img/general_view.svg"
                             disabledImageURL="/img/general_view_muted.svg"
@@ -158,58 +183,71 @@
                     </Link>
 
                     <Link
-                        selected={activeSection.includes("/mqtt")}
-                        buttonText="MQTT"
-                        imageURL="/img/mqtt.svg"
-                        onClick={() => {
-                            browseTo("/mqtt");
-                        }}
+                        selected={activeSection.includes("/connectivity")}
+                        mainLink={true}
+                        enableExpand={false}
+                        expanded={expandedSection === LeftPanelSection.CONNECTIVITY}
+                        buttonText={$texts.connectivity}
+                        imageURL="/img/connectivity.svg"
+                        onToogleExpand={() => expandSection(LeftPanelSection.CONNECTIVITY)}
                     ></Link>
                 </div>
             </div>
-
             <!-- Diagnostics Section -->
             <div class="section">
                 <span class="section-label">{$texts.diagnostics}</span>
                 <div class="section-links-div">
                     <Link
                         selected={activeSection.includes("/health")}
+                        mainLink={true}
+                        expanded={expandedSection === LeftPanelSection.HEALTH}
                         buttonText={$texts.health}
                         imageURL="/img/health.svg"
-                        onClick={() => {
-                            browseTo("/health");
-                        }}
-                    ></Link>
+                        onToogleExpand={() => expandSection(LeftPanelSection.HEALTH)}
+                    >
+                        <Link
+                            style={$SubLinkStyle}
+                            lastLink={true}
+                            selected={activeSection.includes("/health/system")}
+                            buttonText={$texts.system}
+                            imageURL="/img/drive.svg"
+                            onClick={() => {
+                                browseTo("/health/system");
+                            }}
+                        />
+                    </Link>
                     <Link
                         selected={activeSection.includes("/logs")}
+                        mainLink={true}
+                        enableExpand={false}
+                        expanded={expandedSection === LeftPanelSection.LOGS}
                         buttonText={$texts.logs}
                         imageURL="/img/logs.svg"
-                        onClick={() => {
-                            browseTo("/logs");
-                        }}
+                        onToogleExpand={() => expandSection(LeftPanelSection.LOGS)}
                     ></Link>
                 </div>
             </div>
-
             <!-- System Section -->
             <div class="section">
                 <span class="section-label">{$texts.system}</span>
                 <div class="section-links-div">
                     <Link
                         selected={activeSection.includes("/settings")}
+                        mainLink={true}
+                        enableExpand={false}
+                        expanded={expandedSection === LeftPanelSection.SETTINGS}
                         buttonText={$texts.settings}
                         imageURL="/img/settings.svg"
-                        onClick={() => {
-                            browseTo("/settings");
-                        }}
+                        onToogleExpand={() => expandSection(LeftPanelSection.SETTINGS)}
                     ></Link>
                     <Link
                         selected={activeSection.includes("/backup")}
+                        mainLink={true}
+                        enableExpand={false}
+                        expanded={expandedSection === LeftPanelSection.BACKUP}
                         buttonText={$texts.backup}
                         imageURL="/img/backup.svg"
-                        onClick={() => {
-                            browseTo("/backup");
-                        }}
+                        onToogleExpand={() => expandSection(LeftPanelSection.BACKUP)}
                     ></Link>
                 </div>
             </div>
