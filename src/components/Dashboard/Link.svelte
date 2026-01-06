@@ -1,4 +1,6 @@
 <script lang="ts">
+    import { slide } from "svelte/transition";
+
     // Styles
     import { mergeStyle } from "$lib/style/components";
     import { LinkStyle } from "$lib/style/dashboard";
@@ -150,9 +152,11 @@
                 </div>
             {/if}
         </div>
-        <div class="sub-content" class:closed={!isOpen}>
-            <slot />
-        </div>
+        {#if isOpen}
+            <div class="sub-content" in:slide={{ duration: 200 }} out:slide={{ duration: 200 }}>
+                <slot />
+            </div>
+        {/if}
     </div>
 </div>
 
@@ -296,9 +300,6 @@
         border-top-color: transparent;
         border-bottom-left-radius: 4px;
         border-bottom-right-radius: 4px;
-    }
-    .sub-content.closed {
-        display: none;
     }
 
     /* Link text styling */
