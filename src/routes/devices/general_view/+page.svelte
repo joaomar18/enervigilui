@@ -129,7 +129,7 @@
     .content {
         padding: 0;
         width: 100%;
-        min-height: calc(100vh - 74px - 60px);
+        height: 100%;
     }
 
     /* Dashboard grid — 4-column responsive grid for cards; gap and max-width tuned for reasonable card sizing */

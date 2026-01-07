@@ -197,7 +197,7 @@
         margin: 0;
         padding: 0;
         width: 100%;
-        height: 100vh;
+        height: 100dvh;
         display: flex;
         flex-direction: column;
         justify-content: start;
@@ -242,7 +242,7 @@
         width: 100%;
         height: fit-content;
         min-width: 350px;
-        min-height: calc(100vh - 74px);
+        min-height: calc(100dvh - 74px);
     }
 
     /* Content div */

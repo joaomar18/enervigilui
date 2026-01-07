@@ -289,6 +289,7 @@ Shows input forms for protocol-specific parameters and organizes device nodes fo
         flex-direction: column;
         align-items: center;
         width: 100%;
+        height: 100%;
     }
 
     /* Container for all editable device sections */
