@@ -309,7 +309,7 @@ export function addDeviceAPI(deviceData: Device, deviceImage: File | undefined, 
                 timeout,
             });
             if (sucess) {
-                await navigateTo("/devices", {});
+                await navigateTo("/devices/dashboard", {});
             }
         },
     };
@@ -336,7 +336,7 @@ export function editDeviceAPI(deviceData: Device, deviceImage: File | undefined,
                 timeout,
             });
             if (sucess) {
-                await navigateTo("/devices", {});
+                await navigateTo("/devices/dashboard", {});
             }
         },
     };
@@ -359,7 +359,7 @@ export function deleteDeviceAPI(deviceID: number): APIDescriptor<void> {
                 timeout,
             });
             if (sucess) {
-                await navigateTo("/devices", {});
+                await navigateTo("/devices/dashboard", {});
             }
         },
     };

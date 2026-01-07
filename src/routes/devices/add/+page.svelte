@@ -173,7 +173,7 @@ Shows input forms for protocol-specific parameters and organizes device nodes fo
                     buttonText={$texts.cancel}
                     imageURL="/img/previous.svg"
                     onClick={async () => {
-                        await navigateTo("/devices");
+                        await navigateTo("/devices/dashboard");
                     }}
                 />
                 <Button

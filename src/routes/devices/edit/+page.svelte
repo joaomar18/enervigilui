@@ -264,7 +264,7 @@ Shows input forms for protocol-specific parameters and organizes device nodes fo
         <PopupCancelDeviceEdit
             bind:windowOpened={showCancelWindow}
             onCancelEdit={async () => {
-                await navigateTo("/devices");
+                await navigateTo("/devices/dashboard");
             }}
         />
         <!----------     N O D E     C O N F I G U R A T I O N     S H E E T     ---------->
