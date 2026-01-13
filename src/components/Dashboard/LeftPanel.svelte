@@ -2,7 +2,7 @@
     import { getDeviceID } from "$lib/logic/view/navigation";
     import { isDeviceViewPage, navigateTo } from "$lib/logic/view/navigation";
     import { isDeviceSubPage } from "$lib/logic/view/navigation";
-    import { LeftPanelSection } from "$lib/types/view/navigation";
+    import { MainSection } from "$lib/types/view/navigation";
     import Link from "./Link.svelte";
     import LangSelector from "../General/LangSelector.svelte";
     import Logo from "../General/Logo.svelte";
@@ -58,7 +58,7 @@
     // Variables
     let devicesSubSection: boolean = false;
     let devicesViewPage: boolean = false;
-    let expandedSection: LeftPanelSection | undefined;
+    let expandedSection: MainSection | undefined;
 
     // Reactive Statements
     $: devicesSubSection = isDeviceSubPage($currentPage);
@@ -74,14 +74,14 @@
         leftPanelOpen = false;
     }
 
-    function updateExpandedSection(currentPage: string): LeftPanelSection | undefined {
-        for (let section of Object.values(LeftPanelSection)) {
+    function updateExpandedSection(currentPage: string): MainSection | undefined {
+        for (let section of Object.values(MainSection)) {
             if (currentPage.includes(section)) return section;
         }
         return undefined;
     }
 
-    function expandSection(section: LeftPanelSection): void {
+    function expandSection(section: MainSection): void {
         if (expandedSection === section) {
             expandedSection = undefined;
             return;
@@ -134,10 +134,10 @@
                     <Link
                         selected={activeSection.includes("/devices")}
                         mainLink={true}
-                        expanded={expandedSection === LeftPanelSection.DEVICES}
+                        expanded={expandedSection === MainSection.DEVICES}
                         buttonText={$texts.devices}
                         imageURL="/img/devices.svg"
-                        onToogleExpand={() => expandSection(LeftPanelSection.DEVICES)}
+                        onToogleExpand={() => expandSection(MainSection.DEVICES)}
                     >
                         <Link
                             style={$SubLinkStyle}
@@ -186,10 +186,10 @@
                         selected={activeSection.includes("/connectivity")}
                         mainLink={true}
                         enableExpand={false}
-                        expanded={expandedSection === LeftPanelSection.CONNECTIVITY}
+                        expanded={expandedSection === MainSection.CONNECTIVITY}
                         buttonText={$texts.connectivity}
                         imageURL="/img/connectivity.svg"
-                        onToogleExpand={() => expandSection(LeftPanelSection.CONNECTIVITY)}
+                        onToogleExpand={() => expandSection(MainSection.CONNECTIVITY)}
                     ></Link>
                 </div>
             </div>
@@ -200,10 +200,10 @@
                     <Link
                         selected={activeSection.includes("/health")}
                         mainLink={true}
-                        expanded={expandedSection === LeftPanelSection.HEALTH}
+                        expanded={expandedSection === MainSection.HEALTH}
                         buttonText={$texts.health}
                         imageURL="/img/health.svg"
-                        onToogleExpand={() => expandSection(LeftPanelSection.HEALTH)}
+                        onToogleExpand={() => expandSection(MainSection.HEALTH)}
                     >
                         <Link
                             style={$SubLinkStyle}
@@ -220,10 +220,10 @@
                         selected={activeSection.includes("/logs")}
                         mainLink={true}
                         enableExpand={false}
-                        expanded={expandedSection === LeftPanelSection.LOGS}
+                        expanded={expandedSection === MainSection.LOGS}
                         buttonText={$texts.logs}
                         imageURL="/img/logs.svg"
-                        onToogleExpand={() => expandSection(LeftPanelSection.LOGS)}
+                        onToogleExpand={() => expandSection(MainSection.LOGS)}
                     ></Link>
                 </div>
             </div>
@@ -235,19 +235,19 @@
                         selected={activeSection.includes("/settings")}
                         mainLink={true}
                         enableExpand={false}
-                        expanded={expandedSection === LeftPanelSection.SETTINGS}
+                        expanded={expandedSection === MainSection.SETTINGS}
                         buttonText={$texts.settings}
                         imageURL="/img/settings.svg"
-                        onToogleExpand={() => expandSection(LeftPanelSection.SETTINGS)}
+                        onToogleExpand={() => expandSection(MainSection.SETTINGS)}
                     ></Link>
                     <Link
                         selected={activeSection.includes("/backup")}
                         mainLink={true}
                         enableExpand={false}
-                        expanded={expandedSection === LeftPanelSection.BACKUP}
+                        expanded={expandedSection === MainSection.BACKUP}
                         buttonText={$texts.backup}
                         imageURL="/img/backup.svg"
-                        onToogleExpand={() => expandSection(LeftPanelSection.BACKUP)}
+                        onToogleExpand={() => expandSection(MainSection.BACKUP)}
                     ></Link>
                 </div>
             </div>

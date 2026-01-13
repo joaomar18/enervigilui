@@ -2,7 +2,7 @@ import { get } from "svelte/store";
 import { removeKeysFromRecord } from "../util/generic";
 import { showToast } from "../view/toast";
 import { AlertType } from "$lib/stores/view/toast";
-import { loadedDone, userAuthenticated, uiSynchronized, latestAPIMessage } from "$lib/stores/view/navigation";
+import { loadedDone, userAuthenticated, uiSynchronized, latestAPIMessage, pageExists } from "$lib/stores/view/navigation";
 import { convertDateToLocalTime } from "../util/date";
 import { navigateTo } from "../view/navigation";
 import type { AlertTextList } from "$lib/stores/view/toast";
@@ -383,7 +383,7 @@ export class APICaller {
     private static async redirectToLogin(apiResult: APIResult): Promise<boolean> {
         let authenticationError =
             apiResult.kind === "error" && (apiResult.status === 401 || apiResult.status === 429 || apiResult.data?.error_code === "USER_CONFIG_NOT_FOUND");
-        if (authenticationError) {
+        if (authenticationError && get(pageExists)) {
             // Unauthorized acess
             userAuthenticated.set(false);
             await navigateTo("/login", {}, true, true);

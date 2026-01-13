@@ -5,6 +5,7 @@ import { selectedLang } from "$lib/stores/lang/definition";
 import { currentDeviceID } from "$lib/stores/device/current";
 import { closeToast, showToast } from "./toast";
 import { AlertType } from "$lib/stores/view/toast";
+import { MainSection, PageSubsections, DefaultPageSubsection } from "$lib/types/view/navigation";
 
 // Splash screen store
 import {
@@ -19,6 +20,7 @@ import {
     hasMouseCapability,
     uiSynchronized,
     latestAPIMessage,
+    pageExists,
 } from "../../stores/view/navigation";
 
 /**
@@ -140,7 +142,7 @@ export async function navigateTo(
     extraParams: Record<string, string> = {},
     splashScreen: boolean = false,
     replaceState: boolean = false,
-    minSplashDuration: number = 300,
+    minSplashDuration: number = 300
 ): Promise<void> {
     let [target, targetRoute, currentRoute] = getNavigationReady(url, get(selectedLang), extraParams);
 
@@ -164,6 +166,47 @@ export async function navigateTo(
 }
 
 /**
+ * Checks if the provided URL path exists in the application's navigation structure.
+ * @param url - The URL to check.
+ * @returns True if the URL path exists, false otherwise.
+ */
+export function checkPageExists(url: URL): boolean {
+    if (url.pathname === "/") return true;
+    const segments = url.pathname.split("/").filter(Boolean);
+    const base = segments[0];
+    const subpage = segments[1] ?? null;
+
+    for (let section of Object.values(MainSection)) {
+        if (base === section) {
+            if (subpage === null) return true;
+
+            for (let subsection of Object.values(PageSubsections[section])) {
+                if (subpage === subsection) return true;
+            }
+        }
+    }
+    return false;
+}
+
+/**
+ * Redirects to the default subpage of the provided base section.
+ *
+ * @param base - The base section to check.
+ * @param subpage - The subpage to check.
+ * @returns String representing the default subpage of the base section.
+ */
+export function redirectToDefaultSubPage(base: string | null, subpage: string | null): string {
+    if (!base) return "";
+    for (let section of Object.values(MainSection)) {
+        if (base === section) {
+            if (subpage === null && DefaultPageSubsection[section]) return `/${base}/${DefaultPageSubsection[section]}`;
+            break;
+        }
+    }
+    return "";
+}
+
+/**
  * Resolves client-side navigation rules and determines whether the given URL
  * should be redirected to a canonical application route.
  *
@@ -176,35 +219,38 @@ export async function navigateTo(
  *
  * @param url - URL being evaluated for client-side navigation.
  * @param authenticated - Current client-known authentication state.
- * @returns An object indicating whether a redirect is required and the target route.
+ * @returns An object indicating the redirect target.
  */
-export function resolveNavigationRedirect(url: URL, authenticated: boolean): { shouldRedirect: boolean, redirectTarget: string } {
-
-    const DEVICE_SCOPED_PAGES = new Set(["general_view", "edit"]);
-
+export function resolveNavigationRedirect(url: URL, authenticated: boolean): { redirectTarget: string } {
+    const DEVICE_SCOPED_PAGES = new Set([PageSubsections[MainSection.DEVICES].GENERAL_VIEW, PageSubsections[MainSection.DEVICES].EDIT]);
     const segments = url.pathname.split("/").filter(Boolean);
-    const base = segments.length > 0 ? `/${segments[0]}` : "/";
+    const base = segments[0] ?? null;
     const subpage = segments[1] ?? null;
 
-    let redirectTarget: string = "";
+    if (!checkPageExists(url)) {
+        return { redirectTarget: "" };
+    }
 
     if (!authenticated && url.pathname !== "/login") {
-        redirectTarget = "/login";
+        return { redirectTarget: "/login" };
     }
 
     if (authenticated && (url.pathname === "/login" || url.pathname === "/")) {
-        redirectTarget = "/devices/dashboard";
+        return { redirectTarget: "/devices/dashboard" };
     }
 
+    if (subpage === null) return { redirectTarget: redirectToDefaultSubPage(base, subpage) };
+
     // Enforce required device context for device-scoped subpages
-    if (base === "/devices" && subpage && DEVICE_SCOPED_PAGES.has(subpage)) {
+    if (base === MainSection.DEVICES && subpage && DEVICE_SCOPED_PAGES.has(subpage)) {
         const deviceId = url.searchParams.get("deviceId");
 
         if (!deviceId) {
-            redirectTarget = "/devices/dashboard";
+            return { redirectTarget: "/devices/dashboard" };
         }
     }
-    return { shouldRedirect: Boolean(redirectTarget), redirectTarget };
+
+    return { redirectTarget: "" };
 }
 
 /**
@@ -233,6 +279,7 @@ export async function syncUIState(url: URL): Promise<void> {
     currentDeviceID.set(getDeviceID());
     updateSearchQuery(url);
     currentPage.set(url.pathname);
+    pageExists.set(checkPageExists(url));
 
     uiSynchronized.set(true);
 }
@@ -255,7 +302,6 @@ export function isDashboardPage(currentPage: string): boolean {
     return !isAuthenticationPage(currentPage);
 }
 
-
 /**
  * Checks if the current page is a device sub-page (any route under /devices/).
  *
@@ -264,7 +310,6 @@ export function isDashboardPage(currentPage: string): boolean {
  */
 export function isDeviceSubPage(currentPage: string): boolean {
     return currentPage.startsWith("/devices/");
-
 }
 
 /**
@@ -312,7 +357,7 @@ export function getDeviceID() {
  * @param url - The current URL used as the source of truth for the search state.
  */
 export function updateSearchQuery(url: URL) {
-    const path = url.pathname
+    const path = url.pathname;
     const params = url.searchParams;
     const searchString = params.get("searchQuery") ?? "";
     if (path !== "/devices") {
@@ -327,8 +372,8 @@ export function updateSearchQuery(url: URL) {
  * Updates hasMouseCapability store to determine if tooltips should be enabled.
  */
 export function checkClientHasMouse() {
-    const canHover = window.matchMedia('(hover: hover)').matches;
-    const hasFinePointer = window.matchMedia('(pointer: fine)').matches;
+    const canHover = window.matchMedia("(hover: hover)").matches;
+    const hasFinePointer = window.matchMedia("(pointer: fine)").matches;
     hasMouseCapability.set(canHover && hasFinePointer);
 }
 
@@ -348,7 +393,6 @@ export function checkClientHasMouse() {
  * @param showSubLoaderTime - Delay (ms) before showing the sub-loader if initialization is slow.
  */
 export async function initializeClientLayout(minSplashDuration: number = 300, showSubLoaderTime: number = 600) {
-
     checkClientHasMouse();
     const checkAutoLoginPromise = autoLoginAPI().call({ timeout: 5000 });
     const minTimePromise = new Promise((res) => setTimeout(res, minSplashDuration));
@@ -356,7 +400,7 @@ export async function initializeClientLayout(minSplashDuration: number = 300, sh
     const [authResult] = await Promise.all([checkAutoLoginPromise, minTimePromise]);
     const url = new URL(window.location.href);
     let result = resolveNavigationRedirect(url, authResult.sucess);
-    if (result.shouldRedirect) {
+    if (result.redirectTarget) {
         navigateTo(result.redirectTarget, {}, false, true);
     }
     splashDone.set(true);

@@ -13,4 +13,5 @@ export const hasMouseCapability = writable<boolean>(false);
 export const userAuthenticated = writable<boolean>(false); // UI-only auth hint (non-authoritative).
 export const uiSynchronized = writable<boolean>(false); // UI has finished synchronizing (after navigate processed).
 export const userConfigSetup = writable<boolean>(false); // User configuration needs to be setup.
-export const latestAPIMessage = writable<{ code: string, details: Record<string, string>, textList: AlertTextList, autoClose: boolean } | null>(null); // Latest API message not shown due to screen change.
+export const latestAPIMessage = writable<{ code: string; details: Record<string, string>; textList: AlertTextList; autoClose: boolean } | null>(null); // Latest API message not shown due to screen change.
+export const pageExists = writable<boolean>(false); // Page exists
