@@ -16,7 +16,7 @@
 
     // Stores for multi-language support
     import type { Language } from "$lib/stores/lang/definition";
-    import { selectedLang } from "$lib/stores/lang/definition";
+    import { selectedLang, defaultLang, isLanguage } from "$lib/stores/lang/definition";
 
     // Layout / styling props
     export let backgroundColor: string | undefined = undefined;
@@ -84,9 +84,9 @@
     onMount(() => {
         if (browser) {
             const params = new URLSearchParams(window.location.search);
-            let lang = (params.get("lang") || "PT") as Language;
-            if (lang !== "PT" && lang !== "EN") {
-                lang = "PT";
+            let lang = (params.get("lang") || defaultLang) as Language;
+            if (!isLanguage(lang)) {
+                lang = defaultLang;
             }
             changeLanguage(lang);
         }

@@ -31,7 +31,7 @@
         <div class="center-div" class:open={mobileSearchOpen}>
             <SearchBar
                 onClick={async () => {
-                    await navigateTo("/devices", { searchQuery: $searchQuery });
+                    await navigateTo("/devices/dashboard", { searchQuery: $searchQuery });
                 }}
                 bind:searchString={$searchQuery}
                 placeholderText={$texts.searchDevice}

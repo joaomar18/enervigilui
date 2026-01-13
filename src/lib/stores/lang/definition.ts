@@ -3,6 +3,9 @@ import { writable, derived } from "svelte/store";
 // Type for the available languages
 export type Language = "PT" | "EN";
 
+// Default language
+export const defaultLang: Language = "EN";
+
 // Type of the Texts Object
 export interface TextsObject {
     [key: string]: {
@@ -11,7 +14,17 @@ export interface TextsObject {
     };
 }
 
-export const selectedLang = writable<Language>("EN"); //Current selected language: Starts with EN - English
+export const selectedLang = writable<Language>(defaultLang);
+
+/**
+ * Checks if the provided language is valid.
+ *
+ * @param lang - Language to check.
+ * @returns True if the language is valid, false otherwise.
+ */
+export function isLanguage(lang: Language): boolean {
+    return lang === "PT" || lang === "EN";
+}
 
 /**
  * Creates a derived store that exposes texts in the current selected language.
