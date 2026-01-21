@@ -16,6 +16,7 @@ import type { AlertTextList } from "$lib/stores/view/toast";
  * @type CallAPIOptions
  * @property {string} endpoint - API endpoint path (e.g., "/api/device/get")
  * @property {"GET" | "POST" | "PUT" | "DELETE"} method - HTTP method used for the request
+ * @property {string} [requestId] - Identifier for the request. If an explicit identifier is not provided, the endpoint is used as the request identifier.
  * @property {Record<string, any>} [params] - Request parameters (query params for GET, body otherwise)
  * @property {number} [timeout] - Optional request timeout in milliseconds
  * @property {File} [file] - Optional file for multipart/form-data uploads
@@ -28,6 +29,7 @@ import type { AlertTextList } from "$lib/stores/view/toast";
 export type CallAPIOptions = {
     endpoint: string;
     method: "GET" | "POST" | "PUT" | "DELETE";
+    requestId?: string;
     params?: Record<string, any>;
     timeout?: number;
     file?: File;
@@ -47,11 +49,12 @@ export type CallAPIOptions = {
  * @interface APIDescriptor
  * @template T - Type of the resolved response payload
  * @property {Function} call - Executes the API request with optional execution controls
+ * @property {string} requestId - Optional identifier for the request. If the identifier is not provided, the endpoint is used as the request identifier.
  * @property {AbortSignal} [call.options.signal] - Optional abort signal for lifecycle cancellation
  * @property {number} [call.options.timeout] - Optional execution timeout in milliseconds
  */
 export interface APIDescriptor<T> {
-    call(options?: { signal?: AbortSignal; timeout?: number }): Promise<T>;
+    call(options?: { signal?: AbortSignal; timeout?: number }, requestId?: string): Promise<T>;
 }
 
 /**
@@ -302,6 +305,7 @@ export class APICaller {
      * @param options - API call configuration
      * @param options.endpoint - Backend API endpoint path
      * @param options.method - HTTP method ("GET", "POST", "PUT", "DELETE")
+     * @param options.requestId - Identifier for the request. If an explicit identifier is not provided, the endpoint is used as the request identifier.
      * @param options.params - Request parameters (query params for GET, body otherwise)
      * @param options.timeout - Optional request timeout in milliseconds
      * @param options.file - Optional file for multipart/form-data uploads
@@ -318,6 +322,7 @@ export class APICaller {
     static async callAPI({
         endpoint,
         method,
+        requestId,
         params = {},
         timeout,
         file,
@@ -329,14 +334,14 @@ export class APICaller {
     }: CallAPIOptions): Promise<{ sucess: boolean; data: any }> {
         if (APICaller.#paused) return { sucess: false, data: null };
         const payload = JSON.stringify(params);
-        const requestData = APICaller.handleInFlightRequests(endpoint, payload, signal);
+        const requestData = APICaller.handleInFlightRequests(requestId ?? endpoint, payload, signal);
         if (!requestData.promise) {
             // Make a new api request
             const requestPromise = this.processAPIRequest(
-                { endpoint, method, params, timeout, file, fileFieldName, setLoaded, signal, fetchFn },
+                { requestId, endpoint, method, params, timeout, file, fileFieldName, setLoaded, signal, fetchFn },
                 requestData.controller,
             );
-            APICaller.#requests.set(endpoint, {
+            APICaller.#requests.set(requestId ?? endpoint, {
                 controller: requestData.controller,
                 promise: requestPromise,
                 content: payload,
@@ -383,9 +388,11 @@ export class APICaller {
                 const redirectedToLogin = await APICaller.redirectToLogin(apiResult);
                 const stopRequestEarly = APICaller.returnEarly(apiResult, apiOptions.endpoint, redirectedToLogin);
                 if (stopRequestEarly) return { sucess: false, data: apiResult.kind == "error" ? apiResult.data : null };
-                let remainingAttempts = APICaller.#requests.has(apiOptions.endpoint) ? APICaller.#requests.get(apiOptions.endpoint)?.remainingAttempts : 0;
+                let remainingAttempts = APICaller.#requests.has(apiOptions.requestId ?? apiOptions.endpoint)
+                    ? APICaller.#requests.get(apiOptions.requestId ?? apiOptions.endpoint)?.remainingAttempts
+                    : 0;
                 if (remainingAttempts && !redirectedToLogin && apiResult.kind !== "aborted") {
-                    APICaller.#requests.get(apiOptions.endpoint)!.remainingAttempts -= 1;
+                    APICaller.#requests.get(apiOptions.requestId ?? apiOptions.endpoint)!.remainingAttempts -= 1;
                     return await APICaller.processAPIRequest(apiOptions, abortController);
                 }
                 let errorMessage = APICaller.getAPIMessageCode(apiResult);
@@ -397,11 +404,11 @@ export class APICaller {
                 return { sucess: false, data: apiResult.kind == "error" ? apiResult.data : null };
             }
         } catch (e) {
-            console.error(`Error calling API ${apiOptions.endpoint}: ${e}`);
+            console.error(`Error calling API ${apiOptions.endpoint} in request ${apiOptions.requestId}: ${e}`);
             return { sucess: false, data: null };
         } finally {
-            const current = APICaller.#requests.get(apiOptions.endpoint);
-            if (current?.controller === abortController) APICaller.#requests.delete(apiOptions.endpoint);
+            const current = APICaller.#requests.get(apiOptions.requestId ?? apiOptions.endpoint);
+            if (current?.controller === abortController) APICaller.#requests.delete(apiOptions.requestId ?? apiOptions.endpoint);
         }
     }
 
@@ -417,17 +424,17 @@ export class APICaller {
      * Optionally chains an external AbortSignal so caller-initiated cancellation
      * propagates to the managed request lifecycle.
      *
-     * @param endpoint - API endpoint used as the request identity key
+     * @param requestId - API request identifier used as the request identity key
      * @param content - Serialized request payload used to detect equivalent requests
      * @param signal - Optional external AbortSignal for lifecycle cancellation
      * @returns Object containing the AbortController and optional reused promise.
      */
     private static handleInFlightRequests(
-        endpoint: string,
+        requestId: string,
         content: string,
         signal?: AbortSignal,
     ): { controller: AbortController; promise?: Promise<{ sucess: boolean; data: any }> } {
-        const prevRequest = APICaller.#requests.get(endpoint);
+        const prevRequest = APICaller.#requests.get(requestId);
         if (prevRequest) {
             if (prevRequest.content === content) {
                 // return the previous request data without changes

@@ -24,12 +24,13 @@ import type { MeterType } from "$lib/types/device/base";
  */
 export function getDeviceNodesConfigAPI(id: number): APIDescriptor<{ initialNodes: Array<NodeRecord>; nodes: Array<EditableNodeRecord> } | null> {
     return {
-        async call({ signal, timeout } = {}) {
+        async call({ signal, timeout } = {}, requestId) {
             let initialNodes: Array<NodeRecord> = [];
             let nodes: Array<EditableNodeRecord> = [];
             const { sucess, data } = await APICaller.callAPI({
                 endpoint: "/api/nodes/get_nodes_config",
                 method: "GET",
+                requestId,
                 params: { id },
                 signal,
                 timeout,
@@ -63,16 +64,17 @@ export function getDeviceNodesConfigAPI(id: number): APIDescriptor<{ initialNode
  *          or null if the request fails.
  */
 export function getDeviceNodesStateAPI(
-    id: number
+    id: number,
 ): APIDescriptor<{ meterType: MeterType; nodesState: Record<string, NodeState>; processedNodesState: Array<ProcessedNodeState> } | null> {
     return {
-        async call({ signal, timeout } = {}) {
+        async call({ signal, timeout } = {}, requestId) {
             let meter_type: MeterType;
             let nodes_state: Record<string, NodeState>;
             let processedNodesState: Array<ProcessedNodeState>;
             const { sucess, data } = await APICaller.callAPI({
                 endpoint: "/api/nodes/get_nodes_state",
                 method: "GET",
+                requestId,
                 params: { id },
                 setLoaded: true,
                 signal,
@@ -106,10 +108,10 @@ export function getDeviceNodesStateAPI(
 export function getNodeExtendedInfoAPI(
     id: number,
     nodeName: string,
-    nodePhase: NodePhase
+    nodePhase: NodePhase,
 ): APIDescriptor<{ nodeAdditionalInfo: BaseNodeExtendedInfo } | null> {
     return {
-        async call({ signal, timeout } = {}) {
+        async call({ signal, timeout } = {}, requestId) {
             let nodeAdditionalInfo: BaseNodeExtendedInfo;
             const prefix = getNodePrefix(nodePhase);
             const processedName = addPrefix(removePrefix(nodeName), prefix);
@@ -117,6 +119,7 @@ export function getNodeExtendedInfoAPI(
             const { sucess, data } = await APICaller.callAPI({
                 endpoint: "/api/nodes/get_node_extended_info",
                 method: "GET",
+                requestId,
                 params: { id, node_name: processedName },
                 signal,
                 timeout,
@@ -157,10 +160,10 @@ export function getNodeLogsAPI(
     formatted: boolean | null = null,
     start_time: Date | null = null,
     end_time: Date | null = null,
-    time_step: string | null = null
+    time_step: string | null = null,
 ): APIDescriptor<{ nodeLogs: ProcessedNodeLogs } | null> {
     return {
-        async call({ signal, timeout } = {}) {
+        async call({ signal, timeout } = {}, requestId) {
             let nodeLogs: ProcessedNodeLogs;
             const prefix = getNodePrefix(nodePhase);
             const processedName = addPrefix(removePrefix(nodeName), prefix);
@@ -174,6 +177,7 @@ export function getNodeLogsAPI(
                 endpoint: "/api/nodes/get_logs_from_node",
                 method: "GET",
                 params: { id, node_name: processedName, formatted, start_time: start_time_str, end_time: end_time_str, time_step, time_zone },
+                requestId,
                 signal,
                 timeout,
                 numberOfRetries: 2,
@@ -214,14 +218,14 @@ export function getEnergyConsumptionAPI(
     formatted: boolean | null = null,
     start_time: Date | null = null,
     end_time: Date | null = null,
-    time_step: string | null = null
+    time_step: string | null = null,
 ): APIDescriptor<{
     energyLogs: EnergyConsumptionType;
     mergedPoints: Array<ProcessedEnergyConsumptionLogPoint>;
     mergedGlobalMetrics: EnergyConsumptionMetrics;
 } | null> {
     return {
-        async call({ signal, timeout } = {}) {
+        async call({ signal, timeout } = {}, requestId) {
             let energyLogs: EnergyConsumptionType;
             let mergedPoints: Array<ProcessedEnergyConsumptionLogPoint>;
             let mergedGlobalMetrics: EnergyConsumptionMetrics;
@@ -234,6 +238,7 @@ export function getEnergyConsumptionAPI(
             const { sucess, data } = await APICaller.callAPI({
                 endpoint: "/api/nodes/get_energy_consumption",
                 method: "GET",
+                requestId,
                 params: { id, phase, direction, formatted, start_time: start_time_str, end_time: end_time_str, time_step, time_zone },
                 signal,
                 timeout,
@@ -257,7 +262,7 @@ export async function mapMetricsAPI(
     device_id: number,
     phase: SelectablePhaseFilter,
     start_time: Date | null = null,
-    end_time: Date | null = null
+    end_time: Date | null = null,
 ): Promise<any> {
     switch (metric.toLowerCase()) {
         case "peakpower":
@@ -281,10 +286,10 @@ export function getPeakPowerAPI(
     id: number,
     phase: SelectablePhaseFilter,
     start_time: Date | null = null,
-    end_time: Date | null = null
+    end_time: Date | null = null,
 ): APIDescriptor<PeakPowerType | null> {
     return {
-        async call({ signal, timeout } = {}) {
+        async call({ signal, timeout } = {}, requestId) {
             let peakPower: PeakPowerType;
             let start_time_str: string | null = null;
             let end_time_str: string | null = null;
@@ -295,6 +300,7 @@ export function getPeakPowerAPI(
             const { sucess, data } = await APICaller.callAPI({
                 endpoint: "/api/nodes/get_peak_power",
                 method: "GET",
+                requestId,
                 params: { id, phase, start_time: start_time_str, end_time: end_time_str, time_zone },
                 signal,
                 timeout,

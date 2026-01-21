@@ -16,12 +16,13 @@ import { AlertType } from "$lib/stores/view/toast";
  */
 export function loginUserAPI(username: string, password: string, autoLogin: boolean): APIDescriptor<void> {
     return {
-        async call({ signal, timeout } = {}) {
+        async call({ signal, timeout } = {}, requestId) {
             const validInputs: boolean = validateUsername(username) && validatePassword(password);
             if (!validInputs) return;
             const { sucess, data } = await APICaller.callAPI({
                 endpoint: "/api/auth/login",
                 method: "POST",
+                requestId,
                 params: {
                     username,
                     password,
@@ -52,12 +53,13 @@ export function loginUserAPI(username: string, password: string, autoLogin: bool
  */
 export function createUserConfigAPI(username: string, password: string, confirm_password: string): APIDescriptor<void> {
     return {
-        async call({ signal, timeout } = {}) {
+        async call({ signal, timeout } = {}, requestId) {
             const validInputs: boolean = validateUsername(username) && validatePassword(password) && passwordMatch(password, confirm_password);
             if (!validInputs) return;
             const { sucess, data } = await APICaller.callAPI({
                 endpoint: "/api/auth/create_login",
                 method: "POST",
+                requestId,
                 params: {
                     username,
                     password,
@@ -93,10 +95,11 @@ export function createUserConfigAPI(username: string, password: string, confirm_
  */
 export function autoLoginAPI(): APIDescriptor<{ sucess: boolean }> {
     return {
-        async call({ signal, timeout } = {}) {
+        async call({ signal, timeout } = {}, requestId) {
             const { sucess, data } = await APICaller.callAPI({
                 endpoint: "/api/auth/auto_login",
                 method: "POST",
+                requestId,
                 signal,
                 timeout,
             });
@@ -113,10 +116,11 @@ export function autoLoginAPI(): APIDescriptor<{ sucess: boolean }> {
  */
 export function logoutUserAPI(): APIDescriptor<void> {
     return {
-        async call({ signal, timeout } = {}) {
+        async call({ signal, timeout } = {}, requestId) {
             const { sucess, data } = await APICaller.callAPI({
                 endpoint: "/api/auth/logout",
                 method: "POST",
+                requestId,
                 signal,
                 timeout,
             });

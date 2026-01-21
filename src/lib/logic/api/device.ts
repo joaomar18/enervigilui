@@ -13,12 +13,13 @@ import { navigateTo } from "../view/navigation";
  */
 export function getAllDevicesStatusAPI(): APIDescriptor<{ devicesStatus: Record<number, DeviceStatus> } | null> {
     return {
-        async call({ signal, timeout } = {}) {
+        async call({ signal, timeout } = {}, requestId) {
             let devicesStatus: Record<number, DeviceStatus> = {};
 
             const { sucess, data } = await APICaller.callAPI({
                 endpoint: "/api/device/get_all_devices_status",
                 method: "GET",
+                requestId,
                 setLoaded: true,
                 signal,
                 timeout,
@@ -47,13 +48,14 @@ export function getAllDevicesStatusWithImageAPI(): APIDescriptor<{
     devicesImages: Record<number, string>;
 } | null> {
     return {
-        async call({ signal, timeout } = {}) {
+        async call({ signal, timeout } = {}, requestId) {
             let devicesStatus: Record<number, DeviceStatus> = {};
             let devicesImages: Record<number, string> = {};
 
             const { sucess, data } = await APICaller.callAPI({
                 endpoint: "/api/device/get_all_devices_status_with_image",
                 method: "GET",
+                requestId,
                 setLoaded: true,
                 signal,
                 timeout,
@@ -83,11 +85,12 @@ export function getAllDevicesStatusWithImageAPI(): APIDescriptor<{
  */
 export function getDeviceAPI(id: number): APIDescriptor<{ initialDeviceData: Device } | null> {
     return {
-        async call({ signal, timeout } = {}) {
+        async call({ signal, timeout } = {}, requestId) {
             let initialDeviceData: Device;
             const { sucess, data } = await APICaller.callAPI({
                 endpoint: "/api/device/get_device",
                 method: "GET",
+                requestId,
                 params: { id },
                 setLoaded: true,
                 signal,
@@ -114,12 +117,13 @@ export function getDeviceAPI(id: number): APIDescriptor<{ initialDeviceData: Dev
  */
 export function getDeviceExtendedInfoAPI(id: number): APIDescriptor<{ deviceInfo: ExtendedDeviceInfo } | null> {
     return {
-        async call({ signal, timeout } = {}) {
+        async call({ signal, timeout } = {}, requestId) {
             let deviceInfo: ExtendedDeviceInfo;
 
             const { sucess, data } = await APICaller.callAPI({
                 endpoint: "/api/device/get_device_extended_info",
                 method: "GET",
+                requestId,
                 params: { id },
                 signal,
                 timeout,
@@ -144,13 +148,14 @@ export function getDeviceExtendedInfoAPI(id: number): APIDescriptor<{ deviceInfo
  */
 export function getDeviceIdentificationAPI(id: number): APIDescriptor<{ deviceId: number; deviceName: string } | null> {
     return {
-        async call({ signal, timeout } = {}) {
+        async call({ signal, timeout } = {}, requestId) {
             let deviceId: number;
             let deviceName: string;
 
             const { sucess, data } = await APICaller.callAPI({
                 endpoint: "/api/device/get_device_identification_with_image",
                 method: "GET",
+                requestId,
                 params: { id },
                 signal,
                 timeout,
@@ -176,12 +181,13 @@ export function getDeviceIdentificationAPI(id: number): APIDescriptor<{ deviceId
  */
 export function getDeviceWithImageAPI(id: number): APIDescriptor<{ initialDeviceData: Device; deviceData: EditableDevice } | null> {
     return {
-        async call({ signal, timeout } = {}) {
+        async call({ signal, timeout } = {}, requestId) {
             let initialDeviceData: Device;
             let deviceData: EditableDevice;
             const { sucess, data } = await APICaller.callAPI({
                 endpoint: "/api/device/get_device_with_image",
                 method: "GET",
+                requestId,
                 params: { id },
                 setLoaded: true,
                 signal,
@@ -209,13 +215,14 @@ export function getDeviceWithImageAPI(id: number): APIDescriptor<{ initialDevice
  */
 export function getDeviceExtendedInfoWithImageAPI(id: number): APIDescriptor<{ deviceInfo: ExtendedDeviceInfo; deviceImageUrl: string } | null> {
     return {
-        async call({ signal, timeout } = {}) {
+        async call({ signal, timeout } = {}, requestId) {
             let deviceInfo: ExtendedDeviceInfo;
             let deviceImageUrl: string;
 
             const { sucess, data } = await APICaller.callAPI({
                 endpoint: "/api/device/get_device_extended_info_with_image",
                 method: "GET",
+                requestId,
                 params: { id },
                 signal,
                 timeout,
@@ -241,7 +248,7 @@ export function getDeviceExtendedInfoWithImageAPI(id: number): APIDescriptor<{ d
  */
 export function getDeviceIdentificationWithImageAPI(id: number): APIDescriptor<{ deviceId: number; deviceName: string; deviceImageUrl: string } | null> {
     return {
-        async call({ signal, timeout } = {}) {
+        async call({ signal, timeout } = {}, requestId) {
             let deviceImageUrl: string;
             let deviceId: number;
             let deviceName: string;
@@ -249,6 +256,7 @@ export function getDeviceIdentificationWithImageAPI(id: number): APIDescriptor<{
             const { sucess, data } = await APICaller.callAPI({
                 endpoint: "/api/device/get_device_identification_with_image",
                 method: "GET",
+                requestId,
                 params: { id },
                 signal,
                 timeout,
@@ -277,11 +285,12 @@ export function getDeviceIdentificationWithImageAPI(id: number): APIDescriptor<{
  */
 export function getDefaultImageAPI(): APIDescriptor<string | null> {
     return {
-        async call({ signal, timeout } = {}) {
+        async call({ signal, timeout } = {}, requestId) {
             let imageData: Record<string, string>;
             const { sucess, data } = await APICaller.callAPI({
                 endpoint: "/api/device/get_default_image",
                 method: "GET",
+                requestId,
                 setLoaded: true,
                 signal,
                 timeout,
@@ -307,10 +316,11 @@ export function getDefaultImageAPI(): APIDescriptor<string | null> {
  */
 export function addDeviceAPI(deviceData: Device, deviceImage: File | undefined, deviceNodes: Array<NodeRecord>): APIDescriptor<void> {
     return {
-        async call({ signal, timeout } = {}) {
+        async call({ signal, timeout } = {}, requestId) {
             const { sucess, data } = await APICaller.callAPI({
                 endpoint: "/api/device/add_device",
                 method: "POST",
+                requestId,
                 params: { device_data: deviceData, device_nodes: deviceNodes },
                 file: deviceImage,
                 fileFieldName: "device_image",
@@ -334,10 +344,11 @@ export function addDeviceAPI(deviceData: Device, deviceImage: File | undefined, 
  */
 export function editDeviceAPI(deviceData: Device, deviceImage: File | undefined, deviceNodes: Array<NodeRecord>): APIDescriptor<void> {
     return {
-        async call({ signal, timeout } = {}) {
+        async call({ signal, timeout } = {}, requestId) {
             const { sucess, data } = await APICaller.callAPI({
                 endpoint: "/api/device/edit_device",
                 method: "POST",
+                requestId,
                 params: { device_data: deviceData, device_nodes: deviceNodes },
                 file: deviceImage,
                 fileFieldName: "device_image",
@@ -359,10 +370,11 @@ export function editDeviceAPI(deviceData: Device, deviceImage: File | undefined,
  */
 export function deleteDeviceAPI(deviceID: number): APIDescriptor<void> {
     return {
-        async call({ signal, timeout } = {}) {
+        async call({ signal, timeout } = {}, requestId) {
             const { sucess, data } = await APICaller.callAPI({
                 endpoint: "/api/device/delete_device",
                 method: "DELETE",
+                requestId,
                 params: { id: deviceID },
                 signal,
                 timeout,

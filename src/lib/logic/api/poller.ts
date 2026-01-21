@@ -16,15 +16,17 @@ export class APIPoller<T> {
     #callback: (result: T) => void;
     #resumeListener: () => void;
     #interval: number;
+    #requestId?: string;
     #inFlight: boolean;
     #destroyed: boolean;
     #timer: ReturnType<typeof setTimeout> | null;
     #controller: AbortController | null = null;
 
-    constructor(api: APIDescriptor<T>, callback: (result: T) => void, interval: number, immediate: boolean = true) {
+    constructor(api: APIDescriptor<T>, callback: (result: T) => void, interval: number, requestId?: string, immediate: boolean = true) {
         this.#api = api;
         this.#callback = callback;
         this.#interval = interval;
+        this.#requestId = requestId;
         this.#resumeListener = () => {
             this.start();
         };
@@ -80,7 +82,7 @@ export class APIPoller<T> {
         this.#controller = new AbortController();
 
         try {
-            let result = await this.#api.call({ timeout: this.#interval, signal: this.#controller.signal });
+            let result = await this.#api.call({ timeout: this.#interval, signal: this.#controller.signal }, this.#requestId);
             this.#callback(result);
         } catch (e) {
             if ((e as any)?.name !== "AbortError") {

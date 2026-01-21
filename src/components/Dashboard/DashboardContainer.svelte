@@ -215,7 +215,6 @@
         overflow-y: auto;
         overflow-x: auto;
         scrollbar-width: auto;
-        scrollbar-gutter: stable both-edges;
         scrollbar-color: var(--scrollbar-track-color) var(--scrollbar-thumb-color);
     }
 

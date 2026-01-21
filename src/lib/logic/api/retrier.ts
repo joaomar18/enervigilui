@@ -17,6 +17,7 @@ export class APIRetrier<T> {
     #callback: (result: T) => void;
     #resumeListener: () => void;
     #interval: number;
+    #requestId?: string;
     #backoffFactor: number;
     #maxIntervalMs: number;
     #currentInterval: number;
@@ -29,6 +30,7 @@ export class APIRetrier<T> {
         api: APIDescriptor<T>,
         callback: (result: T) => void,
         interval: number,
+        requestId?: string,
         backoffFactor: number = 1.3,
         maxIntervalMs: number = 30000,
         immediate: boolean = true,
@@ -36,6 +38,7 @@ export class APIRetrier<T> {
         this.#api = api;
         this.#callback = callback;
         this.#interval = interval;
+        this.#requestId = requestId;
         this.#resumeListener = () => {
             this.start();
         };
@@ -99,7 +102,7 @@ export class APIRetrier<T> {
         if (!this.#currentInterval) this.#currentInterval = this.#interval;
 
         try {
-            let result = await this.#api.call({ timeout: this.#currentInterval, signal: this.#controller.signal });
+            let result = await this.#api.call({ timeout: this.#currentInterval, signal: this.#controller.signal }, this.#requestId);
             this.#callback(result);
             sucess = result !== null;
         } catch (e) {
