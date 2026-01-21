@@ -1,3 +1,4 @@
+import { APICaller } from "./api";
 import type { APIDescriptor } from "./api";
 
 /**
@@ -13,6 +14,7 @@ import type { APIDescriptor } from "./api";
 export class APIPoller<T> {
     #api: APIDescriptor<T> | null = null;
     #callback: (result: T) => void;
+    #resumeListener: () => void;
     #interval: number;
     #inFlight: boolean;
     #destroyed: boolean;
@@ -23,6 +25,10 @@ export class APIPoller<T> {
         this.#api = api;
         this.#callback = callback;
         this.#interval = interval;
+        this.#resumeListener = () => {
+            this.start();
+        };
+        APICaller.addOnResumeListener(this.#resumeListener);
         this.#inFlight = false;
         this.#destroyed = false;
         this.#timer = null;
@@ -57,6 +63,7 @@ export class APIPoller<T> {
         if (destroy) {
             this.#destroyed = true;
             this.#api = null;
+            APICaller.removeOnResumeListener(this.#resumeListener);
         }
     }
 

@@ -91,10 +91,79 @@ type APIResult =
  * successful requests when requested by the caller.
  */
 export class APICaller {
+    static #initialized = false;
+    static #paused = false;
     static #requests: Map<
         string,
         { controller: AbortController; promise: Promise<{ sucess: boolean; data: any }>; content: string; remainingAttempts: number }
     > = new Map<string, { controller: AbortController; promise: Promise<{ sucess: boolean; data: any }>; content: string; remainingAttempts: number }>();
+    static #onResumeCallbacks: Set<() => void> = new Set<() => void>();
+
+    /**
+     * Initializes application lifecycle handling for API request coordination.
+     *
+     * Registers a single visibility change listener to detect application
+     * pause/resume transitions and dispatch corresponding lifecycle hooks.
+     * This method is idempotent and must be called once during application startup.
+     */
+    static init() {
+        if (APICaller.#initialized) return;
+        APICaller.#initialized = true;
+        document.addEventListener("visibilitychange", () => {
+            if (document.visibilityState === "hidden") APICaller.onPause();
+            if (document.visibilityState === "visible") APICaller.onResume();
+        });
+    }
+
+    /**
+     * Registers a callback to be invoked when the application resumes.
+     *
+     * Resume callbacks are intended to re-establish application intent
+     * (e.g. restart polling or refresh critical state) after suspension.
+     *
+     * @param callback - Function invoked on application resume
+     */
+    static addOnResumeListener(callback: () => void) {
+        APICaller.#onResumeCallbacks.add(callback);
+    }
+
+    /**
+     * Unregisters a previously registered application resume callback.
+     *
+     * @param callback - Callback function to remove
+     */
+    static removeOnResumeListener(callback: () => void) {
+        APICaller.#onResumeCallbacks.delete(callback);
+    }
+
+    /**
+     * Handles application pause by aborting all in-flight API requests and
+     * clearing internal request state.
+     *
+     * Invoked when the document becomes hidden (e.g. tab backgrounded,
+     * window minimized, or app suspended).
+     */
+    private static onPause() {
+        for (const request of APICaller.#requests.values()) {
+            request.controller.abort();
+        }
+        APICaller.#requests.clear();
+        APICaller.#paused = true;
+    }
+
+    /**
+     * Handles application resume by clearing the paused state and notifying
+     * registered listeners to re-establish required application intent
+     * (e.g. restart polling or refresh critical data).
+     *
+     * Invoked when the document becomes visible again.
+     */
+    private static onResume() {
+        APICaller.#paused = false;
+        for (const callback of APICaller.#onResumeCallbacks) {
+            callback();
+        }
+    }
 
     /**
      * Low-level HTTP utility for performing API requests with unified timeout
@@ -258,6 +327,7 @@ export class APICaller {
         numberOfRetries = 0,
         fetchFn = fetch,
     }: CallAPIOptions): Promise<{ sucess: boolean; data: any }> {
+        if (APICaller.#paused) return { sucess: false, data: null };
         const payload = JSON.stringify(params);
         const requestData = APICaller.handleInFlightRequests(endpoint, payload, signal);
         if (!requestData.promise) {

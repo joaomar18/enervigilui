@@ -1,4 +1,5 @@
 <script lang="ts">
+    import { APICaller } from "$lib/logic/api/api";
     import { getDeviceID } from "$lib/logic/view/navigation";
     import { onMount, onDestroy } from "svelte";
     import { SlidingWindow } from "$lib/logic/util/classes/SlidingWindow";
@@ -177,11 +178,13 @@
     }
 
     onMount(() => {
+        APICaller.addOnResumeListener(loadEnergyConsumption);
         window.addEventListener("resize", handleWindowResize);
         handleWindowResize();
     });
 
     onDestroy(() => {
+        APICaller.removeOnResumeListener(loadEnergyConsumption);
         window.removeEventListener("resize", handleWindowResize);
         if (nextRequestTimeout !== null) {
             clearTimeout(nextRequestTimeout);

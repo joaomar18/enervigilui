@@ -8,12 +8,14 @@
     import { syncUIState } from "$lib/logic/view/navigation";
     import SplashLoader from "../components/Dashboard/SplashLoader.svelte";
     import DashboardContainer from "../components/Dashboard/DashboardContainer.svelte";
+    import { APICaller } from "$lib/logic/api/api";
 
     // Authorization stores
     import { currentPage, splashDone, userAuthenticated, pageExists } from "$lib/stores/view/navigation";
 
     // On Mount Function
     onMount(async () => {
+        APICaller.init();
         setInitialLeftPanelState();
         await initializeClientLayout();
     });

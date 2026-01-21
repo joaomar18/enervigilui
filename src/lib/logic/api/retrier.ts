@@ -1,3 +1,4 @@
+import { APICaller } from "./api";
 import type { APIDescriptor } from "./api";
 
 /**
@@ -14,8 +15,8 @@ import type { APIDescriptor } from "./api";
 export class APIRetrier<T> {
     #api: APIDescriptor<T> | null = null;
     #callback: (result: T) => void;
+    #resumeListener: () => void;
     #interval: number;
-    #timeout: number;
     #backoffFactor: number;
     #maxIntervalMs: number;
     #currentInterval: number;
@@ -28,7 +29,6 @@ export class APIRetrier<T> {
         api: APIDescriptor<T>,
         callback: (result: T) => void,
         interval: number,
-        timeout: number,
         backoffFactor: number = 1.3,
         maxIntervalMs: number = 30000,
         immediate: boolean = true,
@@ -36,7 +36,10 @@ export class APIRetrier<T> {
         this.#api = api;
         this.#callback = callback;
         this.#interval = interval;
-        this.#timeout = timeout;
+        this.#resumeListener = () => {
+            this.start();
+        };
+        APICaller.addOnResumeListener(this.#resumeListener);
         this.#backoffFactor = backoffFactor;
         this.#maxIntervalMs = maxIntervalMs;
         this.#currentInterval = 0;
@@ -77,6 +80,7 @@ export class APIRetrier<T> {
         if (destroy) {
             this.#destroyed = true;
             this.#api = null;
+            APICaller.removeOnResumeListener(this.#resumeListener);
         }
     }
 
@@ -95,7 +99,7 @@ export class APIRetrier<T> {
         if (!this.#currentInterval) this.#currentInterval = this.#interval;
 
         try {
-            let result = await this.#api.call({ timeout: this.#timeout, signal: this.#controller.signal });
+            let result = await this.#api.call({ timeout: this.#currentInterval, signal: this.#controller.signal });
             this.#callback(result);
             sucess = result !== null;
         } catch (e) {

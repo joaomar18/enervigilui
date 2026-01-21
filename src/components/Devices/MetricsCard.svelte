@@ -1,4 +1,5 @@
 <script lang="ts">
+    import { APICaller } from "$lib/logic/api/api";
     import { getDeviceID } from "$lib/logic/view/navigation";
     import Action from "../General/Action.svelte";
     import ContentCard from "../General/ContentCard.svelte";
@@ -119,10 +120,12 @@
     }
 
     onMount(() => {
+        APICaller.addOnResumeListener(loadMetrics);
         window.addEventListener("resize", getMobileView);
     });
 
     onDestroy(() => {
+        APICaller.removeOnResumeListener(loadMetrics);
         window.removeEventListener("resize", getMobileView);
         if (nextRequestTimeout !== null) {
             clearTimeout(nextRequestTimeout);

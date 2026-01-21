@@ -83,8 +83,7 @@
                 }
                 if (result !== null) deviceData.current_image_url = result;
             },
-            100, // Start retry interval
-            5000, // Timeout
+            5000,
         );
 
         //Clean-up logic

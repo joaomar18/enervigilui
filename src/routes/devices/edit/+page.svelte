@@ -93,8 +93,7 @@
                     initialDeviceData = result.initialDeviceData;
                     deviceData = result.deviceData;
                 },
-                100, // Start retry interval
-                5000, // Timeout
+                5000,
             );
             nodesConfigRetrier = new APIRetrier(
                 getDeviceNodesConfigAPI(deviceId),
@@ -106,8 +105,7 @@
                         nodesInit = true;
                     }, 100); // Small timeout to give a bit of time for the page to load before the nodes
                 },
-                100, // Start retry interval
-                5000, // Timeout
+                5000,
             );
         } else {
             showToast("errorEditDeviceParams", AlertType.ALERT);
