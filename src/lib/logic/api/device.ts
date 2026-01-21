@@ -22,6 +22,7 @@ export function getAllDevicesStatusAPI(): APIDescriptor<{ devicesStatus: Record<
                 setLoaded: true,
                 signal,
                 timeout,
+                numberOfRetries: 2,
             });
             if (sucess) {
                 for (let deviceStatus of data as Array<DeviceStatus>) {
@@ -56,6 +57,7 @@ export function getAllDevicesStatusWithImageAPI(): APIDescriptor<{
                 setLoaded: true,
                 signal,
                 timeout,
+                numberOfRetries: 2,
             });
             if (sucess) {
                 for (let deviceData of data as Array<DeviceStatus & { image: Record<string, string> }>) {
@@ -90,6 +92,7 @@ export function getDeviceAPI(id: number): APIDescriptor<{ initialDeviceData: Dev
                 setLoaded: true,
                 signal,
                 timeout,
+                numberOfRetries: 2,
             });
             if (sucess) {
                 const { ...requestDeviceData } = data as Device;
@@ -120,6 +123,7 @@ export function getDeviceExtendedInfoAPI(id: number): APIDescriptor<{ deviceInfo
                 params: { id },
                 signal,
                 timeout,
+                numberOfRetries: 2,
             });
             if (sucess) {
                 const { ...requestDeviceInfo } = data;
@@ -150,6 +154,7 @@ export function getDeviceIdentificationAPI(id: number): APIDescriptor<{ deviceId
                 params: { id },
                 signal,
                 timeout,
+                numberOfRetries: 2,
             });
             if (sucess) {
                 const { ...requestDeviceIdentication } = data;
@@ -181,6 +186,7 @@ export function getDeviceWithImageAPI(id: number): APIDescriptor<{ initialDevice
                 setLoaded: true,
                 signal,
                 timeout,
+                numberOfRetries: 2,
             });
             if (sucess) {
                 const { image: deviceImage, ...requestDeviceData } = data as Device & { image: Record<string, string> };
@@ -213,6 +219,7 @@ export function getDeviceExtendedInfoWithImageAPI(id: number): APIDescriptor<{ d
                 params: { id },
                 signal,
                 timeout,
+                numberOfRetries: 2,
             });
             if (sucess) {
                 const { image: requestDeviceImage, ...requestDeviceInfo } = data as ExtendedDeviceInfo & { image: Record<string, string> };
@@ -245,6 +252,7 @@ export function getDeviceIdentificationWithImageAPI(id: number): APIDescriptor<{
                 params: { id },
                 signal,
                 timeout,
+                numberOfRetries: 2,
             });
             if (sucess) {
                 const { image: requestDeviceImage, ...requestDeviceIdentication } = data as Record<string, string | number> & {
@@ -277,6 +285,7 @@ export function getDefaultImageAPI(): APIDescriptor<string | null> {
                 setLoaded: true,
                 signal,
                 timeout,
+                numberOfRetries: 2,
             });
             if (sucess) {
                 imageData = data as Record<string, string>;

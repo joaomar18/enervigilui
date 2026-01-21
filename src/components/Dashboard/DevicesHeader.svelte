@@ -33,7 +33,8 @@
                     deviceImageUrl = result.deviceImageUrl;
                     dataFetched = true;
                 },
-                5000,
+                100, // Start retry interval
+                5000, // Timeout
             );
         }
 

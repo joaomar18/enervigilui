@@ -93,7 +93,8 @@
                     initialDeviceData = result.initialDeviceData;
                     deviceData = result.deviceData;
                 },
-                5000,
+                100, // Start retry interval
+                5000, // Timeout
             );
             nodesConfigRetrier = new APIRetrier(
                 getDeviceNodesConfigAPI(deviceId),
@@ -105,7 +106,8 @@
                         nodesInit = true;
                     }, 100); // Small timeout to give a bit of time for the page to load before the nodes
                 },
-                5000,
+                100, // Start retry interval
+                5000, // Timeout
             );
         } else {
             showToast("errorEditDeviceParams", AlertType.ALERT);
@@ -201,7 +203,7 @@ Shows input forms for protocol-specific parameters and organizes device nodes fo
                     imageURL="/img/previous.svg"
                     onClick={async () => {
                         if (noChangesToDevice(initialDeviceData, deviceData, initialNodes, nodes)) {
-                            await navigateTo("/devices");
+                            await navigateTo("/devices/dashboard");
                             return;
                         }
                         showCancelWindow = true;

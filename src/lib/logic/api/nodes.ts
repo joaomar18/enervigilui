@@ -33,6 +33,7 @@ export function getDeviceNodesConfigAPI(id: number): APIDescriptor<{ initialNode
                 params: { id },
                 signal,
                 timeout,
+                numberOfRetries: 2,
             });
 
             if (sucess) {
@@ -76,6 +77,7 @@ export function getDeviceNodesStateAPI(
                 setLoaded: true,
                 signal,
                 timeout,
+                numberOfRetries: 2,
             });
             if (sucess) {
                 ({ meter_type, nodes_state } = data as { meter_type: MeterType; nodes_state: Record<string, NodeState> });
@@ -118,6 +120,7 @@ export function getNodeExtendedInfoAPI(
                 params: { id, node_name: processedName },
                 signal,
                 timeout,
+                numberOfRetries: 2,
             });
 
             if (sucess) {
@@ -173,6 +176,7 @@ export function getNodeLogsAPI(
                 params: { id, node_name: processedName, formatted, start_time: start_time_str, end_time: end_time_str, time_step, time_zone },
                 signal,
                 timeout,
+                numberOfRetries: 2,
             });
 
             if (sucess) {
@@ -233,6 +237,7 @@ export function getEnergyConsumptionAPI(
                 params: { id, phase, direction, formatted, start_time: start_time_str, end_time: end_time_str, time_step, time_zone },
                 signal,
                 timeout,
+                numberOfRetries: 2,
             });
 
             if (sucess) {
@@ -293,6 +298,7 @@ export function getPeakPowerAPI(
                 params: { id, phase, start_time: start_time_str, end_time: end_time_str, time_zone },
                 signal,
                 timeout,
+                numberOfRetries: 2,
             });
 
             if (sucess) {

@@ -22,6 +22,7 @@ import type { AlertTextList } from "$lib/stores/view/toast";
  * @property {string} [fileFieldName] - Form field name for the uploaded file
  * @property {boolean} [setLoaded] - Whether to update the global loaded state on success
  * @property {AbortSignal} [signal] - Optional abort signal for request cancellation
+ * @property {number} [numberOfRetries] - Number of retries for the request
  * @property {typeof fetch} [fetchFn] - Fetch implementation override (e.g., for SSR)
  */
 export type CallAPIOptions = {
@@ -33,6 +34,7 @@ export type CallAPIOptions = {
     fileFieldName?: string;
     setLoaded?: boolean;
     signal?: AbortSignal;
+    numberOfRetries?: number;
     fetchFn?: typeof fetch;
 };
 
@@ -89,10 +91,10 @@ type APIResult =
  * successful requests when requested by the caller.
  */
 export class APICaller {
-    static #inFlight: Map<string, { controller: AbortController; promise: Promise<{ sucess: boolean; data: any }>; content: string }> = new Map<
+    static #requests: Map<
         string,
-        { controller: AbortController; promise: Promise<{ sucess: boolean; data: any }>; content: string }
-    >();
+        { controller: AbortController; promise: Promise<{ sucess: boolean; data: any }>; content: string; remainingAttempts: number }
+    > = new Map<string, { controller: AbortController; promise: Promise<{ sucess: boolean; data: any }>; content: string; remainingAttempts: number }>();
 
     /**
      * Low-level HTTP utility for performing API requests with unified timeout
@@ -130,7 +132,7 @@ export class APICaller {
         timeout?: number,
         file?: File,
         fileFieldName: string = "file",
-        fetchFn: typeof fetch = fetch
+        fetchFn: typeof fetch = fetch,
     ): Promise<APIResult> {
         const controller = new AbortController();
         const { signal } = controller;
@@ -161,7 +163,7 @@ export class APICaller {
                 signal,
             };
 
-            // Handle GET requests by appending params to URL
+            // Handle GET requests by appending params to URL (Form Data)
             if (method === "GET" && Object.keys(params).length > 0) {
                 const queryParams = Object.entries(params)
                     .map(([key, value]) => {
@@ -175,7 +177,7 @@ export class APICaller {
 
                 url = queryParams ? `${endpoint}?${queryParams}` : endpoint;
             }
-            // For non-GET requests, add params to the body
+            // For non-GET requests, add params to the body (as JSON)
             else if (method !== "GET") {
                 if (file) {
                     const formData = new FormData();
@@ -253,6 +255,7 @@ export class APICaller {
         fileFieldName = "file",
         setLoaded = false,
         signal,
+        numberOfRetries = 0,
         fetchFn = fetch,
     }: CallAPIOptions): Promise<{ sucess: boolean; data: any }> {
         const payload = JSON.stringify(params);
@@ -261,9 +264,14 @@ export class APICaller {
             // Make a new api request
             const requestPromise = this.processAPIRequest(
                 { endpoint, method, params, timeout, file, fileFieldName, setLoaded, signal, fetchFn },
-                requestData.controller
+                requestData.controller,
             );
-            APICaller.#inFlight.set(endpoint, { controller: requestData.controller, promise: requestPromise, content: payload });
+            APICaller.#requests.set(endpoint, {
+                controller: requestData.controller,
+                promise: requestPromise,
+                content: payload,
+                remainingAttempts: numberOfRetries,
+            });
             return await requestPromise;
         } else {
             // Wait for the on going api request
@@ -296,16 +304,20 @@ export class APICaller {
                 apiOptions.timeout,
                 apiOptions.file,
                 apiOptions.fileFieldName,
-                apiOptions.fetchFn
+                apiOptions.fetchFn,
             );
             if (apiResult.kind === "sucess") {
                 if (apiOptions.setLoaded && !get(loadedDone)) loadedDone.set(true); // Set loaded done
                 return { sucess: true, data: apiResult.data };
             } else {
-                // Process Error
                 const redirectedToLogin = await APICaller.redirectToLogin(apiResult);
-                if (APICaller.returnEarly(apiResult, apiOptions.endpoint, redirectedToLogin))
-                    return { sucess: false, data: apiResult.kind == "error" ? apiResult.data : null };
+                const stopRequestEarly = APICaller.returnEarly(apiResult, apiOptions.endpoint, redirectedToLogin);
+                if (stopRequestEarly) return { sucess: false, data: apiResult.kind == "error" ? apiResult.data : null };
+                let remainingAttempts = APICaller.#requests.has(apiOptions.endpoint) ? APICaller.#requests.get(apiOptions.endpoint)?.remainingAttempts : 0;
+                if (remainingAttempts && !redirectedToLogin && apiResult.kind !== "aborted") {
+                    APICaller.#requests.get(apiOptions.endpoint)!.remainingAttempts -= 1;
+                    return await APICaller.processAPIRequest(apiOptions, abortController);
+                }
                 let errorMessage = APICaller.getAPIMessageCode(apiResult);
                 if (get(uiSynchronized)) {
                     showToast(errorMessage.code, AlertType.ALERT, errorMessage.details, errorMessage.textList, errorMessage.autoClose);
@@ -318,8 +330,8 @@ export class APICaller {
             console.error(`Error calling API ${apiOptions.endpoint}: ${e}`);
             return { sucess: false, data: null };
         } finally {
-            const current = APICaller.#inFlight.get(apiOptions.endpoint)?.controller;
-            if (current === abortController) APICaller.#inFlight.delete(apiOptions.endpoint);
+            const current = APICaller.#requests.get(apiOptions.endpoint);
+            if (current?.controller === abortController) APICaller.#requests.delete(apiOptions.endpoint);
         }
     }
 
@@ -343,9 +355,9 @@ export class APICaller {
     private static handleInFlightRequests(
         endpoint: string,
         content: string,
-        signal?: AbortSignal
+        signal?: AbortSignal,
     ): { controller: AbortController; promise?: Promise<{ sucess: boolean; data: any }> } {
-        const prevRequest = APICaller.#inFlight.get(endpoint);
+        const prevRequest = APICaller.#requests.get(endpoint);
         if (prevRequest) {
             if (prevRequest.content === content) {
                 // return the previous request data without changes

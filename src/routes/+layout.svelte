@@ -18,12 +18,11 @@
         await initializeClientLayout();
     });
 
-    beforeNavigate(({ to, cancel }) => {
+    beforeNavigate(({ to }) => {
         if (!to) return;
         let result = resolveNavigationRedirect(to.url, get(userAuthenticated));
         if (!result.redirectTarget) return;
-        cancel();
-        navigateTo(result.redirectTarget, {}, false, false);
+        navigateTo(result.redirectTarget, {}, false, true);
     });
 
     afterNavigate(({ to }) => {
