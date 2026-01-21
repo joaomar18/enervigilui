@@ -21,11 +21,9 @@
     beforeNavigate(({ to, cancel }) => {
         if (!to) return;
         let result = resolveNavigationRedirect(to.url, get(userAuthenticated));
-        if (result.redirectTarget) {
-            cancel();
-            navigateTo(result.redirectTarget, {}, false, true);
-            return;
-        }
+        if (!result.redirectTarget) return;
+        cancel();
+        navigateTo(result.redirectTarget, {}, false, false);
     });
 
     afterNavigate(({ to }) => {
@@ -44,10 +42,10 @@
     <SplashLoader />
 {:else if !$pageExists}
     <p>Page not found</p>
-{:else if isDashboardPage($currentPage)}
+{:else if isDashboardPage($currentPage) && $userAuthenticated}
     <DashboardContainer>
         <slot />
     </DashboardContainer>
-{:else if isAuthenticationPage($currentPage)}
+{:else if isAuthenticationPage($currentPage) && !$userAuthenticated}
     <slot />
 {/if}

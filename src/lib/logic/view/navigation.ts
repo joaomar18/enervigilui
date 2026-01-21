@@ -33,23 +33,16 @@ import {
  * @param url - Target route path to navigate to (without query parameters).
  * @param lang - Language code to append as the `lang` query parameter.
  * @param extraParams - Additional query parameters to include (excluding `lang`).
- * @returns A tuple containing:
- *   - target: Full navigation URL with query parameters.
- *   - targetRoute: Target route path.
- *   - currentRoute: Current route path.
+ * @returns Full navigation URL with query parameters.
  */
-function getNavigationReady(url: string, lang: string, extraParams: Record<string, string> = {}): Array<string> {
+function getNavigationReady(url: string, lang: string, extraParams: Record<string, string> = {}): string {
     const params = new URLSearchParams();
     for (const [key, value] of Object.entries(extraParams)) {
         if (key !== "lang") params.append(key, value);
     }
     params.append("lang", lang);
-
     const target = `${url}?${params.toString()}`;
-    const targetRoute = url;
-    const currentRoute = window.location.pathname;
-
-    return [target, targetRoute, currentRoute];
+    return target;
 }
 
 /**
@@ -142,15 +135,14 @@ export async function navigateTo(
     extraParams: Record<string, string> = {},
     splashScreen: boolean = false,
     replaceState: boolean = false,
-    minSplashDuration: number = 300
+    minSplashDuration: number = 300,
 ): Promise<void> {
-    let [target, targetRoute, currentRoute] = getNavigationReady(url, get(selectedLang), extraParams);
+    let target = getNavigationReady(url, get(selectedLang), extraParams);
 
     // Already in Intended URL
-    if (targetRoute === currentRoute) {
+    if (new URL(target, location.origin).href === location.href) {
         return;
     }
-
     let gotoPromise = goto(target, { replaceState: replaceState });
     let timerPromise = Promise.resolve();
     if (splashScreen) {
