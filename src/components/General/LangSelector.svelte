@@ -2,10 +2,8 @@
     // Styles
     import { mergeStyle } from "$lib/style/components";
     import { LangSelectorStyle } from "$lib/style/general";
-
-    import { browser } from "$app/environment";
-    import { replaceState } from "$app/navigation";
-    import { onMount, onDestroy } from "svelte";
+    import { setLanguage } from "$lib/logic/view/navigation";
+    import { onDestroy } from "svelte";
 
     //Props
     export let invertOptions: boolean = false; //Invert Options div position
@@ -16,7 +14,7 @@
 
     // Stores for multi-language support
     import type { Language } from "$lib/stores/lang/definition";
-    import { selectedLang, defaultLang, isLanguage } from "$lib/stores/lang/definition";
+    import { selectedLang } from "$lib/stores/lang/definition";
 
     // Layout / styling props
     export let backgroundColor: string | undefined = undefined;
@@ -62,17 +60,9 @@
         }
     }
 
-    function changeLanguage(language: Language): void {
-        selectedLang.set(language);
+    function changeLanguage(lang: Language): void {
+        setLanguage(lang);
         isOpen = false;
-
-        if (!browser) return;
-
-        const params = new URLSearchParams(window.location.search);
-        params.set("lang", language);
-        const newUrl = `${window.location.pathname}?${params.toString()}`;
-
-        replaceState(newUrl, {});
     }
 
     function handleClickOutside(event: MouseEvent): void {
@@ -80,17 +70,6 @@
             isOpen = false;
         }
     }
-
-    onMount(() => {
-        if (browser) {
-            const params = new URLSearchParams(window.location.search);
-            let lang = (params.get("lang") || defaultLang) as Language;
-            if (!isLanguage(lang)) {
-                lang = defaultLang;
-            }
-            changeLanguage(lang);
-        }
-    });
 
     onDestroy(() => {
         if (clickEventListenerDefined) {

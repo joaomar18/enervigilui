@@ -11,7 +11,7 @@
     import { APICaller } from "$lib/logic/api/api";
 
     // Authorization stores
-    import { currentPage, splashDone, userAuthenticated, pageExists } from "$lib/stores/view/navigation";
+    import { currentPage, splashDone, userAuthenticated } from "$lib/stores/view/navigation";
 
     // On Mount Function
     onMount(async () => {
@@ -41,12 +41,12 @@
 -->
 {#if !$splashDone}
     <SplashLoader />
-{:else if !$pageExists}
-    <p>Page not found</p>
 {:else if isDashboardPage($currentPage) && $userAuthenticated}
     <DashboardContainer>
         <slot />
     </DashboardContainer>
 {:else if isAuthenticationPage($currentPage) && !$userAuthenticated}
+    <slot />
+{:else}
     <slot />
 {/if}

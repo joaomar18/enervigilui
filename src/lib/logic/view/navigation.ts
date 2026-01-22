@@ -1,11 +1,13 @@
 import { goto } from "$app/navigation";
+import { replaceState } from "$app/navigation";
 import { get } from "svelte/store";
 import { autoLoginAPI } from "../api/auth";
-import { selectedLang } from "$lib/stores/lang/definition";
 import { currentDeviceID } from "$lib/stores/device/current";
 import { closeToast, showToast } from "./toast";
 import { AlertType } from "$lib/stores/view/toast";
 import { MainSection, PageSubsections, DefaultPageSubsection } from "$lib/types/view/navigation";
+import { selectedLang, defaultLang, isLanguage } from "$lib/stores/lang/definition";
+import type { Language } from "$lib/stores/lang/definition";
 
 // Splash screen store
 import {
@@ -220,7 +222,7 @@ export function resolveNavigationRedirect(url: URL, authenticated: boolean): { r
     const subpage = segments[1] ?? null;
 
     if (!checkPageExists(url)) {
-        return { redirectTarget: "" };
+        return { redirectTarget: "/404" };
     }
 
     if (!authenticated && url.pathname !== "/login") {
@@ -272,7 +274,7 @@ export async function syncUIState(url: URL): Promise<void> {
     updateSearchQuery(url);
     currentPage.set(url.pathname);
     pageExists.set(checkPageExists(url));
-
+    selectedLang.set(getUrlLanguage());
     uiSynchronized.set(true);
 }
 
@@ -291,7 +293,7 @@ export function isAuthenticationPage(currentPage: string): boolean {
  * @returns True if the current page is not an authentication page.
  */
 export function isDashboardPage(currentPage: string): boolean {
-    return !isAuthenticationPage(currentPage);
+    return !isAuthenticationPage(currentPage) && currentPage !== "/404";
 }
 
 /**
@@ -312,6 +314,31 @@ export function isDeviceSubPage(currentPage: string): boolean {
  */
 export function isDeviceViewPage(currentPage: string): boolean {
     return currentPage.startsWith("/devices/") && currentPage.includes("general_view");
+}
+
+/**
+ * Extracts the `lang` query parameter from a URL.
+ * Falls back to the default language if missing or invalid.
+ */
+export function getUrlLanguage(): Language {
+    const params = new URLSearchParams(window.location.search);
+    let lang = (params.get("lang") || defaultLang) as Language;
+    if (!isLanguage(lang)) {
+        lang = defaultLang;
+    }
+    return lang;
+}
+
+/**
+ * Updates the application language and syncs it to the URL
+ * without triggering a page reload.
+ */
+export function setLanguage(lang: Language): void {
+    selectedLang.set(lang);
+    const params = new URLSearchParams(window.location.search);
+    params.set("lang", lang);
+    const newUrl = `${window.location.pathname}?${params.toString()}`;
+    replaceState(newUrl, {});
 }
 
 /**

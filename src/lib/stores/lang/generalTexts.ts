@@ -1,7 +1,12 @@
+import { page } from "$app/state";
 import { createLangStore } from "$lib/stores/lang/definition";
 import type { TextsObject } from "$lib/stores/lang/definition";
 
 const textsObject: TextsObject = {
+    pageNotFound: {
+        PT: "A página solicitada não foi encontrada.",
+        EN: "The requested page was not found.",
+    },
     notFound: {
         PT: "Não encontrado",
         EN: "Not found",
