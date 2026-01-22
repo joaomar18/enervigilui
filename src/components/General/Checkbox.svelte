@@ -155,6 +155,7 @@
     /* Checkmark SVG Icon Customization */
     .label-checkbox span svg {
         stroke: var(--disabled-checkmark-color);
+        transition: all 0.2s;
     }
 
     /* Enabled Checkmark Icon Stroke Color */

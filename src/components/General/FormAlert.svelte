@@ -11,8 +11,7 @@
     $: effectiveStyle = style ?? $FormAlertStyle;
 
     // Props
-    export let asToast: boolean = false;
-    export let topPos: string = "0px";
+    export let enableCloseButton: boolean = false;
     export let alertText: string;
     export let alertType: AlertType;
     export let animation: "fade" | "slide" = "fade";
@@ -157,7 +156,6 @@
 -->
 <div
     style="
-        --top-pos: {topPos};
         --width: {mergedStyle.width};
         --height: {mergedStyle.height};
         --max-height: {mergedStyle.maxHeight};
@@ -178,7 +176,7 @@
         --close-button-hover-color: {mergedStyle.closeButtonHoverColor};
     "
     class="alert-div"
-    class:toast={asToast}
+    class:close-button-enabled={enableCloseButton}
     in:InTransitionFn={{ duration: 300 }}
     out:fade={{ duration: 300 }}
 >
@@ -200,7 +198,7 @@
                 <circle cx="12" cy="16.5" r="0.5" fill="currentColor" />
             </svg>{message}</span
         >
-        {#if asToast}
+        {#if enableCloseButton}
             <button class="close-button" on:click={closeButtonClick} aria-label="Close Alert">
                 <svg
                     width={mergedStyle.closeButtonImageWidth}
@@ -233,12 +231,6 @@
         border-top-right-radius: var(--border-radius-right);
         border-bottom-right-radius: var(--border-radius-right);
         padding: var(--padding);
-    }
-
-    /* Makes the alert container behave like a toast (absolute positioning) */
-    .alert-div.toast {
-        position: absolute;
-        top: var(--top-pos);
     }
 
     /* Relative container for the icon and text of the alert */
@@ -278,7 +270,7 @@
         word-wrap: break-word;
     }
 
-    .alert-div.toast .alert-text {
+    .alert-div.close-button-enabled .alert-text {
         padding-right: calc(var(--close-button-width) + 10px);
     }
 

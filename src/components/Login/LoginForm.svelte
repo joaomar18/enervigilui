@@ -81,17 +81,18 @@
 >
     <h3>{$texts.title}</h3>
     {#if $displayToast}
-        <FormAlert
-            style={$LoginFormAlertStyle}
-            asToast={true}
-            animation={"slide"}
-            width="80%"
-            topPos="10px"
-            alertText={$activeAlertTexts[$toastKey]}
-            alertType={$toastType}
-            alertVariables={$toastVariables}
-            closeButtonClick={() => closeToast()}
-        />
+        <div class="form-alert-div">
+            <FormAlert
+                style={$LoginFormAlertStyle}
+                enableCloseButton={true}
+                animation={"slide"}
+                width="100%"
+                alertText={$activeAlertTexts[$toastKey]}
+                alertType={$toastType}
+                alertVariables={$toastVariables}
+                closeButtonClick={() => closeToast()}
+            />
+        </div>
     {/if}
     <form on:submit|preventDefault>
         <LoginField
@@ -160,6 +161,20 @@
         font-size: 1.5rem;
     }
 
+    /* Wrapper for the form alert */
+    .form-alert-div {
+        position: absolute;
+        top: 10px;
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+        width: 90%;
+        height: fit-content;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+
     /* Login fields form */
     form {
         margin: 0;
@@ -198,6 +213,11 @@
             width: 90%;
             max-width: 32.5rem;
             border-radius: 20px;
+        }
+        .form-alert-div {
+            width: 100%;
+            padding-left: 50px;
+            padding-right: 50px;
         }
         .checkbox-div {
             width: 100%;

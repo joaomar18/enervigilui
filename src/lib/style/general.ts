@@ -41,13 +41,14 @@ const ToastStyleConfig: ComponentStyles = {
     dark: {
         topBorderRadius: "10px",
         bottomBorderRadius: "0px",
-        alertBackgroundColor: "#a11f2a",
-        alertBorderColor: "#b91c1c",
-        warningBackgroundColor: "#f59e42",
-        warningBorderColor: "#e67e22",
-        infoBackgroundColor: "#1e3a8a",
-        infoBorderColor: "#1d4ed8",
-        neutralBackgroundColor: "#374151",
+        innerBackgroundColor: "#181d23",
+        alertBackgroundColor: "rgba(245, 101, 101, 0.08)",
+        alertBorderColor: "#f56565",
+        warningBackgroundColor: "rgba(245, 158, 11, 0.08)",
+        warningBorderColor: "#f59e0b",
+        infoBackgroundColor: "rgba(59, 130, 246, 0.08)",
+        infoBorderColor: "#3b82f6",
+        neutralBackgroundColor: "rgba(107, 114, 128, 0.08)",
         neutralBorderColor: "#6b7280",
         textColor: "#ffffff",
     },
@@ -59,7 +60,7 @@ export const ToastStyle = createStyleStore(ToastStyleConfig);
 
 const FormAlertStyleConfig: ComponentStyles = {
     dark: {
-        width: "calc(100% - 20px)",
+        width: "100%",
         height: "fit-content",
         maxHeight: "auto",
         padding: "10px",
@@ -91,7 +92,7 @@ const FormAlertStyleConfig: ComponentStyles = {
         closeButtonImageWidth: "24px",
         closeButtonImageHeight: "24px",
         closeButtonColor: "#9ca3af",
-        closeButtonHoverColor: "#e5e7eb"
+        closeButtonHoverColor: "#e5e7eb",
     },
 };
 

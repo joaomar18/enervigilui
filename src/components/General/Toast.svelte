@@ -22,6 +22,7 @@
     // Layout / styling props
     export let topBorderRadius: string | undefined = undefined;
     export let bottomBorderRadius: string | undefined = undefined;
+    export let innerBackgroundColor: string | undefined = undefined;
     export let alertBackgroundColor: string | undefined = undefined;
     export let alertBorderColor: string | undefined = undefined;
     export let warningBackgroundColor: string | undefined = undefined;
@@ -35,6 +36,7 @@
     $: localOverrides = {
         topBorderRadius,
         bottomBorderRadius,
+        innerBackgroundColor,
         alertBackgroundColor,
         alertBorderColor,
         warningBackgroundColor,
@@ -107,12 +109,13 @@
     Triggered via pushTop / pushBottom or directly with style bindings.
 -->
 <div
-    class="toast-div"
+    class="container"
     style="
         --top-position: {topPos};
         --bottom-position: {bottomPos};
         --top-border-radius: {mergedStyle.topBorderRadius};
         --bottom-border-radius: {mergedStyle.bottomBorderRadius};
+        --inner-background-color: {mergedStyle.innerBackgroundColor};
         --background-color: {backgroundColor};
         --border-color:{borderColor};
         --transform-y: {transformY};
@@ -120,39 +123,53 @@
     in:slide={{ duration: 150 }}
     out:fade={{ duration: 300 }}
 >
-    <div class="content">
-        <span class="toast-text" style="--text-color:{mergedStyle.textColor};">{message}</span>
-        <button class="close-button" on:click={handleClick} aria-label="Close Button">
-            <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none">
-                <line class="close-button-line" x1="6" y1="6" x2="18" y2="18" stroke-width="1" stroke-linecap="round" />
-                <line class="close-button-line" x1="18" y1="6" x2="6" y2="18" stroke-width="1" stroke-linecap="round" />
-            </svg>
-        </button>
+    <div class="toast-div">
+        <div class="content">
+            <span class="toast-text" style="--text-color:{mergedStyle.textColor};">{message}</span>
+            <button class="close-button" on:click={handleClick} aria-label="Close Button">
+                <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none">
+                    <line class="close-button-line" x1="6" y1="6" x2="18" y2="18" stroke-width="1" stroke-linecap="round" />
+                    <line class="close-button-line" x1="18" y1="6" x2="6" y2="18" stroke-width="1" stroke-linecap="round" />
+                </svg>
+            </button>
+        </div>
     </div>
 </div>
 
 <style>
-    /* Root toast container */
-    .toast-div {
+    /* Root container */
+    .container {
         position: absolute;
         top: var(--top-position, auto);
         left: 50%;
         bottom: var(--bottom-position, auto);
         transform: translate(-50%, var(--transform-y));
-        width: 90%;
-        max-width: 500px;
         border-top-left-radius: var(--top-border-radius);
         border-top-right-radius: var(--top-border-radius);
         border-bottom-left-radius: var(--bottom-border-radius);
         border-bottom-right-radius: var(--bottom-border-radius);
+        width: 90%;
+        max-width: 500px;
         height: fit-content;
         min-height: 50px;
-        background-color: var(--background-color);
-        border: 1px solid var(--border-color);
+        background-color: var(--inner-background-color);
         z-index: 102;
         -webkit-tap-highlight-color: transparent;
         -webkit-touch-callout: none;
         user-select: none;
+    }
+
+    /* Toast container */
+    .toast-div {
+        border-top-left-radius: var(--top-border-radius);
+        border-top-right-radius: var(--top-border-radius);
+        border-bottom-left-radius: var(--bottom-border-radius);
+        border-bottom-right-radius: var(--bottom-border-radius);
+        width: 100%;
+        height: fit-content;
+        min-height: 50px;
+        background-color: var(--background-color);
+        border: 1px solid var(--border-color);
     }
 
     /* Flex container for toast text and close button */
