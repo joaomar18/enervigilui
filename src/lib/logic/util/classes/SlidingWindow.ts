@@ -3,11 +3,14 @@ import { isEqual } from "../generic";
 /**
  * Fixed-size sliding window that maintains the most recent items in LIFO order.
  */
-export class SlidingWindow<T extends object> {
+export class SlidingWindow<T> {
     private items: T[] = [];
     private maxSize: number;
 
     constructor(maxSize: number) {
+        if (maxSize <= 0) {
+            throw new Error("maxSize must be greater than 0");
+        }
         this.maxSize = maxSize;
     }
 
@@ -16,7 +19,7 @@ export class SlidingWindow<T extends object> {
         if (this.items.length > 0 && isEqual(item, this.items[0])) return;
         this.items.unshift(item);
         if (this.items.length > this.maxSize) {
-            this.items = this.items.slice(0, this.maxSize);
+            this.items.length = this.maxSize;
         }
     }
 
@@ -30,12 +33,14 @@ export class SlidingWindow<T extends object> {
 
     /** Confirms the previous navigation by removing the current item from history. */
     confirmPrevious(): void {
-        this.items.shift();
+        if (this.items.length > 1) {
+            this.items.shift();
+        }
     }
 
     /** Returns the current (most recent) item without removing it. */
     current(): T | null {
-        return this.items[0] || null;
+        return this.items[0] ?? null;
     }
 
     /** Returns true if there are items to go back to. */

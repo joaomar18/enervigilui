@@ -48,8 +48,8 @@ export function removeKeysFromRecord(source: Record<string, string>, keysToRemov
  * @param b - Second value to compare.
  * @returns `true` if both values have identical structure and content, `false` otherwise.
  */
-export function isEqual(a: Object, b: Object) {
-    if (a === b) return true;
+export function isEqual(a: any, b: any): boolean {
+    if (Object.is(a, b)) return true;
 
     if (typeof a !== "object" || typeof b !== "object" || a == null || b == null) return false;
 
