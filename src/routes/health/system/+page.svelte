@@ -9,7 +9,7 @@
 
     onMount(() => {
         resetDashboardLoader();
-        eventSource = new EventSource("http://localhost:8000/sse/system/get_realtime_metrics");
+        eventSource = new EventSource("/sse/system/get_realtime_metrics");
         eventSource.onmessage = function (event) {
             console.log(event.data);
         };
