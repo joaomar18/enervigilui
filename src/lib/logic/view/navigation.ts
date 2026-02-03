@@ -420,7 +420,7 @@ export async function initializeClientLayout(minSplashDuration: number = 300, sh
     const url = new URL(window.location.href);
     let result = resolveNavigationRedirect(url, authResult.sucess);
     if (result.redirectTarget) {
-        navigateTo(result.redirectTarget, {}, false, true);
+        await navigateTo(result.redirectTarget, {}, false, true);
     }
     splashDone.set(true);
 }
