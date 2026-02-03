@@ -269,7 +269,14 @@ export class APICaller {
             }
 
             const response = await fetchFn(url, options);
-            const data = await response.json();
+            let data: any | null = null;
+            try {
+                data = await response.json();
+            }
+            catch (e) {
+                console.error(`Error parsing API response ${url}: ${e}`);
+                data = null;
+            }
             if (timeoutId != null) {
                 clearTimeout(timeoutId); // cancel timeout if response arrives in time
                 timeoutId = null;
