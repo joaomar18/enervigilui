@@ -72,6 +72,7 @@ type APIResult =
     | { kind: "sucess"; status: number; data: any }
     | { kind: "error"; status: number; data: Record<string, any> }
     | { kind: "aborted"; abortReason: AbortReason }
+    | { kind: "disconnected"; }
     | { kind: "exception"; message: string };
 
 /**
@@ -166,6 +167,20 @@ export class APICaller {
         for (const callback of APICaller.#onResumeCallbacks) {
             callback();
         }
+    }
+
+    /**
+     * Returns true if the response indicates that the backend server is unreachable
+     * while the proxy/front-end layer is still responding.
+     *
+     * Covers standard upstream failure codes:
+     * 502 (Bad Gateway), 503 (Service Unavailable), 504 (Gateway Timeout).
+     */
+    private static serverDisconnected(response: Response): boolean {
+        if (response.status === 502 || response.status === 503 || response.status === 504) {
+            return true;
+        }
+        return false;
     }
 
     /**
@@ -270,6 +285,7 @@ export class APICaller {
 
             let data: any | null = null;
             const response = await fetchFn(url, options);
+            if (APICaller.serverDisconnected(response)) return { kind: "disconnected" };
             try {
                 data = await response.json();
             } catch (error) {
@@ -525,6 +541,7 @@ export class APICaller {
         textList: AlertTextList;
         autoClose: boolean;
     } {
+        if (apiResult.kind === "disconnected") return { code: "disconnectedError", details: {}, textList: "general", autoClose: true };
         if (apiResult.kind === "aborted") return { code: "timeoutError", details: {}, textList: "general", autoClose: true };
         if (apiResult.kind === "exception")
             return { code: "unexpectedError", details: { message: apiResult.message }, textList: "general", autoClose: true };

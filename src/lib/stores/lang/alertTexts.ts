@@ -96,6 +96,10 @@ const generalAlertTextsObject: TextsObject = {
         PT: "Tempo limite da comunicação excedido. Verifique a ligação e tente novamente.",
         EN: "Communication timeout. Please check the connection and try again.",
     },
+    disconnectedError: {
+        PT: "O servidor está inacessível. Verifique a ligação e tente novamente.",
+        EN: "Server is unreachable. Please check the connection and try again.",
+    }
 };
 
 //////////     A P I     G E N E R A L     A L E R T     T E X T S     //////////
