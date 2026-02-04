@@ -268,14 +268,13 @@ export class APICaller {
                 }
             }
 
-            const response = await fetchFn(url, options);
             let data: any | null = null;
+            const response = await fetchFn(url, options);
             try {
                 data = await response.json();
-            }
-            catch (e) {
-                console.error(`Error parsing API response ${url}: ${e}`);
-                data = null;
+            } catch (error) {
+                // Only error result needs to have content, in an order to be able to get the error section and code
+                if (!response.ok) throw new Error("Invalid response from the server.");
             }
             if (timeoutId != null) {
                 clearTimeout(timeoutId); // cancel timeout if response arrives in time
@@ -288,7 +287,8 @@ export class APICaller {
                 timeoutId = null;
             }
             if ((error as any)?.name === "AbortError") return { kind: "aborted", abortReason };
-            return { kind: "exception", message: String(error) };
+            const message = error instanceof Error ? error.message : String(error);
+            return { kind: "exception", message };
         }
     }
 
