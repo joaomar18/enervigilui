@@ -418,12 +418,8 @@ export class APICaller {
                     APICaller.#requests.get(apiOptions.requestId ?? apiOptions.endpoint)!.remainingAttempts -= 1;
                     return await APICaller.processAPIRequest(apiOptions, abortController);
                 }
-                let errorMessage = APICaller.getAPIMessageCode(apiResult);
-                if (get(uiSynchronized)) {
-                    showToast(errorMessage.code, AlertType.ALERT, errorMessage.details, errorMessage.textList, errorMessage.autoClose);
-                } else {
-                    latestAPIMessage.set(errorMessage);
-                }
+                let errorMessage = APICaller.getAPIMessage(apiResult);
+                APICaller.showAPIMessage(errorMessage);
                 return { sucess: false, data: apiResult.kind == "error" ? apiResult.data : null };
             }
         } catch (e) {
@@ -535,7 +531,7 @@ export class APICaller {
      * @param apiResult - Result returned by an API request
      * @returns Structured error message data for toast/alert display
      */
-    private static getAPIMessageCode(apiResult: APIResult): {
+    private static getAPIMessage(apiResult: APIResult): {
         code: string;
         details: Record<string, string>;
         textList: AlertTextList;
@@ -574,5 +570,13 @@ export class APICaller {
         }
         let autoClose = apiResult.status !== 401 && apiResult.status !== 429;
         return { code: errorCode, details, textList, autoClose };
+    }
+
+    private static showAPIMessage(message: { code: string, details: Record<string, string>, textList: AlertTextList, autoClose: boolean }): void {
+        if (get(uiSynchronized)) {
+            showToast(message.code, AlertType.ALERT, message.details, message.textList, message.autoClose);
+        } else {
+            latestAPIMessage.set(message);
+        }
     }
 }

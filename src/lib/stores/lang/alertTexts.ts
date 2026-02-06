@@ -179,8 +179,8 @@ const apiAuthorizationAlertTextsObject: TextsObject = {
         EN: "Incorrect username or password. Remaining attempts: {remaining_attempts}.",
     },
     INVALID_TOKEN: {
-        PT: "Sessão inválida ou expirada.",
-        EN: "Invalid or expired session.",
+        PT: "Sessão inválida ou expirada. Inicie sessão novamente.",
+        EN: "Invalid or expired session. Please log in again.",
     },
     TOKEN_MISSING: {
         PT: "Sessão em falta. Inicie sessão.",

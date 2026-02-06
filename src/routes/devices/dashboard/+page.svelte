@@ -75,6 +75,7 @@
                         devicesStatus = result.devicesStatus;
                     },
                     5000,
+                    undefined,
                     false,
                 );
             },
